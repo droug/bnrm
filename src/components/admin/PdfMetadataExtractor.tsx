@@ -67,13 +67,162 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
     const context = canvas.getContext('2d')!;
     canvas.width = viewport.width;
     canvas.height = viewport.height;
-    
+
     await page.render({
       canvasContext: context,
       viewport: viewport,
     }).promise;
-    
+
     return canvas.toDataURL('image/jpeg', 0.92);
+  };
+
+  const renderPageToCanvas = async (page: any, scale: number = 1.2): Promise<HTMLCanvasElement> => {
+    const viewport = page.getViewport({ scale });
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Canvas context unavailable");
+
+    canvas.width = Math.max(1, Math.floor(viewport.width));
+    canvas.height = Math.max(1, Math.floor(viewport.height));
+
+    await page.render({ canvasContext: ctx, viewport }).promise;
+    return canvas;
+  };
+
+  const cropCanvasToDataUrl = (
+    source: HTMLCanvasElement,
+    crop: { x: number; y: number; w: number; h: number },
+    quality: number = 0.92
+  ): string => {
+    const out = document.createElement("canvas");
+    out.width = Math.max(1, Math.floor(crop.w));
+    out.height = Math.max(1, Math.floor(crop.h));
+    const outCtx = out.getContext("2d");
+    if (!outCtx) return source.toDataURL("image/jpeg", quality);
+
+    outCtx.drawImage(
+      source,
+      crop.x,
+      crop.y,
+      crop.w,
+      crop.h,
+      0,
+      0,
+      out.width,
+      out.height
+    );
+
+    return out.toDataURL("image/jpeg", quality);
+  };
+
+  // Try to find the most "photo-like" region on a rendered page and crop to it.
+  // This helps when the cover is not an extractable embedded image, but a scanned page.
+  const detectPhotoCropFromCanvas = (canvas: HTMLCanvasElement): { dataUrl: string; score: number } | null => {
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+
+    const w = canvas.width;
+    const h = canvas.height;
+    if (w < 64 || h < 64) return null;
+
+    const img = ctx.getImageData(0, 0, w, h);
+    const data = img.data;
+
+    const tile = 24; // coarse grid for performance
+    const cols = Math.max(1, Math.floor(w / tile));
+    const rows = Math.max(1, Math.floor(h / tile));
+
+    const scores: number[] = new Array(cols * rows).fill(0);
+    let maxScore = 0;
+
+    const idx = (x: number, y: number) => (y * w + x) * 4;
+
+    for (let ty = 0; ty < rows; ty++) {
+      for (let tx = 0; tx < cols; tx++) {
+        const x0 = tx * tile;
+        const y0 = ty * tile;
+        const x1 = Math.min(w, x0 + tile);
+        const y1 = Math.min(h, y0 + tile);
+
+        let n = 0;
+        let sum = 0;
+        let sumSq = 0;
+        let nonWhite = 0;
+
+        for (let y = y0; y < y1; y++) {
+          for (let x = x0; x < x1; x++) {
+            const p = idx(x, y);
+            const r = data[p];
+            const g = data[p + 1];
+            const b = data[p + 2];
+
+            // luminance
+            const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+            sum += lum;
+            sumSq += lum * lum;
+            n++;
+
+            // count non-white pixels (text is sparse; photos are dense)
+            if (!(r > 245 && g > 245 && b > 245)) nonWhite++;
+          }
+        }
+
+        const mean = sum / n;
+        const variance = Math.max(0, sumSq / n - mean * mean);
+        const nonWhiteRatio = nonWhite / n;
+
+        // Score favors textured (variance) and dense (non-white) regions.
+        const score = variance * Math.pow(nonWhiteRatio, 1.4);
+        const sIdx = ty * cols + tx;
+        scores[sIdx] = score;
+        if (score > maxScore) maxScore = score;
+      }
+    }
+
+    if (maxScore <= 0) return null;
+
+    // Select tiles that are close to the best tile.
+    const threshold = maxScore * 0.55;
+    let minTx = Infinity,
+      minTy = Infinity,
+      maxTx = -Infinity,
+      maxTy = -Infinity;
+    let selected = 0;
+
+    for (let ty = 0; ty < rows; ty++) {
+      for (let tx = 0; tx < cols; tx++) {
+        const s = scores[ty * cols + tx];
+        if (s >= threshold) {
+          selected++;
+          minTx = Math.min(minTx, tx);
+          minTy = Math.min(minTy, ty);
+          maxTx = Math.max(maxTx, tx);
+          maxTy = Math.max(maxTy, ty);
+        }
+      }
+    }
+
+    if (selected === 0) return null;
+
+    // Expand a bit to avoid cutting edges.
+    const pad = 1;
+    minTx = Math.max(0, minTx - pad);
+    minTy = Math.max(0, minTy - pad);
+    maxTx = Math.min(cols - 1, maxTx + pad);
+    maxTy = Math.min(rows - 1, maxTy + pad);
+
+    const cropX = minTx * tile;
+    const cropY = minTy * tile;
+    const cropW = Math.min(w - cropX, (maxTx - minTx + 1) * tile);
+    const cropH = Math.min(h - cropY, (maxTy - minTy + 1) * tile);
+
+    const areaRatio = (cropW * cropH) / (w * h);
+
+    // Reject crops that are too small (likely text blocks).
+    if (areaRatio < 0.18) return null;
+
+    const dataUrl = cropCanvasToDataUrl(canvas, { x: cropX, y: cropY, w: cropW, h: cropH }, 0.92);
+    return { dataUrl, score: maxScore };
   };
 
   // Check if an image is likely a real photo/cover (not just decoration/icon)
@@ -221,44 +370,42 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
     return images;
   };
 
-  // Intelligent cover extraction: scan multiple pages to find the first real image
+  // Intelligent cover extraction: try embedded images first, then detect a photo region on rendered pages.
   const extractCoverIntelligently = async (pdfDoc: any): Promise<string> => {
-    const maxPagesToScan = Math.min(5, pdfDoc.numPages); // Scan up to 5 pages
-    
+    const maxPagesToScan = Math.min(8, pdfDoc.numPages); // scan more pages for "first photo"
+
     setProgressText("Recherche intelligente de l'image de couverture...");
-    
-    // Scan pages looking for a significant embedded image
+
     for (let pageNum = 1; pageNum <= maxPagesToScan; pageNum++) {
       setProgressText(`Analyse de la page ${pageNum}/${maxPagesToScan}...`);
-      
+
       const page = await pdfDoc.getPage(pageNum);
+
+      // 1) Best case: extract an embedded image object (true cover art)
       const images = await extractImagesFromPage(page);
-      
       if (images.length > 0) {
-        // Sort by area (largest first) and return the biggest image
         images.sort((a, b) => b.area - a.area);
         const bestImage = images[0];
-        
-        setProgressText(`✓ Image de couverture trouvée sur la page ${pageNum} (${bestImage.width}x${bestImage.height}px)`);
+        setProgressText(`✓ Photo extraite (objet) sur la page ${pageNum} (${bestImage.width}x${bestImage.height}px)`);
         return bestImage.data;
       }
+
+      // 2) Fallback: render the page and crop the most photo-like region
+      try {
+        const canvas = await renderPageToCanvas(page, 1.1);
+        const crop = detectPhotoCropFromCanvas(canvas);
+        if (crop) {
+          setProgressText(`✓ Photo détectée (analyse visuelle) sur la page ${pageNum}`);
+          return crop.dataUrl;
+        }
+      } catch {
+        // ignore and continue
+      }
     }
-    
-    // If no embedded image found, check if first page is mostly an image (full-page cover)
-    setProgressText("Aucune image embarquée trouvée, analyse de la première page...");
-    
-    const firstPage = await pdfDoc.getPage(1);
-    const textContent = await firstPage.getTextContent();
-    const textLength = textContent.items.reduce((acc: number, item: any) => acc + (item.str?.length || 0), 0);
-    
-    // If first page has very little text, it's likely a full-page cover image
-    if (textLength < 50) {
-      setProgressText("Page de couverture détectée (page complète)");
-      return await renderPageToImage(firstPage, 2.5);
-    }
-    
-    // Last resort: render the first page as cover
+
+    // Last resort: render the first page
     setProgressText("Rendu de la première page comme couverture...");
+    const firstPage = await pdfDoc.getPage(1);
     return await renderPageToImage(firstPage, 2.5);
   };
 
