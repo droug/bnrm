@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
+import nodemailer from "npm:nodemailer@6.9.12";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -30,44 +30,35 @@ async function sendEmail(to: string, subject: string, html: string): Promise<{ s
   if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASSWORD) {
     try {
       console.log(`Sending email via SMTP to: ${to}`);
-      console.log(`SMTP config: host=${SMTP_HOST}, port=${SMTP_PORT}`);
+      console.log(`SMTP config: host=${SMTP_HOST}, port=${SMTP_PORT}, from=${SMTP_FROM}`);
       
       const port = parseInt(SMTP_PORT, 10);
       
-      // Configuration SMTP améliorée
-      // Port 465 = SSL/TLS direct
-      // Port 587 ou 25 = STARTTLS (upgrade après connexion)
-      const useImplicitTLS = port === 465;
+      // Utiliser l'email d'authentification comme expéditeur si SMTP_FROM est invalide
+      const fromAddress = SMTP_FROM && SMTP_FROM.includes('@') ? SMTP_FROM : SMTP_USER;
       
-      const client = new SMTPClient({
-        connection: {
-          hostname: SMTP_HOST,
-          port: port,
-          tls: useImplicitTLS,
-          // Pour les autres ports, activer STARTTLS
-          ...((!useImplicitTLS && port !== 25) && { 
-            tlsOptions: {
-              starttls: true
-            }
-          }),
-          auth: {
-            username: SMTP_USER,
-            password: SMTP_PASSWORD,
-          },
+      // Configuration nodemailer pour Gmail (port 587 = STARTTLS, port 465 = SSL)
+      const transporter = nodemailer.createTransport({
+        host: SMTP_HOST,
+        port: port,
+        secure: port === 465, // true pour 465, false pour autres ports
+        auth: {
+          user: SMTP_USER,
+          pass: SMTP_PASSWORD,
         },
       });
 
-      await client.send({
-        from: SMTP_FROM || "BNRM - Bibliothèque Nationale <noreply@bnrm.ma>",
+      console.log(`Using fromAddress: ${fromAddress}`);
+      
+      const info = await transporter.sendMail({
+        from: fromAddress,
         to: to,
         subject: subject,
-        content: "auto",
         html: html,
       });
 
-      await client.close();
-      console.log("Email sent successfully via SMTP");
-      return { success: true };
+      console.log("Email sent successfully via SMTP, messageId:", info.messageId);
+      return { success: true, id: info.messageId };
     } catch (error: any) {
       console.error("SMTP error:", error.message || error);
       console.log("Falling back to Resend...");
