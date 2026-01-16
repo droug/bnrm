@@ -5,21 +5,22 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { 
-  FileText, 
-  Loader2, 
-  ScanText, 
+import {
+  FileText,
+  Loader2,
+  ScanText,
   Image as ImageIcon,
   CheckCircle2,
   AlertCircle,
   Upload,
-  X
+  X,
 } from "lucide-react";
-import * as pdfjsLib from 'pdfjs-dist';
-import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
-import Tesseract from 'tesseract.js';
+import * as pdfjsLib from "pdfjs-dist";
+import pdfWorkerSrc from "pdfjs-dist/build/pdf.worker.min.mjs?url";
+import Tesseract from "tesseract.js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { PdfCoverPicker } from "@/components/admin/PdfCoverPicker";
 
 // Configure PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerSrc;
@@ -51,7 +52,7 @@ const TESSERACT_LANG_MAP: Record<string, string> = {
 export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExtractorProps) {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [progressText, setProgressText] = useState("");
@@ -59,6 +60,11 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
   const [extractedData, setExtractedData] = useState<Partial<ExtractedData> | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
+
+  // Manual cover tool
+  const [pdfDocForPicker, setPdfDocForPicker] = useState<any | null>(null);
+  const [isCoverPickerOpen, setIsCoverPickerOpen] = useState(false);
+  const [isApplyingCover, setIsApplyingCover] = useState(false);
 
   // Render a PDF page to a high-quality image
   const renderPageToImage = async (page: any, scale: number = 2.0): Promise<string> => {
@@ -641,21 +647,63 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
     }
     const byteArray = new Uint8Array(byteNumbers);
     const blob = new Blob([byteArray], { type: 'image/jpeg' });
-    
+
     const fileName = `featured-works/pdf-cover-${Date.now()}-${Math.random().toString(36).substring(7)}.jpg`;
-    
+
     const { error: uploadError } = await supabase.storage
       .from('digital-library')
       .upload(fileName, blob);
-    
+
     if (uploadError) throw uploadError;
-    
+
     const { data: { publicUrl } } = supabase.storage
       .from('digital-library')
       .getPublicUrl(fileName);
-    
+
     return publicUrl;
   };
+
+  const applyCoverFromPage = async (pageNum: number) => {
+    if (!pdfDocForPicker) return;
+
+    setIsApplyingCover(true);
+    try {
+      setProgressText(`Application de la couverture (page ${pageNum})...`);
+
+      const page = await pdfDocForPicker.getPage(pageNum);
+      const hqCanvas = await renderPageToCanvas(page, 2.0);
+      const crop = detectPhotoCropFromCanvas(hqCanvas);
+      const coverImage = crop?.dataUrl ?? hqCanvas.toDataURL("image/jpeg", 0.92);
+
+      setCoverPreview(coverImage);
+
+      const coverImageUrl = await uploadCoverImage(coverImage);
+
+      const updated: Partial<ExtractedData> = {
+        ...(extractedData ?? {}),
+        cover_image_url: coverImageUrl,
+      };
+
+      setExtractedData(updated);
+      onDataExtracted(updated);
+      setIsCoverPickerOpen(false);
+
+      toast({
+        title: "Couverture mise à jour",
+        description: `La page ${pageNum} a été définie comme couverture.`,
+      });
+    } catch (err: any) {
+      console.error("applyCoverFromPage error:", err);
+      toast({
+        title: "Erreur",
+        description: err?.message || "Impossible d'appliquer la couverture",
+        variant: "destructive",
+      });
+    } finally {
+      setIsApplyingCover(false);
+    }
+  };
+
 
   const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -677,16 +725,19 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
     setError(null);
     setExtractedData(null);
     setCoverPreview(null);
-    
+    setPdfDocForPicker(null);
+    setIsCoverPickerOpen(false);
+
     try {
       // Load PDF
       const arrayBuffer = await file.arrayBuffer();
       setProgress(10);
-      
+
       const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      setPdfDocForPicker(pdfDoc);
       const pdfInfo = await pdfDoc.getMetadata();
       setProgress(20);
-      
+
       // Intelligent cover extraction: scan pages to find real image
       setProgressText("Extraction intelligente de l'image de couverture...");
       const coverImage = await extractCoverIntelligently(pdfDoc);
@@ -763,6 +814,8 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
   const clearData = () => {
     setExtractedData(null);
     setCoverPreview(null);
+    setPdfDocForPicker(null);
+    setIsCoverPickerOpen(false);
     setProgress(0);
     setError(null);
   };
@@ -843,25 +896,49 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
       {/* Cover image preview */}
       {coverPreview && (
         <div className="space-y-2">
-          <Label className="flex items-center gap-2">
-            <ImageIcon className="h-4 w-4" />
-            Aperçu de la couverture extraite
-          </Label>
+          <div className="flex items-center justify-between gap-3">
+            <Label className="flex items-center gap-2">
+              <ImageIcon className="h-4 w-4" />
+              Aperçu de la couverture
+            </Label>
+
+            {pdfDocForPicker && (
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                disabled={isProcessing || isApplyingCover}
+                onClick={() => setIsCoverPickerOpen((v) => !v)}
+              >
+                {isCoverPickerOpen ? "Fermer" : "Changer"}
+              </Button>
+            )}
+          </div>
+
           <div className="relative w-32 h-44 rounded-lg overflow-hidden border-2 border-primary/30 bg-muted">
-            <img 
-              src={coverPreview} 
-              alt="Couverture extraite" 
+            <img
+              src={coverPreview}
+              alt="Couverture extraite"
               className="w-full h-full object-cover"
             />
-            {isProcessing && (
+            {(isProcessing || isApplyingCover) && (
               <div className="absolute inset-0 bg-background/50 flex items-center justify-center">
                 <Loader2 className="h-6 w-6 animate-spin text-primary" />
               </div>
             )}
           </div>
+
+          {isCoverPickerOpen && pdfDocForPicker && (
+            <PdfCoverPicker
+              pdfDoc={pdfDocForPicker}
+              maxPages={15}
+              disabled={isProcessing || isApplyingCover}
+              onPick={applyCoverFromPage}
+            />
+          )}
         </div>
       )}
-      
+
       {error && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
