@@ -103,69 +103,47 @@ export const BNRMNumberAttribution = () => {
 
   const fetchData = async () => {
     try {
-      // Fetch pending requests that need validation (submitted status)
-      const { data: requests } = await supabase
-        .from("legal_deposits")
+      // Fetch approved requests from legal_deposit_requests that need number attribution
+      const { data: requests, error: requestsError } = await supabase
+        .from("legal_deposit_requests")
         .select("*")
-        .eq("status", "submitted")
+        .eq("status", "valide_par_b")
         .order("created_at", { ascending: true });
 
-      // Mock data for demonstration if no real data
-      const mockPendingRequests = [
-        {
-          id: '1',
-          status: 'valide_par_b',
-          deposit_type: 'monographie',
-          metadata: {
-            publication: {
-              title: 'Histoire Contemporaine du Maroc',
-              type: 'monographie'
-            },
-            declarant: {
-              name: 'Editions Dar Al Fikr',
-              organization: 'Maison d\'édition'
-            }
-          },
-          created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-          updated_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
-        },
-        {
-          id: '2',
-          status: 'valide_par_b',
-          deposit_type: 'periodique',
-          metadata: {
-            publication: {
-              title: 'Revue Marocaine de Droit',
-              type: 'periodique'
-            },
-            declarant: {
-              name: 'Faculté de Droit de Rabat',
-              organization: 'Institution universitaire'
-            }
-          },
-          created_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-          updated_at: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
-        },
-        {
-          id: '3',
-          status: 'valide_par_b',
-          deposit_type: 'monographie',
-          metadata: {
-            publication: {
-              title: 'Atlas du Patrimoine Marocain',
-              type: 'monographie'
-            },
-            declarant: {
-              name: 'Institut Royal de la Culture Amazighe',
-              organization: 'Organisme public'
-            }
-          },
-          created_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          updated_at: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
-        }
-      ];
+      if (requestsError) {
+        console.error("Error fetching approved requests:", requestsError);
+      }
 
-      setPendingRequests((requests && requests.length > 0) ? requests : mockPendingRequests);
+      // Transform data to expected format
+      const transformedRequests = (requests || []).map(req => {
+        const metadata = req.metadata as Record<string, any> || {};
+        return {
+          id: req.id,
+          request_number: req.request_number,
+          status: req.status,
+          deposit_type: req.support_type?.toLowerCase().includes('livre') || req.support_type?.toLowerCase().includes('monograph') ? 'monographie' : 'periodique',
+          title: req.title,
+          author_name: req.author_name,
+          metadata: {
+            publication: {
+              title: req.title,
+              type: req.support_type
+            },
+            declarant: {
+              name: req.author_name || 'Non spécifié',
+              organization: metadata?.publisher_name || ''
+            },
+            ...metadata
+          },
+          created_at: req.created_at,
+          updated_at: req.updated_at,
+          dl_number: req.request_number,
+          isbn_assigned: metadata?.isbn_assigned,
+          issn_assigned: metadata?.issn_assigned
+        };
+      });
+
+      setPendingRequests(transformedRequests);
 
       // Mock data for attributions and ranges - in real app, these would come from respective tables
       setAttributions([
@@ -303,31 +281,31 @@ export const BNRMNumberAttribution = () => {
         attributedNumber = generateNextNumber(numberType, range);
       }
 
-      // Update the legal deposit with the attributed number
-      const updateData: any = {};
+      // Update the legal_deposit_requests table with the attributed number
+      const request = pendingRequests.find(r => r.id === requestId);
+      const currentMetadata = request?.metadata || {};
+      
+      const updateData: any = {
+        metadata: {
+          ...currentMetadata,
+          [`${numberType}_assigned`]: attributedNumber,
+          [`${numberType}_attribution_date`]: new Date().toISOString()
+        }
+      };
+      
+      // If DL number is attributed, mark as fully processed
       if (numberType === 'dl') {
-        updateData.deposit_number = attributedNumber;
-        updateData.status = 'processed';
-      } else {
-        // Update metadata with ISBN/ISSN
-        const request = pendingRequests.find(r => r.id === requestId);
-        updateData.metadata = {
-          ...request?.metadata,
-          publication: {
-            ...request?.metadata?.publication,
-            [`${numberType}`]: attributedNumber
-          }
-        };
+        updateData.status = 'numero_attribue';
       }
 
       const { error } = await supabase
-        .from("legal_deposits")
+        .from("legal_deposit_requests")
         .update(updateData)
         .eq("id", requestId);
 
       if (error) throw error;
 
-      // Add to attributions list (in real app, this would be in a separate table)
+      // Add to attributions list
       const newAttribution: NumberAttribution = {
         id: Date.now().toString(),
         deposit_id: requestId,
@@ -336,8 +314,9 @@ export const BNRMNumberAttribution = () => {
         attribution_date: new Date().toISOString(),
         status: 'attributed',
         metadata: {
-          publication_title: pendingRequests.find(r => r.id === requestId)?.metadata?.publication?.title,
-          declarant_name: pendingRequests.find(r => r.id === requestId)?.metadata?.declarant?.name
+          publication_title: request?.title || request?.metadata?.publication?.title,
+          declarant_name: request?.author_name || request?.metadata?.declarant?.name,
+          dl_number: request?.request_number || request?.dl_number
         }
       };
 
@@ -568,12 +547,111 @@ export const BNRMNumberAttribution = () => {
         </div>
       </div>
 
-      <Tabs defaultValue="attributions" className="w-full">
+      <Tabs defaultValue="pending-requests" className="w-full">
         <TabsList className="h-11">
+          <TabsTrigger value="pending-requests" className="text-base font-medium">
+            Demandes à traiter
+            {pendingRequests.length > 0 && (
+              <Badge variant="secondary" className="ml-2">{pendingRequests.length}</Badge>
+            )}
+          </TabsTrigger>
           <TabsTrigger value="attributions" className="text-base font-medium">Attributions</TabsTrigger>
           <TabsTrigger value="reserved" className="text-base font-medium">Tranches réservées</TabsTrigger>
           <TabsTrigger value="statistics" className="text-base font-medium">Statistiques</TabsTrigger>
         </TabsList>
+
+        {/* Pending Requests Tab - Approved requests awaiting number attribution */}
+        <TabsContent value="pending-requests" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  Demandes approuvées en attente d'attribution
+                </span>
+                <Button variant="outline" size="sm" onClick={fetchData}>
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Actualiser
+                </Button>
+              </CardTitle>
+              <CardDescription>
+                Ces demandes ont été validées et sont prêtes pour l'attribution des numéros ISBN/ISSN/DL
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {pendingRequests.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-500" />
+                  <p>Aucune demande en attente d'attribution</p>
+                  <p className="text-sm">Toutes les demandes validées ont été traitées</p>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>N° Demande</TableHead>
+                      <TableHead>Publication</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Déclarant</TableHead>
+                      <TableHead>Date validation</TableHead>
+                      <TableHead className="text-center">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {pendingRequests.map((request) => (
+                      <TableRow key={request.id}>
+                        <TableCell className="font-mono font-medium">
+                          {request.request_number || request.dl_number}
+                        </TableCell>
+                        <TableCell className="max-w-xs">
+                          <div className="font-medium truncate">{request.title || request.metadata?.publication?.title}</div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">
+                            {request.deposit_type === 'monographie' ? 'Monographie' : 'Périodique'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {request.author_name || request.metadata?.declarant?.name}
+                        </TableCell>
+                        <TableCell>
+                          {request.updated_at 
+                            ? format(new Date(request.updated_at), "dd/MM/yyyy", { locale: fr })
+                            : '-'}
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center justify-center gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedRequestForView(request);
+                                setIsViewRequestDialogOpen(true);
+                              }}
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              Voir
+                            </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => {
+                                setSelectedRequest(request);
+                                setIsAttributionDialogOpen(true);
+                              }}
+                            >
+                              <Hash className="h-4 w-4 mr-1" />
+                              Attribuer N°
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* Attributions History */}
         <TabsContent value="attributions" className="space-y-4">
@@ -821,6 +899,130 @@ export const BNRMNumberAttribution = () => {
                 <Button>
                   <Send className="w-4 h-4 mr-2" />
                   Notifier attribution
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Attribution Dialog for new requests */}
+      <Dialog open={isAttributionDialogOpen} onOpenChange={setIsAttributionDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Attribution de numéro</DialogTitle>
+          </DialogHeader>
+          
+          {selectedRequest && (
+            <div className="space-y-4">
+              <div className="bg-muted p-4 rounded-lg space-y-2">
+                <div>
+                  <Label className="text-sm text-muted-foreground">N° Demande</Label>
+                  <div className="font-mono font-medium">{selectedRequest.request_number || selectedRequest.dl_number}</div>
+                </div>
+                <div>
+                  <Label className="text-sm text-muted-foreground">Publication</Label>
+                  <div className="font-medium">{selectedRequest.title || selectedRequest.metadata?.publication?.title}</div>
+                </div>
+                <div>
+                  <Label className="text-sm text-muted-foreground">Type</Label>
+                  <div>{selectedRequest.deposit_type === 'monographie' ? 'Monographie (ISBN)' : 'Périodique (ISSN)'}</div>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  Sélectionnez le type de numéro à attribuer pour cette publication :
+                </p>
+                
+                <div className="grid gap-2">
+                  {selectedRequest.deposit_type === 'monographie' ? (
+                    <Button 
+                      className="w-full justify-start"
+                      onClick={() => attributeNumber(selectedRequest.id, 'isbn')}
+                    >
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      Attribuer un numéro ISBN
+                    </Button>
+                  ) : (
+                    <Button 
+                      className="w-full justify-start"
+                      onClick={() => attributeNumber(selectedRequest.id, 'issn')}
+                    >
+                      <Newspaper className="h-4 w-4 mr-2" />
+                      Attribuer un numéro ISSN
+                    </Button>
+                  )}
+                  
+                  <Button 
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={() => attributeNumber(selectedRequest.id, 'dl')}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Attribuer le N° de Dépôt Légal
+                  </Button>
+                </div>
+              </div>
+
+              <div className="flex justify-end pt-2">
+                <Button variant="outline" onClick={() => {
+                  setIsAttributionDialogOpen(false);
+                  setSelectedRequest(null);
+                }}>
+                  Annuler
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* View Request Details Dialog */}
+      <Dialog open={isViewRequestDialogOpen} onOpenChange={setIsViewRequestDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              Détails de la demande - {selectedRequestForView?.request_number || selectedRequestForView?.dl_number}
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedRequestForView && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium">Publication</Label>
+                  <div className="text-sm mt-1">{selectedRequestForView.title || selectedRequestForView.metadata?.publication?.title}</div>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Type</Label>
+                  <div className="text-sm mt-1">{selectedRequestForView.deposit_type === 'monographie' ? 'Monographie' : 'Périodique'}</div>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Déclarant</Label>
+                  <div className="text-sm mt-1">{selectedRequestForView.author_name || selectedRequestForView.metadata?.declarant?.name}</div>
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Date de création</Label>
+                  <div className="text-sm mt-1">
+                    {selectedRequestForView.created_at 
+                      ? format(new Date(selectedRequestForView.created_at), "dd/MM/yyyy HH:mm", { locale: fr })
+                      : '-'}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button variant="outline" onClick={() => setIsViewRequestDialogOpen(false)}>
+                  Fermer
+                </Button>
+                <Button onClick={() => {
+                  setIsViewRequestDialogOpen(false);
+                  setSelectedRequest(selectedRequestForView);
+                  setIsAttributionDialogOpen(true);
+                }}>
+                  <Hash className="h-4 w-4 mr-2" />
+                  Attribuer N°
                 </Button>
               </div>
             </div>
