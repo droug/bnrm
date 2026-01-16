@@ -16,15 +16,51 @@ export function AuthRecoveryRedirect() {
   const location = useLocation();
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event !== "PASSWORD_RECOVERY") return;
+    const isRecoveryLikeLink = () => {
+      const hash = window.location.hash.startsWith("#")
+        ? window.location.hash.slice(1)
+        : window.location.hash;
+      const params = new URLSearchParams(hash);
+      const type = params.get("type");
+      return type === "recovery" || type === "invite";
+    };
 
-      const alreadyOnReset = location.pathname === "/auth" && new URLSearchParams(location.search).get("reset") === "true";
-      if (alreadyOnReset) return;
+    const isAlreadyOnReset = () =>
+      location.pathname === "/auth" &&
+      new URLSearchParams(location.search).get("reset") === "true";
+
+    const goToReset = () => {
+      if (isAlreadyOnReset()) return;
+      navigate("/auth?reset=true", { replace: true });
+    };
+
+    // If we land on / (or any route) with a recovery hash and Supabase already
+    // has a session, force the reset UI.
+    if (isRecoveryLikeLink() && !isAlreadyOnReset()) {
+      setTimeout(() => {
+        supabase.auth.getSession().then(({ data }) => {
+          if (data.session) goToReset();
+        });
+      }, 0);
+    }
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      const recoveryLike = isRecoveryLikeLink();
+
+      // Depending on the link type / environment, Supabase can emit SIGNED_IN or
+      // INITIAL_SESSION instead of PASSWORD_RECOVERY.
+      const shouldRedirect =
+        event === "PASSWORD_RECOVERY" ||
+        (recoveryLike && (event === "SIGNED_IN" || event === "INITIAL_SESSION"));
+
+      if (!shouldRedirect) return;
+      if (!session) return;
 
       // Navigate AFTER Supabase has processed the URL tokens.
       setTimeout(() => {
-        navigate("/auth?reset=true", { replace: true });
+        goToReset();
       }, 0);
     });
 
