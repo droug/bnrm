@@ -9,6 +9,7 @@ import ScrollToTop from "@/components/ScrollToTop";
 import { useAutoSync } from "@/hooks/useAutoSync";
 import { PerformanceOptimizer } from "@/components/seo/PerformanceOptimizer";
 import { CookieBanner } from "@/components/cookies/CookieBanner";
+import { AuthRecoveryRedirect } from "@/components/auth/AuthRecoveryRedirect";
 
 // Always loaded (critical routes)
 import Index from "./pages/Index";
@@ -238,6 +239,7 @@ const App = () => {
         <Toaster />
         <Sonner />
         <Suspense fallback={<PageLoader />}>
+          <AuthRecoveryRedirect />
             <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/search" element={<SearchResults />} />
