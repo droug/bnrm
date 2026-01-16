@@ -632,16 +632,24 @@ export const BNRMNumberAttribution = () => {
                               <Eye className="h-4 w-4 mr-1" />
                               Voir
                             </Button>
-                            <Button
-                              size="sm"
-                              onClick={() => {
-                                setSelectedRequest(request);
-                                setIsAttributionDialogOpen(true);
-                              }}
-                            >
-                              <Hash className="h-4 w-4 mr-1" />
-                              Attribuer N°
-                            </Button>
+                            {/* Hide attribution button if number already assigned */}
+                            {!(request.isbn_assigned || request.issn_assigned || request.metadata?.isbn_assigned || request.metadata?.issn_assigned || request.metadata?.dl_number) ? (
+                              <Button
+                                size="sm"
+                                onClick={() => {
+                                  setSelectedRequest(request);
+                                  setIsAttributionDialogOpen(true);
+                                }}
+                              >
+                                <Hash className="h-4 w-4 mr-1" />
+                                Attribuer N°
+                              </Button>
+                            ) : (
+                              <Badge variant="secondary" className="bg-green-100 text-green-800">
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                                Attribué
+                              </Badge>
+                            )}
                           </div>
                         </TableCell>
                       </TableRow>
