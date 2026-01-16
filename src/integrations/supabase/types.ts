@@ -6080,6 +6080,7 @@ export type Database = {
           publisher: string
           rejection_reason: string | null
           request_number: string | null
+          requester_email: string | null
           reviewed_at: string | null
           reviewed_by: string | null
           status: string
@@ -6100,6 +6101,7 @@ export type Database = {
           publisher: string
           rejection_reason?: string | null
           request_number?: string | null
+          requester_email?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
@@ -6120,6 +6122,7 @@ export type Database = {
           publisher?: string
           rejection_reason?: string | null
           request_number?: string | null
+          requester_email?: string | null
           reviewed_at?: string | null
           reviewed_by?: string | null
           status?: string
