@@ -53,6 +53,41 @@ interface ActivityLog {
   user_email?: string;
 }
 
+// --- Helpers (storage) ---
+const resolveProfessionalDocumentsUrl = async (url: string): Promise<string> => {
+  // Supabase returns "Bucket not found" for private buckets via the /public endpoint.
+  // We convert public URLs to signed URLs so admins can open files reliably.
+  try {
+    const match = url.match(/\/storage\/v1\/object\/public\/([^/]+)\/(.+)$/);
+    if (!match) return url;
+
+    const bucket = match[1];
+    if (bucket !== "professional-documents") return url;
+
+    const path = decodeURIComponent(match[2]);
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .createSignedUrl(path, 60 * 10); // 10 min
+
+    if (error || !data?.signedUrl) return url;
+    return data.signedUrl;
+  } catch {
+    return url;
+  }
+};
+
+const openProfessionalDocumentInNewTab = async (url: string) => {
+  const win = window.open("about:blank", "_blank", "noopener,noreferrer");
+  const resolved = await resolveProfessionalDocumentsUrl(url);
+
+  if (win) {
+    win.location.href = resolved;
+  } else {
+    // Popup blocked fallback
+    window.location.href = resolved;
+  }
+};
+
 // Component for displaying attached files from registration_data
 const RegistrationFilesSection = ({ registrationData }: { registrationData: any }) => {
   const [downloadingFile, setDownloadingFile] = useState<string | null>(null);
@@ -84,7 +119,8 @@ const RegistrationFilesSection = ({ registrationData }: { registrationData: any 
   const handleDownload = async (url: string, fileName: string) => {
     setDownloadingFile(fileName);
     try {
-      const response = await fetch(url);
+      const downloadUrlToUse = await resolveProfessionalDocumentsUrl(url);
+      const response = await fetch(downloadUrlToUse);
       if (!response.ok) throw new Error('Download failed');
       const blob = await response.blob();
       const downloadUrl = window.URL.createObjectURL(blob);
@@ -101,8 +137,8 @@ const RegistrationFilesSection = ({ registrationData }: { registrationData: any 
       });
     } catch (error) {
       console.error('Download error:', error);
-      // Try direct open if download fails
-      window.open(url, '_blank');
+      // Fallback to opening in a new tab
+      await openProfessionalDocumentInNewTab(url);
     } finally {
       setDownloadingFile(null);
     }
@@ -146,7 +182,7 @@ const RegistrationFilesSection = ({ registrationData }: { registrationData: any 
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => window.open(url, '_blank')}
+                  onClick={() => openProfessionalDocumentInNewTab(url)}
                 >
                   <Eye className="h-4 w-4" />
                 </Button>
@@ -862,7 +898,7 @@ export function ProfessionalRequestsManager() {
 
                       {/* Nom arabe */}
                       {(selectedRequest.registration_data.name_ar || selectedRequest.registration_data.nameAr) && (
-                        <div className="space-y-1">
+                        <div className="space-y-1 flex flex-col items-end">
                           <p className="text-sm text-muted-foreground text-right">Nom (Arabe)</p>
                           <p
                             className="font-medium text-lg bg-muted/30 p-2 rounded block w-full text-right break-words"
@@ -1027,7 +1063,7 @@ export function ProfessionalRequestsManager() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => window.open(doc.file_url, '_blank')}
+                          onClick={() => openProfessionalDocumentInNewTab(doc.file_url)}
                         >
                           <Eye className="h-4 w-4 mr-1" />
                           Voir
