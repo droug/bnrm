@@ -447,8 +447,8 @@ export function ProfessionalsList() {
                       </div>
                       {selectedProfessional.registration_data.nameAr && (
                         <div className="space-y-1">
-                          <p className="text-sm font-medium text-muted-foreground">Nom (Arabe)</p>
-                          <p className="text-base text-right" dir="rtl" lang="ar">
+                          <p className="text-sm font-medium text-muted-foreground text-right">Nom (Arabe)</p>
+                          <p className="text-base bg-muted/30 p-2 rounded block w-full text-right break-words" dir="rtl" lang="ar">
                             {selectedProfessional.registration_data.nameAr}
                           </p>
                         </div>
@@ -503,8 +503,8 @@ export function ProfessionalsList() {
                     <div className="grid grid-cols-2 gap-4">
                       {selectedProfessional.registration_data.nameAr && (
                         <div className="space-y-1">
-                          <p className="text-sm font-medium text-muted-foreground">Nom (Arabe)</p>
-                          <p className="text-base text-right" dir="rtl" lang="ar">
+                          <p className="text-sm font-medium text-muted-foreground text-right">Nom (Arabe)</p>
+                          <p className="text-base bg-muted/30 p-2 rounded block w-full text-right break-words" dir="rtl" lang="ar">
                             {selectedProfessional.registration_data.nameAr}
                           </p>
                         </div>
