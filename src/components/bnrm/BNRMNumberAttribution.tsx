@@ -114,6 +114,17 @@ export const BNRMNumberAttribution = () => {
         console.error("Error fetching approved requests:", requestsError);
       }
 
+      // Fetch attributed requests (status = attribue)
+      const { data: attributedRequests, error: attributedError } = await supabase
+        .from("legal_deposit_requests")
+        .select("*")
+        .eq("status", "attribue")
+        .order("updated_at", { ascending: false });
+
+      if (attributedError) {
+        console.error("Error fetching attributed requests:", attributedError);
+      }
+
       // Transform data to expected format
       const transformedRequests = (requests || []).map(req => {
         const metadata = req.metadata as Record<string, any> || {};
@@ -145,48 +156,38 @@ export const BNRMNumberAttribution = () => {
 
       setPendingRequests(transformedRequests);
 
-      // Mock data for attributions and ranges - in real app, these would come from respective tables
-      setAttributions([
-        {
-          id: '1',
-          deposit_id: 'dep-001',
-          number_type: 'isbn',
-          attributed_number: '978-9981-123-45-6',
-          attribution_date: new Date().toISOString(),
-          status: 'attributed',
-          metadata: {
-            publication_title: 'Histoire du Maroc Moderne',
-            declarant_name: 'Editions Al Manahil',
-            dl_number: 'DL-2025-000123'
-          }
-        },
-        {
-          id: '2',
-          deposit_id: 'dep-002',
-          number_type: 'issn',
-          attributed_number: '2550-4567',
-          attribution_date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          status: 'confirmed',
-          metadata: {
-            publication_title: 'Revue Marocaine de Sciences',
-            declarant_name: 'Institut de Recherche',
-            dl_number: 'DL-2025-000124'
-          }
-        },
-        {
-          id: '3',
-          deposit_id: 'dep-003',
-          number_type: 'dl',
-          attributed_number: 'DL-2025-000125',
-          attribution_date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-          status: 'attributed',
-          metadata: {
-            publication_title: 'La Culture Berbère',
-            declarant_name: 'Dar Al Kitab',
-            dl_number: 'DL-2025-000125'
-          }
+      // Transform attributed requests to attributions format
+      const transformedAttributions: NumberAttribution[] = (attributedRequests || []).map(req => {
+        const metadata = req.metadata as Record<string, any> || {};
+        
+        // Determine which number type was attributed
+        let numberType: 'isbn' | 'issn' | 'dl' = 'dl';
+        let attributedNumber = metadata?.dl_number || req.request_number;
+        
+        if (metadata?.isbn_assigned) {
+          numberType = 'isbn';
+          attributedNumber = metadata.isbn_assigned;
+        } else if (metadata?.issn_assigned) {
+          numberType = 'issn';
+          attributedNumber = metadata.issn_assigned;
         }
-      ]);
+
+        return {
+          id: req.id,
+          deposit_id: req.id,
+          number_type: numberType,
+          attributed_number: attributedNumber,
+          attribution_date: metadata?.dl_attribution_date || metadata?.isbn_attribution_date || metadata?.issn_attribution_date || req.updated_at,
+          status: 'attributed' as const,
+          metadata: {
+            publication_title: req.title,
+            declarant_name: req.author_name || 'Non spécifié',
+            dl_number: req.request_number
+          }
+        };
+      });
+
+      setAttributions(transformedAttributions);
 
       setRanges([
         {
@@ -295,7 +296,7 @@ export const BNRMNumberAttribution = () => {
       
       // If DL number is attributed, mark as fully processed
       if (numberType === 'dl') {
-        updateData.status = 'numero_attribue';
+        updateData.status = 'attribue';
       }
 
       const { error } = await supabase
