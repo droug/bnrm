@@ -52,14 +52,17 @@ export function AuthRecoveryRedirect() {
     const goToReset = () => {
       if (hasRedirected.current) return;
       hasRedirected.current = true;
-      
+
       try {
         sessionStorage.removeItem(AUTH_ENTRY_SNAPSHOT_KEY);
       } catch {
         // ignore
       }
       if (isAlreadyOnReset()) return;
-      navigate("/auth?reset=true", { replace: true });
+
+      // Preserve hash tokens so Auth can establish the session reliably
+      const hash = window.location.hash || "";
+      navigate(`/auth?reset=true${hash}`, { replace: true });
     };
 
     const snapshot = readSnapshot();
