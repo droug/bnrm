@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-import { Resend } from "npm:resend@2.0.0";
+import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,11 +11,91 @@ interface RegistrationEmailRequest {
   email_type: 'registration_received' | 'account_validated' | 'account_rejected' | 'password_reset';
   recipient_email: string;
   recipient_name: string;
-  user_type?: string; // 'editor' | 'printer' | 'producer' | 'researcher' | 'visitor'
+  user_type?: string;
   rejection_reason?: string;
   reset_link?: string;
-  user_id?: string; // Pour générer le lien de réinitialisation
+  user_id?: string;
   additional_data?: Record<string, any>;
+}
+
+// Fonction d'envoi d'email via SMTP ou Resend (fallback)
+async function sendEmail(to: string, subject: string, html: string): Promise<{ success: boolean; error?: string; id?: string }> {
+  const SMTP_HOST = Deno.env.get("SMTP_HOST");
+  const SMTP_PORT = Deno.env.get("SMTP_PORT");
+  const SMTP_USER = Deno.env.get("SMTP_USER");
+  const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
+  const SMTP_FROM = Deno.env.get("SMTP_FROM");
+
+  // Essayer SMTP d'abord
+  if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASSWORD) {
+    try {
+      console.log(`Sending email via SMTP to: ${to}`);
+      
+      const client = new SMTPClient({
+        connection: {
+          hostname: SMTP_HOST,
+          port: parseInt(SMTP_PORT, 10),
+          tls: parseInt(SMTP_PORT, 10) === 465,
+          auth: {
+            username: SMTP_USER,
+            password: SMTP_PASSWORD,
+          },
+        },
+      });
+
+      await client.send({
+        from: SMTP_FROM || "BNRM - Bibliothèque Nationale <noreply@bnrm.ma>",
+        to: to,
+        subject: subject,
+        content: "auto",
+        html: html,
+      });
+
+      await client.close();
+      console.log("Email sent successfully via SMTP");
+      return { success: true };
+    } catch (error: any) {
+      console.error("SMTP error:", error);
+      // Continuer vers Resend si SMTP échoue
+    }
+  }
+
+  // Fallback vers Resend
+  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+  if (RESEND_API_KEY) {
+    try {
+      console.log(`Sending email via Resend (fallback) to: ${to}`);
+      
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${RESEND_API_KEY}`,
+        },
+        body: JSON.stringify({
+          from: "BNRM - Bibliothèque Nationale <onboarding@resend.dev>",
+          to: [to],
+          subject: subject,
+          html: html,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Resend error:", errorData);
+        return { success: false, error: errorData.message || "Resend error" };
+      }
+
+      const data = await response.json();
+      console.log("Email sent successfully via Resend");
+      return { success: true, id: data.id };
+    } catch (error: any) {
+      console.error("Resend error:", error);
+      return { success: false, error: error.message };
+    }
+  }
+
+  return { success: false, error: "No email service configured (SMTP or Resend)" };
 }
 
 serve(async (req) => {
@@ -30,17 +110,6 @@ serve(async (req) => {
 
     console.log("Sending registration email:", { email_type, recipient_email, user_type, user_id });
 
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    if (!RESEND_API_KEY) {
-      console.warn("RESEND_API_KEY not configured");
-      return new Response(
-        JSON.stringify({ success: false, message: "Email service not configured" }),
-        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    const resend = new Resend(RESEND_API_KEY);
-    
     const supabaseAdmin = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
@@ -76,34 +145,23 @@ serve(async (req) => {
     });
 
     // Envoyer l'email
-    const emailResult = await resend.emails.send({
-      from: "BNRM - Bibliothèque Nationale <onboarding@resend.dev>",
-      to: [recipient_email],
-      subject,
-      html,
-    });
+    const emailResult = await sendEmail(recipient_email, subject, html);
 
-    // Resend renvoie { data, error } — il faut vérifier error
-    if (emailResult.error) {
-      console.error("Resend error:", emailResult.error);
+    if (!emailResult.success) {
+      console.error("Email sending failed:", emailResult.error);
       return new Response(
         JSON.stringify({
           success: false,
-          error: emailResult.error.message ?? "Erreur lors de l'envoi de l'email",
-          provider_error: {
-            statusCode: emailResult.error.statusCode,
-            name: emailResult.error.name,
-            message: emailResult.error.message,
-          },
+          error: emailResult.error || "Erreur lors de l'envoi de l'email",
         }),
         {
-          status: emailResult.error.statusCode ?? 502,
+          status: 502,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );
     }
 
-    console.log("Email sent successfully:", emailResult);
+    console.log("Email sent successfully");
 
     // Trouver l'utilisateur par email pour créer la notification
     const { data: userData } = await supabaseAdmin
@@ -126,7 +184,7 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         message: "Email envoyé avec succès",
-        email_id: emailResult.data?.id 
+        email_id: emailResult.id 
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
