@@ -104,14 +104,12 @@ export const BNRMNumberAttribution = () => {
   const hasAnyAttributedNumber = (req: any) => {
     const metadata = (req?.metadata ?? {}) as Record<string, any>;
 
+    // Vérifier uniquement les vrais numéros attribués (ISBN, ISSN, DL assigné)
+    // dl_number/request_number n'est PAS un numéro attribué, c'est juste l'identifiant de la demande
     return Boolean(
-      req?.isbn_assigned ||
-        req?.issn_assigned ||
-        req?.dl_number ||
-        metadata?.isbn_assigned ||
-        metadata?.issn_assigned ||
-        metadata?.dl_number ||
-        metadata?.dl_assigned
+      metadata?.isbn_assigned ||
+      metadata?.issn_assigned ||
+      metadata?.dl_assigned
     );
   };
 
