@@ -12,7 +12,8 @@ import {
   Image as ImageIcon,
   CheckCircle2,
   AlertCircle,
-  Upload
+  Upload,
+  X
 } from "lucide-react";
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
@@ -57,7 +58,9 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
   const [ocrLanguage, setOcrLanguage] = useState("fr+ar");
   const [extractedData, setExtractedData] = useState<Partial<ExtractedData> | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
 
+  // Render a PDF page to a high-quality image
   const renderPageToImage = async (page: any, scale: number = 2.0): Promise<string> => {
     const viewport = page.getViewport({ scale });
     const canvas = document.createElement('canvas');
@@ -70,110 +73,111 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
       viewport: viewport,
     }).promise;
     
-    return canvas.toDataURL('image/jpeg', 0.85);
+    return canvas.toDataURL('image/jpeg', 0.92);
   };
 
-  // Extract embedded images from PDF page
-  const extractImagesFromPage = async (page: any): Promise<string[]> => {
-    const images: string[] = [];
+  // Scan first page for the dominant image (cover detection)
+  const extractCoverFromFirstPage = async (pdfDoc: any): Promise<string> => {
+    const firstPage = await pdfDoc.getPage(1);
+    const viewport = firstPage.getViewport({ scale: 1.0 });
+    
+    // Get page dimensions
+    const pageWidth = viewport.width;
+    const pageHeight = viewport.height;
+    
+    setProgressText("Analyse de la première page...");
     
     try {
-      const operatorList = await page.getOperatorList();
-      const resources = await page.objs;
+      // Get the operator list to find images
+      const ops = await firstPage.getOperatorList();
+      let largestImage: { data: string; area: number } | null = null;
       
-      // Look for image operators
-      for (let i = 0; i < operatorList.fnArray.length; i++) {
-        const op = operatorList.fnArray[i];
-        // OPS.paintImageXObject = 85, OPS.paintJpegXObject = 82
-        if (op === 85 || op === 82) {
-          const imageName = operatorList.argsArray[i][0];
+      // Iterate through operators looking for images
+      for (let i = 0; i < ops.fnArray.length; i++) {
+        const op = ops.fnArray[i];
+        
+        // Check for image paint operations (82 = paintJpegXObject, 85 = paintImageXObject)
+        if (op === 82 || op === 85) {
+          const objId = ops.argsArray[i][0];
+          
           try {
-            const imgData = await page.objs.get(imageName);
-            if (imgData && imgData.data) {
-              // Convert image data to canvas
-              const canvas = document.createElement('canvas');
-              canvas.width = imgData.width;
-              canvas.height = imgData.height;
-              const ctx = canvas.getContext('2d')!;
+            // Get the image object
+            const imgObj = await new Promise<any>((resolve, reject) => {
+              firstPage.objs.get(objId, (img: any) => {
+                if (img) resolve(img);
+                else reject(new Error("Image not found"));
+              });
+            });
+            
+            if (imgObj && imgObj.width && imgObj.height) {
+              const area = imgObj.width * imgObj.height;
               
-              // Create ImageData from the raw data
-              const imageData = ctx.createImageData(imgData.width, imgData.height);
-              
-              // Handle different color formats
-              if (imgData.data.length === imgData.width * imgData.height * 4) {
-                // RGBA format
-                imageData.data.set(imgData.data);
-              } else if (imgData.data.length === imgData.width * imgData.height * 3) {
-                // RGB format - convert to RGBA
-                for (let j = 0, k = 0; j < imgData.data.length; j += 3, k += 4) {
-                  imageData.data[k] = imgData.data[j];
-                  imageData.data[k + 1] = imgData.data[j + 1];
-                  imageData.data[k + 2] = imgData.data[j + 2];
-                  imageData.data[k + 3] = 255;
+              // Only consider images that are reasonably sized (> 50x50 pixels)
+              if (imgObj.width > 50 && imgObj.height > 50) {
+                // Check if this is the largest image so far
+                if (!largestImage || area > largestImage.area) {
+                  // Create canvas and draw the image
+                  const canvas = document.createElement('canvas');
+                  canvas.width = imgObj.width;
+                  canvas.height = imgObj.height;
+                  const ctx = canvas.getContext('2d')!;
+                  
+                  // Create ImageData and populate it
+                  const imageData = ctx.createImageData(imgObj.width, imgObj.height);
+                  const dataLen = imgObj.width * imgObj.height * 4;
+                  
+                  if (imgObj.data && imgObj.data.length > 0) {
+                    // Handle different data formats
+                    const srcData = imgObj.data;
+                    const hasAlpha = srcData.length >= dataLen;
+                    
+                    if (hasAlpha) {
+                      // RGBA format
+                      for (let j = 0; j < dataLen; j++) {
+                        imageData.data[j] = srcData[j];
+                      }
+                    } else {
+                      // RGB format - add alpha channel
+                      const rgbLen = imgObj.width * imgObj.height * 3;
+                      if (srcData.length >= rgbLen) {
+                        for (let j = 0, k = 0; j < rgbLen && k < dataLen; j += 3, k += 4) {
+                          imageData.data[k] = srcData[j];
+                          imageData.data[k + 1] = srcData[j + 1];
+                          imageData.data[k + 2] = srcData[j + 2];
+                          imageData.data[k + 3] = 255;
+                        }
+                      }
+                    }
+                    
+                    ctx.putImageData(imageData, 0, 0);
+                    
+                    // Convert to base64
+                    const imgBase64 = canvas.toDataURL('image/jpeg', 0.92);
+                    
+                    largestImage = { data: imgBase64, area };
+                    setProgressText(`Image détectée: ${imgObj.width}x${imgObj.height}px`);
+                  }
                 }
-              } else {
-                continue; // Skip unsupported format
-              }
-              
-              ctx.putImageData(imageData, 0, 0);
-              
-              // Only consider images of reasonable size (likely cover images)
-              const minSize = 100;
-              const minArea = 10000;
-              if (imgData.width >= minSize && imgData.height >= minSize && 
-                  (imgData.width * imgData.height) >= minArea) {
-                images.push(canvas.toDataURL('image/jpeg', 0.9));
               }
             }
           } catch (imgErr) {
-            // Skip this image if extraction fails
-            console.log("Could not extract image:", imageName);
+            console.log("Skipping image object:", objId);
           }
         }
       }
-    } catch (err) {
-      console.log("Image extraction from page failed:", err);
-    }
-    
-    return images;
-  };
-
-  // Get the best cover image (prefer embedded image, fallback to page render)
-  const extractCoverImage = async (pdfDoc: any): Promise<string> => {
-    const firstPage = await pdfDoc.getPage(1);
-    
-    // First try to extract embedded images from first page
-    setProgressText("Recherche d'images intégrées...");
-    const embeddedImages = await extractImagesFromPage(firstPage);
-    
-    if (embeddedImages.length > 0) {
-      // Find the largest image (likely the cover)
-      let largestImage = embeddedImages[0];
-      let maxArea = 0;
       
-      for (const imgData of embeddedImages) {
-        const img = new Image();
-        await new Promise<void>((resolve) => {
-          img.onload = () => {
-            const area = img.width * img.height;
-            if (area > maxArea) {
-              maxArea = area;
-              largestImage = imgData;
-            }
-            resolve();
-          };
-          img.onerror = () => resolve();
-          img.src = imgData;
-        });
+      // If we found a significant image, use it
+      if (largestImage && largestImage.area > 10000) {
+        setProgressText("Image de couverture extraite !");
+        return largestImage.data;
       }
-      
-      setProgressText("Image de couverture détectée !");
-      return largestImage;
+    } catch (err) {
+      console.log("Image extraction failed, falling back to page render:", err);
     }
     
-    // Fallback: render the first page as cover
-    setProgressText("Rendu de la première page comme couverture...");
-    return await renderPageToImage(firstPage, 2.0);
+    // Fallback: render the entire first page as the cover
+    setProgressText("Rendu de la page de garde...");
+    return await renderPageToImage(firstPage, 2.5);
   };
 
   const extractTextFromFirstPages = async (pdfDoc: any, numPages: number = 3): Promise<string> => {
@@ -302,6 +306,7 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
     setProgressText("Chargement du PDF...");
     setError(null);
     setExtractedData(null);
+    setCoverPreview(null);
     
     try {
       // Load PDF
@@ -311,14 +316,15 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
       const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
       const pdfInfo = await pdfDoc.getMetadata();
       setProgress(20);
+      
+      // Extract cover image from first page
       setProgressText("Extraction de l'image de couverture...");
-      
-      // Extract the best cover image (embedded or rendered)
-      const coverImage = await extractCoverImage(pdfDoc);
+      const coverImage = await extractCoverFromFirstPage(pdfDoc);
+      setCoverPreview(coverImage); // Show preview immediately
       setProgress(40);
-      setProgressText("Téléchargement de l'image de couverture...");
       
-      // Upload cover image
+      // Upload cover image to storage
+      setProgressText("Téléchargement de l'image...");
       const coverImageUrl = await uploadCoverImage(coverImage);
       setProgress(50);
       
@@ -369,7 +375,7 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
       
       toast({ 
         title: "PDF traité avec succès", 
-        description: `${pdfDoc.numPages} pages analysées, métadonnées extraites` 
+        description: `${pdfDoc.numPages} pages analysées, image de couverture extraite` 
       });
       
     } catch (err: any) {
@@ -384,11 +390,25 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
     }
   };
 
+  const clearData = () => {
+    setExtractedData(null);
+    setCoverPreview(null);
+    setProgress(0);
+    setError(null);
+  };
+
   return (
     <div className="space-y-4 p-4 border rounded-lg bg-accent/20">
-      <div className="flex items-center gap-2 text-primary">
-        <FileText className="h-5 w-5" />
-        <span className="font-medium">Importer depuis un PDF</span>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-primary">
+          <FileText className="h-5 w-5" />
+          <span className="font-medium">Importer depuis un PDF</span>
+        </div>
+        {extractedData && (
+          <Button variant="ghost" size="sm" onClick={clearData}>
+            <X className="h-4 w-4" />
+          </Button>
+        )}
       </div>
       
       <p className="text-sm text-muted-foreground">
@@ -450,6 +470,28 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
         </div>
       )}
       
+      {/* Cover image preview */}
+      {coverPreview && (
+        <div className="space-y-2">
+          <Label className="flex items-center gap-2">
+            <ImageIcon className="h-4 w-4" />
+            Aperçu de la couverture extraite
+          </Label>
+          <div className="relative w-32 h-44 rounded-lg overflow-hidden border-2 border-primary/30 bg-muted">
+            <img 
+              src={coverPreview} 
+              alt="Couverture extraite" 
+              className="w-full h-full object-cover"
+            />
+            {isProcessing && (
+              <div className="absolute inset-0 bg-background/50 flex items-center justify-center">
+                <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      
       {error && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
@@ -461,17 +503,18 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
       {extractedData && !isProcessing && (
         <Alert className="bg-green-500/10 border-green-500/30">
           <CheckCircle2 className="h-4 w-4 text-green-600" />
-          <AlertTitle className="text-green-600">Données extraites</AlertTitle>
+          <AlertTitle className="text-green-600">Données extraites avec succès</AlertTitle>
           <AlertDescription>
             <div className="mt-2 flex flex-wrap gap-2">
               {extractedData.title && <Badge variant="outline">Titre: {extractedData.title.substring(0, 30)}...</Badge>}
+              {extractedData.title_ar && <Badge variant="outline">عنوان عربي ✓</Badge>}
               {extractedData.author && <Badge variant="outline">Auteur: {extractedData.author}</Badge>}
               {extractedData.pages_count && <Badge variant="outline">{extractedData.pages_count} pages</Badge>}
               {extractedData.cover_image_url && (
-                <div className="flex items-center gap-1">
-                  <ImageIcon className="h-3 w-3" />
-                  <span className="text-xs">Image de couverture extraite</span>
-                </div>
+                <Badge variant="outline" className="bg-green-500/20">
+                  <ImageIcon className="h-3 w-3 mr-1" />
+                  Image de couverture ✓
+                </Badge>
               )}
             </div>
           </AlertDescription>
