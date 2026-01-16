@@ -11,6 +11,7 @@ import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import Footer from "@/components/Footer";
 import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
 import logoBnrm from "@/assets/logo-bnrm.png";
+import logoDigitalLibrary from "@/assets/digital-library-logo.png";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -130,13 +131,17 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                 />
               </Link>
 
-              {/* Titre de la bibliothèque */}
+              {/* Logo + Titre de la bibliothèque numérique */}
               <Link 
                 to="/digital-library" 
                 className="flex items-center gap-3 hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md"
                 aria-label={t('dl.backToPortal')}
               >
-                <BookOpen className="h-8 w-8 text-primary" aria-hidden="true" />
+                <img 
+                  src={logoDigitalLibrary} 
+                  alt="Ibn Battuta - Bibliothèque Numérique" 
+                  className="h-14 w-auto object-contain"
+                />
                 <div>
                   <h1 className="text-lg font-bold text-foreground">{t('dl.title')}</h1>
                   <p className="text-xs text-muted-foreground">{t('dl.subtitle')}</p>
