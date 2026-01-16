@@ -123,7 +123,7 @@ export function DepositValidationWorkflow() {
       .order("created_at", { ascending: false });
 
     if (activeTab === "pending") {
-      query = query.in("status", ["brouillon", "soumis", "en_attente_validation_b"]);
+      query = query.in("status", ["brouillon", "soumis", "en_attente_validation_b", "en_cours"]);
     } else if (activeTab === "validated") {
       query = query.in("status", ["valide_par_b"]);
     } else if (activeTab === "rejected") {
@@ -1623,14 +1623,14 @@ export function DepositValidationWorkflow() {
       <Dialog open={showPendingModal} onOpenChange={setShowPendingModal}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>En attente de traitement</DialogTitle>
+            <DialogTitle>Mettre en attente</DialogTitle>
             <DialogDescription>
-              Que souhaitez-vous faire avec cette demande ?
+              Voulez-vous mettre cette demande en attente ?
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <p className="text-sm text-muted-foreground">
-              La demande sera mise en attente et pourra être traitée ultérieurement.
+              La demande sera mise en attente avec le statut "En cours" et pourra être traitée ultérieurement.
             </p>
           </div>
           <div className="flex gap-3 justify-end">
@@ -1641,30 +1641,16 @@ export function DepositValidationWorkflow() {
               Annuler
             </Button>
             <Button
-              variant="secondary"
-              onClick={() => {
+              onClick={async () => {
+                if (selectedRequest) {
+                  await handleSetPending(selectedRequest.id);
+                }
                 setShowPendingModal(false);
-                setSelectedRequest(null);
-                toast({
-                  title: "Demande fermée",
-                  description: "La demande a été fermée sans modification",
-                });
               }}
+              disabled={isLoading}
             >
-              Fermer
-            </Button>
-            <Button
-              onClick={() => {
-                setShowPendingModal(false);
-                setSelectedRequest(null);
-                toast({
-                  title: "Demande archivée",
-                  description: "La demande a été archivée pour traitement ultérieur",
-                });
-              }}
-            >
-              <Archive className="h-4 w-4 mr-2" />
-              Archiver
+              <Clock className="h-4 w-4 mr-2" />
+              Confirmer
             </Button>
           </div>
         </DialogContent>
