@@ -98,7 +98,9 @@ export const BNRMNumberAttribution = () => {
   
   // Paramétrage des numéros par type de document - avec persistance localStorage
   const defaultSettings = {
-    monographie: { isbn: true, issn: false, ismn: false, dl: true },
+    monographie_imprime: { isbn: true, issn: false, ismn: false, dl: true },
+    monographie_electronique: { isbn: true, issn: false, ismn: false, dl: false },
+    monographie_electronique_collection: { isbn: false, issn: true, ismn: false, dl: false },
     periodique: { isbn: false, issn: true, ismn: false, dl: true },
     audiovisuel: { isbn: false, issn: false, ismn: true, dl: true },
     collections_specialisees: { isbn: false, issn: false, ismn: true, dl: true },
@@ -120,7 +122,7 @@ export const BNRMNumberAttribution = () => {
 
   // Récupérer les paramètres pour un type de document donné
   const getSettingsForType = (depositType: string) => {
-    return numberSettings[depositType] || defaultSettings.monographie;
+    return numberSettings[depositType] || defaultSettings.monographie_imprime;
   };
 
   useEffect(() => {
@@ -141,10 +143,12 @@ export const BNRMNumberAttribution = () => {
   };
 
   // Déterminer le type de dépôt à partir des données de la demande
-  const getDepositCategory = (req: any): 'monographie' | 'periodique' | 'audiovisuel' | 'collections_specialisees' => {
+  const getDepositCategory = (req: any): 'monographie_imprime' | 'monographie_electronique' | 'monographie_electronique_collection' | 'periodique' | 'audiovisuel' | 'collections_specialisees' => {
     const supportType = req.support_type?.toLowerCase() || '';
     const metadata = (req.metadata as Record<string, any>) || {};
     const depositType = metadata?.deposit_type?.toLowerCase() || req.deposit_type?.toLowerCase() || '';
+    const isCollection = metadata?.is_collection === true || metadata?.periodicite === 'oui' || supportType.includes('collection');
+    const isElectronic = supportType.includes('electron') || supportType.includes('numérique') || supportType.includes('digital') || metadata?.support === 'electronique';
     
     // Vérifier si c'est audiovisuel
     if (depositType.includes('audiovisuel') || depositType.includes('audio-visuel') || 
@@ -155,7 +159,7 @@ export const BNRMNumberAttribution = () => {
     }
     
     // Vérifier si c'est collections spécialisées
-    if (depositType.includes('collection') || depositType.includes('specialise') ||
+    if (depositType.includes('collection') && depositType.includes('special') ||
         supportType.includes('partition') || supportType.includes('musique') ||
         supportType.includes('carte') || supportType.includes('affiche') ||
         supportType.includes('estampe') || supportType.includes('photo')) {
@@ -164,8 +168,14 @@ export const BNRMNumberAttribution = () => {
     
     // Monographie ou périodique
     if (supportType.includes('livre') || supportType.includes('monograph') || 
-        depositType.includes('monograph')) {
-      return 'monographie';
+        depositType.includes('monograph') || depositType.includes('livres')) {
+      // Distinguer les 3 types de monographies
+      if (isElectronic && isCollection) {
+        return 'monographie_electronique_collection';
+      } else if (isElectronic) {
+        return 'monographie_electronique';
+      }
+      return 'monographie_imprime';
     }
     
     return 'periodique';
@@ -470,6 +480,9 @@ export const BNRMNumberAttribution = () => {
 
   const getDepositTypeLabel = (type: string) => {
     switch (type) {
+      case 'monographie_imprime': return 'Monographie Imprimé';
+      case 'monographie_electronique': return 'Monographie Électronique';
+      case 'monographie_electronique_collection': return 'Monographie Électronique (Collection)';
       case 'monographie': return 'Monographie';
       case 'periodique': return 'Périodique';
       case 'audiovisuel': return 'Audio-visuel';
@@ -910,64 +923,191 @@ export const BNRMNumberAttribution = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {/* Monographies */}
+                {/* Monographie Imprimé */}
                 <div className="border rounded-lg p-4">
                   <div className="flex items-center gap-3 mb-4">
                     <BookOpen className="h-5 w-5 text-primary" />
-                    <h3 className="font-semibold text-lg">Monographies</h3>
+                    <h3 className="font-semibold text-lg">Monographie Imprimé</h3>
+                    <Badge variant="secondary" className="text-xs">ISBN + DL</Badge>
                   </div>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div className="flex items-center space-x-2">
                       <input
                         type="checkbox"
-                        id="mono-isbn"
-                        checked={numberSettings.monographie.isbn}
+                        id="mono-imp-isbn"
+                        checked={numberSettings.monographie_imprime?.isbn ?? true}
                         onChange={(e) => setNumberSettings(prev => ({
                           ...prev,
-                          monographie: { ...prev.monographie, isbn: e.target.checked }
+                          monographie_imprime: { ...prev.monographie_imprime, isbn: e.target.checked }
                         }))}
                         className="h-4 w-4 rounded border-gray-300"
                       />
-                      <Label htmlFor="mono-isbn" className="font-medium">ISBN</Label>
+                      <Label htmlFor="mono-imp-isbn" className="font-medium">ISBN</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <input
                         type="checkbox"
-                        id="mono-issn"
-                        checked={numberSettings.monographie.issn}
+                        id="mono-imp-issn"
+                        checked={numberSettings.monographie_imprime?.issn ?? false}
                         onChange={(e) => setNumberSettings(prev => ({
                           ...prev,
-                          monographie: { ...prev.monographie, issn: e.target.checked }
+                          monographie_imprime: { ...prev.monographie_imprime, issn: e.target.checked }
                         }))}
                         className="h-4 w-4 rounded border-gray-300"
                       />
-                      <Label htmlFor="mono-issn" className="font-medium">ISSN</Label>
+                      <Label htmlFor="mono-imp-issn" className="font-medium">ISSN</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <input
                         type="checkbox"
-                        id="mono-ismn"
-                        checked={numberSettings.monographie.ismn}
+                        id="mono-imp-ismn"
+                        checked={numberSettings.monographie_imprime?.ismn ?? false}
                         onChange={(e) => setNumberSettings(prev => ({
                           ...prev,
-                          monographie: { ...prev.monographie, ismn: e.target.checked }
+                          monographie_imprime: { ...prev.monographie_imprime, ismn: e.target.checked }
                         }))}
                         className="h-4 w-4 rounded border-gray-300"
                       />
-                      <Label htmlFor="mono-ismn" className="font-medium">ISMN</Label>
+                      <Label htmlFor="mono-imp-ismn" className="font-medium">ISMN</Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <input
                         type="checkbox"
-                        id="mono-dl"
-                        checked={numberSettings.monographie.dl}
+                        id="mono-imp-dl"
+                        checked={numberSettings.monographie_imprime?.dl ?? true}
                         onChange={(e) => setNumberSettings(prev => ({
                           ...prev,
-                          monographie: { ...prev.monographie, dl: e.target.checked }
+                          monographie_imprime: { ...prev.monographie_imprime, dl: e.target.checked }
                         }))}
                         className="h-4 w-4 rounded border-gray-300"
                       />
-                      <Label htmlFor="mono-dl" className="font-medium">Dépôt Légal</Label>
+                      <Label htmlFor="mono-imp-dl" className="font-medium">Dépôt Légal</Label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Monographie Électronique */}
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    <BookOpen className="h-5 w-5 text-blue-500" />
+                    <h3 className="font-semibold text-lg">Monographie Électronique</h3>
+                    <Badge variant="secondary" className="text-xs">ISBN uniquement</Badge>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="mono-elec-isbn"
+                        checked={numberSettings.monographie_electronique?.isbn ?? true}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          monographie_electronique: { ...prev.monographie_electronique, isbn: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="mono-elec-isbn" className="font-medium">ISBN</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="mono-elec-issn"
+                        checked={numberSettings.monographie_electronique?.issn ?? false}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          monographie_electronique: { ...prev.monographie_electronique, issn: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="mono-elec-issn" className="font-medium">ISSN</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="mono-elec-ismn"
+                        checked={numberSettings.monographie_electronique?.ismn ?? false}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          monographie_electronique: { ...prev.monographie_electronique, ismn: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="mono-elec-ismn" className="font-medium">ISMN</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="mono-elec-dl"
+                        checked={numberSettings.monographie_electronique?.dl ?? false}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          monographie_electronique: { ...prev.monographie_electronique, dl: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="mono-elec-dl" className="font-medium">Dépôt Légal</Label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Monographie Électronique (Collection) */}
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    <BookOpen className="h-5 w-5 text-purple-500" />
+                    <h3 className="font-semibold text-lg">Monographie Électronique (Collection)</h3>
+                    <Badge variant="secondary" className="text-xs">ISSN uniquement</Badge>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="mono-elec-col-isbn"
+                        checked={numberSettings.monographie_electronique_collection?.isbn ?? false}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          monographie_electronique_collection: { ...prev.monographie_electronique_collection, isbn: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="mono-elec-col-isbn" className="font-medium">ISBN</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="mono-elec-col-issn"
+                        checked={numberSettings.monographie_electronique_collection?.issn ?? true}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          monographie_electronique_collection: { ...prev.monographie_electronique_collection, issn: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="mono-elec-col-issn" className="font-medium">ISSN</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="mono-elec-col-ismn"
+                        checked={numberSettings.monographie_electronique_collection?.ismn ?? false}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          monographie_electronique_collection: { ...prev.monographie_electronique_collection, ismn: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="mono-elec-col-ismn" className="font-medium">ISMN</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="mono-elec-col-dl"
+                        checked={numberSettings.monographie_electronique_collection?.dl ?? false}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          monographie_electronique_collection: { ...prev.monographie_electronique_collection, dl: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="mono-elec-col-dl" className="font-medium">Dépôt Légal</Label>
                     </div>
                   </div>
                 </div>
