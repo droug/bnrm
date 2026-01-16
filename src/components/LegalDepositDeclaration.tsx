@@ -33,6 +33,10 @@ import { PhoneInput } from "@/components/ui/phone-input";
 import { useSystemList } from "@/hooks/useSystemList";
 import { useDependentList } from "@/hooks/useDependentList";
 import { useLegalDepositStorage } from "@/hooks/useLegalDepositStorage";
+import { DisciplineAutocomplete } from "@/components/ui/discipline-autocomplete";
+import { LanguageAutocomplete } from "@/components/ui/language-autocomplete";
+import { CountrySingleAutocomplete } from "@/components/ui/country-single-autocomplete";
+import { PublisherAutocomplete } from "@/components/ui/publisher-autocomplete";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
@@ -4579,37 +4583,37 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
 
                 <div className="space-y-2">
                   <Label>Discipline / domaine <span className="text-destructive">*</span></Label>
-                  <Input
-                    placeholder="Discipline ou domaine"
+                  <DisciplineAutocomplete
+                    placeholder="Rechercher une discipline..."
                     value={issnFormData.discipline}
-                    onChange={(e) => setIssnFormData({ ...issnFormData, discipline: e.target.value })}
+                    onChange={(value) => setIssnFormData({ ...issnFormData, discipline: value })}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label>Langue principale <span className="text-destructive">*</span></Label>
-                  <Input
-                    placeholder="Langue principale"
+                  <LanguageAutocomplete
+                    placeholder="Rechercher une langue..."
                     value={issnFormData.language}
-                    onChange={(e) => setIssnFormData({ ...issnFormData, language: e.target.value })}
+                    onChange={(value) => setIssnFormData({ ...issnFormData, language: value })}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label>Pays d'édition <span className="text-destructive">*</span></Label>
-                  <Input
-                    placeholder="Pays d'édition"
+                  <CountrySingleAutocomplete
+                    placeholder="Rechercher un pays..."
                     value={issnFormData.country}
-                    onChange={(e) => setIssnFormData({ ...issnFormData, country: e.target.value })}
+                    onChange={(value) => setIssnFormData({ ...issnFormData, country: value })}
                   />
                 </div>
 
                 <div className="space-y-2">
                   <Label>Éditeur <span className="text-destructive">*</span></Label>
-                  <Input
-                    placeholder="Nom de l'éditeur"
+                  <PublisherAutocomplete
+                    placeholder="Rechercher un éditeur..."
                     value={issnFormData.publisher}
-                    onChange={(e) => setIssnFormData({ ...issnFormData, publisher: e.target.value })}
+                    onChange={(value) => setIssnFormData({ ...issnFormData, publisher: value })}
                   />
                 </div>
 
