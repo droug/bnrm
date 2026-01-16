@@ -1337,8 +1337,8 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
 
                 {/* Informations de contact */}
                 <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input type="email" placeholder="Email" />
+                  <Label>Email <span className="text-destructive">*</span></Label>
+                  <Input type="email" placeholder="Email" required />
                 </div>
 
                 <div className="space-y-2">
@@ -2063,8 +2063,8 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input type="email" placeholder="Adresse email" />
+                  <Label>Email <span className="text-destructive">*</span></Label>
+                  <Input type="email" placeholder="Adresse email" required />
                 </div>
 
                 <div className="space-y-2">
@@ -2732,12 +2732,13 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                 </div>
                 
                 <div className="space-y-2">
-                  <Label>Email</Label>
+                  <Label>Email <span className="text-destructive">*</span></Label>
                   <Input 
                     type="email" 
                     placeholder="Adresse email"
                     value={distributorData.email || ''}
                     onChange={(e) => setDistributorData({ ...distributorData, email: e.target.value })}
+                    required
                   />
                 </div>
 
@@ -2818,8 +2819,8 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Email</Label>
-                  <Input type="email" placeholder="Adresse email" />
+                  <Label>Email <span className="text-destructive">*</span></Label>
+                  <Input type="email" placeholder="Adresse email" required />
                 </div>
 
                 <div className="space-y-2">
@@ -3635,8 +3636,8 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           </div>
 
           <div className="space-y-2">
-            <Label>البريد الإلكتروني</Label>
-            <Input type="email" placeholder="البريد الإلكتروني" />
+            <Label>البريد الإلكتروني <span className="text-destructive">*</span></Label>
+            <Input type="email" placeholder="البريد الإلكتروني" required />
           </div>
 
           <div className="space-y-2 md:col-span-2">
@@ -3757,8 +3758,8 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           </div>
 
           <div className="space-y-2">
-            <Label>البريد الإلكتروني</Label>
-            <Input type="email" placeholder="بريد الناشر الإلكتروني" />
+            <Label>البريد الإلكتروني <span className="text-destructive">*</span></Label>
+            <Input type="email" placeholder="بريد الناشر الإلكتروني" required />
           </div>
 
           <div className="space-y-2">
@@ -3780,8 +3781,8 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           </div>
 
           <div className="space-y-2">
-            <Label>البريد الإلكتروني</Label>
-            <Input type="email" placeholder="بريد المطبعة الإلكتروني" />
+            <Label>البريد الإلكتروني <span className="text-destructive">*</span></Label>
+            <Input type="email" placeholder="بريد المطبعة الإلكتروني" required />
           </div>
 
           <div className="space-y-2">
