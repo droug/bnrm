@@ -5,13 +5,14 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
-import { Upload, Printer, AlertCircle, MapPin, Building, User } from "lucide-react";
+import { Upload, Printer, AlertCircle, MapPin, Building, User, Loader2 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { PhoneInput } from "@/components/ui/phone-input";
 import { ArabicInputWithKeyboard } from "@/components/ui/arabic-keyboard";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
+import { uploadProfessionalDocuments } from "@/lib/professionalFileUpload";
 
 // Mapping des régions vers leurs villes
 const citiesByRegion: Record<string, Array<{ value: string; label: string }>> = {
@@ -147,6 +148,7 @@ interface PrinterFormData {
 const PrinterSignupForm = () => {
   const { toast } = useToast();
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<PrinterFormData>({
     type: "morale",
     nature: "",
@@ -202,7 +204,23 @@ const PrinterSignupForm = () => {
     setValidationErrors([]);
     
     try {
-      // Prepare registration data
+      setIsSubmitting(true);
+
+      // Generate a temporary reference number
+      const tempRefNumber = `REQ-PR-${Date.now().toString(36).toUpperCase()}`;
+
+      // Upload files to storage
+      const fileUrls = await uploadProfessionalDocuments(
+        {
+          logoFile: formData.logoFile,
+          commerceRegistryFile: formData.commerceRegistryFile,
+          cinFile: formData.cinFile,
+        },
+        'printer',
+        tempRefNumber
+      );
+
+      // Prepare registration data with file URLs
       const registrationData = {
         type: formData.type,
         nature: formData.nature,
@@ -212,6 +230,8 @@ const PrinterSignupForm = () => {
         region: formData.region,
         city: formData.city,
         contact_name: formData.type === "morale" ? formData.contactPerson : formData.otherContact,
+        // Include file URLs
+        ...fileUrls,
         ...(formData.type === "morale" ? {
           name_ar: formData.nameAr,
           name_fr: formData.nameFr,
@@ -226,9 +246,6 @@ const PrinterSignupForm = () => {
       const companyName = formData.type === "morale" 
         ? formData.nameFr || formData.nameAr 
         : formData.printerNameFr || formData.printerNameAr;
-
-      // Generate a temporary reference number
-      const tempRefNumber = `REQ-PR-${Date.now().toString(36).toUpperCase()}`;
 
       // Insert into professional_registration_requests
       const { error } = await supabase
@@ -255,6 +272,8 @@ const PrinterSignupForm = () => {
         description: "Une erreur est survenue lors de l'envoi de votre demande.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

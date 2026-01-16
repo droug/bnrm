@@ -7,11 +7,12 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, User, Building, X, MapPin, AlertCircle } from "lucide-react";
+import { Upload, User, Building, X, MapPin, AlertCircle, Loader2 } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ArabicInputWithKeyboard } from "@/components/ui/arabic-keyboard";
+import { uploadProfessionalDocuments } from "@/lib/professionalFileUpload";
 
 // Mapping des régions vers leurs villes
 const citiesByRegion: Record<string, Array<{ value: string; label: string }>> = {
@@ -163,6 +164,7 @@ const EditorSignupForm = () => {
   const [editorSearch, setEditorSearch] = useState("");
   const [showEditorDropdown, setShowEditorDropdown] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchEditors();
@@ -222,7 +224,24 @@ const EditorSignupForm = () => {
     setValidationErrors([]);
 
     try {
-      // Prepare registration data
+      setIsSubmitting(true);
+
+      // Generate a temporary reference number
+      const tempRefNumber = `REQ-ED-${Date.now().toString(36).toUpperCase()}`;
+
+      // Upload files to storage
+      const fileUrls = await uploadProfessionalDocuments(
+        {
+          logoFile: formData.logoFile,
+          commerceRegistryFile: formData.commerceRegistryFile,
+          cinFile: formData.cinFile,
+          photoFile: formData.photoFile,
+        },
+        'editor',
+        tempRefNumber
+      );
+
+      // Prepare registration data with file URLs
       const registrationData = {
         type: formData.type,
         nature: formData.nature,
@@ -232,6 +251,8 @@ const EditorSignupForm = () => {
         region: formData.region,
         city: formData.city,
         contact_name: formData.type === "morale" ? formData.contactPerson : formData.otherContact,
+        // Include file URLs
+        ...fileUrls,
         ...(formData.type === "morale" ? {
           name_ar: formData.nameAr,
           name_fr: formData.nameFr,
@@ -247,9 +268,6 @@ const EditorSignupForm = () => {
       const companyName = formData.type === "morale" 
         ? formData.nameFr || formData.nameAr 
         : formData.editorNameFr || formData.editorNameAr;
-
-      // Generate a temporary reference number
-      const tempRefNumber = `REQ-ED-${Date.now().toString(36).toUpperCase()}`;
 
       // Insert into professional_registration_requests
       const { error } = await supabase
@@ -276,6 +294,8 @@ const EditorSignupForm = () => {
         description: "Une erreur est survenue lors de l'envoi de votre demande.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
