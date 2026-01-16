@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Keyboard, X } from "lucide-react";
 
 interface ArabicKeyboardProps {
@@ -10,13 +11,13 @@ interface ArabicKeyboardProps {
 
 // Complete Arabic alphabet (28 letters) + special characters
 const arabicKeys = [
-  ['ض', 'ص', 'ث', 'ق', 'ف', 'غ', 'ع', 'ه', 'خ', 'ح', 'ج', 'د', 'ذ'],
-  ['ش', 'س', 'ي', 'ب', 'ل', 'ا', 'ت', 'ن', 'م', 'ك', 'ط', 'ظ'],
-  ['ز', 'و', 'ة', 'ى', 'ر', 'ء', 'ئ', 'ؤ', 'أ', 'إ', 'آ'],
-  ['لا', 'لأ', 'لإ', 'لآ', 'ـ', ' ']
+  ["ض", "ص", "ث", "ق", "ف", "غ", "ع", "ه", "خ", "ح", "ج", "د", "ذ"],
+  ["ش", "س", "ي", "ب", "ل", "ا", "ت", "ن", "م", "ك", "ط", "ظ"],
+  ["ز", "و", "ة", "ى", "ر", "ء", "ئ", "ؤ", "أ", "إ", "آ"],
+  ["لا", "لأ", "لإ", "لآ", "ـ", " "],
 ];
 
-const diacritics = ['َ', 'ً', 'ُ', 'ٌ', 'ِ', 'ٍ', 'ْ', 'ّ', 'ٰ'];
+const diacritics = ["َ", "ً", "ُ", "ٌ", "ِ", "ٍ", "ْ", "ّ", "ٰ"];
 
 export const ArabicKeyboard = ({ onInsert, onClose }: ArabicKeyboardProps) => {
   const [showDiacritics, setShowDiacritics] = useState(false);
@@ -29,26 +30,17 @@ export const ArabicKeyboard = ({ onInsert, onClose }: ArabicKeyboardProps) => {
             type="button"
             size="sm"
             variant={showDiacritics ? "default" : "outline"}
-            onClick={() => setShowDiacritics(!showDiacritics)}
+            onClick={() => setShowDiacritics((v) => !v)}
           >
             التشكيل
           </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={() => onInsert(' ')}
+          <Button type="button" size="sm" variant="outline" onClick={() => onInsert(" ")}
           >
             مسافة
           </Button>
         </div>
         {onClose && (
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            onClick={onClose}
-          >
+          <Button type="button" size="sm" variant="ghost" onClick={onClose}>
             <X className="h-4 w-4" />
           </Button>
         )}
@@ -100,55 +92,97 @@ interface ArabicInputProps {
   className?: string;
 }
 
-export const ArabicInputWithKeyboard = ({ value, onChange, placeholder, className }: ArabicInputProps) => {
+export const ArabicInputWithKeyboard = ({
+  value,
+  onChange,
+  placeholder,
+  className,
+}: ArabicInputProps) => {
+  const inputRef = useRef<HTMLInputElement>(null);
   const [showKeyboard, setShowKeyboard] = useState(false);
   const [cursorPosition, setCursorPosition] = useState(0);
 
+  const getSelection = () => {
+    const el = inputRef.current;
+    const start = el?.selectionStart ?? cursorPosition;
+    const end = el?.selectionEnd ?? cursorPosition;
+    return { start, end };
+  };
+
+  const restoreCaret = (pos: number) => {
+    requestAnimationFrame(() => {
+      const el = inputRef.current;
+      if (!el) return;
+      el.focus();
+      try {
+        el.setSelectionRange(pos, pos);
+      } catch {
+        // noop (some browsers may throw for certain input states)
+      }
+    });
+  };
+
   const handleInsert = (char: string) => {
-    const newValue = value.slice(0, cursorPosition) + char + value.slice(cursorPosition);
+    const { start, end } = getSelection();
+    const newValue = value.slice(0, start) + char + value.slice(end);
+    const nextPos = start + char.length;
+
     onChange(newValue);
-    setCursorPosition(cursorPosition + char.length);
+    setCursorPosition(nextPos);
+    restoreCaret(nextPos);
+  };
+
+  const syncCursor = () => {
+    const el = inputRef.current;
+    if (!el) return;
+    setCursorPosition(el.selectionStart ?? 0);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onChange(e.target.value);
-    setCursorPosition(e.target.selectionStart || 0);
-  };
-
-  const handleInputClick = (e: React.MouseEvent<HTMLInputElement>) => {
-    const target = e.target as HTMLInputElement;
-    setCursorPosition(target.selectionStart || 0);
+    setCursorPosition(e.target.selectionStart ?? 0);
   };
 
   return (
     <div className="space-y-2">
       <div className="relative">
         <input
+          ref={inputRef}
           type="text"
           value={value}
           onChange={handleInputChange}
-          onClick={handleInputClick}
+          onClick={syncCursor}
+          onKeyUp={syncCursor}
+          onSelect={syncCursor}
           placeholder={placeholder}
           dir="rtl"
-          className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pr-10 ${className}`}
+          lang="ar"
+          inputMode="text"
+          className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 pl-10 ${className || ""}`}
         />
-        <Button
-          type="button"
-          size="sm"
-          variant="ghost"
-          className="absolute left-2 top-1/2 -translate-y-1/2"
-          onClick={() => setShowKeyboard(!showKeyboard)}
-        >
-          <Keyboard className="h-4 w-4" />
-        </Button>
-      </div>
 
-      {showKeyboard && (
-        <ArabicKeyboard
-          onInsert={handleInsert}
-          onClose={() => setShowKeyboard(false)}
-        />
-      )}
+        <Popover open={showKeyboard} onOpenChange={setShowKeyboard}>
+          <PopoverTrigger asChild>
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              className="absolute left-2 top-1/2 -translate-y-1/2"
+              onClick={() => setShowKeyboard((v) => !v)}
+              aria-label="Clavier arabe"
+            >
+              <Keyboard className="h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent
+            side="bottom"
+            align="start"
+            className="w-[560px] max-w-[calc(100vw-2rem)] p-2"
+          >
+            <ArabicKeyboard onInsert={handleInsert} onClose={() => setShowKeyboard(false)} />
+          </PopoverContent>
+        </Popover>
+      </div>
     </div>
   );
 };

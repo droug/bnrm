@@ -446,9 +446,11 @@ export function ProfessionalsList() {
                         </p>
                       </div>
                       {selectedProfessional.registration_data.nameAr && (
-                        <div>
+                        <div className="space-y-1">
                           <p className="text-sm font-medium text-muted-foreground">Nom (Arabe)</p>
-                          <p className="text-base">{selectedProfessional.registration_data.nameAr}</p>
+                          <p className="text-base text-right" dir="rtl" lang="ar">
+                            {selectedProfessional.registration_data.nameAr}
+                          </p>
                         </div>
                       )}
                       {selectedProfessional.registration_data.nameFr && (
@@ -500,9 +502,11 @@ export function ProfessionalsList() {
                   {selectedProfessional.role === 'printer' && (
                     <div className="grid grid-cols-2 gap-4">
                       {selectedProfessional.registration_data.nameAr && (
-                        <div>
+                        <div className="space-y-1">
                           <p className="text-sm font-medium text-muted-foreground">Nom (Arabe)</p>
-                          <p className="text-base">{selectedProfessional.registration_data.nameAr}</p>
+                          <p className="text-base text-right" dir="rtl" lang="ar">
+                            {selectedProfessional.registration_data.nameAr}
+                          </p>
                         </div>
                       )}
                       {selectedProfessional.registration_data.nameFr && (
