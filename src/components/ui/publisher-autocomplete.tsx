@@ -82,13 +82,13 @@ export function PublisherAutocomplete({
       )
     : publishers;
 
-  // Update dropdown position
+  // Update dropdown position (fixed position = viewport coords, no scrollY)
   useEffect(() => {
     if (showSuggestions && inputRef.current) {
       const rect = inputRef.current.getBoundingClientRect();
       setDropdownPosition({
-        top: rect.bottom + window.scrollY,
-        left: rect.left + window.scrollX,
+        top: rect.bottom,
+        left: rect.left,
         width: rect.width
       });
     }
@@ -120,31 +120,34 @@ export function PublisherAutocomplete({
 
   const dropdown = showSuggestions && (filteredPublishers.length > 0 || displayValue.trim()) && createPortal(
     <div
-      className="fixed bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-y-auto"
+      className="fixed bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-y-auto"
       style={{
         top: dropdownPosition.top,
         left: dropdownPosition.left,
         width: dropdownPosition.width,
-        zIndex: 99999
+        zIndex: 100001
       }}
     >
       {loading ? (
-        <div className="px-3 py-2 text-sm text-gray-500">Chargement...</div>
+        <div className="px-3 py-2 text-sm text-muted-foreground">Chargement...</div>
       ) : filteredPublishers.length > 0 ? (
         filteredPublishers.slice(0, 50).map((publisher) => (
           <div
             key={publisher.id}
-            className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
-            onClick={() => handleSelect(publisher)}
+            className="px-3 py-2 hover:bg-accent cursor-pointer text-sm"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              handleSelect(publisher);
+            }}
           >
             <div className="font-medium">{publisher.company_name}</div>
             {publisher.city && (
-              <div className="text-xs text-gray-500">{publisher.city}</div>
+              <div className="text-xs text-muted-foreground">{publisher.city}</div>
             )}
           </div>
         ))
       ) : displayValue.trim() ? (
-        <div className="px-3 py-2 text-sm text-gray-500">
+        <div className="px-3 py-2 text-sm text-muted-foreground">
           Aucun éditeur trouvé. Vous pouvez saisir manuellement.
         </div>
       ) : null}
