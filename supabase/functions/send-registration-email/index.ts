@@ -139,11 +139,13 @@ serve(async (req) => {
     if (email_type === 'account_validated' && user_id && !reset_link) {
       console.log("Generating password reset link for user:", user_id);
       
+      const siteUrl = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
+
       const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
         type: 'recovery',
         email: recipient_email,
         options: {
-          redirectTo: `${Deno.env.get("SUPABASE_URL")?.replace('.supabase.co', '')}.lovable.app/auth?reset=true`
+          redirectTo: `${siteUrl}/auth?reset=true`
         }
       });
 

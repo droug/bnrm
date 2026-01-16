@@ -1,12 +1,11 @@
-import { useState } from "react";
-import { Navigate, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { BookOpen, Users, Shield } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -14,15 +13,29 @@ import { toast } from "sonner";
 export default function Auth() {
   const { user, signIn, signUp, loading } = useAuth();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
   const [isLoading, setIsLoading] = useState(false);
+
+  // Forgot-password email form
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
 
-  // Get redirect URL from query params (default to "/" for BNRM portal)
+  // Password update form (after recovery link)
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const isResetFlow = searchParams.get("reset") === "true";
   const redirectTo = searchParams.get("redirect") || "/";
 
-  // Redirect if already authenticated - to the appropriate destination
-  if (user && !loading) {
+  useEffect(() => {
+    if (isResetFlow) {
+      setShowResetPassword(false);
+    }
+  }, [isResetFlow]);
+
+  // Redirect if already authenticated - unless we're setting a new password
+  if (user && !loading && !isResetFlow) {
     return <Navigate to={redirectTo} replace />;
   }
 
@@ -64,11 +77,11 @@ export default function Auth() {
   const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
       redirectTo: `${window.location.origin}/auth?reset=true`,
     });
-    
+
     if (error) {
       toast.error("Erreur", {
         description: error.message,
@@ -80,14 +93,132 @@ export default function Auth() {
       setShowResetPassword(false);
       setResetEmail("");
     }
-    
+
     setIsLoading(false);
+  };
+
+  const handleUpdatePassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (newPassword.length < 8) {
+      toast.error("Mot de passe trop court", {
+        description: "Utilisez au moins 8 caractères.",
+      });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error("Les mots de passe ne correspondent pas");
+      return;
+    }
+
+    setIsLoading(true);
+
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+    if (error) {
+      toast.error("Impossible de modifier le mot de passe", {
+        description: error.message,
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    toast.success("Mot de passe créé", {
+      description: "Votre mot de passe a été enregistré.",
+    });
+
+    setNewPassword("");
+    setConfirmPassword("");
+    setIsLoading(false);
+
+    navigate(redirectTo, { replace: true });
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  if (isResetFlow) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-background via-background/95 to-primary/5 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
+          <CardHeader className="text-center">
+            <div className="flex justify-center mb-4">
+              <div className="bg-primary/10 p-3 rounded-full">
+                <Shield className="h-8 w-8 text-primary" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl font-bold">Créer votre mot de passe</CardTitle>
+            <CardDescription>
+              {user?.email ? `Compte : ${user.email}` : "Lien invalide ou expiré."}
+            </CardDescription>
+          </CardHeader>
+
+          <CardContent className="space-y-4">
+            {!user ? (
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Pour des raisons de sécurité, les liens de récupération expirent. Veuillez demander un nouveau lien.
+                </p>
+                <Button
+                  type="button"
+                  className="w-full"
+                  onClick={() => navigate("/auth", { replace: true })}
+                >
+                  Retour à la connexion
+                </Button>
+              </div>
+            ) : (
+              <form onSubmit={handleUpdatePassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="new-password">Nouveau mot de passe</Label>
+                  <Input
+                    id="new-password"
+                    type="password"
+                    autoComplete="new-password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                    minLength={8}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="confirm-password">Confirmer le mot de passe</Label>
+                  <Input
+                    id="confirm-password"
+                    type="password"
+                    autoComplete="new-password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    minLength={8}
+                  />
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => navigate("/auth", { replace: true })}
+                    disabled={isLoading}
+                  >
+                    Annuler
+                  </Button>
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Enregistrement..." : "Enregistrer"}
+                  </Button>
+                </div>
+              </form>
+            )}
+          </CardContent>
+        </Card>
       </div>
     );
   }
