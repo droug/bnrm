@@ -372,14 +372,24 @@ export default function Auth() {
                 </div>
               </div>
 
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full"
-                onClick={() => navigate("/signup")}
-              >
-                Créer un compte professionnel
-              </Button>
+              <div className="flex flex-col gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => navigate("/signup")}
+                >
+                  Inscription professionnelle
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => navigate("/abonnements")}
+                >
+                  Adhésion bibliothèque numérique
+                </Button>
+              </div>
             </form>
           ) : (
             <div className="space-y-4">
