@@ -41,7 +41,7 @@ import { SearchPagination } from "@/components/ui/search-pagination";
 interface NumberAttribution {
   id: string;
   deposit_id: string;
-  number_type: 'isbn' | 'issn' | 'dl';
+  number_type: 'isbn' | 'issn' | 'ismn' | 'dl';
   attributed_number: string;
   attribution_date: string;
   status: 'pending' | 'attributed' | 'confirmed' | 'cancelled';
@@ -57,7 +57,7 @@ interface NumberAttribution {
 
 interface NumberRange {
   id: string;
-  number_type: 'isbn' | 'issn' | 'dl';
+  number_type: 'isbn' | 'issn' | 'ismn' | 'dl';
   range_start: string;
   range_end: string;
   current_position: string;
@@ -88,7 +88,7 @@ export const BNRMNumberAttribution = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [newRange, setNewRange] = useState({
-    number_type: 'isbn' as 'isbn' | 'issn' | 'dl',
+    number_type: 'isbn' as 'isbn' | 'issn' | 'ismn' | 'dl',
     range_start: '',
     range_end: '',
     source: 'manual' as 'manual' | 'imported' | 'agency',
@@ -104,13 +104,45 @@ export const BNRMNumberAttribution = () => {
   const hasAnyAttributedNumber = (req: any) => {
     const metadata = (req?.metadata ?? {}) as Record<string, any>;
 
-    // Vérifier uniquement les vrais numéros attribués (ISBN, ISSN, DL assigné)
+    // Vérifier uniquement les vrais numéros attribués (ISBN, ISSN, ISMN, DL assigné)
     // dl_number/request_number n'est PAS un numéro attribué, c'est juste l'identifiant de la demande
     return Boolean(
       metadata?.isbn_assigned ||
       metadata?.issn_assigned ||
+      metadata?.ismn_assigned ||
       metadata?.dl_assigned
     );
+  };
+
+  // Déterminer le type de dépôt à partir des données de la demande
+  const getDepositCategory = (req: any): 'monographie' | 'periodique' | 'audiovisuel' | 'collections_specialisees' => {
+    const supportType = req.support_type?.toLowerCase() || '';
+    const metadata = (req.metadata as Record<string, any>) || {};
+    const depositType = metadata?.deposit_type?.toLowerCase() || req.deposit_type?.toLowerCase() || '';
+    
+    // Vérifier si c'est audiovisuel
+    if (depositType.includes('audiovisuel') || depositType.includes('audio-visuel') || 
+        supportType.includes('audiovisuel') || supportType.includes('audio') || 
+        supportType.includes('video') || supportType.includes('logiciel') ||
+        supportType.includes('cd') || supportType.includes('dvd') || supportType.includes('film')) {
+      return 'audiovisuel';
+    }
+    
+    // Vérifier si c'est collections spécialisées
+    if (depositType.includes('collection') || depositType.includes('specialise') ||
+        supportType.includes('partition') || supportType.includes('musique') ||
+        supportType.includes('carte') || supportType.includes('affiche') ||
+        supportType.includes('estampe') || supportType.includes('photo')) {
+      return 'collections_specialisees';
+    }
+    
+    // Monographie ou périodique
+    if (supportType.includes('livre') || supportType.includes('monograph') || 
+        depositType.includes('monograph')) {
+      return 'monographie';
+    }
+    
+    return 'periodique';
   };
 
   const fetchData = async () => {
@@ -148,15 +180,12 @@ export const BNRMNumberAttribution = () => {
       // Pending requests (à traiter) - seulement celles sans numéro
       const transformedRequests = pendingRows.map((req) => {
         const metadata = (req.metadata as Record<string, any>) || {};
+        const depositCategory = getDepositCategory(req);
         return {
           id: req.id,
           request_number: req.request_number,
           status: req.status,
-          deposit_type:
-            req.support_type?.toLowerCase().includes("livre") ||
-            req.support_type?.toLowerCase().includes("monograph")
-              ? "monographie"
-              : "periodique",
+          deposit_type: depositCategory,
           title: req.title,
           author_name: req.author_name,
           metadata: {
@@ -175,6 +204,7 @@ export const BNRMNumberAttribution = () => {
           dl_number: req.request_number,
           isbn_assigned: metadata?.isbn_assigned,
           issn_assigned: metadata?.issn_assigned,
+          ismn_assigned: metadata?.ismn_assigned,
         };
       });
 
@@ -186,8 +216,8 @@ export const BNRMNumberAttribution = () => {
       const transformedAttributions: NumberAttribution[] = allAttributedRows.map((req) => {
         const metadata = (req.metadata as Record<string, any>) || {};
 
-        // Détecter quel numéro est attribué en priorité (ISBN > ISSN > DL)
-        let numberType: "isbn" | "issn" | "dl" = "dl";
+        // Détecter quel numéro est attribué en priorité (ISBN > ISSN > ISMN > DL)
+        let numberType: "isbn" | "issn" | "ismn" | "dl" = "dl";
         let attributedNumber =
           metadata?.dl_number || metadata?.dl_assigned || req.dl_number || req.request_number;
 
@@ -197,6 +227,9 @@ export const BNRMNumberAttribution = () => {
         } else if (metadata?.issn_assigned || req.issn_assigned) {
           numberType = "issn";
           attributedNumber = metadata?.issn_assigned || req.issn_assigned;
+        } else if (metadata?.ismn_assigned || req.ismn_assigned) {
+          numberType = "ismn";
+          attributedNumber = metadata?.ismn_assigned || req.ismn_assigned;
         }
 
         const attributionDate =
@@ -281,8 +314,8 @@ export const BNRMNumberAttribution = () => {
     }
   };
 
-  const generateNextNumber = (type: 'isbn' | 'issn', currentRange: NumberRange): string => {
-    if (type === 'isbn') {
+  const generateNextNumber = (type: 'isbn' | 'issn' | 'ismn', currentRange: NumberRange): string => {
+    if (type === 'isbn' || type === 'ismn') {
       // Simplified ISBN generation logic
       const baseNumber = currentRange.current_position.replace(/-/g, '').slice(0, -1);
       const nextSequence = (parseInt(baseNumber.slice(-4)) + 1).toString().padStart(4, '0');
@@ -302,7 +335,7 @@ export const BNRMNumberAttribution = () => {
     }
   };
 
-  const attributeNumber = async (requestId: string, numberType: 'isbn' | 'issn' | 'dl') => {
+  const attributeNumber = async (requestId: string, numberType: 'isbn' | 'issn' | 'ismn' | 'dl') => {
     try {
       let attributedNumber = '';
       
@@ -403,8 +436,19 @@ export const BNRMNumberAttribution = () => {
     switch (type) {
       case 'isbn': return BookOpen;
       case 'issn': return Newspaper;
+      case 'ismn': return Hash; // Music notation icon
       case 'dl': return FileText;
       default: return Hash;
+    }
+  };
+
+  const getDepositTypeLabel = (type: string) => {
+    switch (type) {
+      case 'monographie': return 'Monographie';
+      case 'periodique': return 'Périodique';
+      case 'audiovisuel': return 'Audio-visuel';
+      case 'collections_specialisees': return 'Collections spécialisées';
+      default: return type;
     }
   };
 
@@ -525,7 +569,7 @@ export const BNRMNumberAttribution = () => {
         <div>
           <h2 className="text-2xl font-bold tracking-tight">Attribution des Numéros</h2>
           <p className="text-muted-foreground">
-            Gestion des numéros ISBN, ISSN et Dépôt Légal
+            Gestion des numéros ISBN, ISSN, ISMN et Dépôt Légal
           </p>
         </div>
         
@@ -555,6 +599,7 @@ export const BNRMNumberAttribution = () => {
                     <SelectContent>
                       <SelectItem value="isbn">ISBN</SelectItem>
                       <SelectItem value="issn">ISSN</SelectItem>
+                      <SelectItem value="ismn">ISMN</SelectItem>
                       <SelectItem value="dl">Dépôt Légal</SelectItem>
                     </SelectContent>
                   </Select>
@@ -647,7 +692,7 @@ export const BNRMNumberAttribution = () => {
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline">
-                            {request.deposit_type === 'monographie' ? 'Monographie' : 'Périodique'}
+                            {getDepositTypeLabel(request.deposit_type)}
                           </Badge>
                         </TableCell>
                         <TableCell>
@@ -723,6 +768,7 @@ export const BNRMNumberAttribution = () => {
                 <SelectItem value="all">Tous les types</SelectItem>
                 <SelectItem value="isbn">ISBN</SelectItem>
                 <SelectItem value="issn">ISSN</SelectItem>
+                <SelectItem value="ismn">ISMN</SelectItem>
                 <SelectItem value="dl">Dépôt Légal</SelectItem>
               </SelectContent>
             </Select>
@@ -973,7 +1019,7 @@ export const BNRMNumberAttribution = () => {
                 </div>
                 <div>
                   <Label className="text-sm text-muted-foreground">Type</Label>
-                  <div>{selectedRequest.deposit_type === 'monographie' ? 'Monographie (ISBN)' : 'Périodique (ISSN)'}</div>
+                  <div>{getDepositTypeLabel(selectedRequest.deposit_type)}</div>
                 </div>
               </div>
 
@@ -983,7 +1029,8 @@ export const BNRMNumberAttribution = () => {
                 </p>
                 
                 <div className="grid gap-2">
-                  {selectedRequest.deposit_type === 'monographie' ? (
+                  {/* Monographie: ISBN */}
+                  {selectedRequest.deposit_type === 'monographie' && (
                     <Button 
                       className="w-full justify-start"
                       onClick={() => attributeNumber(selectedRequest.id, 'isbn')}
@@ -991,7 +1038,10 @@ export const BNRMNumberAttribution = () => {
                       <BookOpen className="h-4 w-4 mr-2" />
                       Attribuer un numéro ISBN
                     </Button>
-                  ) : (
+                  )}
+                  
+                  {/* Périodique: ISSN */}
+                  {selectedRequest.deposit_type === 'periodique' && (
                     <Button 
                       className="w-full justify-start"
                       onClick={() => attributeNumber(selectedRequest.id, 'issn')}
@@ -1001,6 +1051,18 @@ export const BNRMNumberAttribution = () => {
                     </Button>
                   )}
                   
+                  {/* Audio-visuel & Collections spécialisées: ISMN et/ou DL */}
+                  {(selectedRequest.deposit_type === 'audiovisuel' || selectedRequest.deposit_type === 'collections_specialisees') && (
+                    <Button 
+                      className="w-full justify-start"
+                      onClick={() => attributeNumber(selectedRequest.id, 'ismn')}
+                    >
+                      <Hash className="h-4 w-4 mr-2" />
+                      Attribuer un numéro ISMN
+                    </Button>
+                  )}
+                  
+                  {/* Dépôt Légal disponible pour tous les types */}
                   <Button 
                     variant="outline"
                     className="w-full justify-start"
