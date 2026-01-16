@@ -459,8 +459,26 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
       return;
     }
 
+    if (!user) {
+      toast.error("Vous devez être connecté pour soumettre une demande ISSN");
+      return;
+    }
+
     try {
-      // TODO: Sauvegarder la demande ISSN dans la base de données
+      const { error } = await supabase.from('issn_requests').insert({
+        title: issnFormData.title,
+        discipline: issnFormData.discipline,
+        language_code: issnFormData.language,
+        country_code: issnFormData.country,
+        publisher: issnFormData.publisher,
+        support: issnFormData.support,
+        frequency: issnFormData.frequency,
+        contact_address: issnFormData.contactAddress,
+        user_id: user.id
+      });
+
+      if (error) throw error;
+
       setIssnSubmitted(true);
       setIsIssnModalOpen(false);
       toast.success("✅ Demande ISSN effectuée avec succès");

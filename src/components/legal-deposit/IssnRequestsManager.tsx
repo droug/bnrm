@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,61 +8,34 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Eye, CheckCircle, XCircle, Search, Filter, FileText } from "lucide-react";
+import { Eye, CheckCircle, XCircle, Search, Filter, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 interface IssnRequest {
   id: string;
-  requestNumber: string;
+  request_number: string;
   title: string;
   discipline: string;
-  language: string;
-  country: string;
+  language_code: string;
+  country_code: string;
   publisher: string;
   support: string;
   frequency: string;
-  contactAddress: string;
+  contact_address: string;
   status: "en_attente" | "validee" | "refusee";
-  submittedAt: Date;
-  reviewedAt?: Date;
-  reviewedBy?: string;
-  rejectionReason?: string;
+  created_at: string;
+  reviewed_at: string | null;
+  reviewed_by: string | null;
+  rejection_reason: string | null;
 }
 
 export default function IssnRequestsManager() {
-  const [requests, setRequests] = useState<IssnRequest[]>([
-    {
-      id: "1",
-      requestNumber: "ISSN-2025-000001",
-      title: "Revue Marocaine de Littérature",
-      discipline: "Littérature",
-      language: "Français",
-      country: "Maroc",
-      publisher: "Éditions Al-Maarifa",
-      support: "mixte",
-      frequency: "trimestrielle",
-      contactAddress: "123 Rue Mohamed V, Rabat",
-      status: "en_attente",
-      submittedAt: new Date("2025-01-15"),
-    },
-    {
-      id: "2",
-      requestNumber: "ISSN-2025-000002",
-      title: "Journal des Sciences Économiques",
-      discipline: "Économie",
-      language: "Arabe",
-      country: "Maroc",
-      publisher: "Publications Universitaires",
-      support: "papier",
-      frequency: "mensuelle",
-      contactAddress: "456 Avenue Hassan II, Casablanca",
-      status: "validee",
-      submittedAt: new Date("2025-01-10"),
-      reviewedAt: new Date("2025-01-12"),
-    },
-  ]);
-
+  const { user } = useAuth();
+  const [requests, setRequests] = useState<IssnRequest[]>([]);
+  const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [supportFilter, setSupportFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -71,33 +44,56 @@ export default function IssnRequestsManager() {
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
 
+  // Fetch requests from database
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+
+  const fetchRequests = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('issn_requests')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setRequests((data || []) as IssnRequest[]);
+    } catch (error) {
+      console.error('Error fetching ISSN requests:', error);
+      toast.error("Erreur lors du chargement des demandes");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getStatusBadge = (status: IssnRequest["status"]) => {
     const variants = {
       en_attente: { label: "En attente", className: "bg-[#FFF8E1] text-[#F57C00] hover:bg-[#FFF8E1]" },
       validee: { label: "Validée", className: "bg-[#E7F5EC] text-[#2E7D32] hover:bg-[#E7F5EC]" },
       refusee: { label: "Refusée", className: "bg-[#FDEAEA] text-[#C62828] hover:bg-[#FDEAEA]" },
     };
-    const variant = variants[status];
+    const variant = variants[status] || variants.en_attente;
     return <Badge className={variant.className}>{variant.label}</Badge>;
   };
 
   const getSupportLabel = (support: string) => {
-    const labels = {
+    const labels: Record<string, string> = {
       papier: "Papier",
       en_ligne: "En ligne",
       mixte: "Mixte",
     };
-    return labels[support as keyof typeof labels] || support;
+    return labels[support] || support;
   };
 
   const getFrequencyLabel = (frequency: string) => {
-    const labels = {
+    const labels: Record<string, string> = {
       hebdomadaire: "Hebdomadaire",
       mensuelle: "Mensuelle",
       trimestrielle: "Trimestrielle",
       annuelle: "Annuelle",
     };
-    return labels[frequency as keyof typeof labels] || frequency;
+    return labels[frequency] || frequency;
   };
 
   const filteredRequests = requests.filter((request) => {
@@ -105,38 +101,69 @@ export default function IssnRequestsManager() {
     const matchesSupport = supportFilter === "all" || request.support === supportFilter;
     const matchesSearch = 
       request.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      request.requestNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      request.request_number?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       request.publisher.toLowerCase().includes(searchQuery.toLowerCase());
     
     return matchesStatus && matchesSupport && matchesSearch;
   });
 
-  const handleValidate = (request: IssnRequest) => {
-    setRequests(requests.map(r => 
-      r.id === request.id 
-        ? { ...r, status: "validee", reviewedAt: new Date() }
-        : r
-    ));
-    toast.success(`Demande ${request.requestNumber} validée avec succès`);
-    // TODO: Envoyer un email de notification au déclarant
+  const handleValidate = async (request: IssnRequest) => {
+    try {
+      const { error } = await supabase
+        .from('issn_requests')
+        .update({
+          status: 'validee',
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: user?.id
+        })
+        .eq('id', request.id);
+
+      if (error) throw error;
+
+      setRequests(requests.map(r => 
+        r.id === request.id 
+          ? { ...r, status: "validee" as const, reviewed_at: new Date().toISOString() }
+          : r
+      ));
+      toast.success(`Demande ${request.request_number} validée avec succès`);
+    } catch (error) {
+      console.error('Error validating request:', error);
+      toast.error("Erreur lors de la validation");
+    }
   };
 
-  const handleReject = () => {
+  const handleReject = async () => {
     if (!selectedRequest || !rejectionReason.trim()) {
       toast.error("Veuillez saisir un motif de refus");
       return;
     }
 
-    setRequests(requests.map(r => 
-      r.id === selectedRequest.id 
-        ? { ...r, status: "refusee", reviewedAt: new Date(), rejectionReason }
-        : r
-    ));
-    toast.success(`Demande ${selectedRequest.requestNumber} refusée`);
-    setIsRejectDialogOpen(false);
-    setRejectionReason("");
-    setSelectedRequest(null);
-    // TODO: Envoyer un email de notification au déclarant avec le motif
+    try {
+      const { error } = await supabase
+        .from('issn_requests')
+        .update({
+          status: 'refusee',
+          reviewed_at: new Date().toISOString(),
+          reviewed_by: user?.id,
+          rejection_reason: rejectionReason
+        })
+        .eq('id', selectedRequest.id);
+
+      if (error) throw error;
+
+      setRequests(requests.map(r => 
+        r.id === selectedRequest.id 
+          ? { ...r, status: "refusee" as const, reviewed_at: new Date().toISOString(), rejection_reason: rejectionReason }
+          : r
+      ));
+      toast.success(`Demande ${selectedRequest.request_number} refusée`);
+      setIsRejectDialogOpen(false);
+      setRejectionReason("");
+      setSelectedRequest(null);
+    } catch (error) {
+      console.error('Error rejecting request:', error);
+      toast.error("Erreur lors du refus");
+    }
   };
 
   const openRejectDialog = (request: IssnRequest) => {
@@ -148,6 +175,16 @@ export default function IssnRequestsManager() {
     setSelectedRequest(request);
     setIsDetailsOpen(true);
   };
+
+  if (loading) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <>
@@ -251,10 +288,10 @@ export default function IssnRequestsManager() {
                 ) : (
                   filteredRequests.map((request) => (
                     <TableRow key={request.id}>
-                      <TableCell className="font-medium">{request.requestNumber}</TableCell>
+                      <TableCell className="font-medium">{request.request_number}</TableCell>
                       <TableCell>{request.title}</TableCell>
                       <TableCell>{getSupportLabel(request.support)}</TableCell>
-                      <TableCell>{format(request.submittedAt, "dd/MM/yyyy")}</TableCell>
+                      <TableCell>{format(new Date(request.created_at), "dd/MM/yyyy")}</TableCell>
                       <TableCell>{getStatusBadge(request.status)}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex gap-2 justify-end">
@@ -302,7 +339,7 @@ export default function IssnRequestsManager() {
           <DialogHeader>
             <DialogTitle>Détails de la demande ISSN</DialogTitle>
             <DialogDescription>
-              Informations complètes sur la demande {selectedRequest?.requestNumber}
+              Informations complètes sur la demande {selectedRequest?.request_number}
             </DialogDescription>
           </DialogHeader>
           {selectedRequest && (
@@ -318,11 +355,11 @@ export default function IssnRequestsManager() {
                 </div>
                 <div>
                   <Label className="text-muted-foreground">Langue</Label>
-                  <p className="font-medium">{selectedRequest.language}</p>
+                  <p className="font-medium">{selectedRequest.language_code}</p>
                 </div>
                 <div>
                   <Label className="text-muted-foreground">Pays</Label>
-                  <p className="font-medium">{selectedRequest.country}</p>
+                  <p className="font-medium">{selectedRequest.country_code}</p>
                 </div>
                 <div>
                   <Label className="text-muted-foreground">Éditeur</Label>
@@ -343,12 +380,12 @@ export default function IssnRequestsManager() {
               </div>
               <div>
                 <Label className="text-muted-foreground">Adresse de contact</Label>
-                <p className="font-medium">{selectedRequest.contactAddress}</p>
+                <p className="font-medium">{selectedRequest.contact_address}</p>
               </div>
-              {selectedRequest.rejectionReason && (
+              {selectedRequest.rejection_reason && (
                 <div>
                   <Label className="text-muted-foreground">Motif de refus</Label>
-                  <p className="font-medium text-red-600">{selectedRequest.rejectionReason}</p>
+                  <p className="font-medium text-red-600">{selectedRequest.rejection_reason}</p>
                 </div>
               )}
             </div>
@@ -365,7 +402,7 @@ export default function IssnRequestsManager() {
           <DialogHeader>
             <DialogTitle>Refuser la demande ISSN</DialogTitle>
             <DialogDescription>
-              Veuillez indiquer le motif du refus pour la demande {selectedRequest?.requestNumber}
+              Veuillez indiquer le motif du refus pour la demande {selectedRequest?.request_number}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
