@@ -101,22 +101,34 @@ export const BNRMNumberAttribution = () => {
     fetchData();
   }, []);
 
+  const hasAnyAttributedNumber = (req: any) => {
+    const metadata = (req?.metadata ?? {}) as Record<string, any>;
+
+    return Boolean(
+      req?.isbn_assigned ||
+        req?.issn_assigned ||
+        req?.dl_number ||
+        metadata?.isbn_assigned ||
+        metadata?.issn_assigned ||
+        metadata?.dl_number ||
+        metadata?.dl_assigned
+    );
+  };
+
   const fetchData = async () => {
     try {
-      // Fetch approved requests from legal_deposit_requests that need number attribution
-      // Only fetch requests with status 'valide_par_b' that are NOT yet attributed
-      const { data: requests, error: requestsError } = await supabase
+      // Les demandes peuvent déjà avoir un numéro attribué (ISBN/ISSN) tout en gardant le statut "valide_par_b".
+      // On les affiche donc dans "Attribués" et on ne garde dans "Demandes à traiter" que celles sans numéro attribué.
+      const { data: validatedRequests, error: validatedError } = await supabase
         .from("legal_deposit_requests")
         .select("*")
         .eq("status", "valide_par_b")
-        .neq("status", "attribue")
         .order("created_at", { ascending: true });
 
-      if (requestsError) {
-        console.error("Error fetching approved requests:", requestsError);
+      if (validatedError) {
+        console.error("Error fetching validated requests:", validatedError);
       }
 
-      // Fetch attributed requests (status = attribue)
       const { data: attributedRequests, error: attributedError } = await supabase
         .from("legal_deposit_requests")
         .select("*")
@@ -127,112 +139,134 @@ export const BNRMNumberAttribution = () => {
         console.error("Error fetching attributed requests:", attributedError);
       }
 
-      // Transform data to expected format
-      const transformedRequests = (requests || []).map(req => {
-        const metadata = req.metadata as Record<string, any> || {};
+      const validatedRows = validatedRequests || [];
+      const pendingRows = validatedRows.filter((r) => !hasAnyAttributedNumber(r));
+      const attributedRowsFromValidated = validatedRows.filter((r) => hasAnyAttributedNumber(r));
+
+      // Pending requests (à traiter)
+      const transformedRequests = pendingRows.map((req) => {
+        const metadata = (req.metadata as Record<string, any>) || {};
         return {
           id: req.id,
           request_number: req.request_number,
           status: req.status,
-          deposit_type: req.support_type?.toLowerCase().includes('livre') || req.support_type?.toLowerCase().includes('monograph') ? 'monographie' : 'periodique',
+          deposit_type:
+            req.support_type?.toLowerCase().includes("livre") ||
+            req.support_type?.toLowerCase().includes("monograph")
+              ? "monographie"
+              : "periodique",
           title: req.title,
           author_name: req.author_name,
           metadata: {
             publication: {
               title: req.title,
-              type: req.support_type
+              type: req.support_type,
             },
             declarant: {
-              name: req.author_name || 'Non spécifié',
-              organization: metadata?.publisher_name || ''
+              name: req.author_name || "Non spécifié",
+              organization: metadata?.publisher_name || "",
             },
-            ...metadata
+            ...metadata,
           },
           created_at: req.created_at,
           updated_at: req.updated_at,
           dl_number: req.request_number,
           isbn_assigned: metadata?.isbn_assigned,
-          issn_assigned: metadata?.issn_assigned
+          issn_assigned: metadata?.issn_assigned,
         };
       });
 
       setPendingRequests(transformedRequests);
 
-      // Transform attributed requests to attributions format
-      const transformedAttributions: NumberAttribution[] = (attributedRequests || []).map(req => {
-        const metadata = req.metadata as Record<string, any> || {};
-        
-        // Determine which number type was attributed
-        let numberType: 'isbn' | 'issn' | 'dl' = 'dl';
-        let attributedNumber = metadata?.dl_number || req.request_number;
-        
-        if (metadata?.isbn_assigned) {
-          numberType = 'isbn';
-          attributedNumber = metadata.isbn_assigned;
-        } else if (metadata?.issn_assigned) {
-          numberType = 'issn';
-          attributedNumber = metadata.issn_assigned;
+      // Attributions (historique)
+      const allAttributedRows = [...(attributedRequests || []), ...attributedRowsFromValidated];
+
+      const transformedAttributions: NumberAttribution[] = allAttributedRows.map((req) => {
+        const metadata = (req.metadata as Record<string, any>) || {};
+
+        // Détecter quel numéro est attribué en priorité (ISBN > ISSN > DL)
+        let numberType: "isbn" | "issn" | "dl" = "dl";
+        let attributedNumber =
+          metadata?.dl_number || metadata?.dl_assigned || req.dl_number || req.request_number;
+
+        if (metadata?.isbn_assigned || req.isbn_assigned) {
+          numberType = "isbn";
+          attributedNumber = metadata?.isbn_assigned || req.isbn_assigned;
+        } else if (metadata?.issn_assigned || req.issn_assigned) {
+          numberType = "issn";
+          attributedNumber = metadata?.issn_assigned || req.issn_assigned;
         }
+
+        const attributionDate =
+          metadata?.[`${numberType}_attribution_date`] ||
+          metadata?.dl_attribution_date ||
+          metadata?.isbn_attribution_date ||
+          metadata?.issn_attribution_date ||
+          req.updated_at;
 
         return {
           id: req.id,
           deposit_id: req.id,
           number_type: numberType,
           attributed_number: attributedNumber,
-          attribution_date: metadata?.dl_attribution_date || metadata?.isbn_attribution_date || metadata?.issn_attribution_date || req.updated_at,
-          status: 'attributed' as const,
+          attribution_date: attributionDate,
+          status: "attributed" as const,
           metadata: {
             publication_title: req.title,
-            declarant_name: req.author_name || 'Non spécifié',
-            dl_number: req.request_number
-          }
+            declarant_name: req.author_name || "Non spécifié",
+            dl_number: req.request_number,
+          },
         };
       });
+
+      transformedAttributions.sort(
+        (a, b) =>
+          new Date(b.attribution_date).getTime() - new Date(a.attribution_date).getTime()
+      );
 
       setAttributions(transformedAttributions);
 
       setRanges([
         {
-          id: '1',
-          number_type: 'isbn',
-          range_start: '978-9981-100-00-0',
-          range_end: '978-9981-199-99-9',
-          current_position: '978-9981-123-45-6',
+          id: "1",
+          number_type: "isbn",
+          range_start: "978-9981-100-00-0",
+          range_end: "978-9981-199-99-9",
+          current_position: "978-9981-123-45-6",
           total_numbers: 10000,
           used_numbers: 2346,
-          status: 'active',
-          assigned_date: '2024-01-01',
-          expiry_date: '2026-12-31',
-          source: 'agency',
-          agency: 'Agence Internationale ISBN'
+          status: "active",
+          assigned_date: "2024-01-01",
+          expiry_date: "2026-12-31",
+          source: "agency",
+          agency: "Agence Internationale ISBN",
         },
         {
-          id: '2',
-          number_type: 'issn',
-          range_start: '2550-0000',
-          range_end: '2550-9999',
-          current_position: '2550-4567',
+          id: "2",
+          number_type: "issn",
+          range_start: "2550-0000",
+          range_end: "2550-9999",
+          current_position: "2550-4567",
           total_numbers: 10000,
           used_numbers: 4567,
-          status: 'active',
-          assigned_date: '2024-01-01',
-          source: 'agency',
-          agency: 'Centre International ISSN'
+          status: "active",
+          assigned_date: "2024-01-01",
+          source: "agency",
+          agency: "Centre International ISSN",
         },
         {
-          id: '3',
-          number_type: 'dl',
-          range_start: 'DL-2025-000001',
-          range_end: 'DL-2025-999999',
-          current_position: 'DL-2025-000123',
+          id: "3",
+          number_type: "dl",
+          range_start: "DL-2025-000001",
+          range_end: "DL-2025-999999",
+          current_position: "DL-2025-000123",
           total_numbers: 999999,
           used_numbers: 123,
-          status: 'active',
-          assigned_date: '2025-01-01',
-          source: 'manual'
-        }
+          status: "active",
+          assigned_date: "2025-01-01",
+          source: "manual",
+        },
       ]);
-
     } catch (error) {
       console.error("Error fetching data:", error);
       toast({
@@ -636,7 +670,7 @@ export const BNRMNumberAttribution = () => {
                               Voir
                             </Button>
                             {/* Hide attribution button if number already assigned */}
-                            {!(request.isbn_assigned || request.issn_assigned || request.metadata?.isbn_assigned || request.metadata?.issn_assigned || request.metadata?.dl_number) ? (
+                            {!hasAnyAttributedNumber(request) ? (
                               <Button
                                 size="sm"
                                 onClick={() => {
