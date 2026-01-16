@@ -125,9 +125,17 @@ serve(async (req) => {
   }
 
   try {
-    const request: RegistrationEmailRequest = await req.json();
-    const { email_type, recipient_email, recipient_name, user_type, rejection_reason, user_id, additional_data } = request;
-    let { reset_link } = request;
+    const request = await req.json();
+    
+    // Support pour les 2 formats de paramètres (to_email ou recipient_email, user_name ou recipient_name)
+    const email_type = request.email_type;
+    const recipient_email = request.recipient_email || request.to_email;
+    const recipient_name = request.recipient_name || request.user_name || "Utilisateur";
+    const user_type = request.user_type;
+    const rejection_reason = request.rejection_reason;
+    const user_id = request.user_id;
+    const additional_data = request.additional_data;
+    let reset_link = request.reset_link;
 
     console.log("Sending registration email:", { email_type, recipient_email, user_type, user_id });
 
