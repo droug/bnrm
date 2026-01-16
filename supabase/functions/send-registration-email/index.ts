@@ -83,8 +83,10 @@ async function sendEmail(to: string, subject: string, html: string): Promise<{ s
     try {
       console.log(`Sending email via Resend (fallback) to: ${to}`);
       
-      // Note: Pour envoyer à des destinataires autres que l'email du compte Resend,
-      // vous devez vérifier un domaine sur https://resend.com/domains
+      // IMPORTANT: Resend en mode test ne peut envoyer qu'avec le domaine par défaut
+      // Pour utiliser un domaine personnalisé, vérifiez-le sur https://resend.com/domains
+      const resendFrom = "BNRM - Bibliothèque Nationale <onboarding@resend.dev>";
+      
       const response = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
@@ -92,7 +94,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<{ s
           Authorization: `Bearer ${RESEND_API_KEY}`,
         },
         body: JSON.stringify({
-          from: SMTP_FROM || "BNRM - Bibliothèque Nationale <onboarding@resend.dev>",
+          from: resendFrom,
           to: [to],
           subject: subject,
           html: html,
