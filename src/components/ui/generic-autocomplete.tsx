@@ -107,17 +107,11 @@ export function GenericAutocomplete({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDisplayValue(e.target.value);
-    if (e.target.value.trim()) {
-      setShowSuggestions(true);
-    } else {
-      setShowSuggestions(false);
-    }
+    setShowSuggestions(true);
   };
 
   const handleInputFocus = () => {
-    if (displayValue.trim()) {
-      setShowSuggestions(true);
-    }
+    setShowSuggestions(true);
   };
 
   const handleRemove = (code: string) => {
