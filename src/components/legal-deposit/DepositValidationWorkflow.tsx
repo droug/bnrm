@@ -566,6 +566,56 @@ export function DepositValidationWorkflow() {
     }
   };
 
+  const handleSetPending = async (requestId: string) => {
+    setIsLoading(true);
+
+    try {
+      // Pour les exemples, simuler une mise à jour
+      if (requestId.startsWith("example-")) {
+        const updatedRequests = requests.map(req => {
+          if (req.id === requestId) {
+            return { ...req, status: "en_cours" };
+          }
+          return req;
+        });
+        setRequests(updatedRequests);
+        
+        toast({
+          title: "Demande mise en attente",
+          description: "Le statut de la demande a été mis à jour (données d'exemple)",
+        });
+        
+        setSelectedRequest(null);
+        return;
+      }
+
+      // Pour les vraies données, utiliser Supabase
+      const { error } = await supabase
+        .from("legal_deposit_requests")
+        .update({ status: "en_cours" })
+        .eq("id", requestId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Demande mise en attente",
+        description: "Le statut de la demande a été mis à jour vers 'En cours'",
+      });
+
+      setSelectedRequest(null);
+      fetchRequests();
+    } catch (error: any) {
+      console.error("Error updating status:", error);
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Helper function to add request details to PDF
   const addRequestDetailsToPDF = (doc: jsPDF, request: DepositRequest, startY: number): number => {
     let yPos = startY;
@@ -1467,12 +1517,12 @@ export function DepositValidationWorkflow() {
                   {!selectedRequest.validated_by_committee && (
                     <>
                       <Button
-                        variant="destructive"
-                        onClick={() => openRejectionModal(selectedRequest.id, "committee")}
+                        variant="outline"
+                        onClick={() => handleSetPending(selectedRequest.id)}
                         disabled={isLoading}
                       >
-                        <XCircle className="h-4 w-4 mr-2" />
-                        Rejeter (Comité)
+                        <Clock className="h-4 w-4 mr-2" />
+                        En attente
                       </Button>
                       <Button
                         onClick={() => setShowCommitteeConfirmModal(true)}
