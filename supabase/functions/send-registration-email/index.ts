@@ -135,18 +135,21 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    // Pour les validations de compte, générer un lien de création de mot de passe
-    if (email_type === 'account_validated' && user_id && !reset_link) {
+    // Pour les validations de compte, (re)générer un lien de création de mot de passe
+    // IMPORTANT: on régénère même si `reset_link` est fourni pour garantir un redirect_to correct.
+    if (email_type === 'account_validated' && user_id) {
       console.log("Generating password reset link for user:", user_id);
-      
-      const siteUrl = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
+
+      const rawSiteUrl = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
+      const siteUrl = rawSiteUrl.replace(/\/$/, "");
+      const redirectTo = `${siteUrl}/auth?reset=true`;
 
       const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
         type: 'recovery',
         email: recipient_email,
         options: {
-          redirectTo: `${siteUrl}/auth?reset=true`
-        }
+          redirectTo,
+        },
       });
 
       if (linkError) {

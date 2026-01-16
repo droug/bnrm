@@ -133,13 +133,16 @@ serve(async (req) => {
       }
 
       // Générer le lien de réinitialisation de mot de passe
-      const siteUrl = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
+      const rawSiteUrl = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
+      const siteUrl = rawSiteUrl.replace(/\/$/, "");
+      const redirectTo = `${siteUrl}/auth?reset=true`;
+
       const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
         type: "recovery",
         email: userEmail,
         options: {
-          redirectTo: `${siteUrl}/auth?reset=true`
-        }
+          redirectTo,
+        },
       });
 
       if (linkError) {
