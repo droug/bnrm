@@ -4,6 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { InlineSelect } from "@/components/ui/inline-select";
 import { GenericAutocomplete } from "@/components/ui/generic-autocomplete";
+import { NationalityAutocomplete } from "@/components/ui/nationality-autocomplete";
 import { CustomField } from "@/types/formBuilder";
 
 interface DynamicFieldRendererProps {
@@ -99,8 +100,19 @@ export function DynamicFieldRenderer({ field, language, value, onChange }: Dynam
         );
 
       case "autocomplete":
-        // Autocomplete avec chargement depuis la base de données
+        // Cas spécial pour la nationalité - utiliser le composant dédié
         const listCode = field.config?.list_code as string;
+        if (field.field_key === "author_nationality" || listCode === "nationalities") {
+          return (
+            <NationalityAutocomplete
+              value={value || ''}
+              onChange={onChange}
+              placeholder={`Sélectionner ${label.toLowerCase()}`}
+            />
+          );
+        }
+        
+        // Autocomplete générique avec chargement depuis la base de données
         if (!listCode) {
           return <div className="text-sm text-destructive">Configuration manquante: list_code requis</div>;
         }
