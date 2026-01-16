@@ -852,9 +852,9 @@ export function ProfessionalRequestsManager() {
 
                       {/* Nom arabe */}
                       {selectedRequest.registration_data.name_ar && (
-                        <div>
-                          <Label className="text-muted-foreground">Nom (Arabe)</Label>
-                          <p className="font-medium text-right" dir="rtl">{selectedRequest.registration_data.name_ar}</p>
+                        <div className="space-y-1">
+                          <Label className="text-muted-foreground block">Nom (Arabe)</Label>
+                          <p className="font-medium text-lg" dir="rtl">{selectedRequest.registration_data.name_ar}</p>
                         </div>
                       )}
 
