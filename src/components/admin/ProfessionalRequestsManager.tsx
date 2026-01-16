@@ -876,9 +876,9 @@ export function ProfessionalRequestsManager() {
 
                       {/* Nom français */}
                       {(selectedRequest.registration_data.name_fr || selectedRequest.registration_data.nameFr) && (
-                        <div>
-                          <Label className="text-muted-foreground block mb-1">Nom (Français)</Label>
-                          <p className="font-medium text-lg bg-muted/30 p-2 rounded">
+                        <div className="space-y-1">
+                          <p className="text-sm text-muted-foreground">Nom (Français)</p>
+                          <p className="font-medium text-lg bg-muted/30 p-2 rounded block w-full">
                             {selectedRequest.registration_data.name_fr || selectedRequest.registration_data.nameFr}
                           </p>
                         </div>
