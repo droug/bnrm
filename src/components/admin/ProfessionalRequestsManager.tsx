@@ -91,6 +91,9 @@ const openProfessionalDocumentInNewTab = async (url: string) => {
 // Component for displaying attached files from registration_data
 const RegistrationFilesSection = ({ registrationData }: { registrationData: any }) => {
   const [downloadingFile, setDownloadingFile] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewLabel, setPreviewLabel] = useState<string>("");
+  const [loadingPreview, setLoadingPreview] = useState(false);
   const { toast } = useToast();
 
   if (!registrationData) return null;
@@ -115,6 +118,19 @@ const RegistrationFilesSection = ({ registrationData }: { registrationData: any 
     const value = registrationData[field.key];
     return value && typeof value === 'string' && (value.startsWith('http') || value.startsWith('/'));
   });
+
+  const handlePreview = async (url: string, label: string) => {
+    setLoadingPreview(true);
+    setPreviewLabel(label);
+    try {
+      const resolved = await resolveProfessionalDocumentsUrl(url);
+      setPreviewUrl(resolved);
+    } catch {
+      setPreviewUrl(url);
+    } finally {
+      setLoadingPreview(false);
+    }
+  };
 
   const handleDownload = async (url: string, fileName: string) => {
     setDownloadingFile(fileName);
@@ -144,6 +160,16 @@ const RegistrationFilesSection = ({ registrationData }: { registrationData: any 
     }
   };
 
+  const isImage = (url: string) => {
+    const ext = url.split('?')[0].split('.').pop()?.toLowerCase() || '';
+    return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext);
+  };
+
+  const isPdf = (url: string) => {
+    const ext = url.split('?')[0].split('.').pop()?.toLowerCase() || '';
+    return ext === 'pdf';
+  };
+
   if (availableFiles.length === 0) {
     return (
       <div className="form-card">
@@ -157,53 +183,93 @@ const RegistrationFilesSection = ({ registrationData }: { registrationData: any 
   }
 
   return (
-    <div className="form-card">
-      <h3 className="form-section-title flex items-center gap-2">
-        <FileImage className="h-5 w-5" />
-        Pièces jointes ({availableFiles.length})
-      </h3>
-      <div className="grid gap-3 md:grid-cols-2">
-        {availableFiles.map((field) => {
-          const IconComponent = field.icon;
-          const url = registrationData[field.key];
-          const fileName = url?.split('/').pop() || field.label;
-          const isDownloading = downloadingFile === fileName;
+    <>
+      <div className="form-card">
+        <h3 className="form-section-title flex items-center gap-2">
+          <FileImage className="h-5 w-5" />
+          Pièces jointes ({availableFiles.length})
+        </h3>
+        <div className="grid gap-3 md:grid-cols-2">
+          {availableFiles.map((field) => {
+            const IconComponent = field.icon;
+            const url = registrationData[field.key];
+            const fileName = url?.split('/').pop() || field.label;
+            const isDownloading = downloadingFile === fileName;
 
-          return (
-            <div key={field.key} className="flex items-center justify-between p-3 border rounded-lg bg-muted/20">
-              <div className="flex items-center gap-3">
-                <IconComponent className="h-5 w-5 text-primary" />
-                <div>
-                  <p className="text-sm font-medium">{field.label}</p>
-                  <p className="text-xs text-muted-foreground truncate max-w-[150px]">{fileName}</p>
+            return (
+              <div key={field.key} className="flex items-center justify-between p-3 border rounded-lg bg-muted/20">
+                <div className="flex items-center gap-3">
+                  <IconComponent className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="text-sm font-medium">{field.label}</p>
+                    <p className="text-xs text-muted-foreground truncate max-w-[150px]">{fileName}</p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePreview(url, field.label)}
+                  >
+                    <Eye className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handleDownload(url, fileName)}
+                    disabled={isDownloading}
+                  >
+                    {isDownloading ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Download className="h-4 w-4" />
+                    )}
+                  </Button>
                 </div>
               </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => openProfessionalDocumentInNewTab(url)}
-                >
-                  <Eye className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDownload(url, fileName)}
-                  disabled={isDownloading}
-                >
-                  {isDownloading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Download className="h-4 w-4" />
-                  )}
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Modal for file preview */}
+      <Dialog open={!!previewUrl} onOpenChange={() => setPreviewUrl(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileImage className="h-5 w-5" />
+              {previewLabel}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-auto min-h-[400px] flex items-center justify-center bg-muted/30 rounded-lg">
+            {loadingPreview ? (
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            ) : previewUrl && isImage(previewUrl) ? (
+              <img 
+                src={previewUrl} 
+                alt={previewLabel} 
+                className="max-w-full max-h-[70vh] object-contain"
+              />
+            ) : previewUrl && isPdf(previewUrl) ? (
+              <iframe 
+                src={previewUrl} 
+                className="w-full h-[70vh] border-0"
+                title={previewLabel}
+              />
+            ) : previewUrl ? (
+              <div className="text-center p-8">
+                <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground mb-4">Aperçu non disponible pour ce type de fichier</p>
+                <Button onClick={() => openProfessionalDocumentInNewTab(previewUrl)}>
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Ouvrir dans un nouvel onglet
                 </Button>
               </div>
-            </div>
-          );
-        })}
-      </div>
-    </div>
+            ) : null}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
@@ -218,9 +284,12 @@ export function ProfessionalRequestsManager() {
   const [loading, setLoading] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [showDocPreview, setShowDocPreview] = useState(false);
   const [showRejectionDialog, setShowRejectionDialog] = useState(false);
   const [showApprovalDialog, setShowApprovalDialog] = useState(false);
+  // Document preview modal state
+  const [docPreviewUrl, setDocPreviewUrl] = useState<string | null>(null);
+  const [docPreviewLabel, setDocPreviewLabel] = useState<string>("");
+  const [docPreviewLoading, setDocPreviewLoading] = useState(false);
 
   useEffect(() => {
     loadRequests();
@@ -287,6 +356,29 @@ export function ProfessionalRequestsManager() {
       p_resource_id: requestId,
       p_details: details
     });
+  };
+
+  const handlePreviewDocument = async (url: string, label: string) => {
+    setDocPreviewLoading(true);
+    setDocPreviewLabel(label);
+    try {
+      const resolved = await resolveProfessionalDocumentsUrl(url);
+      setDocPreviewUrl(resolved);
+    } catch {
+      setDocPreviewUrl(url);
+    } finally {
+      setDocPreviewLoading(false);
+    }
+  };
+
+  const isImageFile = (url: string) => {
+    const ext = url.split('?')[0].split('.').pop()?.toLowerCase() || '';
+    return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext);
+  };
+
+  const isPdfFile = (url: string) => {
+    const ext = url.split('?')[0].split('.').pop()?.toLowerCase() || '';
+    return ext === 'pdf';
   };
 
   const handleViewRequest = (request: ProfessionalRequest) => {
@@ -1063,7 +1155,7 @@ export function ProfessionalRequestsManager() {
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => openProfessionalDocumentInNewTab(doc.file_url)}
+                          onClick={() => handlePreviewDocument(doc.file_url, getDocumentTypeLabel(doc.document_type))}
                         >
                           <Eye className="h-4 w-4 mr-1" />
                           Voir
@@ -1260,6 +1352,44 @@ export function ProfessionalRequestsManager() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Modal for document preview (verified documents) */}
+      <Dialog open={!!docPreviewUrl} onOpenChange={() => setDocPreviewUrl(null)}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileImage className="h-5 w-5" />
+              {docPreviewLabel}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex-1 overflow-auto min-h-[400px] flex items-center justify-center bg-muted/30 rounded-lg">
+            {docPreviewLoading ? (
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+            ) : docPreviewUrl && isImageFile(docPreviewUrl) ? (
+              <img 
+                src={docPreviewUrl} 
+                alt={docPreviewLabel} 
+                className="max-w-full max-h-[70vh] object-contain"
+              />
+            ) : docPreviewUrl && isPdfFile(docPreviewUrl) ? (
+              <iframe 
+                src={docPreviewUrl} 
+                className="w-full h-[70vh] border-0"
+                title={docPreviewLabel}
+              />
+            ) : docPreviewUrl ? (
+              <div className="text-center p-8">
+                <FileText className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
+                <p className="text-muted-foreground mb-4">Aperçu non disponible pour ce type de fichier</p>
+                <Button onClick={() => openProfessionalDocumentInNewTab(docPreviewUrl)}>
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Ouvrir dans un nouvel onglet
+                </Button>
+              </div>
+            ) : null}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
