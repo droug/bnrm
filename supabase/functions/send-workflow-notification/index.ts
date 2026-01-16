@@ -221,8 +221,19 @@ serve(async (req) => {
           .eq("id", request_id)
           .single();
         requestData = formation;
-        emailSubject = getCBMFormationEmailSubject(notification_type, requestData);
+      emailSubject = getCBMFormationEmailSubject(notification_type, requestData);
         emailHtml = getCBMFormationEmailHtml(notification_type, requestData, additional_data);
+        break;
+
+      case "issn_request":
+        const { data: issnRequest } = await supabaseAdmin
+          .from("issn_requests")
+          .select("*")
+          .eq("id", request_id)
+          .single();
+        requestData = issnRequest;
+        emailSubject = getIssnRequestEmailSubject(notification_type, requestData);
+        emailHtml = getIssnRequestEmailHtml(notification_type, requestData, additional_data);
         break;
 
       default:
@@ -709,6 +720,70 @@ function getCBMFormationEmailHtml(type: string, data: any, additionalData: any):
       <p>Nous regrettons de vous informer que votre demande de formation n'a pas pu être acceptée.</p>
       ${additionalData?.reason ? `<p><strong>Motif:</strong> ${additionalData.reason}</p>` : ''}
       <p>N'hésitez pas à soumettre une nouvelle demande ultérieurement.</p>
+    `;
+  }
+
+  return getEmailBase(content);
+}
+
+// ISSN Request emails
+function getIssnRequestEmailSubject(type: string, data: any): string {
+  switch (type) {
+    case "created":
+      return `Demande ISSN enregistrée - ${data.request_number}`;
+    case "validee":
+      return `Votre demande ISSN a été validée - ${data.request_number}`;
+    case "refusee":
+      return `Décision concernant votre demande ISSN - ${data.request_number}`;
+    default:
+      return `Notification - Demande ISSN ${data.request_number}`;
+  }
+}
+
+function getIssnRequestEmailHtml(type: string, data: any, additionalData: any): string {
+  const supportLabels: Record<string, string> = {
+    papier: "Papier",
+    en_ligne: "En ligne",
+    mixte: "Mixte"
+  };
+  
+  const frequencyLabels: Record<string, string> = {
+    hebdomadaire: "Hebdomadaire",
+    mensuelle: "Mensuelle",
+    trimestrielle: "Trimestrielle",
+    annuelle: "Annuelle"
+  };
+
+  let content = `
+    <h2 style="color: #002B45;">Notification - Demande ISSN</h2>
+    <div class="info-box">
+      <p><strong>Numéro de demande:</strong> ${data.request_number}</p>
+      <p><strong>Titre de la publication:</strong> ${data.title}</p>
+      <p><strong>Discipline:</strong> ${data.discipline || 'N/A'}</p>
+      <p><strong>Éditeur:</strong> ${data.publisher || 'N/A'}</p>
+      <p><strong>Support:</strong> ${supportLabels[data.support] || data.support}</p>
+      <p><strong>Fréquence:</strong> ${frequencyLabels[data.frequency] || data.frequency}</p>
+    </div>
+  `;
+
+  if (type === "created") {
+    content += `
+      <p>Votre demande d'ISSN a été enregistrée avec succès.</p>
+      <p>Elle sera examinée par notre équipe dans les meilleurs délais.</p>
+      <p>Vous recevrez une notification dès qu'une décision sera prise.</p>
+    `;
+  } else if (type === "validee") {
+    content += `
+      <p>Nous avons le plaisir de vous informer que votre demande d'ISSN a été <strong>validée</strong>.</p>
+      <p>Votre numéro ISSN vous sera communiqué prochainement.</p>
+      <p>Vous pourrez utiliser ce numéro pour l'identification internationale de votre publication périodique.</p>
+    `;
+  } else if (type === "refusee") {
+    content += `
+      <p>Nous regrettons de vous informer que votre demande d'ISSN n'a pas pu être acceptée.</p>
+      ${data.rejection_reason ? `<p><strong>Motif:</strong> ${data.rejection_reason}</p>` : ''}
+      ${additionalData?.reason ? `<p><strong>Motif:</strong> ${additionalData.reason}</p>` : ''}
+      <p>N'hésitez pas à soumettre une nouvelle demande après correction des éléments mentionnés.</p>
     `;
   }
 

@@ -30,6 +30,7 @@ interface IssnRequest {
   reviewed_at: string | null;
   reviewed_by: string | null;
   rejection_reason: string | null;
+  user_id: string | null;
 }
 
 export default function IssnRequestsManager() {
@@ -120,6 +121,21 @@ export default function IssnRequestsManager() {
 
       if (error) throw error;
 
+      // Try to send notification email via edge function
+      // The edge function will retrieve user email internally
+      try {
+        await supabase.functions.invoke('send-workflow-notification', {
+          body: {
+            request_type: 'issn_request',
+            request_id: request.id,
+            notification_type: 'validee',
+            recipient_email: request.contact_address // Use contact address as fallback
+          }
+        });
+      } catch (notifError) {
+        console.warn('Notification email failed:', notifError);
+      }
+
       setRequests(requests.map(r => 
         r.id === request.id 
           ? { ...r, status: "validee" as const, reviewed_at: new Date().toISOString() }
@@ -150,6 +166,22 @@ export default function IssnRequestsManager() {
         .eq('id', selectedRequest.id);
 
       if (error) throw error;
+
+      // Try to send notification email via edge function
+      // Use contact_address as recipient
+      try {
+        await supabase.functions.invoke('send-workflow-notification', {
+          body: {
+            request_type: 'issn_request',
+            request_id: selectedRequest.id,
+            notification_type: 'refusee',
+            recipient_email: selectedRequest.contact_address, // Use contact address as fallback
+            additional_data: { reason: rejectionReason }
+          }
+        });
+      } catch (notifError) {
+        console.warn('Notification email failed:', notifError);
+      }
 
       setRequests(requests.map(r => 
         r.id === selectedRequest.id 
