@@ -11,7 +11,9 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { CheckCircle2, XCircle, FileText, Eye, Edit, Archive, Trash2, FileDown, FileCheck, Search } from 'lucide-react';
+import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { CheckCircle2, XCircle, FileText, Eye, Edit, Archive, Trash2, FileDown, FileCheck, Search, Download, Loader2, ExternalLink, User, Building2, MapPin, Phone, Mail, Globe, FileImage, CreditCard } from 'lucide-react';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import { addBNRMHeader, addBNRMFooter } from '@/lib/pdfHeaderUtils';
@@ -50,6 +52,114 @@ interface ActivityLog {
   details: any;
   user_email?: string;
 }
+
+// Component for displaying attached files from registration_data
+const RegistrationFilesSection = ({ registrationData }: { registrationData: any }) => {
+  const [downloadingFile, setDownloadingFile] = useState<string | null>(null);
+  const { toast } = useToast();
+
+  if (!registrationData) return null;
+
+  // List of file field keys that might be present in registration_data
+  const fileFields = [
+    { key: 'logo_url', label: 'Logo', icon: FileImage },
+    { key: 'rc_attachment_url', label: 'Pièce jointe RC', icon: FileText },
+    { key: 'cin_file_url', label: 'Copie CNIE', icon: CreditCard },
+    { key: 'status_document_url', label: 'Statuts', icon: FileText },
+    { key: 'authorization_url', label: 'Autorisation', icon: FileText },
+  ];
+
+  const availableFiles = fileFields.filter(field => registrationData[field.key]);
+
+  const handleDownload = async (url: string, fileName: string) => {
+    setDownloadingFile(fileName);
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Download failed');
+      const blob = await response.blob();
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+      toast({
+        title: 'Téléchargement réussi',
+        description: `${fileName} téléchargé avec succès`,
+      });
+    } catch (error) {
+      console.error('Download error:', error);
+      // Try direct open if download fails
+      window.open(url, '_blank');
+    } finally {
+      setDownloadingFile(null);
+    }
+  };
+
+  if (availableFiles.length === 0) {
+    return (
+      <div className="form-card">
+        <h3 className="form-section-title flex items-center gap-2">
+          <FileImage className="h-5 w-5" />
+          Pièces jointes
+        </h3>
+        <p className="text-sm text-muted-foreground italic">Aucune pièce jointe dans cette demande</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="form-card">
+      <h3 className="form-section-title flex items-center gap-2">
+        <FileImage className="h-5 w-5" />
+        Pièces jointes ({availableFiles.length})
+      </h3>
+      <div className="grid gap-3 md:grid-cols-2">
+        {availableFiles.map((field) => {
+          const IconComponent = field.icon;
+          const url = registrationData[field.key];
+          const fileName = url?.split('/').pop() || field.label;
+          const isDownloading = downloadingFile === fileName;
+
+          return (
+            <div key={field.key} className="flex items-center justify-between p-3 border rounded-lg bg-muted/20">
+              <div className="flex items-center gap-3">
+                <IconComponent className="h-5 w-5 text-primary" />
+                <div>
+                  <p className="text-sm font-medium">{field.label}</p>
+                  <p className="text-xs text-muted-foreground truncate max-w-[150px]">{fileName}</p>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => window.open(url, '_blank')}
+                >
+                  <Eye className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleDownload(url, fileName)}
+                  disabled={isDownloading}
+                >
+                  {isDownloading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Download className="h-4 w-4" />
+                  )}
+                </Button>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 export function ProfessionalRequestsManager() {
   const { toast } = useToast();
@@ -664,160 +774,353 @@ export function ProfessionalRequestsManager() {
           </SheetHeader>
 
           {selectedRequest && (
-            <div className="space-y-6">
-              {/* Informations principales */}
-              <div className="form-card">
-                <h3 className="form-section-title">Identification de la demande</h3>
-                <div className="grid gap-4 md:grid-cols-2">
-                  <div>
-                    <Label className="text-muted-foreground">ID Demande</Label>
-                    <p className="font-mono font-medium">{selectedRequest.id.substring(0, 8).toUpperCase()}</p>
-                  </div>
-                  <div>
-                    <Label className="text-muted-foreground">Type de professionnel</Label>
-                    <p className="font-medium">{getProfessionalTypeLabel(selectedRequest.professional_type)}</p>
-                  </div>
-                  <div>
-                    <Label className="text-muted-foreground">Entreprise</Label>
-                    <p className="font-medium">{selectedRequest.company_name}</p>
-                  </div>
-                  <div>
-                    <Label className="text-muted-foreground">Numéro de dépôt vérifié</Label>
-                    <p className="font-mono">{selectedRequest.verified_deposit_number}</p>
-                  </div>
-                  <div>
-                    <Label className="text-muted-foreground">Acceptation CNDP</Label>
-                    {selectedRequest.cndp_acceptance ? (
-                      <Badge className="bg-green-100 text-green-800">✅ Accepté</Badge>
-                    ) : (
-                      <Badge variant="destructive">❌ Non accepté</Badge>
+            <ScrollArea className="h-[calc(100vh-120px)]">
+              <div className="space-y-6 pr-4">
+                {/* Informations principales */}
+                <div className="form-card">
+                  <h3 className="form-section-title flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Identification de la demande
+                  </h3>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div>
+                      <Label className="text-muted-foreground">ID Demande</Label>
+                      <p className="font-mono font-medium">{selectedRequest.id.substring(0, 8).toUpperCase()}</p>
+                    </div>
+                    <div>
+                      <Label className="text-muted-foreground">Type de professionnel</Label>
+                      <p className="font-medium">{getProfessionalTypeLabel(selectedRequest.professional_type)}</p>
+                    </div>
+                    <div>
+                      <Label className="text-muted-foreground">Entreprise / Nom</Label>
+                      <p className="font-medium">{selectedRequest.company_name}</p>
+                    </div>
+                    <div>
+                      <Label className="text-muted-foreground">Numéro de référence</Label>
+                      <p className="font-mono">{selectedRequest.verified_deposit_number}</p>
+                    </div>
+                    <div>
+                      <Label className="text-muted-foreground">Acceptation CNDP</Label>
+                      {selectedRequest.cndp_acceptance ? (
+                        <Badge className="bg-green-100 text-green-800">✅ Accepté</Badge>
+                      ) : (
+                        <Badge variant="destructive">❌ Non accepté</Badge>
+                      )}
+                    </div>
+                    <div>
+                      <Label className="text-muted-foreground">Statut actuel</Label>
+                      <div>{getStatusBadge(selectedRequest.status)}</div>
+                    </div>
+                    <div>
+                      <Label className="text-muted-foreground">Date de soumission</Label>
+                      <p>{new Date(selectedRequest.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</p>
+                    </div>
+                    {selectedRequest.reviewed_at && (
+                      <div>
+                        <Label className="text-muted-foreground">Date de traitement</Label>
+                        <p>{new Date(selectedRequest.reviewed_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}</p>
+                      </div>
                     )}
                   </div>
-                  <div>
-                    <Label className="text-muted-foreground">Statut actuel</Label>
-                    <div>{getStatusBadge(selectedRequest.status)}</div>
+                </div>
+
+                <Separator />
+
+                {/* Données d'inscription détaillées */}
+                {selectedRequest.registration_data && (
+                  <div className="form-card">
+                    <h3 className="form-section-title flex items-center gap-2">
+                      <User className="h-5 w-5" />
+                      Informations d'inscription
+                    </h3>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {/* Type de personne */}
+                      {selectedRequest.registration_data.type && (
+                        <div>
+                          <Label className="text-muted-foreground">Type de personne</Label>
+                          <p className="font-medium capitalize">{selectedRequest.registration_data.type === 'morale' ? 'Personne morale' : 'Personne physique'}</p>
+                        </div>
+                      )}
+                      
+                      {/* Nature */}
+                      {selectedRequest.registration_data.nature && (
+                        <div>
+                          <Label className="text-muted-foreground">Nature / Genre</Label>
+                          <p className="font-medium capitalize">{selectedRequest.registration_data.nature}</p>
+                        </div>
+                      )}
+
+                      {/* Nom arabe */}
+                      {selectedRequest.registration_data.name_ar && (
+                        <div>
+                          <Label className="text-muted-foreground">Nom (Arabe)</Label>
+                          <p className="font-medium text-right" dir="rtl">{selectedRequest.registration_data.name_ar}</p>
+                        </div>
+                      )}
+
+                      {/* Nom français */}
+                      {selectedRequest.registration_data.name_fr && (
+                        <div>
+                          <Label className="text-muted-foreground">Nom (Français)</Label>
+                          <p className="font-medium">{selectedRequest.registration_data.name_fr}</p>
+                        </div>
+                      )}
+
+                      {/* Contact */}
+                      {selectedRequest.registration_data.contact_name && (
+                        <div>
+                          <Label className="text-muted-foreground">Personne de contact</Label>
+                          <p className="font-medium">{selectedRequest.registration_data.contact_name}</p>
+                        </div>
+                      )}
+
+                      {/* Email */}
+                      {(selectedRequest.registration_data.email || selectedRequest.registration_data.contact_email) && (
+                        <div className="flex items-start gap-2">
+                          <Mail className="h-4 w-4 mt-1 text-muted-foreground" />
+                          <div>
+                            <Label className="text-muted-foreground">Email</Label>
+                            <p className="font-medium">{selectedRequest.registration_data.email || selectedRequest.registration_data.contact_email}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Téléphone */}
+                      {selectedRequest.registration_data.phone && (
+                        <div className="flex items-start gap-2">
+                          <Phone className="h-4 w-4 mt-1 text-muted-foreground" />
+                          <div>
+                            <Label className="text-muted-foreground">Téléphone</Label>
+                            <p className="font-medium">{selectedRequest.registration_data.phone}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Registre de commerce */}
+                      {selectedRequest.registration_data.commerce_registry && (
+                        <div className="flex items-start gap-2">
+                          <CreditCard className="h-4 w-4 mt-1 text-muted-foreground" />
+                          <div>
+                            <Label className="text-muted-foreground">Registre de commerce</Label>
+                            <p className="font-medium">{selectedRequest.registration_data.commerce_registry}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* CIN */}
+                      {selectedRequest.registration_data.cin && (
+                        <div className="flex items-start gap-2">
+                          <CreditCard className="h-4 w-4 mt-1 text-muted-foreground" />
+                          <div>
+                            <Label className="text-muted-foreground">Numéro CIN</Label>
+                            <p className="font-medium">{selectedRequest.registration_data.cin}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Région */}
+                      {selectedRequest.registration_data.region && (
+                        <div className="flex items-start gap-2">
+                          <MapPin className="h-4 w-4 mt-1 text-muted-foreground" />
+                          <div>
+                            <Label className="text-muted-foreground">Région</Label>
+                            <p className="font-medium">{selectedRequest.registration_data.region}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Ville */}
+                      {selectedRequest.registration_data.city && (
+                        <div className="flex items-start gap-2">
+                          <Building2 className="h-4 w-4 mt-1 text-muted-foreground" />
+                          <div>
+                            <Label className="text-muted-foreground">Ville</Label>
+                            <p className="font-medium">{selectedRequest.registration_data.city}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Lien Google Maps */}
+                      {selectedRequest.registration_data.google_maps_link && (
+                        <div className="flex items-start gap-2 md:col-span-2">
+                          <Globe className="h-4 w-4 mt-1 text-muted-foreground" />
+                          <div className="flex-1">
+                            <Label className="text-muted-foreground">Lien Google Maps</Label>
+                            <a 
+                              href={selectedRequest.registration_data.google_maps_link} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-primary hover:underline flex items-center gap-1"
+                            >
+                              Voir sur Google Maps
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Site web */}
+                      {selectedRequest.registration_data.website && (
+                        <div className="flex items-start gap-2">
+                          <Globe className="h-4 w-4 mt-1 text-muted-foreground" />
+                          <div>
+                            <Label className="text-muted-foreground">Site web</Label>
+                            <a 
+                              href={selectedRequest.registration_data.website} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="text-primary hover:underline flex items-center gap-1"
+                            >
+                              {selectedRequest.registration_data.website}
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <Separator />
+
+                {/* Pièces jointes du registration_data */}
+                <RegistrationFilesSection registrationData={selectedRequest.registration_data} />
+
+                {/* Documents depuis la table professional_registration_documents */}
+                <div className="form-card">
+                  <h3 className="form-section-title flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Documents vérifiés
+                  </h3>
+                  <div className="space-y-2">
+                    {documents.map((doc) => (
+                      <div key={doc.id} className="flex items-center justify-between p-3 border rounded-lg bg-muted/20">
+                        <div className="flex items-center gap-2">
+                          <FileText className="h-4 w-4 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm font-medium">{getDocumentTypeLabel(doc.document_type)}</p>
+                            <p className="text-xs text-muted-foreground">{doc.file_name}</p>
+                          </div>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => window.open(doc.file_url, '_blank')}
+                        >
+                          <Eye className="h-4 w-4 mr-1" />
+                          Voir
+                        </Button>
+                      </div>
+                    ))}
+                    {documents.length === 0 && (
+                      <p className="text-sm text-muted-foreground italic">Aucun document dans la table de vérification</p>
+                    )}
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Observations */}
+                <div className="form-card">
+                  <h3 className="form-section-title">Observations internes</h3>
+                  <Textarea
+                    placeholder="Notes internes, observations..."
+                    value={observations}
+                    onChange={(e) => setObservations(e.target.value)}
+                    rows={3}
+                  />
+                </div>
+
+                {/* Raison du refus si rejetée */}
+                {selectedRequest.status === 'rejected' && selectedRequest.rejection_reason && (
+                  <div className="form-card border-destructive/50 bg-destructive/5">
+                    <h3 className="form-section-title text-destructive flex items-center gap-2">
+                      <XCircle className="h-5 w-5" />
+                      Raison du refus
+                    </h3>
+                    <p className="text-sm">{selectedRequest.rejection_reason}</p>
+                  </div>
+                )}
+
+                {/* Historique d'activité */}
+                <div className="form-card">
+                  <h3 className="form-section-title">Historique d'activité</h3>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {activityLogs.map((log) => (
+                      <div key={log.id} className="flex items-start gap-3 text-sm p-2 border-l-2 border-primary/20 pl-3">
+                        <div className="flex-1">
+                          <p className="font-medium">{log.action_type}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(log.created_at).toLocaleString('fr-FR')}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                    {activityLogs.length === 0 && (
+                      <p className="text-sm text-muted-foreground italic">Aucun historique</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="form-card">
+                  <h3 className="form-section-title">Actions</h3>
+                  <div className="grid gap-3 md:grid-cols-2">
+                    {selectedRequest.status === 'pending' && (
+                      <>
+                        <Button
+                          onClick={() => setShowApprovalDialog(true)}
+                          disabled={loading}
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                        >
+                          <CheckCircle2 className="h-4 w-4 mr-2" />
+                          Valider la demande
+                        </Button>
+                        <Button
+                          onClick={handleOpenRejectionDialog}
+                          disabled={loading || selectedRequest.status !== 'pending'}
+                          className="bg-[#C62828] hover:bg-[#B71C1C] text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <XCircle className="h-4 w-4 mr-2" />
+                          Refuser la demande
+                        </Button>
+                      </>
+                    )}
+                    
+                    <Button
+                      onClick={() => generatePDF('receipt')}
+                      variant="outline"
+                      className="border-blue-200 hover:bg-blue-50"
+                    >
+                      <FileDown className="h-4 w-4 mr-2" />
+                      Accusé de réception
+                    </Button>
+
+                    {selectedRequest.status === 'approved' && (
+                      <Button
+                        onClick={() => generatePDF('approval')}
+                        variant="outline"
+                        className="border-green-200 hover:bg-green-50"
+                      >
+                        <FileCheck className="h-4 w-4 mr-2" />
+                        Attestation d'inscription
+                      </Button>
+                    )}
+
+                    {selectedRequest.status === 'rejected' && (
+                      <Button
+                        onClick={() => generatePDF('rejection')}
+                        variant="outline"
+                        className="border-red-200 hover:bg-red-50"
+                      >
+                        <FileText className="h-4 w-4 mr-2" />
+                        Lettre de refus
+                      </Button>
+                    )}
                   </div>
                 </div>
               </div>
-
-              {/* Documents fournis */}
-              <div className="form-card">
-                <h3 className="form-section-title">Documents fournis</h3>
-                <div className="space-y-2">
-                  {documents.map((doc) => (
-                    <div key={doc.id} className="flex items-center justify-between p-3 border rounded-lg bg-muted/20">
-                      <div className="flex items-center gap-2">
-                        <FileText className="h-4 w-4 text-muted-foreground" />
-                        <div>
-                          <p className="text-sm font-medium">{getDocumentTypeLabel(doc.document_type)}</p>
-                          <p className="text-xs text-muted-foreground">{doc.file_name}</p>
-                        </div>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => window.open(doc.file_url, '_blank')}
-                      >
-                        Voir
-                      </Button>
-                    </div>
-                  ))}
-                  {documents.length === 0 && (
-                    <p className="text-sm text-muted-foreground">Aucun document</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Observations */}
-              <div className="form-card">
-                <h3 className="form-section-title">Observations</h3>
-                <Textarea
-                  placeholder="Notes internes, observations..."
-                  value={observations}
-                  onChange={(e) => setObservations(e.target.value)}
-                  rows={3}
-                />
-              </div>
-
-
-              {/* Historique d'activité */}
-              <div className="form-card">
-                <h3 className="form-section-title">Historique d'activité</h3>
-                <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {activityLogs.map((log) => (
-                    <div key={log.id} className="flex items-start gap-3 text-sm p-2 border-l-2 border-primary/20 pl-3">
-                      <div className="flex-1">
-                        <p className="font-medium">{log.action_type}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {new Date(log.created_at).toLocaleString('fr-FR')}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                  {activityLogs.length === 0 && (
-                    <p className="text-sm text-muted-foreground">Aucun historique</p>
-                  )}
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="form-card">
-                <h3 className="form-section-title">Actions</h3>
-                <div className="grid gap-3 md:grid-cols-2">
-                  {selectedRequest.status === 'pending' && (
-                    <>
-                      <Button
-                        onClick={() => setShowApprovalDialog(true)}
-                        disabled={loading}
-                        className="bg-green-600 hover:bg-green-700 text-white"
-                      >
-                        <CheckCircle2 className="h-4 w-4 mr-2" />
-                        Valider la demande
-                      </Button>
-                      <Button
-                        onClick={handleOpenRejectionDialog}
-                        disabled={loading || selectedRequest.status !== 'pending'}
-                        className="bg-[#C62828] hover:bg-[#B71C1C] text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        <XCircle className="h-4 w-4 mr-2" />
-                        Refuser la demande
-                      </Button>
-                    </>
-                  )}
-                  
-                  <Button
-                    onClick={() => generatePDF('receipt')}
-                    variant="outline"
-                    className="border-blue-200 hover:bg-blue-50"
-                  >
-                    <FileDown className="h-4 w-4 mr-2" />
-                    Accusé de réception
-                  </Button>
-
-                  {selectedRequest.status === 'approved' && (
-                    <Button
-                      onClick={() => generatePDF('approval')}
-                      variant="outline"
-                      className="border-green-200 hover:bg-green-50"
-                    >
-                      <FileCheck className="h-4 w-4 mr-2" />
-                      Attestation d'inscription
-                    </Button>
-                  )}
-
-                  {selectedRequest.status === 'rejected' && (
-                    <Button
-                      onClick={() => generatePDF('rejection')}
-                      variant="outline"
-                      className="border-red-200 hover:bg-red-50"
-                    >
-                      <FileText className="h-4 w-4 mr-2" />
-                      Lettre de refus
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </div>
+            </ScrollArea>
           )}
         </SheetContent>
       </Sheet>
