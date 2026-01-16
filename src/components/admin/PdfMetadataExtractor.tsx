@@ -73,6 +73,109 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
     return canvas.toDataURL('image/jpeg', 0.85);
   };
 
+  // Extract embedded images from PDF page
+  const extractImagesFromPage = async (page: any): Promise<string[]> => {
+    const images: string[] = [];
+    
+    try {
+      const operatorList = await page.getOperatorList();
+      const resources = await page.objs;
+      
+      // Look for image operators
+      for (let i = 0; i < operatorList.fnArray.length; i++) {
+        const op = operatorList.fnArray[i];
+        // OPS.paintImageXObject = 85, OPS.paintJpegXObject = 82
+        if (op === 85 || op === 82) {
+          const imageName = operatorList.argsArray[i][0];
+          try {
+            const imgData = await page.objs.get(imageName);
+            if (imgData && imgData.data) {
+              // Convert image data to canvas
+              const canvas = document.createElement('canvas');
+              canvas.width = imgData.width;
+              canvas.height = imgData.height;
+              const ctx = canvas.getContext('2d')!;
+              
+              // Create ImageData from the raw data
+              const imageData = ctx.createImageData(imgData.width, imgData.height);
+              
+              // Handle different color formats
+              if (imgData.data.length === imgData.width * imgData.height * 4) {
+                // RGBA format
+                imageData.data.set(imgData.data);
+              } else if (imgData.data.length === imgData.width * imgData.height * 3) {
+                // RGB format - convert to RGBA
+                for (let j = 0, k = 0; j < imgData.data.length; j += 3, k += 4) {
+                  imageData.data[k] = imgData.data[j];
+                  imageData.data[k + 1] = imgData.data[j + 1];
+                  imageData.data[k + 2] = imgData.data[j + 2];
+                  imageData.data[k + 3] = 255;
+                }
+              } else {
+                continue; // Skip unsupported format
+              }
+              
+              ctx.putImageData(imageData, 0, 0);
+              
+              // Only consider images of reasonable size (likely cover images)
+              const minSize = 100;
+              const minArea = 10000;
+              if (imgData.width >= minSize && imgData.height >= minSize && 
+                  (imgData.width * imgData.height) >= minArea) {
+                images.push(canvas.toDataURL('image/jpeg', 0.9));
+              }
+            }
+          } catch (imgErr) {
+            // Skip this image if extraction fails
+            console.log("Could not extract image:", imageName);
+          }
+        }
+      }
+    } catch (err) {
+      console.log("Image extraction from page failed:", err);
+    }
+    
+    return images;
+  };
+
+  // Get the best cover image (prefer embedded image, fallback to page render)
+  const extractCoverImage = async (pdfDoc: any): Promise<string> => {
+    const firstPage = await pdfDoc.getPage(1);
+    
+    // First try to extract embedded images from first page
+    setProgressText("Recherche d'images intégrées...");
+    const embeddedImages = await extractImagesFromPage(firstPage);
+    
+    if (embeddedImages.length > 0) {
+      // Find the largest image (likely the cover)
+      let largestImage = embeddedImages[0];
+      let maxArea = 0;
+      
+      for (const imgData of embeddedImages) {
+        const img = new Image();
+        await new Promise<void>((resolve) => {
+          img.onload = () => {
+            const area = img.width * img.height;
+            if (area > maxArea) {
+              maxArea = area;
+              largestImage = imgData;
+            }
+            resolve();
+          };
+          img.onerror = () => resolve();
+          img.src = imgData;
+        });
+      }
+      
+      setProgressText("Image de couverture détectée !");
+      return largestImage;
+    }
+    
+    // Fallback: render the first page as cover
+    setProgressText("Rendu de la première page comme couverture...");
+    return await renderPageToImage(firstPage, 2.0);
+  };
+
   const extractTextFromFirstPages = async (pdfDoc: any, numPages: number = 3): Promise<string> => {
     let fullText = "";
     const pagesToExtract = Math.min(numPages, pdfDoc.numPages);
@@ -208,11 +311,10 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
       const pdfDoc = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
       const pdfInfo = await pdfDoc.getMetadata();
       setProgress(20);
-      setProgressText("Extraction de la première page...");
+      setProgressText("Extraction de l'image de couverture...");
       
-      // Render first page as cover image
-      const firstPage = await pdfDoc.getPage(1);
-      const coverImage = await renderPageToImage(firstPage, 2.0);
+      // Extract the best cover image (embedded or rendered)
+      const coverImage = await extractCoverImage(pdfDoc);
       setProgress(40);
       setProgressText("Téléchargement de l'image de couverture...");
       
