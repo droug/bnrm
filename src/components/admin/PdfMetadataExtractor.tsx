@@ -117,7 +117,18 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
 
   // Try to find the most "photo-like" region on a rendered page and crop to it.
   // This helps when the cover is not an extractable embedded image, but a scanned page.
-  const detectPhotoCropFromCanvas = (canvas: HTMLCanvasElement): { dataUrl: string; score: number } | null => {
+  const detectPhotoCropFromCanvas = (
+    canvas: HTMLCanvasElement
+  ):
+    | {
+        dataUrl: string;
+        score: number;
+        entropy: number;
+        colorfulness: number;
+        nonWhiteRatio: number;
+        areaRatio: number;
+      }
+    | null => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
 
@@ -128,14 +139,55 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
     const img = ctx.getImageData(0, 0, w, h);
     const data = img.data;
 
+    const idx = (x: number, y: number) => (y * w + x) * 4;
+
+    const computeRegionStats = (x0: number, y0: number, rw: number, rh: number) => {
+      const bins = new Array(64).fill(0);
+      let total = 0;
+      let nonWhite = 0;
+      let colorSum = 0;
+
+      const step = Math.max(1, Math.floor(Math.min(rw, rh) / 260)); // adaptive sampling
+
+      for (let y = y0; y < y0 + rh; y += step) {
+        for (let x = x0; x < x0 + rw; x += step) {
+          const p = idx(x, y);
+          const r = data[p];
+          const g = data[p + 1];
+          const b = data[p + 2];
+
+          const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+          bins[Math.min(63, Math.max(0, Math.floor(lum / 4)))]++;
+          total++;
+
+          if (!(r > 245 && g > 245 && b > 245)) nonWhite++;
+
+          // simple colorfulness proxy (0..255-ish)
+          colorSum += (Math.abs(r - g) + Math.abs(r - b) + Math.abs(g - b)) / 3;
+        }
+      }
+
+      const nonWhiteRatio = total > 0 ? nonWhite / total : 0;
+      const colorfulness = total > 0 ? colorSum / total : 0;
+
+      let entropy = 0;
+      if (total > 0) {
+        for (const c of bins) {
+          if (c <= 0) continue;
+          const p = c / total;
+          entropy -= p * Math.log2(p);
+        }
+      }
+
+      return { entropy, colorfulness, nonWhiteRatio };
+    };
+
     const tile = 24; // coarse grid for performance
     const cols = Math.max(1, Math.floor(w / tile));
     const rows = Math.max(1, Math.floor(h / tile));
 
     const scores: number[] = new Array(cols * rows).fill(0);
     let maxScore = 0;
-
-    const idx = (x: number, y: number) => (y * w + x) * 4;
 
     for (let ty = 0; ty < rows; ty++) {
       for (let tx = 0; tx < cols; tx++) {
@@ -156,13 +208,11 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
             const g = data[p + 1];
             const b = data[p + 2];
 
-            // luminance
             const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
             sum += lum;
             sumSq += lum * lum;
             n++;
 
-            // count non-white pixels (text is sparse; photos are dense)
             if (!(r > 245 && g > 245 && b > 245)) nonWhite++;
           }
         }
@@ -171,7 +221,7 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
         const variance = Math.max(0, sumSq / n - mean * mean);
         const nonWhiteRatio = nonWhite / n;
 
-        // Score favors textured (variance) and dense (non-white) regions.
+        // Score favors textured (variance) and dense regions.
         const score = variance * Math.pow(nonWhiteRatio, 1.4);
         const sIdx = ty * cols + tx;
         scores[sIdx] = score;
@@ -181,7 +231,7 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
 
     if (maxScore <= 0) return null;
 
-    // Select tiles that are close to the best tile.
+    // Select tiles close to the best tile.
     const threshold = maxScore * 0.55;
     let minTx = Infinity,
       minTy = Infinity,
@@ -218,11 +268,28 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
 
     const areaRatio = (cropW * cropH) / (w * h);
 
-    // Reject crops that are too small (likely text blocks).
+    // Reject crops that are too small (often just a text block)
     if (areaRatio < 0.18) return null;
 
+    const stats = computeRegionStats(cropX, cropY, cropW, cropH);
+
+    // Reject regions that look like pure text (low entropy + low colorfulness)
+    // but keep grayscale photos (entropy high even if colorfulness low).
+    const looksLikeText = stats.entropy < 3.3 && stats.colorfulness < 6;
+    if (looksLikeText) return null;
+
+    // Reject nearly-empty regions.
+    if (stats.nonWhiteRatio < 0.14) return null;
+
     const dataUrl = cropCanvasToDataUrl(canvas, { x: cropX, y: cropY, w: cropW, h: cropH }, 0.92);
-    return { dataUrl, score: maxScore };
+    return {
+      dataUrl,
+      score: maxScore,
+      entropy: stats.entropy,
+      colorfulness: stats.colorfulness,
+      nonWhiteRatio: stats.nonWhiteRatio,
+      areaRatio,
+    };
   };
 
   // Check if an image is likely a real photo/cover (not just decoration/icon)
@@ -390,9 +457,19 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
         return bestImage.data;
       }
 
+      // If the page is mostly text, skip the visual crop heuristic.
+      // (Your sample PDF has a text-heavy page 1 then an illustrated page 2.)
+      try {
+        const textContent = await page.getTextContent();
+        const textLength = textContent.items.reduce((acc: number, item: any) => acc + (item.str?.length || 0), 0);
+        if (textLength > 1200) continue;
+      } catch {
+        // ignore
+      }
+
       // 2) Fallback: render the page and crop the most photo-like region
       try {
-        const canvas = await renderPageToCanvas(page, 1.1);
+        const canvas = await renderPageToCanvas(page, 1.15);
         const crop = detectPhotoCropFromCanvas(canvas);
         if (crop) {
           setProgressText(`✓ Photo détectée (analyse visuelle) sur la page ${pageNum}`);
