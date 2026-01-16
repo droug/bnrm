@@ -474,7 +474,8 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         support: issnFormData.support,
         frequency: issnFormData.frequency,
         contact_address: issnFormData.contactAddress,
-        user_id: user.id
+        user_id: user.id,
+        requester_email: user.email
       });
 
       if (error) throw error;
