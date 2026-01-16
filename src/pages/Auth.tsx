@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navigate, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -29,7 +29,7 @@ export default function Auth() {
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
-
+  const hasTriedRecoverySession = useRef(false);
   // Forgot-password email form
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
@@ -55,6 +55,31 @@ export default function Auth() {
       setShowResetPassword(false);
     }
   }, [isResetFlow]);
+
+  // When arriving from a recovery link that contains tokens in the hash (#access_token=...)
+  // ensure we establish the session before showing the password form.
+  useEffect(() => {
+    if (!isResetFlow) return;
+    if (hasTriedRecoverySession.current) return;
+
+    const hp = parseHashParams(location.hash);
+    const access_token = hp.access_token;
+    const refresh_token = hp.refresh_token;
+
+    if (!access_token || !refresh_token) return;
+
+    hasTriedRecoverySession.current = true;
+
+    setIsLoading(true);
+    supabase.auth
+      .setSession({ access_token, refresh_token })
+      .then(({ error }) => {
+        if (error) {
+          toast.error("Lien invalide ou expiré", { description: error.message });
+        }
+      })
+      .finally(() => setIsLoading(false));
+  }, [isResetFlow, location.hash]);
 
   // Redirect if already authenticated - unless we're setting a new password
   if (user && !loading && !isResetFlow) {
@@ -177,7 +202,11 @@ export default function Auth() {
             </div>
             <CardTitle className="text-2xl font-bold">Créer votre mot de passe</CardTitle>
             <CardDescription>
-              {user?.email ? `Compte : ${user.email}` : "Lien invalide ou expiré."}
+              {user?.email
+                ? `Compte : ${user.email}`
+                : isLoading
+                  ? "Chargement du compte..."
+                  : "Lien invalide ou expiré."}
             </CardDescription>
           </CardHeader>
 
