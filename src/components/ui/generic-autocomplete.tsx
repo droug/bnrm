@@ -77,14 +77,14 @@ export function GenericAutocomplete({
 
   // Fermer au clic extérieur
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handlePointerDownOutside = (event: PointerEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setShowSuggestions(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('pointerdown', handlePointerDownOutside);
+    return () => document.removeEventListener('pointerdown', handlePointerDownOutside);
   }, []);
 
   const handleSelect = (code: string, label: string) => {
@@ -173,16 +173,16 @@ export function GenericAutocomplete({
               width: `${dropdownPosition.width}px`,
               zIndex: 100001
             }}
-            onMouseDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
           >
             {filteredValues.map((item) => (
               <button
                 key={item.value_code}
                 type="button"
                 className="w-full text-left px-3 py-2 hover:bg-accent hover:text-accent-foreground cursor-pointer flex items-center justify-between"
-                onMouseDown={(e) => {
-                  e.preventDefault(); // Empêcher le blur de l'input
-                  e.stopPropagation(); // Empêcher le handler "click outside" (dropdown en portal)
+                onPointerDown={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   handleSelect(item.value_code, item.value_label);
                 }}
               >

@@ -14,7 +14,7 @@ import { DynamicHierarchicalSelect } from "@/components/ui/dynamic-hierarchical-
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { AlertTriangle, CheckCircle, Clock, FileText, Upload, X, File, ArrowLeft, CalendarIcon, ExternalLink, Check, ChevronsUpDown } from "lucide-react";
-import { ScrollableDialog, ScrollableDialogContent, ScrollableDialogHeader, ScrollableDialogTitle, ScrollableDialogDescription, ScrollableDialogFooter, ScrollableDialogBody } from "@/components/ui/scrollable-dialog";
+import { ScrollableDialog, ScrollableDialogNestedRoot, ScrollableDialogContent, ScrollableDialogHeader, ScrollableDialogTitle, ScrollableDialogDescription, ScrollableDialogFooter, ScrollableDialogBody } from "@/components/ui/scrollable-dialog";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
@@ -4559,7 +4559,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         </div>
 
         {/* Modale ISSN */}
-        <ScrollableDialog open={isIssnModalOpen} onOpenChange={setIsIssnModalOpen}>
+        <ScrollableDialogNestedRoot open={isIssnModalOpen} onOpenChange={setIsIssnModalOpen}>
           <ScrollableDialogContent className="max-w-[700px]">
             <ScrollableDialogHeader>
               <ScrollableDialogTitle className="text-xl text-[#0E2D5C]">
@@ -4693,7 +4693,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
               </Button>
             </ScrollableDialogFooter>
           </ScrollableDialogContent>
-        </ScrollableDialog>
+        </ScrollableDialogNestedRoot>
         </>
       );
     }
