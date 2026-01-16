@@ -1,18 +1,31 @@
 import { useEffect, useState } from "react";
-import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { Navigate, useNavigate, useSearchParams, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, Users, Shield } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { BookOpen, Users, Shield, AlertTriangle, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
+// Helper to parse hash fragment error params (e.g., #error=access_denied&error_code=otp_expired)
+function parseHashParams(hash: string): Record<string, string> {
+  if (!hash || hash.length <= 1) return {};
+  const params = new URLSearchParams(hash.substring(1));
+  const result: Record<string, string> = {};
+  params.forEach((value, key) => {
+    result[key] = value;
+  });
+  return result;
+}
 
 export default function Auth() {
   const { user, signIn, signUp, loading } = useAuth();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -25,8 +38,17 @@ export default function Auth() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
+  // Parse URL hash for auth errors (e.g., otp_expired)
+  const hashParams = parseHashParams(location.hash);
+  const authError = hashParams.error;
+  const authErrorCode = hashParams.error_code;
+  const authErrorDescription = hashParams.error_description?.replace(/\+/g, " ");
+
   const isResetFlow = searchParams.get("reset") === "true";
   const redirectTo = searchParams.get("redirect") || "/";
+
+  // Show expired link UI
+  const isExpiredLink = authErrorCode === "otp_expired" || authError === "access_denied";
 
   useEffect(() => {
     if (isResetFlow) {
@@ -239,6 +261,35 @@ export default function Auth() {
         </CardHeader>
         
         <CardContent>
+          {/* Expired / Invalid Link Alert */}
+          {isExpiredLink && (
+            <Alert variant="destructive" className="mb-6">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Lien expiré ou invalide</AlertTitle>
+              <AlertDescription className="mt-2 space-y-3">
+                <p>
+                  {authErrorDescription || "Le lien d'activation ou de réinitialisation a expiré ou a déjà été utilisé."}
+                </p>
+                <p className="text-sm">
+                  Pour des raisons de sécurité, ces liens sont à usage unique et expirent après 1 heure.
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-2"
+                  onClick={() => {
+                    setShowResetPassword(true);
+                    // Clear the hash from URL
+                    navigate("/auth", { replace: true });
+                  }}
+                >
+                  <RefreshCw className="h-4 w-4 mr-2" />
+                  Demander un nouveau lien
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+
           <Tabs defaultValue="signin" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="signin">Connexion</TabsTrigger>
