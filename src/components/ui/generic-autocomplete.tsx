@@ -173,6 +173,7 @@ export function GenericAutocomplete({
               width: `${dropdownPosition.width}px`,
               zIndex: 100001
             }}
+            onMouseDown={(e) => e.stopPropagation()}
           >
             {filteredValues.map((item) => (
               <button
@@ -181,6 +182,7 @@ export function GenericAutocomplete({
                 className="w-full text-left px-3 py-2 hover:bg-accent hover:text-accent-foreground cursor-pointer flex items-center justify-between"
                 onMouseDown={(e) => {
                   e.preventDefault(); // Empêcher le blur de l'input
+                  e.stopPropagation(); // Empêcher le handler "click outside" (dropdown en portal)
                   handleSelect(item.value_code, item.value_label);
                 }}
               >

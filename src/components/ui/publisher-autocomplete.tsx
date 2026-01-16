@@ -127,6 +127,7 @@ export function PublisherAutocomplete({
         width: dropdownPosition.width,
         zIndex: 100001
       }}
+      onMouseDown={(e) => e.stopPropagation()}
     >
       {loading ? (
         <div className="px-3 py-2 text-sm text-muted-foreground">Chargement...</div>
@@ -137,6 +138,7 @@ export function PublisherAutocomplete({
             className="px-3 py-2 hover:bg-accent cursor-pointer text-sm"
             onMouseDown={(e) => {
               e.preventDefault();
+              e.stopPropagation();
               handleSelect(publisher);
             }}
           >
