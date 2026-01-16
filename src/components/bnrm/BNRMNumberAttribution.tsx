@@ -96,15 +96,32 @@ export const BNRMNumberAttribution = () => {
     expiry_date: ''
   });
   
-  // Paramétrage des numéros par type de document
-  const [numberSettings, setNumberSettings] = useState<Record<string, { isbn: boolean; issn: boolean; ismn: boolean; dl: boolean }>>({
+  // Paramétrage des numéros par type de document - avec persistance localStorage
+  const defaultSettings = {
     monographie: { isbn: true, issn: false, ismn: false, dl: true },
     periodique: { isbn: false, issn: true, ismn: false, dl: true },
     audiovisuel: { isbn: false, issn: false, ismn: true, dl: true },
     collections_specialisees: { isbn: false, issn: false, ismn: true, dl: true },
+  };
+  
+  const [numberSettings, setNumberSettings] = useState<Record<string, { isbn: boolean; issn: boolean; ismn: boolean; dl: boolean }>>(() => {
+    const saved = localStorage.getItem('depot_legal_number_settings');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch {
+        return defaultSettings;
+      }
+    }
+    return defaultSettings;
   });
   
   const { toast } = useToast();
+
+  // Récupérer les paramètres pour un type de document donné
+  const getSettingsForType = (depositType: string) => {
+    return numberSettings[depositType] || defaultSettings.monographie;
+  };
 
   useEffect(() => {
     fetchData();
@@ -1143,6 +1160,8 @@ export const BNRMNumberAttribution = () => {
 
                 <div className="flex justify-end pt-4">
                   <Button onClick={() => {
+                    // Sauvegarder dans localStorage
+                    localStorage.setItem('depot_legal_number_settings', JSON.stringify(numberSettings));
                     toast({
                       title: "Paramètres enregistrés",
                       description: "La configuration des numéros a été mise à jour avec succès.",
@@ -1318,7 +1337,7 @@ export const BNRMNumberAttribution = () => {
                 
                 <div className="grid gap-2">
                   {/* ISBN - si activé pour ce type */}
-                  {numberSettings[selectedRequest.deposit_type]?.isbn && (
+                  {getSettingsForType(selectedRequest.deposit_type).isbn && (
                     <Button 
                       className="w-full justify-start"
                       onClick={() => attributeNumber(selectedRequest.id, 'isbn')}
@@ -1329,7 +1348,7 @@ export const BNRMNumberAttribution = () => {
                   )}
                   
                   {/* ISSN - si activé pour ce type */}
-                  {numberSettings[selectedRequest.deposit_type]?.issn && (
+                  {getSettingsForType(selectedRequest.deposit_type).issn && (
                     <Button 
                       className="w-full justify-start"
                       onClick={() => attributeNumber(selectedRequest.id, 'issn')}
@@ -1340,7 +1359,7 @@ export const BNRMNumberAttribution = () => {
                   )}
                   
                   {/* ISMN - si activé pour ce type */}
-                  {numberSettings[selectedRequest.deposit_type]?.ismn && (
+                  {getSettingsForType(selectedRequest.deposit_type).ismn && (
                     <Button 
                       className="w-full justify-start"
                       onClick={() => attributeNumber(selectedRequest.id, 'ismn')}
@@ -1351,7 +1370,7 @@ export const BNRMNumberAttribution = () => {
                   )}
                   
                   {/* Dépôt Légal - si activé pour ce type */}
-                  {numberSettings[selectedRequest.deposit_type]?.dl && (
+                  {getSettingsForType(selectedRequest.deposit_type).dl && (
                     <Button 
                       variant="outline"
                       className="w-full justify-start"
