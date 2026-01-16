@@ -60,16 +60,26 @@ const RegistrationFilesSection = ({ registrationData }: { registrationData: any 
 
   if (!registrationData) return null;
 
-  // List of file field keys that might be present in registration_data
+  // List of file field keys that might be present in registration_data (various naming conventions)
   const fileFields = [
     { key: 'logo_url', label: 'Logo', icon: FileImage },
+    { key: 'logoFile', label: 'Logo', icon: FileImage },
     { key: 'rc_attachment_url', label: 'Pièce jointe RC', icon: FileText },
+    { key: 'commerceRegistryFile', label: 'Pièce jointe RC', icon: FileText },
     { key: 'cin_file_url', label: 'Copie CNIE', icon: CreditCard },
+    { key: 'cinFile', label: 'Copie CNIE', icon: CreditCard },
+    { key: 'cin_file', label: 'Copie CNIE', icon: CreditCard },
+    { key: 'photoFile', label: 'Photo d\'identité', icon: FileImage },
+    { key: 'photo_file', label: 'Photo d\'identité', icon: FileImage },
     { key: 'status_document_url', label: 'Statuts', icon: FileText },
     { key: 'authorization_url', label: 'Autorisation', icon: FileText },
   ];
 
-  const availableFiles = fileFields.filter(field => registrationData[field.key]);
+  // Filter to get only fields that have valid URL strings (not File objects)
+  const availableFiles = fileFields.filter(field => {
+    const value = registrationData[field.key];
+    return value && typeof value === 'string' && (value.startsWith('http') || value.startsWith('/'));
+  });
 
   const handleDownload = async (url: string, fileName: string) => {
     setDownloadingFile(fileName);
@@ -851,26 +861,32 @@ export function ProfessionalRequestsManager() {
                       )}
 
                       {/* Nom arabe */}
-                      {selectedRequest.registration_data.name_ar && (
-                        <div className="space-y-1">
-                          <Label className="text-muted-foreground block">Nom (Arabe)</Label>
-                          <p className="font-medium text-lg" dir="rtl">{selectedRequest.registration_data.name_ar}</p>
+                      {(selectedRequest.registration_data.name_ar || selectedRequest.registration_data.nameAr) && (
+                        <div>
+                          <Label className="text-muted-foreground block mb-1">Nom (Arabe)</Label>
+                          <p className="font-medium text-lg bg-muted/30 p-2 rounded" dir="rtl">
+                            {selectedRequest.registration_data.name_ar || selectedRequest.registration_data.nameAr}
+                          </p>
                         </div>
                       )}
 
                       {/* Nom français */}
-                      {selectedRequest.registration_data.name_fr && (
+                      {(selectedRequest.registration_data.name_fr || selectedRequest.registration_data.nameFr) && (
                         <div>
-                          <Label className="text-muted-foreground">Nom (Français)</Label>
-                          <p className="font-medium">{selectedRequest.registration_data.name_fr}</p>
+                          <Label className="text-muted-foreground block mb-1">Nom (Français)</Label>
+                          <p className="font-medium text-lg bg-muted/30 p-2 rounded">
+                            {selectedRequest.registration_data.name_fr || selectedRequest.registration_data.nameFr}
+                          </p>
                         </div>
                       )}
 
                       {/* Contact */}
-                      {selectedRequest.registration_data.contact_name && (
+                      {(selectedRequest.registration_data.contact_name || selectedRequest.registration_data.contactPerson) && (
                         <div>
-                          <Label className="text-muted-foreground">Personne de contact</Label>
-                          <p className="font-medium">{selectedRequest.registration_data.contact_name}</p>
+                          <Label className="text-muted-foreground block mb-1">Personne de contact</Label>
+                          <p className="font-medium">
+                            {selectedRequest.registration_data.contact_name || selectedRequest.registration_data.contactPerson}
+                          </p>
                         </div>
                       )}
 
@@ -879,7 +895,7 @@ export function ProfessionalRequestsManager() {
                         <div className="flex items-start gap-2">
                           <Mail className="h-4 w-4 mt-1 text-muted-foreground" />
                           <div>
-                            <Label className="text-muted-foreground">Email</Label>
+                            <Label className="text-muted-foreground block mb-1">Email</Label>
                             <p className="font-medium">{selectedRequest.registration_data.email || selectedRequest.registration_data.contact_email}</p>
                           </div>
                         </div>
@@ -897,12 +913,14 @@ export function ProfessionalRequestsManager() {
                       )}
 
                       {/* Registre de commerce */}
-                      {selectedRequest.registration_data.commerce_registry && (
+                      {(selectedRequest.registration_data.commerce_registry || selectedRequest.registration_data.commerceRegistry) && (
                         <div className="flex items-start gap-2">
                           <CreditCard className="h-4 w-4 mt-1 text-muted-foreground" />
                           <div>
-                            <Label className="text-muted-foreground">Registre de commerce</Label>
-                            <p className="font-medium">{selectedRequest.registration_data.commerce_registry}</p>
+                            <Label className="text-muted-foreground block mb-1">Registre de commerce</Label>
+                            <p className="font-medium">
+                              {selectedRequest.registration_data.commerce_registry || selectedRequest.registration_data.commerceRegistry}
+                            </p>
                           </div>
                         </div>
                       )}
