@@ -109,7 +109,14 @@ export const BNRMNumberAttribution = () => {
         .from("legal_deposit_requests")
         .select("*")
         .eq("status", "valide_par_b")
-        .neq("status", "attribue")
+        // Exclure toute demande ayant déjà reçu un numéro (DL/ISBN/ISSN)
+        .is("dl_number", null)
+        .is("isbn_assigned", null)
+        .is("issn_assigned", null)
+        .is("metadata->>dl_assigned", null)
+        .is("metadata->>isbn_assigned", null)
+        .is("metadata->>issn_assigned", null)
+        .is("metadata->>dl_number", null)
         .order("created_at", { ascending: true });
 
       if (requestsError) {
@@ -288,17 +295,26 @@ export const BNRMNumberAttribution = () => {
       const request = pendingRequests.find(r => r.id === requestId);
       const currentMetadata = request?.metadata || {};
       
+      const attributionDate = new Date().toISOString();
+
       const updateData: any = {
+        status: 'attribue',
+        attribution_date: attributionDate,
         metadata: {
           ...currentMetadata,
           [`${numberType}_assigned`]: attributedNumber,
-          [`${numberType}_attribution_date`]: new Date().toISOString()
+          [`${numberType}_attribution_date`]: attributionDate,
         }
       };
-      
-      // If DL number is attributed, mark as fully processed
+
       if (numberType === 'dl') {
-        updateData.status = 'attribue';
+        updateData.dl_number = attributedNumber;
+        // compatibilité: certains écrans lisent encore metadata.dl_number
+        updateData.metadata = { ...updateData.metadata, dl_number: attributedNumber };
+      } else if (numberType === 'isbn') {
+        updateData.isbn_assigned = attributedNumber;
+      } else if (numberType === 'issn') {
+        updateData.issn_assigned = attributedNumber;
       }
 
       const { error } = await supabase
@@ -346,10 +362,10 @@ export const BNRMNumberAttribution = () => {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      pending: { color: "bg-yellow-100 text-yellow-800", label: "En attente", icon: Clock },
-      attributed: { color: "bg-blue-100 text-blue-800", label: "Attribué", icon: Hash },
-      confirmed: { color: "bg-green-100 text-green-800", label: "Confirmé", icon: CheckCircle },
-      cancelled: { color: "bg-red-100 text-red-800", label: "Annulé", icon: AlertCircle },
+      pending: { color: "border-amber-soft bg-amber-light text-slate-base-dark", label: "En attente", icon: Clock },
+      attributed: { color: "border-blue-soft bg-blue-light text-blue-dark", label: "Attribué", icon: Hash },
+      confirmed: { color: "border-blue-soft bg-blue-surface text-blue-primary", label: "Confirmé", icon: CheckCircle },
+      cancelled: { color: "border-destructive/20 bg-destructive text-destructive-foreground", label: "Annulé", icon: AlertCircle },
     };
     
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
@@ -636,7 +652,15 @@ export const BNRMNumberAttribution = () => {
                               Voir
                             </Button>
                             {/* Hide attribution button if number already assigned */}
-                            {!(request.isbn_assigned || request.issn_assigned || request.metadata?.isbn_assigned || request.metadata?.issn_assigned || request.metadata?.dl_number) ? (
+                            {!(
+                              request.dl_number ||
+                              request.isbn_assigned ||
+                              request.issn_assigned ||
+                              request.metadata?.dl_assigned ||
+                              request.metadata?.isbn_assigned ||
+                              request.metadata?.issn_assigned ||
+                              request.metadata?.dl_number
+                            ) ? (
                               <Button
                                 size="sm"
                                 onClick={() => {
@@ -648,7 +672,7 @@ export const BNRMNumberAttribution = () => {
                                 Attribuer N°
                               </Button>
                             ) : (
-                              <Badge variant="secondary" className="bg-green-100 text-green-800">
+                              <Badge variant="secondary" className="border-blue-soft bg-blue-surface text-blue-dark">
                                 <CheckCircle className="h-3 w-3 mr-1" />
                                 Attribué
                               </Badge>
