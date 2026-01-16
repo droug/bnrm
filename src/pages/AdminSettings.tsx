@@ -291,7 +291,7 @@ export default function AdminSettings() {
               </Card>
             </div>
             
-            {/* Configuration Notification Mail */}
+            {/* Configuration Notification Mail - SMTP */}
             <div className="mb-8">
               <SmtpConfigCard />
             </div>
