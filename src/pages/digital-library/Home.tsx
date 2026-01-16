@@ -62,11 +62,69 @@ export default function DigitalLibraryHome() {
   }, [session]);
 
   const [newItems, setNewItems] = useState<any[]>([]);
+  const [featuredWorks, setFeaturedWorks] = useState<any[]>([]);
   const [featuredCollections, setFeaturedCollections] = useState<any[]>([]);
   const [featuredThemes, setFeaturedThemes] = useState<any[]>([]);
   const [newsArticles, setNewsArticles] = useState<any[]>([]);
   const [statsData, setStatsData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingFeatured, setLoadingFeatured] = useState(true);
+
+  // Load featured works from CMS for the hero carousel
+  useEffect(() => {
+    const loadFeaturedWorks = async () => {
+      setLoadingFeatured(true);
+      try {
+        // Load featured works from digital_library_featured_works
+        const { data: works, error } = await supabase
+          .from('digital_library_featured_works')
+          .select('*')
+          .eq('is_active', true)
+          .order('display_order', { ascending: true });
+        
+        if (error) throw error;
+        
+        if (works && works.length > 0) {
+          // For each work, get document details if linked
+          const formattedWorks = await Promise.all(works.map(async (work: any) => {
+            let docData = null;
+            
+            if (work.document_id) {
+              const { data } = await supabase
+                .from('digital_library_documents')
+                .select('id, title, author, cover_image_url, document_type, publication_year, is_manuscript')
+                .eq('id', work.document_id)
+                .single();
+              docData = data;
+            }
+            
+            return {
+              id: work.document_id || work.id,
+              workId: work.id,
+              title: docData?.title || work.custom_title || 'Sans titre',
+              title_ar: work.custom_title_ar,
+              author: docData?.author || work.custom_author || t('dl.home.unknownAuthor'),
+              type: work.custom_category || (docData?.is_manuscript ? t('dl.docTypes.manuscript') : t('dl.docTypes.document')),
+              date: work.custom_date || (docData?.publication_year ? String(docData.publication_year) : ''),
+              thumbnail: docData?.cover_image_url || work.custom_image_url,
+              description: work.custom_description,
+              link: work.custom_link,
+              isManuscript: docData?.is_manuscript || false,
+              hasDocument: !!work.document_id,
+            };
+          }));
+          
+          setFeaturedWorks(formattedWorks);
+        }
+      } catch (err) {
+        console.error('Error loading featured works:', err);
+      } finally {
+        setLoadingFeatured(false);
+      }
+    };
+    
+    loadFeaturedWorks();
+  }, [t]);
 
   useEffect(() => {
     const loadRecentDocuments = async () => {
@@ -126,7 +184,7 @@ export default function DigitalLibraryHome() {
     };
 
     loadRecentDocuments();
-  }, []);
+  }, [t]);
 
   const handleReservationClick = (item: any) => {
     setSelectedDocument(item);
@@ -301,8 +359,79 @@ export default function DigitalLibraryHome() {
             </p>
           </div>
 
-          {/* Carousel */}
-          {!loading && newItems.length > 0 && (
+          {/* Hero Carousel - Uses Featured Works from CMS */}
+          {!loadingFeatured && featuredWorks.length > 0 && (
+            <div className="max-w-5xl mx-auto">
+              <Carousel
+                opts={{
+                  align: "start",
+                  loop: true,
+                }}
+                plugins={[autoplayPlugin.current]}
+                className="w-full"
+              >
+                <CarouselContent>
+                  {featuredWorks.map((item) => (
+                     <CarouselItem key={item.workId || item.id} className="animate-fade-in">
+                       <div className="p-1">
+                         <Card className="border-2 hover:shadow-2xl transition-all duration-700 bg-background/10 backdrop-blur-sm border-primary-foreground/30 hover:bg-background/20 hover:scale-[1.02]">
+                           <CardContent className="flex flex-col md:flex-row items-center gap-6 p-8 text-white">
+                             <div className="flex-1">
+                               <Badge className="mb-3">{item.type}</Badge>
+                               <h3 className="text-2xl font-bold mb-2 text-white">
+                                 {language === 'ar' && item.title_ar ? item.title_ar : item.title}
+                               </h3>
+                               <p className="text-white/80 mb-2">{item.author}</p>
+                               {item.description && (
+                                 <p className="text-sm text-white/70 mb-3 line-clamp-2">{item.description}</p>
+                               )}
+                               {item.date && (
+                                 <p className="text-sm text-white/60 mb-4">{item.date}</p>
+                               )}
+                               <div className="flex gap-2 mt-6">
+                                 {item.hasDocument ? (
+                                   <Button 
+                                     size="lg" 
+                                     className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 min-w-[160px]" 
+                                     onClick={() => handleConsultDocument(item)}
+                                   >
+                                     <BookOpen className="h-5 w-5 mr-2" />
+                                     {t('dl.home.consult')}
+                                   </Button>
+                                 ) : item.link ? (
+                                   <Button 
+                                     size="lg" 
+                                     className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 min-w-[160px]" 
+                                     onClick={() => window.open(item.link, '_blank')}
+                                   >
+                                     <ExternalLink className="h-5 w-5 mr-2" />
+                                     {t('dl.home.discover')}
+                                   </Button>
+                                 ) : null}
+                               </div>
+                            </div>
+                            {item.thumbnail && (
+                              <div className="w-full md:w-48 h-64 rounded-lg overflow-hidden hover-scale shadow-xl">
+                                <img 
+                                  src={item.thumbnail} 
+                                  alt={item.title}
+                                  className="w-full h-full object-cover"
+                                />
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      </div>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                <CarouselPrevious className="hidden md:flex" />
+                <CarouselNext className="hidden md:flex" />
+              </Carousel>
+            </div>
+          )}
+          {/* Fallback to recent documents if no featured works */}
+          {!loadingFeatured && featuredWorks.length === 0 && !loading && newItems.length > 0 && (
             <div className="max-w-5xl mx-auto">
               <Carousel
                 opts={{
@@ -352,12 +481,12 @@ export default function DigitalLibraryHome() {
               </Carousel>
             </div>
           )}
-          {loading && (
+          {(loadingFeatured || loading) && (
             <div className="max-w-5xl mx-auto text-center py-12">
               <p className="text-white/90 drop-shadow-md">{t('dl.home.loadingDocuments')}</p>
             </div>
           )}
-          {!loading && newItems.length === 0 && (
+          {!loadingFeatured && featuredWorks.length === 0 && !loading && newItems.length === 0 && (
             <div className="max-w-5xl mx-auto text-center py-12">
               <p className="text-white/90 drop-shadow-md">{t('dl.home.noDocumentsAvailable')}</p>
             </div>
