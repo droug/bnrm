@@ -96,13 +96,13 @@ export function PublisherAutocomplete({
 
   // Close on click outside
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handlePointerDownOutside = (event: PointerEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setShowSuggestions(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener('pointerdown', handlePointerDownOutside);
+    return () => document.removeEventListener('pointerdown', handlePointerDownOutside);
   }, []);
 
   const handleSelect = (publisher: Publisher) => {
@@ -127,7 +127,7 @@ export function PublisherAutocomplete({
         width: dropdownPosition.width,
         zIndex: 100001
       }}
-      onMouseDown={(e) => e.stopPropagation()}
+      onPointerDown={(e) => e.stopPropagation()}
     >
       {loading ? (
         <div className="px-3 py-2 text-sm text-muted-foreground">Chargement...</div>
@@ -136,7 +136,7 @@ export function PublisherAutocomplete({
           <div
             key={publisher.id}
             className="px-3 py-2 hover:bg-accent cursor-pointer text-sm"
-            onMouseDown={(e) => {
+            onPointerDown={(e) => {
               e.preventDefault();
               e.stopPropagation();
               handleSelect(publisher);
