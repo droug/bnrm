@@ -437,47 +437,114 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
     return images;
   };
 
-  // Intelligent cover extraction: try embedded images first, then detect a photo region on rendered pages.
+  // Compute colorfulness and entropy directly from a canvas
+  const computeCanvasStats = (canvas: HTMLCanvasElement): { entropy: number; colorfulness: number; nonWhiteRatio: number } => {
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return { entropy: 0, colorfulness: 0, nonWhiteRatio: 0 };
+
+    const w = canvas.width;
+    const h = canvas.height;
+    const data = ctx.getImageData(0, 0, w, h).data;
+
+    const bins = new Array(64).fill(0);
+    let total = 0;
+    let nonWhite = 0;
+    let colorSum = 0;
+
+    const step = Math.max(1, Math.floor(Math.sqrt(w * h) / 300));
+    for (let i = 0; i < data.length; i += 4 * step) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+
+      const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      bins[Math.min(63, Math.max(0, Math.floor(lum / 4)))]++;
+      total++;
+
+      if (!(r > 245 && g > 245 && b > 245)) nonWhite++;
+      colorSum += (Math.abs(r - g) + Math.abs(r - b) + Math.abs(g - b)) / 3;
+    }
+
+    const nonWhiteRatio = total > 0 ? nonWhite / total : 0;
+    const colorfulness = total > 0 ? colorSum / total : 0;
+
+    let entropy = 0;
+    if (total > 0) {
+      for (const c of bins) {
+        if (c <= 0) continue;
+        const p = c / total;
+        entropy -= p * Math.log2(p);
+      }
+    }
+
+    return { entropy, colorfulness, nonWhiteRatio };
+  };
+
+  // Intelligent cover extraction: scan ALL pages, collect candidates, pick the best visual one.
   const extractCoverIntelligently = async (pdfDoc: any): Promise<string> => {
-    const maxPagesToScan = Math.min(8, pdfDoc.numPages); // scan more pages for "first photo"
+    const maxPagesToScan = Math.min(10, pdfDoc.numPages);
 
     setProgressText("Recherche intelligente de l'image de couverture...");
+
+    interface Candidate {
+      dataUrl: string;
+      pageNum: number;
+      score: number; // higher = more likely a photo
+      source: "embedded" | "rendered";
+    }
+
+    const candidates: Candidate[] = [];
 
     for (let pageNum = 1; pageNum <= maxPagesToScan; pageNum++) {
       setProgressText(`Analyse de la page ${pageNum}/${maxPagesToScan}...`);
 
       const page = await pdfDoc.getPage(pageNum);
 
-      // 1) Best case: extract an embedded image object (true cover art)
+      // 1) Try embedded images
       const images = await extractImagesFromPage(page);
-      if (images.length > 0) {
-        images.sort((a, b) => b.area - a.area);
-        const bestImage = images[0];
-        setProgressText(`✓ Photo extraite (objet) sur la page ${pageNum} (${bestImage.width}x${bestImage.height}px)`);
-        return bestImage.data;
+      for (const img of images) {
+        // Score embedded images by area (larger = better)
+        candidates.push({
+          dataUrl: img.data,
+          pageNum,
+          score: img.area / 1000 + 500, // bias towards embedded
+          source: "embedded",
+        });
       }
 
-      // If the page is mostly text, skip the visual crop heuristic.
-      // (Your sample PDF has a text-heavy page 1 then an illustrated page 2.)
+      // 2) Render page and analyze visually
       try {
-        const textContent = await page.getTextContent();
-        const textLength = textContent.items.reduce((acc: number, item: any) => acc + (item.str?.length || 0), 0);
-        if (textLength > 1200) continue;
+        const canvas = await renderPageToCanvas(page, 1.0);
+        const stats = computeCanvasStats(canvas);
+
+        // Skip pages that look like text (low entropy + low colorfulness)
+        const looksLikeText = stats.entropy < 3.5 && stats.colorfulness < 8;
+        if (looksLikeText) continue;
+
+        // Score: entropy * colorfulness * density
+        const visualScore = stats.entropy * stats.colorfulness * stats.nonWhiteRatio;
+
+        if (visualScore > 10) {
+          // Render at higher quality for the candidate
+          const hqCanvas = await renderPageToCanvas(page, 2.0);
+          candidates.push({
+            dataUrl: hqCanvas.toDataURL("image/jpeg", 0.92),
+            pageNum,
+            score: visualScore,
+            source: "rendered",
+          });
+        }
       } catch {
         // ignore
       }
+    }
 
-      // 2) Fallback: render the page and crop the most photo-like region
-      try {
-        const canvas = await renderPageToCanvas(page, 1.15);
-        const crop = detectPhotoCropFromCanvas(canvas);
-        if (crop) {
-          setProgressText(`✓ Photo détectée (analyse visuelle) sur la page ${pageNum}`);
-          return crop.dataUrl;
-        }
-      } catch {
-        // ignore and continue
-      }
+    // Pick the best candidate
+    if (candidates.length > 0) {
+      candidates.sort((a, b) => b.score - a.score);
+      const best = candidates[0];
+      setProgressText(`✓ Couverture sélectionnée depuis la page ${best.pageNum} (${best.source})`);
+      return best.dataUrl;
     }
 
     // Last resort: render the first page
