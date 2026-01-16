@@ -202,6 +202,14 @@ export const ArabicInputWithKeyboard = ({
           <PopoverContent
             side="bottom"
             align="end"
+            // Keep the keyboard open while we maintain focus/caret on the input.
+            // (Radix Popover closes on "focus outside" by default.)
+            onFocusOutside={(e) => {
+              const target = e.target as HTMLElement | null;
+              if (inputRef.current && target && inputRef.current.contains(target)) {
+                e.preventDefault();
+              }
+            }}
             className="z-[10001] w-[560px] max-w-[calc(100vw-2rem)] p-2"
           >
             <ArabicKeyboard onInsert={handleInsert} onClose={() => setShowKeyboard(false)} />
