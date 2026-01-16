@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { UseFormReturn } from 'react-hook-form';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -24,6 +25,8 @@ export function AuthorIdentification({
   setSelectedCity
 }: AuthorIdentificationProps) {
   const authorType = form.watch('author.authorType');
+  const authorGender = form.watch('author.gender');
+  const [otherNationalityValue, setOtherNationalityValue] = useState<string>('');
   
   return (
     <div>
@@ -166,6 +169,9 @@ export function AuthorIdentification({
                       value={field.value}
                       onChange={field.onChange}
                       placeholder="Sélectionner la nationalité"
+                      gender={authorGender as 'homme' | 'femme' | ''}
+                      otherValue={otherNationalityValue}
+                      onOtherValueChange={setOtherNationalityValue}
                     />
                   </FormControl>
                   <FormMessage />

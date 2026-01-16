@@ -173,6 +173,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
   const [directorType, setDirectorType] = useState<string>("");
   const [directorGender, setDirectorGender] = useState<string>("");
   const [directorPseudonym, setDirectorPseudonym] = useState<string>("");
+  const [otherNationalityValue, setOtherNationalityValue] = useState<string>("");
 
 
 
@@ -2050,6 +2051,9 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                           [field.field_key]: value,
                         }))
                       }
+                      gender={authorGender as 'homme' | 'femme' | ''}
+                      otherNationalityValue={otherNationalityValue}
+                      onOtherNationalityChange={setOtherNationalityValue}
                     />
                   ))}
 
@@ -2802,6 +2806,9 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                           [field.field_key]: value,
                         }))
                       }
+                      gender={authorGender as 'homme' | 'femme' | ''}
+                      otherNationalityValue={otherNationalityValue}
+                      onOtherNationalityChange={setOtherNationalityValue}
                     />
                   ))}
 

@@ -12,9 +12,21 @@ interface DynamicFieldRendererProps {
   language: string;
   value?: any;
   onChange: (value: any) => void;
+  // Props additionnelles pour le champ nationalité
+  gender?: 'homme' | 'femme' | '';
+  otherNationalityValue?: string;
+  onOtherNationalityChange?: (value: string) => void;
 }
 
-export function DynamicFieldRenderer({ field, language, value, onChange }: DynamicFieldRendererProps) {
+export function DynamicFieldRenderer({ 
+  field, 
+  language, 
+  value, 
+  onChange,
+  gender = '',
+  otherNationalityValue = '',
+  onOtherNationalityChange
+}: DynamicFieldRendererProps) {
   const label = language === "ar" ? field.label_ar || field.label_fr : field.label_fr;
   const description = language === "ar" ? field.description_ar : field.description_fr;
 
@@ -108,6 +120,9 @@ export function DynamicFieldRenderer({ field, language, value, onChange }: Dynam
               value={value || ''}
               onChange={onChange}
               placeholder={`Sélectionner ${label.toLowerCase()}`}
+              gender={gender}
+              otherValue={otherNationalityValue}
+              onOtherValueChange={onOtherNationalityChange}
             />
           );
         }
