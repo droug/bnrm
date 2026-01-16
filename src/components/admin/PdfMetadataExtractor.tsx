@@ -480,18 +480,15 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
     return { entropy, colorfulness, nonWhiteRatio };
   };
 
-  // Intelligent cover extraction: scan ALL pages, collect candidates, pick the best visual one.
+  // Intelligent cover extraction: scan pages, score them visually, pick the best, then render HQ.
   const extractCoverIntelligently = async (pdfDoc: any): Promise<string> => {
-    const maxPagesToScan = Math.min(10, pdfDoc.numPages);
+    const maxPagesToScan = Math.min(15, pdfDoc.numPages);
 
     setProgressText("Recherche intelligente de l'image de couverture...");
 
-    interface Candidate {
-      dataUrl: string;
-      pageNum: number;
-      score: number; // higher = more likely a photo
-      source: "embedded" | "rendered";
-    }
+    type Candidate =
+      | { pageNum: number; score: number; source: "embedded"; dataUrl: string }
+      | { pageNum: number; score: number; source: "rendered" };
 
     const candidates: Candidate[] = [];
 
@@ -500,57 +497,57 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
 
       const page = await pdfDoc.getPage(pageNum);
 
-      // 1) Try embedded images
+      // 1) Embedded images (rare for scanned PDFs, but best signal if present)
       const images = await extractImagesFromPage(page);
       for (const img of images) {
-        // Score embedded images by area (larger = better)
         candidates.push({
-          dataUrl: img.data,
           pageNum,
-          score: img.area / 1000 + 500, // bias towards embedded
           source: "embedded",
+          dataUrl: img.data,
+          // strong bias to embedded cover art
+          score: img.area / 1000 + 2000,
         });
       }
 
-      // 2) Render page and analyze visually
+      // 2) Always score the rendered page (even if it contains text)
       try {
-        const canvas = await renderPageToCanvas(page, 1.0);
+        const canvas = await renderPageToCanvas(page, 0.85);
         const stats = computeCanvasStats(canvas);
 
-        // Skip pages that look like text (low entropy + low colorfulness)
-        const looksLikeText = stats.entropy < 3.5 && stats.colorfulness < 8;
-        if (looksLikeText) continue;
+        // Score favors: entropy (texture) + colorfulness + pixel density
+        // This reliably ranks illustrated pages above plain text pages.
+        const visualScore = (stats.entropy * 1.2 + stats.colorfulness * 0.35) * Math.max(0.01, stats.nonWhiteRatio);
 
-        // Score: entropy * colorfulness * density
-        const visualScore = stats.entropy * stats.colorfulness * stats.nonWhiteRatio;
-
-        if (visualScore > 10) {
-          // Render at higher quality for the candidate
-          const hqCanvas = await renderPageToCanvas(page, 2.0);
-          candidates.push({
-            dataUrl: hqCanvas.toDataURL("image/jpeg", 0.92),
-            pageNum,
-            score: visualScore,
-            source: "rendered",
-          });
-        }
+        candidates.push({ pageNum, source: "rendered", score: visualScore });
       } catch {
         // ignore
       }
     }
 
-    // Pick the best candidate
-    if (candidates.length > 0) {
-      candidates.sort((a, b) => b.score - a.score);
-      const best = candidates[0];
-      setProgressText(`✓ Couverture sélectionnée depuis la page ${best.pageNum} (${best.source})`);
+    if (candidates.length === 0) {
+      setProgressText("Rendu de la première page comme couverture...");
+      const firstPage = await pdfDoc.getPage(1);
+      return await renderPageToImage(firstPage, 2.5);
+    }
+
+    candidates.sort((a, b) => b.score - a.score);
+    const best = candidates[0];
+
+    // If we found a true embedded image, use it directly.
+    if (best.source === "embedded") {
+      setProgressText(`✓ Couverture sélectionnée depuis la page ${best.pageNum} (image extraite)`);
       return best.dataUrl;
     }
 
-    // Last resort: render the first page
-    setProgressText("Rendu de la première page comme couverture...");
-    const firstPage = await pdfDoc.getPage(1);
-    return await renderPageToImage(firstPage, 2.5);
+    // Otherwise, render the best page in HQ and try to crop to the most photo-like region.
+    setProgressText(`✓ Couverture sélectionnée depuis la page ${best.pageNum}`);
+    const bestPage = await pdfDoc.getPage(best.pageNum);
+    const hqCanvas = await renderPageToCanvas(bestPage, 2.0);
+
+    const crop = detectPhotoCropFromCanvas(hqCanvas);
+    if (crop) return crop.dataUrl;
+
+    return hqCanvas.toDataURL("image/jpeg", 0.92);
   };
 
   const extractTextFromFirstPages = async (pdfDoc: any, numPages: number = 3): Promise<string> => {
