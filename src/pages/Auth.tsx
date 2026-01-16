@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { BookOpen, Users, Shield, AlertTriangle, RefreshCw } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -319,182 +318,114 @@ export default function Auth() {
             </Alert>
           )}
 
-          <Tabs defaultValue="signin" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="signin">Connexion</TabsTrigger>
-              <TabsTrigger value="signup">Inscription</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="signin">
-              {!showResetPassword ? (
-                <form onSubmit={handleSignIn} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="votre@email.com"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Mot de passe</Label>
-                    <Input
-                      id="password"
-                      name="password"
-                      type="password"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="flex justify-end">
-                    <Button
-                      type="button"
-                      variant="link"
-                      className="text-sm px-0"
-                      onClick={() => setShowResetPassword(true)}
-                    >
-                      Mot de passe oublié ?
-                    </Button>
-                  </div>
-                  
+          {/* Login form only - signup redirects to /signup */}
+          {!showResetPassword ? (
+            <form onSubmit={handleSignIn} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="votre@email.com"
+                  required
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="password">Mot de passe</Label>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                />
+              </div>
+              
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="link"
+                  className="text-sm px-0"
+                  onClick={() => setShowResetPassword(true)}
+                >
+                  Mot de passe oublié ?
+                </Button>
+              </div>
+              
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isLoading}
+              >
+                {isLoading ? "Connexion..." : "Se connecter"}
+              </Button>
+
+              <div className="relative my-4">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-card px-2 text-muted-foreground">
+                    Pas encore de compte ?
+                  </span>
+                </div>
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => navigate("/signup")}
+              >
+                Créer un compte professionnel
+              </Button>
+            </form>
+          ) : (
+            <div className="space-y-4">
+              <div className="text-center space-y-2">
+                <h3 className="font-semibold">Réinitialiser le mot de passe</h3>
+                <p className="text-sm text-muted-foreground">
+                  Entrez votre email pour recevoir un lien de réinitialisation
+                </p>
+              </div>
+              
+              <form onSubmit={handleResetPassword} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="reset-email">Email</Label>
+                  <Input
+                    id="reset-email"
+                    type="email"
+                    placeholder="votre@email.com"
+                    value={resetEmail}
+                    onChange={(e) => setResetEmail(e.target.value)}
+                    required
+                  />
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => {
+                      setShowResetPassword(false);
+                      setResetEmail("");
+                    }}
+                  >
+                    Annuler
+                  </Button>
                   <Button
                     type="submit"
                     className="w-full"
                     disabled={isLoading}
                   >
-                    {isLoading ? "Connexion..." : "Se connecter"}
+                    {isLoading ? "Envoi..." : "Envoyer"}
                   </Button>
-                </form>
-              ) : (
-                <div className="space-y-4">
-                  <div className="text-center space-y-2">
-                    <h3 className="font-semibold">Réinitialiser le mot de passe</h3>
-                    <p className="text-sm text-muted-foreground">
-                      Entrez votre email pour recevoir un lien de réinitialisation
-                    </p>
-                  </div>
-                  
-                  <form onSubmit={handleResetPassword} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="reset-email">Email</Label>
-                      <Input
-                        id="reset-email"
-                        type="email"
-                        placeholder="votre@email.com"
-                        value={resetEmail}
-                        onChange={(e) => setResetEmail(e.target.value)}
-                        required
-                      />
-                    </div>
-                    
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => {
-                          setShowResetPassword(false);
-                          setResetEmail("");
-                        }}
-                      >
-                        Annuler
-                      </Button>
-                      <Button
-                        type="submit"
-                        className="w-full"
-                        disabled={isLoading}
-                      >
-                        {isLoading ? "Envoi..." : "Envoyer"}
-                      </Button>
-                    </div>
-                  </form>
                 </div>
-              )}
-            </TabsContent>
-            
-            <TabsContent value="signup">
-              <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">Prénom</Label>
-                    <Input
-                      id="firstName"
-                      name="firstName"
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Nom</Label>
-                    <Input
-                      id="lastName"
-                      name="lastName"
-                      required
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="votre@email.com"
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="password">Mot de passe</Label>
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="institution">Institution</Label>
-                  <Input
-                    id="institution"
-                    name="institution"
-                    placeholder="Université, Centre de recherche..."
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="researchField">Domaine de recherche</Label>
-                  <Input
-                    id="researchField"
-                    name="researchField"
-                    placeholder="Histoire, Littérature..."
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Téléphone</Label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    placeholder="+212 6 12 34 56 78"
-                  />
-                </div>
-                
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Inscription..." : "S'inscrire"}
-                </Button>
               </form>
-            </TabsContent>
-          </Tabs>
+            </div>
+          )}
           
           <div className="mt-6 text-center">
             <div className="flex items-center justify-center space-x-4 text-sm text-muted-foreground">
