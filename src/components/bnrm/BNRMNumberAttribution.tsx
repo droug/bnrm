@@ -37,6 +37,7 @@ import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ReservedRangesManager } from "@/components/legal-deposit/ReservedRangesManager";
 import { SearchPagination } from "@/components/ui/search-pagination";
+import IssnRequestsManager from "@/components/legal-deposit/IssnRequestsManager";
 
 interface NumberAttribution {
   id: string;
@@ -671,12 +672,15 @@ export const BNRMNumberAttribution = () => {
       </div>
 
       <Tabs defaultValue="pending-requests" className="w-full">
-        <TabsList className="h-11">
+        <TabsList className="h-11 flex-wrap">
           <TabsTrigger value="pending-requests" className="text-base font-medium">
             Demandes à traiter
             {pendingRequests.length > 0 && (
               <Badge variant="secondary" className="ml-2">{pendingRequests.length}</Badge>
             )}
+          </TabsTrigger>
+          <TabsTrigger value="number-requests" className="text-base font-medium">
+            Demandes N°
           </TabsTrigger>
           <TabsTrigger value="attributions" className="text-base font-medium">Attribués</TabsTrigger>
           <TabsTrigger value="reserved" className="text-base font-medium">Tranches réservées</TabsTrigger>
@@ -783,6 +787,11 @@ export const BNRMNumberAttribution = () => {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* ISSN/Number Requests Tab */}
+        <TabsContent value="number-requests" className="space-y-4">
+          <IssnRequestsManager />
         </TabsContent>
 
         {/* Attributions History */}
