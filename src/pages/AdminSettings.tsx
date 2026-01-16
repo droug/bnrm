@@ -8,6 +8,7 @@ import { AdminHeader } from "@/components/AdminHeader";
 import { useNavigate } from "react-router-dom";
 import { CreateTestDepositButton } from "@/components/admin/CreateTestDepositButton";
 import { ExternalSystemsConfig } from "@/components/admin/ExternalSystemsConfig";
+import { SmtpConfigCard } from "@/components/admin/SmtpConfigCard";
 
 export default function AdminSettings() {
   const navigate = useNavigate();
@@ -288,6 +289,11 @@ export default function AdminSettings() {
                   </CardContent>
                 )}
               </Card>
+            </div>
+            
+            {/* Configuration Notification Mail */}
+            <div className="mb-8">
+              <SmtpConfigCard />
             </div>
             
             {/* Section Gestion des Demandes */}
