@@ -30,17 +30,29 @@ export const ArabicKeyboard = ({ onInsert, onClose }: ArabicKeyboardProps) => {
             type="button"
             size="sm"
             variant={showDiacritics ? "default" : "outline"}
+            onPointerDownCapture={(e) => e.preventDefault()}
             onClick={() => setShowDiacritics((v) => !v)}
           >
             التشكيل
           </Button>
-          <Button type="button" size="sm" variant="outline" onClick={() => onInsert(" ")}
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            onPointerDownCapture={(e) => e.preventDefault()}
+            onClick={() => onInsert(" ")}
           >
             مسافة
           </Button>
         </div>
         {onClose && (
-          <Button type="button" size="sm" variant="ghost" onClick={onClose}>
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            onPointerDownCapture={(e) => e.preventDefault()}
+            onClick={onClose}
+          >
             <X className="h-4 w-4" />
           </Button>
         )}
@@ -55,6 +67,7 @@ export const ArabicKeyboard = ({ onInsert, onClose }: ArabicKeyboardProps) => {
               variant="outline"
               size="sm"
               className="min-w-[40px] h-10 text-lg"
+              onPointerDownCapture={(e) => e.preventDefault()}
               onClick={() => onInsert(char)}
             >
               {char}
@@ -72,6 +85,7 @@ export const ArabicKeyboard = ({ onInsert, onClose }: ArabicKeyboardProps) => {
                   variant="outline"
                   size="sm"
                   className="min-w-[40px] h-10 text-lg flex-shrink-0"
+                  onPointerDownCapture={(e) => e.preventDefault()}
                   onClick={() => onInsert(char)}
                 >
                   {char}
