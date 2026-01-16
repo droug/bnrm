@@ -33,6 +33,7 @@ import {
   X
 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import PdfMetadataExtractor from "./PdfMetadataExtractor";
 
 interface FeaturedWork {
   id: string;
@@ -481,6 +482,30 @@ export default function FeaturedWorksManager() {
                 </TabsContent>
                 
                 <TabsContent value="custom" className="space-y-4 mt-4">
+                  {/* PDF Metadata Extractor */}
+                  <PdfMetadataExtractor 
+                    onDataExtracted={(data) => {
+                      setFormData(prev => ({
+                        ...prev,
+                        custom_title: data.title || prev.custom_title,
+                        custom_title_ar: data.title_ar || prev.custom_title_ar,
+                        custom_author: data.author || prev.custom_author,
+                        custom_image_url: data.cover_image_url || prev.custom_image_url,
+                        custom_description: data.description || prev.custom_description,
+                        custom_date: data.date || prev.custom_date,
+                      }));
+                    }}
+                  />
+                  
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-background px-2 text-muted-foreground">ou saisir manuellement</span>
+                    </div>
+                  </div>
+                  
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label>Titre (FR)</Label>
