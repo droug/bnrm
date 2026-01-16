@@ -30,12 +30,26 @@ async function sendEmail(to: string, subject: string, html: string): Promise<{ s
   if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASSWORD) {
     try {
       console.log(`Sending email via SMTP to: ${to}`);
+      console.log(`SMTP config: host=${SMTP_HOST}, port=${SMTP_PORT}`);
+      
+      const port = parseInt(SMTP_PORT, 10);
+      
+      // Configuration SMTP améliorée
+      // Port 465 = SSL/TLS direct
+      // Port 587 ou 25 = STARTTLS (upgrade après connexion)
+      const useImplicitTLS = port === 465;
       
       const client = new SMTPClient({
         connection: {
           hostname: SMTP_HOST,
-          port: parseInt(SMTP_PORT, 10),
-          tls: parseInt(SMTP_PORT, 10) === 465,
+          port: port,
+          tls: useImplicitTLS,
+          // Pour les autres ports, activer STARTTLS
+          ...((!useImplicitTLS && port !== 25) && { 
+            tlsOptions: {
+              starttls: true
+            }
+          }),
           auth: {
             username: SMTP_USER,
             password: SMTP_PASSWORD,
@@ -55,9 +69,12 @@ async function sendEmail(to: string, subject: string, html: string): Promise<{ s
       console.log("Email sent successfully via SMTP");
       return { success: true };
     } catch (error: any) {
-      console.error("SMTP error:", error);
+      console.error("SMTP error:", error.message || error);
+      console.log("Falling back to Resend...");
       // Continuer vers Resend si SMTP échoue
     }
+  } else {
+    console.log("SMTP not configured, trying Resend...");
   }
 
   // Fallback vers Resend
@@ -66,6 +83,8 @@ async function sendEmail(to: string, subject: string, html: string): Promise<{ s
     try {
       console.log(`Sending email via Resend (fallback) to: ${to}`);
       
+      // Note: Pour envoyer à des destinataires autres que l'email du compte Resend,
+      // vous devez vérifier un domaine sur https://resend.com/domains
       const response = await fetch("https://api.resend.com/emails", {
         method: "POST",
         headers: {
@@ -73,7 +92,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<{ s
           Authorization: `Bearer ${RESEND_API_KEY}`,
         },
         body: JSON.stringify({
-          from: "BNRM - Bibliothèque Nationale <onboarding@resend.dev>",
+          from: SMTP_FROM || "BNRM - Bibliothèque Nationale <onboarding@resend.dev>",
           to: [to],
           subject: subject,
           html: html,
