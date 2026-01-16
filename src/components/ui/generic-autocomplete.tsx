@@ -63,13 +63,13 @@ export function GenericAutocomplete({
       )
     : values;
 
-  // Mettre à jour la position du dropdown
+  // Mettre à jour la position du dropdown (fixed position = viewport coords, no scrollY)
   useEffect(() => {
     if (showSuggestions && inputRef.current) {
       const rect = inputRef.current.getBoundingClientRect();
       setDropdownPosition({
-        top: rect.bottom + window.scrollY,
-        left: rect.left + window.scrollX,
+        top: rect.bottom,
+        left: rect.left,
         width: rect.width
       });
     }
@@ -166,11 +166,12 @@ export function GenericAutocomplete({
         {/* Dropdown des suggestions */}
         {showSuggestions && filteredValues.length > 0 && createPortal(
           <div
-            className="fixed bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-y-auto z-[9999]"
+            className="fixed bg-popover border border-border rounded-md shadow-lg max-h-60 overflow-y-auto"
             style={{
               top: `${dropdownPosition.top}px`,
               left: `${dropdownPosition.left}px`,
-              width: `${dropdownPosition.width}px`
+              width: `${dropdownPosition.width}px`,
+              zIndex: 100001
             }}
           >
             {filteredValues.map((item) => (
@@ -196,11 +197,12 @@ export function GenericAutocomplete({
         {/* Message aucun résultat */}
         {showSuggestions && filteredValues.length === 0 && displayValue.trim() && createPortal(
           <div
-            className="fixed bg-popover border border-border rounded-md shadow-lg p-3 text-sm text-muted-foreground z-[9999]"
+            className="fixed bg-popover border border-border rounded-md shadow-lg p-3 text-sm text-muted-foreground"
             style={{
               top: `${dropdownPosition.top}px`,
               left: `${dropdownPosition.left}px`,
-              width: `${dropdownPosition.width}px`
+              width: `${dropdownPosition.width}px`,
+              zIndex: 100001
             }}
           >
             Aucun résultat trouvé
