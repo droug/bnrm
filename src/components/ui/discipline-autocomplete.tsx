@@ -94,6 +94,7 @@ export function DisciplineAutocomplete({
         width: dropdownPosition.width,
         zIndex: 100001
       }}
+      onMouseDown={(e) => e.stopPropagation()}
     >
       {filteredDisciplines.slice(0, 50).map((discipline, index) => (
         <div
@@ -101,6 +102,7 @@ export function DisciplineAutocomplete({
           className="px-3 py-2 hover:bg-accent cursor-pointer text-sm"
           onMouseDown={(e) => {
             e.preventDefault();
+            e.stopPropagation();
             handleSelect(discipline);
           }}
         >
