@@ -76,23 +76,27 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
     return canvas.toDataURL('image/jpeg', 0.92);
   };
 
-  // Scan first page for the dominant image (cover detection)
-  const extractCoverFromFirstPage = async (pdfDoc: any): Promise<string> => {
-    const firstPage = await pdfDoc.getPage(1);
-    const viewport = firstPage.getViewport({ scale: 1.0 });
+  // Check if an image is likely a real photo/cover (not just decoration/icon)
+  const isSignificantImage = (width: number, height: number, pageWidth: number, pageHeight: number): boolean => {
+    const area = width * height;
+    const pageArea = pageWidth * pageHeight;
+    const areaRatio = area / pageArea;
     
-    // Get page dimensions
-    const pageWidth = viewport.width;
-    const pageHeight = viewport.height;
-    
-    setProgressText("Analyse de la première page...");
+    // Image must be:
+    // - At least 100x100 pixels
+    // - At least 5% of the page area (significant content)
+    // - Not too small (icons, logos, etc.)
+    return width >= 100 && height >= 100 && areaRatio >= 0.05 && area > 20000;
+  };
+
+  // Extract embedded images from a specific page
+  const extractImagesFromPage = async (page: any): Promise<{ data: string; area: number; width: number; height: number }[]> => {
+    const images: { data: string; area: number; width: number; height: number }[] = [];
+    const viewport = page.getViewport({ scale: 1.0 });
     
     try {
-      // Get the operator list to find images
-      const ops = await firstPage.getOperatorList();
-      let largestImage: { data: string; area: number } | null = null;
+      const ops = await page.getOperatorList();
       
-      // Iterate through operators looking for images
       for (let i = 0; i < ops.fnArray.length; i++) {
         const op = ops.fnArray[i];
         
@@ -101,82 +105,109 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
           const objId = ops.argsArray[i][0];
           
           try {
-            // Get the image object
             const imgObj = await new Promise<any>((resolve, reject) => {
-              firstPage.objs.get(objId, (img: any) => {
+              const timeout = setTimeout(() => reject(new Error("Timeout")), 3000);
+              page.objs.get(objId, (img: any) => {
+                clearTimeout(timeout);
                 if (img) resolve(img);
                 else reject(new Error("Image not found"));
               });
             });
             
             if (imgObj && imgObj.width && imgObj.height) {
-              const area = imgObj.width * imgObj.height;
-              
-              // Only consider images that are reasonably sized (> 50x50 pixels)
-              if (imgObj.width > 50 && imgObj.height > 50) {
-                // Check if this is the largest image so far
-                if (!largestImage || area > largestImage.area) {
-                  // Create canvas and draw the image
-                  const canvas = document.createElement('canvas');
-                  canvas.width = imgObj.width;
-                  canvas.height = imgObj.height;
-                  const ctx = canvas.getContext('2d')!;
+              // Check if this is a significant image
+              if (isSignificantImage(imgObj.width, imgObj.height, viewport.width, viewport.height)) {
+                // Create canvas and draw the image
+                const canvas = document.createElement('canvas');
+                canvas.width = imgObj.width;
+                canvas.height = imgObj.height;
+                const ctx = canvas.getContext('2d')!;
+                
+                const imageData = ctx.createImageData(imgObj.width, imgObj.height);
+                const dataLen = imgObj.width * imgObj.height * 4;
+                
+                if (imgObj.data && imgObj.data.length > 0) {
+                  const srcData = imgObj.data;
+                  const hasAlpha = srcData.length >= dataLen;
                   
-                  // Create ImageData and populate it
-                  const imageData = ctx.createImageData(imgObj.width, imgObj.height);
-                  const dataLen = imgObj.width * imgObj.height * 4;
-                  
-                  if (imgObj.data && imgObj.data.length > 0) {
-                    // Handle different data formats
-                    const srcData = imgObj.data;
-                    const hasAlpha = srcData.length >= dataLen;
-                    
-                    if (hasAlpha) {
-                      // RGBA format
-                      for (let j = 0; j < dataLen; j++) {
-                        imageData.data[j] = srcData[j];
-                      }
-                    } else {
-                      // RGB format - add alpha channel
-                      const rgbLen = imgObj.width * imgObj.height * 3;
-                      if (srcData.length >= rgbLen) {
-                        for (let j = 0, k = 0; j < rgbLen && k < dataLen; j += 3, k += 4) {
-                          imageData.data[k] = srcData[j];
-                          imageData.data[k + 1] = srcData[j + 1];
-                          imageData.data[k + 2] = srcData[j + 2];
-                          imageData.data[k + 3] = 255;
-                        }
+                  if (hasAlpha) {
+                    for (let j = 0; j < dataLen; j++) {
+                      imageData.data[j] = srcData[j];
+                    }
+                  } else {
+                    const rgbLen = imgObj.width * imgObj.height * 3;
+                    if (srcData.length >= rgbLen) {
+                      for (let j = 0, k = 0; j < rgbLen && k < dataLen; j += 3, k += 4) {
+                        imageData.data[k] = srcData[j];
+                        imageData.data[k + 1] = srcData[j + 1];
+                        imageData.data[k + 2] = srcData[j + 2];
+                        imageData.data[k + 3] = 255;
                       }
                     }
-                    
-                    ctx.putImageData(imageData, 0, 0);
-                    
-                    // Convert to base64
-                    const imgBase64 = canvas.toDataURL('image/jpeg', 0.92);
-                    
-                    largestImage = { data: imgBase64, area };
-                    setProgressText(`Image détectée: ${imgObj.width}x${imgObj.height}px`);
                   }
+                  
+                  ctx.putImageData(imageData, 0, 0);
+                  const imgBase64 = canvas.toDataURL('image/jpeg', 0.92);
+                  
+                  images.push({
+                    data: imgBase64,
+                    area: imgObj.width * imgObj.height,
+                    width: imgObj.width,
+                    height: imgObj.height
+                  });
                 }
               }
             }
           } catch (imgErr) {
-            console.log("Skipping image object:", objId);
+            // Skip this image
           }
         }
       }
-      
-      // If we found a significant image, use it
-      if (largestImage && largestImage.area > 10000) {
-        setProgressText("Image de couverture extraite !");
-        return largestImage.data;
-      }
     } catch (err) {
-      console.log("Image extraction failed, falling back to page render:", err);
+      console.log("Error extracting images from page:", err);
     }
     
-    // Fallback: render the entire first page as the cover
-    setProgressText("Rendu de la page de garde...");
+    return images;
+  };
+
+  // Intelligent cover extraction: scan multiple pages to find the first real image
+  const extractCoverIntelligently = async (pdfDoc: any): Promise<string> => {
+    const maxPagesToScan = Math.min(5, pdfDoc.numPages); // Scan up to 5 pages
+    
+    setProgressText("Recherche intelligente de l'image de couverture...");
+    
+    // Scan pages looking for a significant embedded image
+    for (let pageNum = 1; pageNum <= maxPagesToScan; pageNum++) {
+      setProgressText(`Analyse de la page ${pageNum}/${maxPagesToScan}...`);
+      
+      const page = await pdfDoc.getPage(pageNum);
+      const images = await extractImagesFromPage(page);
+      
+      if (images.length > 0) {
+        // Sort by area (largest first) and return the biggest image
+        images.sort((a, b) => b.area - a.area);
+        const bestImage = images[0];
+        
+        setProgressText(`✓ Image de couverture trouvée sur la page ${pageNum} (${bestImage.width}x${bestImage.height}px)`);
+        return bestImage.data;
+      }
+    }
+    
+    // If no embedded image found, check if first page is mostly an image (full-page cover)
+    setProgressText("Aucune image embarquée trouvée, analyse de la première page...");
+    
+    const firstPage = await pdfDoc.getPage(1);
+    const textContent = await firstPage.getTextContent();
+    const textLength = textContent.items.reduce((acc: number, item: any) => acc + (item.str?.length || 0), 0);
+    
+    // If first page has very little text, it's likely a full-page cover image
+    if (textLength < 50) {
+      setProgressText("Page de couverture détectée (page complète)");
+      return await renderPageToImage(firstPage, 2.5);
+    }
+    
+    // Last resort: render the first page as cover
+    setProgressText("Rendu de la première page comme couverture...");
     return await renderPageToImage(firstPage, 2.5);
   };
 
@@ -317,9 +348,9 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
       const pdfInfo = await pdfDoc.getMetadata();
       setProgress(20);
       
-      // Extract cover image from first page
-      setProgressText("Extraction de l'image de couverture...");
-      const coverImage = await extractCoverFromFirstPage(pdfDoc);
+      // Intelligent cover extraction: scan pages to find real image
+      setProgressText("Extraction intelligente de l'image de couverture...");
+      const coverImage = await extractCoverIntelligently(pdfDoc);
       setCoverPreview(coverImage); // Show preview immediately
       setProgress(40);
       
