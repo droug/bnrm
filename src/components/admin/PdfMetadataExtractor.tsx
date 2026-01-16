@@ -81,92 +81,143 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
     const area = width * height;
     const pageArea = pageWidth * pageHeight;
     const areaRatio = area / pageArea;
-    
-    // Image must be:
-    // - At least 100x100 pixels
-    // - At least 5% of the page area (significant content)
-    // - Not too small (icons, logos, etc.)
-    return width >= 100 && height >= 100 && areaRatio >= 0.05 && area > 20000;
+
+    // Heuristics:
+    // - Ignore tiny icons/logos
+    // - Prefer images that cover a meaningful portion of the page
+    // (covers in scanned PDFs are often full-page images)
+    return width >= 100 && height >= 100 && areaRatio >= 0.03 && area > 20000;
+  };
+
+  const loadImageFromSrc = (src: string): Promise<HTMLImageElement> =>
+    new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+
+  // Convert various PDF.js image object shapes into a base64 data URL
+  const pdfImageObjectToDataUrl = async (imgObj: any): Promise<string | null> => {
+    if (!imgObj?.width || !imgObj?.height) return null;
+
+    const canvas = document.createElement("canvas");
+    canvas.width = imgObj.width;
+    canvas.height = imgObj.height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+
+    // 1) Raw pixel buffer (common for paintImageXObject)
+    if (imgObj.data && typeof imgObj.data.length === "number") {
+      const imageData = ctx.createImageData(imgObj.width, imgObj.height);
+      const dataLen = imgObj.width * imgObj.height * 4;
+      const srcData = imgObj.data as Uint8ClampedArray;
+
+      if (srcData.length >= dataLen) {
+        // RGBA
+        imageData.data.set(srcData.subarray(0, dataLen));
+        ctx.putImageData(imageData, 0, 0);
+        return canvas.toDataURL("image/jpeg", 0.92);
+      }
+
+      // RGB (no alpha)
+      const rgbLen = imgObj.width * imgObj.height * 3;
+      if (srcData.length >= rgbLen) {
+        for (let j = 0, k = 0; j < rgbLen && k < dataLen; j += 3, k += 4) {
+          imageData.data[k] = srcData[j];
+          imageData.data[k + 1] = srcData[j + 1];
+          imageData.data[k + 2] = srcData[j + 2];
+          imageData.data[k + 3] = 255;
+        }
+        ctx.putImageData(imageData, 0, 0);
+        return canvas.toDataURL("image/jpeg", 0.92);
+      }
+    }
+
+    // 2) ImageBitmap / bitmap payloads (common for JPEG XObjects)
+    if (typeof ImageBitmap !== "undefined" && imgObj.bitmap instanceof ImageBitmap) {
+      ctx.drawImage(imgObj.bitmap, 0, 0, imgObj.width, imgObj.height);
+      return canvas.toDataURL("image/jpeg", 0.92);
+    }
+
+    // 3) HTMLImageElement provided by PDF.js
+    if (typeof HTMLImageElement !== "undefined" && imgObj instanceof HTMLImageElement) {
+      ctx.drawImage(imgObj, 0, 0, imgObj.width, imgObj.height);
+      return canvas.toDataURL("image/jpeg", 0.92);
+    }
+
+    // 4) Object with a `src` (data URL / blob URL)
+    if (typeof imgObj.src === "string" && imgObj.src.length > 0) {
+      const img = await loadImageFromSrc(imgObj.src);
+      ctx.drawImage(img, 0, 0, imgObj.width, imgObj.height);
+      return canvas.toDataURL("image/jpeg", 0.92);
+    }
+
+    return null;
   };
 
   // Extract embedded images from a specific page
   const extractImagesFromPage = async (page: any): Promise<{ data: string; area: number; width: number; height: number }[]> => {
     const images: { data: string; area: number; width: number; height: number }[] = [];
     const viewport = page.getViewport({ scale: 1.0 });
-    
+
+    // Support multiple image paint operations; values vary slightly by pdfjs version
+    const OPS: any = (pdfjsLib as any).OPS || {};
+    const imageOps = new Set<number>([
+      OPS.paintJpegXObject ?? 82,
+      OPS.paintImageXObject ?? 85,
+      OPS.paintInlineImageXObject ?? 86,
+      OPS.paintInlineImageXObjectGroup ?? 87,
+      OPS.paintImageMaskXObject ?? 83,
+      OPS.paintImageMaskXObjectGroup ?? 84,
+    ]);
+
     try {
       const ops = await page.getOperatorList();
-      
+
       for (let i = 0; i < ops.fnArray.length; i++) {
         const op = ops.fnArray[i];
-        
-        // Check for image paint operations (82 = paintJpegXObject, 85 = paintImageXObject)
-        if (op === 82 || op === 85) {
-          const objId = ops.argsArray[i][0];
-          
-          try {
-            const imgObj = await new Promise<any>((resolve, reject) => {
+        if (!imageOps.has(op)) continue;
+
+        const arg0 = ops.argsArray?.[i]?.[0];
+        let imgObj: any | null = null;
+
+        try {
+          // Some ops reference an object id, others carry the image payload directly.
+          if (typeof arg0 === "string") {
+            imgObj = await new Promise<any>((resolve, reject) => {
               const timeout = setTimeout(() => reject(new Error("Timeout")), 3000);
-              page.objs.get(objId, (img: any) => {
+              page.objs.get(arg0, (img: any) => {
                 clearTimeout(timeout);
                 if (img) resolve(img);
                 else reject(new Error("Image not found"));
               });
             });
-            
-            if (imgObj && imgObj.width && imgObj.height) {
-              // Check if this is a significant image
-              if (isSignificantImage(imgObj.width, imgObj.height, viewport.width, viewport.height)) {
-                // Create canvas and draw the image
-                const canvas = document.createElement('canvas');
-                canvas.width = imgObj.width;
-                canvas.height = imgObj.height;
-                const ctx = canvas.getContext('2d')!;
-                
-                const imageData = ctx.createImageData(imgObj.width, imgObj.height);
-                const dataLen = imgObj.width * imgObj.height * 4;
-                
-                if (imgObj.data && imgObj.data.length > 0) {
-                  const srcData = imgObj.data;
-                  const hasAlpha = srcData.length >= dataLen;
-                  
-                  if (hasAlpha) {
-                    for (let j = 0; j < dataLen; j++) {
-                      imageData.data[j] = srcData[j];
-                    }
-                  } else {
-                    const rgbLen = imgObj.width * imgObj.height * 3;
-                    if (srcData.length >= rgbLen) {
-                      for (let j = 0, k = 0; j < rgbLen && k < dataLen; j += 3, k += 4) {
-                        imageData.data[k] = srcData[j];
-                        imageData.data[k + 1] = srcData[j + 1];
-                        imageData.data[k + 2] = srcData[j + 2];
-                        imageData.data[k + 3] = 255;
-                      }
-                    }
-                  }
-                  
-                  ctx.putImageData(imageData, 0, 0);
-                  const imgBase64 = canvas.toDataURL('image/jpeg', 0.92);
-                  
-                  images.push({
-                    data: imgBase64,
-                    area: imgObj.width * imgObj.height,
-                    width: imgObj.width,
-                    height: imgObj.height
-                  });
-                }
-              }
-            }
-          } catch (imgErr) {
-            // Skip this image
+          } else if (arg0 && typeof arg0 === "object") {
+            imgObj = arg0;
           }
+
+          if (!imgObj?.width || !imgObj?.height) continue;
+          if (!isSignificantImage(imgObj.width, imgObj.height, viewport.width, viewport.height)) continue;
+
+          const dataUrl = await pdfImageObjectToDataUrl(imgObj);
+          if (!dataUrl) continue;
+
+          images.push({
+            data: dataUrl,
+            area: imgObj.width * imgObj.height,
+            width: imgObj.width,
+            height: imgObj.height,
+          });
+        } catch {
+          // skip
         }
       }
     } catch (err) {
       console.log("Error extracting images from page:", err);
     }
-    
+
     return images;
   };
 
