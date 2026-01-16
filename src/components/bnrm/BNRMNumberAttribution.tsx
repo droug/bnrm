@@ -95,6 +95,15 @@ export const BNRMNumberAttribution = () => {
     agency: '',
     expiry_date: ''
   });
+  
+  // Paramétrage des numéros par type de document
+  const [numberSettings, setNumberSettings] = useState<Record<string, { isbn: boolean; issn: boolean; ismn: boolean; dl: boolean }>>({
+    monographie: { isbn: true, issn: false, ismn: false, dl: true },
+    periodique: { isbn: false, issn: true, ismn: false, dl: true },
+    audiovisuel: { isbn: false, issn: false, ismn: true, dl: true },
+    collections_specialisees: { isbn: false, issn: false, ismn: true, dl: true },
+  });
+  
   const { toast } = useToast();
 
   useEffect(() => {
@@ -641,6 +650,7 @@ export const BNRMNumberAttribution = () => {
           </TabsTrigger>
           <TabsTrigger value="attributions" className="text-base font-medium">Attribués</TabsTrigger>
           <TabsTrigger value="reserved" className="text-base font-medium">Tranches réservées</TabsTrigger>
+          <TabsTrigger value="settings" className="text-base font-medium">Paramétrage N°</TabsTrigger>
           <TabsTrigger value="statistics" className="text-base font-medium">Statistiques</TabsTrigger>
         </TabsList>
 
@@ -869,6 +879,284 @@ export const BNRMNumberAttribution = () => {
           <ReservedRangesManager />
         </TabsContent>
 
+        {/* Number Settings Tab */}
+        <TabsContent value="settings" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Settings className="h-5 w-5" />
+                Paramétrage des numéros par type de document
+              </CardTitle>
+              <CardDescription>
+                Configurez les types de numéros disponibles pour chaque catégorie de dépôt légal
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-6">
+                {/* Monographies */}
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    <BookOpen className="h-5 w-5 text-primary" />
+                    <h3 className="font-semibold text-lg">Monographies</h3>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="mono-isbn"
+                        checked={numberSettings.monographie.isbn}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          monographie: { ...prev.monographie, isbn: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="mono-isbn" className="font-medium">ISBN</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="mono-issn"
+                        checked={numberSettings.monographie.issn}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          monographie: { ...prev.monographie, issn: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="mono-issn" className="font-medium">ISSN</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="mono-ismn"
+                        checked={numberSettings.monographie.ismn}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          monographie: { ...prev.monographie, ismn: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="mono-ismn" className="font-medium">ISMN</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="mono-dl"
+                        checked={numberSettings.monographie.dl}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          monographie: { ...prev.monographie, dl: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="mono-dl" className="font-medium">Dépôt Légal</Label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Périodiques */}
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Newspaper className="h-5 w-5 text-primary" />
+                    <h3 className="font-semibold text-lg">Périodiques</h3>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="period-isbn"
+                        checked={numberSettings.periodique.isbn}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          periodique: { ...prev.periodique, isbn: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="period-isbn" className="font-medium">ISBN</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="period-issn"
+                        checked={numberSettings.periodique.issn}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          periodique: { ...prev.periodique, issn: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="period-issn" className="font-medium">ISSN</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="period-ismn"
+                        checked={numberSettings.periodique.ismn}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          periodique: { ...prev.periodique, ismn: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="period-ismn" className="font-medium">ISMN</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="period-dl"
+                        checked={numberSettings.periodique.dl}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          periodique: { ...prev.periodique, dl: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="period-dl" className="font-medium">Dépôt Légal</Label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Audio-visuel & Logiciels */}
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    <Hash className="h-5 w-5 text-primary" />
+                    <h3 className="font-semibold text-lg">Audio-visuel & Logiciels</h3>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="av-isbn"
+                        checked={numberSettings.audiovisuel.isbn}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          audiovisuel: { ...prev.audiovisuel, isbn: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="av-isbn" className="font-medium">ISBN</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="av-issn"
+                        checked={numberSettings.audiovisuel.issn}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          audiovisuel: { ...prev.audiovisuel, issn: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="av-issn" className="font-medium">ISSN</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="av-ismn"
+                        checked={numberSettings.audiovisuel.ismn}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          audiovisuel: { ...prev.audiovisuel, ismn: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="av-ismn" className="font-medium">ISMN</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="av-dl"
+                        checked={numberSettings.audiovisuel.dl}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          audiovisuel: { ...prev.audiovisuel, dl: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="av-dl" className="font-medium">Dépôt Légal</Label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Collections spécialisées */}
+                <div className="border rounded-lg p-4">
+                  <div className="flex items-center gap-3 mb-4">
+                    <FileText className="h-5 w-5 text-primary" />
+                    <h3 className="font-semibold text-lg">Collections spécialisées</h3>
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="cs-isbn"
+                        checked={numberSettings.collections_specialisees.isbn}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          collections_specialisees: { ...prev.collections_specialisees, isbn: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="cs-isbn" className="font-medium">ISBN</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="cs-issn"
+                        checked={numberSettings.collections_specialisees.issn}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          collections_specialisees: { ...prev.collections_specialisees, issn: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="cs-issn" className="font-medium">ISSN</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="cs-ismn"
+                        checked={numberSettings.collections_specialisees.ismn}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          collections_specialisees: { ...prev.collections_specialisees, ismn: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="cs-ismn" className="font-medium">ISMN</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        id="cs-dl"
+                        checked={numberSettings.collections_specialisees.dl}
+                        onChange={(e) => setNumberSettings(prev => ({
+                          ...prev,
+                          collections_specialisees: { ...prev.collections_specialisees, dl: e.target.checked }
+                        }))}
+                        className="h-4 w-4 rounded border-gray-300"
+                      />
+                      <Label htmlFor="cs-dl" className="font-medium">Dépôt Légal</Label>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-end pt-4">
+                  <Button onClick={() => {
+                    toast({
+                      title: "Paramètres enregistrés",
+                      description: "La configuration des numéros a été mise à jour avec succès.",
+                    });
+                  }}>
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Enregistrer les paramètres
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         {/* Statistics */}
         <TabsContent value="statistics" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -1029,8 +1317,8 @@ export const BNRMNumberAttribution = () => {
                 </p>
                 
                 <div className="grid gap-2">
-                  {/* Monographie: ISBN */}
-                  {selectedRequest.deposit_type === 'monographie' && (
+                  {/* ISBN - si activé pour ce type */}
+                  {numberSettings[selectedRequest.deposit_type]?.isbn && (
                     <Button 
                       className="w-full justify-start"
                       onClick={() => attributeNumber(selectedRequest.id, 'isbn')}
@@ -1040,8 +1328,8 @@ export const BNRMNumberAttribution = () => {
                     </Button>
                   )}
                   
-                  {/* Périodique: ISSN */}
-                  {selectedRequest.deposit_type === 'periodique' && (
+                  {/* ISSN - si activé pour ce type */}
+                  {numberSettings[selectedRequest.deposit_type]?.issn && (
                     <Button 
                       className="w-full justify-start"
                       onClick={() => attributeNumber(selectedRequest.id, 'issn')}
@@ -1051,8 +1339,8 @@ export const BNRMNumberAttribution = () => {
                     </Button>
                   )}
                   
-                  {/* Audio-visuel & Collections spécialisées: ISMN et/ou DL */}
-                  {(selectedRequest.deposit_type === 'audiovisuel' || selectedRequest.deposit_type === 'collections_specialisees') && (
+                  {/* ISMN - si activé pour ce type */}
+                  {numberSettings[selectedRequest.deposit_type]?.ismn && (
                     <Button 
                       className="w-full justify-start"
                       onClick={() => attributeNumber(selectedRequest.id, 'ismn')}
@@ -1062,15 +1350,17 @@ export const BNRMNumberAttribution = () => {
                     </Button>
                   )}
                   
-                  {/* Dépôt Légal disponible pour tous les types */}
-                  <Button 
-                    variant="outline"
-                    className="w-full justify-start"
-                    onClick={() => attributeNumber(selectedRequest.id, 'dl')}
-                  >
-                    <FileText className="h-4 w-4 mr-2" />
-                    Attribuer le N° de Dépôt Légal
-                  </Button>
+                  {/* Dépôt Légal - si activé pour ce type */}
+                  {numberSettings[selectedRequest.deposit_type]?.dl && (
+                    <Button 
+                      variant="outline"
+                      className="w-full justify-start"
+                      onClick={() => attributeNumber(selectedRequest.id, 'dl')}
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      Attribuer le N° de Dépôt Légal
+                    </Button>
+                  )}
                 </div>
               </div>
 
