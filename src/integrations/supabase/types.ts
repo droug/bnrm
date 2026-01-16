@@ -6067,6 +6067,69 @@ export type Database = {
           },
         ]
       }
+      issn_requests: {
+        Row: {
+          contact_address: string
+          country_code: string
+          created_at: string
+          discipline: string
+          frequency: string
+          id: string
+          justification_file_url: string | null
+          language_code: string
+          publisher: string
+          rejection_reason: string | null
+          request_number: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          support: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          contact_address: string
+          country_code: string
+          created_at?: string
+          discipline: string
+          frequency: string
+          id?: string
+          justification_file_url?: string | null
+          language_code: string
+          publisher: string
+          rejection_reason?: string | null
+          request_number?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          support: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          contact_address?: string
+          country_code?: string
+          created_at?: string
+          discipline?: string
+          frequency?: string
+          id?: string
+          justification_file_url?: string | null
+          language_code?: string
+          publisher?: string
+          rejection_reason?: string | null
+          request_number?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          support?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       languages: {
         Row: {
           code: string
