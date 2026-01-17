@@ -50,53 +50,53 @@ Enhanced Moroccan Heritage Design System
     --morocco-green: 145 60% 30%; /* Moroccan green */
     --morocco-green-light: 145 50% 45%;
     
-    /* Semantic tokens mapped to BNRM palette */
-    --background: var(--slate-surface);
-    --foreground: var(--slate-base-dark);
+    /* Semantic tokens mapped to BNRM palette - DIRECT HSL VALUES */
+    --background: 210 40% 98%;
+    --foreground: 217 33% 17%;
 
-    --card: var(--slate-light);
-    --card-foreground: var(--slate-base-dark);
+    --card: 214 32% 96%;
+    --card-foreground: 217 33% 17%;
 
-    --popover: var(--slate-light);
-    --popover-foreground: var(--slate-base-dark);
+    --popover: 214 32% 96%;
+    --popover-foreground: 217 33% 17%;
 
-    /* Primary: Official BNRM Burgundy */
-    --primary: var(--burgundy-primary);
+    /* Primary: Official BNRM Burgundy - DIRECT HSL */
+    --primary: 345 70% 30%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: var(--burgundy-soft);
-    --primary-deep: var(--burgundy-deep);
+    --primary-glow: 345 50% 70%;
+    --primary-deep: 345 80% 20%;
 
     /* Secondary: Gold tones for warmth */
-    --secondary: var(--gold-light);
-    --secondary-foreground: var(--slate-base-dark);
-    --secondary-warm: var(--gold-soft);
+    --secondary: 45 90% 80%;
+    --secondary-foreground: 217 33% 17%;
+    --secondary-warm: 45 80% 55%;
 
     /* Muted: Slate neutral tones */
-    --muted: var(--slate-light);
-    --muted-foreground: var(--slate-text);
+    --muted: 214 32% 96%;
+    --muted-foreground: 215 20% 47%;
 
     /* Accent: Gold for emphasis */
-    --accent: var(--gold-primary);
-    --accent-foreground: var(--slate-base-dark);
-    --accent-glow: var(--gold-soft);
-    --accent-bright: var(--gold-primary-dark);
+    --accent: 45 85% 45%;
+    --accent-foreground: 217 33% 17%;
+    --accent-glow: 45 80% 55%;
+    --accent-bright: 40 90% 40%;
 
     /* Highlight: Deep gold */
-    --highlight: var(--gold-deep);
+    --highlight: 38 85% 35%;
     --highlight-foreground: 0 0% 100%;
-    --highlight-deep: var(--gold-dark);
+    --highlight-deep: 35 80% 25%;
 
     /* Gold: Heritage colors */
-    --gold: var(--gold-soft);
-    --gold-foreground: var(--slate-base-dark);
-    --gold-bright: var(--gold-primary);
+    --gold: 45 80% 55%;
+    --gold-foreground: 217 33% 17%;
+    --gold-bright: 45 85% 45%;
 
     /* Coral: Legacy support - mapped to burgundy */
-    --coral: var(--burgundy-soft);
+    --coral: 345 50% 70%;
     --coral-foreground: 0 0% 100%;
 
     /* Royal: Legacy support - mapped to burgundy */
-    --royal: var(--burgundy-primary-dark);
+    --royal: 345 75% 25%;
     --royal-foreground: 0 0% 100%;
     
     /* Header specific colors */
