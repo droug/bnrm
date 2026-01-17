@@ -93,7 +93,7 @@ const Index = () => {
                 <Button 
                   size="lg"
                   onClick={() => navigate('/help')}
-                  className="bg-[#e67e22] hover:bg-[#d35400] text-white px-8 py-6 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
+                  className="bg-morocco-green hover:bg-morocco-green/90 text-white px-8 py-6 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
                 >
                   <HelpCircle className={`h-5 w-5 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
                   {language === 'ar' ? 'المساعدة والدعم' : 'Aide & Support'}
@@ -155,7 +155,7 @@ const Index = () => {
                       <Button 
                         size="lg"
                         onClick={handleSearch}
-                        className="absolute right-2 top-2 h-10 px-6 bg-gradient-to-r from-orange-500 to-blue-900 hover:from-orange-600 hover:to-blue-950 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
+                        className="absolute right-2 top-2 h-10 px-6 bg-gradient-to-r from-morocco-green to-blue-900 hover:from-morocco-green/90 hover:to-blue-950 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
                       >
                         <Search className="h-5 w-5 mr-2" />
                         {language === 'ar' ? 'بحث' : 'Rechercher'}
@@ -173,13 +173,13 @@ const Index = () => {
                 <div className="py-8 bg-gradient-to-b from-slate-50 to-white rounded-lg">
                   <div className="container mx-auto px-4">
                     <div className="mb-10">
-                      <p className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">
+                      <p className="text-morocco-green text-sm font-semibold uppercase tracking-wide mb-2">
                         BNRM
                       </p>
                       <h2 className="text-4xl font-bold text-[#1e3a8a] mb-4">
                         {language === 'ar' ? 'خدماتنا الرقمية' : 'Nos Services Numériques'}
                       </h2>
-                      <div className="w-24 h-1 bg-orange-500 mb-4"></div>
+                      <div className="w-24 h-1 bg-morocco-green mb-4"></div>
                       <p className="text-muted-foreground">
                         {language === 'ar'
                           ? 'اكتشف مجموعة واسعة من الخدمات الرقمية المتاحة'
@@ -199,13 +199,13 @@ const Index = () => {
               {/* Quick Links */}
               <div className="mb-12">
                 <div className={`mb-10 ${language === 'ar' ? 'text-center' : 'text-left'}`}>
-                  <p className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">
+                  <p className="text-morocco-green text-sm font-semibold uppercase tracking-wide mb-2">
                     BNRM
                   </p>
                   <h2 className="text-4xl font-bold text-[#1e3a8a] mb-4">
                     {language === 'ar' ? 'روابط سريعة' : 'Liens rapides'}
                   </h2>
-                  <div className={`w-24 h-1 bg-orange-500 mb-4 ${language === 'ar' ? 'mx-auto' : ''}`}></div>
+                  <div className={`w-24 h-1 bg-morocco-green mb-4 ${language === 'ar' ? 'mx-auto' : ''}`}></div>
                   <p className="text-muted-foreground">
                     {language === 'ar'
                       ? 'الوصول السريع إلى خدماتنا الأساسية'
