@@ -350,17 +350,19 @@ export function ExternalSystemsConfig() {
   const z3950Systems = systems.filter(s => s.system_type === 'z3950');
   const oaiSystems = systems.filter(s => s.system_type === 'oai-pmh');
   const authSystems = systems.filter(s => s.system_type === 'auth' || s.system_type === 'ldap' || s.system_type === 'active_directory');
+  const coraSystems = systems.filter(s => s.system_type === 'cora');
 
   return (
     <>
       <Tabs defaultValue="sigb" className="w-full">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="sigb">SIGB ({sigbSystems.length})</TabsTrigger>
           <TabsTrigger value="dbm600">DBM-600 ({dbm600Systems.length})</TabsTrigger>
           <TabsTrigger value="catalog">Catalogues ({catalogSystems.length})</TabsTrigger>
           <TabsTrigger value="z3950">Z39.50 ({z3950Systems.length})</TabsTrigger>
           <TabsTrigger value="oai">OAI-PMH ({oaiSystems.length})</TabsTrigger>
-          <TabsTrigger value="auth">Authentification ({authSystems.length})</TabsTrigger>
+          <TabsTrigger value="auth">Auth ({authSystems.length})</TabsTrigger>
+          <TabsTrigger value="cora">CORA ({coraSystems.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="sigb" className="space-y-4">
@@ -384,7 +386,49 @@ export function ExternalSystemsConfig() {
         </TabsContent>
 
         <TabsContent value="auth" className="space-y-4">
-          {authSystems.map(renderSystemCard)}
+          {authSystems.length === 0 ? (
+            <Card>
+              <CardContent className="p-6 text-center text-muted-foreground">
+                Aucune configuration d'authentification externe trouvée
+              </CardContent>
+            </Card>
+          ) : authSystems.map(renderSystemCard)}
+        </TabsContent>
+
+        <TabsContent value="cora" className="space-y-4">
+          {coraSystems.length === 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <LinkIcon className="h-5 w-5" />
+                  CORA - Système de gestion des ouvrages rares
+                </CardTitle>
+                <CardDescription>
+                  Configuration de l'interconnexion avec le système CORA pour la gestion des collections patrimoniales et ouvrages rares
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Alert>
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>
+                    La configuration CORA n'est pas encore initialisée dans la base de données.
+                    Contactez votre administrateur système pour ajouter cette configuration.
+                  </AlertDescription>
+                </Alert>
+                
+                <div className="text-sm text-muted-foreground space-y-2">
+                  <p><strong>CORA</strong> (Collection of Rare Acquisitions) permet :</p>
+                  <ul className="list-disc list-inside space-y-1 ml-2">
+                    <li>Synchronisation des notices bibliographiques des ouvrages rares</li>
+                    <li>Gestion des états de conservation</li>
+                    <li>Suivi des restaurations et interventions</li>
+                    <li>Import/Export des métadonnées patrimoniales</li>
+                    <li>Intégration avec le catalogue national</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          ) : coraSystems.map(renderSystemCard)}
         </TabsContent>
       </Tabs>
 
