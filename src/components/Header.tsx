@@ -428,7 +428,9 @@ const Header = () => {
               </Link>
             )}
           </div>
+          </div>
         </div>
+      </div>
 
         {/* Bouton Retour - affiché sur toutes les pages sauf les pages d'accueil principales */}
         {showBackButton && (
@@ -773,7 +775,6 @@ const Header = () => {
           </div>
         </div>
         )}
-      </div>
 
       {/* Menu Mobile Navigation amélioré */}
       {!hideNavigation && isMenuOpen && (
