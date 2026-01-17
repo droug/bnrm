@@ -210,224 +210,132 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 shadow-lg">
-      {/* Bannière supérieure - Style bordeaux BNRM */}
-      <div className="bg-primary text-primary-foreground">
+      {/* Barre supérieure - Fond blanc avec logo, recherche et actions */}
+      <div className="bg-white border-b border-gray-200">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center py-2">
-            {/* Logo + Titre compact */}
-            <Link to="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-              <img src={logoImage} alt="Logo BNRM" className="h-12 w-auto bg-white rounded-sm p-1" />
-              <div className="hidden lg:flex flex-col">
-                <span className="text-xs text-primary-foreground/80">المملكة المغربية</span>
-                <span className="font-bold text-sm text-white">
-                  {t('header.title')}
-                </span>
+          <div className="flex justify-between items-center py-3">
+            {/* Logo + Titre trilingue */}
+            <Link to="/" className="flex items-center gap-4 hover:opacity-90 transition-opacity">
+              <div className="hidden lg:flex flex-col text-right leading-tight">
+                <span className="text-sm text-gray-700 font-medium">المكتبة الوطنية للمملكة المغربية</span>
+                <span className="text-xs text-gray-500">ⵜⴰⵙⴷⴰⵡⵉⵜ ⵜⴰⵏⴰⵎⵓⵔⵜ ⵏ ⵜⴳⵍⴷⵉⵜ ⵏ ⵍⵎⵖⵔⵉⴱ</span>
+                <span className="text-xs text-gray-600">Bibliothèque Nationale du Royaume du Maroc</span>
               </div>
+              <img src={logoImage} alt="Logo BNRM" className="h-14 w-auto" />
             </Link>
           
-            {/* Bouton de gestion pour les plateformes spéciales (admin/librarian uniquement) */}
-          {(profile?.role === 'admin' || profile?.role === 'librarian') && (
-            <>
-              {isManuscriptsPlatform && (
-                <Link to="/admin/manuscripts-backoffice">
-                  <Button variant="outline" size="sm" className="gap-2 border-gold/40 hover:border-gold hover:bg-gold/10">
-                    <Shield className="h-4 w-4" />
-                    <span className="hidden sm:inline">Gestion Manuscrits Numérisés</span>
-                    <span className="sm:hidden">Gestion</span>
-                  </Button>
-                </Link>
-              )}
-              {isDigitalLibrary && (
-                <Link to="/admin/digital-library">
-                  <Button variant="outline" size="sm" className="gap-2 border-gold/40 hover:border-gold hover:bg-gold/10">
-                    <Shield className="h-4 w-4" />
-                    <span className="hidden sm:inline">Gestion Bibliothèque Numérique</span>
-                    <span className="sm:hidden">Gestion</span>
-                  </Button>
-                </Link>
-              )}
-              {isCBMPortal && (
-                <Link to="/cbm/admin">
-                  <Button variant="outline" size="sm" className="gap-2 border-primary/40 hover:border-primary hover:bg-primary/10">
-                    <Shield className="h-4 w-4" />
-                    <span className="hidden sm:inline">Administration CBM</span>
-                    <span className="sm:hidden">Admin CBM</span>
-                  </Button>
-                </Link>
-              )}
-            </>
-          )}
+            {/* Barre de recherche centrale */}
+            <div className="hidden md:flex flex-1 max-w-md mx-8">
+              <div className="relative w-full">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder={language === 'ar' ? 'بحث...' : 'Search'}
+                  className="pl-10 pr-4 py-2 w-full border-gray-300 rounded-md focus:border-primary focus:ring-primary"
+                />
+              </div>
+            </div>
 
-          {/* Mon Espace pour la plateforme des manuscrits */}
-          {isManuscriptsPlatform && user && (
-            <Link to="/mon-espace-manuscrits">
-              <Button variant="outline" size="sm" className="gap-2">
-                <User className="h-4 w-4" />
-                <span className="hidden sm:inline">Mon Espace</span>
+            {/* Actions à droite */}
+            <div className="flex items-center gap-3">
+              {/* Langue */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="text-gray-600 hover:text-primary hover:bg-gray-100">
+                    <Globe className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="bg-white border border-gray-200 z-50">
+                  <DropdownMenuItem onClick={() => setLanguage('ar')} className="cursor-pointer">
+                    🇲🇦 العربية
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLanguage('ber')} className="cursor-pointer">
+                    ⵣ ⵜⴰⵎⴰⵣⵉⵖⵜ
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLanguage('fr')} className="cursor-pointer">
+                    🇫🇷 Français
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLanguage('en')} className="cursor-pointer">
+                    🇺🇸 English
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              
+              {/* Accessibilité */}
+              <Button variant="ghost" size="icon" className="text-gray-600 hover:text-primary hover:bg-gray-100">
+                <Accessibility className="h-5 w-5" />
               </Button>
-            </Link>
-          )}
-
-          {/* Actions compactes */}
-          <div className="flex items-center gap-2">
-            {/* Navigation Portails */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2 h-11 text-base font-medium">
-                  <Building className="h-4 w-4" />
-                  <span className="hidden md:inline">{language === 'ar' ? 'البوابات' : 'Portails'}</span>
-                  <ChevronDown className="h-3 w-3" />
+              
+              {/* Utilisateur icône */}
+              {!user && (
+                <Button variant="ghost" size="icon" className="text-gray-600 hover:text-primary hover:bg-gray-100">
+                  <User className="h-5 w-5" />
                 </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-64 bg-popover z-50">
-                <DropdownMenuItem asChild className="text-base font-medium">
-                  <Link to="/" className="cursor-pointer">
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    {language === 'ar' ? 'البوابة الرئيسية' : 'Portail Principal'}
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild className="text-base font-medium">
-                  <Link to="/digital-library" className="cursor-pointer">
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    {language === 'ar' ? 'المكتبة الرقمية' : 'Bibliothèque Numérique'}
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild className="text-base font-medium">
-                  <Link to="/plateforme-manuscrits" className="cursor-pointer">
-                    <FileText className="h-4 w-4 mr-2" />
-                    {language === 'ar' ? 'المخطوطات الرقمية' : 'Manuscrits Numérisés'}
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild className="text-base font-medium">
-                  <Link to="/cbm" className="cursor-pointer">
-                    <Network className="h-4 w-4 mr-2" />
-                    {language === 'ar' ? 'بوابة CBM' : 'Portail CBM'}
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
-            {/* Langue - icône seulement sur mobile */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-1 px-2 h-11 text-base font-medium">
-                  <Globe className="h-4 w-4" />
-                  <span className="hidden sm:inline">
-                    {language === 'ar' && 'ع'}
-                    {language === 'ber' && 'ⵣ'}
-                    {language === 'fr' && 'FR'}
-                    {language === 'en' && 'EN'}
-                  </span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="bg-popover border border-primary/20 z-50">
-                <DropdownMenuItem onClick={() => setLanguage('ar')} className="cursor-pointer text-base font-medium">
-                  🇲🇦 العربية
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLanguage('ber')} className="cursor-pointer text-base font-medium">
-                  ⵣ ⵜⴰⵎⴰⵣⵉⵖⵜ
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLanguage('fr')} className="cursor-pointer text-base font-medium">
-                  🇫🇷 Français
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => setLanguage('en')} className="cursor-pointer text-base font-medium">
-                  🇺🇸 English
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            
-            {/* Accessibilité - icône seulement */}
-            {/* Moved to floating button */}
-            
-            {/* Chatbot - icône seulement */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsChatBotOpen(!isChatBotOpen)}
-              className={`px-2 relative ${isChatBotOpen ? 'bg-primary/10' : ''}`}
-              title={language === 'ar' ? 'المساعد الذكي' : 'Assistant IA'}
-            >
-              <Bot className="h-4 w-4" />
-              {!isChatBotOpen && (
-                <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full"></div>
               )}
-            </Button>
-            
-            {/* Messagerie */}
-            {user && <MessagingButton isHomePage={false} />}
-            
-            {/* Notifications */}
-            {user && <NotificationsButton isHomePage={false} />}
-            
-            {/* Utilisateur */}
-            {user ? (
-              <div className="flex items-center gap-2">
+              
+              {/* Bouton Mon Espace / Connexion */}
+              {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="gap-1 px-2 h-11 text-base font-medium">
-                      <User className="h-4 w-4" />
-                      <span className="hidden md:inline max-w-[80px] truncate">
-                        {profile?.first_name || 'Compte'}
-                      </span>
+                    <Button className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded">
+                      <User className="h-4 w-4 mr-2" />
+                      {language === 'ar' ? 'مساحتي' : 'Mon espace'}
                     </Button>
                   </DropdownMenuTrigger>
-                   <DropdownMenuContent align="end" className="bg-popover border border-primary/20 z-50">
-                    <DropdownMenuItem asChild className="cursor-pointer text-base font-medium">
+                  <DropdownMenuContent align="end" className="bg-white border border-gray-200 z-50 w-48">
+                    <DropdownMenuItem asChild className="cursor-pointer">
                       <Link to="/my-space" className="flex items-center gap-2">
                         <BookOpen className="h-4 w-4" />
                         {language === 'ar' ? 'مساحتي' : 'Mon Espace'}
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="cursor-pointer text-base font-medium">
+                    <DropdownMenuItem asChild className="cursor-pointer">
                       <Link to="/wallet" className="flex items-center gap-2">
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                         </svg>
-                        {language === 'ar' ? 'المحفظة الإلكترونية' : 'e-Wallet'}
+                        {language === 'ar' ? 'المحفظة' : 'e-Wallet'}
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="cursor-pointer text-base font-medium">
+                    <DropdownMenuItem asChild className="cursor-pointer">
                       <Link to="/profile" className="flex items-center gap-2">
                         <User className="h-4 w-4" />
-                        {language === 'ar' ? 'ملفي الشخصي' : 'Mon Profil'}
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild className="cursor-pointer text-base font-medium">
-                      <Link to="/dashboard" className="flex items-center gap-2">
-                        <BookOpen className="h-4 w-4" />
-                        {language === 'ar' ? 'لوحة التحكم' : 'Tableau de bord'}
+                        {language === 'ar' ? 'ملفي' : 'Mon Profil'}
                       </Link>
                     </DropdownMenuItem>
                     {(profile?.role === 'admin' || profile?.role === 'librarian') && (
-                      <DropdownMenuItem asChild className="cursor-pointer text-base font-medium">
+                      <DropdownMenuItem asChild className="cursor-pointer">
                         <Link to="/admin/settings" className="flex items-center gap-2">
                           <Shield className="h-4 w-4" />
                           {language === 'ar' ? 'الإدارة' : 'Administration'}
                         </Link>
                       </DropdownMenuItem>
                     )}
-                   </DropdownMenuContent>
+                    <DropdownMenuItem onClick={signOut} className="cursor-pointer text-red-600">
+                      <LogIn className="h-4 w-4 mr-2 rotate-180" />
+                      {language === 'ar' ? 'خروج' : 'Déconnexion'}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
                 </DropdownMenu>
-                
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={signOut}
-                  className="px-2 hover:bg-destructive/10 text-destructive"
-                  title={language === 'ar' ? 'تسجيل الخروج' : 'Déconnexion'}
-                >
-                  <LogIn className="h-4 w-4 rotate-180" />
-                </Button>
-              </div>
-            ) : (
-              <Link to="/auth">
-                <Button size="sm" className="gap-1 px-3">
-                  <LogIn className="h-4 w-4" />
-                  <span className="hidden sm:inline text-xs">{t('nav.login')}</span>
-                </Button>
-              </Link>
-            )}
-          </div>
+              ) : (
+                <Link to="/auth">
+                  <Button className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded">
+                    <User className="h-4 w-4 mr-2" />
+                    {language === 'ar' ? 'مساحتي' : 'Mon espace'}
+                  </Button>
+                </Link>
+              )}
+              
+              {/* Menu mobile */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="md:hidden text-gray-600"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+              >
+                {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -468,19 +376,34 @@ const Header = () => {
           </div>
         )}
 
-        {/* Navigation principale ultra-compacte - cachée sur certaines plateformes */}
+        {/* Navigation principale bordeaux - style comme l'image de référence */}
         {!hideNavigation && (
-          <div className="bg-primary text-primary-foreground py-2">
-            <div className="container mx-auto px-4 flex items-center justify-center">
+          <div className="bg-primary">
+            <div className="container mx-auto px-4 flex items-center justify-center py-0">
 
-          {/* Navigation Desktop compacte avec icônes */}
+          {/* Navigation Desktop */}
           <NavigationMenu className="hidden md:flex">
-            <NavigationMenuList className="space-x-1">
+            <NavigationMenuList className="flex items-center gap-0">
+              {/* Accueil - Bouton actif */}
+              <NavigationMenuItem>
+                <Link to="/">
+                  <Button 
+                    variant={isHomePage ? "secondary" : "ghost"} 
+                    className={`rounded-none h-12 px-4 text-sm font-medium ${isHomePage ? 'bg-primary-deep text-white' : 'text-white/90 hover:text-white hover:bg-white/10'}`}
+                  >
+                    <BookOpen className="w-4 h-4 mr-2" />
+                    {language === 'ar' ? 'الرئيسية' : 'Accueil'}
+                  </Button>
+                </Link>
+              </NavigationMenuItem>
+              
+              <span className="text-white/40 mx-1">|</span>
+              
               {/* Découvrir */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 h-11 text-base font-medium px-3" title={t('nav.discover')}>
-                  <BookOpen className="w-4 h-4 mr-1" />
-                  <span className="hidden lg:inline">{t('nav.discover')}</span>
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-white/10 h-12 text-sm font-medium px-3 rounded-none">
+                  <BookOpen className="w-4 h-4 mr-2" />
+                  <span>{t('nav.discover')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
                   <div className="grid gap-2 p-4 w-[650px] lg:grid-cols-2 bg-popover border border-primary/20 shadow-xl">
@@ -509,12 +432,14 @@ const Header = () => {
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
+              
+              <span className="text-white/40 mx-1">|</span>
 
               {/* Services */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 h-11 text-base font-medium px-3" title={t('nav.services')}>
-                  <Users className="w-4 h-4 mr-1" />
-                  <span className="hidden lg:inline">{t('nav.services')}</span>
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-white/10 h-12 text-sm font-medium px-3 rounded-none">
+                  <Users className="w-4 h-4 mr-2" />
+                  <span>{t('nav.services')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
                   <div className="grid gap-2 p-4 w-[650px] lg:grid-cols-2 bg-popover border border-primary/20 shadow-xl">
@@ -544,11 +469,13 @@ const Header = () => {
                 </NavigationMenuContent>
               </NavigationMenuItem>
 
-              {/* Explorer */}
+              <span className="text-white/40 mx-1">|</span>
+
+              {/* Patrimoine (Explorer) */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 h-11 text-base font-medium px-3" title={t('nav.explore')}>
-                  <Book className="w-4 h-4 mr-1" />
-                  <span className="hidden lg:inline">{t('nav.explore')}</span>
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-white/10 h-12 text-sm font-medium px-3 rounded-none">
+                  <Book className="w-4 h-4 mr-2" />
+                  <span>{language === 'ar' ? 'التراث' : 'Patrimoine'}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
                   <div className="grid gap-3 p-5 w-[900px] lg:grid-cols-3 bg-popover border border-primary/20 shadow-xl">
@@ -685,17 +612,31 @@ const Header = () => {
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
+              
+              <span className="text-white/40 mx-1">|</span>
+
+              {/* Actualités */}
+              <NavigationMenuItem>
+                <Link to="/news">
+                  <Button variant="ghost" className="bg-transparent text-white/90 hover:text-white hover:bg-white/10 h-12 text-sm font-medium px-3 rounded-none">
+                    <Calendar className="w-4 h-4 mr-2" />
+                    <span>{language === 'ar' ? 'الأخبار' : 'Actualités'}</span>
+                  </Button>
+                </Link>
+              </NavigationMenuItem>
+              
+              <span className="text-white/40 mx-1">|</span>
 
               {/* Collaborer avec nous */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 h-11 text-base font-medium px-3">
-                  <Building className="w-4 h-4 mr-1" />
-                  <span className="hidden lg:inline">{t('nav.collaborate')}</span>
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-white/10 h-12 text-sm font-medium px-3 rounded-none">
+                  <Users className="w-4 h-4 mr-2" />
+                  <span>{language === 'ar' ? 'تعاون معنا' : 'Collaborer avec nous'}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-2 p-4 w-[500px] bg-popover border border-primary/20 shadow-xl">
+                  <div className="grid gap-2 p-4 w-[500px] bg-white border border-gray-200 shadow-xl">
                     <NavigationMenuLink asChild>
-                      <a href="/collaborations-nationales" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                      <a href="/collaborations-nationales" className="block p-3 text-foreground hover:bg-primary/10 hover:text-primary rounded">
                         <div className="font-medium">{t('nav.national.collaborations')}</div>
                         <p className="text-sm text-muted-foreground">
                           {t('nav.national.collaborations.desc')}
@@ -703,30 +644,19 @@ const Header = () => {
                       </a>
                     </NavigationMenuLink>
                     <NavigationMenuLink asChild>
-                      <a href="/collaborations-internationales" className="block p-2 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                      <a href="/collaborations-internationales" className="block p-3 text-foreground hover:bg-primary/10 hover:text-primary rounded">
                         <div className="font-medium">{t('nav.international.collaborations')}</div>
                         <p className="text-sm text-muted-foreground">
                           {t('nav.international.collaborations.desc')}
                         </p>
                       </a>
                     </NavigationMenuLink>
-                  </div>
-                </NavigationMenuContent>
-              </NavigationMenuItem>
-
-              {/* Mécénat */}
-              <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent hover:bg-primary/10 h-11 text-base font-medium px-3">
-                  <Users className="w-4 h-4 mr-1" />
-                  <span className="hidden lg:inline">{menuData.mecenat.title[language]}</span>
-                </NavigationMenuTrigger>
-                <NavigationMenuContent className="z-50">
-                  <div className="grid gap-2 p-4 w-[500px] bg-popover border border-primary/20 shadow-xl">
+                    {/* Mécénat items */}
                     {menuData.mecenat.items.map((item, idx) => (
                       <NavigationMenuLink key={idx} asChild>
-                        <Link to={item.href} className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
-                          <div className="font-semibold">{item.title[language]}</div>
-                          <div className="text-xs text-muted-foreground mt-1">{item.desc[language]}</div>
+                        <Link to={item.href} className="block p-3 text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                          <div className="font-medium">{item.title[language]}</div>
+                          <div className="text-sm text-muted-foreground">{item.desc[language]}</div>
                         </Link>
                       </NavigationMenuLink>
                     ))}
@@ -736,44 +666,6 @@ const Header = () => {
             </NavigationMenuList>
           </NavigationMenu>
 
-          {/* Outils et Actions - outils d'accessibilité */}
-          <div className="flex items-center space-x-4">
-            
-            {/* Outils d'accessibilité et assistance */}
-            <div className="flex items-center space-x-2">
-              {/* Toolkit d'accessibilité */}
-              <AccessibilityToolkit />
-              
-              {/* Assistant IA / Chatbot */}
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => setIsChatBotOpen(!isChatBotOpen)}
-                className={`text-foreground border-2 border-primary/30 hover:border-primary bg-background/80 backdrop-blur-sm hover:bg-primary/10 flex items-center gap-2 px-4 py-2 transition-all duration-300 hover:scale-105 relative ${
-                  isChatBotOpen ? 'bg-primary/20 border-primary' : ''
-                }`}
-                title={language === 'ar' ? 'المساعد الذكي - المساعدة والبحث الذكي' : 'Assistant IA - Aide et recherche intelligente'}
-              >
-                <Bot className="h-5 w-5" />
-                <span className="font-medium hidden md:inline">
-                  {language === 'ar' ? 'المساعد الذكي' : 'Assistant IA'}
-                </span>
-                {!isChatBotOpen && (
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full animate-pulse border border-green-600"></div>
-                )}
-              </Button>
-            </div>
-            
-            {/* Menu mobile toggle */}
-            <Button
-              variant="outline"
-              size="lg"
-              className="md:hidden border-2 border-primary/30 hover:border-primary/50 hover:bg-primary/10 transition-all duration-300 hover:scale-105"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </Button>
-          </div>
             </div>
           </div>
         )}
