@@ -399,19 +399,19 @@ const Header = () => {
               
               <span className="text-white/40 mx-1">|</span>
               
-              {/* Découvrir */}
+              {/* Découvrir la Bibliothèque */}
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-white/10 h-12 text-sm font-medium px-3 rounded-none">
                   <BookOpen className="w-4 h-4 mr-2" />
                   <span>{t('nav.discover')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-2 p-4 w-[650px] lg:grid-cols-2 bg-popover border border-primary/20 shadow-xl">
+                  <div className="grid gap-2 p-4 w-[650px] lg:grid-cols-2 bg-white border border-gray-200 shadow-xl">
                     <div className="space-y-1">
                       <h4 className="text-base font-bold text-primary mb-2">{menuData.discover.practicalInfo.title[language]}</h4>
                       {menuData.discover.practicalInfo.items.map((item, idx) => (
                         <NavigationMenuLink key={idx} asChild>
-                          <Link to={item.href} className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <Link to={item.href} className="block p-3 text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
                             <div className="font-semibold">{item.title[language]}</div>
                             <div className="text-xs text-muted-foreground mt-1">{item.desc[language]}</div>
                           </Link>
@@ -422,7 +422,7 @@ const Header = () => {
                       <h4 className="text-base font-bold text-primary mb-2">{menuData.discover.historyMissions.title[language]}</h4>
                       {menuData.discover.historyMissions.items.map((item, idx) => (
                         <NavigationMenuLink key={idx} asChild>
-                          <Link to={item.href} className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
+                          <Link to={item.href} className="block p-3 text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
                             <div className="font-semibold">{item.title[language]}</div>
                             <div className="text-xs text-muted-foreground mt-1">{item.desc[language]}</div>
                           </Link>
@@ -435,7 +435,7 @@ const Header = () => {
               
               <span className="text-white/40 mx-1">|</span>
 
-              {/* Services */}
+              {/* Accéder à nos services */}
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-white/10 h-12 text-sm font-medium px-3 rounded-none">
                   <Users className="w-4 h-4 mr-2" />
@@ -471,14 +471,14 @@ const Header = () => {
 
               <span className="text-white/40 mx-1">|</span>
 
-              {/* Patrimoine (Explorer) */}
+              {/* Explorer le patrimoine */}
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-white/10 h-12 text-sm font-medium px-3 rounded-none">
                   <Book className="w-4 h-4 mr-2" />
-                  <span>{language === 'ar' ? 'التراث' : 'Patrimoine'}</span>
+                  <span>{t('nav.explore')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-3 p-5 w-[900px] lg:grid-cols-3 bg-popover border border-primary/20 shadow-xl">
+                  <div className="grid gap-3 p-5 w-[900px] lg:grid-cols-3 bg-white border border-gray-200 shadow-xl">
                     {/* Colonne 1 - Galerie et Collections */}
                     <div className="space-y-2">
                       <NavigationMenuLink asChild>
@@ -615,14 +615,32 @@ const Header = () => {
               
               <span className="text-white/40 mx-1">|</span>
 
-              {/* Actualités */}
+              {/* Consulter nos actualités */}
               <NavigationMenuItem>
-                <Link to="/news">
-                  <Button variant="ghost" className="bg-transparent text-white/90 hover:text-white hover:bg-white/10 h-12 text-sm font-medium px-3 rounded-none">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    <span>{language === 'ar' ? 'الأخبار' : 'Actualités'}</span>
-                  </Button>
-                </Link>
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-white/10 h-12 text-sm font-medium px-3 rounded-none">
+                  <Calendar className="w-4 h-4 mr-2" />
+                  <span>{t('nav.consult.news')}</span>
+                </NavigationMenuTrigger>
+                <NavigationMenuContent className="z-50">
+                  <div className="grid gap-2 p-4 w-[500px] bg-white border border-gray-200 shadow-xl">
+                    {menuData.news.news.items.map((item, idx) => (
+                      <NavigationMenuLink key={idx} asChild>
+                        <Link to={item.href} className="block p-3 text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                          <div className="font-medium">{item.title[language]}</div>
+                          <div className="text-sm text-muted-foreground">{item.desc[language]}</div>
+                        </Link>
+                      </NavigationMenuLink>
+                    ))}
+                    {menuData.news.cultural.items.map((item, idx) => (
+                      <NavigationMenuLink key={idx} asChild>
+                        <Link to={item.href} className="block p-3 text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                          <div className="font-medium">{item.title[language]}</div>
+                          <div className="text-sm text-muted-foreground">{item.desc[language]}</div>
+                        </Link>
+                      </NavigationMenuLink>
+                    ))}
+                  </div>
+                </NavigationMenuContent>
               </NavigationMenuItem>
               
               <span className="text-white/40 mx-1">|</span>
@@ -630,28 +648,37 @@ const Header = () => {
               {/* Collaborer avec nous */}
               <NavigationMenuItem>
                 <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-white/10 h-12 text-sm font-medium px-3 rounded-none">
-                  <Users className="w-4 h-4 mr-2" />
-                  <span>{language === 'ar' ? 'تعاون معنا' : 'Collaborer avec nous'}</span>
+                  <Building className="w-4 h-4 mr-2" />
+                  <span>{t('nav.collaborate')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
                   <div className="grid gap-2 p-4 w-[500px] bg-white border border-gray-200 shadow-xl">
                     <NavigationMenuLink asChild>
-                      <a href="/collaborations-nationales" className="block p-3 text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                      <Link to="/collaborations-nationales" className="block p-3 text-foreground hover:bg-primary/10 hover:text-primary rounded">
                         <div className="font-medium">{t('nav.national.collaborations')}</div>
-                        <p className="text-sm text-muted-foreground">
-                          {t('nav.national.collaborations.desc')}
-                        </p>
-                      </a>
+                        <p className="text-sm text-muted-foreground">{t('nav.national.collaborations.desc')}</p>
+                      </Link>
                     </NavigationMenuLink>
                     <NavigationMenuLink asChild>
-                      <a href="/collaborations-internationales" className="block p-3 text-foreground hover:bg-primary/10 hover:text-primary rounded">
+                      <Link to="/collaborations-internationales" className="block p-3 text-foreground hover:bg-primary/10 hover:text-primary rounded">
                         <div className="font-medium">{t('nav.international.collaborations')}</div>
-                        <p className="text-sm text-muted-foreground">
-                          {t('nav.international.collaborations.desc')}
-                        </p>
-                      </a>
+                        <p className="text-sm text-muted-foreground">{t('nav.international.collaborations.desc')}</p>
+                      </Link>
                     </NavigationMenuLink>
-                    {/* Mécénat items */}
+                  </div>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              
+              <span className="text-white/40 mx-1">|</span>
+
+              {/* Mécénat */}
+              <NavigationMenuItem>
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-white/10 h-12 text-sm font-medium px-3 rounded-none">
+                  <Users className="w-4 h-4 mr-2" />
+                  <span>{menuData.mecenat.title[language]}</span>
+                </NavigationMenuTrigger>
+                <NavigationMenuContent className="z-50">
+                  <div className="grid gap-2 p-4 w-[500px] bg-white border border-gray-200 shadow-xl">
                     {menuData.mecenat.items.map((item, idx) => (
                       <NavigationMenuLink key={idx} asChild>
                         <Link to={item.href} className="block p-3 text-foreground hover:bg-primary/10 hover:text-primary rounded">
