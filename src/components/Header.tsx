@@ -237,7 +237,44 @@ const Header = () => {
             </div>
 
             {/* Actions à droite */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              {/* Navigation Portails */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-2 text-gray-600 hover:text-primary hover:bg-gray-100">
+                    <Building className="h-4 w-4" />
+                    <span className="hidden md:inline">{language === 'ar' ? 'البوابات' : 'Portails'}</span>
+                    <ChevronDown className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-64 bg-white border border-gray-200 z-50">
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link to="/">
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      {language === 'ar' ? 'البوابة الرئيسية' : 'Portail Principal'}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link to="/digital-library">
+                      <BookOpen className="h-4 w-4 mr-2" />
+                      {language === 'ar' ? 'المكتبة الرقمية' : 'Bibliothèque Numérique'}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link to="/plateforme-manuscrits">
+                      <FileText className="h-4 w-4 mr-2" />
+                      {language === 'ar' ? 'المخطوطات الرقمية' : 'Manuscrits Numérisés'}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link to="/cbm">
+                      <Network className="h-4 w-4 mr-2" />
+                      {language === 'ar' ? 'بوابة CBM' : 'Portail CBM'}
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               {/* Langue */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -262,11 +299,29 @@ const Header = () => {
               </DropdownMenu>
               
               {/* Accessibilité */}
-              <Button variant="ghost" size="icon" className="text-gray-600 hover:text-primary hover:bg-gray-100">
-                <Accessibility className="h-5 w-5" />
+              <AccessibilityToolkit />
+              
+              {/* Chatbot */}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsChatBotOpen(!isChatBotOpen)}
+                className={`text-gray-600 hover:text-primary hover:bg-gray-100 relative ${isChatBotOpen ? 'bg-gray-100' : ''}`}
+                title={language === 'ar' ? 'المساعد الذكي' : 'Assistant IA'}
+              >
+                <Bot className="h-5 w-5" />
+                {!isChatBotOpen && (
+                  <div className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-green-500 rounded-full"></div>
+                )}
               </Button>
               
-              {/* Utilisateur icône */}
+              {/* Messagerie */}
+              {user && <MessagingButton isHomePage={false} />}
+              
+              {/* Notifications */}
+              {user && <NotificationsButton isHomePage={false} />}
+              
+              {/* Utilisateur icône (non connecté) */}
               {!user && (
                 <Button variant="ghost" size="icon" className="text-gray-600 hover:text-primary hover:bg-gray-100">
                   <User className="h-5 w-5" />
@@ -301,6 +356,12 @@ const Header = () => {
                       <Link to="/profile" className="flex items-center gap-2">
                         <User className="h-4 w-4" />
                         {language === 'ar' ? 'ملفي' : 'Mon Profil'}
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="cursor-pointer">
+                      <Link to="/dashboard" className="flex items-center gap-2">
+                        <BookOpen className="h-4 w-4" />
+                        {language === 'ar' ? 'لوحة التحكم' : 'Tableau de bord'}
                       </Link>
                     </DropdownMenuItem>
                     {(profile?.role === 'admin' || profile?.role === 'librarian') && (
