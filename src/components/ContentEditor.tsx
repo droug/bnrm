@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -19,7 +19,10 @@ import {
   Eye, 
   Globe,
   FileText,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Upload,
+  Loader2,
+  Trash2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
@@ -89,6 +92,9 @@ export default function ContentEditor({ content, onSave, onCancel }: ContentEdit
   const [newTag, setNewTag] = useState('');
   const [newKeyword, setNewKeyword] = useState('');
   const [showPreview, setShowPreview] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
 
   useEffect(() => {
     fetchCategories();
@@ -188,6 +194,73 @@ export default function ContentEditor({ content, onSave, onCancel }: ContentEdit
       ...prev,
       seo_keywords: prev.seo_keywords.filter(keyword => keyword !== keywordToRemove)
     }));
+  };
+
+  const handleImageUpload = async (file: File) => {
+    if (!file) return;
+    
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Erreur",
+        description: "Le fichier doit être une image (JPG, PNG, GIF, WebP)",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Erreur",
+        description: "L'image ne doit pas dépasser 5 Mo",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setIsUploadingImage(true);
+    
+    try {
+      const fileExt = file.name.split('.').pop()?.toLowerCase();
+      const fileName = `content-images/${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('digital-library')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+      
+      if (uploadError) throw uploadError;
+      
+      const { data: { publicUrl } } = supabase.storage
+        .from('digital-library')
+        .getPublicUrl(fileName);
+      
+      setFormData(prev => ({ ...prev, featured_image_url: publicUrl }));
+      
+      toast({
+        title: "Image téléchargée",
+        description: "L'image a été ajoutée avec succès",
+      });
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      toast({
+        title: "Erreur de téléchargement",
+        description: error.message || "Impossible de télécharger l'image",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploadingImage(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setFormData(prev => ({ ...prev, featured_image_url: '' }));
   };
 
   const handleSave = async () => {
@@ -553,9 +626,54 @@ export default function ContentEditor({ content, onSave, onCancel }: ContentEdit
                   Image à la une
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div>
-                  <Label htmlFor="featured_image_url">URL de l'image</Label>
+              <CardContent className="space-y-4">
+                {/* Upload zone */}
+                <div className="space-y-3">
+                  <div 
+                    className={`
+                      relative border-2 border-dashed rounded-lg p-4 transition-colors
+                      ${isUploadingImage ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-primary/50'}
+                    `}
+                  >
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                      disabled={isUploadingImage}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleImageUpload(file);
+                      }}
+                    />
+                    <div className="flex flex-col items-center gap-2 text-center">
+                      {isUploadingImage ? (
+                        <>
+                          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                          <span className="text-sm text-muted-foreground">Téléchargement en cours...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="h-8 w-8 text-muted-foreground" />
+                          <div>
+                            <span className="text-sm font-medium text-primary">Cliquez pour télécharger</span>
+                            <p className="text-xs text-muted-foreground mt-1">JPG, PNG, GIF, WebP (max. 5 Mo)</p>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* URL manuelle */}
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-background px-2 text-muted-foreground">ou URL directe</span>
+                    </div>
+                  </div>
+
                   <Input
                     id="featured_image_url"
                     type="url"
@@ -564,16 +682,28 @@ export default function ContentEditor({ content, onSave, onCancel }: ContentEdit
                     placeholder="https://example.com/image.jpg"
                   />
                 </div>
+
+                {/* Aperçu de l'image */}
                 {formData.featured_image_url && (
-                  <div className="mt-3">
+                  <div className="relative group">
                     <img
                       src={formData.featured_image_url}
-                      alt="Aperçu"
-                      className="w-full h-32 object-cover rounded-md border"
+                      alt="Aperçu de l'image à la une"
+                      className="w-full h-40 object-cover rounded-lg border shadow-sm"
                       onError={(e) => {
                         e.currentTarget.style.display = 'none';
                       }}
                     />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={handleRemoveImage}
+                    >
+                      <Trash2 className="h-4 w-4 mr-1" />
+                      Supprimer
+                    </Button>
                   </div>
                 )}
               </CardContent>
