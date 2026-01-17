@@ -50,13 +50,13 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
         {/* Header with blue background */}
         <div className="bg-[#1e3a8a] text-white px-8 py-8 rounded-lg mb-8">
           <div className={`${language === 'ar' ? 'text-center' : 'text-left'}`}>
-            <p className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">
+            <p className="text-morocco-green text-sm font-semibold uppercase tracking-wide mb-2">
               BNRM
             </p>
             <h2 className="text-4xl font-bold mb-4">
               {language === 'ar' ? 'الوسائط المتعددة' : 'Médiathèque'}
             </h2>
-            <div className={`w-24 h-1 bg-orange-500 mb-6 ${language === 'ar' ? 'mx-auto' : ''}`}></div>
+            <div className={`w-24 h-1 bg-morocco-green mb-6 ${language === 'ar' ? 'mx-auto' : ''}`}></div>
             <p className="text-lg text-white/90 max-w-2xl">
               {language === 'ar' 
                 ? 'استكشف مجموعاتنا الصوتية والمرئية الغنية'
@@ -78,7 +78,7 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
             <CarouselContent>
               {videos.map((video, index) => (
                 <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/2">
-                  <Card className="border-2 hover:border-orange-500/50 transition-colors">
+                  <Card className="border-2 hover:border-morocco-green/50 transition-colors">
                     <CardContent className="p-6">
                       <div className="aspect-video rounded-lg overflow-hidden mb-4">
                         <iframe
@@ -107,7 +107,7 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
           <Button
             onClick={() => navigate('/digital-library')}
             size="lg"
-            className="bg-gradient-to-r from-orange-500 to-blue-900 hover:from-orange-600 hover:to-blue-950 text-white px-8 py-6 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105"
+            className="bg-gradient-to-r from-morocco-green to-blue-900 hover:from-morocco-green/90 hover:to-blue-950 text-white px-8 py-6 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105"
           >
             <Library className={`h-5 w-5 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
             {language === 'ar' ? 'استكشف الوسائط المتعددة' : 'Explorer la médiathèque'}

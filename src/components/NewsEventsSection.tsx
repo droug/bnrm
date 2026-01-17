@@ -43,13 +43,13 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
         <div className="bg-[#1e3a8a] text-white px-8 py-8 rounded-lg mb-8">
           <div className="flex items-start justify-between">
             <div>
-              <p className="text-orange-500 text-sm font-semibold uppercase tracking-wide mb-2">
+              <p className="text-morocco-green text-sm font-semibold uppercase tracking-wide mb-2">
                 BNRM
               </p>
               <h2 className="text-4xl font-bold mb-4">
                 {language === 'ar' ? 'الأخبار و الأحداث' : 'Actualités & Événements'}
               </h2>
-              <div className="w-24 h-1 bg-orange-500 mb-4"></div>
+              <div className="w-24 h-1 bg-morocco-green mb-4"></div>
               <p className="text-lg text-white/90 max-w-2xl">
                 {language === 'ar' 
                   ? 'اطلع على آخر الأخبار والفعاليات'
@@ -60,7 +60,7 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
             <Button 
               variant="outline"
               onClick={() => navigate('/news')}
-              className="bg-orange-500 text-white border-orange-500 hover:bg-orange-600"
+              className="bg-morocco-green text-white border-morocco-green hover:bg-morocco-green/90"
             >
               {language === 'ar' ? 'عرض الكل' : 'Tout afficher'}
             </Button>
@@ -87,7 +87,7 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
               
               {/* Content */}
               <div className="p-6">
-                <Badge variant="outline" className="bg-orange-500 text-white border-0 mb-3">
+                <Badge variant="outline" className="bg-morocco-green text-white border-0 mb-3">
                   {language === 'ar' ? item.tag_ar : item.tag_fr}
                 </Badge>
                 <h3 className="text-xl font-bold text-[#1e3a8a] mb-2 group-hover:text-blue-600 transition-colors">
