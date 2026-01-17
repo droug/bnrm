@@ -332,7 +332,7 @@ const Header = () => {
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded">
+                    <Button className="bg-primary hover:bg-morocco-green text-white px-4 py-2 rounded transition-colors">
                       <User className="h-4 w-4 mr-2" />
                       {language === 'ar' ? 'مساحتي' : 'Mon espace'}
                     </Button>
@@ -380,7 +380,7 @@ const Header = () => {
                 </DropdownMenu>
               ) : (
                 <Link to="/auth">
-                  <Button className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded">
+                  <Button className="bg-primary hover:bg-morocco-green text-white px-4 py-2 rounded transition-colors">
                     <User className="h-4 w-4 mr-2" />
                     {language === 'ar' ? 'مساحتي' : 'Mon espace'}
                   </Button>
