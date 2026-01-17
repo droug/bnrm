@@ -470,10 +470,11 @@ const Header = () => {
 
         {/* Navigation principale ultra-compacte - cachée sur certaines plateformes */}
         {!hideNavigation && (
-          <div className="flex items-center justify-between py-2">
+          <div className="bg-primary text-primary-foreground py-2">
+            <div className="container mx-auto px-4 flex items-center justify-center">
 
           {/* Navigation Desktop compacte avec icônes */}
-          <NavigationMenu className="hidden md:flex flex-1 justify-center">
+          <NavigationMenu className="hidden md:flex">
             <NavigationMenuList className="space-x-1">
               {/* Découvrir */}
               <NavigationMenuItem>
@@ -773,7 +774,8 @@ const Header = () => {
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
-        </div>
+            </div>
+          </div>
         )}
 
       {/* Menu Mobile Navigation amélioré */}
