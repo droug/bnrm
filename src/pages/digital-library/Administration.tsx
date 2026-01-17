@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { 
   LayoutDashboard, Database, Users, Upload, BarChart3, FileImage,
-  Shield, Copyright, Settings, Image, FolderOpen, Lock, Globe
+  Shield, Copyright, Settings, Image, FolderOpen, Lock, Globe, View
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -95,6 +95,13 @@ export default function Administration() {
       icon: FileImage,
       path: "/admin/digital-library/exhibitions",
       color: "bg-pink-100 text-pink-600",
+    },
+    {
+      title: "CMS Expositions 360°",
+      description: "Créer et gérer des expositions virtuelles immersives",
+      icon: View,
+      path: "/admin/vexpo360",
+      color: "bg-teal-100 text-teal-600",
     },
     {
       title: "Demandes de reproduction",
