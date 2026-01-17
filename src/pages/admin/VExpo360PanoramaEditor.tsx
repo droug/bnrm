@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Plus, Trash2, Edit, Image, MapPin, FileText, Video, Navigation } from "lucide-react";
+import { VExpoImageUpload } from "@/components/vexpo360/VExpoImageUpload";
 
 interface Panorama {
   id: string;
@@ -345,13 +346,14 @@ export default function VExpo360PanoramaEditor() {
                         />
                       </div>
                       <div>
-                        <Label>URL de l'image *</Label>
-                        <Input
+                        <VExpoImageUpload
                           value={panoramaForm.panorama_image_url}
-                          onChange={(e) => setPanoramaForm(p => ({ ...p, panorama_image_url: e.target.value }))}
-                          placeholder="https://..."
+                          onChange={(url) => setPanoramaForm(p => ({ ...p, panorama_image_url: url }))}
+                          label="Image panoramique *"
+                          description="Format recommandé: 8192×4096 équirectangulaire"
+                          folder="panoramas"
+                          maxSizeMB={50}
                         />
-                        <p className="text-xs text-muted-foreground mt-1">Format recommandé: 8192×4096 équirectangulaire</p>
                       </div>
                     </div>
                     <DialogFooter>
