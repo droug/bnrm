@@ -130,10 +130,11 @@ export function DepositValidationWorkflow() {
     if (activeTab === "pending") {
       query = query.in("status", ["brouillon", "soumis", "en_attente_validation_b", "en_cours"]);
     } else if (activeTab === "validated") {
-      query = query.in("status", ["valide_par_b"]);
+      query = query.in("status", ["valide_par_b", "attribue"]);
     } else if (activeTab === "rejected") {
       query = query.in("status", ["rejete", "rejete_par_b", "rejete_par_comite"]);
     }
+    // Pour l'onglet "statistics", on ne filtre pas - on récupère toutes les demandes
 
     const { data, error } = await query;
 
@@ -1089,7 +1090,33 @@ export function DepositValidationWorkflow() {
     doc.save(`Rejet_${request.request_number}_${format(new Date(), "yyyyMMdd")}.pdf`);
   };
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status: string, request?: DepositRequest) => {
+    // Déterminer le statut affiché en fonction de l'étape du workflow
+    let displayStatus = status;
+    
+    if (request) {
+      // Si rejeté
+      if (request.rejected_by || ['rejete', 'rejete_par_b', 'rejete_par_comite'].includes(status)) {
+        displayStatus = 'rejete';
+      }
+      // Si validé par ABN (attribué)
+      else if (request.validated_by_department || ['valide_par_b', 'attribue'].includes(status)) {
+        displayStatus = 'attribue';
+      }
+      // Si validé par comité mais pas encore par ABN (en attente)
+      else if (request.validated_by_committee && !request.validated_by_department) {
+        displayStatus = 'en_attente';
+      }
+      // Si en cours de traitement
+      else if (status === 'en_cours') {
+        displayStatus = 'en_cours';
+      }
+      // Si pas encore approuvé par le comité (soumis)
+      else if (!request.validated_by_committee) {
+        displayStatus = 'soumis';
+      }
+    }
+    
     const statusConfig: any = {
       brouillon: { label: "Soumise", variant: "secondary" },
       soumis: { label: "Soumise", variant: "secondary" },
@@ -1103,7 +1130,7 @@ export function DepositValidationWorkflow() {
       attribue: { label: "Attribuée", variant: "default" },
     };
 
-    const config = statusConfig[status] || { label: status, variant: "secondary" };
+    const config = statusConfig[displayStatus] || { label: displayStatus, variant: "secondary" };
     return <Badge variant={config.variant as any}>{config.label}</Badge>;
   };
 
@@ -1177,10 +1204,11 @@ export function DepositValidationWorkflow() {
         </CardHeader>
         <CardContent>
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="pending">En Attente</TabsTrigger>
               <TabsTrigger value="validated">Validées</TabsTrigger>
               <TabsTrigger value="rejected">Rejetées</TabsTrigger>
+              <TabsTrigger value="statistics">Statistiques</TabsTrigger>
             </TabsList>
 
             <TabsContent value={activeTab} className="mt-6">
@@ -1336,7 +1364,7 @@ export function DepositValidationWorkflow() {
                                   </div>
                                 </TableCell>
                                 <TableCell>{request.support_type}</TableCell>
-                                <TableCell>{getStatusBadge(request.status)}</TableCell>
+                                <TableCell>{getStatusBadge(request.status, request)}</TableCell>
                                 <TableCell>
                                   <Badge variant="outline">
                                     {getCurrentValidator(request)}
@@ -1421,6 +1449,117 @@ export function DepositValidationWorkflow() {
                   </>
                 );
               })()}
+            </TabsContent>
+
+            {/* Onglet Statistiques */}
+            <TabsContent value="statistics" className="mt-6">
+              <div className="space-y-6">
+                {/* Statistiques par statut */}
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+                  <Card className="border-blue-200 bg-blue-50">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-blue-700">Soumise</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-blue-800">
+                        {requests.filter(r => 
+                          ['brouillon', 'soumis'].includes(r.status) && !r.validated_by_committee
+                        ).length}
+                      </div>
+                      <p className="text-xs text-blue-600">demandes en attente de traitement</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-yellow-200 bg-yellow-50">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-yellow-700">En cours</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-yellow-800">
+                        {requests.filter(r => r.status === 'en_cours').length}
+                      </div>
+                      <p className="text-xs text-yellow-600">demandes en cours de traitement</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-orange-200 bg-orange-50">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-orange-700">En attente</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-orange-800">
+                        {requests.filter(r => 
+                          ['en_attente', 'en_attente_validation_b'].includes(r.status) || 
+                          (r.validated_by_committee && !r.validated_by_department && !r.rejected_by)
+                        ).length}
+                      </div>
+                      <p className="text-xs text-orange-600">en attente de validation ABN</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-red-200 bg-red-50">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-red-700">Rejetée</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-red-800">
+                        {requests.filter(r => 
+                          ['rejete', 'rejete_par_b', 'rejete_par_comite'].includes(r.status)
+                        ).length}
+                      </div>
+                      <p className="text-xs text-red-600">demandes rejetées</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card className="border-green-200 bg-green-50">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium text-green-700">Attribuée</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold text-green-800">
+                        {requests.filter(r => 
+                          ['valide_par_b', 'attribue'].includes(r.status)
+                        ).length}
+                      </div>
+                      <p className="text-xs text-green-600">numéros attribués</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Statistiques par type de support */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Répartition par type de support</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {['Livre', 'Périodique', 'Audio-visuel', 'Collections spéciales', 'Base de données', 'Logiciel'].map(supportType => {
+                        const count = requests.filter(r => r.support_type === supportType).length;
+                        if (count === 0) return null;
+                        return (
+                          <div key={supportType} className="flex items-center justify-between p-3 border rounded-lg">
+                            <span className="text-sm font-medium">{supportType}</span>
+                            <Badge variant="secondary">{count}</Badge>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Total général */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Résumé</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                      <span className="text-lg font-medium">Total des demandes</span>
+                      <span className="text-3xl font-bold">{requests.length}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
           </Tabs>
         </CardContent>
