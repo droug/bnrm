@@ -69,6 +69,11 @@ const CoteManagementPage = lazy(() => import("./pages/CoteManagementPage"));
 const CmsBackoffice = lazy(() => import("./pages/cms/CmsBackoffice"));
 const CmsDynamicPage = lazy(() => import("./pages/cms/CmsDynamicPage"));
 
+// VExpo 360 CMS (lazy)
+const VirtualExhibitions360CMS = lazy(() => import("./pages/admin/VirtualExhibitions360CMS"));
+const VExpo360ExhibitionWizard = lazy(() => import("./pages/admin/VExpo360ExhibitionWizard"));
+const VExpo360PanoramaEditor = lazy(() => import("./pages/admin/VExpo360PanoramaEditor"));
+
 // BNRM Portal (lazy)
 const BNRMPortal = lazy(() => import("./pages/BNRMPortal"));
 const BNRMTariffsPage = lazy(() => import("./pages/BNRMTariffsPage"));
@@ -361,6 +366,13 @@ const App = () => {
           <Route path="/admin/digital-library/settings" element={<DigitalLibraryAdminSettings />} />
           <Route path="/admin/digital-library/requests-management" element={<RequestsManagement />} />
           <Route path="/admin/digital-library/electronic-bundles" element={<ElectronicBundlesAdmin />} />
+          
+          {/* VExpo 360 CMS Routes */}
+          <Route path="/admin/vexpo360" element={<VirtualExhibitions360CMS />} />
+          <Route path="/admin/vexpo360/new" element={<VExpo360ExhibitionWizard />} />
+          <Route path="/admin/vexpo360/edit/:id" element={<VExpo360ExhibitionWizard />} />
+          <Route path="/admin/vexpo360/panoramas/:exhibitionId" element={<VExpo360PanoramaEditor />} />
+          
           <Route path="/access-policies" element={<AccessPolicies />} />
           <Route path="/politiques-acces" element={<AccessPolicies />} />
           <Route path="/admin/professional-management" element={<ProfessionalManagement />} />
