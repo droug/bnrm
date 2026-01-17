@@ -4109,6 +4109,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
 
       if (submitError) throw submitError;
 
+      toast.dismiss();
       toast.success(language === 'ar' ? "تم إرسال التصريح بنجاح" : "Déclaration de dépôt légal soumise avec succès");
       setCurrentStep("confirmation");
       
@@ -4118,6 +4119,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
       }, 2000);
     } catch (error: any) {
       console.error("Error submitting declaration:", error);
+      toast.dismiss();
       toast.error(`Erreur lors de la soumission: ${error.message}`);
     }
   };
