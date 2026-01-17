@@ -450,7 +450,7 @@ const Header = () => {
                 <Link to="/">
                   <Button 
                     variant={isHomePage ? "secondary" : "ghost"} 
-                    className={`rounded-none h-12 px-4 text-sm font-medium ${isHomePage ? 'bg-primary-deep text-white' : 'text-white/90 hover:text-white hover:bg-white/10'}`}
+                    className={`rounded-none h-12 px-4 text-sm font-medium ${isHomePage ? 'bg-primary-deep text-white' : 'text-white/90 hover:text-white hover:bg-morocco-green'}`}
                   >
                     <BookOpen className="w-4 h-4 mr-2" />
                     {language === 'ar' ? 'الرئيسية' : 'Accueil'}
@@ -462,7 +462,7 @@ const Header = () => {
               
               {/* Découvrir la Bibliothèque */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-white/10 h-12 text-sm font-medium px-3 rounded-none">
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-morocco-green h-12 text-sm font-medium px-3 rounded-none">
                   <BookOpen className="w-4 h-4 mr-2" />
                   <span>{t('nav.discover')}</span>
                 </NavigationMenuTrigger>
@@ -498,7 +498,7 @@ const Header = () => {
 
               {/* Accéder à nos services */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-white/10 h-12 text-sm font-medium px-3 rounded-none">
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-morocco-green h-12 text-sm font-medium px-3 rounded-none">
                   <Users className="w-4 h-4 mr-2" />
                   <span>{t('nav.services')}</span>
                 </NavigationMenuTrigger>
@@ -534,7 +534,7 @@ const Header = () => {
 
               {/* Explorer le patrimoine */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-white/10 h-12 text-sm font-medium px-3 rounded-none">
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-morocco-green h-12 text-sm font-medium px-3 rounded-none">
                   <Book className="w-4 h-4 mr-2" />
                   <span>{t('nav.explore')}</span>
                 </NavigationMenuTrigger>
@@ -678,7 +678,7 @@ const Header = () => {
 
               {/* Consulter nos actualités */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-white/10 h-12 text-sm font-medium px-3 rounded-none">
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-morocco-green h-12 text-sm font-medium px-3 rounded-none">
                   <Calendar className="w-4 h-4 mr-2" />
                   <span>{t('nav.consult.news')}</span>
                 </NavigationMenuTrigger>
@@ -708,7 +708,7 @@ const Header = () => {
 
               {/* Collaborer avec nous */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-white/10 h-12 text-sm font-medium px-3 rounded-none">
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-morocco-green h-12 text-sm font-medium px-3 rounded-none">
                   <Building className="w-4 h-4 mr-2" />
                   <span>{t('nav.collaborate')}</span>
                 </NavigationMenuTrigger>
@@ -734,7 +734,7 @@ const Header = () => {
 
               {/* Mécénat */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-white/10 h-12 text-sm font-medium px-3 rounded-none">
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-morocco-green h-12 text-sm font-medium px-3 rounded-none">
                   <Users className="w-4 h-4 mr-2" />
                   <span>{menuData.mecenat.title[language]}</span>
                 </NavigationMenuTrigger>
