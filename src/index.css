@@ -17,7 +17,7 @@ Enhanced Moroccan Heritage Design System
 @layer base {
   :root {
     /* === BNRM OFFICIAL COLOR PALETTE === */
-    /* Based on official brand guidelines - Slate, Blue, Amber families */
+    /* Based on official brand guidelines - Burgundy, Gold, Green (Moroccan heritage) */
     
     /* Slate Family - Neutral surfaces */
     --slate-surface: 210 40% 98%; /* #F8FAFC */
@@ -28,23 +28,27 @@ Enhanced Moroccan Heritage Design System
     --slate-base: 217 23% 27%; /* #334155 */
     --slate-base-dark: 217 33% 17%; /* #1E293B */
     
-    /* Blue Family - Primary brand colors */
-    --blue-surface: 214 100% 97%; /* #EFF6FF */
-    --blue-light: 214 95% 93%; /* #DBEAFE */
-    --blue-soft: 213 94% 78%; /* #93C5FD */
-    --blue-primary: 223 71% 40%; /* #1E40AF - Official BNRM Blue */
-    --blue-primary-dark: 223 71% 35%; /* Darker variant */
-    --blue-deep: 223 71% 30%; /* Deep variant */
-    --blue-dark: 223 71% 25%; /* Dark variant */
+    /* Burgundy Family - Primary brand colors (Moroccan heritage) */
+    --burgundy-surface: 345 30% 97%; /* Light burgundy surface */
+    --burgundy-light: 345 40% 90%; /* Light burgundy */
+    --burgundy-soft: 345 50% 70%; /* Soft burgundy */
+    --burgundy-primary: 345 70% 30%; /* #8B1538 - Official BNRM Burgundy */
+    --burgundy-primary-dark: 345 75% 25%; /* Darker variant */
+    --burgundy-deep: 345 80% 20%; /* Deep variant */
+    --burgundy-dark: 345 85% 15%; /* Dark variant */
     
-    /* Amber Family - Accent colors */
-    --amber-surface: 48 100% 95%; /* #FFFBE9 */
-    --amber-light: 48 96% 89%; /* #FEF3C7 */
-    --amber-soft: 45 96% 64%; /* #FCD34D */
-    --amber-primary: 43 96% 50%; /* #F59E0B */
-    --amber-primary-dark: 32 95% 44%; /* #D97706 */
-    --amber-deep: 27 91% 37%; /* #B45309 */
-    --amber-dark: 25 81% 26%; /* #78350F */
+    /* Gold Family - Accent colors (Moroccan heritage) */
+    --gold-surface: 45 100% 95%; /* Light gold surface */
+    --gold-light: 45 90% 80%; /* Light gold */
+    --gold-soft: 45 80% 55%; /* Soft gold */
+    --gold-primary: 45 85% 45%; /* Rich gold */
+    --gold-primary-dark: 40 90% 40%; /* Dark gold */
+    --gold-deep: 38 85% 35%; /* Deep gold */
+    --gold-dark: 35 80% 25%; /* Dark gold */
+    
+    /* Green Family - Secondary accent (Moroccan flag) */
+    --morocco-green: 145 60% 30%; /* Moroccan green */
+    --morocco-green-light: 145 50% 45%;
     
     /* Semantic tokens mapped to BNRM palette */
     --background: var(--slate-surface);
@@ -56,44 +60,50 @@ Enhanced Moroccan Heritage Design System
     --popover: var(--slate-light);
     --popover-foreground: var(--slate-base-dark);
 
-    /* Primary: Official BNRM Blue */
-    --primary: var(--blue-primary);
+    /* Primary: Official BNRM Burgundy */
+    --primary: var(--burgundy-primary);
     --primary-foreground: 0 0% 100%;
-    --primary-glow: var(--blue-soft);
-    --primary-deep: var(--blue-deep);
+    --primary-glow: var(--burgundy-soft);
+    --primary-deep: var(--burgundy-deep);
 
-    /* Secondary: Amber tones for warmth */
-    --secondary: var(--amber-light);
+    /* Secondary: Gold tones for warmth */
+    --secondary: var(--gold-light);
     --secondary-foreground: var(--slate-base-dark);
-    --secondary-warm: var(--amber-soft);
+    --secondary-warm: var(--gold-soft);
 
     /* Muted: Slate neutral tones */
     --muted: var(--slate-light);
     --muted-foreground: var(--slate-text);
 
-    /* Accent: Amber for emphasis */
-    --accent: var(--amber-primary);
-    --accent-foreground: 0 0% 100%;
-    --accent-glow: var(--amber-soft);
-    --accent-bright: var(--amber-primary-dark);
+    /* Accent: Gold for emphasis */
+    --accent: var(--gold-primary);
+    --accent-foreground: var(--slate-base-dark);
+    --accent-glow: var(--gold-soft);
+    --accent-bright: var(--gold-primary-dark);
 
-    /* Highlight: Deep amber */
-    --highlight: var(--amber-deep);
+    /* Highlight: Deep gold */
+    --highlight: var(--gold-deep);
     --highlight-foreground: 0 0% 100%;
-    --highlight-deep: var(--amber-dark);
+    --highlight-deep: var(--gold-dark);
 
-    /* Gold: Legacy support - mapped to amber */
-    --gold: var(--amber-soft);
+    /* Gold: Heritage colors */
+    --gold: var(--gold-soft);
     --gold-foreground: var(--slate-base-dark);
-    --gold-bright: var(--amber-primary);
+    --gold-bright: var(--gold-primary);
 
-    /* Coral: Legacy support - mapped to amber */
-    --coral: var(--amber-primary);
+    /* Coral: Legacy support - mapped to burgundy */
+    --coral: var(--burgundy-soft);
     --coral-foreground: 0 0% 100%;
 
-    /* Royal: Legacy support - mapped to blue */
-    --royal: var(--blue-primary-dark);
+    /* Royal: Legacy support - mapped to burgundy */
+    --royal: var(--burgundy-primary-dark);
     --royal-foreground: 0 0% 100%;
+    
+    /* Header specific colors */
+    --header-bg: var(--burgundy-primary);
+    --header-foreground: 0 0% 100%;
+    --nav-bg: var(--burgundy-deep);
+    --nav-foreground: 0 0% 100%;
 
     /* === CBM Portal Specific Colors === */
     /* Palette distinctive pour le Catalogue des Bibliothèques Marocaines */
