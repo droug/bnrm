@@ -65,6 +65,11 @@ export function DepositValidationWorkflow() {
     validationType: "service" | "department" | "committee";
   } | null>(null);
   
+  // États pour les champs éditables
+  const [editTitle, setEditTitle] = useState("");
+  const [editPrinter, setEditPrinter] = useState("");
+  const [editPageCount, setEditPageCount] = useState("");
+  
   // États pour les filtres
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedSupport, setSelectedSupport] = useState<string>("all");
@@ -531,6 +536,62 @@ export function DepositValidationWorkflow() {
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const saveFieldCorrections = async (requestId: string) => {
+    try {
+      const currentRequest = requests.find(r => r.id === requestId);
+      if (!currentRequest) return;
+
+      const updatedMetadata = {
+        ...currentRequest.metadata,
+        printer_name: editPrinter,
+        page_count: editPageCount ? parseInt(editPageCount) : null,
+        customFields: {
+          ...currentRequest.metadata?.customFields,
+          printer_name: editPrinter,
+          page_count: editPageCount ? parseInt(editPageCount) : null,
+        }
+      };
+
+      const { error } = await supabase
+        .from("legal_deposit_requests")
+        .update({
+          title: editTitle,
+          metadata: updatedMetadata,
+        })
+        .eq("id", requestId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Corrections enregistrées",
+        description: "Les modifications ont été sauvegardées",
+      });
+
+      // Mettre à jour l'état local
+      setRequests(prev => prev.map(r => 
+        r.id === requestId 
+          ? { ...r, title: editTitle, metadata: updatedMetadata }
+          : r
+      ));
+      
+      // Mettre à jour selectedRequest aussi
+      if (selectedRequest && selectedRequest.id === requestId) {
+        setSelectedRequest({
+          ...selectedRequest,
+          title: editTitle,
+          metadata: updatedMetadata,
+        });
+      }
+    } catch (error: any) {
+      console.error("Error saving corrections:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder les corrections",
+        variant: "destructive",
+      });
     }
   };
 
@@ -1285,7 +1346,12 @@ export function DepositValidationWorkflow() {
                                     <Button
                                       size="sm"
                                       variant="outline"
-                                      onClick={() => setSelectedRequest(request)}
+                                      onClick={() => {
+                                        setSelectedRequest(request);
+                                        setEditTitle(request.title || "");
+                                        setEditPrinter(request.metadata?.printer_name || request.metadata?.customFields?.printer_name || "");
+                                        setEditPageCount(request.metadata?.page_count?.toString() || request.metadata?.customFields?.page_count?.toString() || "");
+                                      }}
                                     >
                                       <GitBranch className="h-4 w-4 mr-2" />
                                       Examiner
@@ -1375,12 +1441,57 @@ export function DepositValidationWorkflow() {
               {renderWorkflowSteps(selectedRequest)}
 
               <div className="bg-muted/50 p-4 rounded-lg">
-                <h3 className="font-semibold mb-3">Détails de la Publication</h3>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium">Titre:</span>
-                    <p className="mt-1">{selectedRequest.title}</p>
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="font-semibold">Détails de la Publication</h3>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => saveFieldCorrections(selectedRequest.id)}
+                    disabled={isLoading}
+                  >
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Enregistrer les corrections
+                  </Button>
+                </div>
+                
+                {/* Champs éditables */}
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="col-span-2">
+                    <Label htmlFor="edit-title" className="text-sm font-medium">Titre *</Label>
+                    <Input
+                      id="edit-title"
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      className="mt-1"
+                      placeholder="Titre de la publication"
+                    />
                   </div>
+                  <div>
+                    <Label htmlFor="edit-printer" className="text-sm font-medium">Imprimeur</Label>
+                    <Input
+                      id="edit-printer"
+                      value={editPrinter}
+                      onChange={(e) => setEditPrinter(e.target.value)}
+                      className="mt-1"
+                      placeholder="Nom de l'imprimeur"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="edit-pages" className="text-sm font-medium">Nombre de pages</Label>
+                    <Input
+                      id="edit-pages"
+                      type="number"
+                      value={editPageCount}
+                      onChange={(e) => setEditPageCount(e.target.value)}
+                      className="mt-1"
+                      placeholder="Ex: 250"
+                      min="1"
+                    />
+                  </div>
+                </div>
+
+                {/* Champs en lecture seule */}
+                <div className="grid grid-cols-2 gap-4 text-sm pt-4 border-t">
                   {selectedRequest.subtitle && (
                     <div>
                       <span className="font-medium">Sous-titre:</span>
@@ -1413,7 +1524,7 @@ export function DepositValidationWorkflow() {
                     <h4 className="font-medium text-sm mb-2">Informations supplémentaires</h4>
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       {Object.entries(selectedRequest.metadata.customFields)
-                        .filter(([key]) => key !== 'author_nationality') // Déjà affiché plus haut
+                        .filter(([key]) => !['author_nationality', 'printer_name', 'page_count'].includes(key))
                         .map(([key, value]) => (
                           <div key={key}>
                             <strong className="capitalize">{key.replace(/_/g, ' ')}:</strong>{' '}
