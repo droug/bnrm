@@ -42,16 +42,6 @@ import { Separator } from "@/components/ui/separator";
 
 const tabs = [
   { 
-    id: "carrousel-bn", 
-    label: "Carrousel BN", 
-    icon: Sparkles, 
-    color: "text-amber-500",
-    bgColor: "bg-amber-500/10",
-    borderColor: "border-amber-500/30",
-    gradient: "from-amber-500/20 to-amber-600/5",
-    description: "Œuvres vedettes de la Bibliothèque Numérique"
-  },
-  { 
     id: "bannieres", 
     label: "Bannières", 
     icon: Megaphone, 
@@ -226,7 +216,7 @@ function QuickAction({
 }
 
 export default function ContentManagementSystem() {
-  const [activeTab, setActiveTab] = useState("carrousel-bn");
+  const [activeTab, setActiveTab] = useState("bannieres");
 
   // Fetch stats
   const { data: stats } = useQuery({
@@ -264,8 +254,6 @@ export default function ContentManagementSystem() {
 
   const renderContent = () => {
     switch (activeTab) {
-      case "carrousel-bn":
-        return <FeaturedWorksManager />;
       case "bannieres":
         return <CmsBannersManager />;
       case "actualites":
