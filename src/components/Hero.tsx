@@ -7,23 +7,24 @@ import { useLanguage } from "@/hooks/useLanguage";
 const Hero = () => {
   const { t, isRTL } = useLanguage();
   return (
-    <section className="relative min-h-[90vh] flex items-center justify-center overflow-hidden">
-      {/* Background avec meilleure netteté */}
+    <section className="relative min-h-[85vh] flex items-center overflow-hidden">
+      {/* Background avec image */}
       <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat transform scale-105"
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{ 
           backgroundImage: `url(${heroImage})`,
-          filter: 'contrast(1.1) brightness(1.05) saturate(1.1)'
+          filter: 'brightness(0.95) saturate(1.1)'
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/70 via-primary/50 to-accent/60"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/80 via-primary/60 to-transparent"></div>
       </div>
 
-      {/* Moroccan pattern overlay */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="w-full h-full bg-repeat opacity-30" 
+      {/* Moroccan geometric pattern overlay on right side */}
+      <div className="absolute right-0 top-0 bottom-0 w-1/3 opacity-30 hidden lg:block">
+        <div className="w-full h-full" 
              style={{ 
-               backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.4'%3E%3Cpath d='M30 30l15-15v30L30 30zm0 0l-15 15V15l15 15z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")` 
+               backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23C4A052' stroke-width='1'%3E%3Cpath d='M40 0L80 40L40 80L0 40Z'/%3E%3Cpath d='M40 10L70 40L40 70L10 40Z'/%3E%3Cpath d='M40 20L60 40L40 60L20 40Z'/%3E%3C/g%3E%3C/svg%3E")`,
+               backgroundSize: '80px 80px'
              }}>
         </div>
       </div>

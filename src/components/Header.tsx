@@ -209,19 +209,23 @@ const Header = () => {
   const showBackButton = !isHomePage && !isDigitalLibraryHome && !isManuscriptsPlatformHome;
 
   return (
-    <header className="sticky top-0 z-50 border-b-2 shadow-lg bg-white backdrop-blur-lg border-border">
-      <div className="container mx-auto px-4">
-        {/* Bannière ultra-compacte */}
-        <div className="flex justify-between items-center py-2 border-b border-border">
-          {/* Logo + Titre compact */}
-          <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-            <img src={logoImage} alt="Logo BNRM" className="h-10 w-auto" />
-            <span className="font-bold text-sm hidden lg:inline">
-              {t('header.title')} (BNRM)
-            </span>
-          </Link>
+    <header className="sticky top-0 z-50 shadow-lg">
+      {/* Bannière supérieure - Style bordeaux BNRM */}
+      <div className="bg-primary text-primary-foreground">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-center py-2">
+            {/* Logo + Titre compact */}
+            <Link to="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
+              <img src={logoImage} alt="Logo BNRM" className="h-12 w-auto bg-white rounded-sm p-1" />
+              <div className="hidden lg:flex flex-col">
+                <span className="text-xs text-primary-foreground/80">المملكة المغربية</span>
+                <span className="font-bold text-sm text-white">
+                  {t('header.title')}
+                </span>
+              </div>
+            </Link>
           
-          {/* Bouton de gestion pour les plateformes spéciales (admin/librarian uniquement) */}
+            {/* Bouton de gestion pour les plateformes spéciales (admin/librarian uniquement) */}
           {(profile?.role === 'admin' || profile?.role === 'librarian') && (
             <>
               {isManuscriptsPlatform && (
