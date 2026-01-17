@@ -49,7 +49,7 @@ const tabs = [
     bgColor: "bg-amber-500/10",
     borderColor: "border-amber-500/30",
     gradient: "from-amber-500/20 to-amber-600/5",
-    description: "Œuvres vedettes de la bibliothèque numérique"
+    description: "Œuvres vedettes de la Bibliothèque Numérique"
   },
   { 
     id: "bannieres", 
