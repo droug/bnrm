@@ -1422,118 +1422,93 @@ export function DepositValidationWorkflow() {
         </CardContent>
       </Card>
 
-      <Dialog open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Validation de la Demande de Dépôt Légal</DialogTitle>
-            <DialogDescription>
-              N° {selectedRequest?.request_number}
-            </DialogDescription>
-          </DialogHeader>
+      {/* Interface de validation (Sheet plein écran) */}
+      <Sheet open={!!selectedRequest} onOpenChange={() => setSelectedRequest(null)}>
+        <SheetContent className="w-full sm:max-w-5xl overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle className="flex items-center gap-3">
+              Validation de la Demande de Dépôt Légal
+              <Badge variant="outline">{selectedRequest?.request_number}</Badge>
+            </SheetTitle>
+            <SheetDescription>
+              Examiner et valider la demande de dépôt légal
+            </SheetDescription>
+          </SheetHeader>
+          
           {selectedRequest && (
-            <div className="space-y-6">
+            <div className="space-y-6 mt-6">
               {/* Alerte de détection de doublons */}
               <DuplicateDetectionAlert 
                 currentRequest={selectedRequest}
                 duplicates={findDuplicatesByTitle(selectedRequest)}
               />
               
+              {/* Étapes du workflow */}
               {renderWorkflowSteps(selectedRequest)}
 
-              <div className="bg-muted/50 p-4 rounded-lg">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="font-semibold">Détails de la Publication</h3>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => saveFieldCorrections(selectedRequest.id)}
-                    disabled={isLoading}
-                  >
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Enregistrer les corrections
-                  </Button>
-                </div>
-                
-                {/* Champs éditables */}
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="col-span-2">
-                    <Label htmlFor="edit-title" className="text-sm font-medium">Titre *</Label>
-                    <Input
-                      id="edit-title"
-                      value={editTitle}
-                      onChange={(e) => setEditTitle(e.target.value)}
-                      className="mt-1"
-                      placeholder="Titre de la publication"
-                    />
+              {/* Section des champs modifiables */}
+              <Card className="border-primary/20 bg-primary/5">
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <FileText className="h-4 w-4" />
+                      Corrections administratives
+                    </CardTitle>
+                    <Button
+                      size="sm"
+                      onClick={() => saveFieldCorrections(selectedRequest.id)}
+                      disabled={isLoading}
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      Enregistrer les corrections
+                    </Button>
                   </div>
-                  <div>
-                    <Label htmlFor="edit-printer" className="text-sm font-medium">Imprimeur</Label>
-                    <Input
-                      id="edit-printer"
-                      value={editPrinter}
-                      onChange={(e) => setEditPrinter(e.target.value)}
-                      className="mt-1"
-                      placeholder="Nom de l'imprimeur"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="edit-pages" className="text-sm font-medium">Nombre de pages</Label>
-                    <Input
-                      id="edit-pages"
-                      type="number"
-                      value={editPageCount}
-                      onChange={(e) => setEditPageCount(e.target.value)}
-                      className="mt-1"
-                      placeholder="Ex: 250"
-                      min="1"
-                    />
-                  </div>
-                </div>
-
-                {/* Champs en lecture seule */}
-                <div className="grid grid-cols-2 gap-4 text-sm pt-4 border-t">
-                  {selectedRequest.subtitle && (
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="md:col-span-2">
+                      <Label htmlFor="edit-title" className="text-sm font-medium">Titre *</Label>
+                      <Input
+                        id="edit-title"
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        className="mt-1"
+                        placeholder="Titre de la publication"
+                      />
+                    </div>
                     <div>
-                      <span className="font-medium">Sous-titre:</span>
-                      <p className="mt-1">{selectedRequest.subtitle}</p>
+                      <Label htmlFor="edit-pages" className="text-sm font-medium">Nombre de pages</Label>
+                      <Input
+                        id="edit-pages"
+                        type="number"
+                        value={editPageCount}
+                        onChange={(e) => setEditPageCount(e.target.value)}
+                        className="mt-1"
+                        placeholder="Ex: 250"
+                        min="1"
+                      />
                     </div>
-                  )}
-                  <div>
-                    <span className="font-medium">Auteur:</span>
-                    <p className="mt-1">{selectedRequest.author_name || 'Non spécifié'}</p>
-                  </div>
-                  {selectedRequest.metadata?.customFields?.author_nationality && (
-                    <div>
-                      <span className="font-medium">Nationalité:</span>
-                      <p className="mt-1">{selectedRequest.metadata.customFields.author_nationality}</p>
+                    <div className="md:col-span-3">
+                      <Label htmlFor="edit-printer" className="text-sm font-medium">Imprimeur</Label>
+                      <Input
+                        id="edit-printer"
+                        value={editPrinter}
+                        onChange={(e) => setEditPrinter(e.target.value)}
+                        className="mt-1"
+                        placeholder="Nom de l'imprimeur"
+                      />
                     </div>
-                  )}
-                  <div>
-                    <span className="font-medium">Type de support:</span>
-                    <p className="mt-1">{selectedRequest.support_type}</p>
                   </div>
-                  <div>
-                    <span className="font-medium">Statut actuel:</span>
-                    <p className="mt-1">{getStatusBadge(selectedRequest.status)}</p>
-                  </div>
-                </div>
+                </CardContent>
+              </Card>
 
-                {/* Section pour tous les autres champs personnalisés */}
-                {selectedRequest.metadata?.customFields && Object.keys(selectedRequest.metadata.customFields).length > 1 && (
-                  <div className="mt-4 pt-4 border-t">
-                    <h4 className="font-medium text-sm mb-2">Informations supplémentaires</h4>
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      {Object.entries(selectedRequest.metadata.customFields)
-                        .filter(([key]) => !['author_nationality', 'printer_name', 'page_count'].includes(key))
-                        .map(([key, value]) => (
-                          <div key={key}>
-                            <strong className="capitalize">{key.replace(/_/g, ' ')}:</strong>{' '}
-                            {value as string || 'Non spécifié'}
-                          </div>
-                        ))}
-                    </div>
-                  </div>
-                )}
+              {/* Toutes les informations de la demande via LegalDepositDetailsView */}
+              <div className="space-y-4">
+                <h3 className="font-semibold text-lg flex items-center gap-2">
+                  <Eye className="h-5 w-5" />
+                  Détails complets de la demande
+                </h3>
+                <LegalDepositDetailsView request={selectedRequest} />
               </div>
 
               {/* Historique des validations */}
@@ -1541,9 +1516,11 @@ export function DepositValidationWorkflow() {
                 selectedRequest.validated_by_department ||
                 selectedRequest.validated_by_committee ||
                 selectedRequest.rejected_by) && (
-                <div>
-                  <h3 className="font-semibold mb-3">Historique des Validations</h3>
-                  <div className="space-y-3">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Historique des Validations</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
                     {selectedRequest.validated_by_committee && (
                       <div className="border-l-4 border-green-500 pl-4 py-2">
                         <div className="flex items-center gap-2">
@@ -1603,106 +1580,109 @@ export function DepositValidationWorkflow() {
                         )}
                       </div>
                     )}
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               )}
 
               {/* Formulaire de validation */}
               {!selectedRequest.rejected_by && (
-                <div>
-                  <Label htmlFor="comments">Commentaires / Motif</Label>
-                  <Textarea
-                    id="comments"
-                    value={comments}
-                    onChange={(e) => setComments(e.target.value)}
-                    placeholder="Ajouter des commentaires ou le motif de rejet..."
-                    className="mt-2"
-                    rows={4}
-                  />
-                </div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">Commentaires / Motif</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <Textarea
+                      id="comments"
+                      value={comments}
+                      onChange={(e) => setComments(e.target.value)}
+                      placeholder="Ajouter des commentaires ou le motif de rejet..."
+                      rows={4}
+                    />
+                  </CardContent>
+                </Card>
               )}
 
-              {/* Actions de validation */}
-              {!selectedRequest.rejected_by && (
-                <div className="flex gap-3 justify-end">
-                  {!selectedRequest.validated_by_committee && (
-                    <>
+              {/* Actions de validation - Sticky footer */}
+              <div className="sticky bottom-0 bg-background border-t pt-4 pb-2 -mx-6 px-6">
+                {!selectedRequest.rejected_by && (
+                  <div className="flex flex-wrap gap-3 justify-end">
+                    {!selectedRequest.validated_by_committee && (
+                      <>
+                        <Button
+                          variant="outline"
+                          onClick={() => handleSetPending(selectedRequest.id)}
+                          disabled={isLoading}
+                        >
+                          <Clock className="h-4 w-4 mr-2" />
+                          Mettre en attente
+                        </Button>
+                        <Button
+                          onClick={() => setShowCommitteeConfirmModal(true)}
+                          disabled={isLoading}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Approuver (Comité)
+                        </Button>
+                      </>
+                    )}
+
+                    {selectedRequest.validated_by_committee && !selectedRequest.validated_by_department && (
+                      <>
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowPendingModal(true)}
+                          disabled={isLoading}
+                        >
+                          <Clock className="h-4 w-4 mr-2" />
+                          Mettre en attente
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          onClick={() => openRejectionModal(selectedRequest.id, "department")}
+                          disabled={isLoading}
+                        >
+                          <XCircle className="h-4 w-4 mr-2" />
+                          Rejeter (ABN)
+                        </Button>
+                        <Button
+                          onClick={() => handleValidation(selectedRequest.id, "department", "approved")}
+                          disabled={isLoading}
+                        >
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Approuver (ABN)
+                        </Button>
+                      </>
+                    )}
+
+                    {/* Bouton de génération de l'accusé de réception - uniquement après validation ABN */}
+                    {selectedRequest.validated_by_department && (
                       <Button
                         variant="outline"
-                        onClick={() => handleSetPending(selectedRequest.id)}
-                        disabled={isLoading}
+                        onClick={() => generateAccuseReception(selectedRequest)}
                       >
-                        <Clock className="h-4 w-4 mr-2" />
-                        Mettre en attente
+                        <Download className="h-4 w-4 mr-2" />
+                        Accusé de Réception
                       </Button>
-                      <Button
-                        onClick={() => setShowCommitteeConfirmModal(true)}
-                        disabled={isLoading}
-                      >
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Approuver (Comité)
-                      </Button>
-                    </>
-                  )}
+                    )}
+                  </div>
+                )}
 
-                  {selectedRequest.validated_by_committee && !selectedRequest.validated_by_department && (
-                    <>
-                      <Button
-                        variant="outline"
-                        onClick={() => setShowPendingModal(true)}
-                        disabled={isLoading}
-                      >
-                        <Clock className="h-4 w-4 mr-2" />
-                        Mettre en attente
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        onClick={() => openRejectionModal(selectedRequest.id, "department")}
-                        disabled={isLoading}
-                      >
-                        <XCircle className="h-4 w-4 mr-2" />
-                        Rejeter (ABN)
-                      </Button>
-                      <Button
-                        onClick={() => handleValidation(selectedRequest.id, "department", "approved")}
-                        disabled={isLoading}
-                      >
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Approuver (ABN)
-                      </Button>
-                    </>
-                  )}
-                </div>
-              )}
-
-              {/* Bouton de génération de l'accusé de réception - uniquement après validation ABN */}
-              {selectedRequest.validated_by_department && (
-                <div className="flex flex-wrap gap-3 border-t pt-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => generateAccuseReception(selectedRequest)}
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Accusé de Réception
-                  </Button>
-                </div>
-              )}
-
-              {selectedRequest.rejected_by && (
-                <div className="flex gap-3 border-t pt-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => generateRejectionLetter(selectedRequest)}
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Télécharger Lettre de Rejet
-                  </Button>
-                </div>
-              )}
+                {selectedRequest.rejected_by && (
+                  <div className="flex gap-3 justify-end">
+                    <Button
+                      variant="outline"
+                      onClick={() => generateRejectionLetter(selectedRequest)}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Télécharger Lettre de Rejet
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
 
       {/* View-Only Details Sheet */}
       <Sheet open={isViewDetailsOpen} onOpenChange={setIsViewDetailsOpen}>
