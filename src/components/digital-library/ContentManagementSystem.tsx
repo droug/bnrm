@@ -8,6 +8,8 @@ import CmsActualitesManager from "@/components/cms/CmsActualitesManager";
 import CmsEvenementsManager from "@/components/cms/CmsEvenementsManager";
 import CmsMenusManager from "@/components/cms/CmsMenusManager";
 import CmsBannersManager from "@/components/cms/CmsBannersManager";
+import CmsFooterManager from "@/components/cms/CmsFooterManager";
+import CmsSectionsManager from "@/components/cms/CmsSectionsManager";
 import FeaturedWorksManager from "@/components/admin/FeaturedWorksManager";
 import { 
   Sparkles, 
@@ -25,7 +27,10 @@ import {
   CheckCircle2,
   AlertCircle,
   Eye,
-  PenLine
+  PenLine,
+  Footprints,
+  LayoutTemplate,
+  Settings2
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -54,8 +59,7 @@ const tabs = [
     bgColor: "bg-pink-500/10",
     borderColor: "border-pink-500/30",
     gradient: "from-pink-500/20 to-pink-600/5",
-    description: "Bannières promotionnelles du site",
-    badge: "Nouveau"
+    description: "Bannières promotionnelles du site"
   },
   { 
     id: "actualites", 
@@ -88,6 +92,17 @@ const tabs = [
     description: "Pages statiques du site"
   },
   { 
+    id: "sections", 
+    label: "Sections", 
+    icon: LayoutTemplate, 
+    color: "text-indigo-500",
+    bgColor: "bg-indigo-500/10",
+    borderColor: "border-indigo-500/30",
+    gradient: "from-indigo-500/20 to-indigo-600/5",
+    description: "Sections de contenu des pages",
+    badge: "Nouveau"
+  },
+  { 
     id: "media", 
     label: "Médias", 
     icon: ImageIcon, 
@@ -106,6 +121,16 @@ const tabs = [
     borderColor: "border-cyan-500/30",
     gradient: "from-cyan-500/20 to-cyan-600/5",
     description: "Navigation du site"
+  },
+  { 
+    id: "footer", 
+    label: "Footer", 
+    icon: Footprints, 
+    color: "text-slate-500",
+    bgColor: "bg-slate-500/10",
+    borderColor: "border-slate-500/30",
+    gradient: "from-slate-500/20 to-slate-600/5",
+    description: "Pied de page du site"
   },
   { 
     id: "webhooks", 
@@ -249,10 +274,14 @@ export default function ContentManagementSystem() {
         return <CmsEvenementsManager />;
       case "pages":
         return <CmsPagesManager />;
+      case "sections":
+        return <CmsSectionsManager />;
       case "media":
         return <CmsMediaManager />;
       case "menus":
         return <CmsMenusManager />;
+      case "footer":
+        return <CmsFooterManager />;
       case "webhooks":
         return <CmsWebhooksManager />;
       default:
