@@ -217,12 +217,12 @@ export default function CmsSectionsManager() {
           </CardDescription>
         </div>
         <div className="flex items-center gap-4">
-          <Select value={selectedPageId} onValueChange={setSelectedPageId}>
+          <Select value={selectedPageId || "all"} onValueChange={(v) => setSelectedPageId(v === "all" ? "" : v)}>
             <SelectTrigger className="w-64">
               <SelectValue placeholder="Toutes les pages" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Toutes les pages</SelectItem>
+              <SelectItem value="all">Toutes les pages</SelectItem>
               {pages.map((page) => (
                 <SelectItem key={page.id} value={page.id}>
                   {page.title_fr}
