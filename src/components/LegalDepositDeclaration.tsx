@@ -552,6 +552,10 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                       return null;
                     }
                     
+                    // Vérifier si c'est le champ Nationalité
+                    const isNationalityField = field.field_key === 'author_nationality' || 
+                                               field.field_key.toLowerCase().includes('nationalit');
+                    
                     return (
                       <>
                         <DynamicFieldRenderer
@@ -571,6 +575,10 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                               console.log('Author type updated:', value);
                             }
                           }}
+                          // Passer les props pour le champ nationalité
+                          gender={isNationalityField ? (authorGender as 'homme' | 'femme' | '') : undefined}
+                          otherNationalityValue={isNationalityField ? otherNationalityValue : undefined}
+                          onOtherNationalityChange={isNationalityField ? setOtherNationalityValue : undefined}
                         />
                         
                         {/* Insérer le champ "Représentant" juste après le champ Type de l'auteur si Personne Morale */}
