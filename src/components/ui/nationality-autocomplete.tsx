@@ -245,11 +245,11 @@ export function NationalityAutocomplete({
   const selectedNationality = nationalities.find((n) => n.code === value);
   const isOtherSelected = value === 'OTHER';
 
-  // Préparer la liste avec "Autre" à la fin
-  const displayNationalities = [
-    ...nationalities,
-    { code: 'OTHER', label_fr: 'Autre' }
-  ];
+  // Préparer la liste avec "Autre" à la fin (seulement si pas déjà présent dans la DB)
+  const hasOtherInDb = nationalities.some(n => n.code === 'OTHER');
+  const displayNationalities = hasOtherInDb 
+    ? nationalities 
+    : [...nationalities, { code: 'OTHER', label_fr: 'Autre' }];
 
   return (
     <div className="space-y-2">
