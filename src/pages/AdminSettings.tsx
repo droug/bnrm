@@ -272,7 +272,7 @@ export default function AdminSettings() {
                         Interconnexions
                       </CardTitle>
                       <CardDescription>
-                        Configuration des interconnexions avec les systèmes externes (SIGB, DBM-600, Catalogues, Z39.50, OAI-PMH, Active Directory)
+                        Configuration des interconnexions avec les systèmes externes (SIGB, DBM-600, Catalogues, Z39.50, OAI-PMH, Active Directory, CORA)
                       </CardDescription>
                     </div>
                     <Button 
