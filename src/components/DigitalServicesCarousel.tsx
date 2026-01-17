@@ -236,7 +236,7 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
                 <div className="p-6 flex flex-col flex-1">
                   {/* Category */}
                   <div className="mb-4">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-orange-500 text-white">
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-morocco-green text-white">
                       {service.category}
                     </span>
                   </div>
@@ -267,7 +267,7 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
               onClick={() => api?.scrollTo(index)}
               className={`h-2 rounded-full transition-all ${
                 index === current
-                  ? 'w-8 bg-orange-500'
+                  ? 'w-8 bg-morocco-green'
                   : 'w-2 bg-slate-300 hover:bg-slate-400'
               }`}
               aria-label={`Go to slide ${index + 1}`}
@@ -299,7 +299,7 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
         <Button
           onClick={() => navigate('/services-bnrm')}
           size="lg"
-          className="bg-gradient-to-r from-orange-500 to-blue-900 hover:from-orange-600 hover:to-blue-950 text-white px-8 py-6 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
+          className="bg-gradient-to-r from-morocco-green to-blue-900 hover:from-morocco-green/90 hover:to-blue-950 text-white px-8 py-6 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
         >
           {language === 'ar' ? 'عرض جميع الخدمات' : 'Voir tous nos services'}
           <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
