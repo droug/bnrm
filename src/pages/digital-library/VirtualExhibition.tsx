@@ -2,12 +2,14 @@ import { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
+import { VExpoPublicList } from "@/components/vexpo360/VExpoPublicList";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Separator } from "@/components/ui/separator";
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -409,6 +411,15 @@ export default function VirtualExhibition() {
           </div>
         </div>
       </section>
+
+      {/* VExpo 360 Exhibitions from CMS */}
+      <section className="py-16 bg-background">
+        <div className="container mx-auto px-4">
+          <VExpoPublicList />
+        </div>
+      </section>
+
+      <Separator className="my-8" />
 
       {/* Interactive Timeline */}
       <section ref={timelineRef} className="py-16 bg-gradient-to-b from-slate-900 to-background">
