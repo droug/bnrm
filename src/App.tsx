@@ -116,6 +116,7 @@ const ThemeDetails = lazy(() => import("./pages/digital-library/ThemeDetails"));
 const AdvancedSearch = lazy(() => import("./pages/digital-library/AdvancedSearch"));
 const NewsEvents = lazy(() => import("./pages/digital-library/NewsEvents"));
 const VirtualExhibition = lazy(() => import("./pages/digital-library/VirtualExhibition"));
+const VExpo360Detail = lazy(() => import("./pages/digital-library/VExpo360Detail"));
 const NewsDetails = lazy(() => import("./pages/digital-library/NewsDetails"));
 const HelpFAQ = lazy(() => import("./pages/digital-library/HelpFAQ"));
 const MySpace = lazy(() => import("./pages/digital-library/MySpace"));
@@ -324,6 +325,7 @@ const App = () => {
           <Route path="/digital-library/news" element={<NewsEvents />} />
           <Route path="/digital-library/actualites" element={<NewsEvents />} />
           <Route path="/digital-library/exposition-virtuelle" element={<VirtualExhibition />} />
+          <Route path="/digital-library/exposition-virtuelle/:slug" element={<VExpo360Detail />} />
           <Route path="/digital-library/news/:newsId" element={<NewsDetails />} />
           <Route path="/digital-library/help" element={<HelpFAQ />} />
           <Route path="/digital-library/my-space" element={<MySpace />} />
