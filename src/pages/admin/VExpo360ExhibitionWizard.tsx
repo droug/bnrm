@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft, Save, Eye, Image, Settings, FileText, Globe } from "lucide-react";
+import { VExpoImageUpload } from "@/components/vexpo360/VExpoImageUpload";
 
 interface ExhibitionFormData {
   title_fr: string;
@@ -366,31 +367,16 @@ export default function VExpo360ExhibitionWizard() {
             <Card>
               <CardHeader>
                 <CardTitle>Image de couverture</CardTitle>
-                <CardDescription>Image principale affichée sur la carte de l'exposition</CardDescription>
+                <CardDescription>Image principale affichée sur la carte de l'exposition (recommandé: 1200x630px)</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
-                <div>
-                  <Label htmlFor="cover_image_url">URL de l'image</Label>
-                  <Input
-                    id="cover_image_url"
-                    type="url"
-                    value={formData.cover_image_url}
-                    onChange={(e) => handleChange('cover_image_url', e.target.value)}
-                    placeholder="https://example.com/image.jpg"
-                  />
-                </div>
-                {formData.cover_image_url && (
-                  <div className="mt-4">
-                    <img 
-                      src={formData.cover_image_url} 
-                      alt="Aperçu" 
-                      className="max-w-md rounded-lg border"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                  </div>
-                )}
+              <CardContent>
+                <VExpoImageUpload
+                  value={formData.cover_image_url}
+                  onChange={(url) => handleChange('cover_image_url', url)}
+                  label=""
+                  folder="covers"
+                  maxSizeMB={10}
+                />
               </CardContent>
             </Card>
           </TabsContent>
