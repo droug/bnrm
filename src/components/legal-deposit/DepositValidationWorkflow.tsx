@@ -50,6 +50,7 @@ interface DepositRequest {
 export function DepositValidationWorkflow() {
   const { user } = useAuth();
   const [requests, setRequests] = useState<DepositRequest[]>([]);
+  const [allRequests, setAllRequests] = useState<DepositRequest[]>([]); // Pour les statistiques
   const [selectedRequest, setSelectedRequest] = useState<DepositRequest | null>(null);
   const [viewDetailsRequest, setViewDetailsRequest] = useState<DepositRequest | null>(null);
   const [isViewDetailsOpen, setIsViewDetailsOpen] = useState(false);
@@ -88,12 +89,56 @@ export function DepositValidationWorkflow() {
     );
   };
 
+  // Charger toutes les demandes pour les statistiques au montage
+  useEffect(() => {
+    if (user) {
+      fetchAllRequests();
+    }
+  }, [user]);
+
   useEffect(() => {
     if (user) {
       fetchRequests();
     }
     setCurrentPage(1); // Réinitialiser la page lors du changement d'onglet
   }, [user, activeTab]);
+
+  const fetchAllRequests = async () => {
+    if (!user) return;
+
+    const { data, error } = await supabase
+      .from("legal_deposit_requests")
+      .select(`
+        id,
+        request_number,
+        title,
+        subtitle,
+        support_type,
+        monograph_type,
+        status,
+        author_name,
+        created_at,
+        metadata,
+        documents_urls,
+        validated_by_service,
+        service_validated_at,
+        service_validation_notes,
+        validated_by_department,
+        department_validated_at,
+        department_validation_notes,
+        validated_by_committee,
+        committee_validated_at,
+        committee_validation_notes,
+        rejected_by,
+        rejected_at,
+        rejection_reason
+      `)
+      .order("created_at", { ascending: false });
+
+    if (!error && data) {
+      setAllRequests(data as any);
+    }
+  };
 
   const fetchRequests = async () => {
     if (!user) return;
@@ -134,7 +179,6 @@ export function DepositValidationWorkflow() {
     } else if (activeTab === "rejected") {
       query = query.in("status", ["rejete", "rejete_par_b", "rejete_par_comite"]);
     }
-    // Pour l'onglet "statistics", on ne filtre pas - on récupère toutes les demandes
 
     const { data, error } = await query;
 
@@ -145,12 +189,10 @@ export function DepositValidationWorkflow() {
         description: "Impossible de charger les demandes",
         variant: "destructive"
       });
-      // Utiliser des exemples de données pour démonstration
       setRequests(getExampleRequests());
       return;
     }
 
-    // Afficher uniquement les données réelles
     if (data && data.length > 0) {
       setRequests(data as any);
     } else {
@@ -1462,7 +1504,7 @@ export function DepositValidationWorkflow() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold text-blue-800">
-                        {requests.filter(r => 
+                        {allRequests.filter(r => 
                           ['brouillon', 'soumis'].includes(r.status) && !r.validated_by_committee
                         ).length}
                       </div>
@@ -1476,7 +1518,7 @@ export function DepositValidationWorkflow() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold text-yellow-800">
-                        {requests.filter(r => r.status === 'en_cours').length}
+                        {allRequests.filter(r => r.status === 'en_cours').length}
                       </div>
                       <p className="text-xs text-yellow-600">demandes en cours de traitement</p>
                     </CardContent>
@@ -1488,7 +1530,7 @@ export function DepositValidationWorkflow() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold text-orange-800">
-                        {requests.filter(r => 
+                        {allRequests.filter(r => 
                           ['en_attente', 'en_attente_validation_b'].includes(r.status) || 
                           (r.validated_by_committee && !r.validated_by_department && !r.rejected_by)
                         ).length}
@@ -1503,7 +1545,7 @@ export function DepositValidationWorkflow() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold text-red-800">
-                        {requests.filter(r => 
+                        {allRequests.filter(r => 
                           ['rejete', 'rejete_par_b', 'rejete_par_comite'].includes(r.status)
                         ).length}
                       </div>
@@ -1517,7 +1559,7 @@ export function DepositValidationWorkflow() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold text-green-800">
-                        {requests.filter(r => 
+                        {allRequests.filter(r => 
                           ['valide_par_b', 'attribue'].includes(r.status)
                         ).length}
                       </div>
@@ -1534,7 +1576,7 @@ export function DepositValidationWorkflow() {
                   <CardContent>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       {['Livre', 'Périodique', 'Audio-visuel', 'Collections spéciales', 'Base de données', 'Logiciel'].map(supportType => {
-                        const count = requests.filter(r => r.support_type === supportType).length;
+                        const count = allRequests.filter(r => r.support_type === supportType).length;
                         if (count === 0) return null;
                         return (
                           <div key={supportType} className="flex items-center justify-between p-3 border rounded-lg">
@@ -1555,7 +1597,7 @@ export function DepositValidationWorkflow() {
                   <CardContent>
                     <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
                       <span className="text-lg font-medium">Total des demandes</span>
-                      <span className="text-3xl font-bold">{requests.length}</span>
+                      <span className="text-3xl font-bold">{allRequests.length}</span>
                     </div>
                   </CardContent>
                 </Card>
