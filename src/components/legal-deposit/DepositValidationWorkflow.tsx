@@ -1091,12 +1091,16 @@ export function DepositValidationWorkflow() {
 
   const getStatusBadge = (status: string) => {
     const statusConfig: any = {
-      soumis: { label: "Soumis", variant: "secondary" },
-      en_attente_validation_b: { label: "En attente ABN", variant: "default" },
-      valide_par_b: { label: "Validé", variant: "default" },
-      rejete: { label: "Rejeté", variant: "destructive" },
-      rejete_par_comite: { label: "Rejeté Comité", variant: "destructive" },
-      rejete_par_b: { label: "Rejeté ABN", variant: "destructive" },
+      brouillon: { label: "Soumise", variant: "secondary" },
+      soumis: { label: "Soumise", variant: "secondary" },
+      en_cours: { label: "En cours", variant: "default" },
+      en_attente: { label: "En attente", variant: "outline" },
+      en_attente_validation_b: { label: "En attente", variant: "outline" },
+      rejete: { label: "Rejetée", variant: "destructive" },
+      rejete_par_comite: { label: "Rejetée", variant: "destructive" },
+      rejete_par_b: { label: "Rejetée", variant: "destructive" },
+      valide_par_b: { label: "Attribuée", variant: "default" },
+      attribue: { label: "Attribuée", variant: "default" },
     };
 
     const config = statusConfig[status] || { label: status, variant: "secondary" };
