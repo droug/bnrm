@@ -11863,6 +11863,485 @@ export type Database = {
           },
         ]
       }
+      vexpo_artworks: {
+        Row: {
+          artwork_type: string | null
+          created_at: string | null
+          created_by: string | null
+          creation_date: string | null
+          creator_author: string | null
+          description_ar: string | null
+          description_fr: string | null
+          external_catalog_url: string | null
+          id: string
+          images: Json | null
+          inventory_id: string | null
+          is_active: boolean | null
+          keywords: string[] | null
+          show_visit_cta: boolean | null
+          title_ar: string | null
+          title_fr: string
+          updated_at: string | null
+          updated_by: string | null
+          visit_cta_text_ar: string | null
+          visit_cta_text_fr: string | null
+        }
+        Insert: {
+          artwork_type?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          creation_date?: string | null
+          creator_author?: string | null
+          description_ar?: string | null
+          description_fr?: string | null
+          external_catalog_url?: string | null
+          id?: string
+          images?: Json | null
+          inventory_id?: string | null
+          is_active?: boolean | null
+          keywords?: string[] | null
+          show_visit_cta?: boolean | null
+          title_ar?: string | null
+          title_fr: string
+          updated_at?: string | null
+          updated_by?: string | null
+          visit_cta_text_ar?: string | null
+          visit_cta_text_fr?: string | null
+        }
+        Update: {
+          artwork_type?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          creation_date?: string | null
+          creator_author?: string | null
+          description_ar?: string | null
+          description_fr?: string | null
+          external_catalog_url?: string | null
+          id?: string
+          images?: Json | null
+          inventory_id?: string | null
+          is_active?: boolean | null
+          keywords?: string[] | null
+          show_visit_cta?: boolean | null
+          title_ar?: string | null
+          title_fr?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          visit_cta_text_ar?: string | null
+          visit_cta_text_fr?: string | null
+        }
+        Relationships: []
+      }
+      vexpo_audit_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          entity_id: string
+          entity_title: string | null
+          entity_type: string
+          id: string
+          ip_address: unknown
+          new_values: Json | null
+          old_values: Json | null
+          user_agent: string | null
+          user_email: string | null
+          user_id: string | null
+          user_role: Database["public"]["Enums"]["vexpo_role"] | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          entity_id: string
+          entity_title?: string | null
+          entity_type: string
+          id?: string
+          ip_address?: unknown
+          new_values?: Json | null
+          old_values?: Json | null
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          user_role?: Database["public"]["Enums"]["vexpo_role"] | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          entity_id?: string
+          entity_title?: string | null
+          entity_type?: string
+          id?: string
+          ip_address?: unknown
+          new_values?: Json | null
+          old_values?: Json | null
+          user_agent?: string | null
+          user_email?: string | null
+          user_id?: string | null
+          user_role?: Database["public"]["Enums"]["vexpo_role"] | null
+        }
+        Relationships: []
+      }
+      vexpo_exhibitions: {
+        Row: {
+          archived_at: string | null
+          cover_image_url: string | null
+          created_at: string | null
+          created_by: string | null
+          cta_title_ar: string | null
+          cta_title_fr: string | null
+          end_date: string | null
+          id: string
+          intro_ar: string | null
+          intro_fr: string | null
+          location_text_ar: string | null
+          location_text_fr: string | null
+          map_link: string | null
+          meta_description_ar: string | null
+          meta_description_fr: string | null
+          meta_title_ar: string | null
+          meta_title_fr: string | null
+          opening_hours_ar: string | null
+          opening_hours_fr: string | null
+          primary_button_label_ar: string | null
+          primary_button_label_fr: string | null
+          published_at: string | null
+          published_by: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          slug: string
+          start_date: string | null
+          status: Database["public"]["Enums"]["vexpo_status"]
+          submitted_at: string | null
+          teaser_ar: string | null
+          teaser_fr: string | null
+          title_ar: string | null
+          title_fr: string
+          updated_at: string | null
+          visitor_count: number | null
+        }
+        Insert: {
+          archived_at?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          cta_title_ar?: string | null
+          cta_title_fr?: string | null
+          end_date?: string | null
+          id?: string
+          intro_ar?: string | null
+          intro_fr?: string | null
+          location_text_ar?: string | null
+          location_text_fr?: string | null
+          map_link?: string | null
+          meta_description_ar?: string | null
+          meta_description_fr?: string | null
+          meta_title_ar?: string | null
+          meta_title_fr?: string | null
+          opening_hours_ar?: string | null
+          opening_hours_fr?: string | null
+          primary_button_label_ar?: string | null
+          primary_button_label_fr?: string | null
+          published_at?: string | null
+          published_by?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          slug: string
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["vexpo_status"]
+          submitted_at?: string | null
+          teaser_ar?: string | null
+          teaser_fr?: string | null
+          title_ar?: string | null
+          title_fr: string
+          updated_at?: string | null
+          visitor_count?: number | null
+        }
+        Update: {
+          archived_at?: string | null
+          cover_image_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          cta_title_ar?: string | null
+          cta_title_fr?: string | null
+          end_date?: string | null
+          id?: string
+          intro_ar?: string | null
+          intro_fr?: string | null
+          location_text_ar?: string | null
+          location_text_fr?: string | null
+          map_link?: string | null
+          meta_description_ar?: string | null
+          meta_description_fr?: string | null
+          meta_title_ar?: string | null
+          meta_title_fr?: string | null
+          opening_hours_ar?: string | null
+          opening_hours_fr?: string | null
+          primary_button_label_ar?: string | null
+          primary_button_label_fr?: string | null
+          published_at?: string | null
+          published_by?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          slug?: string
+          start_date?: string | null
+          status?: Database["public"]["Enums"]["vexpo_status"]
+          submitted_at?: string | null
+          teaser_ar?: string | null
+          teaser_fr?: string | null
+          title_ar?: string | null
+          title_fr?: string
+          updated_at?: string | null
+          visitor_count?: number | null
+        }
+        Relationships: []
+      }
+      vexpo_hotspots: {
+        Row: {
+          artwork_id: string | null
+          caption_ar: string | null
+          caption_fr: string | null
+          created_at: string | null
+          display_order: number | null
+          hotspot_type: Database["public"]["Enums"]["vexpo_hotspot_type"]
+          icon_color: string | null
+          icon_name: string | null
+          icon_size: number | null
+          id: string
+          is_active: boolean | null
+          label_ar: string | null
+          label_fr: string | null
+          media_type: string | null
+          media_url: string | null
+          panorama_id: string
+          pitch: number
+          priority: number | null
+          rich_text_ar: string | null
+          rich_text_fr: string | null
+          show_on_mobile: boolean | null
+          target_panorama_id: string | null
+          teleport_label_ar: string | null
+          teleport_label_fr: string | null
+          updated_at: string | null
+          yaw: number
+        }
+        Insert: {
+          artwork_id?: string | null
+          caption_ar?: string | null
+          caption_fr?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          hotspot_type: Database["public"]["Enums"]["vexpo_hotspot_type"]
+          icon_color?: string | null
+          icon_name?: string | null
+          icon_size?: number | null
+          id?: string
+          is_active?: boolean | null
+          label_ar?: string | null
+          label_fr?: string | null
+          media_type?: string | null
+          media_url?: string | null
+          panorama_id: string
+          pitch: number
+          priority?: number | null
+          rich_text_ar?: string | null
+          rich_text_fr?: string | null
+          show_on_mobile?: boolean | null
+          target_panorama_id?: string | null
+          teleport_label_ar?: string | null
+          teleport_label_fr?: string | null
+          updated_at?: string | null
+          yaw: number
+        }
+        Update: {
+          artwork_id?: string | null
+          caption_ar?: string | null
+          caption_fr?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          hotspot_type?: Database["public"]["Enums"]["vexpo_hotspot_type"]
+          icon_color?: string | null
+          icon_name?: string | null
+          icon_size?: number | null
+          id?: string
+          is_active?: boolean | null
+          label_ar?: string | null
+          label_fr?: string | null
+          media_type?: string | null
+          media_url?: string | null
+          panorama_id?: string
+          pitch?: number
+          priority?: number | null
+          rich_text_ar?: string | null
+          rich_text_fr?: string | null
+          show_on_mobile?: boolean | null
+          target_panorama_id?: string | null
+          teleport_label_ar?: string | null
+          teleport_label_fr?: string | null
+          updated_at?: string | null
+          yaw?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vexpo_hotspots_artwork_id_fkey"
+            columns: ["artwork_id"]
+            isOneToOne: false
+            referencedRelation: "vexpo_artworks"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vexpo_hotspots_panorama_id_fkey"
+            columns: ["panorama_id"]
+            isOneToOne: false
+            referencedRelation: "vexpo_panoramas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vexpo_hotspots_target_panorama_id_fkey"
+            columns: ["target_panorama_id"]
+            isOneToOne: false
+            referencedRelation: "vexpo_panoramas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vexpo_panoramas: {
+        Row: {
+          auto_rotate: boolean | null
+          created_at: string | null
+          display_order: number
+          exhibition_id: string
+          id: string
+          initial_pitch: number | null
+          initial_yaw: number | null
+          is_active: boolean | null
+          max_zoom: number | null
+          min_zoom: number | null
+          name_ar: string | null
+          name_fr: string
+          panorama_image_url: string
+          panorama_webp_url: string | null
+          show_navigation_hints: boolean | null
+          thumbnail_url: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          auto_rotate?: boolean | null
+          created_at?: string | null
+          display_order?: number
+          exhibition_id: string
+          id?: string
+          initial_pitch?: number | null
+          initial_yaw?: number | null
+          is_active?: boolean | null
+          max_zoom?: number | null
+          min_zoom?: number | null
+          name_ar?: string | null
+          name_fr: string
+          panorama_image_url: string
+          panorama_webp_url?: string | null
+          show_navigation_hints?: boolean | null
+          thumbnail_url?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          auto_rotate?: boolean | null
+          created_at?: string | null
+          display_order?: number
+          exhibition_id?: string
+          id?: string
+          initial_pitch?: number | null
+          initial_yaw?: number | null
+          is_active?: boolean | null
+          max_zoom?: number | null
+          min_zoom?: number | null
+          name_ar?: string | null
+          name_fr?: string
+          panorama_image_url?: string
+          panorama_webp_url?: string | null
+          show_navigation_hints?: boolean | null
+          thumbnail_url?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vexpo_panoramas_exhibition_id_fkey"
+            columns: ["exhibition_id"]
+            isOneToOne: false
+            referencedRelation: "vexpo_exhibitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vexpo_review_comments: {
+        Row: {
+          author_id: string | null
+          author_name: string | null
+          comment_text: string
+          comment_type: string | null
+          created_at: string | null
+          exhibition_id: string
+          id: string
+          is_resolved: boolean | null
+          resolved_at: string | null
+          resolved_by: string | null
+        }
+        Insert: {
+          author_id?: string | null
+          author_name?: string | null
+          comment_text: string
+          comment_type?: string | null
+          created_at?: string | null
+          exhibition_id: string
+          id?: string
+          is_resolved?: boolean | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+        }
+        Update: {
+          author_id?: string | null
+          author_name?: string | null
+          comment_text?: string
+          comment_type?: string | null
+          created_at?: string | null
+          exhibition_id?: string
+          id?: string
+          is_resolved?: boolean | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vexpo_review_comments_exhibition_id_fkey"
+            columns: ["exhibition_id"]
+            isOneToOne: false
+            referencedRelation: "vexpo_exhibitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vexpo_user_roles: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          id: string
+          role: Database["public"]["Enums"]["vexpo_role"]
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          id?: string
+          role: Database["public"]["Enums"]["vexpo_role"]
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          id?: string
+          role?: Database["public"]["Enums"]["vexpo_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       virtual_exhibitions: {
         Row: {
           created_at: string | null
@@ -13174,6 +13653,7 @@ export type Database = {
         Args: { user_uuid: string }
         Returns: Database["public"]["Enums"]["user_role"]
       }
+      has_any_vexpo_role: { Args: { _user_id: string }; Returns: boolean }
       has_manuscript_role: {
         Args: {
           _role: Database["public"]["Enums"]["manuscript_platform_role"]
@@ -13190,6 +13670,13 @@ export type Database = {
       }
       has_system_role: {
         Args: { _role_code: string; _user_id: string }
+        Returns: boolean
+      }
+      has_vexpo_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["vexpo_role"]
+          _user_id: string
+        }
         Returns: boolean
       }
       has_workflow_permission: {
@@ -13445,6 +13932,9 @@ export type Database = {
         | "comptable"
         | "direction"
         | "read_only"
+      vexpo_hotspot_type: "artwork" | "text" | "media" | "navigation"
+      vexpo_role: "super_admin" | "editor" | "reviewer"
+      vexpo_status: "draft" | "in_review" | "published" | "archived"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -13665,6 +14155,9 @@ export const Constants = {
         "direction",
         "read_only",
       ],
+      vexpo_hotspot_type: ["artwork", "text", "media", "navigation"],
+      vexpo_role: ["super_admin", "editor", "reviewer"],
+      vexpo_status: ["draft", "in_review", "published", "archived"],
     },
   },
 } as const
