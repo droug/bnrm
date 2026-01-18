@@ -51,7 +51,7 @@ export default function Administration() {
       title: "Système de Gestion de Contenu",
       description: "CMS complet pour créer et gérer tout le contenu de la plateforme",
       icon: FileImage,
-      path: "/admin/content-management",
+      path: "/admin/content-management-BN",
       color: "bg-violet-100 text-violet-600",
     },
     {

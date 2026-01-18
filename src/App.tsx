@@ -273,7 +273,7 @@ const App = () => {
         <Route path="/access-request" element={<AccessRequest />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/admin/users" element={<UserManagement />} />
-        <Route path="/admin/content" element={<ContentManagement />} />
+        <Route path="/admin/content-management-portail-BNRM" element={<ContentManagement />} />
             <Route path="/admin/cms" element={<CmsBackoffice />} />
             <Route path="/page/:slug" element={<CmsDynamicPage />} />
           <Route path="/news" element={<News />} />
@@ -353,7 +353,7 @@ const App = () => {
         <Route path="/admin/preservation" element={<PreservationPage />} />
           <Route path="/admin/digital-library" element={<DigitalLibraryAdministration />} />
           <Route path="/digital-library/admin" element={<DigitalLibraryAdministration />} />
-          <Route path="/admin/content-management" element={<ContentManagementPage />} />
+          <Route path="/admin/content-management-BN" element={<ContentManagementPage />} />
           <Route path="/admin/digital-library/dashboard" element={<DigitalLibraryAdminDashboard />} />
           <Route path="/admin/digital-library/documents" element={<DigitalLibraryDocuments />} />
           <Route path="/admin/digital-library/users" element={<DigitalLibraryUsers />} />
