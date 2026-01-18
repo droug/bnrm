@@ -8,7 +8,7 @@ import { useAccessControl } from "@/hooks/useAccessControl";
 import { useAuth } from "@/hooks/useAuth";
 import GlobalSearchBar from "@/components/GlobalSearchBar";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
-import Footer from "@/components/Footer";
+import DigitalLibraryFooter from "@/components/digital-library/DigitalLibraryFooter";
 import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
 import logoBnrm from "@/assets/logo-bnrm.png";
 import logoDigitalLibrary from "@/assets/digital-library-logo.png";
@@ -501,8 +501,8 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
         {children}
       </main>
 
-      {/* Footer */}
-      <Footer />
+      {/* Footer BN */}
+      <DigitalLibraryFooter />
 
       {/* Outils globaux d'accessibilité et chatbot */}
       <GlobalAccessibilityTools />
