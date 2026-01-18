@@ -65,13 +65,13 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
             </div>
           </div>
           
-          {/* Title */}
-          <h2 className="font-playfair text-3xl md:text-4xl font-semibold text-bn-blue-primary mb-3">
+          {/* Title - Unified with "Ressources électroniques" style */}
+          <h2 className="heading-3 text-bn-blue-primary font-heading">
             Ibn Battouta en chiffres
           </h2>
           
           {/* Subtitle */}
-          <p className="text-slate-text max-w-2xl mx-auto text-base">
+          <p className="font-body text-regular text-muted-foreground max-w-2xl mx-auto mt-4">
             Découvrez les documents récemment ajoutés à nos collections, 
             soigneusement sélectionnés pour enrichir votre expérience.
           </p>
