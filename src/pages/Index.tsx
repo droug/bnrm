@@ -25,6 +25,8 @@ import { DigitalServicesCarousel } from "@/components/DigitalServicesCarousel";
 import { PlatformsSection } from "@/components/PlatformsSection";
 import { NewsEventsSection } from "@/components/NewsEventsSection";
 import { MediathequeSection } from "@/components/MediathequeSection";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
   const { t, language } = useLanguage();
@@ -32,6 +34,33 @@ const Index = () => {
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFilter, setSearchFilter] = useState("all");
+
+  // Fetch hero settings from CMS
+  const { data: heroSettings } = useQuery({
+    queryKey: ['cms-hero-settings-bn'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('cms_hero_settings')
+        .select('*')
+        .limit(1)
+        .maybeSingle();
+      
+      if (error) {
+        console.error('Error fetching hero settings:', error);
+        return null;
+      }
+      return data;
+    }
+  });
+
+  // Get hero image URL with fallback to static image
+  const heroImageUrl = heroSettings?.hero_image_url || bnrmBuildingNight;
+  const heroTitle = language === 'ar' 
+    ? (heroSettings?.hero_title_ar || t('header.title'))
+    : (heroSettings?.hero_title_fr || t('header.title'));
+  const heroSubtitle = language === 'ar'
+    ? (heroSettings?.hero_subtitle_ar || 'الحفاظ على التراث المخطوط المغربي وتثمينه. اكتشف آلاف المخطوطات القديمة الرقمية في إطار معماري استثنائي.')
+    : (heroSettings?.hero_subtitle_fr || 'Préservation et valorisation du patrimoine manuscrit marocain. Découvrez des milliers de manuscrits anciens numérisés dans un cadre architectural exceptionnel.');
 
   useEffect(() => {
     const hasSeenWelcome = sessionStorage.getItem('bnrm-welcome-popup-dismissed');
@@ -70,7 +99,7 @@ const Index = () => {
           <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{ 
-              backgroundImage: `url(${bnrmBuildingNight})`,
+              backgroundImage: `url(${heroImageUrl})`,
             }}
           />
           
@@ -85,15 +114,12 @@ const Index = () => {
               
               {/* Heading 2 - Main title */}
               <h1 className="heading-2 text-white mb-6">
-                {t('header.title')}
+                {heroTitle}
               </h1>
               
               {/* Text medium - Description */}
               <p className="text-medium text-white/90 mb-8 max-w-xl">
-                {language === 'ar' 
-                  ? 'الحفاظ على التراث المخطوط المغربي وتثمينه. اكتشف آلاف المخطوطات القديمة الرقمية في إطار معماري استثنائي.'
-                  : 'Préservation et valorisation du patrimoine manuscrit marocain. Découvrez des milliers de manuscrits anciens numérisés dans un cadre architectural exceptionnel.'
-                }
+                {heroSubtitle}
               </p>
               
               <div>
