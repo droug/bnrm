@@ -1,8 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Play, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { YoutubeThumbnail } from "@/components/media/YoutubeThumbnail";
 
 interface MediathequeSectionProps {
   language: string;
@@ -25,19 +26,45 @@ const defaultVideos = [
   { id: "6", youtube_id: "ILx_Ooc9TqA", title_fr: "Patrimoine marocain", title_ar: "التراث المغربي" }
 ];
 
-// YouTube thumbnail quality levels (from highest to lowest)
-const YOUTUBE_THUMBNAIL_QUALITIES = [
-  'maxresdefault', // 1280x720
-  'sddefault',     // 640x480
-  'hqdefault',     // 480x360
-  'mqdefault',     // 320x180
-  'default'        // 120x90
-];
+const extractYoutubeId = (input: string) => {
+  const raw = input.trim();
+
+  // Already an ID
+  if (/^[a-zA-Z0-9_-]{11}$/.test(raw)) return raw;
+
+  // Try parsing as URL
+  try {
+    const url = new URL(raw);
+
+    // youtu.be/<id>
+    if (url.hostname.includes("youtu.be")) {
+      const id = url.pathname.split("/").filter(Boolean)[0];
+      if (id && /^[a-zA-Z0-9_-]{11}$/.test(id)) return id;
+    }
+
+    // youtube.com/watch?v=<id>
+    const v = url.searchParams.get("v");
+    if (v && /^[a-zA-Z0-9_-]{11}$/.test(v)) return v;
+
+    // /embed/<id> or /shorts/<id>
+    const parts = url.pathname.split("/").filter(Boolean);
+    const markerIndex = parts.findIndex((p) => p === "embed" || p === "shorts");
+    if (markerIndex >= 0) {
+      const id = parts[markerIndex + 1];
+      if (id && /^[a-zA-Z0-9_-]{11}$/.test(id)) return id;
+    }
+  } catch {
+    // not a URL
+  }
+
+  // Last resort: find any 11-char token
+  const match = raw.match(/([a-zA-Z0-9_-]{11})/);
+  return match?.[1] ?? raw;
+};
 
 export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
-  const [thumbnailErrors, setThumbnailErrors] = useState<Record<string, number>>({});
 
   // Fetch videos from CMS
   const { data: cmsVideos = [], isLoading } = useQuery({
@@ -85,25 +112,6 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
     return language === 'ar' ? (video.title_ar || video.title_fr) : video.title_fr;
   };
 
-  // Get the current thumbnail URL for a video, falling back to lower quality on error
-  const getThumbnailUrl = useCallback((youtubeId: string) => {
-    const errorCount = thumbnailErrors[youtubeId] || 0;
-    const qualityIndex = Math.min(errorCount, YOUTUBE_THUMBNAIL_QUALITIES.length - 1);
-    const quality = YOUTUBE_THUMBNAIL_QUALITIES[qualityIndex];
-    return `https://img.youtube.com/vi/${youtubeId}/${quality}.jpg`;
-  }, [thumbnailErrors]);
-
-  // Handle thumbnail load error - try next quality level
-  const handleThumbnailError = useCallback((youtubeId: string) => {
-    setThumbnailErrors(prev => {
-      const currentErrors = prev[youtubeId] || 0;
-      // Only increment if we haven't tried all qualities
-      if (currentErrors < YOUTUBE_THUMBNAIL_QUALITIES.length - 1) {
-        return { ...prev, [youtubeId]: currentErrors + 1 };
-      }
-      return prev;
-    });
-  }, []);
 
   return (
     <section className="py-0 mb-12">
@@ -141,44 +149,47 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {visibleVideos.map((video) => (
-                  <div 
-                    key={video.id} 
-                    className="relative group cursor-pointer rounded-lg overflow-hidden aspect-[4/3] bg-slate-100"
-                    onClick={() => handlePlayVideo(video.youtube_id)}
-                  >
-                    {playingVideo === video.youtube_id ? (
-                      <iframe
-                        src={`https://www.youtube.com/embed/${video.youtube_id}?autoplay=1`}
-                        className="w-full h-full"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        title={getTitle(video)}
-                      />
-                    ) : (
-                      <>
-                        {/* Thumbnail */}
-                        <img 
-                          key={`${video.youtube_id}-${thumbnailErrors[video.youtube_id] || 0}`}
-                          src={getThumbnailUrl(video.youtube_id)}
-                          alt={getTitle(video)}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                          onError={() => handleThumbnailError(video.youtube_id)}
+                {visibleVideos.map((video) => {
+                  const youtubeId = extractYoutubeId(video.youtube_id);
+                  const title = getTitle(video);
+
+                  return (
+                    <div 
+                      key={video.id} 
+                      className="relative group cursor-pointer rounded-lg overflow-hidden aspect-[4/3] bg-slate-100"
+                      onClick={() => handlePlayVideo(youtubeId)}
+                    >
+                      {playingVideo === youtubeId ? (
+                        <iframe
+                          src={`https://www.youtube.com/embed/${youtubeId}?autoplay=1`}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          title={title}
                         />
-                        
-                        {/* Overlay gradient */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                        
-                        {/* Play button */}
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-14 h-14 bg-blue-primary/90 rounded-full flex items-center justify-center shadow-lg transform transition-transform group-hover:scale-110">
-                            <Play className="h-6 w-6 text-white fill-white ml-1" />
+                      ) : (
+                        <>
+                          {/* Thumbnail */}
+                          <YoutubeThumbnail
+                            youtubeId={youtubeId}
+                            alt={title}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          />
+
+                          {/* Overlay gradient */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+
+                          {/* Play button */}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-14 h-14 bg-blue-primary/90 rounded-full flex items-center justify-center shadow-lg transform transition-transform group-hover:scale-110">
+                              <Play className="h-6 w-6 text-white fill-white ml-1" />
+                            </div>
                           </div>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                ))}
+                        </>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
