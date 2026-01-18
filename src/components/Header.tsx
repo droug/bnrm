@@ -500,12 +500,12 @@ const Header = () => {
                   <span>{t('nav.services')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-2 p-4 w-[650px] lg:grid-cols-2 bg-popover border border-slate-border shadow-xl">
+                  <div className="grid gap-2 p-4 w-[650px] lg:grid-cols-2 bg-white border border-slate-border shadow-xl">
                     <div className="space-y-1">
                       <h4 className="text-base font-bold text-blue-primary-dark mb-2">{menuData.services.userServices.title[language]}</h4>
                       {menuData.services.userServices.items.map((item, idx) => (
                         <NavigationMenuLink key={idx} asChild>
-                          <Link to={item.href} className="block p-3 text-base font-medium text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded border-l-2 border-transparent hover:border-blue-primary-dark">
+                          <Link to={item.href} className="block p-3 text-base font-medium text-foreground hover:bg-blue-light hover:text-blue-primary-dark rounded border-l-2 border-transparent hover:border-blue-primary-dark transition-colors">
                             <div className="font-semibold">{item.title[language]}</div>
                             <div className="text-xs text-muted-foreground mt-1">{item.desc[language]}</div>
                           </Link>
@@ -516,7 +516,7 @@ const Header = () => {
                       <h4 className="text-base font-bold text-blue-primary-dark mb-2">{menuData.services.specializedServices.title[language]}</h4>
                       {menuData.services.specializedServices.items.map((item, idx) => (
                         <NavigationMenuLink key={idx} asChild>
-                          <Link to={item.href} className="block p-3 text-base font-medium text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded border-l-2 border-transparent hover:border-blue-primary-dark">
+                          <Link to={item.href} className="block p-3 text-base font-medium text-foreground hover:bg-blue-light hover:text-blue-primary-dark rounded border-l-2 border-transparent hover:border-blue-primary-dark transition-colors">
                             <div className="font-semibold">{item.title[language]}</div>
                             <div className="text-xs text-muted-foreground mt-1">{item.desc[language]}</div>
                           </Link>
