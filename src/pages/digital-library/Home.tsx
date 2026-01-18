@@ -1,4 +1,4 @@
-// Force cache regeneration: v3 - 2026-01-18
+// Force cache regeneration: v4 - 2026-01-18
 import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
@@ -11,6 +11,7 @@ import SEOHead from "@/components/seo/SEOHead";
 import SEOImage from "@/components/seo/SEOImage";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { ReservationRequestDialog } from "@/components/digital-library/ReservationRequestDialog";
+import { LatestAdditionsSection } from "@/components/digital-library/LatestAdditionsSection";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import Autoplay from "embla-carousel-autoplay";
@@ -525,56 +526,12 @@ export default function DigitalLibraryHome() {
         </div>
       </section>
 
-      {/* Latest Additions */}
-      <section className="container mx-auto px-4 py-12">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-          <h2 className="text-3xl font-bold text-foreground flex items-center gap-2">
-              <Sparkles className="h-8 w-8 text-gold-bn-primary" />
-              {t('dl.home.latestAdditions')}
-            </h2>
-            <p className="text-muted-foreground mt-1">{t('dl.home.recentlyAdded')}</p>
-          </div>
-          <Link to="/digital-library/search?sort=recent">
-            <Button variant="outline" className="border-gold-bn-primary text-bn-blue-primary hover:bg-gold-bn-surface">{t('dl.home.viewAll')}</Button>
-          </Link>
-        </div>
-
-        {!loading && newItems.length > 0 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {newItems.map((item) => (
-              <Card key={item.id} className="hover:shadow-lg transition-shadow flex flex-col h-full">
-                <CardHeader className="flex-1">
-                  <div className="aspect-[3/4] rounded-lg mb-4 overflow-hidden">
-                    <img 
-                      src={item.thumbnail} 
-                      alt={item.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <Badge variant="secondary" className="w-fit mb-2">{item.type}</Badge>
-                  <CardTitle className="text-lg line-clamp-2">{item.title}</CardTitle>
-                  <CardDescription>{item.author}</CardDescription>
-                </CardHeader>
-                <CardContent className="mt-auto pt-0">
-                  <Button 
-                    className="w-full bg-gradient-to-r from-gold-bn-primary to-gold-bn-primary-dark hover:from-gold-bn-primary-dark hover:to-gold-bn-deep text-white shadow-lg hover:shadow-xl transition-all duration-300" 
-                    onClick={() => handleConsultDocument(item)}
-                  >
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    {t('dl.home.consult')}
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-        {!loading && newItems.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">{t('dl.home.noRecentDocuments')}</p>
-          </div>
-        )}
-      </section>
+      {/* Latest Additions - Reference Design */}
+      <LatestAdditionsSection 
+        items={newItems}
+        loading={loading}
+        onConsultDocument={handleConsultDocument}
+      />
 
       {/* Featured Collections */}
       <section className="bg-muted/30 py-12">
