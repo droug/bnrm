@@ -16,87 +16,86 @@ Enhanced Moroccan Heritage Design System
 
 @layer base {
   :root {
-    /* === BNRM OFFICIAL COLOR PALETTE === */
-    /* Based on official brand guidelines - Burgundy, Gold, Green (Moroccan heritage) */
+    /* === BN OFFICIAL COLOR PALETTE === */
+    /* Based on official design system: Blue, Gold, White (Page d'accueil BN) */
     
-    /* Slate Family - Neutral surfaces */
-    --slate-surface: 210 40% 98%; /* #F8FAFC */
-    --slate-light: 214 32% 96%; /* #F1F5F9 */
-    --slate-border: 214 32% 91%; /* #E2E8F0 */
-    --slate-text-light: 215 16% 65%; /* #94A3B8 */
-    --slate-text: 215 20% 47%; /* #64748B */
-    --slate-base: 217 23% 27%; /* #334155 */
-    --slate-base-dark: 217 33% 17%; /* #1E293B */
+    /* Blue Family - Primary brand colors (from reference) */
+    --blue-surface: 216 33% 97%;     /* #F4F6F8 */
+    --blue-light: 209 41% 87%;       /* #D9E1E8 */
+    --blue-light-alt: 207 31% 75%;   /* #BFCAD4 */
+    --blue-soft: 206 23% 65%;        /* #A5B3C0 */
+    --blue-primary-light: 206 21% 50%; /* #8093A8 */
+    --blue-primary: 208 28% 28%;     /* #33475C - Official BN Blue Primary */
+    --blue-primary-dark: 208 34% 20%; /* #253241 */
+    --blue-deep: 209 37% 16%;        /* #1B2735 */
+    --blue-deep-alt: 210 40% 13%;    /* #151E2A */
+    --blue-dark: 212 45% 10%;        /* #0E151E */
+    --blue-shadow: 213 53% 5%;       /* #070C12 */
     
-    /* Burgundy Family - Primary brand colors (Moroccan heritage) */
-    --burgundy-surface: 345 30% 97%; /* Light burgundy surface */
-    --burgundy-light: 345 40% 90%; /* Light burgundy */
-    --burgundy-soft: 345 50% 70%; /* Soft burgundy */
-    --burgundy-primary: 345 70% 30%; /* #8B1538 - Official BNRM Burgundy */
-    --burgundy-primary-dark: 345 75% 25%; /* Darker variant */
-    --burgundy-deep: 345 80% 20%; /* Deep variant */
-    --burgundy-dark: 345 85% 15%; /* Dark variant */
+    /* Gold Family - Accent colors (from reference) */
+    --gold-surface: 49 100% 96%;     /* #FFFBEA */
+    --gold-light: 50 100% 87%;       /* #FFF3C4 */
+    --gold-light-alt: 48 100% 77%;   /* #FFE28A */
+    --gold-soft: 47 100% 65%;        /* #FFD54F */
+    --gold-primary-light: 43 97% 58%; /* #FBC02D */
+    --gold-primary: 43 65% 52%;      /* #D4AF37 - Official BN Gold Primary */
+    --gold-primary-dark: 40 87% 38%; /* #B8860B */
+    --gold-deep: 38 100% 29%;        /* #946200 */
+    --gold-deep-alt: 36 100% 23%;    /* #755100 */
+    --gold-dark: 33 100% 18%;        /* #5C3B00 */
+    --gold-shadow: 30 100% 11%;      /* #3B2700 */
     
-    /* Gold Family - Accent colors (Moroccan heritage) */
-    --gold-surface: 45 100% 95%; /* Light gold surface */
-    --gold-light: 45 90% 80%; /* Light gold */
-    --gold-soft: 45 80% 55%; /* Soft gold */
-    --gold-primary: 45 85% 45%; /* Rich gold */
-    --gold-primary-dark: 40 90% 40%; /* Dark gold */
-    --gold-deep: 38 85% 35%; /* Deep gold */
-    --gold-dark: 35 80% 25%; /* Dark gold */
-    
-    /* Green Family - Secondary accent (Moroccan flag) */
-    --morocco-green: 145 60% 30%; /* Moroccan green */
+    /* Morocco Green - Secondary accent (Moroccan flag) */
+    --morocco-green: 145 60% 30%;
     --morocco-green-light: 145 50% 45%;
     
-    /* Semantic tokens mapped to BNRM palette - DIRECT HSL VALUES */
-    --background: 210 40% 98%;
-    --foreground: 217 33% 17%;
+    /* Semantic tokens mapped to BN palette - DIRECT HSL VALUES */
+    --background: 0 0% 100%;         /* Pure white */
+    --foreground: 208 28% 28%;       /* Blue Primary */
 
-    --card: 214 32% 96%;
-    --card-foreground: 217 33% 17%;
+    --card: 0 0% 100%;               /* White cards */
+    --card-foreground: 208 28% 28%;
 
-    --popover: 214 32% 96%;
-    --popover-foreground: 217 33% 17%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 208 28% 28%;
 
-    /* Primary: Official BNRM Burgundy - DIRECT HSL */
-    --primary: 345 70% 30%;
+    /* Primary: Official BN Blue - DIRECT HSL */
+    --primary: 208 28% 28%;          /* #33475C */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 345 50% 70%;
-    --primary-deep: 345 80% 20%;
+    --primary-glow: 206 23% 65%;
+    --primary-deep: 209 37% 16%;
 
     /* Secondary: Gold tones for warmth */
-    --secondary: 45 90% 80%;
-    --secondary-foreground: 217 33% 17%;
-    --secondary-warm: 45 80% 55%;
+    --secondary: 50 100% 87%;
+    --secondary-foreground: 208 28% 28%;
+    --secondary-warm: 43 65% 52%;
 
-    /* Muted: Slate neutral tones */
-    --muted: 214 32% 96%;
-    --muted-foreground: 215 20% 47%;
+    /* Muted: Light blue tones */
+    --muted: 216 33% 97%;
+    --muted-foreground: 206 23% 65%;
 
     /* Accent: Gold for emphasis */
-    --accent: 45 85% 45%;
-    --accent-foreground: 217 33% 17%;
-    --accent-glow: 45 80% 55%;
-    --accent-bright: 40 90% 40%;
+    --accent: 43 65% 52%;            /* #D4AF37 */
+    --accent-foreground: 0 0% 100%;
+    --accent-glow: 47 100% 65%;
+    --accent-bright: 43 97% 58%;
 
     /* Highlight: Deep gold */
-    --highlight: 38 85% 35%;
+    --highlight: 38 100% 29%;
     --highlight-foreground: 0 0% 100%;
-    --highlight-deep: 35 80% 25%;
+    --highlight-deep: 33 100% 18%;
 
     /* Gold: Heritage colors */
-    --gold: 45 80% 55%;
-    --gold-foreground: 217 33% 17%;
-    --gold-bright: 45 85% 45%;
+    --gold: 43 65% 52%;
+    --gold-foreground: 0 0% 100%;
+    --gold-bright: 43 97% 58%;
 
-    /* Coral: Legacy support - mapped to burgundy */
-    --coral: 345 50% 70%;
-    --coral-foreground: 0 0% 100%;
+    /* Coral: Legacy support - mapped to gold-light */
+    --coral: 48 100% 77%;
+    --coral-foreground: 208 28% 28%;
 
-    /* Royal: Legacy support - mapped to burgundy */
-    --royal: 345 75% 25%;
+    /* Royal: Legacy support - mapped to blue-deep */
+    --royal: 209 37% 16%;
     --royal-foreground: 0 0% 100%;
     
     /* Header specific colors */
@@ -397,117 +396,131 @@ Enhanced Moroccan Heritage Design System
     font-family: 'Noto Sans Tifinagh', 'Arial Unicode MS', sans-serif;
   }
 
-  /* === BNRM Typography System === */
-  /* Heading 1: Desktop 72px/4.5rem, Mobile 44px/2.75rem, Line-height 120% */
+  /* === BN Typography System (from reference) === */
+  /* Heading Typeface: Playfair Display | Body Typeface: Inter */
+  
+  /* Heading 1: Desktop 60px/3.75rem, Mobile 44px/2.75rem, Line-height 120% */
   .heading-1 {
+    font-family: 'Playfair Display', Georgia, serif;
     font-size: 2.75rem;
     line-height: 1.2;
     font-weight: 700;
   }
   @media (min-width: 768px) {
     .heading-1 {
-      font-size: 4.5rem;
+      font-size: 3.75rem;
     }
   }
 
-  /* Heading 2: Desktop 52px/3.25rem, Mobile 40px/2.5rem, Line-height 120% */
+  /* Heading 2: Desktop 48px/3rem, Mobile 32px/2rem, Line-height 120% */
   .heading-2 {
-    font-size: 2.5rem;
-    line-height: 1.2;
-    font-weight: 700;
-  }
-  @media (min-width: 768px) {
-    .heading-2 {
-      font-size: 3.25rem;
-    }
-  }
-
-  /* Heading 3: Desktop 44px/2.75rem, Mobile 32px/2rem, Line-height 120% */
-  .heading-3 {
+    font-family: 'Playfair Display', Georgia, serif;
     font-size: 2rem;
     line-height: 1.2;
     font-weight: 700;
   }
   @media (min-width: 768px) {
-    .heading-3 {
-      font-size: 2.75rem;
+    .heading-2 {
+      font-size: 3rem;
     }
   }
 
-  /* Heading 4: Desktop 36px/2.25rem, Mobile 24px/1.5rem, Line-height 130% */
-  .heading-4 {
+  /* Heading 3: Desktop 40px/2.5rem, Mobile 24px/1.5rem, Line-height 120% */
+  .heading-3 {
+    font-family: 'Playfair Display', Georgia, serif;
     font-size: 1.5rem;
-    line-height: 1.3;
+    line-height: 1.2;
+    font-weight: 700;
+  }
+  @media (min-width: 768px) {
+    .heading-3 {
+      font-size: 2.5rem;
+    }
+  }
+
+  /* Heading 4: Desktop 32px/2rem, Mobile 20px/1.25rem, Line-height 120% */
+  .heading-4 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.25rem;
+    line-height: 1.2;
     font-weight: 700;
   }
   @media (min-width: 768px) {
     .heading-4 {
-      font-size: 2.25rem;
+      font-size: 2rem;
     }
   }
 
-  /* Heading 5: Desktop 28px/1.75rem, Mobile 20px/1.25rem, Line-height 140% */
+  /* Heading 5: Desktop 26px/1.625rem, Mobile 18px/1.125rem, Line-height 120% */
   .heading-5 {
-    font-size: 1.25rem;
-    line-height: 1.4;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 1.125rem;
+    line-height: 1.2;
     font-weight: 700;
   }
   @media (min-width: 768px) {
     .heading-5 {
-      font-size: 1.75rem;
+      font-size: 1.625rem;
     }
   }
 
-  /* Heading 6: Desktop 22px/1.375rem, Mobile 18px/1.125rem, Line-height 140% */
+  /* Heading 6: Desktop 16px/1rem, Mobile 14px/0.875rem, Line-height 150% */
   .heading-6 {
-    font-size: 1.125rem;
-    line-height: 1.4;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 0.875rem;
+    line-height: 1.5;
     font-weight: 700;
   }
   @media (min-width: 768px) {
     .heading-6 {
-      font-size: 1.375rem;
+      font-size: 1rem;
     }
   }
 
-  /* Tagline: 16px/1rem, Line-height 150% */
+  /* Tagline: Uppercase, tracking wide */
   .tagline {
-    font-size: 1rem;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.875rem;
     line-height: 1.5;
     font-weight: 600;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.1em;
   }
 
-  /* Text sizes with weights */
-  /* Text large: 22px/1.375rem, Line-height 150% */
+  /* Text sizes with weights (Body: Inter) */
+  /* Text large: Desktop 26px/1.625rem, Line-height 160% */
   .text-large {
-    font-size: 1.375rem;
-    line-height: 1.5;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 1.625rem;
+    line-height: 1.6;
   }
 
-  /* Text medium: 18px/1.125rem, Line-height 150% */
+  /* Text medium: Desktop 20px/1.25rem, Line-height 160% */
   .text-medium {
-    font-size: 1.125rem;
-    line-height: 1.5;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 1.25rem;
+    line-height: 1.6;
   }
 
-  /* Text regular: 16px/1rem, Line-height 150% */
+  /* Text regular: Desktop 18px/1.125rem, Line-height 160% */
   .text-regular {
-    font-size: 1rem;
-    line-height: 1.5;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 1.125rem;
+    line-height: 1.6;
   }
 
-  /* Text small: 14px/0.875rem, Line-height 150% */
+  /* Text small: Desktop 16px/1rem, Line-height 160% */
   .text-small {
-    font-size: 0.875rem;
-    line-height: 1.5;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 1rem;
+    line-height: 1.6;
   }
 
-  /* Text tiny: 12px/0.75rem, Line-height 150% */
+  /* Text tiny: Desktop 12px/0.75rem, Line-height 160% */
   .text-tiny {
+    font-family: 'Inter', system-ui, sans-serif;
     font-size: 0.75rem;
-    line-height: 1.5;
+    line-height: 1.6;
   }
 
   /* Font weight utilities */

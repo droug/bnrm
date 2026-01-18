@@ -14,64 +14,67 @@ export default {
     },
     extend: {
       fontFamily: {
-        // BNRM Official Typography - French: Times New Roman, Georgia (serif with empattements)
-        'serif': ['Georgia', 'Times New Roman', 'serif'],
-        'french': ['Georgia', 'Times New Roman', 'serif'],
-        'sans': ['system-ui', '-apple-system', 'sans-serif'],
-        // BNRM Official Typography - Arabic: Traditional calligraphy
+        // BN Official Typography - Headings: Playfair Display, Body: Inter
+        'serif': ['Playfair Display', 'Georgia', 'Times New Roman', 'serif'],
+        'heading': ['Playfair Display', 'Georgia', 'serif'],
+        'sans': ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        'body': ['Inter', 'system-ui', 'sans-serif'],
+        'french': ['Playfair Display', 'Georgia', 'serif'],
+        // BN Official Typography - Arabic: Traditional calligraphy
         'arabic': ['Amiri', 'Noto Naskh Arabic', 'Noto Sans Arabic', 'serif'],
-        'moroccan': ['Georgia', 'Amiri', 'serif'],
-        'elegant': ['Georgia', 'Times New Roman', 'serif'],
+        'moroccan': ['Playfair Display', 'Amiri', 'serif'],
+        'elegant': ['Playfair Display', 'Georgia', 'serif'],
       },
       fontSize: {
-        // BNRM Typography Scale
-        'heading-1': ['4.5rem', { lineHeight: '1.2' }],
-        'heading-1-mobile': ['2.75rem', { lineHeight: '1.2' }],
-        'heading-2': ['3.25rem', { lineHeight: '1.2' }],
-        'heading-2-mobile': ['2.5rem', { lineHeight: '1.2' }],
-        'heading-3': ['2.75rem', { lineHeight: '1.2' }],
-        'heading-3-mobile': ['2rem', { lineHeight: '1.2' }],
-        'heading-4': ['2.25rem', { lineHeight: '1.3' }],
-        'heading-4-mobile': ['1.5rem', { lineHeight: '1.3' }],
-        'heading-5': ['1.75rem', { lineHeight: '1.4' }],
-        'heading-5-mobile': ['1.25rem', { lineHeight: '1.4' }],
-        'heading-6': ['1.375rem', { lineHeight: '1.4' }],
-        'heading-6-mobile': ['1.125rem', { lineHeight: '1.4' }],
-        'tagline': ['1rem', { lineHeight: '1.5', letterSpacing: '0.05em' }],
-        'text-large': ['1.375rem', { lineHeight: '1.5' }],
-        'text-medium': ['1.125rem', { lineHeight: '1.5' }],
-        'text-regular': ['1rem', { lineHeight: '1.5' }],
-        'text-small': ['0.875rem', { lineHeight: '1.5' }],
-        'text-tiny': ['0.75rem', { lineHeight: '1.5' }],
+        // BN Typography Scale (from reference)
+        // Desktop sizes | Mobile sizes
+        'heading-1': ['3.75rem', { lineHeight: '1.2' }],      // 60px desktop
+        'heading-1-mobile': ['2.75rem', { lineHeight: '1.2' }], // 44px mobile
+        'heading-2': ['3rem', { lineHeight: '1.2' }],         // 48px desktop
+        'heading-2-mobile': ['2rem', { lineHeight: '1.2' }],  // 32px mobile
+        'heading-3': ['2.5rem', { lineHeight: '1.2' }],       // 40px desktop
+        'heading-3-mobile': ['1.5rem', { lineHeight: '1.2' }], // 24px mobile
+        'heading-4': ['2rem', { lineHeight: '1.2' }],         // 32px desktop
+        'heading-4-mobile': ['1.25rem', { lineHeight: '1.2' }], // 20px mobile
+        'heading-5': ['1.625rem', { lineHeight: '1.2' }],     // 26px desktop
+        'heading-5-mobile': ['1.125rem', { lineHeight: '1.2' }], // 18px mobile
+        'heading-6': ['1rem', { lineHeight: '1.5' }],         // 16px desktop
+        'heading-6-mobile': ['0.875rem', { lineHeight: '1.5' }], // 14px mobile
+        'tagline': ['0.875rem', { lineHeight: '1.5', letterSpacing: '0.1em' }],
+        // Body text sizes (line-height 160%)
+        'text-large': ['1.625rem', { lineHeight: '1.6' }],    // 26px
+        'text-medium': ['1.25rem', { lineHeight: '1.6' }],    // 20px
+        'text-regular': ['1.125rem', { lineHeight: '1.6' }],  // 18px
+        'text-small': ['1rem', { lineHeight: '1.6' }],        // 16px
+        'text-tiny': ['0.75rem', { lineHeight: '1.6' }],      // 12px
       },
       colors: {
-        // BNRM Official Color Families
-        slate: {
-          surface: "hsl(var(--slate-surface))",
-          light: "hsl(var(--slate-light))",
-          border: "hsl(var(--slate-border))",
-          'text-light': "hsl(var(--slate-text-light))",
-          text: "hsl(var(--slate-text))",
-          base: "hsl(var(--slate-base))",
-          'base-dark': "hsl(var(--slate-base-dark))",
+        // BN Official Color Families
+        blue: {
+          surface: "hsl(var(--blue-surface))",
+          light: "hsl(var(--blue-light))",
+          'light-alt': "hsl(var(--blue-light-alt))",
+          soft: "hsl(var(--blue-soft))",
+          'primary-light': "hsl(var(--blue-primary-light))",
+          primary: "hsl(var(--blue-primary))",
+          'primary-dark': "hsl(var(--blue-primary-dark))",
+          deep: "hsl(var(--blue-deep))",
+          'deep-alt': "hsl(var(--blue-deep-alt))",
+          dark: "hsl(var(--blue-dark))",
+          shadow: "hsl(var(--blue-shadow))",
         },
-        burgundy: {
-          surface: "hsl(var(--burgundy-surface))",
-          light: "hsl(var(--burgundy-light))",
-          soft: "hsl(var(--burgundy-soft))",
-          primary: "hsl(var(--burgundy-primary))",
-          'primary-dark': "hsl(var(--burgundy-primary-dark))",
-          deep: "hsl(var(--burgundy-deep))",
-          dark: "hsl(var(--burgundy-dark))",
-        },
-        'gold-bnrm': {
+        'gold-bn': {
           surface: "hsl(var(--gold-surface))",
           light: "hsl(var(--gold-light))",
+          'light-alt': "hsl(var(--gold-light-alt))",
           soft: "hsl(var(--gold-soft))",
+          'primary-light': "hsl(var(--gold-primary-light))",
           primary: "hsl(var(--gold-primary))",
           'primary-dark': "hsl(var(--gold-primary-dark))",
           deep: "hsl(var(--gold-deep))",
+          'deep-alt': "hsl(var(--gold-deep-alt))",
           dark: "hsl(var(--gold-dark))",
+          shadow: "hsl(var(--gold-shadow))",
         },
         'morocco-green': "hsl(var(--morocco-green))",
         border: "hsl(var(--border))",
