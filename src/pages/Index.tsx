@@ -35,22 +35,26 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFilter, setSearchFilter] = useState("all");
 
-  // Fetch hero settings from CMS
+  // Fetch hero settings from CMS (always take the latest row)
   const { data: heroSettings } = useQuery({
-    queryKey: ['cms-hero-settings-bn'],
+    queryKey: ["cms-hero-settings-bn"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('cms_hero_settings')
-        .select('*')
-        .limit(1)
-        .maybeSingle();
-      
+        .from("cms_hero_settings")
+        .select("*")
+        .order("updated_at", { ascending: false })
+        .limit(1);
+
       if (error) {
-        console.error('Error fetching hero settings:', error);
+        console.error("Error fetching hero settings:", error);
         return null;
       }
-      return data;
-    }
+
+      return data?.[0] ?? null;
+    },
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+    refetchOnMount: "always",
   });
 
   // Get hero image URL with fallback to static image

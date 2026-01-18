@@ -111,8 +111,16 @@ export default function CmsHeroManager() {
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['hero-settings'] });
-      toast({ title: "Paramètres Hero sauvegardés", description: "Les modifications seront visibles sur le portail." });
+      // Refresh admin form + all public pages that consume cms_hero_settings
+      queryClient.invalidateQueries({ queryKey: ["hero-settings"] });
+      queryClient.invalidateQueries({ queryKey: ["cms-hero-settings-bn"] });
+      queryClient.invalidateQueries({ queryKey: ["cms-hero-settings-digital-library"] });
+      queryClient.invalidateQueries({ queryKey: ["cms-hero-settings-digital-library-home"] });
+
+      toast({
+        title: "Paramètres Hero sauvegardés",
+        description: "Les modifications seront visibles sur le portail.",
+      });
     },
     onError: (error: any) => {
       toast({ title: "Erreur", description: error.message, variant: "destructive" });
