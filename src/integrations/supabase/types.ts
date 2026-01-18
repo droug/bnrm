@@ -2203,6 +2203,7 @@ export type Database = {
           hero_title_ar: string | null
           hero_title_fr: string | null
           id: string
+          platform: string
           updated_at: string
         }
         Insert: {
@@ -2219,6 +2220,7 @@ export type Database = {
           hero_title_ar?: string | null
           hero_title_fr?: string | null
           id?: string
+          platform?: string
           updated_at?: string
         }
         Update: {
@@ -2235,6 +2237,7 @@ export type Database = {
           hero_title_ar?: string | null
           hero_title_fr?: string | null
           id?: string
+          platform?: string
           updated_at?: string
         }
         Relationships: []

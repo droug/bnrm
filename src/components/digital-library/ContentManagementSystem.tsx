@@ -10,7 +10,7 @@ import CmsMenusManager from "@/components/cms/CmsMenusManager";
 import CmsBannersManager from "@/components/cms/CmsBannersManager";
 import CmsFooterManager from "@/components/cms/CmsFooterManager";
 import CmsSectionsManager from "@/components/cms/CmsSectionsManager";
-import CmsHeroManager from "@/components/cms/CmsHeroManager";
+import CmsHeroManagerBN from "@/components/cms/CmsHeroManagerBN";
 import FeaturedWorksManager from "@/components/admin/FeaturedWorksManager";
 import { 
   Sparkles, 
@@ -259,7 +259,7 @@ export default function ContentManagementSystem() {
   const renderContent = () => {
     switch (activeTab) {
       case "hero":
-        return <CmsHeroManager />;
+        return <CmsHeroManagerBN />;
       case "carrousel-bn":
         return <FeaturedWorksManager />;
       case "collections":
