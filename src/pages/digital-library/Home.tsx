@@ -830,9 +830,9 @@ export default function DigitalLibraryHome() {
                         href="https://www.brill.com" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 mt-6 px-6 py-2 border border-gray-300 rounded-full text-sm text-gray-600 hover:border-bn-gold hover:text-bn-gold transition-colors"
+                        className="inline-flex items-center gap-2 mt-6 px-5 py-2 border border-gray-200 rounded-full text-sm text-gray-500 hover:border-bn-blue hover:text-bn-blue transition-colors group"
                       >
-                        Explorer <span className="text-xs">▶</span>
+                        Explorer <span className="text-bn-gold group-hover:text-bn-blue transition-colors">▷</span>
                       </a>
                     </CardContent>
                   </Card>
@@ -855,9 +855,9 @@ export default function DigitalLibraryHome() {
                         href="https://www.ebsco.com" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 mt-6 px-6 py-2 border border-gray-300 rounded-full text-sm text-gray-600 hover:border-bn-gold hover:text-bn-gold transition-colors"
+                        className="inline-flex items-center gap-2 mt-6 px-5 py-2 border border-gray-200 rounded-full text-sm text-gray-500 hover:border-bn-blue hover:text-bn-blue transition-colors group"
                       >
-                        Explorer <span className="text-xs">▶</span>
+                        Explorer <span className="text-bn-gold group-hover:text-bn-blue transition-colors">▷</span>
                       </a>
                     </CardContent>
                   </Card>
@@ -898,9 +898,9 @@ export default function DigitalLibraryHome() {
                         href="https://www.cairn.info" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 mt-6 px-6 py-2 border border-gray-300 rounded-full text-sm text-gray-600 hover:border-bn-gold hover:text-bn-gold transition-colors"
+                        className="inline-flex items-center gap-2 mt-6 px-5 py-2 border border-gray-200 rounded-full text-sm text-gray-500 hover:border-bn-blue hover:text-bn-blue transition-colors group"
                       >
-                        Explorer <span className="text-xs">▶</span>
+                        Explorer <span className="text-bn-gold group-hover:text-bn-blue transition-colors">▷</span>
                       </a>
                     </CardContent>
                   </Card>
@@ -923,9 +923,9 @@ export default function DigitalLibraryHome() {
                         href="https://rfnum.org" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 mt-6 px-6 py-2 border border-gray-300 rounded-full text-sm text-gray-600 hover:border-bn-gold hover:text-bn-gold transition-colors"
+                        className="inline-flex items-center gap-2 mt-6 px-5 py-2 border border-gray-200 rounded-full text-sm text-gray-500 hover:border-bn-blue hover:text-bn-blue transition-colors group"
                       >
-                        Explorer <span className="text-xs">▶</span>
+                        Explorer <span className="text-bn-gold group-hover:text-bn-blue transition-colors">▷</span>
                       </a>
                     </CardContent>
                   </Card>
@@ -948,9 +948,9 @@ export default function DigitalLibraryHome() {
                         href="https://www.europeana.eu" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 mt-6 px-6 py-2 border border-gray-300 rounded-full text-sm text-gray-600 hover:border-bn-gold hover:text-bn-gold transition-colors"
+                        className="inline-flex items-center gap-2 mt-6 px-5 py-2 border border-gray-200 rounded-full text-sm text-gray-500 hover:border-bn-blue hover:text-bn-blue transition-colors group"
                       >
-                        Explorer <span className="text-xs">▶</span>
+                        Explorer <span className="text-bn-gold group-hover:text-bn-blue transition-colors">▷</span>
                       </a>
                     </CardContent>
                   </Card>
@@ -973,9 +973,9 @@ export default function DigitalLibraryHome() {
                         href="https://www.ifla.org" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 mt-6 px-6 py-2 border border-gray-300 rounded-full text-sm text-gray-600 hover:border-bn-gold hover:text-bn-gold transition-colors"
+                        className="inline-flex items-center gap-2 mt-6 px-5 py-2 border border-gray-200 rounded-full text-sm text-gray-500 hover:border-bn-blue hover:text-bn-blue transition-colors group"
                       >
-                        Explorer <span className="text-xs">▶</span>
+                        Explorer <span className="text-bn-gold group-hover:text-bn-blue transition-colors">▷</span>
                       </a>
                     </CardContent>
                   </Card>
