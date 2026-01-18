@@ -69,13 +69,13 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
             </div>
           </div>
           
-          {/* Title in Playfair Display with gold underline */}
-          <h2 className="font-playfair text-3xl md:text-4xl font-semibold text-gold-bn-primary mb-3">
+          {/* Title - Unified with "Ressources électroniques" style */}
+          <h2 className="heading-3 text-bn-blue-primary font-heading">
             {t('dl.home.latestAdditions')}
           </h2>
           
-          {/* Subtitle in muted text */}
-          <p className="text-slate-text max-w-2xl mx-auto text-base">
+          {/* Subtitle */}
+          <p className="font-body text-regular text-muted-foreground max-w-2xl mx-auto mt-4">
             {t('dl.home.recentlyAdded')}
           </p>
         </div>
