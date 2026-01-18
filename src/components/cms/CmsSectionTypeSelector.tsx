@@ -73,6 +73,24 @@ const sectionTypes = [
     icon: '📈',
     label: 'Blocs de Stats',
     description: 'Statistiques ou chiffres clés'
+  },
+  {
+    type: 'ibnBattoutaStats',
+    icon: '📚',
+    label: 'Ibn Battouta Stats',
+    description: 'Section statistiques Bibliothèque Numérique'
+  },
+  {
+    type: 'mediatheque',
+    icon: '🎬',
+    label: 'Médiathèque',
+    description: 'Carrousel de vidéos YouTube'
+  },
+  {
+    type: 'electronicResources',
+    icon: '🌐',
+    label: 'Ressources Électroniques',
+    description: 'Liens vers ressources en ligne'
   }
 ];
 
