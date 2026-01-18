@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ElementType } from "react";
-import { ChevronLeft, ChevronRight, BookOpen, Newspaper, Image, Grid3X3 } from "lucide-react";
+import { BookOpen, Newspaper, Image, Grid3X3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Link } from "react-router-dom";
@@ -54,14 +54,14 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-12">
-          {/* Gold Grid Icon */}
+          {/* Gold Grid Icon - outlined box */}
           <div className="flex justify-center mb-6">
             <div className="w-12 h-12 rounded-lg border border-gold-bn-primary flex items-center justify-center">
               <Grid3X3 className="h-6 w-6 text-gold-bn-primary" strokeWidth={1.5} />
             </div>
           </div>
           
-          {/* Title */}
+          {/* Title - Dark blue Playfair */}
           <h2 className="heading-3 text-bn-blue-primary font-heading">
             Ibn Battouta en chiffres
           </h2>
@@ -74,35 +74,39 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
         </div>
 
         {/* Stats Cards with Navigation */}
-        <div className="relative max-w-5xl mx-auto flex items-center">
-          {/* Left Arrow */}
+        <div className="relative max-w-5xl mx-auto flex items-center justify-center gap-2">
+          {/* Left Arrow - Simple triangle */}
           <button
             onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))}
             disabled={!canGoPrev}
-            className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-slate-text hover:text-bn-blue-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-slate-text-dark hover:text-bn-blue-primary transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
             aria-label="Précédent"
           >
-            <ChevronLeft className="h-8 w-8" strokeWidth={1.5} />
+            <svg width="12" height="20" viewBox="0 0 12 20" fill="currentColor">
+              <path d="M10 2L2 10L10 18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </button>
 
           {/* Stats Cards */}
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 px-4">
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl">
             {visibleStats.map((stat, index) => (
               <Link 
                 key={index} 
                 to={stat.href || "#"}
                 className="group"
               >
-                {/* Card with blue gradient background */}
-                <div className="relative bg-gradient-to-br from-bn-blue-primary via-bn-blue-primary to-bn-blue-primary-dark rounded-xl p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
-                  {/* Subtle pattern overlay */}
-                  <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2)_1px,transparent_1px)] bg-[length:20px_20px]" />
-                  
+                {/* Card - Blue gradient background matching reference */}
+                <div 
+                  className="relative rounded-xl p-6 text-center hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+                  style={{
+                    background: 'linear-gradient(135deg, hsl(210 28% 35%) 0%, hsl(210 28% 28%) 50%, hsl(210 34% 22%) 100%)'
+                  }}
+                >
                   {/* Content */}
                   <div className="relative z-10">
                     {/* Icon Container - Gold outlined box */}
                     <div className="flex justify-center mb-4">
-                      <div className="w-14 h-14 rounded-lg border-2 border-gold-bn-primary bg-transparent flex items-center justify-center">
+                      <div className="w-14 h-14 rounded-lg border-2 border-gold-bn-primary flex items-center justify-center">
                         <stat.icon className="h-7 w-7 text-gold-bn-primary" strokeWidth={1.5} />
                       </div>
                     </div>
@@ -122,18 +126,20 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
             ))}
           </div>
 
-          {/* Right Arrow */}
+          {/* Right Arrow - Simple triangle */}
           <button
             onClick={() => setCurrentIndex(Math.min(stats.length - 3, currentIndex + 1))}
             disabled={!canGoNext}
-            className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-slate-text hover:text-bn-blue-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-slate-text-dark hover:text-bn-blue-primary transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
             aria-label="Suivant"
           >
-            <ChevronRight className="h-8 w-8" strokeWidth={1.5} />
+            <svg width="12" height="20" viewBox="0 0 12 20" fill="currentColor">
+              <path d="M2 2L10 10L2 18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
           </button>
         </div>
 
-        {/* CTA Button */}
+        {/* CTA Button - Gold */}
         <div className="flex justify-center mt-10">
           <Link to="/digital-library/collections">
             <Button 
