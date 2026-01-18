@@ -445,16 +445,13 @@ const Header = () => {
           {/* Navigation Desktop */}
           <NavigationMenu className="hidden md:flex">
             <NavigationMenuList className="flex items-center gap-0">
-              {/* Accueil - Style cohérent avec les autres menus */}
+              {/* Accueil - Même style que les autres menus */}
               <NavigationMenuItem>
                 <Link to="/">
-                  <Button 
-                    variant="ghost" 
-                    className={`rounded-none h-12 px-4 text-sm font-medium ${isHomePage ? 'text-blue-primary-dark border-b-2 border-blue-primary-dark' : 'text-slate-text-dark hover:text-blue-primary-dark hover:bg-slate-light'}`}
-                  >
+                  <span className="bg-transparent text-slate-text-dark hover:text-blue-primary-dark hover:bg-slate-light h-12 text-sm font-medium px-3 rounded-none inline-flex items-center cursor-pointer">
                     <BookOpen className="w-4 h-4 mr-2" />
                     {language === 'ar' ? 'الرئيسية' : 'Accueil'}
-                  </Button>
+                  </span>
                 </Link>
               </NavigationMenuItem>
               
