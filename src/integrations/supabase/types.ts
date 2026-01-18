@@ -2059,6 +2059,54 @@ export type Database = {
         }
         Relationships: []
       }
+      cms_digital_services: {
+        Row: {
+          category_ar: string | null
+          category_fr: string | null
+          created_at: string
+          description_ar: string | null
+          description_fr: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          link_url: string | null
+          sort_order: number
+          title_ar: string | null
+          title_fr: string
+          updated_at: string
+        }
+        Insert: {
+          category_ar?: string | null
+          category_fr?: string | null
+          created_at?: string
+          description_ar?: string | null
+          description_fr?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          link_url?: string | null
+          sort_order?: number
+          title_ar?: string | null
+          title_fr: string
+          updated_at?: string
+        }
+        Update: {
+          category_ar?: string | null
+          category_fr?: string | null
+          created_at?: string
+          description_ar?: string | null
+          description_fr?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          link_url?: string | null
+          sort_order?: number
+          title_ar?: string | null
+          title_fr?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cms_evenements: {
         Row: {
           affiche_alt_ar: string | null
@@ -2314,6 +2362,48 @@ export type Database = {
         }
         Relationships: []
       }
+      cms_mediatheque_videos: {
+        Row: {
+          created_at: string
+          description_ar: string | null
+          description_fr: string | null
+          id: string
+          is_active: boolean
+          sort_order: number
+          thumbnail_url: string | null
+          title_ar: string | null
+          title_fr: string
+          updated_at: string
+          youtube_id: string
+        }
+        Insert: {
+          created_at?: string
+          description_ar?: string | null
+          description_fr?: string | null
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          thumbnail_url?: string | null
+          title_ar?: string | null
+          title_fr: string
+          updated_at?: string
+          youtube_id: string
+        }
+        Update: {
+          created_at?: string
+          description_ar?: string | null
+          description_fr?: string | null
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          thumbnail_url?: string | null
+          title_ar?: string | null
+          title_fr?: string
+          updated_at?: string
+          youtube_id?: string
+        }
+        Relationships: []
+      }
       cms_menus: {
         Row: {
           created_at: string | null
@@ -2413,6 +2503,36 @@ export type Database = {
           updated_at?: string | null
           updated_by?: string | null
           workflow_comments?: Json | null
+        }
+        Relationships: []
+      }
+      cms_portal_settings: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          setting_key: string
+          setting_value: Json
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          setting_key: string
+          setting_value?: Json
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          setting_key?: string
+          setting_value?: Json
+          updated_at?: string
         }
         Relationships: []
       }
