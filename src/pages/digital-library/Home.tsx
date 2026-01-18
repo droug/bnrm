@@ -813,18 +813,18 @@ export default function DigitalLibraryHome() {
                     <CardHeader className="text-center pt-10 pb-4">
                       <div className="flex items-center justify-center gap-4">
                         {/* Icône Brill (bloc bleu + pictogramme blanc) */}
-                        <div className="w-14 h-14 bg-primary rounded-md flex items-center justify-center">
+                        <div className="w-14 h-14 bg-bn-blue-primary rounded-md flex items-center justify-center">
                           <svg viewBox="0 0 24 24" className="w-9 h-9" fill="none" aria-hidden="true">
-                            <path d="M9 18V7h5.2c2.2 0 3.8 1.4 3.8 3.2 0 1.6-1 2.8-2.6 3.1l2.4 4.5h-2.4L13.3 14H11v4H9z" fill="hsl(var(--primary-foreground))" />
+                            <path d="M9 18V7h5.2c2.2 0 3.8 1.4 3.8 3.2 0 1.6-1 2.8-2.6 3.1l2.4 4.5h-2.4L13.3 14H11v4H9z" fill="white" />
                           </svg>
                         </div>
-                        <span className="font-heading text-[30px] tracking-[0.14em] text-primary">BRILL</span>
+                        <span className="font-heading text-[30px] tracking-[0.14em] text-bn-blue-primary">BRILL</span>
                       </div>
                       <a
                         href="https://brill.com/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-4 inline-block text-primary underline underline-offset-4 font-semibold"
+                        className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold"
                       >
                         brill.com
                       </a>
@@ -838,7 +838,7 @@ export default function DigitalLibraryHome() {
                           href="https://brill.com/"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-blue-surface text-primary text-sm font-medium underline underline-offset-4 hover:bg-blue-light transition-colors"
+                          className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors"
                         >
                           Explorer <ChevronRight className="h-4 w-4" strokeWidth={2} />
                         </a>
@@ -851,12 +851,12 @@ export default function DigitalLibraryHome() {
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
                   <Card className="bg-card border-0 rounded-xl h-full shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
                     <CardHeader className="text-center pt-10 pb-4">
-                      <div className="font-heading text-[42px] font-semibold text-primary tracking-wide">EBSCO</div>
+                      <div className="font-heading text-[42px] font-semibold text-bn-blue-primary tracking-wide">EBSCO</div>
                       <a
                         href="https://www.ebsco.com/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-4 inline-block text-primary underline underline-offset-4 font-semibold"
+                        className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold"
                       >
                         ebsco.com
                       </a>
@@ -870,7 +870,7 @@ export default function DigitalLibraryHome() {
                           href="https://www.ebsco.com/"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-blue-surface text-primary text-sm font-medium underline underline-offset-4 hover:bg-blue-light transition-colors"
+                          className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors"
                         >
                           Explorer <ChevronRight className="h-4 w-4" strokeWidth={2} />
                         </a>
@@ -885,15 +885,15 @@ export default function DigitalLibraryHome() {
                     <CardHeader className="text-center pt-10 pb-4">
                       <div className="flex items-center justify-center gap-3">
                         {/* Icône losanges */}
-                        <svg viewBox="0 0 32 32" className="w-10 h-10 text-primary" fill="currentColor" aria-hidden="true">
+                        <svg viewBox="0 0 32 32" className="w-10 h-10 text-bn-blue-primary" fill="currentColor" aria-hidden="true">
                           <path d="M8 6l6 6-6 6-6-6 6-6zm12 0l6 6-6 6-6-6 6-6zm-6 12l6 6-6 6-6-6 6-6z" />
                         </svg>
                         <div className="text-left">
                           <div className="leading-none">
-                            <span className="font-heading text-[26px] tracking-[0.18em] text-primary">CAIRN</span>
+                            <span className="font-heading text-[26px] tracking-[0.18em] text-bn-blue-primary">CAIRN</span>
                             <span className="font-heading text-[26px] tracking-[0.18em] text-muted-foreground/60">.INF</span>
                           </div>
-                          <div className="mt-1 text-xs tracking-[0.14em] text-primary font-semibold">
+                          <div className="mt-1 text-xs tracking-[0.14em] text-bn-blue-primary font-semibold">
                             SCIENCES HUMAINES &amp; SOCIALES
                           </div>
                         </div>
@@ -902,7 +902,7 @@ export default function DigitalLibraryHome() {
                         href="https://shs.cairn.info/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-4 inline-block text-primary underline underline-offset-4 font-semibold"
+                        className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold"
                       >
                         Cairn.info
                       </a>
@@ -916,7 +916,7 @@ export default function DigitalLibraryHome() {
                           href="https://shs.cairn.info/"
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-blue-surface text-primary text-sm font-medium underline underline-offset-4 hover:bg-blue-light transition-colors"
+                          className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors"
                         >
                           Explorer <ChevronRight className="h-4 w-4" strokeWidth={2} />
                         </a>
@@ -929,8 +929,8 @@ export default function DigitalLibraryHome() {
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
                   <Card className="bg-card border-0 rounded-xl h-full shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
                     <CardHeader className="text-center pt-10 pb-4">
-                      <div className="font-heading text-[42px] font-semibold text-primary">RFN</div>
-                      <a href="https://rfnum.org" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-primary underline underline-offset-4 font-semibold">
+                      <div className="font-heading text-[42px] font-semibold text-bn-blue-primary">RFN</div>
+                      <a href="https://rfnum.org" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold">
                         rfnum.org
                       </a>
                     </CardHeader>
@@ -939,7 +939,7 @@ export default function DigitalLibraryHome() {
                         Réseau Francophone Numérique regroupant les collections patrimoniales de bibliothèques nationales francophones pour préserver le patrimoine documentaire commun.
                       </p>
                       <div className="flex justify-end mt-6">
-                        <a href="https://rfnum.org" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-blue-surface text-primary text-sm font-medium underline underline-offset-4 hover:bg-blue-light transition-colors">
+                        <a href="https://rfnum.org" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors">
                           Explorer <ChevronRight className="h-4 w-4" strokeWidth={2} />
                         </a>
                       </div>
@@ -951,8 +951,8 @@ export default function DigitalLibraryHome() {
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
                   <Card className="bg-card border-0 rounded-xl h-full shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
                     <CardHeader className="text-center pt-10 pb-4">
-                      <div className="font-heading text-[42px] font-semibold text-primary">Europeana</div>
-                      <a href="https://www.europeana.eu" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-primary underline underline-offset-4 font-semibold">
+                      <div className="font-heading text-[42px] font-semibold text-bn-blue-primary">Europeana</div>
+                      <a href="https://www.europeana.eu" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold">
                         europeana.eu
                       </a>
                     </CardHeader>
@@ -961,7 +961,7 @@ export default function DigitalLibraryHome() {
                         Agrégateur central du patrimoine culturel européen. Initiative de l'UE visant à moderniser la numérisation et la réutilisation des données culturelles.
                       </p>
                       <div className="flex justify-end mt-6">
-                        <a href="https://www.europeana.eu" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-blue-surface text-primary text-sm font-medium underline underline-offset-4 hover:bg-blue-light transition-colors">
+                        <a href="https://www.europeana.eu" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors">
                           Explorer <ChevronRight className="h-4 w-4" strokeWidth={2} />
                         </a>
                       </div>
@@ -973,8 +973,8 @@ export default function DigitalLibraryHome() {
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
                   <Card className="bg-card border-0 rounded-xl h-full shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
                     <CardHeader className="text-center pt-10 pb-4">
-                      <div className="font-heading text-[42px] font-semibold text-primary">IFLA</div>
-                      <a href="https://www.ifla.org" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-primary underline underline-offset-4 font-semibold">
+                      <div className="font-heading text-[42px] font-semibold text-bn-blue-primary">IFLA</div>
+                      <a href="https://www.ifla.org" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold">
                         ifla.org
                       </a>
                     </CardHeader>
@@ -983,7 +983,7 @@ export default function DigitalLibraryHome() {
                         Fédération Internationale des Associations de Bibliothécaires. Définit les normes internationales pour l'interopérabilité entre les grands réservoirs mondiaux.
                       </p>
                       <div className="flex justify-end mt-6">
-                        <a href="https://www.ifla.org" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-blue-surface text-primary text-sm font-medium underline underline-offset-4 hover:bg-blue-light transition-colors">
+                        <a href="https://www.ifla.org" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors">
                           Explorer <ChevronRight className="h-4 w-4" strokeWidth={2} />
                         </a>
                       </div>
@@ -1011,7 +1011,7 @@ export default function DigitalLibraryHome() {
                 key={index}
                 onClick={() => setRepoCarouselIndex(index)}
                 className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                  repoCarouselIndex === index ? 'bg-primary' : 'bg-muted-foreground/25 hover:bg-muted-foreground/40'
+                  repoCarouselIndex === index ? 'bg-gold-bn-primary' : 'bg-muted-foreground/25 hover:bg-muted-foreground/40'
                 }`}
                 aria-label={`Aller à la page ${index + 1}`}
               />
