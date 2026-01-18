@@ -948,24 +948,68 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
       )}
       
       {extractedData && !isProcessing && (
-        <Alert className="bg-green-500/10 border-green-500/30">
-          <CheckCircle2 className="h-4 w-4 text-green-600" />
-          <AlertTitle className="text-green-600">Données extraites avec succès</AlertTitle>
-          <AlertDescription>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {extractedData.title && <Badge variant="outline">Titre: {extractedData.title.substring(0, 30)}...</Badge>}
-              {extractedData.title_ar && <Badge variant="outline">عنوان عربي ✓</Badge>}
-              {extractedData.author && <Badge variant="outline">Auteur: {extractedData.author}</Badge>}
-              {extractedData.pages_count && <Badge variant="outline">{extractedData.pages_count} pages</Badge>}
-              {extractedData.cover_image_url && (
-                <Badge variant="outline" className="bg-green-500/20">
-                  <ImageIcon className="h-3 w-3 mr-1" />
-                  Image de couverture ✓
-                </Badge>
-              )}
-            </div>
-          </AlertDescription>
-        </Alert>
+        <div className="space-y-3 p-4 border rounded-lg bg-green-500/10 border-green-500/30">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="h-5 w-5 text-green-600" />
+            <span className="font-medium text-green-700">Métadonnées extraites avec succès</span>
+          </div>
+          
+          {/* Extracted metadata display */}
+          <div className="grid grid-cols-1 gap-3 text-sm">
+            {extractedData.title && (
+              <div className="flex items-start gap-2">
+                <Badge variant="outline" className="shrink-0">Titre FR</Badge>
+                <span className="text-foreground">{extractedData.title}</span>
+              </div>
+            )}
+            
+            {extractedData.title_ar && (
+              <div className="flex items-start gap-2">
+                <Badge variant="outline" className="shrink-0 bg-amber-50 border-amber-200">العنوان AR</Badge>
+                <span className="text-foreground" dir="rtl">{extractedData.title_ar}</span>
+              </div>
+            )}
+            
+            {extractedData.author && (
+              <div className="flex items-start gap-2">
+                <Badge variant="outline" className="shrink-0">Auteur</Badge>
+                <span className="text-foreground">{extractedData.author}</span>
+              </div>
+            )}
+            
+            {extractedData.date && (
+              <div className="flex items-start gap-2">
+                <Badge variant="outline" className="shrink-0">Date</Badge>
+                <span className="text-foreground">{extractedData.date}</span>
+              </div>
+            )}
+            
+            {extractedData.description && (
+              <div className="flex items-start gap-2">
+                <Badge variant="outline" className="shrink-0">Description</Badge>
+                <span className="text-foreground line-clamp-2">{extractedData.description}</span>
+              </div>
+            )}
+          </div>
+          
+          {/* Summary badges */}
+          <div className="flex flex-wrap gap-2 pt-2 border-t border-green-500/20">
+            {extractedData.pages_count && (
+              <Badge variant="secondary">{extractedData.pages_count} pages</Badge>
+            )}
+            {extractedData.cover_image_url && (
+              <Badge variant="secondary" className="bg-green-600/20 text-green-700">
+                <ImageIcon className="h-3 w-3 mr-1" />
+                Couverture ✓
+              </Badge>
+            )}
+            {extractedData.title_ar && (
+              <Badge variant="secondary" className="bg-amber-500/20 text-amber-700">
+                Arabe détecté ✓
+              </Badge>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );
