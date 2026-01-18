@@ -7,23 +7,73 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Palette, Save, Loader2, Type, Paintbrush, RotateCcw } from "lucide-react";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Palette, Save, Loader2, Type, Paintbrush, RotateCcw, Home, Newspaper, Globe, Link2, Video, Footprints } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface SectionStyles {
+  hero: {
+    overlay_color: string;
+    overlay_opacity: string;
+    title_color: string;
+    subtitle_color: string;
+    tagline_color: string;
+    button_bg_color: string;
+    button_text_color: string;
+  };
+  actualites_evenements: {
+    header_bg_color: string;
+    header_title_color: string;
+    header_tagline_color: string;
+    card_bg_color: string;
+    card_title_color: string;
+    badge_bg_color: string;
+    badge_text_color: string;
+    button_bg_color: string;
+    button_text_color: string;
+  };
   services_numeriques: {
     background_color: string;
     title_color: string;
+    tagline_color: string;
+    description_color: string;
     button_bg_color: string;
     button_text_color: string;
     card_bg_color: string;
+    accent_color: string;
+  };
+  plateformes: {
+    overlay_color: string;
+    title_color: string;
+    tagline_color: string;
+    description_color: string;
+    accent_color: string;
+  };
+  liens_rapides: {
+    background_color: string;
+    title_color: string;
+    tagline_color: string;
+    card_bg_gradient_from: string;
+    card_bg_gradient_to: string;
+    card_title_color: string;
+    card_description_color: string;
+    icon_color: string;
   };
   mediatheque: {
     background_color: string;
     title_color: string;
+    tagline_color: string;
+    description_color: string;
+    accent_color: string;
     button_bg_color: string;
     button_text_color: string;
-    accent_color: string;
+  };
+  footer: {
+    background_color: string;
+    text_color: string;
+    link_color: string;
+    link_hover_color: string;
+    border_color: string;
   };
 }
 
@@ -62,19 +112,68 @@ const availableFonts = [
 ];
 
 const defaultStyles: SectionStyles = {
+  hero: {
+    overlay_color: "#000000",
+    overlay_opacity: "0.5",
+    title_color: "#ffffff",
+    subtitle_color: "#ffffff",
+    tagline_color: "#93c5fd",
+    button_bg_color: "#1e40af",
+    button_text_color: "#ffffff"
+  },
+  actualites_evenements: {
+    header_bg_color: "#1e3a8a",
+    header_title_color: "#ffffff",
+    header_tagline_color: "#93c5fd",
+    card_bg_color: "#ffffff",
+    card_title_color: "#1e3a8a",
+    badge_bg_color: "#1e40af",
+    badge_text_color: "#ffffff",
+    button_bg_color: "#1e40af",
+    button_text_color: "#ffffff"
+  },
   services_numeriques: {
     background_color: "#f8fafc",
-    title_color: "#1e293b",
+    title_color: "#1e3a8a",
+    tagline_color: "#3b82f6",
+    description_color: "#64748b",
     button_bg_color: "#1e40af",
     button_text_color: "#ffffff",
-    card_bg_color: "#ffffff"
+    card_bg_color: "#ffffff",
+    accent_color: "#3b82f6"
+  },
+  plateformes: {
+    overlay_color: "#000000",
+    title_color: "#ffffff",
+    tagline_color: "#f97316",
+    description_color: "#ffffff",
+    accent_color: "#f97316"
+  },
+  liens_rapides: {
+    background_color: "#ffffff",
+    title_color: "#1e3a8a",
+    tagline_color: "#3b82f6",
+    card_bg_gradient_from: "#eff6ff",
+    card_bg_gradient_to: "#dbeafe",
+    card_title_color: "#1e293b",
+    card_description_color: "#64748b",
+    icon_color: "#3b82f6"
   },
   mediatheque: {
     background_color: "#1e3a5f",
     title_color: "#ffffff",
+    tagline_color: "#93c5fd",
+    description_color: "#ffffff",
+    accent_color: "#d4af37",
     button_bg_color: "#3b82f6",
-    button_text_color: "#ffffff",
-    accent_color: "#d4af37"
+    button_text_color: "#ffffff"
+  },
+  footer: {
+    background_color: "#1e293b",
+    text_color: "#94a3b8",
+    link_color: "#cbd5e1",
+    link_hover_color: "#ffffff",
+    border_color: "#334155"
   }
 };
 
@@ -97,6 +196,37 @@ const defaultButtonStyles: ButtonStyles = {
   }
 };
 
+// Composant réutilisable pour les champs de couleur
+function ColorField({ 
+  label, 
+  value, 
+  onChange 
+}: { 
+  label: string; 
+  value: string; 
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <Label className="text-sm">{label}</Label>
+      <div className="flex gap-2">
+        <Input
+          type="color"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-12 h-10 p-1 cursor-pointer"
+        />
+        <Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="#000000"
+          className="flex-1"
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function CmsStyleManager() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -116,11 +246,11 @@ export default function CmsStyleManager() {
       
       data?.forEach((setting: any) => {
         if (setting.setting_key === 'section_styles') {
-          setSectionStyles(setting.setting_value as SectionStyles);
+          setSectionStyles({ ...defaultStyles, ...setting.setting_value });
         } else if (setting.setting_key === 'typography') {
-          setTypography(setting.setting_value as Typography);
+          setTypography({ ...defaultTypography, ...setting.setting_value });
         } else if (setting.setting_key === 'button_styles') {
-          setButtonStyles(setting.setting_value as ButtonStyles);
+          setButtonStyles({ ...defaultButtonStyles, ...setting.setting_value });
         }
       });
       
@@ -139,9 +269,7 @@ export default function CmsStyleManager() {
       for (const update of updates) {
         const { error } = await supabase
           .from('cms_portal_settings')
-          .upsert(update, {
-            onConflict: 'setting_key'
-          });
+          .upsert(update, { onConflict: 'setting_key' });
         if (error) throw error;
       }
     },
@@ -161,6 +289,17 @@ export default function CmsStyleManager() {
     toast({ title: "Styles réinitialisés aux valeurs par défaut" });
   };
 
+  const updateSectionStyle = <K extends keyof SectionStyles>(
+    section: K,
+    key: keyof SectionStyles[K],
+    value: string
+  ) => {
+    setSectionStyles(prev => ({
+      ...prev,
+      [section]: { ...prev[section], [key]: value }
+    }));
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center py-8">
@@ -178,7 +317,7 @@ export default function CmsStyleManager() {
             Styles et Design du Portail
           </CardTitle>
           <CardDescription>
-            Personnalisez les couleurs, polices et styles des sections
+            Personnalisez les couleurs, polices et styles de toutes les sections
           </CardDescription>
         </div>
         <div className="flex gap-2">
@@ -214,235 +353,341 @@ export default function CmsStyleManager() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="sections" className="space-y-6 mt-4">
-            {/* Services Numériques */}
-            <Card className="border-dashed">
-              <CardHeader className="py-3">
-                <CardTitle className="text-lg">Section "Nos Services Numériques"</CardTitle>
-              </CardHeader>
-              <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label>Couleur de fond</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="color"
-                      value={sectionStyles.services_numeriques.background_color}
-                      onChange={(e) => setSectionStyles(prev => ({
-                        ...prev,
-                        services_numeriques: { ...prev.services_numeriques, background_color: e.target.value }
-                      }))}
-                      className="w-12 h-10 p-1 cursor-pointer"
+          <TabsContent value="sections" className="mt-4">
+            <Accordion type="multiple" defaultValue={["hero"]} className="space-y-2">
+              {/* Hero Section */}
+              <AccordionItem value="hero" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <Home className="h-5 w-5 text-blue-500" />
+                    <span className="font-semibold">Section Hero</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4">
+                    <ColorField 
+                      label="Overlay" 
+                      value={sectionStyles.hero.overlay_color}
+                      onChange={(v) => updateSectionStyle('hero', 'overlay_color', v)}
                     />
-                    <Input
-                      value={sectionStyles.services_numeriques.background_color}
-                      onChange={(e) => setSectionStyles(prev => ({
-                        ...prev,
-                        services_numeriques: { ...prev.services_numeriques, background_color: e.target.value }
-                      }))}
-                      placeholder="#f8fafc"
+                    <ColorField 
+                      label="Titre" 
+                      value={sectionStyles.hero.title_color}
+                      onChange={(v) => updateSectionStyle('hero', 'title_color', v)}
+                    />
+                    <ColorField 
+                      label="Sous-titre" 
+                      value={sectionStyles.hero.subtitle_color}
+                      onChange={(v) => updateSectionStyle('hero', 'subtitle_color', v)}
+                    />
+                    <ColorField 
+                      label="Tagline" 
+                      value={sectionStyles.hero.tagline_color}
+                      onChange={(v) => updateSectionStyle('hero', 'tagline_color', v)}
+                    />
+                    <ColorField 
+                      label="Bouton (fond)" 
+                      value={sectionStyles.hero.button_bg_color}
+                      onChange={(v) => updateSectionStyle('hero', 'button_bg_color', v)}
+                    />
+                    <ColorField 
+                      label="Bouton (texte)" 
+                      value={sectionStyles.hero.button_text_color}
+                      onChange={(v) => updateSectionStyle('hero', 'button_text_color', v)}
                     />
                   </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Couleur du titre</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="color"
-                      value={sectionStyles.services_numeriques.title_color}
-                      onChange={(e) => setSectionStyles(prev => ({
-                        ...prev,
-                        services_numeriques: { ...prev.services_numeriques, title_color: e.target.value }
-                      }))}
-                      className="w-12 h-10 p-1 cursor-pointer"
-                    />
-                    <Input
-                      value={sectionStyles.services_numeriques.title_color}
-                      onChange={(e) => setSectionStyles(prev => ({
-                        ...prev,
-                        services_numeriques: { ...prev.services_numeriques, title_color: e.target.value }
-                      }))}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Fond des boutons</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="color"
-                      value={sectionStyles.services_numeriques.button_bg_color}
-                      onChange={(e) => setSectionStyles(prev => ({
-                        ...prev,
-                        services_numeriques: { ...prev.services_numeriques, button_bg_color: e.target.value }
-                      }))}
-                      className="w-12 h-10 p-1 cursor-pointer"
-                    />
-                    <Input
-                      value={sectionStyles.services_numeriques.button_bg_color}
-                      onChange={(e) => setSectionStyles(prev => ({
-                        ...prev,
-                        services_numeriques: { ...prev.services_numeriques, button_bg_color: e.target.value }
-                      }))}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Texte des boutons</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="color"
-                      value={sectionStyles.services_numeriques.button_text_color}
-                      onChange={(e) => setSectionStyles(prev => ({
-                        ...prev,
-                        services_numeriques: { ...prev.services_numeriques, button_text_color: e.target.value }
-                      }))}
-                      className="w-12 h-10 p-1 cursor-pointer"
-                    />
-                    <Input
-                      value={sectionStyles.services_numeriques.button_text_color}
-                      onChange={(e) => setSectionStyles(prev => ({
-                        ...prev,
-                        services_numeriques: { ...prev.services_numeriques, button_text_color: e.target.value }
-                      }))}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Fond des cartes</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="color"
-                      value={sectionStyles.services_numeriques.card_bg_color}
-                      onChange={(e) => setSectionStyles(prev => ({
-                        ...prev,
-                        services_numeriques: { ...prev.services_numeriques, card_bg_color: e.target.value }
-                      }))}
-                      className="w-12 h-10 p-1 cursor-pointer"
-                    />
-                    <Input
-                      value={sectionStyles.services_numeriques.card_bg_color}
-                      onChange={(e) => setSectionStyles(prev => ({
-                        ...prev,
-                        services_numeriques: { ...prev.services_numeriques, card_bg_color: e.target.value }
-                      }))}
-                    />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </AccordionContent>
+              </AccordionItem>
 
-            {/* Médiathèque */}
-            <Card className="border-dashed">
-              <CardHeader className="py-3">
-                <CardTitle className="text-lg">Section "Médiathèque"</CardTitle>
-              </CardHeader>
-              <CardContent className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label>Couleur de fond</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="color"
+              {/* Actualités & Événements */}
+              <AccordionItem value="actualites" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <Newspaper className="h-5 w-5 text-emerald-500" />
+                    <span className="font-semibold">Section Actualités & Événements</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4">
+                    <ColorField 
+                      label="Header (fond)" 
+                      value={sectionStyles.actualites_evenements.header_bg_color}
+                      onChange={(v) => updateSectionStyle('actualites_evenements', 'header_bg_color', v)}
+                    />
+                    <ColorField 
+                      label="Header (titre)" 
+                      value={sectionStyles.actualites_evenements.header_title_color}
+                      onChange={(v) => updateSectionStyle('actualites_evenements', 'header_title_color', v)}
+                    />
+                    <ColorField 
+                      label="Header (tagline)" 
+                      value={sectionStyles.actualites_evenements.header_tagline_color}
+                      onChange={(v) => updateSectionStyle('actualites_evenements', 'header_tagline_color', v)}
+                    />
+                    <ColorField 
+                      label="Carte (fond)" 
+                      value={sectionStyles.actualites_evenements.card_bg_color}
+                      onChange={(v) => updateSectionStyle('actualites_evenements', 'card_bg_color', v)}
+                    />
+                    <ColorField 
+                      label="Carte (titre)" 
+                      value={sectionStyles.actualites_evenements.card_title_color}
+                      onChange={(v) => updateSectionStyle('actualites_evenements', 'card_title_color', v)}
+                    />
+                    <ColorField 
+                      label="Badge (fond)" 
+                      value={sectionStyles.actualites_evenements.badge_bg_color}
+                      onChange={(v) => updateSectionStyle('actualites_evenements', 'badge_bg_color', v)}
+                    />
+                    <ColorField 
+                      label="Badge (texte)" 
+                      value={sectionStyles.actualites_evenements.badge_text_color}
+                      onChange={(v) => updateSectionStyle('actualites_evenements', 'badge_text_color', v)}
+                    />
+                    <ColorField 
+                      label="Bouton (fond)" 
+                      value={sectionStyles.actualites_evenements.button_bg_color}
+                      onChange={(v) => updateSectionStyle('actualites_evenements', 'button_bg_color', v)}
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Services Numériques */}
+              <AccordionItem value="services" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <Globe className="h-5 w-5 text-sky-500" />
+                    <span className="font-semibold">Section Nos Services Numériques</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4">
+                    <ColorField 
+                      label="Fond" 
+                      value={sectionStyles.services_numeriques.background_color}
+                      onChange={(v) => updateSectionStyle('services_numeriques', 'background_color', v)}
+                    />
+                    <ColorField 
+                      label="Titre" 
+                      value={sectionStyles.services_numeriques.title_color}
+                      onChange={(v) => updateSectionStyle('services_numeriques', 'title_color', v)}
+                    />
+                    <ColorField 
+                      label="Tagline" 
+                      value={sectionStyles.services_numeriques.tagline_color}
+                      onChange={(v) => updateSectionStyle('services_numeriques', 'tagline_color', v)}
+                    />
+                    <ColorField 
+                      label="Description" 
+                      value={sectionStyles.services_numeriques.description_color}
+                      onChange={(v) => updateSectionStyle('services_numeriques', 'description_color', v)}
+                    />
+                    <ColorField 
+                      label="Carte (fond)" 
+                      value={sectionStyles.services_numeriques.card_bg_color}
+                      onChange={(v) => updateSectionStyle('services_numeriques', 'card_bg_color', v)}
+                    />
+                    <ColorField 
+                      label="Accent (ligne)" 
+                      value={sectionStyles.services_numeriques.accent_color}
+                      onChange={(v) => updateSectionStyle('services_numeriques', 'accent_color', v)}
+                    />
+                    <ColorField 
+                      label="Bouton (fond)" 
+                      value={sectionStyles.services_numeriques.button_bg_color}
+                      onChange={(v) => updateSectionStyle('services_numeriques', 'button_bg_color', v)}
+                    />
+                    <ColorField 
+                      label="Bouton (texte)" 
+                      value={sectionStyles.services_numeriques.button_text_color}
+                      onChange={(v) => updateSectionStyle('services_numeriques', 'button_text_color', v)}
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Plateformes */}
+              <AccordionItem value="plateformes" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <Globe className="h-5 w-5 text-orange-500" />
+                    <span className="font-semibold">Section Nos Plateformes</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4">
+                    <ColorField 
+                      label="Overlay" 
+                      value={sectionStyles.plateformes.overlay_color}
+                      onChange={(v) => updateSectionStyle('plateformes', 'overlay_color', v)}
+                    />
+                    <ColorField 
+                      label="Titre" 
+                      value={sectionStyles.plateformes.title_color}
+                      onChange={(v) => updateSectionStyle('plateformes', 'title_color', v)}
+                    />
+                    <ColorField 
+                      label="Tagline" 
+                      value={sectionStyles.plateformes.tagline_color}
+                      onChange={(v) => updateSectionStyle('plateformes', 'tagline_color', v)}
+                    />
+                    <ColorField 
+                      label="Description" 
+                      value={sectionStyles.plateformes.description_color}
+                      onChange={(v) => updateSectionStyle('plateformes', 'description_color', v)}
+                    />
+                    <ColorField 
+                      label="Accent (ligne)" 
+                      value={sectionStyles.plateformes.accent_color}
+                      onChange={(v) => updateSectionStyle('plateformes', 'accent_color', v)}
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Liens Rapides */}
+              <AccordionItem value="liens" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <Link2 className="h-5 w-5 text-violet-500" />
+                    <span className="font-semibold">Section Liens Rapides</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4">
+                    <ColorField 
+                      label="Fond" 
+                      value={sectionStyles.liens_rapides.background_color}
+                      onChange={(v) => updateSectionStyle('liens_rapides', 'background_color', v)}
+                    />
+                    <ColorField 
+                      label="Titre" 
+                      value={sectionStyles.liens_rapides.title_color}
+                      onChange={(v) => updateSectionStyle('liens_rapides', 'title_color', v)}
+                    />
+                    <ColorField 
+                      label="Tagline" 
+                      value={sectionStyles.liens_rapides.tagline_color}
+                      onChange={(v) => updateSectionStyle('liens_rapides', 'tagline_color', v)}
+                    />
+                    <ColorField 
+                      label="Carte (gradient début)" 
+                      value={sectionStyles.liens_rapides.card_bg_gradient_from}
+                      onChange={(v) => updateSectionStyle('liens_rapides', 'card_bg_gradient_from', v)}
+                    />
+                    <ColorField 
+                      label="Carte (gradient fin)" 
+                      value={sectionStyles.liens_rapides.card_bg_gradient_to}
+                      onChange={(v) => updateSectionStyle('liens_rapides', 'card_bg_gradient_to', v)}
+                    />
+                    <ColorField 
+                      label="Carte (titre)" 
+                      value={sectionStyles.liens_rapides.card_title_color}
+                      onChange={(v) => updateSectionStyle('liens_rapides', 'card_title_color', v)}
+                    />
+                    <ColorField 
+                      label="Carte (description)" 
+                      value={sectionStyles.liens_rapides.card_description_color}
+                      onChange={(v) => updateSectionStyle('liens_rapides', 'card_description_color', v)}
+                    />
+                    <ColorField 
+                      label="Icône" 
+                      value={sectionStyles.liens_rapides.icon_color}
+                      onChange={(v) => updateSectionStyle('liens_rapides', 'icon_color', v)}
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Médiathèque */}
+              <AccordionItem value="mediatheque" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <Video className="h-5 w-5 text-red-500" />
+                    <span className="font-semibold">Section Médiathèque</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4">
+                    <ColorField 
+                      label="Fond" 
                       value={sectionStyles.mediatheque.background_color}
-                      onChange={(e) => setSectionStyles(prev => ({
-                        ...prev,
-                        mediatheque: { ...prev.mediatheque, background_color: e.target.value }
-                      }))}
-                      className="w-12 h-10 p-1 cursor-pointer"
+                      onChange={(v) => updateSectionStyle('mediatheque', 'background_color', v)}
                     />
-                    <Input
-                      value={sectionStyles.mediatheque.background_color}
-                      onChange={(e) => setSectionStyles(prev => ({
-                        ...prev,
-                        mediatheque: { ...prev.mediatheque, background_color: e.target.value }
-                      }))}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Couleur du titre</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="color"
+                    <ColorField 
+                      label="Titre" 
                       value={sectionStyles.mediatheque.title_color}
-                      onChange={(e) => setSectionStyles(prev => ({
-                        ...prev,
-                        mediatheque: { ...prev.mediatheque, title_color: e.target.value }
-                      }))}
-                      className="w-12 h-10 p-1 cursor-pointer"
+                      onChange={(v) => updateSectionStyle('mediatheque', 'title_color', v)}
                     />
-                    <Input
-                      value={sectionStyles.mediatheque.title_color}
-                      onChange={(e) => setSectionStyles(prev => ({
-                        ...prev,
-                        mediatheque: { ...prev.mediatheque, title_color: e.target.value }
-                      }))}
+                    <ColorField 
+                      label="Tagline" 
+                      value={sectionStyles.mediatheque.tagline_color}
+                      onChange={(v) => updateSectionStyle('mediatheque', 'tagline_color', v)}
                     />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Fond des boutons</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="color"
-                      value={sectionStyles.mediatheque.button_bg_color}
-                      onChange={(e) => setSectionStyles(prev => ({
-                        ...prev,
-                        mediatheque: { ...prev.mediatheque, button_bg_color: e.target.value }
-                      }))}
-                      className="w-12 h-10 p-1 cursor-pointer"
+                    <ColorField 
+                      label="Description" 
+                      value={sectionStyles.mediatheque.description_color}
+                      onChange={(v) => updateSectionStyle('mediatheque', 'description_color', v)}
                     />
-                    <Input
-                      value={sectionStyles.mediatheque.button_bg_color}
-                      onChange={(e) => setSectionStyles(prev => ({
-                        ...prev,
-                        mediatheque: { ...prev.mediatheque, button_bg_color: e.target.value }
-                      }))}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Texte des boutons</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="color"
-                      value={sectionStyles.mediatheque.button_text_color}
-                      onChange={(e) => setSectionStyles(prev => ({
-                        ...prev,
-                        mediatheque: { ...prev.mediatheque, button_text_color: e.target.value }
-                      }))}
-                      className="w-12 h-10 p-1 cursor-pointer"
-                    />
-                    <Input
-                      value={sectionStyles.mediatheque.button_text_color}
-                      onChange={(e) => setSectionStyles(prev => ({
-                        ...prev,
-                        mediatheque: { ...prev.mediatheque, button_text_color: e.target.value }
-                      }))}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label>Couleur accent (ligne)</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      type="color"
+                    <ColorField 
+                      label="Accent (ligne)" 
                       value={sectionStyles.mediatheque.accent_color}
-                      onChange={(e) => setSectionStyles(prev => ({
-                        ...prev,
-                        mediatheque: { ...prev.mediatheque, accent_color: e.target.value }
-                      }))}
-                      className="w-12 h-10 p-1 cursor-pointer"
+                      onChange={(v) => updateSectionStyle('mediatheque', 'accent_color', v)}
                     />
-                    <Input
-                      value={sectionStyles.mediatheque.accent_color}
-                      onChange={(e) => setSectionStyles(prev => ({
-                        ...prev,
-                        mediatheque: { ...prev.mediatheque, accent_color: e.target.value }
-                      }))}
+                    <ColorField 
+                      label="Bouton (fond)" 
+                      value={sectionStyles.mediatheque.button_bg_color}
+                      onChange={(v) => updateSectionStyle('mediatheque', 'button_bg_color', v)}
+                    />
+                    <ColorField 
+                      label="Bouton (texte)" 
+                      value={sectionStyles.mediatheque.button_text_color}
+                      onChange={(v) => updateSectionStyle('mediatheque', 'button_text_color', v)}
                     />
                   </div>
-                </div>
-              </CardContent>
-            </Card>
+                </AccordionContent>
+              </AccordionItem>
+
+              {/* Footer */}
+              <AccordionItem value="footer" className="border rounded-lg px-4">
+                <AccordionTrigger className="hover:no-underline">
+                  <div className="flex items-center gap-3">
+                    <Footprints className="h-5 w-5 text-slate-500" />
+                    <span className="font-semibold">Section Footer</span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pt-4">
+                    <ColorField 
+                      label="Fond" 
+                      value={sectionStyles.footer.background_color}
+                      onChange={(v) => updateSectionStyle('footer', 'background_color', v)}
+                    />
+                    <ColorField 
+                      label="Texte" 
+                      value={sectionStyles.footer.text_color}
+                      onChange={(v) => updateSectionStyle('footer', 'text_color', v)}
+                    />
+                    <ColorField 
+                      label="Liens" 
+                      value={sectionStyles.footer.link_color}
+                      onChange={(v) => updateSectionStyle('footer', 'link_color', v)}
+                    />
+                    <ColorField 
+                      label="Liens (survol)" 
+                      value={sectionStyles.footer.link_hover_color}
+                      onChange={(v) => updateSectionStyle('footer', 'link_hover_color', v)}
+                    />
+                    <ColorField 
+                      label="Bordure" 
+                      value={sectionStyles.footer.border_color}
+                      onChange={(v) => updateSectionStyle('footer', 'border_color', v)}
+                    />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </TabsContent>
 
           <TabsContent value="typography" className="space-y-4 mt-4">
@@ -461,19 +706,17 @@ export default function CmsStyleManager() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {availableFonts.map(font => (
+                      {availableFonts.map((font) => (
                         <SelectItem key={font} value={font} style={{ fontFamily: font }}>
                           {font}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground" style={{ fontFamily: typography.heading_font }}>
-                    Aperçu: Titre exemple
-                  </p>
+                  <p className="text-xs text-muted-foreground">Appliquée aux titres H1-H6</p>
                 </div>
                 <div className="space-y-2">
-                  <Label>Police du corps de texte</Label>
+                  <Label>Police du corps</Label>
                   <Select
                     value={typography.body_font}
                     onValueChange={(value) => setTypography(prev => ({ ...prev, body_font: value }))}
@@ -482,16 +725,14 @@ export default function CmsStyleManager() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {availableFonts.map(font => (
+                      {availableFonts.map((font) => (
                         <SelectItem key={font} value={font} style={{ fontFamily: font }}>
                           {font}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground" style={{ fontFamily: typography.body_font }}>
-                    Aperçu: Texte de paragraphe exemple
-                  </p>
+                  <p className="text-xs text-muted-foreground">Appliquée aux paragraphes</p>
                 </div>
                 <div className="space-y-2">
                   <Label>Police des boutons</Label>
@@ -503,16 +744,34 @@ export default function CmsStyleManager() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {availableFonts.map(font => (
+                      {availableFonts.map((font) => (
                         <SelectItem key={font} value={font} style={{ fontFamily: font }}>
                           {font}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground" style={{ fontFamily: typography.button_font }}>
-                    Aperçu: BOUTON
+                  <p className="text-xs text-muted-foreground">Appliquée aux boutons et CTA</p>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Preview */}
+            <Card>
+              <CardHeader className="py-3">
+                <CardTitle className="text-lg">Aperçu des polices</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="p-4 bg-muted rounded-lg">
+                  <h2 style={{ fontFamily: typography.heading_font }} className="text-2xl font-bold mb-2">
+                    Titre de section (Playfair Display)
+                  </h2>
+                  <p style={{ fontFamily: typography.body_font }} className="text-base mb-4">
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                   </p>
+                  <Button style={{ fontFamily: typography.button_font }}>
+                    Bouton exemple
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -526,72 +785,54 @@ export default function CmsStyleManager() {
                   <CardTitle className="text-lg">Bouton Primaire</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  <ColorField 
+                    label="Couleur de fond" 
+                    value={buttonStyles.primary.background}
+                    onChange={(v) => setButtonStyles(prev => ({
+                      ...prev,
+                      primary: { ...prev.primary, background: v }
+                    }))}
+                  />
+                  <ColorField 
+                    label="Couleur du texte" 
+                    value={buttonStyles.primary.text}
+                    onChange={(v) => setButtonStyles(prev => ({
+                      ...prev,
+                      primary: { ...prev.primary, text: v }
+                    }))}
+                  />
                   <div className="space-y-2">
-                    <Label>Couleur de fond</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="color"
-                        value={buttonStyles.primary.background}
-                        onChange={(e) => setButtonStyles(prev => ({
-                          ...prev,
-                          primary: { ...prev.primary, background: e.target.value }
-                        }))}
-                        className="w-12 h-10 p-1 cursor-pointer"
-                      />
-                      <Input
-                        value={buttonStyles.primary.background}
-                        onChange={(e) => setButtonStyles(prev => ({
-                          ...prev,
-                          primary: { ...prev.primary, background: e.target.value }
-                        }))}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Couleur du texte</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="color"
-                        value={buttonStyles.primary.text}
-                        onChange={(e) => setButtonStyles(prev => ({
-                          ...prev,
-                          primary: { ...prev.primary, text: e.target.value }
-                        }))}
-                        className="w-12 h-10 p-1 cursor-pointer"
-                      />
-                      <Input
-                        value={buttonStyles.primary.text}
-                        onChange={(e) => setButtonStyles(prev => ({
-                          ...prev,
-                          primary: { ...prev.primary, text: e.target.value }
-                        }))}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Rayon des coins</Label>
-                    <Input
+                    <Label>Rayon de bordure</Label>
+                    <Select
                       value={buttonStyles.primary.border_radius}
-                      onChange={(e) => setButtonStyles(prev => ({
+                      onValueChange={(value) => setButtonStyles(prev => ({
                         ...prev,
-                        primary: { ...prev.primary, border_radius: e.target.value }
+                        primary: { ...prev.primary, border_radius: value }
                       }))}
-                      placeholder="8px"
-                    />
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="0px">Carré (0px)</SelectItem>
+                        <SelectItem value="4px">Léger (4px)</SelectItem>
+                        <SelectItem value="8px">Standard (8px)</SelectItem>
+                        <SelectItem value="12px">Arrondi (12px)</SelectItem>
+                        <SelectItem value="9999px">Pilule</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <div className="pt-2">
-                    <Label className="text-xs text-muted-foreground">Aperçu:</Label>
-                    <button
-                      className="mt-2 px-6 py-2 font-medium"
+                  <div className="pt-4">
+                    <Label className="mb-2 block">Aperçu</Label>
+                    <Button
                       style={{
                         backgroundColor: buttonStyles.primary.background,
                         color: buttonStyles.primary.text,
-                        borderRadius: buttonStyles.primary.border_radius,
-                        fontFamily: typography.button_font
+                        borderRadius: buttonStyles.primary.border_radius
                       }}
                     >
                       Bouton Primaire
-                    </button>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -602,72 +843,55 @@ export default function CmsStyleManager() {
                   <CardTitle className="text-lg">Bouton Secondaire</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  <ColorField 
+                    label="Couleur de fond" 
+                    value={buttonStyles.secondary.background}
+                    onChange={(v) => setButtonStyles(prev => ({
+                      ...prev,
+                      secondary: { ...prev.secondary, background: v }
+                    }))}
+                  />
+                  <ColorField 
+                    label="Couleur du texte" 
+                    value={buttonStyles.secondary.text}
+                    onChange={(v) => setButtonStyles(prev => ({
+                      ...prev,
+                      secondary: { ...prev.secondary, text: v }
+                    }))}
+                  />
                   <div className="space-y-2">
-                    <Label>Couleur de fond</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="color"
-                        value={buttonStyles.secondary.background}
-                        onChange={(e) => setButtonStyles(prev => ({
-                          ...prev,
-                          secondary: { ...prev.secondary, background: e.target.value }
-                        }))}
-                        className="w-12 h-10 p-1 cursor-pointer"
-                      />
-                      <Input
-                        value={buttonStyles.secondary.background}
-                        onChange={(e) => setButtonStyles(prev => ({
-                          ...prev,
-                          secondary: { ...prev.secondary, background: e.target.value }
-                        }))}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Couleur du texte</Label>
-                    <div className="flex gap-2">
-                      <Input
-                        type="color"
-                        value={buttonStyles.secondary.text}
-                        onChange={(e) => setButtonStyles(prev => ({
-                          ...prev,
-                          secondary: { ...prev.secondary, text: e.target.value }
-                        }))}
-                        className="w-12 h-10 p-1 cursor-pointer"
-                      />
-                      <Input
-                        value={buttonStyles.secondary.text}
-                        onChange={(e) => setButtonStyles(prev => ({
-                          ...prev,
-                          secondary: { ...prev.secondary, text: e.target.value }
-                        }))}
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Rayon des coins</Label>
-                    <Input
+                    <Label>Rayon de bordure</Label>
+                    <Select
                       value={buttonStyles.secondary.border_radius}
-                      onChange={(e) => setButtonStyles(prev => ({
+                      onValueChange={(value) => setButtonStyles(prev => ({
                         ...prev,
-                        secondary: { ...prev.secondary, border_radius: e.target.value }
+                        secondary: { ...prev.secondary, border_radius: value }
                       }))}
-                      placeholder="8px"
-                    />
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="0px">Carré (0px)</SelectItem>
+                        <SelectItem value="4px">Léger (4px)</SelectItem>
+                        <SelectItem value="8px">Standard (8px)</SelectItem>
+                        <SelectItem value="12px">Arrondi (12px)</SelectItem>
+                        <SelectItem value="9999px">Pilule</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <div className="pt-2">
-                    <Label className="text-xs text-muted-foreground">Aperçu:</Label>
-                    <button
-                      className="mt-2 px-6 py-2 font-medium border"
+                  <div className="pt-4">
+                    <Label className="mb-2 block">Aperçu</Label>
+                    <Button
+                      variant="outline"
                       style={{
                         backgroundColor: buttonStyles.secondary.background,
                         color: buttonStyles.secondary.text,
-                        borderRadius: buttonStyles.secondary.border_radius,
-                        fontFamily: typography.button_font
+                        borderRadius: buttonStyles.secondary.border_radius
                       }}
                     >
                       Bouton Secondaire
-                    </button>
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
