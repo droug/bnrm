@@ -50,14 +50,14 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
         {/* Header with blue background */}
         <div className="bg-[#1e3a8a] text-white px-8 py-8 rounded-lg mb-8">
           <div className={`${language === 'ar' ? 'text-center' : 'text-left'}`}>
-            <p className="text-morocco-green text-sm font-semibold uppercase tracking-wide mb-2">
+            <p className="tagline text-morocco-green mb-2">
               BNRM
             </p>
-            <h2 className="text-4xl font-bold mb-4">
+            <h2 className="heading-3 mb-4">
               {language === 'ar' ? 'الوسائط المتعددة' : 'Médiathèque'}
             </h2>
             <div className={`w-24 h-1 bg-morocco-green mb-6 ${language === 'ar' ? 'mx-auto' : ''}`}></div>
-            <p className="text-lg text-white/90 max-w-2xl">
+            <p className="text-medium text-white/90 max-w-2xl">
               {language === 'ar' 
                 ? 'استكشف مجموعاتنا الصوتية والمرئية الغنية'
                 : 'Explorez nos riches collections audiovisuelles et multimédias'
@@ -89,7 +89,7 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
                           title={video.title[language]}
                         />
                       </div>
-                      <h3 className="text-base font-semibold text-center text-foreground">
+                      <h3 className="text-regular font-semibold text-center text-foreground">
                         {video.title[language]}
                       </h3>
                     </CardContent>

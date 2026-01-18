@@ -78,11 +78,18 @@ const Index = () => {
           
           <div className="relative z-10 container mx-auto px-4 h-full flex items-center min-h-[70vh]">
             <div className="max-w-2xl">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+              {/* Tagline */}
+              <p className="tagline text-morocco-green mb-4">
+                {language === 'ar' ? 'التراث الوطني المغربي' : 'Patrimoine National Marocain'}
+              </p>
+              
+              {/* Heading 2 - Main title */}
+              <h1 className="heading-2 text-white mb-6">
                 {t('header.title')}
               </h1>
               
-              <p className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed max-w-xl">
+              {/* Text medium - Description */}
+              <p className="text-medium text-white/90 mb-8 max-w-xl">
                 {language === 'ar' 
                   ? 'الحفاظ على التراث المخطوط المغربي وتثمينه. اكتشف آلاف المخطوطات القديمة الرقمية في إطار معماري استثنائي.'
                   : 'Préservation et valorisation du patrimoine manuscrit marocain. Découvrez des milliers de manuscrits anciens numérisés dans un cadre architectural exceptionnel.'
@@ -93,7 +100,7 @@ const Index = () => {
                 <Button 
                   size="lg"
                   onClick={() => navigate('/help')}
-                  className="bg-morocco-green hover:bg-morocco-green/90 text-white px-8 py-6 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
+                  className="bg-morocco-green hover:bg-morocco-green/90 text-white px-8 py-6 text-regular font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
                 >
                   <HelpCircle className={`h-5 w-5 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
                   {language === 'ar' ? 'المساعدة والدعم' : 'Aide & Support'}
@@ -114,10 +121,10 @@ const Index = () => {
                     <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center">
                       <Search className="h-8 w-8 text-primary" />
                     </div>
-                    <h2 className="text-2xl font-bold text-foreground mb-2">
+                    <h2 className="heading-5 text-foreground mb-2">
                       {language === 'ar' ? 'البحث في الفهرس' : 'Rechercher dans le catalogue'}
                     </h2>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-small text-muted-foreground">
                       {language === 'ar' 
                         ? 'ابحث في مجموعاتنا الواسعة من الكتب والمخطوطات'
                         : 'Explorez nos vastes collections de livres et manuscrits'
@@ -173,14 +180,14 @@ const Index = () => {
                 <div className="py-8 bg-gradient-to-b from-slate-50 to-white rounded-lg">
                   <div className="container mx-auto px-4">
                     <div className="mb-10">
-                      <p className="text-morocco-green text-sm font-semibold uppercase tracking-wide mb-2">
+                      <p className="tagline text-morocco-green mb-2">
                         BNRM
                       </p>
-                      <h2 className="text-4xl font-bold text-[#1e3a8a] mb-4">
+                      <h2 className="heading-3 text-[#1e3a8a] mb-4">
                         {language === 'ar' ? 'خدماتنا الرقمية' : 'Nos Services Numériques'}
                       </h2>
                       <div className="w-24 h-1 bg-morocco-green mb-4"></div>
-                      <p className="text-muted-foreground">
+                      <p className="text-regular text-muted-foreground">
                         {language === 'ar'
                           ? 'اكتشف مجموعة واسعة من الخدمات الرقمية المتاحة'
                           : 'Découvrez notre large gamme de services numériques disponibles'
@@ -199,14 +206,14 @@ const Index = () => {
               {/* Quick Links */}
               <div className="mb-12">
                 <div className={`mb-10 ${language === 'ar' ? 'text-center' : 'text-left'}`}>
-                  <p className="text-morocco-green text-sm font-semibold uppercase tracking-wide mb-2">
+                  <p className="tagline text-morocco-green mb-2">
                     BNRM
                   </p>
-                  <h2 className="text-4xl font-bold text-[#1e3a8a] mb-4">
+                  <h2 className="heading-3 text-[#1e3a8a] mb-4">
                     {language === 'ar' ? 'روابط سريعة' : 'Liens rapides'}
                   </h2>
                   <div className={`w-24 h-1 bg-morocco-green mb-4 ${language === 'ar' ? 'mx-auto' : ''}`}></div>
-                  <p className="text-muted-foreground">
+                  <p className="text-regular text-muted-foreground">
                     {language === 'ar'
                       ? 'الوصول السريع إلى خدماتنا الأساسية'
                       : 'Accès rapide à nos services essentiels'
@@ -229,10 +236,10 @@ const Index = () => {
                       <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         <UserPlus className="h-10 w-10 text-primary" />
                       </div>
-                      <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                      <h3 className="heading-6 text-foreground group-hover:text-primary transition-colors">
                         {language === 'ar' ? 'تسجيل' : 'Inscription'}
                       </h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
+                      <p className="text-small text-muted-foreground">
                         {language === 'ar' 
                           ? 'إنشاء حساب جديد للوصول إلى جميع خدماتنا' 
                           : 'Créez votre compte pour accéder à tous nos services'}
@@ -255,10 +262,10 @@ const Index = () => {
                       <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         <CreditCard className="h-10 w-10 text-primary" />
                       </div>
-                      <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                      <h3 className="heading-6 text-foreground group-hover:text-primary transition-colors">
                         {language === 'ar' ? 'الاشتراكات' : 'Adhésions'}
                       </h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
+                      <p className="text-small text-muted-foreground">
                         {language === 'ar' 
                           ? 'اكتشف أنواع الاشتراكات والخدمات المتاحة' 
                           : 'Découvrez nos différentes formules d\'adhésion'}
@@ -281,10 +288,10 @@ const Index = () => {
                       <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         <MousePointer className="h-10 w-10 text-primary" />
                       </div>
-                      <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                      <h3 className="heading-6 text-foreground group-hover:text-primary transition-colors">
                         {language === 'ar' ? 'المساعدة والدعم' : 'Aide & Support'}
                       </h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
+                      <p className="text-small text-muted-foreground">
                         {language === 'ar' 
                           ? 'احصل على المساعدة والدعم الذي تحتاجه' 
                           : 'Obtenez l\'aide dont vous avez besoin'}

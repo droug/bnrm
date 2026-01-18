@@ -23,6 +23,27 @@ export default {
         'moroccan': ['Georgia', 'Amiri', 'serif'],
         'elegant': ['Georgia', 'Times New Roman', 'serif'],
       },
+      fontSize: {
+        // BNRM Typography Scale
+        'heading-1': ['4.5rem', { lineHeight: '1.2' }],
+        'heading-1-mobile': ['2.75rem', { lineHeight: '1.2' }],
+        'heading-2': ['3.25rem', { lineHeight: '1.2' }],
+        'heading-2-mobile': ['2.5rem', { lineHeight: '1.2' }],
+        'heading-3': ['2.75rem', { lineHeight: '1.2' }],
+        'heading-3-mobile': ['2rem', { lineHeight: '1.2' }],
+        'heading-4': ['2.25rem', { lineHeight: '1.3' }],
+        'heading-4-mobile': ['1.5rem', { lineHeight: '1.3' }],
+        'heading-5': ['1.75rem', { lineHeight: '1.4' }],
+        'heading-5-mobile': ['1.25rem', { lineHeight: '1.4' }],
+        'heading-6': ['1.375rem', { lineHeight: '1.4' }],
+        'heading-6-mobile': ['1.125rem', { lineHeight: '1.4' }],
+        'tagline': ['1rem', { lineHeight: '1.5', letterSpacing: '0.05em' }],
+        'text-large': ['1.375rem', { lineHeight: '1.5' }],
+        'text-medium': ['1.125rem', { lineHeight: '1.5' }],
+        'text-regular': ['1rem', { lineHeight: '1.5' }],
+        'text-small': ['0.875rem', { lineHeight: '1.5' }],
+        'text-tiny': ['0.75rem', { lineHeight: '1.5' }],
+      },
       colors: {
         // BNRM Official Color Families
         slate: {
