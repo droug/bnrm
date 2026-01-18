@@ -190,9 +190,9 @@ const DigitalLibrary = () => {
       icon: BookOpen,
       count: "12,450",
       description: "Manuscrits arabes, berbères et hébraïques",
-      color: "text-primary",
-      bgColor: "bg-primary/10",
-      gradient: "from-primary/20 to-accent/20"
+      color: "text-bn-blue-primary",
+      bgColor: "bg-bn-blue-primary/10",
+      gradient: "from-bn-blue-primary/20 to-gold-bn-primary/20"
     },
     {
       id: "periodicals",
@@ -200,9 +200,9 @@ const DigitalLibrary = () => {
       icon: FileText,
       count: "8,320",
       description: "Journaux marocains historiques et revues",
-      color: "text-accent",
-      bgColor: "bg-accent/10",
-      gradient: "from-accent/20 to-highlight/20"
+      color: "text-gold-bn-primary",
+      bgColor: "bg-gold-bn-primary/10",
+      gradient: "from-gold-bn-primary/20 to-bn-blue-deep/20"
     },
     {
       id: "monographs",
@@ -210,9 +210,9 @@ const DigitalLibrary = () => {
       icon: Book,
       count: "45,670",
       description: "Ouvrages sur le patrimoine marocain",
-      color: "text-highlight",
-      bgColor: "bg-highlight/10",
-      gradient: "from-highlight/20 to-royal/20"
+      color: "text-bn-blue-deep",
+      bgColor: "bg-bn-blue-deep/10",
+      gradient: "from-bn-blue-deep/20 to-gold-bn-primary-dark/20"
     },
     {
       id: "special",
@@ -220,9 +220,9 @@ const DigitalLibrary = () => {
       icon: ImageIcon,
       count: "3,240",
       description: "Cartes anciennes, lithographies marocaines",
-      color: "text-royal",
-      bgColor: "bg-royal/10",
-      gradient: "from-royal/20 to-gold/20"
+      color: "text-gold-bn-primary-dark",
+      bgColor: "bg-gold-bn-primary-dark/10",
+      gradient: "from-gold-bn-primary-dark/20 to-bn-blue-primary/20"
     },
     {
       id: "audiovisual",
@@ -230,9 +230,9 @@ const DigitalLibrary = () => {
       icon: Video,
       count: "2,890",
       description: "Archives sonores et vidéos du Maroc",
-      color: "text-gold",
-      bgColor: "bg-gold/10",
-      gradient: "from-gold/20 to-primary/20"
+      color: "text-gold-bn-deep",
+      bgColor: "bg-gold-bn-deep/10",
+      gradient: "from-gold-bn-deep/20 to-bn-blue-primary/20"
     }
   ];
 

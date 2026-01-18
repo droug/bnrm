@@ -152,7 +152,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
             {/* Bouton Gestion Bibliothèque Numérique pour admin/bibliothécaire */}
             {canManageLibrary && (
               <Link to="/admin/digital-library">
-                <Button variant="outline" size="sm" className="gap-2 border-primary/40 hover:border-primary hover:bg-primary/10">
+                <Button variant="outline" size="sm" className="gap-2 border-gold-bn-primary/40 hover:border-gold-bn-primary hover:bg-gold-bn-primary/10">
                   <Shield className="h-4 w-4" />
                   <span className="hidden sm:inline">{t('dl.manageLibrary')}</span>
                   <span className="sm:hidden">{t('dl.administration')}</span>
@@ -167,7 +167,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" 
+                    className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-gold-bn-primary focus-visible:ring-offset-2" 
                     aria-label="Sélectionner la langue"
                   >
                     <Globe className="h-4 w-4" aria-hidden="true" />
@@ -187,7 +187,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                       aria-current={language === lang.code ? 'true' : 'false'}
                     >
                       {lang.label}
-                      {language === lang.code && <span className="ml-auto text-primary" aria-hidden="true">✓</span>}
+                      {language === lang.code && <span className="ml-auto text-gold-bn-primary" aria-hidden="true">✓</span>}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
@@ -201,7 +201,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                     <Button 
                       variant="outline" 
                       size="sm" 
-                      className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                      className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-gold-bn-primary focus-visible:ring-offset-2"
                       aria-label={t('dl.login')}
                     >
                       <LogIn className="h-4 w-4" aria-hidden="true" />
@@ -211,7 +211,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   <Link to="/abonnements">
                     <Button 
                       size="sm" 
-                      className="gap-2 text-sm bg-primary hover:bg-primary/90 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                      className="gap-2 text-sm bg-gold-bn-primary hover:bg-gold-bn-primary-dark text-white focus-visible:ring-2 focus-visible:ring-gold-bn-primary focus-visible:ring-offset-2"
                       aria-label={t('dl.membership')}
                     >
                       <UserPlus className="h-4 w-4" aria-hidden="true" />
@@ -315,15 +315,15 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   <Link key={item.href} to={item.href} className="block" title={t(item.tooltipKey)}>
                     <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3">
                       <div className="flex items-center gap-3 flex-1">
-                        <div className="p-1.5 rounded-md bg-primary/10">
-                          <item.icon className="h-4 w-4 text-primary" aria-hidden="true" />
+                        <div className="p-1.5 rounded-md bg-gold-bn-primary/10">
+                          <item.icon className="h-4 w-4 text-gold-bn-primary" aria-hidden="true" />
                         </div>
                         <div className="flex flex-col">
                           <span className="font-medium">{t(item.labelKey)}</span>
                           <span className="text-xs text-muted-foreground">{t(item.descKey)}</span>
                         </div>
                       </div>
-                      <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-primary/10 text-primary">
+                      <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-gold-bn-primary/10 text-gold-bn-primary">
                         {item.count}
                       </span>
                     </DropdownMenuItem>
