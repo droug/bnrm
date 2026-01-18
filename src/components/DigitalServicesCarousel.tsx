@@ -299,7 +299,7 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
         <Button
           onClick={() => navigate('/services-bnrm')}
           size="lg"
-          className="bg-primary hover:bg-blue-primary-dark text-white px-8 py-6 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
+          className="bg-blue-primary-dark hover:bg-blue-deep text-white px-8 py-6 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
         >
           {language === 'ar' ? 'عرض جميع الخدمات' : 'Voir tous nos services'}
           <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
