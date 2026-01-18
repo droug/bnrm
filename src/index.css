@@ -37,7 +37,7 @@ Enhanced Moroccan Heritage Design System
     --slate-shadow: 224 71% 4%;        /* #020617 */
     
     /* ─────────────────────────────────────────────── */
-    /* BLUE FAMILY - Primary brand colors              */
+    /* BLUE FAMILY - Primary brand colors (Portail)    */
     /* ─────────────────────────────────────────────── */
     --blue-surface: 214 100% 97%;      /* #EFF6FF */
     --blue-light: 214 95% 93%;         /* #DBEAFE */
@@ -50,6 +50,22 @@ Enhanced Moroccan Heritage Design System
     --blue-deep-alt: 224 76% 40%;      /* #1E40AF */
     --blue-dark: 224 64% 33%;          /* #1E3A8A */
     --blue-shadow: 226 57% 21%;        /* #172554 */
+    
+    /* ─────────────────────────────────────────────── */
+    /* BLUE BN FAMILY - Bibliothèque Numérique        */
+    /* Based on Variables BN Design System             */
+    /* ─────────────────────────────────────────────── */
+    --bn-blue-surface: 210 33% 96%;    /* #F4F6F8 */
+    --bn-blue-light: 210 26% 88%;      /* #D9E1E8 */
+    --bn-blue-light-alt: 210 20% 79%;  /* #BFCAD4 */
+    --bn-blue-soft: 210 16% 70%;       /* #A5B3C0 */
+    --bn-blue-primary-light: 210 18% 58%; /* #8093A8 */
+    --bn-blue-primary: 210 28% 28%;    /* #33475C - Official BN Blue */
+    --bn-blue-primary-dark: 210 34% 20%; /* #253241 */
+    --bn-blue-deep: 210 37% 16%;       /* #1B2735 */
+    --bn-blue-deep-alt: 210 40% 12%;   /* #151E2A */
+    --bn-blue-dark: 210 45% 9%;        /* #0E151E */
+    --bn-blue-shadow: 210 50% 5%;      /* #070C12 */
     
     /* ─────────────────────────────────────────────── */
     /* GOLD/AMBER FAMILY - Accent colors               */

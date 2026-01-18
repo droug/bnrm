@@ -416,23 +416,23 @@ export default function DigitalLibraryHome() {
                                  <p className="text-sm text-white/60 mb-4">{item.date}</p>
                                )}
                                <div className="flex gap-2 mt-6">
-                                 {item.hasDocument ? (
-                                   <Button 
-                                     size="lg" 
-                                     className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 min-w-[160px]" 
-                                     onClick={() => handleConsultDocument(item)}
-                                   >
-                                     <BookOpen className="h-5 w-5 mr-2" />
-                                     {t('dl.home.consult')}
+                                  {item.hasDocument ? (
+                                    <Button 
+                                      size="lg" 
+                                      className="bg-gradient-to-r from-gold-bn-primary to-gold-bn-primary-dark hover:from-gold-bn-primary-dark hover:to-gold-bn-deep text-white shadow-lg hover:shadow-xl transition-all duration-300 min-w-[160px]" 
+                                      onClick={() => handleConsultDocument(item)}
+                                    >
+                                      <BookOpen className="h-5 w-5 mr-2" />
+                                      {t('dl.home.consult')}
                                    </Button>
-                                 ) : item.link ? (
-                                   <Button 
-                                     size="lg" 
-                                     className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 min-w-[160px]" 
-                                     onClick={() => window.open(item.link, '_blank')}
-                                   >
-                                     <ExternalLink className="h-5 w-5 mr-2" />
-                                     {t('dl.home.discover')}
+                                  ) : item.link ? (
+                                    <Button 
+                                      size="lg" 
+                                      className="bg-gradient-to-r from-gold-bn-primary to-gold-bn-primary-dark hover:from-gold-bn-primary-dark hover:to-gold-bn-deep text-white shadow-lg hover:shadow-xl transition-all duration-300 min-w-[160px]" 
+                                      onClick={() => window.open(item.link, '_blank')}
+                                    >
+                                      <ExternalLink className="h-5 w-5 mr-2" />
+                                      {t('dl.home.discover')}
                                    </Button>
                                  ) : null}
                                </div>
@@ -479,14 +479,14 @@ export default function DigitalLibraryHome() {
                                <h3 className="text-2xl font-bold mb-2 text-white">{item.title}</h3>
                                <p className="text-white/80 mb-4">{item.author}</p>
                                 <p className="text-sm text-white/70 mb-4">{t('dl.home.addedOn')} {new Date(item.date).toLocaleDateString(language === 'ar' ? 'ar-MA' : language === 'en' ? 'en-US' : 'fr-FR')}</p>
-                                  <div className="flex gap-2 mt-6">
-                                    <Button 
-                                      size="lg" 
-                                      className="bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-lg hover:shadow-xl transition-all duration-300 min-w-[160px]" 
-                                      onClick={() => handleConsultDocument(item)}
-                                    >
-                                      <BookOpen className="h-5 w-5 mr-2" />
-                                      {t('dl.home.consult')}
+                                    <div className="flex gap-2 mt-6">
+                                     <Button 
+                                       size="lg" 
+                                       className="bg-gradient-to-r from-gold-bn-primary to-gold-bn-primary-dark hover:from-gold-bn-primary-dark hover:to-gold-bn-deep text-white shadow-lg hover:shadow-xl transition-all duration-300 min-w-[160px]" 
+                                       onClick={() => handleConsultDocument(item)}
+                                     >
+                                       <BookOpen className="h-5 w-5 mr-2" />
+                                       {t('dl.home.consult')}
                                     </Button>
                                  </div>
                             </div>
@@ -525,14 +525,14 @@ export default function DigitalLibraryHome() {
       <section className="container mx-auto px-4 py-12">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-3xl font-bold text-foreground flex items-center gap-2">
-              <Sparkles className="h-8 w-8 text-primary" />
+          <h2 className="text-3xl font-bold text-foreground flex items-center gap-2">
+              <Sparkles className="h-8 w-8 text-gold-bn-primary" />
               {t('dl.home.latestAdditions')}
             </h2>
             <p className="text-muted-foreground mt-1">{t('dl.home.recentlyAdded')}</p>
           </div>
           <Link to="/digital-library/search?sort=recent">
-            <Button variant="outline">{t('dl.home.viewAll')}</Button>
+            <Button variant="outline" className="border-gold-bn-primary text-bn-blue-primary hover:bg-gold-bn-surface">{t('dl.home.viewAll')}</Button>
           </Link>
         </div>
 
@@ -554,7 +554,7 @@ export default function DigitalLibraryHome() {
                 </CardHeader>
                 <CardContent className="mt-auto pt-0">
                   <Button 
-                    className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white shadow-lg hover:shadow-xl transition-all duration-300" 
+                    className="w-full bg-gradient-to-r from-gold-bn-primary to-gold-bn-primary-dark hover:from-gold-bn-primary-dark hover:to-gold-bn-deep text-white shadow-lg hover:shadow-xl transition-all duration-300" 
                     onClick={() => handleConsultDocument(item)}
                   >
                     <BookOpen className="h-4 w-4 mr-2" />
@@ -581,11 +581,11 @@ export default function DigitalLibraryHome() {
               <Link key={collection.id} to={collection.href}>
                 <Card className="hover:shadow-lg transition-all hover:scale-105">
                   <CardHeader className="text-center">
-                    <div className="mx-auto p-4 bg-primary/10 rounded-full w-fit mb-4">
-                      <collection.icon className="h-8 w-8 text-primary" />
+                    <div className="mx-auto p-4 bg-bn-blue-primary/10 rounded-full w-fit mb-4">
+                      <collection.icon className="h-8 w-8 text-bn-blue-primary" />
                     </div>
                     <CardTitle className="text-lg">{collection.titleKey ? t(collection.titleKey) : collection.title}</CardTitle>
-                    <CardDescription className="text-2xl font-bold text-primary">
+                    <CardDescription className="text-2xl font-bold text-gold-bn-primary">
                       {collection.count}
                     </CardDescription>
                   </CardHeader>
@@ -621,11 +621,11 @@ export default function DigitalLibraryHome() {
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-3xl font-bold text-foreground flex items-center gap-2">
-                <Calendar className="h-8 w-8 text-primary" />
+                <Calendar className="h-8 w-8 text-gold-bn-primary" />
                 {t('dl.home.latestNews')}
               </h2>
               <Link to="/digital-library/news">
-                <Button variant="outline">{t('dl.home.allNews')}</Button>
+                <Button variant="outline" className="border-gold-bn-primary text-bn-blue-primary hover:bg-gold-bn-surface">{t('dl.home.allNews')}</Button>
               </Link>
             </div>
 
@@ -651,7 +651,7 @@ export default function DigitalLibraryHome() {
                   </CardHeader>
                   <CardContent>
                     <Link to={`/digital-library/news/${article.id}`}>
-                      <Button variant="outline" className="w-full">{t('dl.home.readMore')}</Button>
+                      <Button variant="outline" className="w-full border-gold-bn-primary text-bn-blue-primary hover:bg-gold-bn-surface">{t('dl.home.readMore')}</Button>
                     </Link>
                   </CardContent>
                 </Card>
@@ -664,12 +664,12 @@ export default function DigitalLibraryHome() {
       {/* Quick Stats */}
       {statsData.length > 0 && (
         <section className="container mx-auto px-4 py-12">
-          <Card className="bg-gradient-to-br from-primary/10 to-accent/10 border-2">
+          <Card className="bg-gradient-to-br from-bn-blue-primary/10 to-gold-bn-primary/10 border-2 border-gold-bn-primary/30">
             <CardContent className="py-8">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-center">
                 {statsData.map((stat, index) => (
                   <div key={index}>
-                    <div className="text-4xl font-bold text-primary mb-2">{stat.value}</div>
+                    <div className="text-4xl font-bold text-gold-bn-primary mb-2">{stat.value}</div>
                     <div className="text-sm text-muted-foreground">{stat.labelKey ? t(stat.labelKey) : stat.label}</div>
                   </div>
                 ))}
@@ -681,17 +681,17 @@ export default function DigitalLibraryHome() {
 
       {/* Section Exposition Virtuelle */}
       <section className="py-16 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/10 via-background to-indigo-900/10" />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl" />
+        <div className="absolute inset-0 bg-gradient-to-br from-bn-blue-primary/10 via-background to-gold-bn-primary/10" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-bn-blue-primary/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-gold-bn-primary/10 rounded-full blur-3xl" />
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 text-sm font-medium mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-bn-blue-primary/10 text-bn-blue-primary text-sm font-medium mb-4">
               <Layers className="h-4 w-4" />
               Découverte immersive
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-bn-blue-primary via-bn-blue-primary-dark to-bn-blue-primary bg-clip-text text-transparent">
               Exposition Virtuelle
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
@@ -701,29 +701,29 @@ export default function DigitalLibraryHome() {
 
           <div className="max-w-4xl mx-auto">
             <Link to="/digital-library/exposition-virtuelle">
-              <Card className="group relative overflow-hidden border-2 border-transparent hover:border-purple-500/30 transition-all duration-500 bg-gradient-to-br from-card via-card to-purple-500/5 cursor-pointer">
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-600/0 via-purple-600/5 to-indigo-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <Card className="group relative overflow-hidden border-2 border-transparent hover:border-gold-bn-primary/30 transition-all duration-500 bg-gradient-to-br from-card via-card to-bn-blue-primary/5 cursor-pointer">
+                <div className="absolute inset-0 bg-gradient-to-r from-bn-blue-primary/0 via-bn-blue-primary/5 to-gold-bn-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
                 <CardContent className="p-8 md:p-12">
                   <div className="flex flex-col md:flex-row items-center gap-8">
                     {/* Image/Visual */}
                     <div className="relative flex-shrink-0">
-                      <div className="w-48 h-48 md:w-56 md:h-56 rounded-2xl bg-gradient-to-br from-purple-500 to-indigo-600 p-1 shadow-2xl shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-shadow duration-500">
+                      <div className="w-48 h-48 md:w-56 md:h-56 rounded-2xl bg-gradient-to-br from-bn-blue-primary to-bn-blue-deep p-1 shadow-2xl shadow-bn-blue-primary/20 group-hover:shadow-bn-blue-primary/40 transition-shadow duration-500">
                         <div className="w-full h-full rounded-xl bg-card flex items-center justify-center overflow-hidden">
                           <div className="relative">
-                            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/20 to-indigo-500/20 rounded-full blur-xl animate-pulse" />
-                            <Layers className="h-24 w-24 text-purple-600 relative z-10 group-hover:scale-110 transition-transform duration-500" />
+                            <div className="absolute inset-0 bg-gradient-to-br from-bn-blue-primary/20 to-gold-bn-primary/20 rounded-full blur-xl animate-pulse" />
+                            <Layers className="h-24 w-24 text-bn-blue-primary relative z-10 group-hover:scale-110 transition-transform duration-500" />
                           </div>
                         </div>
                       </div>
-                      <div className="absolute -bottom-2 -right-2 px-3 py-1 bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold rounded-full shadow-lg">
+                      <div className="absolute -bottom-2 -right-2 px-3 py-1 bg-gradient-to-r from-gold-bn-primary to-gold-bn-primary-dark text-white text-xs font-bold rounded-full shadow-lg">
                         NOUVEAU
                       </div>
                     </div>
 
                     {/* Content */}
                     <div className="flex-1 text-center md:text-left">
-                      <h3 className="text-2xl md:text-3xl font-bold mb-3 group-hover:text-purple-600 transition-colors">
+                      <h3 className="text-2xl md:text-3xl font-bold mb-3 group-hover:text-bn-blue-primary transition-colors">
                         Le Maroc à travers les âges
                       </h3>
                       <p className="text-muted-foreground mb-6 leading-relaxed">
@@ -732,7 +732,7 @@ export default function DigitalLibraryHome() {
                         dans une expérience immersive unique.
                       </p>
                       <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
-                        <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-lg shadow-purple-500/25 group-hover:shadow-purple-500/40 transition-all duration-300">
+                        <Button className="bg-gradient-to-r from-gold-bn-primary to-gold-bn-primary-dark hover:from-gold-bn-primary-dark hover:to-gold-bn-deep text-white shadow-lg shadow-gold-bn-primary/25 group-hover:shadow-gold-bn-primary/40 transition-all duration-300">
                           <Eye className="h-4 w-4 mr-2" />
                           Visiter l'exposition
                         </Button>
@@ -760,18 +760,18 @@ export default function DigitalLibraryHome() {
       <section className="py-20 bg-gradient-to-b from-muted to-background relative overflow-hidden">
         {/* Décorations de fond (très léger) */}
         <div className="absolute bottom-0 left-0 w-64 h-64 opacity-10">
-          <div className="w-full h-full bg-gradient-to-tr from-accent/30 to-transparent rounded-full blur-3xl" />
+          <div className="w-full h-full bg-gradient-to-tr from-gold-bn-primary/30 to-transparent rounded-full blur-3xl" />
         </div>
         <div className="absolute bottom-0 right-0 w-64 h-64 opacity-10">
-          <div className="w-full h-full bg-gradient-to-tl from-accent/30 to-transparent rounded-full blur-3xl" />
+          <div className="w-full h-full bg-gradient-to-tl from-gold-bn-primary/30 to-transparent rounded-full blur-3xl" />
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
           {/* Header */}
           <div className="text-center mb-14">
             {/* Icône dorée (grille + plus) */}
-            <div className="inline-flex items-center justify-center w-12 h-12 border border-accent rounded-lg mb-6">
-              <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-accent" aria-hidden="true">
+            <div className="inline-flex items-center justify-center w-12 h-12 border border-gold-bn-primary rounded-lg mb-6">
+              <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-gold-bn-primary" aria-hidden="true">
                 <rect x="5" y="5" width="5" height="5" stroke="currentColor" strokeWidth="1.5" />
                 <rect x="14" y="5" width="5" height="5" stroke="currentColor" strokeWidth="1.5" />
                 <rect x="5" y="14" width="5" height="5" stroke="currentColor" strokeWidth="1.5" />
@@ -781,7 +781,7 @@ export default function DigitalLibraryHome() {
               </svg>
             </div>
 
-            <h2 className="heading-3 text-primary font-heading">
+            <h2 className="heading-3 text-bn-blue-primary font-heading">
               Ressources électroniques
             </h2>
             <p className="font-body text-regular text-muted-foreground max-w-2xl mx-auto mt-4">

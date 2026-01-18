@@ -295,14 +295,14 @@ const DigitalLibrary = () => {
       
       <main className="container mx-auto px-4 py-8">
         {/* Hero Section */}
-        <section className="relative mb-12 py-24 md:py-32 px-8 rounded-3xl border-4 border-gold/40 overflow-hidden shadow-2xl">
+        <section className="relative mb-12 py-24 md:py-32 px-8 rounded-3xl border-4 border-gold-bn-primary/40 overflow-hidden shadow-2xl">
           {/* Background Image - Dynamic from CMS */}
           <div 
             className="absolute inset-0 bg-cover bg-center opacity-70"
             style={{ backgroundImage: `url(${heroImageUrl})` }}
           ></div>
-          {/* Overlay - réduit pour plus de visibilité */}
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/50 via-primary/40 to-accent/50"></div>
+          {/* Overlay - BN Blue tones */}
+          <div className="absolute inset-0 bg-gradient-to-r from-bn-blue-primary/70 via-bn-blue-primary/60 to-bn-blue-deep/70"></div>
           <div className="absolute inset-0 bg-pattern-zellige-complex opacity-10"></div>
           <div className="relative z-10 text-center">
             <h1 className="text-6xl md:text-7xl lg:text-8xl font-moroccan font-bold text-white mb-6 drop-shadow-2xl">
@@ -354,7 +354,7 @@ const DigitalLibrary = () => {
                       type="button"
                       variant="secondary"
                       size="lg"
-                      className="h-16 px-4 gap-2 bg-white/95 hover:bg-white border-3 border-gold/30 shadow-lg shrink-0"
+                      className="h-16 px-4 gap-2 bg-white/95 hover:bg-white border-3 border-gold-bn-primary/30 shadow-lg shrink-0"
                     >
                       <Filter className="h-5 w-5" />
                       <span className="hidden sm:inline">Filtres</span>
@@ -463,7 +463,7 @@ const DigitalLibrary = () => {
                     placeholder="Rechercher dans les collections (titre, auteur, mots-clés...)..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full h-16 text-lg bg-white/98 shadow-lg border-3 border-gold/30 focus:border-primary pl-6 pr-28 rounded-full"
+                    className="w-full h-16 text-lg bg-white/98 shadow-lg border-3 border-gold-bn-primary/30 focus:border-bn-blue-primary pl-6 pr-28 rounded-full"
                   />
                   
                   {/* Clear button */}
@@ -484,7 +484,7 @@ const DigitalLibrary = () => {
                   <Button 
                     type="submit"
                     size="lg" 
-                    className="absolute right-2 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full shadow-md"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 h-12 w-12 rounded-full shadow-md bg-gold-bn-primary hover:bg-gold-bn-primary-dark text-white"
                     disabled={!searchQuery.trim() && activeFilters.length === 0}
                   >
                     <Search className="h-6 w-6" />
@@ -509,7 +509,7 @@ const DigitalLibrary = () => {
               const Icon = collection.icon;
               return (
                 <Link key={collection.id} to={`/digital-library/${collection.id}`}>
-                  <Card className="h-full hover:shadow-2xl transition-all duration-300 hover:scale-105 border-3 border-gold/30 hover:border-primary cursor-pointer relative overflow-hidden group">
+                  <Card className="h-full hover:shadow-2xl transition-all duration-300 hover:scale-105 border-3 border-gold-bn-primary/30 hover:border-gold-bn-primary cursor-pointer relative overflow-hidden group">
                     {/* Zellige Pattern Background */}
                     <div 
                       className="absolute inset-0 opacity-15 group-hover:opacity-25 transition-opacity bg-cover bg-center"
@@ -537,7 +537,7 @@ const DigitalLibrary = () => {
                         <Badge variant="secondary" className="text-base px-4 py-1 bg-white/80 backdrop-blur-sm">
                           {collection.count} documents
                         </Badge>
-                        <ArrowRight className="h-5 w-5 text-primary" />
+                        <ArrowRight className="h-5 w-5 text-gold-bn-primary" />
                       </div>
                     </CardContent>
                   </Card>
@@ -553,7 +553,7 @@ const DigitalLibrary = () => {
             <h2 className="text-3xl font-moroccan font-bold text-foreground">
               Œuvres à la Une
             </h2>
-            <Button variant="outline" className="flex items-center gap-2">
+            <Button variant="outline" className="flex items-center gap-2 border-gold-bn-primary text-bn-blue-primary hover:bg-gold-bn-surface">
               Voir tout
               <ArrowRight className="h-4 w-4" />
             </Button>
@@ -561,7 +561,7 @@ const DigitalLibrary = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {displayedFeaturedWorks.slice(0, 3).map((work, index) => (
               <Link key={work.id} to={work.link || `/digital-library/document/${work.documentId || index}`}>
-                <Card className="h-full hover:shadow-2xl transition-all duration-300 hover:scale-105 cursor-pointer border-3 border-gold/30 hover:border-primary group overflow-hidden">
+                <Card className="h-full hover:shadow-2xl transition-all duration-300 hover:scale-105 cursor-pointer border-3 border-gold-bn-primary/30 hover:border-gold-bn-primary group overflow-hidden">
                   {/* Image */}
                   <div className="aspect-[3/4] relative overflow-hidden">
                     <img 
@@ -611,7 +611,7 @@ const DigitalLibrary = () => {
             </TabsList>
             
             <TabsContent value="recent">
-              <Card className="border-2 border-gold/20">
+              <Card className="border-2 border-gold-bn-primary/20">
                 <CardContent className="p-6">
                   <p className="text-muted-foreground mb-2 font-elegant">
                     Découvrez les derniers documents numérisés et ajoutés à notre bibliothèque numérique.
@@ -637,7 +637,7 @@ const DigitalLibrary = () => {
             </TabsContent>
             
             <TabsContent value="popular">
-              <Card className="border-2 border-gold/20">
+              <Card className="border-2 border-gold-bn-primary/20">
                 <CardContent className="p-6">
                   <p className="text-muted-foreground mb-2 font-elegant">
                     Les documents les plus consultés par notre communauté.
@@ -654,7 +654,7 @@ const DigitalLibrary = () => {
                           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-3">
                             <p className="text-white text-xs font-semibold line-clamp-2">{work.title}</p>
                           </div>
-                          <Badge className="absolute top-2 right-2 bg-primary/90 backdrop-blur-sm">
+                          <Badge className="absolute top-2 right-2 bg-gold-bn-primary/90 backdrop-blur-sm text-white">
                             <Eye className="h-3 w-3 mr-1" />
                             {work.views}
                           </Badge>
@@ -667,7 +667,7 @@ const DigitalLibrary = () => {
             </TabsContent>
             
             <TabsContent value="recommended">
-              <Card className="border-2 border-gold/20">
+              <Card className="border-2 border-gold-bn-primary/20">
                 <CardContent className="p-6">
                   <p className="text-muted-foreground mb-2 font-elegant">
                     Sélection personnalisée basée sur les manuscrits andalous et maghrébins.
@@ -711,9 +711,9 @@ const DigitalLibrary = () => {
                     href={repo.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-4 border-2 border-muted rounded-lg hover:border-primary hover:bg-primary/5 transition-all duration-300"
+                    className="flex items-center gap-3 p-4 border-2 border-muted rounded-lg hover:border-gold-bn-primary hover:bg-gold-bn-surface transition-all duration-300"
                   >
-                    <Globe className="h-6 w-6 text-primary" />
+                    <Globe className="h-6 w-6 text-bn-blue-primary" />
                     <div>
                       <div className="font-semibold">{repo.code}</div>
                       <div className="text-xs text-muted-foreground">{repo.name}</div>
@@ -727,13 +727,13 @@ const DigitalLibrary = () => {
 
         {/* Help & Support Section */}
         <section className="mb-12">
-          <div className="bg-gradient-to-r from-primary/10 via-accent/10 to-highlight/10 rounded-2xl p-8 border-2 border-primary/20">
+          <div className="bg-gradient-to-r from-bn-blue-primary/10 via-gold-bn-primary/10 to-bn-blue-deep/10 rounded-2xl p-8 border-2 border-gold-bn-primary/20">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Card className="border-primary/30 hover:shadow-lg transition-shadow">
+              <Card className="border-bn-blue-primary/30 hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="p-3 bg-primary/10 rounded-lg">
-                      <HelpCircle className="h-6 w-6 text-primary" />
+                    <div className="p-3 bg-bn-blue-primary/10 rounded-lg">
+                      <HelpCircle className="h-6 w-6 text-bn-blue-primary" />
                     </div>
                     <CardTitle className="text-xl">Besoin d'aide ?</CardTitle>
                   </div>
@@ -743,7 +743,7 @@ const DigitalLibrary = () => {
                 </CardHeader>
                 <CardContent>
                   <Link to="/help">
-                    <Button className="w-full gap-2">
+                    <Button className="w-full gap-2 bg-gold-bn-primary hover:bg-gold-bn-primary-dark text-white">
                       <Lightbulb className="h-4 w-4" />
                       Consulter le centre d'aide
                       <ArrowRight className="h-4 w-4 ml-auto" />
@@ -752,11 +752,11 @@ const DigitalLibrary = () => {
                 </CardContent>
               </Card>
 
-              <Card className="border-accent/30 hover:shadow-lg transition-shadow">
+              <Card className="border-gold-bn-primary/30 hover:shadow-lg transition-shadow">
                 <CardHeader>
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="p-3 bg-accent/10 rounded-lg">
-                      <BookOpen className="h-6 w-6 text-accent" />
+                    <div className="p-3 bg-gold-bn-primary/10 rounded-lg">
+                      <BookOpen className="h-6 w-6 text-gold-bn-primary" />
                     </div>
                     <CardTitle className="text-xl">Guides rapides</CardTitle>
                   </div>
@@ -766,15 +766,15 @@ const DigitalLibrary = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2 text-sm">
-                    <Link to="/help" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
+                    <Link to="/help" className="flex items-center gap-2 text-muted-foreground hover:text-bn-blue-primary transition-colors">
                       <ArrowRight className="h-4 w-4" />
                       Comment rechercher dans les collections
                     </Link>
-                    <Link to="/help" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
+                    <Link to="/help" className="flex items-center gap-2 text-muted-foreground hover:text-bn-blue-primary transition-colors">
                       <ArrowRight className="h-4 w-4" />
                       Consulter et télécharger des documents
                     </Link>
-                    <Link to="/help" className="flex items-center gap-2 text-muted-foreground hover:text-primary transition-colors">
+                    <Link to="/help" className="flex items-center gap-2 text-muted-foreground hover:text-bn-blue-primary transition-colors">
                       <ArrowRight className="h-4 w-4" />
                       Utiliser les filtres avancés
                     </Link>
