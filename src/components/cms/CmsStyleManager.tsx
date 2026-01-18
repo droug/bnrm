@@ -245,11 +245,21 @@ export default function CmsStyleManager() {
       if (error) throw error;
       
       data?.forEach((setting: any) => {
-        if (setting.setting_key === 'section_styles') {
-          setSectionStyles({ ...defaultStyles, ...setting.setting_value });
-        } else if (setting.setting_key === 'typography') {
+        if (setting.setting_key === 'section_styles' && setting.setting_value) {
+          // Deep merge each section with defaults
+          const loaded = setting.setting_value as Partial<SectionStyles>;
+          setSectionStyles({
+            hero: { ...defaultStyles.hero, ...(loaded.hero || {}) },
+            actualites_evenements: { ...defaultStyles.actualites_evenements, ...(loaded.actualites_evenements || {}) },
+            services_numeriques: { ...defaultStyles.services_numeriques, ...(loaded.services_numeriques || {}) },
+            plateformes: { ...defaultStyles.plateformes, ...(loaded.plateformes || {}) },
+            liens_rapides: { ...defaultStyles.liens_rapides, ...(loaded.liens_rapides || {}) },
+            mediatheque: { ...defaultStyles.mediatheque, ...(loaded.mediatheque || {}) },
+            footer: { ...defaultStyles.footer, ...(loaded.footer || {}) }
+          });
+        } else if (setting.setting_key === 'typography' && setting.setting_value) {
           setTypography({ ...defaultTypography, ...setting.setting_value });
-        } else if (setting.setting_key === 'button_styles') {
+        } else if (setting.setting_key === 'button_styles' && setting.setting_value) {
           setButtonStyles({ ...defaultButtonStyles, ...setting.setting_value });
         }
       });
