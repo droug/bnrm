@@ -31,6 +31,7 @@ import logicielPatrimoine from "@/assets/digital-library/logiciel-patrimoine.jpg
 import manuscritsAndalous from "@/assets/digital-library/manuscrits-andalous.jpg";
 import documentsAdministratifs from "@/assets/digital-library/documents-administratifs.jpg";
 import libraryBanner from "@/assets/digital-library/library-banner.jpg";
+import virtualExhibitionBg from "@/assets/virtual-exhibition-bg.png";
 
 export default function DigitalLibraryHome() {
   const navigate = useNavigate();
@@ -603,39 +604,44 @@ export default function DigitalLibraryHome() {
 
       {/* Section Exposition Virtuelle */}
       <section className="py-16 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-bn-blue-primary/10 via-background to-gold-bn-primary/10" />
-        <div className="absolute top-0 right-0 w-96 h-96 bg-bn-blue-primary/10 rounded-full blur-3xl" />
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${virtualExhibitionBg})` }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-bn-blue-primary/80 via-bn-blue-primary/70 to-bn-blue-deep/80" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-gold-bn-primary/10 rounded-full blur-3xl" />
         
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-10">
             {/* Icon badge */}
-            <div className="inline-flex items-center justify-center w-12 h-12 border border-gold-bn-primary rounded-lg mb-6">
+            <div className="inline-flex items-center justify-center w-12 h-12 border border-gold-bn-primary bg-white/10 backdrop-blur-sm rounded-lg mb-6">
               <Layers className="h-6 w-6 text-gold-bn-primary" />
             </div>
             
-            <h2 className="heading-3 text-bn-blue-primary font-heading">
+            <h2 className="heading-3 text-white font-heading">
               Exposition Virtuelle
             </h2>
-            <p className="font-body text-regular text-muted-foreground max-w-2xl mx-auto mt-4">
+            <p className="font-body text-regular text-white/80 max-w-2xl mx-auto mt-4">
               Explorez l'histoire et le patrimoine du Maroc à travers nos expositions interactives
             </p>
           </div>
 
           <div className="max-w-4xl mx-auto">
             <Link to="/digital-library/exposition-virtuelle">
-              <Card className="group relative overflow-hidden border-2 border-transparent hover:border-gold-bn-primary/30 transition-all duration-500 bg-gradient-to-br from-card via-card to-bn-blue-primary/5 cursor-pointer">
-                <div className="absolute inset-0 bg-gradient-to-r from-bn-blue-primary/0 via-bn-blue-primary/5 to-gold-bn-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <Card className="group relative overflow-hidden border-2 border-white/20 hover:border-gold-bn-primary/50 transition-all duration-500 bg-white/10 backdrop-blur-md cursor-pointer">
+                <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-gold-bn-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 
                 <CardContent className="p-8 md:p-12">
                   <div className="flex flex-col md:flex-row items-center gap-8">
                     {/* Image/Visual */}
                     <div className="relative flex-shrink-0">
-                      <div className="w-48 h-48 md:w-56 md:h-56 rounded-2xl bg-gradient-to-br from-bn-blue-primary to-bn-blue-deep p-1 shadow-2xl shadow-bn-blue-primary/20 group-hover:shadow-bn-blue-primary/40 transition-shadow duration-500">
-                        <div className="w-full h-full rounded-xl bg-card flex items-center justify-center overflow-hidden">
+                      <div className="w-48 h-48 md:w-56 md:h-56 rounded-2xl bg-gradient-to-br from-gold-bn-primary to-gold-bn-deep p-1 shadow-2xl shadow-gold-bn-primary/30 group-hover:shadow-gold-bn-primary/50 transition-shadow duration-500">
+                        <div className="w-full h-full rounded-xl bg-bn-blue-primary/50 backdrop-blur-sm flex items-center justify-center overflow-hidden">
                           <div className="relative">
-                            <div className="absolute inset-0 bg-gradient-to-br from-bn-blue-primary/20 to-gold-bn-primary/20 rounded-full blur-xl animate-pulse" />
-                            <Layers className="h-24 w-24 text-bn-blue-primary relative z-10 group-hover:scale-110 transition-transform duration-500" />
+                            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-gold-bn-primary/20 rounded-full blur-xl animate-pulse" />
+                            <Layers className="h-24 w-24 text-white relative z-10 group-hover:scale-110 transition-transform duration-500" />
                           </div>
                         </div>
                       </div>
@@ -646,10 +652,10 @@ export default function DigitalLibraryHome() {
 
                     {/* Content */}
                     <div className="flex-1 text-center md:text-left">
-                      <h3 className="text-2xl md:text-3xl font-bold mb-3 group-hover:text-bn-blue-primary transition-colors">
+                      <h3 className="text-2xl md:text-3xl font-bold mb-3 text-white group-hover:text-gold-bn-primary transition-colors">
                         Le Maroc à travers les âges
                       </h3>
-                      <p className="text-muted-foreground mb-6 leading-relaxed">
+                      <p className="text-white/80 mb-6 leading-relaxed">
                         Une exposition virtuelle interactive présentant l'histoire du Maroc à travers documents rares, 
                         manuscrits anciens et photographies historiques. Découvrez des siècles de patrimoine culturel 
                         dans une expérience immersive unique.
@@ -659,7 +665,7 @@ export default function DigitalLibraryHome() {
                           <Eye className="h-4 w-4 mr-2" />
                           Visiter l'exposition
                         </Button>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-4 text-sm text-white/70">
                           <span className="flex items-center gap-1">
                             <FileText className="h-4 w-4" />
                             50+ documents
