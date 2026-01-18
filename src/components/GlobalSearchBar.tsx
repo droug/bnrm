@@ -160,7 +160,7 @@ export default function GlobalSearchBar() {
             <Button 
               type="submit" 
               size="sm" 
-              className="absolute right-1 top-1/2 -translate-y-1/2"
+              className="absolute right-1 top-1/2 -translate-y-1/2 bg-[#D4AF37] hover:bg-[#B8962F] text-white"
             >
               Rechercher
             </Button>
