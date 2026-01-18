@@ -159,6 +159,7 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
                       <>
                         {/* Thumbnail */}
                         <img 
+                          key={`${video.youtube_id}-${thumbnailErrors[video.youtube_id] || 0}`}
                           src={getThumbnailUrl(video.youtube_id)}
                           alt={getTitle(video)}
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
