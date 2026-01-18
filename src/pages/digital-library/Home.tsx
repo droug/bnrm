@@ -1,4 +1,4 @@
-// Force cache regeneration: v2 - 2026-01-15
+// Force cache regeneration: v3 - 2026-01-18
 import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
@@ -16,6 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Autoplay from "embla-carousel-autoplay";
 import { format } from "date-fns";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useCmsStyles } from "@/hooks/useCmsStyles";
 import document1 from "@/assets/digital-library/document-1.jpg";
 import document2 from "@/assets/digital-library/document-2.jpg";
 import document3 from "@/assets/digital-library/document-3.jpg";
@@ -37,6 +38,9 @@ export default function DigitalLibraryHome() {
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [repoCarouselIndex, setRepoCarouselIndex] = useState(0);
+
+  // Fetch CMS styles for BN platform
+  const { data: cmsStyles } = useCmsStyles('bn');
 
   // Hero image configured from /admin/content-management-BN (CmsHeroManagerBN)
   // Fetches settings for the BN (Bibliothèque Numérique) platform specifically

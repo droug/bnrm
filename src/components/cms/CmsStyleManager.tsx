@@ -239,17 +239,24 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
   const [typography, setTypography] = useState<Typography>(defaultTypography);
   const [buttonStyles, setButtonStyles] = useState<ButtonStyles>(defaultButtonStyles);
 
+  // Use platform-specific keys to separate BN and Portal styles
+  const keyPrefix = platform === 'bn' ? 'bn_' : '';
+  const sectionStylesKey = `${keyPrefix}section_styles`;
+  const typographyKey = `${keyPrefix}typography`;
+  const buttonStylesKey = `${keyPrefix}button_styles`;
+
   const { isLoading } = useQuery({
-    queryKey: ['cms-portal-settings'],
+    queryKey: ['cms-portal-settings', platform],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('cms_portal_settings')
-        .select('*');
+        .select('*')
+        .in('setting_key', [sectionStylesKey, typographyKey, buttonStylesKey]);
       
       if (error) throw error;
       
       data?.forEach((setting: any) => {
-        if (setting.setting_key === 'section_styles' && setting.setting_value) {
+        if (setting.setting_key === sectionStylesKey && setting.setting_value) {
           // Deep merge each section with defaults
           const loaded = setting.setting_value as Partial<SectionStyles>;
           setSectionStyles({
@@ -261,9 +268,9 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
             mediatheque: { ...defaultStyles.mediatheque, ...(loaded.mediatheque || {}) },
             footer: { ...defaultStyles.footer, ...(loaded.footer || {}) }
           });
-        } else if (setting.setting_key === 'typography' && setting.setting_value) {
+        } else if (setting.setting_key === typographyKey && setting.setting_value) {
           setTypography({ ...defaultTypography, ...setting.setting_value });
-        } else if (setting.setting_key === 'button_styles' && setting.setting_value) {
+        } else if (setting.setting_key === buttonStylesKey && setting.setting_value) {
           setButtonStyles({ ...defaultButtonStyles, ...setting.setting_value });
         }
       });
@@ -275,9 +282,9 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
   const saveMutation = useMutation({
     mutationFn: async () => {
       const updates = [
-        { setting_key: 'section_styles', setting_value: sectionStyles as any, category: 'styling' },
-        { setting_key: 'typography', setting_value: typography as any, category: 'styling' },
-        { setting_key: 'button_styles', setting_value: buttonStyles as any, category: 'styling' }
+        { setting_key: sectionStylesKey, setting_value: sectionStyles as any, category: 'styling' },
+        { setting_key: typographyKey, setting_value: typography as any, category: 'styling' },
+        { setting_key: buttonStylesKey, setting_value: buttonStyles as any, category: 'styling' }
       ];
 
       for (const update of updates) {
@@ -288,7 +295,7 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['cms-portal-settings'] });
+      queryClient.invalidateQueries({ queryKey: ['cms-portal-settings', platform] });
       toast({ title: "Styles sauvegardés avec succès" });
     },
     onError: (error: any) => {
