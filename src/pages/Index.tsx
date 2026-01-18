@@ -144,64 +144,6 @@ const Index = () => {
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-6xl mx-auto space-y-4">
               
-              {/* Search Section */}
-              <Card className="shadow-2xl border-2 border-primary/10 mb-6">
-                <CardContent className="p-8">
-                  <div className="text-center mb-6">
-                    <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center">
-                      <Search className="h-8 w-8 text-primary" />
-                    </div>
-                    <h2 className="heading-5 text-foreground mb-2">
-                      {language === 'ar' ? 'البحث في الفهرس' : 'Rechercher dans le catalogue'}
-                    </h2>
-                    <p className="text-small text-muted-foreground">
-                      {language === 'ar' 
-                        ? 'ابحث في مجموعاتنا الواسعة من الكتب والمخطوطات'
-                        : 'Explorez nos vastes collections de livres et manuscrits'
-                      }
-                    </p>
-                  </div>
-                  
-                  <div className="flex flex-col md:flex-row gap-3">
-                    <SimpleSelect
-                      value={searchFilter}
-                      onValueChange={setSearchFilter}
-                      options={[
-                        { value: "all", label: language === 'ar' ? 'الكل' : 'Tout' },
-                        { value: "books", label: language === 'ar' ? 'كتب' : 'Livres' },
-                        { value: "manuscripts", label: language === 'ar' ? 'مخطوطات' : 'Manuscrits' },
-                        { value: "documents", label: language === 'ar' ? 'وثائق' : 'Documents' },
-                        { value: "periodicals", label: language === 'ar' ? 'دوريات' : 'Périodiques' },
-                      ]}
-                      placeholder={language === 'ar' ? 'الفئة' : 'Catégorie'}
-                      icon={<Filter className="h-4 w-4" />}
-                      className="w-full md:w-[200px]"
-                    />
-                    
-                    <div className="relative flex-1">
-                      <Input
-                        type="search"
-                        placeholder={language === 'ar' ? 'ابحث عن عنوان، مؤلف، موضوع...' : 'Rechercher un titre, auteur, sujet...'}
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                        className="w-full h-14 text-base bg-background border-2 pr-16 hover:border-primary/50 focus:border-primary transition-colors"
-                        maxLength={200}
-                      />
-                      
-                      <Button 
-                        size="lg"
-                        onClick={handleSearch}
-                        className="absolute right-2 top-2 h-10 px-6 bg-blue-primary-dark hover:bg-blue-deep text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
-                      >
-                        <Search className="h-5 w-5 mr-2" />
-                        {language === 'ar' ? 'بحث' : 'Rechercher'}
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
               {/* News and Events Section */}
               <NewsEventsSection language={language} />
 
