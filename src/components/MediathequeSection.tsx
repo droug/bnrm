@@ -85,8 +85,8 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
           {/* Description */}
           <p className="text-white/80 text-base max-w-2xl">
             {language === 'ar' 
-              ? 'استكشف مجموعاتنا الصوتية والمرئية الغنية، واكتشف أحدث الفيديوهات والوثائق المتعددة الوسائط'
-              : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
+              ? 'استكشف مجموعاتنا الصوتية والمرئية الغنية'
+              : 'Explorez nos riches collections audiovisuelles et multimédias'
             }
           </p>
         </div>
