@@ -9,8 +9,8 @@ import CmsMenusManager from "@/components/cms/CmsMenusManager";
 import CmsBannersManager from "@/components/cms/CmsBannersManager";
 import CmsFooterManager from "@/components/cms/CmsFooterManager";
 import CmsSectionsManager from "@/components/cms/CmsSectionsManager";
-import CmsHeroManager from "@/components/cms/CmsHeroManager";
-import { 
+import CmsHeroManagerPortal from "@/components/cms/CmsHeroManagerPortal";
+import {
   FileText, 
   Webhook, 
   ImageIcon, 
@@ -271,7 +271,7 @@ export default function PortalContentManagementSystem() {
   const renderContent = () => {
     switch (activeTab) {
       case "hero":
-        return <CmsHeroManager />;
+        return <CmsHeroManagerPortal />;
       case "bannieres":
         return <CmsBannersManager />;
       case "actualites":
