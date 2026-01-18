@@ -42,20 +42,23 @@ const DigitalLibrary = () => {
 
   // Fetch hero settings from CMS
   const { data: heroSettings } = useQuery({
-    queryKey: ['cms-hero-settings-public'],
+    queryKey: ['cms-hero-settings-digital-library'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('cms_hero_settings')
         .select('*')
         .limit(1)
-        .single();
+        .maybeSingle();
       
       if (error) {
         console.error('Error fetching hero settings:', error);
         return null;
       }
+      console.log('Hero settings loaded:', data);
       return data;
-    }
+    },
+    staleTime: 0, // Always fetch fresh data
+    refetchOnWindowFocus: true
   });
 
   // Fetch featured works from database
