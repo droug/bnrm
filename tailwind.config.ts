@@ -49,20 +49,39 @@ export default {
         'text-tiny': ['0.75rem', { lineHeight: '1.6' }],       // 12px
       },
       colors: {
-        // BN Official Color Families
-        blue: {
-          surface: "hsl(var(--blue-surface))",
-          light: "hsl(var(--blue-light))",
-          'light-alt': "hsl(var(--blue-light-alt))",
-          soft: "hsl(var(--blue-soft))",
-          'primary-light': "hsl(var(--blue-primary-light))",
-          primary: "hsl(var(--blue-primary))",
-          'primary-dark': "hsl(var(--blue-primary-dark))",
-          deep: "hsl(var(--blue-deep))",
-          'deep-alt': "hsl(var(--blue-deep-alt))",
-          dark: "hsl(var(--blue-dark))",
-          shadow: "hsl(var(--blue-shadow))",
+        // === PORTAIL BNRM - Variables Primitives ===
+        
+        // Slate Family - Neutral colors (from Variables Portail)
+        slate: {
+          surface: "hsl(var(--slate-surface))",       // #F8FAFC
+          light: "hsl(var(--slate-light))",           // #F1F5F9
+          border: "hsl(var(--slate-border))",         // #E2E8F0
+          muted: "hsl(var(--slate-muted))",           // #CBD5E1
+          'text-light': "hsl(var(--slate-text-light))", // #94A3B8
+          text: "hsl(var(--slate-text))",             // #64748B
+          'text-dark': "hsl(var(--slate-text-dark))", // #475569
+          base: "hsl(var(--slate-base))",             // #334155
+          'base-dark': "hsl(var(--slate-base-dark))", // #1E293B
+          dark: "hsl(var(--slate-dark))",             // #0F172A
+          shadow: "hsl(var(--slate-shadow))",         // #020617
         },
+        
+        // Blue Family - Primary brand colors (from Variables Portail)
+        blue: {
+          surface: "hsl(var(--blue-surface))",        // #EFF6FF
+          light: "hsl(var(--blue-light))",            // #DBEAFE
+          'light-alt': "hsl(var(--blue-light-alt))",  // #BFDBFE
+          soft: "hsl(var(--blue-soft))",              // #93C5FD
+          'primary-light': "hsl(var(--blue-primary-light))", // #60A5FA
+          primary: "hsl(var(--blue-primary))",        // #3B82F6
+          'primary-dark': "hsl(var(--blue-primary-dark))", // #2563EB
+          deep: "hsl(var(--blue-deep))",              // #1D4ED8
+          'deep-alt': "hsl(var(--blue-deep-alt))",    // #1E40AF
+          dark: "hsl(var(--blue-dark))",              // #1E3A8A
+          shadow: "hsl(var(--blue-shadow))",          // #172554
+        },
+        
+        // Gold Family - Accent colors
         'gold-bn': {
           surface: "hsl(var(--gold-surface))",
           light: "hsl(var(--gold-light))",
