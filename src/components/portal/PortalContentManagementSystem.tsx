@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import CmsPagesManager from "@/components/cms/CmsPagesManager";
 import CmsWebhooksManager from "@/components/cms/CmsWebhooksManager";
 import CmsMediaManager from "@/components/cms/CmsMediaManager";
@@ -11,9 +10,7 @@ import CmsBannersManager from "@/components/cms/CmsBannersManager";
 import CmsFooterManager from "@/components/cms/CmsFooterManager";
 import CmsSectionsManager from "@/components/cms/CmsSectionsManager";
 import CmsHeroManager from "@/components/cms/CmsHeroManager";
-import ContentEditor from "@/components/ContentEditor";
 import { 
-  Sparkles, 
   FileText, 
   Webhook, 
   ImageIcon, 
@@ -21,26 +18,30 @@ import {
   CalendarDays, 
   Menu,
   Megaphone,
-  LayoutDashboard,
   ChevronRight,
   TrendingUp,
   Home,
   Footprints,
   LayoutTemplate,
   Video,
-  Globe
+  Globe,
+  Info,
+  MapPin,
+  Building2,
+  Users,
+  BookOpen
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+// Modules spécifiques au Portail BNRM
 const tabs = [
   { 
     id: "hero", 
-    label: "Hero", 
+    label: "Hero Portail", 
     icon: Home, 
     color: "text-blue-600",
     bgColor: "bg-blue-500/10",
@@ -60,27 +61,57 @@ const tabs = [
   },
   { 
     id: "actualites", 
-    label: "Actualités", 
+    label: "Actualités BNRM", 
     icon: Newspaper, 
     color: "text-emerald-500",
     bgColor: "bg-emerald-500/10",
     borderColor: "border-emerald-500/30",
     gradient: "from-emerald-500/20 to-emerald-600/5",
-    description: "Actualités et annonces du portail"
+    description: "Actualités et annonces de la BNRM"
   },
   { 
     id: "evenements", 
-    label: "Événements", 
+    label: "Événements BNRM", 
     icon: CalendarDays, 
     color: "text-orange-500",
     bgColor: "bg-orange-500/10",
     borderColor: "border-orange-500/30",
     gradient: "from-orange-500/20 to-orange-600/5",
-    description: "Programmation culturelle"
+    description: "Programmation culturelle de la BNRM"
+  },
+  { 
+    id: "infos-pratiques", 
+    label: "Infos Pratiques", 
+    icon: Info, 
+    color: "text-teal-500",
+    bgColor: "bg-teal-500/10",
+    borderColor: "border-teal-500/30",
+    gradient: "from-teal-500/20 to-teal-600/5",
+    description: "Horaires, accès, tarifs"
+  },
+  { 
+    id: "services", 
+    label: "Services", 
+    icon: Building2, 
+    color: "text-violet-500",
+    bgColor: "bg-violet-500/10",
+    borderColor: "border-violet-500/30",
+    gradient: "from-violet-500/20 to-violet-600/5",
+    description: "Services proposés par la BNRM"
+  },
+  { 
+    id: "espaces", 
+    label: "Espaces", 
+    icon: MapPin, 
+    color: "text-rose-500",
+    bgColor: "bg-rose-500/10",
+    borderColor: "border-rose-500/30",
+    gradient: "from-rose-500/20 to-rose-600/5",
+    description: "Espaces culturels et salles"
   },
   { 
     id: "pages", 
-    label: "Pages", 
+    label: "Pages Portail", 
     icon: FileText, 
     color: "text-purple-500",
     bgColor: "bg-purple-500/10",
@@ -120,17 +151,17 @@ const tabs = [
   },
   { 
     id: "menus", 
-    label: "Menus", 
+    label: "Menus Portail", 
     icon: Menu, 
     color: "text-cyan-500",
     bgColor: "bg-cyan-500/10",
     borderColor: "border-cyan-500/30",
     gradient: "from-cyan-500/20 to-cyan-600/5",
-    description: "Navigation du portail"
+    description: "Navigation du portail BNRM"
   },
   { 
     id: "footer", 
-    label: "Footer", 
+    label: "Footer Portail", 
     icon: Footprints, 
     color: "text-slate-500",
     bgColor: "bg-slate-500/10",
@@ -202,20 +233,18 @@ function StatCard({
 
 export default function PortalContentManagementSystem() {
   const [activeTab, setActiveTab] = useState("hero");
-  const [showContentEditor, setShowContentEditor] = useState(false);
-  const [editingContent, setEditingContent] = useState<any>(null);
 
-  // Fetch stats
+  // Fetch stats pour le Portail BNRM
   const { data: stats } = useQuery({
     queryKey: ['portal-cms-stats'],
     queryFn: async () => {
-      const [actualites, evenements, pages, media, bannieres, content] = await Promise.all([
+      const [actualites, evenements, pages, media, bannieres, culturalSpaces] = await Promise.all([
         supabase.from('cms_actualites').select('id, status', { count: 'exact' }),
         supabase.from('cms_evenements').select('id, status', { count: 'exact' }),
         supabase.from('cms_pages').select('id, status', { count: 'exact' }),
         supabase.from('cms_media').select('id', { count: 'exact' }),
         supabase.from('cms_bannieres').select('id, is_active', { count: 'exact' }),
-        supabase.from('content').select('id, status', { count: 'exact' }),
+        supabase.from('cultural_spaces').select('id', { count: 'exact' }),
       ]);
 
       return {
@@ -228,12 +257,11 @@ export default function PortalContentManagementSystem() {
           published: evenements.data?.filter(e => e.status === 'published').length || 0,
         },
         pages: pages.count || 0,
-        media: media.count || 0,
         bannieres: {
           total: bannieres.count || 0,
           active: bannieres.data?.filter(b => b.is_active).length || 0,
         },
-        content: content.count || 0,
+        espaces: culturalSpaces.count || 0,
       };
     }
   });
@@ -250,6 +278,42 @@ export default function PortalContentManagementSystem() {
         return <CmsActualitesManager />;
       case "evenements":
         return <CmsEvenementsManager />;
+      case "infos-pratiques":
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Informations Pratiques</CardTitle>
+              <CardDescription>Gestion des horaires, accès et tarifs du portail BNRM</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">Module en développement - Gérez les informations pratiques affichées sur le portail.</p>
+            </CardContent>
+          </Card>
+        );
+      case "services":
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Services BNRM</CardTitle>
+              <CardDescription>Gestion des services proposés par la BNRM</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">Module en développement - Gérez les services affichés sur le portail.</p>
+            </CardContent>
+          </Card>
+        );
+      case "espaces":
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Espaces Culturels</CardTitle>
+              <CardDescription>Gestion des espaces et salles de la BNRM</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">Module en développement - Accédez à la gestion des espaces depuis le menu Administration.</p>
+            </CardContent>
+          </Card>
+        );
       case "pages":
         return <CmsPagesManager />;
       case "sections":
@@ -279,22 +343,6 @@ export default function PortalContentManagementSystem() {
     }
   };
 
-  if (showContentEditor) {
-    return (
-      <ContentEditor
-        content={editingContent}
-        onSave={async () => {
-          setShowContentEditor(false);
-          setEditingContent(null);
-        }}
-        onCancel={() => {
-          setShowContentEditor(false);
-          setEditingContent(null);
-        }}
-      />
-    );
-  }
-
   return (
     <div className="space-y-6">
       {/* Modern Header with Portal Branding */}
@@ -303,26 +351,26 @@ export default function PortalContentManagementSystem() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <Card className="border-none bg-gradient-to-br from-primary/10 via-primary/5 to-background shadow-lg overflow-hidden">
+        <Card className="border-none bg-gradient-to-br from-blue-500/10 via-blue-400/5 to-background shadow-lg overflow-hidden">
           <CardHeader className="pb-6 relative">
             {/* Decorative elements */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/20 to-transparent rounded-full blur-3xl -mr-32 -mt-32" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-primary/10 to-transparent rounded-full blur-2xl -ml-24 -mb-24" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-blue-500/20 to-transparent rounded-full blur-3xl -mr-32 -mt-32" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-blue-400/10 to-transparent rounded-full blur-2xl -ml-24 -mb-24" />
             
             <div className="flex items-start gap-4 relative z-10">
               <motion.div 
-                className="p-4 rounded-2xl bg-primary/10 border border-primary/20 shadow-inner"
+                className="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 shadow-inner"
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 400 }}
               >
-                <Globe className="h-8 w-8 text-primary" />
+                <Globe className="h-8 w-8 text-blue-600" />
               </motion.div>
               <div className="flex-1">
                 <CardTitle className="text-3xl font-bold tracking-tight">
                   Gestion du Portail BNRM
                 </CardTitle>
                 <CardDescription className="text-base mt-2 max-w-2xl">
-                  Gérez le contenu de la page d'accueil, les actualités, événements et pages du portail 
+                  Gérez le contenu de la page d'accueil, les actualités, événements, services et pages du portail 
                   avec un éditeur enrichi et support bilingue
                 </CardDescription>
               </div>
@@ -345,16 +393,16 @@ export default function PortalContentManagementSystem() {
                 description={`${stats?.evenements.published || 0} publiés`}
               />
               <StatCard 
-                title="Pages" 
-                value={stats?.pages || 0}
-                icon={FileText}
-                color="primary"
+                title="Espaces" 
+                value={stats?.espaces || 0}
+                icon={MapPin}
+                color="pink"
               />
               <StatCard 
                 title="Bannières" 
                 value={stats?.bannieres.total || 0}
                 icon={Megaphone}
-                color="pink"
+                color="blue"
                 description={`${stats?.bannieres.active || 0} actives`}
               />
             </div>
@@ -373,7 +421,7 @@ export default function PortalContentManagementSystem() {
           <Card className="sticky top-6 border shadow-sm">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-                Modules du Portail
+                Modules du Portail BNRM
               </CardTitle>
             </CardHeader>
             <CardContent className="p-2">
