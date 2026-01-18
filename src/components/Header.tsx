@@ -445,12 +445,12 @@ const Header = () => {
           {/* Navigation Desktop */}
           <NavigationMenu className="hidden md:flex">
             <NavigationMenuList className="flex items-center gap-0">
-              {/* Accueil - Bouton actif */}
+              {/* Accueil - Style cohérent avec les autres menus */}
               <NavigationMenuItem>
                 <Link to="/">
                   <Button 
-                    variant={isHomePage ? "secondary" : "ghost"} 
-                    className={`rounded-none h-12 px-4 text-sm font-medium ${isHomePage ? 'bg-blue-primary-dark text-white' : 'text-slate-text-dark hover:text-blue-primary-dark hover:bg-slate-light'}`}
+                    variant="ghost" 
+                    className={`rounded-none h-12 px-4 text-sm font-medium ${isHomePage ? 'text-blue-primary-dark border-b-2 border-blue-primary-dark' : 'text-slate-text-dark hover:text-blue-primary-dark hover:bg-slate-light'}`}
                   >
                     <BookOpen className="w-4 h-4 mr-2" />
                     {language === 'ar' ? 'الرئيسية' : 'Accueil'}
