@@ -10,6 +10,9 @@ import CmsBannersManager from "@/components/cms/CmsBannersManager";
 import CmsFooterManager from "@/components/cms/CmsFooterManager";
 import CmsSectionsManager from "@/components/cms/CmsSectionsManager";
 import CmsHeroManagerPortal from "@/components/cms/CmsHeroManagerPortal";
+import CmsStyleManager from "@/components/cms/CmsStyleManager";
+import CmsMediathequeManager from "@/components/cms/CmsMediathequeManager";
+import CmsDigitalServicesManager from "@/components/cms/CmsDigitalServicesManager";
 import {
   FileText, 
   Webhook, 
@@ -29,7 +32,9 @@ import {
   MapPin,
   Building2,
   Users,
-  BookOpen
+  BookOpen,
+  Palette,
+  Settings2
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -50,6 +55,26 @@ const tabs = [
     description: "Section Hero de la page d'accueil"
   },
   { 
+    id: "styles", 
+    label: "Styles & Design", 
+    icon: Palette, 
+    color: "text-fuchsia-500",
+    bgColor: "bg-fuchsia-500/10",
+    borderColor: "border-fuchsia-500/30",
+    gradient: "from-fuchsia-500/20 to-fuchsia-600/5",
+    description: "Couleurs, polices et boutons"
+  },
+  { 
+    id: "services-numeriques", 
+    label: "Services Numériques", 
+    icon: Settings2, 
+    color: "text-sky-500",
+    bgColor: "bg-sky-500/10",
+    borderColor: "border-sky-500/30",
+    gradient: "from-sky-500/20 to-sky-600/5",
+    description: "Carousel des services numériques"
+  },
+  {
     id: "bannieres", 
     label: "Bannières", 
     icon: Megaphone, 
