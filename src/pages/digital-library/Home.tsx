@@ -12,6 +12,7 @@ import SEOImage from "@/components/seo/SEOImage";
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel";
 import { ReservationRequestDialog } from "@/components/digital-library/ReservationRequestDialog";
 import { LatestAdditionsSection } from "@/components/digital-library/LatestAdditionsSection";
+import { IbnBattoutaStatsSection } from "@/components/digital-library/IbnBattoutaStatsSection";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import Autoplay from "embla-carousel-autoplay";
@@ -532,6 +533,9 @@ export default function DigitalLibraryHome() {
         loading={loading}
         onConsultDocument={handleConsultDocument}
       />
+
+      {/* Ibn Battouta en chiffres - Stats Section */}
+      <IbnBattoutaStatsSection />
 
       {/* Featured Collections */}
       <section className="bg-muted/30 py-12">
