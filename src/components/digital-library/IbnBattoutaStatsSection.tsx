@@ -50,74 +50,72 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
   const canGoPrev = currentIndex > 0;
 
   return (
-    <section className="py-16 relative overflow-hidden bg-gradient-to-br from-gold-bn-surface via-gold-bn-light to-gold-bn-light-alt">
+    <section className="py-20 relative overflow-hidden bg-white">
       <div className="container mx-auto px-4">
         {/* Section Header */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-14">
           {/* Gold Grid Icon - outlined box */}
           <div className="flex justify-center mb-6">
-            <div className="w-12 h-12 rounded-lg border border-gold-bn-primary flex items-center justify-center">
-              <Grid3X3 className="h-6 w-6 text-gold-bn-primary" strokeWidth={1.5} />
+            <div className="w-14 h-14 rounded-lg border-2 border-gold-bn-primary flex items-center justify-center">
+              <Grid3X3 className="h-7 w-7 text-gold-bn-primary" strokeWidth={1.5} />
             </div>
           </div>
           
-          {/* Title - Dark blue Playfair */}
-          <h2 className="heading-3 text-bn-blue-primary font-heading">
+          {/* Title - Dark Playfair Display */}
+          <h2 className="text-4xl md:text-5xl font-heading font-semibold text-slate-dark mb-6">
             Ibn Battouta en chiffres
           </h2>
           
           {/* Subtitle */}
-          <p className="font-body text-regular text-muted-foreground max-w-2xl mx-auto mt-4">
+          <p className="font-body text-lg text-slate-text max-w-2xl mx-auto">
             Découvrez les documents récemment ajoutés à nos collections,
             soigneusement sélectionnés pour enrichir votre expérience.
           </p>
         </div>
 
         {/* Stats Cards with Navigation */}
-        <div className="relative max-w-5xl mx-auto flex items-center justify-center gap-2">
-          {/* Left Arrow - Simple triangle */}
+        <div className="relative max-w-5xl mx-auto flex items-center justify-center gap-4">
+          {/* Left Arrow - Simple filled triangle */}
           <button
             onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))}
             disabled={!canGoPrev}
-            className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-slate-text-dark hover:text-bn-blue-primary transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+            className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-slate-text hover:text-gold-bn-primary transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
             aria-label="Précédent"
           >
-            <svg width="12" height="20" viewBox="0 0 12 20" fill="currentColor">
-              <path d="M10 2L2 10L10 18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg width="16" height="28" viewBox="0 0 16 28" fill="currentColor">
+              <path d="M14 2L2 14L14 26" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
 
           {/* Stats Cards */}
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl">
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl">
             {visibleStats.map((stat, index) => (
               <Link 
                 key={index} 
                 to={stat.href || "#"}
                 className="group"
               >
-                {/* Card - Blue gradient background matching reference */}
-                <div 
-                  className="relative rounded-xl p-6 text-center hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 overflow-hidden"
-                  style={{
-                    background: 'linear-gradient(135deg, hsl(210 28% 35%) 0%, hsl(210 28% 28%) 50%, hsl(210 34% 22%) 100%)'
-                  }}
-                >
+                {/* Card - White with gold top border */}
+                <div className="relative bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-slate-border">
+                  {/* Gold top border */}
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gold-bn-primary" />
+                  
                   {/* Content */}
-                  <div className="relative z-10">
+                  <div className="p-8 text-center">
                     {/* Icon Container - Gold outlined box */}
-                    <div className="flex justify-center mb-4">
-                      <div className="w-14 h-14 rounded-lg border-2 border-gold-bn-primary flex items-center justify-center">
-                        <stat.icon className="h-7 w-7 text-gold-bn-primary" strokeWidth={1.5} />
+                    <div className="flex justify-center mb-5">
+                      <div className="w-16 h-16 rounded-lg border-2 border-gold-bn-primary flex items-center justify-center">
+                        <stat.icon className="h-8 w-8 text-gold-bn-primary" strokeWidth={1.5} />
                       </div>
                     </div>
                     
-                    {/* Value - Large white text */}
-                    <div className="text-4xl md:text-5xl font-bold text-white mb-2 font-heading">
+                    {/* Value - Gold text */}
+                    <div className="text-4xl md:text-5xl font-bold text-gold-bn-primary mb-3 font-heading">
                       {stat.value}
                     </div>
                     
-                    {/* Label - Smaller white text */}
-                    <div className="text-white/90 text-sm font-medium">
+                    {/* Label - Dark text */}
+                    <div className="text-slate-dark text-lg font-medium">
                       {language === 'ar' && stat.labelAr ? stat.labelAr : stat.label}
                     </div>
                   </div>
@@ -126,26 +124,26 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
             ))}
           </div>
 
-          {/* Right Arrow - Simple triangle */}
+          {/* Right Arrow - Simple filled triangle */}
           <button
             onClick={() => setCurrentIndex(Math.min(stats.length - 3, currentIndex + 1))}
             disabled={!canGoNext}
-            className="flex-shrink-0 w-8 h-8 flex items-center justify-center text-slate-text-dark hover:text-bn-blue-primary transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+            className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-slate-text hover:text-gold-bn-primary transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
             aria-label="Suivant"
           >
-            <svg width="12" height="20" viewBox="0 0 12 20" fill="currentColor">
-              <path d="M2 2L10 10L2 18" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+            <svg width="16" height="28" viewBox="0 0 16 28" fill="currentColor">
+              <path d="M2 2L14 14L2 26" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
           </button>
         </div>
 
         {/* CTA Button - Gold */}
-        <div className="flex justify-center mt-10">
+        <div className="flex justify-center mt-12">
           <Link to="/digital-library/collections">
             <Button 
-              className="bg-gold-bn-primary hover:bg-gold-bn-primary-dark text-white px-8 py-2.5 rounded-md shadow-md hover:shadow-lg transition-all font-medium"
+              className="bg-gold-bn-primary hover:bg-gold-bn-primary-dark text-white px-10 py-3 rounded-md shadow-md hover:shadow-lg transition-all font-semibold uppercase tracking-wide"
             >
-              Voir tout
+              Voir tous
             </Button>
           </Link>
         </div>
