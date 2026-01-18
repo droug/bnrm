@@ -332,7 +332,7 @@ const Header = () => {
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button className="bg-primary hover:bg-blue-primary-dark text-white px-4 py-2 rounded transition-colors">
+                <Button className="bg-blue-primary-dark hover:bg-blue-deep text-white px-4 py-2 rounded transition-colors">
                       <User className="h-4 w-4 mr-2" />
                       {language === 'ar' ? 'مساحتي' : 'Mon espace'}
                     </Button>
@@ -380,7 +380,7 @@ const Header = () => {
                 </DropdownMenu>
               ) : (
                 <Link to="/auth">
-                  <Button className="bg-primary hover:bg-blue-primary-dark text-white px-4 py-2 rounded transition-colors">
+                  <Button className="bg-blue-primary-dark hover:bg-blue-deep text-white px-4 py-2 rounded transition-colors">
                     <User className="h-4 w-4 mr-2" />
                     {language === 'ar' ? 'مساحتي' : 'Mon espace'}
                   </Button>
@@ -437,9 +437,9 @@ const Header = () => {
           </div>
         )}
 
-        {/* Navigation principale bordeaux - style comme l'image de référence */}
+        {/* Navigation principale blanche - style comme l'image de référence */}
         {!hideNavigation && (
-          <div className="bg-primary">
+          <div className="bg-white border-t border-slate-border">
             <div className="container mx-auto px-4 flex items-center justify-center py-0">
 
           {/* Navigation Desktop */}
@@ -450,7 +450,7 @@ const Header = () => {
                 <Link to="/">
                   <Button 
                     variant={isHomePage ? "secondary" : "ghost"} 
-                    className={`rounded-none h-12 px-4 text-sm font-medium ${isHomePage ? 'bg-primary-deep text-white' : 'text-white/90 hover:text-white hover:bg-blue-primary-dark'}`}
+                    className={`rounded-none h-12 px-4 text-sm font-medium ${isHomePage ? 'bg-blue-primary-dark text-white' : 'text-slate-text-dark hover:text-blue-primary-dark hover:bg-slate-light'}`}
                   >
                     <BookOpen className="w-4 h-4 mr-2" />
                     {language === 'ar' ? 'الرئيسية' : 'Accueil'}
@@ -458,11 +458,11 @@ const Header = () => {
                 </Link>
               </NavigationMenuItem>
               
-              <span className="text-white/40 mx-1">|</span>
+              <span className="text-slate-border mx-1">|</span>
               
               {/* Découvrir la Bibliothèque */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-blue-primary-dark h-12 text-sm font-medium px-3 rounded-none">
+                <NavigationMenuTrigger className="bg-transparent text-slate-text-dark hover:text-blue-primary-dark hover:bg-slate-light h-12 text-sm font-medium px-3 rounded-none">
                   <BookOpen className="w-4 h-4 mr-2" />
                   <span>{t('nav.discover')}</span>
                 </NavigationMenuTrigger>
@@ -494,11 +494,11 @@ const Header = () => {
                 </NavigationMenuContent>
               </NavigationMenuItem>
               
-              <span className="text-white/40 mx-1">|</span>
+              <span className="text-slate-border mx-1">|</span>
 
               {/* Accéder à nos services */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-blue-primary-dark h-12 text-sm font-medium px-3 rounded-none">
+                <NavigationMenuTrigger className="bg-transparent text-slate-text-dark hover:text-blue-primary-dark hover:bg-slate-light h-12 text-sm font-medium px-3 rounded-none">
                   <Users className="w-4 h-4 mr-2" />
                   <span>{t('nav.services')}</span>
                 </NavigationMenuTrigger>
@@ -530,11 +530,11 @@ const Header = () => {
                 </NavigationMenuContent>
               </NavigationMenuItem>
 
-              <span className="text-white/40 mx-1">|</span>
+              <span className="text-slate-border mx-1">|</span>
 
               {/* Explorer le patrimoine */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-blue-primary-dark h-12 text-sm font-medium px-3 rounded-none">
+                <NavigationMenuTrigger className="bg-transparent text-slate-text-dark hover:text-blue-primary-dark hover:bg-slate-light h-12 text-sm font-medium px-3 rounded-none">
                   <Book className="w-4 h-4 mr-2" />
                   <span>{t('nav.explore')}</span>
                 </NavigationMenuTrigger>
@@ -551,43 +551,43 @@ const Header = () => {
                       <div className="pt-2">
                         <h4 className="text-sm font-bold text-primary mb-2 px-2">{language === 'ar' ? 'المجموعات' : 'Collections'}</h4>
                         <NavigationMenuLink asChild>
-                          <Link to="/collections-specialisees" className="block p-2 text-sm text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded">
+                          <Link to="/collections-specialisees" className="block p-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary rounded">
                             {language === 'ar' ? 'المجموعات المتخصصة' : 'Collections spécialisées'}
                           </Link>
                         </NavigationMenuLink>
                         <NavigationMenuLink asChild>
-                          <Link to="/collections-numerisees" className="block p-2 text-sm text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded">
+                          <Link to="/collections-numerisees" className="block p-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary rounded">
                             {language === 'ar' ? 'المجموعات الرقمية' : 'Collections numérisées'}
                           </Link>
                         </NavigationMenuLink>
                         <NavigationMenuLink asChild>
-                          <Link to="/collections-offertes" className="block p-2 text-sm text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded">
+                          <Link to="/collections-offertes" className="block p-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary rounded">
                             {language === 'ar' ? 'المجموعات المقدمة' : 'Collections offertes'}
                           </Link>
                         </NavigationMenuLink>
                         <div className="ml-3 mt-1 space-y-1">
                           <NavigationMenuLink asChild>
-                            <Link to="/plateforme-manuscrits" className="block p-1.5 text-xs text-muted-foreground hover:text-morocco-green rounded">
+                            <Link to="/plateforme-manuscrits" className="block p-1.5 text-xs text-muted-foreground hover:text-primary rounded">
                               • {language === 'ar' ? 'المخطوطات' : 'Manuscrits'}
                             </Link>
                           </NavigationMenuLink>
                           <NavigationMenuLink asChild>
-                            <Link to="/monographies" className="block p-1.5 text-xs text-muted-foreground hover:text-morocco-green rounded">
+                            <Link to="/monographies" className="block p-1.5 text-xs text-muted-foreground hover:text-primary rounded">
                               • {language === 'ar' ? 'الأحاديات' : 'Monographies'}
                             </Link>
                           </NavigationMenuLink>
                           <NavigationMenuLink asChild>
-                            <Link to="/periodiques" className="block p-1.5 text-xs text-muted-foreground hover:text-morocco-green rounded">
+                            <Link to="/periodiques" className="block p-1.5 text-xs text-muted-foreground hover:text-primary rounded">
                               • {language === 'ar' ? 'الدوريات' : 'Périodiques'}
                             </Link>
                           </NavigationMenuLink>
                           <NavigationMenuLink asChild>
-                            <Link to="/bouquets-abonnements" className="block p-1.5 text-xs text-muted-foreground hover:text-morocco-green rounded">
+                            <Link to="/bouquets-abonnements" className="block p-1.5 text-xs text-muted-foreground hover:text-primary rounded">
                               • {language === 'ar' ? 'باقات الاشتراكات' : 'Bouquets des abonnements'}
                             </Link>
                           </NavigationMenuLink>
                           <NavigationMenuLink asChild>
-                            <Link to="/audiovisuelles" className="block p-1.5 text-xs text-muted-foreground hover:text-morocco-green rounded">
+                            <Link to="/audiovisuelles" className="block p-1.5 text-xs text-muted-foreground hover:text-primary rounded">
                               • {language === 'ar' ? 'السمعية البصرية والوسائط المتعددة' : 'Audiovisuelles et multimédias'}
                             </Link>
                           </NavigationMenuLink>
@@ -602,17 +602,17 @@ const Header = () => {
                       <div>
                         <p className="text-xs font-semibold text-foreground px-2 mb-1">{language === 'ar' ? 'القراءة والاستماع والمشاهدة' : 'Lire, écouter et voir'}</p>
                         <NavigationMenuLink asChild>
-                          <Link to="/bibliographies" className="block p-2 text-sm text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded">
+                          <Link to="/bibliographies" className="block p-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary rounded">
                             {language === 'ar' ? 'الببليوغرافيات الوطنية' : 'Bibliographies Nationales'}
                           </Link>
                         </NavigationMenuLink>
                         <NavigationMenuLink asChild>
-                          <Link to="/rapports-activites" className="block p-2 text-sm text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded">
+                          <Link to="/rapports-activites" className="block p-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary rounded">
                             {language === 'ar' ? 'تقرير الأنشطة' : 'Rapport d\'activités'}
                           </Link>
                         </NavigationMenuLink>
                         <NavigationMenuLink asChild>
-                          <Link to="/tresors" className="block p-2 text-sm text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded">
+                          <Link to="/tresors" className="block p-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary rounded">
                             {language === 'ar' ? 'الكنوز' : 'Trésors'}
                           </Link>
                         </NavigationMenuLink>
@@ -620,17 +620,17 @@ const Header = () => {
 
                       <div className="pt-2">
                         <NavigationMenuLink asChild>
-                          <Link to="/archives-manuscrits" className="block p-2 text-sm text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded">
+                          <Link to="/archives-manuscrits" className="block p-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary rounded">
                             {language === 'ar' ? 'الأرشيف والمخطوطات' : 'Archives et manuscrits'}
                           </Link>
                         </NavigationMenuLink>
                         <NavigationMenuLink asChild>
-                          <Link to="/autres-catalogues" className="block p-2 text-sm text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded">
+                          <Link to="/autres-catalogues" className="block p-2 text-sm text-foreground hover:bg-primary/10 hover:text-primary rounded">
                             {language === 'ar' ? 'فهارس وقواعد أخرى' : 'Autres catalogues et bases'}
                           </Link>
                         </NavigationMenuLink>
                         <NavigationMenuLink asChild>
-                          <Link to="/digital-library" className="block p-2 text-sm font-medium text-morocco-green hover:bg-morocco-green/10 rounded border-l-2 border-morocco-green/50">
+                          <Link to="/digital-library" className="block p-2 text-sm font-medium text-primary hover:bg-primary/10 rounded border-l-2 border-primary/50">
                             📚 {language === 'ar' ? 'الفهرس الرقمي (منصة BN)' : 'Catalogue numérisé (Plateforme BN)'}
                           </Link>
                         </NavigationMenuLink>
@@ -641,7 +641,7 @@ const Header = () => {
                     <div className="space-y-2">
                       <h4 className="text-sm font-bold text-primary mb-2 px-2">{language === 'ar' ? 'البحث عن وثيقة' : 'Chercher un document'}</h4>
                       <NavigationMenuLink asChild>
-                        <Link to="/recherche-avancee" className="block p-2 text-sm font-medium text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded bg-accent/30">
+                        <Link to="/recherche-avancee" className="block p-2 text-sm font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded bg-accent/30">
                           🔍 {language === 'ar' ? 'بحث متقدم' : 'Recherche avancée'}
                         </Link>
                       </NavigationMenuLink>
@@ -649,22 +649,22 @@ const Header = () => {
                       <div className="pt-2 space-y-1">
                         <p className="text-xs font-semibold text-muted-foreground px-2 mb-2">{language === 'ar' ? 'وثائق في الوصول الحر:' : 'Documents en accès libre :'}</p>
                         <NavigationMenuLink asChild>
-                          <Link to="/recherche-avancee?type=livres-periodiques" className="block p-2 text-xs text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded">
+                          <Link to="/recherche-avancee?type=livres-periodiques" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                             • {language === 'ar' ? 'الكتب والدوريات المحفوظة' : 'Livres et périodiques conservés'}
                           </Link>
                         </NavigationMenuLink>
                         <NavigationMenuLink asChild>
-                          <Link to="/recherche-avancee?type=manuscrits-archives" className="block p-2 text-xs text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded">
+                          <Link to="/recherche-avancee?type=manuscrits-archives" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                             • {language === 'ar' ? 'المخطوطات الحديثة والأرشيف' : 'Manuscrits modernes et archives'}
                           </Link>
                         </NavigationMenuLink>
                         <NavigationMenuLink asChild>
-                          <Link to="/recherche-avancee?type=iconographiques" className="block p-2 text-xs text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded">
+                          <Link to="/recherche-avancee?type=iconographiques" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                             • {language === 'ar' ? 'الوثائق الأيقونية (مطبوعات، صور، ملصقات)' : 'Documents iconographiques (estampes, photos, affiches)'}
                           </Link>
                         </NavigationMenuLink>
                         <NavigationMenuLink asChild>
-                          <Link to="/recherche-avancee?type=periodiques-extraits" className="block p-2 text-xs text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded">
+                          <Link to="/recherche-avancee?type=periodiques-extraits" className="block p-2 text-xs text-foreground hover:bg-primary/10 hover:text-primary rounded">
                             • {language === 'ar' ? 'الدوريات (مقتطفات)' : 'Périodiques (extraits)'}
                           </Link>
                         </NavigationMenuLink>
@@ -674,11 +674,11 @@ const Header = () => {
                 </NavigationMenuContent>
               </NavigationMenuItem>
               
-              <span className="text-white/40 mx-1">|</span>
+              <span className="text-slate-border mx-1">|</span>
 
               {/* Consulter nos actualités */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-morocco-green h-12 text-sm font-medium px-3 rounded-none">
+                <NavigationMenuTrigger className="bg-transparent text-slate-text-dark hover:text-blue-primary-dark hover:bg-slate-light h-12 text-sm font-medium px-3 rounded-none">
                   <Calendar className="w-4 h-4 mr-2" />
                   <span>{t('nav.consult.news')}</span>
                 </NavigationMenuTrigger>
@@ -686,7 +686,7 @@ const Header = () => {
                   <div className="grid gap-2 p-4 w-[500px] bg-white border border-gray-200 shadow-xl">
                     {menuData.news.news.items.map((item, idx) => (
                       <NavigationMenuLink key={idx} asChild>
-                        <Link to={item.href} className="block p-3 text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded">
+                        <Link to={item.href} className="block p-3 text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           <div className="font-medium">{item.title[language]}</div>
                           <div className="text-sm text-muted-foreground">{item.desc[language]}</div>
                         </Link>
@@ -694,7 +694,7 @@ const Header = () => {
                     ))}
                     {menuData.news.cultural.items.map((item, idx) => (
                       <NavigationMenuLink key={idx} asChild>
-                        <Link to={item.href} className="block p-3 text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded">
+                        <Link to={item.href} className="block p-3 text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           <div className="font-medium">{item.title[language]}</div>
                           <div className="text-sm text-muted-foreground">{item.desc[language]}</div>
                         </Link>
@@ -704,24 +704,24 @@ const Header = () => {
                 </NavigationMenuContent>
               </NavigationMenuItem>
               
-              <span className="text-white/40 mx-1">|</span>
+              <span className="text-slate-border mx-1">|</span>
 
               {/* Collaborer avec nous */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-morocco-green h-12 text-sm font-medium px-3 rounded-none">
+                <NavigationMenuTrigger className="bg-transparent text-slate-text-dark hover:text-blue-primary-dark hover:bg-slate-light h-12 text-sm font-medium px-3 rounded-none">
                   <Building className="w-4 h-4 mr-2" />
                   <span>{t('nav.collaborate')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
                   <div className="grid gap-2 p-4 w-[500px] bg-white border border-gray-200 shadow-xl">
                     <NavigationMenuLink asChild>
-                      <Link to="/collaborations-nationales" className="block p-3 text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded">
+                      <Link to="/collaborations-nationales" className="block p-3 text-foreground hover:bg-primary/10 hover:text-primary rounded">
                         <div className="font-medium">{t('nav.national.collaborations')}</div>
                         <p className="text-sm text-muted-foreground">{t('nav.national.collaborations.desc')}</p>
                       </Link>
                     </NavigationMenuLink>
                     <NavigationMenuLink asChild>
-                      <Link to="/collaborations-internationales" className="block p-3 text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded">
+                      <Link to="/collaborations-internationales" className="block p-3 text-foreground hover:bg-primary/10 hover:text-primary rounded">
                         <div className="font-medium">{t('nav.international.collaborations')}</div>
                         <p className="text-sm text-muted-foreground">{t('nav.international.collaborations.desc')}</p>
                       </Link>
@@ -730,11 +730,11 @@ const Header = () => {
                 </NavigationMenuContent>
               </NavigationMenuItem>
               
-              <span className="text-white/40 mx-1">|</span>
+              <span className="text-slate-border mx-1">|</span>
 
               {/* Mécénat */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-morocco-green h-12 text-sm font-medium px-3 rounded-none">
+                <NavigationMenuTrigger className="bg-transparent text-slate-text-dark hover:text-blue-primary-dark hover:bg-slate-light h-12 text-sm font-medium px-3 rounded-none">
                   <Users className="w-4 h-4 mr-2" />
                   <span>{menuData.mecenat.title[language]}</span>
                 </NavigationMenuTrigger>
@@ -742,7 +742,7 @@ const Header = () => {
                   <div className="grid gap-2 p-4 w-[500px] bg-white border border-gray-200 shadow-xl">
                     {menuData.mecenat.items.map((item, idx) => (
                       <NavigationMenuLink key={idx} asChild>
-                        <Link to={item.href} className="block p-3 text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded">
+                        <Link to={item.href} className="block p-3 text-foreground hover:bg-primary/10 hover:text-primary rounded">
                           <div className="font-medium">{item.title[language]}</div>
                           <div className="text-sm text-muted-foreground">{item.desc[language]}</div>
                         </Link>
