@@ -227,7 +227,11 @@ function ColorField({
   );
 }
 
-export default function CmsStyleManager() {
+interface CmsStyleManagerProps {
+  platform?: 'portal' | 'bn';
+}
+
+export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManagerProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -324,7 +328,7 @@ export default function CmsStyleManager() {
         <div>
           <CardTitle className="flex items-center gap-2">
             <Palette className="h-5 w-5" />
-            Styles et Design du Portail
+            {platform === 'bn' ? 'Styles et Design de la BN' : 'Styles et Design du Portail'}
           </CardTitle>
           <CardDescription>
             Personnalisez les couleurs, polices et styles de toutes les sections
