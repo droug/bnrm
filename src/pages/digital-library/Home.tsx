@@ -756,194 +756,193 @@ export default function DigitalLibraryHome() {
         </div>
       </section>
 
-      {/* Section Réservoirs mondiaux - Style "Page d'accueil BN" */}
-      <section className="py-16 bg-background">
+      {/* Section Ressources électroniques - Style exact "Page d'accueil BN" */}
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
-          {/* Header avec icône */}
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-bn-gold/10 mb-4">
-              <Globe className="h-6 w-6 text-bn-gold" />
+          {/* Header avec icône cadre */}
+          <div className="text-center mb-12">
+            <div className="inline-flex items-center justify-center w-14 h-14 border-2 border-bn-gold rounded-lg mb-6">
+              <Layers className="h-7 w-7 text-bn-gold" />
             </div>
-            <h2 className="font-display text-heading-2 text-bn-blue mb-3">
+            <h2 className="font-display text-3xl md:text-4xl text-bn-blue mb-4">
               Ressources électroniques
             </h2>
-            <p className="text-muted-foreground text-text-base max-w-2xl mx-auto">
+            <p className="font-body text-muted-foreground text-base max-w-2xl mx-auto leading-relaxed">
               Ces ressources permettent la centralisation et le partage du patrimoine documentaire et culturel à l'échelle internationale
             </p>
           </div>
 
-          {/* Carrousel */}
-          <div className="relative">
-            {/* Flèche gauche */}
+          {/* Carrousel avec flèches style BN */}
+          <div className="relative px-12">
+            {/* Flèche gauche - style gris fin */}
             <button 
               onClick={() => setRepoCarouselIndex(prev => Math.max(0, prev - 1))}
               disabled={repoCarouselIndex === 0}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 w-10 h-10 rounded-full bg-white shadow-lg border border-border flex items-center justify-center hover:bg-bn-gold hover:text-white transition-colors disabled:opacity-50 disabled:hover:bg-white disabled:hover:text-foreground"
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full border border-gray-300 bg-white flex items-center justify-center text-gray-400 hover:border-bn-gold hover:text-bn-gold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="h-5 w-5" />
             </button>
 
             {/* Cartes du carrousel */}
-            <div className="overflow-hidden mx-8">
+            <div className="overflow-hidden">
               <div 
-                className="flex transition-transform duration-500 ease-in-out gap-6"
-                style={{ transform: `translateX(-${repoCarouselIndex * (100 / 3 + 2)}%)` }}
+                className="flex transition-transform duration-500 ease-in-out"
+                style={{ transform: `translateX(-${repoCarouselIndex * 33.333}%)` }}
               >
                 {/* BRILL */}
-                <div className="flex-shrink-0 w-full md:w-[calc(33.333%-1rem)]">
-                  <Card className="bg-white border border-border rounded-xl h-full shadow-sm hover:shadow-md transition-shadow">
-                    <CardHeader className="text-center pb-2 pt-6">
-                      <img 
-                        src="https://www.brill.com/assets/images/brill-logo.svg" 
-                        alt="BRILL" 
-                        className="h-8 mx-auto mb-2 object-contain"
-                        onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.nextElementSibling?.classList.remove('hidden'); }}
-                      />
-                      <CardTitle className="text-heading-5 text-bn-blue hidden">BRILL</CardTitle>
-                      <a href="https://www.brill.com" target="_blank" rel="noopener noreferrer" className="text-bn-gold text-text-small hover:underline">
+                <div className="flex-shrink-0 w-full md:w-1/3 px-3">
+                  <Card className="bg-white border border-gray-200 rounded-lg h-full shadow-sm">
+                    <CardHeader className="text-center pb-3 pt-8">
+                      <div className="flex items-center justify-center gap-1 mb-3">
+                        <span className="text-bn-gold text-2xl">❦</span>
+                        <span className="font-serif text-2xl font-bold tracking-wide text-bn-blue">BRILL</span>
+                      </div>
+                      <a href="https://www.brill.com" target="_blank" rel="noopener noreferrer" className="text-bn-gold text-sm hover:underline font-medium">
                         brill.com
                       </a>
                     </CardHeader>
-                    <CardContent className="text-center space-y-4 pb-6">
-                      <p className="text-muted-foreground text-text-small leading-relaxed">
+                    <CardContent className="text-center space-y-5 pb-8 px-6">
+                      <p className="text-gray-600 text-sm leading-relaxed">
                         Brill est une maison d'édition académique néerlandaise, fondée en 1683 à Leyde. Elle publie des revues, des collections et des ouvrages de référence dans les domaines des sciences humaines.
                       </p>
                       <a 
                         href="https://www.brill.com" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-6 py-2 bg-bn-gold text-white rounded-md font-medium hover:bg-bn-gold/90 transition-colors text-text-small"
+                        className="inline-flex items-center gap-2 px-6 py-2.5 bg-bn-gold text-white rounded font-medium hover:bg-bn-gold/90 transition-colors text-sm"
                       >
-                        Accéder <ExternalLink className="h-4 w-4" />
+                        Accéder <ChevronRight className="h-4 w-4" />
                       </a>
                     </CardContent>
                   </Card>
                 </div>
 
                 {/* EBSCO */}
-                <div className="flex-shrink-0 w-full md:w-[calc(33.333%-1rem)]">
-                  <Card className="bg-white border border-border rounded-xl h-full shadow-sm hover:shadow-md transition-shadow">
-                    <CardHeader className="text-center pb-2 pt-6">
-                      <div className="text-2xl font-bold text-bn-blue mb-2">EBSCO</div>
-                      <a href="https://www.ebsco.com" target="_blank" rel="noopener noreferrer" className="text-bn-gold text-text-small hover:underline">
+                <div className="flex-shrink-0 w-full md:w-1/3 px-3">
+                  <Card className="bg-white border border-gray-200 rounded-lg h-full shadow-sm">
+                    <CardHeader className="text-center pb-3 pt-8">
+                      <div className="font-sans text-2xl font-bold text-bn-blue mb-3 tracking-wide">EBSCO</div>
+                      <a href="https://www.ebsco.com" target="_blank" rel="noopener noreferrer" className="text-bn-gold text-sm hover:underline font-medium">
                         ebsco.com
                       </a>
                     </CardHeader>
-                    <CardContent className="text-center space-y-4 pb-6">
-                      <p className="text-muted-foreground text-text-small leading-relaxed">
+                    <CardContent className="text-center space-y-5 pb-8 px-6">
+                      <p className="text-gray-600 text-sm leading-relaxed">
                         EBSCO est le leader mondial de la vente d'accès aux périodiques, e-books et bases de données des éditeurs du monde entier permettant à ses utilisateurs un accès sécurisé.
                       </p>
                       <a 
                         href="https://www.ebsco.com" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-6 py-2 bg-bn-gold text-white rounded-md font-medium hover:bg-bn-gold/90 transition-colors text-text-small"
+                        className="inline-flex items-center gap-2 px-6 py-2.5 bg-bn-gold text-white rounded font-medium hover:bg-bn-gold/90 transition-colors text-sm"
                       >
-                        Accéder <ExternalLink className="h-4 w-4" />
+                        Accéder <ChevronRight className="h-4 w-4" />
                       </a>
                     </CardContent>
                   </Card>
                 </div>
 
                 {/* CAIRN */}
-                <div className="flex-shrink-0 w-full md:w-[calc(33.333%-1rem)]">
-                  <Card className="bg-white border border-border rounded-xl h-full shadow-sm hover:shadow-md transition-shadow">
-                    <CardHeader className="text-center pb-2 pt-6">
-                      <div className="text-xl font-bold mb-2">
-                        <span className="text-red-600">CAIRN</span>
-                        <span className="text-bn-blue">.INFO</span>
+                <div className="flex-shrink-0 w-full md:w-1/3 px-3">
+                  <Card className="bg-white border border-gray-200 rounded-lg h-full shadow-sm">
+                    <CardHeader className="text-center pb-3 pt-8">
+                      <div className="mb-3">
+                        <span className="font-bold text-2xl">
+                          <span className="text-red-600">CAIRN</span>
+                          <span className="text-bn-blue">.INFO</span>
+                        </span>
+                        <div className="text-[10px] text-gray-500 tracking-widest mt-1">CHERCHER • REPÉRER • AVANCER</div>
                       </div>
-                      <span className="text-xs text-muted-foreground block mb-1">CHERCHER REPÉRER AVANCER</span>
-                      <a href="https://www.cairn.info" target="_blank" rel="noopener noreferrer" className="text-bn-gold text-text-small hover:underline">
+                      <a href="https://www.cairn.info" target="_blank" rel="noopener noreferrer" className="text-bn-gold text-sm hover:underline font-medium">
                         Cairn.info
                       </a>
                     </CardHeader>
-                    <CardContent className="text-center space-y-4 pb-6">
-                      <p className="text-muted-foreground text-text-small leading-relaxed">
+                    <CardContent className="text-center space-y-5 pb-8 px-6">
+                      <p className="text-gray-600 text-sm leading-relaxed">
                         Cairn est une plateforme de référence pour les publications de sciences humaines et sociales. Elle diffuse les contenus de plus de 500 éditeurs et 2000 revues en ligne.
                       </p>
                       <a 
                         href="https://www.cairn.info" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-6 py-2 bg-bn-gold text-white rounded-md font-medium hover:bg-bn-gold/90 transition-colors text-text-small"
+                        className="inline-flex items-center gap-2 px-6 py-2.5 bg-bn-gold text-white rounded font-medium hover:bg-bn-gold/90 transition-colors text-sm"
                       >
-                        Accéder <ExternalLink className="h-4 w-4" />
+                        Accéder <ChevronRight className="h-4 w-4" />
                       </a>
                     </CardContent>
                   </Card>
                 </div>
 
                 {/* RFN */}
-                <div className="flex-shrink-0 w-full md:w-[calc(33.333%-1rem)]">
-                  <Card className="bg-white border border-border rounded-xl h-full shadow-sm hover:shadow-md transition-shadow">
-                    <CardHeader className="text-center pb-2 pt-6">
-                      <div className="text-xl font-bold text-bn-blue mb-2">RFN</div>
-                      <a href="https://rfnum.org" target="_blank" rel="noopener noreferrer" className="text-bn-gold text-text-small hover:underline">
+                <div className="flex-shrink-0 w-full md:w-1/3 px-3">
+                  <Card className="bg-white border border-gray-200 rounded-lg h-full shadow-sm">
+                    <CardHeader className="text-center pb-3 pt-8">
+                      <div className="font-serif text-2xl font-bold text-bn-blue mb-3">RFN</div>
+                      <a href="https://rfnum.org" target="_blank" rel="noopener noreferrer" className="text-bn-gold text-sm hover:underline font-medium">
                         rfnum.org
                       </a>
                     </CardHeader>
-                    <CardContent className="text-center space-y-4 pb-6">
-                      <p className="text-muted-foreground text-text-small leading-relaxed">
+                    <CardContent className="text-center space-y-5 pb-8 px-6">
+                      <p className="text-gray-600 text-sm leading-relaxed">
                         Réseau Francophone Numérique regroupant les collections patrimoniales de bibliothèques nationales francophones pour préserver le patrimoine documentaire commun.
                       </p>
                       <a 
                         href="https://rfnum.org" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-6 py-2 bg-bn-gold text-white rounded-md font-medium hover:bg-bn-gold/90 transition-colors text-text-small"
+                        className="inline-flex items-center gap-2 px-6 py-2.5 bg-bn-gold text-white rounded font-medium hover:bg-bn-gold/90 transition-colors text-sm"
                       >
-                        Accéder <ExternalLink className="h-4 w-4" />
+                        Accéder <ChevronRight className="h-4 w-4" />
                       </a>
                     </CardContent>
                   </Card>
                 </div>
 
                 {/* Europeana */}
-                <div className="flex-shrink-0 w-full md:w-[calc(33.333%-1rem)]">
-                  <Card className="bg-white border border-border rounded-xl h-full shadow-sm hover:shadow-md transition-shadow">
-                    <CardHeader className="text-center pb-2 pt-6">
-                      <div className="text-xl font-bold text-bn-blue mb-2">Europeana</div>
-                      <a href="https://www.europeana.eu" target="_blank" rel="noopener noreferrer" className="text-bn-gold text-text-small hover:underline">
+                <div className="flex-shrink-0 w-full md:w-1/3 px-3">
+                  <Card className="bg-white border border-gray-200 rounded-lg h-full shadow-sm">
+                    <CardHeader className="text-center pb-3 pt-8">
+                      <div className="font-serif text-2xl font-bold text-bn-blue mb-3">Europeana</div>
+                      <a href="https://www.europeana.eu" target="_blank" rel="noopener noreferrer" className="text-bn-gold text-sm hover:underline font-medium">
                         europeana.eu
                       </a>
                     </CardHeader>
-                    <CardContent className="text-center space-y-4 pb-6">
-                      <p className="text-muted-foreground text-text-small leading-relaxed">
+                    <CardContent className="text-center space-y-5 pb-8 px-6">
+                      <p className="text-gray-600 text-sm leading-relaxed">
                         Agrégateur central du patrimoine culturel européen. Initiative de l'UE visant à moderniser la numérisation et la réutilisation des données culturelles.
                       </p>
                       <a 
                         href="https://www.europeana.eu" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-6 py-2 bg-bn-gold text-white rounded-md font-medium hover:bg-bn-gold/90 transition-colors text-text-small"
+                        className="inline-flex items-center gap-2 px-6 py-2.5 bg-bn-gold text-white rounded font-medium hover:bg-bn-gold/90 transition-colors text-sm"
                       >
-                        Accéder <ExternalLink className="h-4 w-4" />
+                        Accéder <ChevronRight className="h-4 w-4" />
                       </a>
                     </CardContent>
                   </Card>
                 </div>
 
                 {/* IFLA */}
-                <div className="flex-shrink-0 w-full md:w-[calc(33.333%-1rem)]">
-                  <Card className="bg-white border border-border rounded-xl h-full shadow-sm hover:shadow-md transition-shadow">
-                    <CardHeader className="text-center pb-2 pt-6">
-                      <div className="text-xl font-bold text-bn-blue mb-2">IFLA</div>
-                      <a href="https://www.ifla.org" target="_blank" rel="noopener noreferrer" className="text-bn-gold text-text-small hover:underline">
+                <div className="flex-shrink-0 w-full md:w-1/3 px-3">
+                  <Card className="bg-white border border-gray-200 rounded-lg h-full shadow-sm">
+                    <CardHeader className="text-center pb-3 pt-8">
+                      <div className="font-serif text-2xl font-bold text-bn-blue mb-3">IFLA</div>
+                      <a href="https://www.ifla.org" target="_blank" rel="noopener noreferrer" className="text-bn-gold text-sm hover:underline font-medium">
                         ifla.org
                       </a>
                     </CardHeader>
-                    <CardContent className="text-center space-y-4 pb-6">
-                      <p className="text-muted-foreground text-text-small leading-relaxed">
+                    <CardContent className="text-center space-y-5 pb-8 px-6">
+                      <p className="text-gray-600 text-sm leading-relaxed">
                         Fédération Internationale des Associations de Bibliothécaires. Définit les normes internationales pour l'interopérabilité entre les grands réservoirs mondiaux.
                       </p>
                       <a 
                         href="https://www.ifla.org" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-6 py-2 bg-bn-gold text-white rounded-md font-medium hover:bg-bn-gold/90 transition-colors text-text-small"
+                        className="inline-flex items-center gap-2 px-6 py-2.5 bg-bn-gold text-white rounded font-medium hover:bg-bn-gold/90 transition-colors text-sm"
                       >
-                        Accéder <ExternalLink className="h-4 w-4" />
+                        Accéder <ChevronRight className="h-4 w-4" />
                       </a>
                     </CardContent>
                   </Card>
@@ -951,24 +950,26 @@ export default function DigitalLibraryHome() {
               </div>
             </div>
 
-            {/* Flèche droite */}
+            {/* Flèche droite - style gris fin */}
             <button 
               onClick={() => setRepoCarouselIndex(prev => Math.min(3, prev + 1))}
               disabled={repoCarouselIndex >= 3}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 w-10 h-10 rounded-full bg-white shadow-lg border border-border flex items-center justify-center hover:bg-bn-gold hover:text-white transition-colors disabled:opacity-50 disabled:hover:bg-white disabled:hover:text-foreground"
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full border border-gray-300 bg-white flex items-center justify-center text-gray-400 hover:border-bn-gold hover:text-bn-gold transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
             >
               <ChevronRight className="h-5 w-5" />
             </button>
           </div>
 
-          {/* Points de pagination */}
-          <div className="flex justify-center gap-2 mt-8">
+          {/* Points de pagination style BN */}
+          <div className="flex justify-center gap-2 mt-10">
             {[0, 1, 2, 3].map((index) => (
               <button
                 key={index}
                 onClick={() => setRepoCarouselIndex(index)}
-                className={`w-2 h-2 rounded-full transition-colors ${
-                  repoCarouselIndex === index ? 'bg-bn-gold' : 'bg-border hover:bg-bn-gold/50'
+                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
+                  repoCarouselIndex === index 
+                    ? 'bg-bn-gold w-6' 
+                    : 'bg-gray-300 hover:bg-bn-gold/50'
                 }`}
               />
             ))}
