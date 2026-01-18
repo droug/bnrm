@@ -30,7 +30,10 @@ const sectionTypeLabels: Record<string, string> = {
   image: '🖼️ Image',
   video: '🎥 Vidéo',
   callout: '💡 Encadré',
-  statBlocks: '📈 Blocs de Stats'
+  statBlocks: '📈 Blocs de Stats',
+  ibnBattoutaStats: '📚 Ibn Battouta Stats',
+  mediatheque: '🎬 Médiathèque',
+  electronicResources: '🌐 Ressources Électroniques'
 };
 
 export default function CmsSectionItem({ section, index, onUpdate, onDelete, onDuplicate }: CmsSectionItemProps) {

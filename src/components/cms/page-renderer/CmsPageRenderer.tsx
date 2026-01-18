@@ -12,6 +12,9 @@ import { ImageSection } from "./sections/ImageSection";
 import { VideoSection } from "./sections/VideoSection";
 import { CalloutSection } from "./sections/CalloutSection";
 import { StatBlocksSection } from "./sections/StatBlocksSection";
+import { IbnBattoutaStatsSection } from "./sections/IbnBattoutaStatsSection";
+import { MediathequeSection } from "./sections/MediathequeSection";
+import { ElectronicResourcesSection } from "./sections/ElectronicResourcesSection";
 
 interface CmsPageRendererProps {
   slug: string;
@@ -90,6 +93,12 @@ export default function CmsPageRenderer({ slug, language = 'fr' }: CmsPageRender
         return <CalloutSection {...props} />;
       case 'statBlocks':
         return <StatBlocksSection {...props} />;
+      case 'ibnBattoutaStats':
+        return <IbnBattoutaStatsSection {...props} />;
+      case 'mediatheque':
+        return <MediathequeSection {...props} />;
+      case 'electronicResources':
+        return <ElectronicResourcesSection {...props} />;
       default:
         return null;
     }
