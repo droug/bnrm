@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import DigitalLibraryFooter from "@/components/digital-library/DigitalLibraryFooter";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Search, Book, BookOpen, FileText, Video, Music, Image as ImageIcon, Globe, ArrowRight, TrendingUp, Clock, Eye, Download, Filter, ChevronDown, X, Calendar, HelpCircle, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -786,7 +786,7 @@ const DigitalLibrary = () => {
         </section>
       </main>
 
-      <Footer />
+      <DigitalLibraryFooter />
     </div>
   );
 };
