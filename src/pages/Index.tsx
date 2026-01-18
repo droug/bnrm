@@ -35,22 +35,22 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFilter, setSearchFilter] = useState("all");
 
-  // Fetch hero settings from CMS (always take the latest row)
+  // Fetch hero settings from CMS for PORTAL platform
   const { data: heroSettings } = useQuery({
-    queryKey: ["cms-hero-settings-bn"],
+    queryKey: ["cms-hero-settings-portal"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("cms_hero_settings")
         .select("*")
-        .order("updated_at", { ascending: false })
-        .limit(1);
+        .eq("platform", "portal")
+        .single();
 
-      if (error) {
+      if (error && error.code !== 'PGRST116') {
         console.error("Error fetching hero settings:", error);
         return null;
       }
 
-      return data?.[0] ?? null;
+      return data ?? null;
     },
     staleTime: 0,
     refetchOnWindowFocus: true,
