@@ -38,23 +38,23 @@ export default function DigitalLibraryHome() {
   const [userProfile, setUserProfile] = useState<any>(null);
   const [repoCarouselIndex, setRepoCarouselIndex] = useState(0);
 
-  // Hero image configured from /admin/content-management (CmsHeroManager)
-  // Note: Supabase REST returns an array by default, so we take the first row.
+  // Hero image configured from /admin/content-management-BN (CmsHeroManagerBN)
+  // Fetches settings for the BN (Bibliothèque Numérique) platform specifically
   const { data: heroSettings } = useQuery({
-    queryKey: ["cms-hero-settings-digital-library-home"],
+    queryKey: ["cms-hero-settings-bn"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("cms_hero_settings")
         .select("*")
-        .order("updated_at", { ascending: false })
-        .limit(1);
+        .eq("platform", "bn")
+        .single();
 
-      if (error) {
+      if (error && error.code !== 'PGRST116') {
         console.error("Error fetching hero settings:", error);
         return null;
       }
 
-      return data?.[0] ?? null;
+      return data ?? null;
     },
     staleTime: 0,
     refetchOnWindowFocus: true,
