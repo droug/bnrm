@@ -91,54 +91,55 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
           </p>
         </div>
 
-        {/* Video Carousel */}
-        <div className="px-8 pb-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {visibleVideos.map((video) => (
-              <div 
-                key={video.id} 
-                className="relative group cursor-pointer rounded-lg overflow-hidden aspect-[4/3]"
-                onClick={() => handlePlayVideo(video.id)}
-              >
-                {playingVideo === video.id ? (
-                  <iframe
-                    src={`https://www.youtube.com/embed/${video.id}?autoplay=1`}
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    title={video.title[language as 'fr' | 'ar']}
-                  />
-                ) : (
-                  <>
-                    {/* Thumbnail */}
-                    <img 
-                      src={video.thumbnail}
-                      alt={video.title[language as 'fr' | 'ar']}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                      onError={(e) => {
-                        // Fallback to hqdefault if maxresdefault doesn't exist
-                        (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`;
-                      }}
+        {/* Video Carousel - White background area */}
+        <div className="bg-white mx-0 rounded-none">
+          <div className="px-6 py-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {visibleVideos.map((video) => (
+                <div 
+                  key={video.id} 
+                  className="relative group cursor-pointer rounded-lg overflow-hidden aspect-[4/3] bg-slate-100"
+                  onClick={() => handlePlayVideo(video.id)}
+                >
+                  {playingVideo === video.id ? (
+                    <iframe
+                      src={`https://www.youtube.com/embed/${video.id}?autoplay=1`}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title={video.title[language as 'fr' | 'ar']}
                     />
-                    
-                    {/* Overlay gradient */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    
-                    {/* Play button */}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-14 h-14 bg-white/90 rounded-full flex items-center justify-center shadow-lg transform transition-transform group-hover:scale-110">
-                        <Play className="h-6 w-6 text-blue-dark fill-blue-dark ml-1" />
+                  ) : (
+                    <>
+                      {/* Thumbnail */}
+                      <img 
+                        src={video.thumbnail}
+                        alt={video.title[language as 'fr' | 'ar']}
+                        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`;
+                        }}
+                      />
+                      
+                      {/* Overlay gradient */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      
+                      {/* Play button */}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-14 h-14 bg-blue-primary/90 rounded-full flex items-center justify-center shadow-lg transform transition-transform group-hover:scale-110">
+                          <Play className="h-6 w-6 text-white fill-white ml-1" />
+                        </div>
                       </div>
-                    </div>
-                  </>
-                )}
-              </div>
-            ))}
+                    </>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Footer with pagination and navigation */}
-        <div className="px-8 pb-8 flex items-center justify-between">
+        {/* Footer with pagination and navigation - back to blue */}
+        <div className="px-8 py-4 flex items-center justify-between">
           {/* Pagination dots */}
           <div className="flex gap-2">
             {Array.from({ length: totalSlides }).map((_, index) => (
