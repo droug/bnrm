@@ -1,5 +1,6 @@
 // Force cache regeneration: v2 - 2026-01-15
 import { useState, useEffect, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -35,6 +36,28 @@ export default function DigitalLibraryHome() {
   const [showReservationDialog, setShowReservationDialog] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
+
+  // Hero image configured from /admin/content-management (CmsHeroManager)
+  const { data: heroSettings } = useQuery({
+    queryKey: ['cms-hero-settings-digital-library-home'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('cms_hero_settings')
+        .select('*')
+        .limit(1)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching hero settings:', error);
+        return null;
+      }
+      return data;
+    },
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+  });
+
+  const heroImageUrl = heroSettings?.hero_image_url?.trim() ? heroSettings.hero_image_url : libraryBanner;
   
   const autoplayPlugin = useRef(
     Autoplay({ delay: 5000, stopOnInteraction: true, stopOnMouseEnter: true })
@@ -343,7 +366,7 @@ export default function DigitalLibraryHome() {
       <section 
         className="relative py-16 overflow-hidden"
         style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(${libraryBanner})`,
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(${heroImageUrl})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
