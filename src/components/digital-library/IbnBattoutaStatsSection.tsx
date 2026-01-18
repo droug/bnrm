@@ -42,7 +42,7 @@ interface IbnBattoutaStatsSectionProps {
 }
 
 export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaStatsSectionProps) {
-  const { t, language } = useLanguage();
+  const { language } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
   
   const visibleStats = stats.slice(currentIndex, currentIndex + 3);
@@ -55,61 +55,67 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
         {/* Section Header */}
         <div className="text-center mb-12">
           {/* Gold Grid Icon */}
-          <div className="flex justify-center mb-4">
-            <div className="w-14 h-14 rounded-lg border-2 border-gold-bn-primary flex items-center justify-center bg-white/50">
-              <Grid3X3 className="h-7 w-7 text-gold-bn-primary" strokeWidth={1.5} />
+          <div className="flex justify-center mb-6">
+            <div className="w-12 h-12 rounded-lg border border-gold-bn-primary flex items-center justify-center">
+              <Grid3X3 className="h-6 w-6 text-gold-bn-primary" strokeWidth={1.5} />
             </div>
           </div>
           
-          {/* Title - Unified with "Ressources électroniques" style */}
+          {/* Title */}
           <h2 className="heading-3 text-bn-blue-primary font-heading">
             Ibn Battouta en chiffres
           </h2>
           
           {/* Subtitle */}
           <p className="font-body text-regular text-muted-foreground max-w-2xl mx-auto mt-4">
-            Découvrez les documents récemment ajoutés à nos collections, 
+            Découvrez les documents récemment ajoutés à nos collections,
             soigneusement sélectionnés pour enrichir votre expérience.
           </p>
         </div>
 
         {/* Stats Cards with Navigation */}
-        <div className="relative max-w-4xl mx-auto">
+        <div className="relative max-w-5xl mx-auto flex items-center">
           {/* Left Arrow */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute -left-4 md:-left-12 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-white border border-slate-border shadow-sm hover:bg-slate-light z-10"
+          <button
             onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))}
             disabled={!canGoPrev}
+            className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-slate-text hover:text-bn-blue-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            aria-label="Précédent"
           >
-            <ChevronLeft className="h-5 w-5 text-slate-text-dark" />
-          </Button>
+            <ChevronLeft className="h-8 w-8" strokeWidth={1.5} />
+          </button>
 
           {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-8">
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 px-4">
             {visibleStats.map((stat, index) => (
               <Link 
                 key={index} 
                 to={stat.href || "#"}
                 className="group"
               >
-                <div className="bg-white rounded-xl shadow-md p-8 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gold-bn-primary/20">
-                  {/* Icon Container */}
-                  <div className="flex justify-center mb-4">
-                    <div className="w-16 h-16 rounded-xl bg-gold-bn-surface border border-gold-bn-primary/30 flex items-center justify-center group-hover:bg-gold-bn-light transition-colors">
-                      <stat.icon className="h-8 w-8 text-gold-bn-primary" strokeWidth={1.5} />
+                {/* Card with blue gradient background */}
+                <div className="relative bg-gradient-to-br from-bn-blue-primary via-bn-blue-primary to-bn-blue-primary-dark rounded-xl p-6 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-1 overflow-hidden">
+                  {/* Subtle pattern overlay */}
+                  <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.2)_1px,transparent_1px)] bg-[length:20px_20px]" />
+                  
+                  {/* Content */}
+                  <div className="relative z-10">
+                    {/* Icon Container - Gold outlined box */}
+                    <div className="flex justify-center mb-4">
+                      <div className="w-14 h-14 rounded-lg border-2 border-gold-bn-primary bg-transparent flex items-center justify-center">
+                        <stat.icon className="h-7 w-7 text-gold-bn-primary" strokeWidth={1.5} />
+                      </div>
                     </div>
-                  </div>
-                  
-                  {/* Value */}
-                  <div className="text-4xl font-bold text-bn-blue-primary mb-2 font-playfair">
-                    {stat.value}
-                  </div>
-                  
-                  {/* Label */}
-                  <div className="text-slate-text text-sm">
-                    {language === 'ar' && stat.labelAr ? stat.labelAr : stat.label}
+                    
+                    {/* Value - Large white text */}
+                    <div className="text-4xl md:text-5xl font-bold text-white mb-2 font-heading">
+                      {stat.value}
+                    </div>
+                    
+                    {/* Label - Smaller white text */}
+                    <div className="text-white/90 text-sm font-medium">
+                      {language === 'ar' && stat.labelAr ? stat.labelAr : stat.label}
+                    </div>
                   </div>
                 </div>
               </Link>
@@ -117,22 +123,21 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
           </div>
 
           {/* Right Arrow */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="absolute -right-4 md:-right-12 top-1/2 -translate-y-1/2 h-10 w-10 rounded-full bg-white border border-slate-border shadow-sm hover:bg-slate-light z-10"
+          <button
             onClick={() => setCurrentIndex(Math.min(stats.length - 3, currentIndex + 1))}
             disabled={!canGoNext}
+            className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-slate-text hover:text-bn-blue-primary transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            aria-label="Suivant"
           >
-            <ChevronRight className="h-5 w-5 text-slate-text-dark" />
-          </Button>
+            <ChevronRight className="h-8 w-8" strokeWidth={1.5} />
+          </button>
         </div>
 
         {/* CTA Button */}
         <div className="flex justify-center mt-10">
           <Link to="/digital-library/collections">
             <Button 
-              className="bg-gold-bn-primary hover:bg-gold-bn-primary-dark text-white px-8 py-2 rounded-md shadow-md hover:shadow-lg transition-all"
+              className="bg-gold-bn-primary hover:bg-gold-bn-primary-dark text-white px-8 py-2.5 rounded-md shadow-md hover:shadow-lg transition-all font-medium"
             >
               Voir tout
             </Button>
