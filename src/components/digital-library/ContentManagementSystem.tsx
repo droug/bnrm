@@ -12,6 +12,7 @@ import CmsFooterManager from "@/components/cms/CmsFooterManager";
 import CmsSectionsManager from "@/components/cms/CmsSectionsManager";
 import CmsHeroManagerBN from "@/components/cms/CmsHeroManagerBN";
 import CmsStyleManager from "@/components/cms/CmsStyleManager";
+import CmsVExpo360Manager from "@/components/cms/CmsVExpo360Manager";
 import FeaturedWorksManager from "@/components/admin/FeaturedWorksManager";
 import { 
   Sparkles, 
@@ -31,7 +32,8 @@ import {
   BookOpen,
   Library,
   Scroll,
-  Palette
+  Palette,
+  Globe
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -71,6 +73,16 @@ const tabs = [
     borderColor: "border-amber-500/30",
     gradient: "from-amber-500/20 to-amber-600/5",
     description: "Carrousel des œuvres mises en avant"
+  },
+  { 
+    id: "vexpo360", 
+    label: "Expositions Virtuelles 360°", 
+    icon: Globe, 
+    color: "text-purple-500",
+    bgColor: "bg-purple-500/10",
+    borderColor: "border-purple-500/30",
+    gradient: "from-purple-500/20 to-purple-600/5",
+    description: "Expositions virtuelles immersives"
   },
   { 
     id: "collections", 
@@ -276,6 +288,8 @@ export default function ContentManagementSystem() {
         return <CmsStyleManager />;
       case "carrousel-bn":
         return <FeaturedWorksManager />;
+      case "vexpo360":
+        return <CmsVExpo360Manager />;
       case "collections":
         return (
           <Card>
