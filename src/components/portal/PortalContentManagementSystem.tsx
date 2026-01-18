@@ -74,6 +74,16 @@ const tabs = [
     gradient: "from-sky-500/20 to-sky-600/5",
     description: "Carousel des services numériques"
   },
+  { 
+    id: "mediatheque", 
+    label: "Médiathèque", 
+    icon: Video, 
+    color: "text-red-500",
+    bgColor: "bg-red-500/10",
+    borderColor: "border-red-500/30",
+    gradient: "from-red-500/20 to-red-600/5",
+    description: "Vidéos YouTube de la BNRM"
+  },
   {
     id: "bannieres", 
     label: "Bannières", 
@@ -153,16 +163,6 @@ const tabs = [
     borderColor: "border-indigo-500/30",
     gradient: "from-indigo-500/20 to-indigo-600/5",
     description: "Blocs de contenu des pages"
-  },
-  { 
-    id: "mediatheque", 
-    label: "Médiathèque", 
-    icon: Video, 
-    color: "text-red-500",
-    bgColor: "bg-red-500/10",
-    borderColor: "border-red-500/30",
-    gradient: "from-red-500/20 to-red-600/5",
-    description: "Vidéos et galeries médias"
   },
   { 
     id: "media", 
