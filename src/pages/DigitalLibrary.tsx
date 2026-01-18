@@ -40,25 +40,28 @@ const DigitalLibrary = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<{type: string, value: string}[]>([]);
 
-  // Fetch hero settings from CMS
+  // Fetch hero settings from CMS (always take the latest row)
   const { data: heroSettings } = useQuery({
-    queryKey: ['cms-hero-settings-digital-library'],
+    queryKey: ["cms-hero-settings-digital-library"],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('cms_hero_settings')
-        .select('*')
-        .limit(1)
-        .maybeSingle();
-      
+        .from("cms_hero_settings")
+        .select("*")
+        .order("updated_at", { ascending: false })
+        .limit(1);
+
       if (error) {
-        console.error('Error fetching hero settings:', error);
+        console.error("Error fetching hero settings:", error);
         return null;
       }
-      console.log('Hero settings loaded:', data);
-      return data;
+
+      const row = data?.[0] ?? null;
+      console.log("Hero settings loaded:", row);
+      return row;
     },
     staleTime: 0, // Always fetch fresh data
-    refetchOnWindowFocus: true
+    refetchOnWindowFocus: true,
+    refetchOnMount: "always",
   });
 
   // Fetch featured works from database
