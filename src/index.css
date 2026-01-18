@@ -396,84 +396,84 @@ Enhanced Moroccan Heritage Design System
     font-family: 'Noto Sans Tifinagh', 'Arial Unicode MS', sans-serif;
   }
 
-  /* === BN Typography System (from reference) === */
+  /* === BN Typography System (exact from reference image) === */
   /* Heading Typeface: Playfair Display | Body Typeface: Inter */
   
-  /* Heading 1: Desktop 60px/3.75rem, Mobile 44px/2.75rem, Line-height 120% */
+  /* Heading 1: Desktop 84px/5.25rem, Mobile 48px/3rem, Line-height 110% */
   .heading-1 {
     font-family: 'Playfair Display', Georgia, serif;
-    font-size: 2.75rem;
-    line-height: 1.2;
-    font-weight: 700;
+    font-size: 3rem;
+    line-height: 1.1;
+    font-weight: 400;
   }
   @media (min-width: 768px) {
     .heading-1 {
+      font-size: 5.25rem;
+    }
+  }
+
+  /* Heading 2: Desktop 60px/3.75rem, Mobile 44px/2.75rem, Line-height 120% */
+  .heading-2 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 2.75rem;
+    line-height: 1.2;
+    font-weight: 400;
+  }
+  @media (min-width: 768px) {
+    .heading-2 {
       font-size: 3.75rem;
     }
   }
 
-  /* Heading 2: Desktop 48px/3rem, Mobile 32px/2rem, Line-height 120% */
-  .heading-2 {
+  /* Heading 3: Desktop 48px/3rem, Mobile 32px/2rem, Line-height 120% */
+  .heading-3 {
     font-family: 'Playfair Display', Georgia, serif;
     font-size: 2rem;
     line-height: 1.2;
-    font-weight: 700;
+    font-weight: 400;
   }
   @media (min-width: 768px) {
-    .heading-2 {
+    .heading-3 {
       font-size: 3rem;
     }
   }
 
-  /* Heading 3: Desktop 40px/2.5rem, Mobile 24px/1.5rem, Line-height 120% */
-  .heading-3 {
+  /* Heading 4: Desktop 40px/2.5rem, Mobile 24px/1.5rem, Line-height 120% */
+  .heading-4 {
     font-family: 'Playfair Display', Georgia, serif;
     font-size: 1.5rem;
     line-height: 1.2;
-    font-weight: 700;
+    font-weight: 400;
   }
   @media (min-width: 768px) {
-    .heading-3 {
+    .heading-4 {
       font-size: 2.5rem;
     }
   }
 
-  /* Heading 4: Desktop 32px/2rem, Mobile 20px/1.25rem, Line-height 120% */
-  .heading-4 {
+  /* Heading 5: Desktop 32px/2rem, Mobile 20px/1.25rem, Line-height 120% */
+  .heading-5 {
     font-family: 'Playfair Display', Georgia, serif;
     font-size: 1.25rem;
     line-height: 1.2;
-    font-weight: 700;
+    font-weight: 400;
   }
   @media (min-width: 768px) {
-    .heading-4 {
+    .heading-5 {
       font-size: 2rem;
     }
   }
 
-  /* Heading 5: Desktop 26px/1.625rem, Mobile 18px/1.125rem, Line-height 120% */
-  .heading-5 {
+  /* Heading 6: Desktop 26px/1.625rem, Mobile 18px/1.125rem, Line-height 120% */
+  .heading-6 {
     font-family: 'Playfair Display', Georgia, serif;
     font-size: 1.125rem;
     line-height: 1.2;
-    font-weight: 700;
-  }
-  @media (min-width: 768px) {
-    .heading-5 {
-      font-size: 1.625rem;
-    }
-  }
-
-  /* Heading 6: Desktop 16px/1rem, Mobile 14px/0.875rem, Line-height 150% */
-  .heading-6 {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: 0.875rem;
-    line-height: 1.5;
-    font-weight: 700;
+    font-weight: 400;
   }
   @media (min-width: 768px) {
     .heading-6 {
-      font-size: 1rem;
+      font-size: 1.625rem;
     }
   }
 
