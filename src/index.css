@@ -16,29 +16,42 @@ Enhanced Moroccan Heritage Design System
 
 @layer base {
   :root {
-    /* === BN OFFICIAL COLOR PALETTE === */
-    /* Based on official design system: Blue, Gold, White (Page d'accueil BN) */
+    /* === PORTAIL BNRM - DESIGN SYSTEM === */
+    /* Based on Variables Portail: Slate + Blue palette */
     
-    /* Blue Family - Primary brand colors (from reference) */
-    --blue-surface: 216 33% 97%;     /* #F4F6F8 */
-    --blue-light: 209 41% 87%;       /* #D9E1E8 */
-    --blue-light-alt: 207 31% 75%;   /* #BFCAD4 */
-    --blue-soft: 206 23% 65%;        /* #A5B3C0 */
-    --blue-primary-light: 206 21% 50%; /* #8093A8 */
-    --blue-primary: 208 28% 28%;     /* #33475C - Official BN Blue Primary */
-    --blue-primary-dark: 208 34% 20%; /* #253241 */
-    --blue-deep: 209 37% 16%;        /* #1B2735 */
-    --blue-deep-alt: 210 40% 13%;    /* #151E2A */
-    --blue-dark: 212 45% 10%;        /* #0E151E */
-    --blue-shadow: 213 53% 5%;       /* #070C12 */
+    /* Slate Family - Neutral colors */
+    --slate-surface: 220 14% 98%;     /* #F8FAFC */
+    --slate-light: 220 13% 96%;       /* #F1F5F9 */
+    --slate-border: 220 13% 91%;      /* #E2E8F0 */
+    --slate-muted: 215 16% 80%;       /* #CBD5E1 */
+    --slate-text-light: 215 16% 65%;  /* #94A3B8 */
+    --slate-text: 215 16% 47%;        /* #64748B */
+    --slate-text-dark: 215 19% 35%;   /* #475569 */
+    --slate-base: 215 25% 27%;        /* #334155 */
+    --slate-base-dark: 217 33% 17%;   /* #1E293B */
+    --slate-dark: 222 47% 11%;        /* #0F172A */
+    --slate-shadow: 229 84% 5%;       /* #020617 */
     
-    /* Gold Family - Accent colors (from reference) */
+    /* Blue Family - Primary brand colors */
+    --blue-surface: 213 100% 97%;     /* #EFF6FF */
+    --blue-light: 214 95% 93%;        /* #DBEAFE */
+    --blue-light-alt: 213 97% 87%;    /* #BFDBFE */
+    --blue-soft: 212 96% 78%;         /* #93C5FD */
+    --blue-primary-light: 213 94% 68%; /* #60A5FA */
+    --blue-primary: 217 91% 60%;      /* #3B82F6 - Official Portal Blue */
+    --blue-primary-dark: 224 76% 53%; /* #2563EB */
+    --blue-deep: 226 83% 47%;         /* #1D4ED8 */
+    --blue-deep-alt: 224 76% 40%;     /* #1E40AF */
+    --blue-dark: 224 64% 33%;         /* #1E3A8A */
+    --blue-shadow: 226 57% 21%;       /* #172554 */
+    
+    /* Gold/Amber Family - Accent colors (Curious Blue accent) */
     --gold-surface: 49 100% 96%;     /* #FFFBEA */
     --gold-light: 50 100% 87%;       /* #FFF3C4 */
     --gold-light-alt: 48 100% 77%;   /* #FFE28A */
     --gold-soft: 47 100% 65%;        /* #FFD54F */
     --gold-primary-light: 43 97% 58%; /* #FBC02D */
-    --gold-primary: 43 65% 52%;      /* #D4AF37 - Official BN Gold Primary */
+    --gold-primary: 43 65% 52%;      /* #D4AF37 */
     --gold-primary-dark: 40 87% 38%; /* #B8860B */
     --gold-deep: 38 100% 29%;        /* #946200 */
     --gold-deep-alt: 36 100% 23%;    /* #755100 */
@@ -49,60 +62,68 @@ Enhanced Moroccan Heritage Design System
     --morocco-green: 145 60% 30%;
     --morocco-green-light: 145 50% 45%;
     
-    /* Semantic tokens mapped to BN palette - DIRECT HSL VALUES */
-    --background: 0 0% 100%;         /* Pure white */
-    --foreground: 208 28% 28%;       /* Blue Primary */
+    /* Semantic tokens mapped to new palette - DIRECT HSL VALUES */
+    --background: 0 0% 100%;           /* Pure white */
+    --foreground: 222 47% 11%;         /* Slate Dark #0F172A */
 
-    --card: 0 0% 100%;               /* White cards */
-    --card-foreground: 208 28% 28%;
+    --card: 0 0% 100%;                 /* White cards */
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 208 28% 28%;
+    --popover-foreground: 222 47% 11%;
 
-    /* Primary: Official BN Blue - DIRECT HSL */
-    --primary: 208 28% 28%;          /* #33475C */
+    /* Primary: Official Portal Blue - DIRECT HSL */
+    --primary: 217 91% 60%;            /* #3B82F6 */
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 206 23% 65%;
-    --primary-deep: 209 37% 16%;
+    --primary-glow: 213 94% 68%;       /* #60A5FA */
+    --primary-deep: 226 83% 47%;       /* #1D4ED8 */
 
-    /* Secondary: Gold tones for warmth */
-    --secondary: 50 100% 87%;
-    --secondary-foreground: 208 28% 28%;
+    /* Secondary: Light slate tones */
+    --secondary: 220 13% 96%;          /* #F1F5F9 */
+    --secondary-foreground: 222 47% 11%;
     --secondary-warm: 43 65% 52%;
 
-    /* Muted: Light blue tones */
-    --muted: 216 33% 97%;
-    --muted-foreground: 206 23% 65%;
+    /* Muted: Slate surface */
+    --muted: 220 14% 98%;              /* #F8FAFC */
+    --muted-foreground: 215 16% 47%;   /* #64748B */
 
-    /* Accent: Gold for emphasis */
-    --accent: 43 65% 52%;            /* #D4AF37 */
+    /* Accent: Curious Blue */
+    --accent: 217 91% 60%;             /* #3B82F6 */
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 47 100% 65%;
-    --accent-bright: 43 97% 58%;
+    --accent-glow: 213 94% 68%;
+    --accent-bright: 224 76% 53%;
 
-    /* Highlight: Deep gold */
-    --highlight: 38 100% 29%;
+    /* Highlight: Deep blue */
+    --highlight: 224 64% 33%;          /* #1E3A8A */
     --highlight-foreground: 0 0% 100%;
-    --highlight-deep: 33 100% 18%;
+    --highlight-deep: 226 57% 21%;
 
-    /* Gold: Heritage colors */
+    /* Gold: Heritage colors - preserved */
     --gold: 43 65% 52%;
     --gold-foreground: 0 0% 100%;
     --gold-bright: 43 97% 58%;
 
     /* Coral: Legacy support - mapped to gold-light */
     --coral: 48 100% 77%;
-    --coral-foreground: 208 28% 28%;
+    --coral-foreground: 222 47% 11%;
 
     /* Royal: Legacy support - mapped to blue-deep */
-    --royal: 209 37% 16%;
+    --royal: 224 64% 33%;
     --royal-foreground: 0 0% 100%;
     
-    /* Header specific colors */
-    --header-bg: var(--burgundy-primary);
+    /* Header specific colors - Now Blue based */
+    --header-bg: 217 91% 60%;          /* Blue Primary */
     --header-foreground: 0 0% 100%;
-    --nav-bg: var(--burgundy-deep);
+    --nav-bg: 224 76% 53%;             /* Blue Primary Dark */
     --nav-foreground: 0 0% 100%;
+    
+    /* Burgundy tokens - remapped to Blue for portal consistency */
+    --burgundy-surface: 213 100% 97%;
+    --burgundy-light: 214 95% 93%;
+    --burgundy-primary: 217 91% 60%;   /* Now Blue Primary */
+    --burgundy-primary-dark: 224 76% 53%;
+    --burgundy-deep: 226 83% 47%;
+    --burgundy-dark: 224 64% 33%;
 
     /* === CBM Portal Specific Colors === */
     /* Palette distinctive pour le Catalogue des Bibliothèques Marocaines */
