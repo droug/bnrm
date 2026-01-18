@@ -16,92 +16,106 @@ Enhanced Moroccan Heritage Design System
 
 @layer base {
   :root {
-    /* === PORTAIL BNRM - DESIGN SYSTEM === */
-    /* Based on Variables Portail: Slate + Blue palette */
+    /* ============================================== */
+    /* === PORTAIL BNRM - VARIABLES PRIMITIVES === */
+    /* Based on Variables Portail Design System     */
+    /* ============================================== */
     
-    /* Slate Family - Neutral colors */
-    --slate-surface: 220 14% 98%;     /* #F8FAFC */
-    --slate-light: 220 13% 96%;       /* #F1F5F9 */
-    --slate-border: 220 13% 91%;      /* #E2E8F0 */
-    --slate-muted: 215 16% 80%;       /* #CBD5E1 */
-    --slate-text-light: 215 16% 65%;  /* #94A3B8 */
-    --slate-text: 215 16% 47%;        /* #64748B */
-    --slate-text-dark: 215 19% 35%;   /* #475569 */
-    --slate-base: 215 25% 27%;        /* #334155 */
-    --slate-base-dark: 217 33% 17%;   /* #1E293B */
-    --slate-dark: 222 47% 11%;        /* #0F172A */
-    --slate-shadow: 229 84% 5%;       /* #020617 */
+    /* ─────────────────────────────────────────────── */
+    /* SLATE FAMILY - Neutral colors                   */
+    /* ─────────────────────────────────────────────── */
+    --slate-surface: 210 40% 98%;      /* #F8FAFC */
+    --slate-light: 210 40% 96%;        /* #F1F5F9 */
+    --slate-border: 214 32% 91%;       /* #E2E8F0 */
+    --slate-muted: 212 26% 80%;        /* #CBD5E1 */
+    --slate-text-light: 215 20% 65%;   /* #94A3B8 */
+    --slate-text: 215 16% 47%;         /* #64748B */
+    --slate-text-dark: 215 19% 35%;    /* #475569 */
+    --slate-base: 215 25% 27%;         /* #334155 */
+    --slate-base-dark: 217 33% 17%;    /* #1E293B */
+    --slate-dark: 222 47% 11%;         /* #0F172A */
+    --slate-shadow: 224 71% 4%;        /* #020617 */
     
-    /* Blue Family - Primary brand colors */
-    --blue-surface: 213 100% 97%;     /* #EFF6FF */
-    --blue-light: 214 95% 93%;        /* #DBEAFE */
-    --blue-light-alt: 213 97% 87%;    /* #BFDBFE */
-    --blue-soft: 212 96% 78%;         /* #93C5FD */
+    /* ─────────────────────────────────────────────── */
+    /* BLUE FAMILY - Primary brand colors              */
+    /* ─────────────────────────────────────────────── */
+    --blue-surface: 214 100% 97%;      /* #EFF6FF */
+    --blue-light: 214 95% 93%;         /* #DBEAFE */
+    --blue-light-alt: 213 97% 87%;     /* #BFDBFE */
+    --blue-soft: 212 96% 78%;          /* #93C5FD */
     --blue-primary-light: 213 94% 68%; /* #60A5FA */
-    --blue-primary: 217 91% 60%;      /* #3B82F6 - Official Portal Blue */
-    --blue-primary-dark: 224 76% 53%; /* #2563EB */
-    --blue-deep: 226 83% 47%;         /* #1D4ED8 */
-    --blue-deep-alt: 224 76% 40%;     /* #1E40AF */
-    --blue-dark: 224 64% 33%;         /* #1E3A8A */
-    --blue-shadow: 226 57% 21%;       /* #172554 */
+    --blue-primary: 217 91% 60%;       /* #3B82F6 - Official Portal Blue */
+    --blue-primary-dark: 224 76% 53%;  /* #2563EB */
+    --blue-deep: 226 83% 47%;          /* #1D4ED8 */
+    --blue-deep-alt: 224 76% 40%;      /* #1E40AF */
+    --blue-dark: 224 64% 33%;          /* #1E3A8A */
+    --blue-shadow: 226 57% 21%;        /* #172554 */
     
-    /* Gold/Amber Family - Accent colors (Curious Blue accent) */
-    --gold-surface: 49 100% 96%;     /* #FFFBEA */
-    --gold-light: 50 100% 87%;       /* #FFF3C4 */
-    --gold-light-alt: 48 100% 77%;   /* #FFE28A */
-    --gold-soft: 47 100% 65%;        /* #FFD54F */
-    --gold-primary-light: 43 97% 58%; /* #FBC02D */
-    --gold-primary: 43 65% 52%;      /* #D4AF37 */
-    --gold-primary-dark: 40 87% 38%; /* #B8860B */
-    --gold-deep: 38 100% 29%;        /* #946200 */
-    --gold-deep-alt: 36 100% 23%;    /* #755100 */
-    --gold-dark: 33 100% 18%;        /* #5C3B00 */
-    --gold-shadow: 30 100% 11%;      /* #3B2700 */
+    /* ─────────────────────────────────────────────── */
+    /* GOLD/AMBER FAMILY - Accent colors               */
+    /* ─────────────────────────────────────────────── */
+    --gold-surface: 49 100% 96%;       /* #FFFBEA */
+    --gold-light: 50 100% 87%;         /* #FFF3C4 */
+    --gold-light-alt: 48 100% 77%;     /* #FFE28A */
+    --gold-soft: 47 100% 65%;          /* #FFD54F */
+    --gold-primary-light: 43 97% 58%;  /* #FBC02D */
+    --gold-primary: 43 65% 52%;        /* #D4AF37 */
+    --gold-primary-dark: 40 87% 38%;   /* #B8860B */
+    --gold-deep: 38 100% 29%;          /* #946200 */
+    --gold-deep-alt: 36 100% 23%;      /* #755100 */
+    --gold-dark: 33 100% 18%;          /* #5C3B00 */
+    --gold-shadow: 30 100% 11%;        /* #3B2700 */
     
-    /* Morocco Green - Secondary accent (Moroccan flag) */
+    /* ─────────────────────────────────────────────── */
+    /* MOROCCO GREEN - Secondary accent                */
+    /* ─────────────────────────────────────────────── */
     --morocco-green: 145 60% 30%;
     --morocco-green-light: 145 50% 45%;
     
-    /* Semantic tokens mapped to new palette - DIRECT HSL VALUES */
-    --background: 0 0% 100%;           /* Pure white */
-    --foreground: 222 47% 11%;         /* Slate Dark #0F172A */
+    /* ============================================== */
+    /* === COLOR SCHEMES (Semantic Tokens)        === */
+    /* ============================================== */
+    
+    /* Color Scheme 1: White background */
+    --background: 0 0% 100%;                    /* Pure white */
+    --foreground: 222 47% 11%;                  /* Slate Dark - Neutral Darkest */
 
-    --card: 0 0% 100%;                 /* White cards */
+    --card: 0 0% 100%;                          /* White cards */
     --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    /* Primary: Official Portal Blue - DIRECT HSL */
-    --primary: 217 91% 60%;            /* #3B82F6 */
-    --primary-foreground: 0 0% 100%;
-    --primary-glow: 213 94% 68%;       /* #60A5FA */
-    --primary-deep: 226 83% 47%;       /* #1D4ED8 */
+    /* Primary: Official Portal Blue */
+    --primary: 217 91% 60%;                     /* #3B82F6 - Blue Primary */
+    --primary-foreground: 0 0% 100%;            /* White */
+    --primary-glow: 213 94% 68%;                /* #60A5FA - Blue Primary-Light */
+    --primary-deep: 226 83% 47%;                /* #1D4ED8 - Blue Deep */
 
-    /* Secondary: Light slate tones */
-    --secondary: 220 13% 96%;          /* #F1F5F9 */
-    --secondary-foreground: 222 47% 11%;
-    --secondary-warm: 43 65% 52%;
+    /* Secondary: Slate Light tones */
+    --secondary: 210 40% 96%;                   /* #F1F5F9 - Slate Light */
+    --secondary-foreground: 222 47% 11%;        /* Slate Dark */
+    --secondary-warm: 43 65% 52%;               /* Gold Primary */
 
-    /* Muted: Slate surface */
-    --muted: 220 14% 98%;              /* #F8FAFC */
-    --muted-foreground: 215 16% 47%;   /* #64748B */
+    /* Muted: Slate Surface */
+    --muted: 210 40% 98%;                       /* #F8FAFC - Slate Surface */
+    --muted-foreground: 215 16% 47%;            /* #64748B - Slate Text */
 
-    /* Accent: Curious Blue */
-    --accent: 217 91% 60%;             /* #3B82F6 */
+    /* Accent: Curious Blue (same as Primary for consistency) */
+    --accent: 217 91% 60%;                      /* #3B82F6 */
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 213 94% 68%;
-    --accent-bright: 224 76% 53%;
+    --accent-glow: 213 94% 68%;                 /* Blue Primary-Light */
+    --accent-bright: 224 76% 53%;               /* Blue Primary-Dark */
 
     /* Highlight: Deep blue */
-    --highlight: 224 64% 33%;          /* #1E3A8A */
+    --highlight: 224 64% 33%;                   /* #1E3A8A - Blue Dark */
     --highlight-foreground: 0 0% 100%;
-    --highlight-deep: 226 57% 21%;
+    --highlight-deep: 226 57% 21%;              /* Blue Shadow */
 
-    /* Gold: Heritage colors - preserved */
-    --gold: 43 65% 52%;
+    /* Gold: Heritage colors */
+    --gold: 43 65% 52%;                         /* #D4AF37 */
     --gold-foreground: 0 0% 100%;
-    --gold-bright: 43 97% 58%;
+    --gold-bright: 43 97% 58%;                  /* Gold Primary-Light */
 
     /* Coral: Legacy support - mapped to gold-light */
     --coral: 48 100% 77%;
