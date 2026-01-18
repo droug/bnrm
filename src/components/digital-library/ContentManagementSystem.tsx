@@ -24,15 +24,12 @@ import {
   LayoutDashboard,
   ChevronRight,
   TrendingUp,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  Eye,
-  PenLine,
   Footprints,
   LayoutTemplate,
-  Settings2,
-  Home
+  Home,
+  BookOpen,
+  Library,
+  Scroll
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -40,109 +37,128 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 
+// Modules spécifiques à la Bibliothèque Numérique (BN)
 const tabs = [
   { 
     id: "hero", 
-    label: "Hero", 
+    label: "Hero BN", 
     icon: Home, 
     color: "text-rose-500",
     bgColor: "bg-rose-500/10",
     borderColor: "border-rose-500/30",
     gradient: "from-rose-500/20 to-rose-600/5",
-    description: "Image et contenu de la section Hero"
+    description: "Section Hero de la Bibliothèque Numérique"
   },
   { 
     id: "carrousel-bn", 
-    label: "Carrousel BN", 
+    label: "Œuvres Vedettes", 
     icon: Sparkles, 
     color: "text-amber-500",
     bgColor: "bg-amber-500/10",
     borderColor: "border-amber-500/30",
     gradient: "from-amber-500/20 to-amber-600/5",
-    description: "Œuvres vedettes de la Bibliothèque Numérique"
+    description: "Carrousel des œuvres mises en avant"
+  },
+  { 
+    id: "collections", 
+    label: "Collections", 
+    icon: Library, 
+    color: "text-indigo-500",
+    bgColor: "bg-indigo-500/10",
+    borderColor: "border-indigo-500/30",
+    gradient: "from-indigo-500/20 to-indigo-600/5",
+    description: "Gestion des collections numériques"
+  },
+  { 
+    id: "manuscripts", 
+    label: "Manuscrits", 
+    icon: Scroll, 
+    color: "text-amber-600",
+    bgColor: "bg-amber-600/10",
+    borderColor: "border-amber-600/30",
+    gradient: "from-amber-600/20 to-amber-700/5",
+    description: "Manuscrits et documents anciens"
   },
   { 
     id: "bannieres", 
-    label: "Bannières", 
+    label: "Bannières BN", 
     icon: Megaphone, 
     color: "text-pink-500",
     bgColor: "bg-pink-500/10",
     borderColor: "border-pink-500/30",
     gradient: "from-pink-500/20 to-pink-600/5",
-    description: "Bannières promotionnelles du site"
+    description: "Bannières de la Bibliothèque Numérique"
   },
   { 
     id: "actualites", 
-    label: "Actualités", 
+    label: "Actualités BN", 
     icon: Newspaper, 
     color: "text-blue-500",
     bgColor: "bg-blue-500/10",
     borderColor: "border-blue-500/30",
     gradient: "from-blue-500/20 to-blue-600/5",
-    description: "Actualités et communiqués"
+    description: "Actualités de la Bibliothèque Numérique"
   },
   { 
     id: "evenements", 
-    label: "Événements", 
+    label: "Événements BN", 
     icon: CalendarDays, 
     color: "text-green-500",
     bgColor: "bg-green-500/10",
     borderColor: "border-green-500/30",
     gradient: "from-green-500/20 to-green-600/5",
-    description: "Événements culturels"
+    description: "Événements de la Bibliothèque Numérique"
   },
   { 
     id: "pages", 
-    label: "Pages", 
+    label: "Pages BN", 
     icon: FileText, 
     color: "text-purple-500",
     bgColor: "bg-purple-500/10",
     borderColor: "border-purple-500/30",
     gradient: "from-purple-500/20 to-purple-600/5",
-    description: "Pages statiques du site"
+    description: "Pages statiques de la BN"
   },
   { 
     id: "sections", 
     label: "Sections", 
     icon: LayoutTemplate, 
-    color: "text-indigo-500",
-    bgColor: "bg-indigo-500/10",
-    borderColor: "border-indigo-500/30",
-    gradient: "from-indigo-500/20 to-indigo-600/5",
-    description: "Sections de contenu des pages",
-    badge: "Nouveau"
+    color: "text-violet-500",
+    bgColor: "bg-violet-500/10",
+    borderColor: "border-violet-500/30",
+    gradient: "from-violet-500/20 to-violet-600/5",
+    description: "Blocs de contenu des pages"
   },
   { 
     id: "media", 
-    label: "Médias", 
+    label: "Médias BN", 
     icon: ImageIcon, 
     color: "text-orange-500",
     bgColor: "bg-orange-500/10",
     borderColor: "border-orange-500/30",
     gradient: "from-orange-500/20 to-orange-600/5",
-    description: "Bibliothèque de médias"
+    description: "Bibliothèque de médias BN"
   },
   { 
     id: "menus", 
-    label: "Menus", 
+    label: "Menus BN", 
     icon: Menu, 
     color: "text-cyan-500",
     bgColor: "bg-cyan-500/10",
     borderColor: "border-cyan-500/30",
     gradient: "from-cyan-500/20 to-cyan-600/5",
-    description: "Navigation du site"
+    description: "Navigation de la BN"
   },
   { 
     id: "footer", 
-    label: "Footer", 
+    label: "Footer BN", 
     icon: Footprints, 
     color: "text-slate-500",
     bgColor: "bg-slate-500/10",
     borderColor: "border-slate-500/30",
     gradient: "from-slate-500/20 to-slate-600/5",
-    description: "Pied de page du site"
+    description: "Pied de page de la BN"
   },
   { 
     id: "webhooks", 
@@ -177,6 +193,7 @@ function StatCard({
     green: { bg: "bg-green-500/5", text: "text-green-500", iconBg: "bg-green-500/10" },
     amber: { bg: "bg-amber-500/5", text: "text-amber-500", iconBg: "bg-amber-500/10" },
     pink: { bg: "bg-pink-500/5", text: "text-pink-500", iconBg: "bg-pink-500/10" },
+    indigo: { bg: "bg-indigo-500/5", text: "text-indigo-500", iconBg: "bg-indigo-500/10" },
   };
 
   const classes = colorClasses[color] || colorClasses.primary;
@@ -214,60 +231,25 @@ function StatCard({
   );
 }
 
-function QuickAction({ 
-  icon: Icon, 
-  label, 
-  onClick,
-  color = "primary"
-}: { 
-  icon: any; 
-  label: string; 
-  onClick: () => void;
-  color?: string;
-}) {
-  return (
-    <Button 
-      variant="outline" 
-      className="flex flex-col h-auto py-4 px-3 gap-2 hover:border-primary/50 hover:bg-primary/5 transition-all"
-      onClick={onClick}
-    >
-      <Icon className={cn("h-5 w-5", color === "primary" ? "text-primary" : `text-${color}-500`)} />
-      <span className="text-xs font-medium">{label}</span>
-    </Button>
-  );
-}
-
 export default function ContentManagementSystem() {
   const [activeTab, setActiveTab] = useState("hero");
 
-  // Fetch stats
+  // Fetch stats pour la Bibliothèque Numérique
   const { data: stats } = useQuery({
-    queryKey: ['cms-stats'],
+    queryKey: ['bn-cms-stats'],
     queryFn: async () => {
-      const [actualites, evenements, pages, media, bannieres] = await Promise.all([
-        supabase.from('cms_actualites').select('id, status', { count: 'exact' }),
-        supabase.from('cms_evenements').select('id, status', { count: 'exact' }),
-        supabase.from('cms_pages').select('id, status', { count: 'exact' }),
+      const [manuscripts, documents, collections, media] = await Promise.all([
+        supabase.from('manuscripts').select('id', { count: 'exact' }),
+        supabase.from('digital_library_documents').select('id', { count: 'exact' }),
+        supabase.from('collections').select('id', { count: 'exact' }),
         supabase.from('cms_media').select('id', { count: 'exact' }),
-        supabase.from('cms_bannieres').select('id, is_active', { count: 'exact' }),
       ]);
 
       return {
-        actualites: {
-          total: actualites.count || 0,
-          published: actualites.data?.filter(a => a.status === 'published').length || 0,
-          draft: actualites.data?.filter(a => a.status === 'draft').length || 0,
-        },
-        evenements: {
-          total: evenements.count || 0,
-          published: evenements.data?.filter(e => e.status === 'published').length || 0,
-        },
-        pages: pages.count || 0,
+        manuscripts: manuscripts.count || 0,
+        documents: documents.count || 0,
+        collections: collections.count || 0,
         media: media.count || 0,
-        bannieres: {
-          total: bannieres.count || 0,
-          active: bannieres.data?.filter(b => b.is_active).length || 0,
-        }
       };
     }
   });
@@ -280,6 +262,30 @@ export default function ContentManagementSystem() {
         return <CmsHeroManager />;
       case "carrousel-bn":
         return <FeaturedWorksManager />;
+      case "collections":
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Collections Numériques</CardTitle>
+              <CardDescription>Gestion des collections de la Bibliothèque Numérique</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">Module en développement - Accédez à la gestion des collections depuis le menu Administration.</p>
+            </CardContent>
+          </Card>
+        );
+      case "manuscripts":
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle>Manuscrits</CardTitle>
+              <CardDescription>Gestion des manuscrits et documents anciens</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">Module en développement - Accédez à la gestion des manuscrits depuis le menu Administration.</p>
+            </CardContent>
+          </Card>
+        );
       case "bannieres":
         return <CmsBannersManager />;
       case "actualites":
@@ -311,27 +317,26 @@ export default function ContentManagementSystem() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <Card className="border-none bg-gradient-to-br from-primary/10 via-primary/5 to-background shadow-lg overflow-hidden">
+        <Card className="border-none bg-gradient-to-br from-indigo-500/10 via-purple-500/5 to-background shadow-lg overflow-hidden">
           <CardHeader className="pb-6 relative">
             {/* Decorative elements */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-primary/20 to-transparent rounded-full blur-3xl -mr-32 -mt-32" />
-            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-primary/10 to-transparent rounded-full blur-2xl -ml-24 -mb-24" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-indigo-500/20 to-transparent rounded-full blur-3xl -mr-32 -mt-32" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-gradient-to-tr from-purple-500/10 to-transparent rounded-full blur-2xl -ml-24 -mb-24" />
             
             <div className="flex items-start gap-4 relative z-10">
               <motion.div 
-                className="p-4 rounded-2xl bg-primary/10 border border-primary/20 shadow-inner"
+                className="p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 shadow-inner"
                 whileHover={{ scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 400 }}
               >
-                <LayoutDashboard className="h-8 w-8 text-primary" />
+                <BookOpen className="h-8 w-8 text-indigo-600" />
               </motion.div>
               <div className="flex-1">
                 <CardTitle className="text-3xl font-bold tracking-tight">
-                  Système de Gestion de Contenu
+                  Gestion de la Bibliothèque Numérique
                 </CardTitle>
                 <CardDescription className="text-base mt-2 max-w-2xl">
-                  Créez et gérez tout le contenu de la plateforme avec un éditeur enrichi, 
-                  prévisualisation en temps réel et support bilingue complet
+                  Gérez les collections, manuscrits, œuvres vedettes et tout le contenu de la plateforme Ibn Battuta
                 </CardDescription>
               </div>
             </div>
@@ -339,30 +344,28 @@ export default function ContentManagementSystem() {
             {/* Stats Row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 relative z-10">
               <StatCard 
-                title="Actualités" 
-                value={stats?.actualites.total || 0}
-                icon={Newspaper}
-                color="blue"
-                description={`${stats?.actualites.published || 0} publiées`}
+                title="Manuscrits" 
+                value={stats?.manuscripts || 0}
+                icon={Scroll}
+                color="amber"
               />
               <StatCard 
-                title="Événements" 
-                value={stats?.evenements.total || 0}
-                icon={CalendarDays}
-                color="green"
-                description={`${stats?.evenements.published || 0} publiés`}
-              />
-              <StatCard 
-                title="Pages" 
-                value={stats?.pages || 0}
+                title="Documents" 
+                value={stats?.documents || 0}
                 icon={FileText}
-                color="primary"
+                color="blue"
+              />
+              <StatCard 
+                title="Collections" 
+                value={stats?.collections || 0}
+                icon={Library}
+                color="indigo"
               />
               <StatCard 
                 title="Médias" 
                 value={stats?.media || 0}
                 icon={ImageIcon}
-                color="amber"
+                color="pink"
               />
             </div>
           </CardHeader>
@@ -380,7 +383,7 @@ export default function ContentManagementSystem() {
           <Card className="sticky top-6 border shadow-sm">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-                Modules
+                Modules Bibliothèque Numérique
               </CardTitle>
             </CardHeader>
             <CardContent className="p-2">
@@ -411,19 +414,12 @@ export default function ContentManagementSystem() {
                           <Icon className={cn("h-4 w-4", tab.color)} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className={cn(
-                              "font-medium text-sm truncate",
-                              isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
-                            )}>
-                              {tab.label}
-                            </span>
-                            {tab.badge && (
-                              <Badge className="text-[10px] px-1.5 py-0 bg-pink-500 hover:bg-pink-500 text-white">
-                                {tab.badge}
-                              </Badge>
-                            )}
-                          </div>
+                          <span className={cn(
+                            "font-medium text-sm truncate block",
+                            isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
+                          )}>
+                            {tab.label}
+                          </span>
                           <p className="text-xs text-muted-foreground truncate mt-0.5">
                             {tab.description}
                           </p>
