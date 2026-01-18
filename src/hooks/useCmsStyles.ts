@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import type { CSSProperties } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export interface SectionStyle {
@@ -136,5 +137,5 @@ export function getCssVariables(styles: {
     '--btn-primary-text': buttonStyles?.primaryText,
     '--btn-primary-hover': buttonStyles?.primaryHoverBg,
     '--btn-radius': buttonStyles?.borderRadius,
-  } as React.CSSProperties;
+  } as CSSProperties;
 }
