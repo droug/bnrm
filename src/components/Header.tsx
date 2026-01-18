@@ -241,7 +241,7 @@ const Header = () => {
               {/* Navigation Portails */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-2 text-gray-600 hover:text-primary hover:bg-gray-100">
+                  <Button variant="ghost" size="sm" className="gap-2 text-gray-600 hover:text-blue-primary-dark hover:bg-gray-100">
                     <Building className="h-4 w-4" />
                     <span className="hidden md:inline">{language === 'ar' ? 'البوابات' : 'Portails'}</span>
                     <ChevronDown className="h-3 w-3" />
@@ -278,7 +278,7 @@ const Header = () => {
               {/* Langue */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="text-gray-600 hover:text-primary hover:bg-gray-100">
+                  <Button variant="ghost" size="icon" className="text-gray-600 hover:text-blue-primary-dark hover:bg-gray-100">
                     <Globe className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -306,7 +306,7 @@ const Header = () => {
                 variant="ghost"
                 size="icon"
                 onClick={() => setIsChatBotOpen(!isChatBotOpen)}
-                className={`text-gray-600 hover:text-primary hover:bg-gray-100 relative ${isChatBotOpen ? 'bg-gray-100' : ''}`}
+                className={`text-gray-600 hover:text-blue-primary-dark hover:bg-gray-100 relative ${isChatBotOpen ? 'bg-gray-100' : ''}`}
                 title={language === 'ar' ? 'المساعد الذكي' : 'Assistant IA'}
               >
                 <Bot className="h-5 w-5" />
@@ -323,7 +323,7 @@ const Header = () => {
               
               {/* Utilisateur icône (non connecté) */}
               {!user && (
-                <Button variant="ghost" size="icon" className="text-gray-600 hover:text-primary hover:bg-gray-100">
+                <Button variant="ghost" size="icon" className="text-gray-600 hover:text-blue-primary-dark hover:bg-gray-100">
                   <User className="h-5 w-5" />
                 </Button>
               )}
@@ -757,11 +757,11 @@ const Header = () => {
 
       {/* Menu Mobile Navigation amélioré */}
       {!hideNavigation && isMenuOpen && (
-        <div className="md:hidden bg-background/98 backdrop-blur-lg border-t-4 border-primary/30 shadow-2xl animate-slide-in-right">
+        <div className="md:hidden bg-background/98 backdrop-blur-lg border-t-4 border-blue-primary-dark/30 shadow-2xl animate-slide-in-right">
           <nav className="container mx-auto px-6 py-8 space-y-6">
             {/* Liens principaux avec icônes */}
             <div className="space-y-4">
-              <h3 className="text-lg font-bold text-primary border-b border-primary/20 pb-2">Navigation</h3>
+              <h3 className="text-lg font-bold text-blue-primary-dark border-b border-blue-primary-dark/20 pb-2">Navigation</h3>
               
               <Link to="/" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-blue-primary-dark hover:bg-blue-surface transition-all duration-300 rounded-xl border border-transparent hover:border-blue-primary/20">
                 <BookOpen className="w-5 h-5" />
@@ -790,16 +790,16 @@ const Header = () => {
             </div>
 
             {/* Outils d'assistance mobile */}
-            <div className="space-y-3 pt-4 border-t border-primary/20">
-              <h4 className="text-base font-semibold text-primary">Outils d'assistance</h4>
+            <div className="space-y-3 pt-4 border-t border-blue-primary-dark/20">
+              <h4 className="text-base font-semibold text-blue-primary-dark">Outils d'assistance</h4>
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Assistant IA et Accessibilité disponibles dans la barre du haut</span>
               </div>
             </div>
 
             {/* Section contact rapide */}
-            <div className="space-y-3 pt-4 border-t border-primary/20">
-              <h4 className="text-base font-semibold text-primary">Contact rapide</h4>
+            <div className="space-y-3 pt-4 border-t border-blue-primary-dark/20">
+              <h4 className="text-base font-semibold text-blue-primary-dark">Contact rapide</h4>
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <Phone className="w-4 h-4" />
                 <span>+212 5 37 77 30 01</span>
