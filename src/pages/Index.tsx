@@ -130,7 +130,7 @@ const Index = () => {
                 <Button 
                   size="lg"
                   onClick={() => navigate('/help')}
-                  className="bg-primary hover:bg-blue-primary-dark text-white px-8 py-6 text-regular font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
+                  className="bg-blue-primary-dark hover:bg-blue-deep text-white px-8 py-6 text-regular font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
                 >
                   <HelpCircle className={`h-5 w-5 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
                   {language === 'ar' ? 'المساعدة والدعم' : 'Aide & Support'}
