@@ -26,27 +26,27 @@ export default {
         'elegant': ['Playfair Display', 'Georgia', 'serif'],
       },
       fontSize: {
-        // BN Typography Scale (from reference)
+        // BN Typography Scale (exact from reference image)
         // Desktop sizes | Mobile sizes
-        'heading-1': ['3.75rem', { lineHeight: '1.2' }],      // 60px desktop
-        'heading-1-mobile': ['2.75rem', { lineHeight: '1.2' }], // 44px mobile
-        'heading-2': ['3rem', { lineHeight: '1.2' }],         // 48px desktop
-        'heading-2-mobile': ['2rem', { lineHeight: '1.2' }],  // 32px mobile
-        'heading-3': ['2.5rem', { lineHeight: '1.2' }],       // 40px desktop
-        'heading-3-mobile': ['1.5rem', { lineHeight: '1.2' }], // 24px mobile
-        'heading-4': ['2rem', { lineHeight: '1.2' }],         // 32px desktop
-        'heading-4-mobile': ['1.25rem', { lineHeight: '1.2' }], // 20px mobile
-        'heading-5': ['1.625rem', { lineHeight: '1.2' }],     // 26px desktop
-        'heading-5-mobile': ['1.125rem', { lineHeight: '1.2' }], // 18px mobile
-        'heading-6': ['1rem', { lineHeight: '1.5' }],         // 16px desktop
-        'heading-6-mobile': ['0.875rem', { lineHeight: '1.5' }], // 14px mobile
-        'tagline': ['0.875rem', { lineHeight: '1.5', letterSpacing: '0.1em' }],
+        'heading-1': ['5.25rem', { lineHeight: '1.1' }],       // 84px desktop
+        'heading-1-mobile': ['3rem', { lineHeight: '1.1' }],   // 48px mobile
+        'heading-2': ['3.75rem', { lineHeight: '1.2' }],       // 60px desktop
+        'heading-2-mobile': ['2.75rem', { lineHeight: '1.2' }], // 44px mobile
+        'heading-3': ['3rem', { lineHeight: '1.2' }],          // 48px desktop
+        'heading-3-mobile': ['2rem', { lineHeight: '1.2' }],   // 32px mobile
+        'heading-4': ['2.5rem', { lineHeight: '1.2' }],        // 40px desktop
+        'heading-4-mobile': ['1.5rem', { lineHeight: '1.2' }], // 24px mobile
+        'heading-5': ['2rem', { lineHeight: '1.2' }],          // 32px desktop
+        'heading-5-mobile': ['1.25rem', { lineHeight: '1.2' }], // 20px mobile
+        'heading-6': ['1.625rem', { lineHeight: '1.2' }],      // 26px desktop
+        'heading-6-mobile': ['1.125rem', { lineHeight: '1.2' }], // 18px mobile
+        'tagline': ['1rem', { lineHeight: '1.5', letterSpacing: '0.1em' }], // 16px
         // Body text sizes (line-height 160%)
-        'text-large': ['1.625rem', { lineHeight: '1.6' }],    // 26px
-        'text-medium': ['1.25rem', { lineHeight: '1.6' }],    // 20px
-        'text-regular': ['1.125rem', { lineHeight: '1.6' }],  // 18px
-        'text-small': ['1rem', { lineHeight: '1.6' }],        // 16px
-        'text-tiny': ['0.75rem', { lineHeight: '1.6' }],      // 12px
+        'text-large': ['1.625rem', { lineHeight: '1.6' }],     // 26px
+        'text-medium': ['1.25rem', { lineHeight: '1.6' }],     // 20px
+        'text-regular': ['1.125rem', { lineHeight: '1.6' }],   // 18px
+        'text-small': ['1rem', { lineHeight: '1.6' }],         // 16px
+        'text-tiny': ['0.75rem', { lineHeight: '1.6' }],       // 12px
       },
       colors: {
         // BN Official Color Families
