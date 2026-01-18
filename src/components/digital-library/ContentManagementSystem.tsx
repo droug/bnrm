@@ -10,6 +10,7 @@ import CmsMenusManager from "@/components/cms/CmsMenusManager";
 import CmsBannersManager from "@/components/cms/CmsBannersManager";
 import CmsFooterManager from "@/components/cms/CmsFooterManager";
 import CmsSectionsManager from "@/components/cms/CmsSectionsManager";
+import CmsHeroManager from "@/components/cms/CmsHeroManager";
 import FeaturedWorksManager from "@/components/admin/FeaturedWorksManager";
 import { 
   Sparkles, 
@@ -30,7 +31,8 @@ import {
   PenLine,
   Footprints,
   LayoutTemplate,
-  Settings2
+  Settings2,
+  Home
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -41,6 +43,16 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 
 const tabs = [
+  { 
+    id: "hero", 
+    label: "Hero", 
+    icon: Home, 
+    color: "text-rose-500",
+    bgColor: "bg-rose-500/10",
+    borderColor: "border-rose-500/30",
+    gradient: "from-rose-500/20 to-rose-600/5",
+    description: "Image et contenu de la section Hero"
+  },
   { 
     id: "carrousel-bn", 
     label: "Carrousel BN", 
@@ -226,7 +238,7 @@ function QuickAction({
 }
 
 export default function ContentManagementSystem() {
-  const [activeTab, setActiveTab] = useState("carrousel-bn");
+  const [activeTab, setActiveTab] = useState("hero");
 
   // Fetch stats
   const { data: stats } = useQuery({
@@ -264,6 +276,8 @@ export default function ContentManagementSystem() {
 
   const renderContent = () => {
     switch (activeTab) {
+      case "hero":
+        return <CmsHeroManager />;
       case "carrousel-bn":
         return <FeaturedWorksManager />;
       case "bannieres":

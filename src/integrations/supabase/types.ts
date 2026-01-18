@@ -2188,6 +2188,57 @@ export type Database = {
         }
         Relationships: []
       }
+      cms_hero_settings: {
+        Row: {
+          created_at: string
+          hero_cta_label_ar: string | null
+          hero_cta_label_fr: string | null
+          hero_cta_url: string | null
+          hero_image_url: string | null
+          hero_secondary_cta_label_ar: string | null
+          hero_secondary_cta_label_fr: string | null
+          hero_secondary_cta_url: string | null
+          hero_subtitle_ar: string | null
+          hero_subtitle_fr: string | null
+          hero_title_ar: string | null
+          hero_title_fr: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          hero_cta_label_ar?: string | null
+          hero_cta_label_fr?: string | null
+          hero_cta_url?: string | null
+          hero_image_url?: string | null
+          hero_secondary_cta_label_ar?: string | null
+          hero_secondary_cta_label_fr?: string | null
+          hero_secondary_cta_url?: string | null
+          hero_subtitle_ar?: string | null
+          hero_subtitle_fr?: string | null
+          hero_title_ar?: string | null
+          hero_title_fr?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          hero_cta_label_ar?: string | null
+          hero_cta_label_fr?: string | null
+          hero_cta_url?: string | null
+          hero_image_url?: string | null
+          hero_secondary_cta_label_ar?: string | null
+          hero_secondary_cta_label_fr?: string | null
+          hero_secondary_cta_url?: string | null
+          hero_subtitle_ar?: string | null
+          hero_subtitle_fr?: string | null
+          hero_title_ar?: string | null
+          hero_title_fr?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cms_media: {
         Row: {
           alt_ar: string | null
