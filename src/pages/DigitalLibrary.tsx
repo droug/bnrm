@@ -40,6 +40,24 @@ const DigitalLibrary = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilters, setActiveFilters] = useState<{type: string, value: string}[]>([]);
 
+  // Fetch hero settings from CMS
+  const { data: heroSettings } = useQuery({
+    queryKey: ['cms-hero-settings-public'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('cms_hero_settings')
+        .select('*')
+        .limit(1)
+        .single();
+      
+      if (error) {
+        console.error('Error fetching hero settings:', error);
+        return null;
+      }
+      return data;
+    }
+  });
+
   // Fetch featured works from database
   const { data: featuredWorks = [], isLoading: isFeaturedLoading } = useQuery({
     queryKey: ['featured-works-public'],
@@ -85,6 +103,15 @@ const DigitalLibrary = () => {
       return worksWithDocs;
     }
   });
+
+  // Get hero image URL with fallback
+  const heroImageUrl = heroSettings?.hero_image_url || digitalLibraryHero;
+  const heroTitle = language === 'ar' 
+    ? (heroSettings?.hero_title_ar || 'المكتبة الرقمية للمغرب')
+    : (heroSettings?.hero_title_fr || 'Bibliothèque Numérique du Maroc');
+  const heroSubtitle = language === 'ar'
+    ? (heroSettings?.hero_subtitle_ar || 'اكتشف التراث المكتوب المغربي')
+    : (heroSettings?.hero_subtitle_fr || 'Découvrez le patrimoine écrit marocain : manuscrits andalous, périodiques historiques, ouvrages rares et collections d\'exception');
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -265,20 +292,20 @@ const DigitalLibrary = () => {
       <main className="container mx-auto px-4 py-8">
         {/* Hero Section */}
         <section className="relative mb-12 py-24 md:py-32 px-8 rounded-3xl border-4 border-gold/40 overflow-hidden shadow-2xl">
-          {/* Background Image */}
+          {/* Background Image - Dynamic from CMS */}
           <div 
             className="absolute inset-0 bg-cover bg-center opacity-70"
-            style={{ backgroundImage: `url(${digitalLibraryHero})` }}
+            style={{ backgroundImage: `url(${heroImageUrl})` }}
           ></div>
           {/* Overlay - réduit pour plus de visibilité */}
           <div className="absolute inset-0 bg-gradient-to-r from-primary/50 via-primary/40 to-accent/50"></div>
           <div className="absolute inset-0 bg-pattern-zellige-complex opacity-10"></div>
           <div className="relative z-10 text-center">
             <h1 className="text-6xl md:text-7xl lg:text-8xl font-moroccan font-bold text-white mb-6 drop-shadow-2xl">
-              Bibliothèque Numérique du Maroc
+              {heroTitle}
             </h1>
             <p className="text-2xl md:text-3xl text-white mb-10 max-w-4xl mx-auto drop-shadow-2xl font-elegant">
-              Découvrez le patrimoine écrit marocain : manuscrits andalous, périodiques historiques, ouvrages rares et collections d'exception
+              {heroSubtitle}
             </p>
             
             {/* Advanced Search Bar with Filters */}
