@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
@@ -57,33 +56,19 @@ export default function CmsHeroManager() {
     hero_secondary_cta_url: "",
   });
 
-  // Fetch current hero settings from site_settings or a dedicated table
+  // Fetch current hero settings using raw query (table not yet in types)
   const { data: heroSettings, isLoading, refetch } = useQuery({
     queryKey: ['hero-settings'],
-    queryFn: async () => {
-      // Try to fetch from cms_hero_settings table, create if doesn't exist
-      const { data, error } = await supabase
+    queryFn: async (): Promise<HeroSettings | null> => {
+      const { data, error } = await (supabase as any)
         .from('cms_hero_settings')
         .select('*')
         .limit(1)
         .single();
       
       if (error && error.code === 'PGRST116') {
-        // No row exists, create default
-        const { data: newData, error: insertError } = await supabase
-          .from('cms_hero_settings')
-          .insert({
-            hero_image_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=1920&q=80',
-            hero_title_fr: 'Bienvenue à la Bibliothèque Nationale',
-            hero_title_ar: 'مرحباً بكم في المكتبة الوطنية',
-            hero_subtitle_fr: 'Découvrez notre patrimoine culturel',
-            hero_subtitle_ar: 'اكتشفوا تراثنا الثقافي',
-          })
-          .select()
-          .single();
-        
-        if (insertError) throw insertError;
-        return newData as HeroSettings;
+        // No row exists - should not happen since we inserted default
+        return null;
       }
       
       if (error) throw error;
@@ -115,7 +100,7 @@ export default function CmsHeroManager() {
     mutationFn: async (data: Partial<HeroSettings>) => {
       if (!heroSettings?.id) throw new Error("No settings found");
       
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('cms_hero_settings')
         .update({
           ...data,
@@ -399,7 +384,7 @@ export default function CmsHeroManager() {
                       dir="rtl"
                       value={formData.hero_cta_label_ar}
                       onChange={(e) => setFormData(prev => ({ ...prev, hero_cta_label_ar: e.target.value }))}
-                      placeholder="استكشف المجموعات"
+                      placeholder="استكشاف المجموعات"
                     />
                   </div>
                   <div className="space-y-2">
