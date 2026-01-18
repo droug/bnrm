@@ -1,8 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { Navigate, useNavigate } from "react-router-dom";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import ContentManagementSystem from "@/components/digital-library/ContentManagementSystem";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, LayoutDashboard } from "lucide-react";
@@ -37,9 +36,8 @@ export default function ContentManagementPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
-      <Header />
-      <main className="container mx-auto px-4 py-6 lg:px-8">
+    <DigitalLibraryLayout>
+      <div className="container mx-auto px-4 py-6 lg:px-8">
         {/* Breadcrumb / Back button */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -53,13 +51,12 @@ export default function ContentManagementPage() {
             className="gap-2 hover:bg-primary/5 hover:text-primary transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
-            <span>Retour à la bibliothèque</span>
+            <span>Retour à la gestion de la bibliothèque</span>
           </Button>
         </motion.div>
         
         <ContentManagementSystem />
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </DigitalLibraryLayout>
   );
 }
