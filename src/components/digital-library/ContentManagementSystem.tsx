@@ -285,7 +285,7 @@ export default function ContentManagementSystem() {
       case "hero":
         return <CmsHeroManagerBN />;
       case "styles":
-        return <CmsStyleManager />;
+        return <CmsStyleManager platform="bn" />;
       case "carrousel-bn":
         return <FeaturedWorksManager />;
       case "vexpo360":
