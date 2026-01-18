@@ -21,7 +21,7 @@ export function AdminSettingsCards() {
       icon: FileText,
       title: t('admin.content.title'),
       description: t('admin.content.description'),
-      href: "/admin/content",
+      href: "/admin/content-management-portail-BNRM",
       permission: "content.manage"
     },
     {

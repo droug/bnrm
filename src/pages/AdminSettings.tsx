@@ -96,7 +96,7 @@ export default function AdminSettings() {
       icon: Newspaper,
       title: "Gestion de contenu",
       description: "Créer et modérer les actualités, événements et expositions",
-      href: "/admin/content",
+      href: "/admin/content-management-portail-BNRM",
       permission: "content.manage",
       gradient: "from-blue-500 to-blue-600"
     },

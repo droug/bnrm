@@ -177,7 +177,7 @@ export default function DigitalLibraryBackoffice() {
       title: "Système de Gestion de Contenu",
       description: "CMS complet pour créer et gérer tout le contenu de la plateforme",
       count: documents?.length || 0,
-      action: () => navigate('/admin/content-management'),
+      action: () => navigate('/admin/content-management-BN'),
       gradient: "from-violet-500 to-purple-600"
     },
     {
