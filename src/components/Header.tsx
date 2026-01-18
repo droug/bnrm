@@ -332,7 +332,7 @@ const Header = () => {
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button className="bg-primary hover:bg-morocco-green text-white px-4 py-2 rounded transition-colors">
+                    <Button className="bg-primary hover:bg-blue-primary-dark text-white px-4 py-2 rounded transition-colors">
                       <User className="h-4 w-4 mr-2" />
                       {language === 'ar' ? 'مساحتي' : 'Mon espace'}
                     </Button>
@@ -380,7 +380,7 @@ const Header = () => {
                 </DropdownMenu>
               ) : (
                 <Link to="/auth">
-                  <Button className="bg-primary hover:bg-morocco-green text-white px-4 py-2 rounded transition-colors">
+                  <Button className="bg-primary hover:bg-blue-primary-dark text-white px-4 py-2 rounded transition-colors">
                     <User className="h-4 w-4 mr-2" />
                     {language === 'ar' ? 'مساحتي' : 'Mon espace'}
                   </Button>
@@ -450,7 +450,7 @@ const Header = () => {
                 <Link to="/">
                   <Button 
                     variant={isHomePage ? "secondary" : "ghost"} 
-                    className={`rounded-none h-12 px-4 text-sm font-medium ${isHomePage ? 'bg-primary-deep text-white' : 'text-white/90 hover:text-white hover:bg-morocco-green'}`}
+                    className={`rounded-none h-12 px-4 text-sm font-medium ${isHomePage ? 'bg-primary-deep text-white' : 'text-white/90 hover:text-white hover:bg-blue-primary-dark'}`}
                   >
                     <BookOpen className="w-4 h-4 mr-2" />
                     {language === 'ar' ? 'الرئيسية' : 'Accueil'}
@@ -462,7 +462,7 @@ const Header = () => {
               
               {/* Découvrir la Bibliothèque */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-morocco-green h-12 text-sm font-medium px-3 rounded-none">
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-blue-primary-dark h-12 text-sm font-medium px-3 rounded-none">
                   <BookOpen className="w-4 h-4 mr-2" />
                   <span>{t('nav.discover')}</span>
                 </NavigationMenuTrigger>
@@ -472,7 +472,7 @@ const Header = () => {
                       <h4 className="text-base font-bold text-primary mb-2">{menuData.discover.practicalInfo.title[language]}</h4>
                       {menuData.discover.practicalInfo.items.map((item, idx) => (
                         <NavigationMenuLink key={idx} asChild>
-                          <Link to={item.href} className="block p-3 text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded border-l-2 border-transparent hover:border-morocco-green">
+                          <Link to={item.href} className="block p-3 text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
                             <div className="font-semibold">{item.title[language]}</div>
                             <div className="text-xs text-muted-foreground mt-1">{item.desc[language]}</div>
                           </Link>
@@ -483,7 +483,7 @@ const Header = () => {
                       <h4 className="text-base font-bold text-primary mb-2">{menuData.discover.historyMissions.title[language]}</h4>
                       {menuData.discover.historyMissions.items.map((item, idx) => (
                         <NavigationMenuLink key={idx} asChild>
-                          <Link to={item.href} className="block p-3 text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded border-l-2 border-transparent hover:border-morocco-green">
+                          <Link to={item.href} className="block p-3 text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
                             <div className="font-semibold">{item.title[language]}</div>
                             <div className="text-xs text-muted-foreground mt-1">{item.desc[language]}</div>
                           </Link>
@@ -498,7 +498,7 @@ const Header = () => {
 
               {/* Accéder à nos services */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-morocco-green h-12 text-sm font-medium px-3 rounded-none">
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-blue-primary-dark h-12 text-sm font-medium px-3 rounded-none">
                   <Users className="w-4 h-4 mr-2" />
                   <span>{t('nav.services')}</span>
                 </NavigationMenuTrigger>
@@ -508,7 +508,7 @@ const Header = () => {
                       <h4 className="text-base font-bold text-primary mb-2">{menuData.services.userServices.title[language]}</h4>
                       {menuData.services.userServices.items.map((item, idx) => (
                         <NavigationMenuLink key={idx} asChild>
-                          <Link to={item.href} className="block p-3 text-base font-medium text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded border-l-2 border-transparent hover:border-morocco-green">
+                          <Link to={item.href} className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
                             <div className="font-semibold">{item.title[language]}</div>
                             <div className="text-xs text-muted-foreground mt-1">{item.desc[language]}</div>
                           </Link>
@@ -519,7 +519,7 @@ const Header = () => {
                       <h4 className="text-base font-bold text-primary mb-2">{menuData.services.specializedServices.title[language]}</h4>
                       {menuData.services.specializedServices.items.map((item, idx) => (
                         <NavigationMenuLink key={idx} asChild>
-                          <Link to={item.href} className="block p-3 text-base font-medium text-foreground hover:bg-morocco-green/10 hover:text-morocco-green rounded border-l-2 border-transparent hover:border-morocco-green">
+                          <Link to={item.href} className="block p-3 text-base font-medium text-foreground hover:bg-primary/10 hover:text-primary rounded border-l-2 border-transparent hover:border-primary">
                             <div className="font-semibold">{item.title[language]}</div>
                             <div className="text-xs text-muted-foreground mt-1">{item.desc[language]}</div>
                           </Link>
@@ -534,7 +534,7 @@ const Header = () => {
 
               {/* Explorer le patrimoine */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-morocco-green h-12 text-sm font-medium px-3 rounded-none">
+                <NavigationMenuTrigger className="bg-transparent text-white/90 hover:text-white hover:bg-blue-primary-dark h-12 text-sm font-medium px-3 rounded-none">
                   <Book className="w-4 h-4 mr-2" />
                   <span>{t('nav.explore')}</span>
                 </NavigationMenuTrigger>
@@ -543,7 +543,7 @@ const Header = () => {
                     {/* Colonne 1 - Galerie et Collections */}
                     <div className="space-y-2">
                       <NavigationMenuLink asChild>
-                        <Link to="/galerie-medias" className="block p-3 text-base font-semibold text-morocco-green hover:bg-morocco-green/10 rounded border-l-2 border-morocco-green">
+                        <Link to="/galerie-medias" className="block p-3 text-base font-semibold text-primary hover:bg-primary/10 rounded border-l-2 border-primary">
                           {language === 'ar' ? 'معرض الوسائط' : 'Galerie des médias'}
                         </Link>
                       </NavigationMenuLink>

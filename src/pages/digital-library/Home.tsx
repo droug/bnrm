@@ -885,15 +885,15 @@ export default function DigitalLibraryHome() {
                     <CardHeader className="text-center pt-10 pb-4">
                       <div className="flex items-center justify-center gap-3">
                         {/* Icône losanges */}
-                        <svg viewBox="0 0 32 32" className="w-10 h-10 text-morocco-green" fill="currentColor" aria-hidden="true">
+                        <svg viewBox="0 0 32 32" className="w-10 h-10 text-primary" fill="currentColor" aria-hidden="true">
                           <path d="M8 6l6 6-6 6-6-6 6-6zm12 0l6 6-6 6-6-6 6-6zm-6 12l6 6-6 6-6-6 6-6z" />
                         </svg>
                         <div className="text-left">
                           <div className="leading-none">
-                            <span className="font-heading text-[26px] tracking-[0.18em] text-morocco-green">CAIRN</span>
+                            <span className="font-heading text-[26px] tracking-[0.18em] text-primary">CAIRN</span>
                             <span className="font-heading text-[26px] tracking-[0.18em] text-muted-foreground/60">.INF</span>
                           </div>
-                          <div className="mt-1 text-xs tracking-[0.14em] text-morocco-green font-semibold">
+                          <div className="mt-1 text-xs tracking-[0.14em] text-primary font-semibold">
                             SCIENCES HUMAINES &amp; SOCIALES
                           </div>
                         </div>

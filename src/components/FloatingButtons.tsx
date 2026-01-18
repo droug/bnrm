@@ -104,7 +104,7 @@ export function FloatingButtons() {
           size="lg"
           onClick={() => setIsChatBotOpen(!isChatBotOpen)}
           className={`h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 relative ${
-            isChatBotOpen ? 'bg-morocco-green' : 'bg-morocco-green/90'
+            isChatBotOpen ? 'bg-primary' : 'bg-primary/90'
           }`}
           title={language === 'ar' ? 'المساعد الذكي' : 'Assistant IA'}
         >
