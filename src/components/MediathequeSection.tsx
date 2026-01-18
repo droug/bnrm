@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Play, Loader2 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
@@ -25,9 +25,19 @@ const defaultVideos = [
   { id: "6", youtube_id: "ILx_Ooc9TqA", title_fr: "Patrimoine marocain", title_ar: "التراث المغربي" }
 ];
 
+// YouTube thumbnail quality levels (from highest to lowest)
+const YOUTUBE_THUMBNAIL_QUALITIES = [
+  'maxresdefault', // 1280x720
+  'sddefault',     // 640x480
+  'hqdefault',     // 480x360
+  'mqdefault',     // 320x180
+  'default'        // 120x90
+];
+
 export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
+  const [thumbnailErrors, setThumbnailErrors] = useState<Record<string, number>>({});
 
   // Fetch videos from CMS
   const { data: cmsVideos = [], isLoading } = useQuery({
@@ -74,6 +84,26 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
   const getTitle = (video: MediathequeVideo) => {
     return language === 'ar' ? (video.title_ar || video.title_fr) : video.title_fr;
   };
+
+  // Get the current thumbnail URL for a video, falling back to lower quality on error
+  const getThumbnailUrl = useCallback((youtubeId: string) => {
+    const errorCount = thumbnailErrors[youtubeId] || 0;
+    const qualityIndex = Math.min(errorCount, YOUTUBE_THUMBNAIL_QUALITIES.length - 1);
+    const quality = YOUTUBE_THUMBNAIL_QUALITIES[qualityIndex];
+    return `https://img.youtube.com/vi/${youtubeId}/${quality}.jpg`;
+  }, [thumbnailErrors]);
+
+  // Handle thumbnail load error - try next quality level
+  const handleThumbnailError = useCallback((youtubeId: string) => {
+    setThumbnailErrors(prev => {
+      const currentErrors = prev[youtubeId] || 0;
+      // Only increment if we haven't tried all qualities
+      if (currentErrors < YOUTUBE_THUMBNAIL_QUALITIES.length - 1) {
+        return { ...prev, [youtubeId]: currentErrors + 1 };
+      }
+      return prev;
+    });
+  }, []);
 
   return (
     <section className="py-0 mb-12">
@@ -129,12 +159,10 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
                       <>
                         {/* Thumbnail */}
                         <img 
-                          src={`https://img.youtube.com/vi/${video.youtube_id}/maxresdefault.jpg`}
+                          src={getThumbnailUrl(video.youtube_id)}
                           alt={getTitle(video)}
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${video.youtube_id}/hqdefault.jpg`;
-                          }}
+                          onError={() => handleThumbnailError(video.youtube_id)}
                         />
                         
                         {/* Overlay gradient */}
