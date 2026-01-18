@@ -1,11 +1,12 @@
 import { useState } from "react";
+import type { ElementType } from "react";
 import { ChevronLeft, ChevronRight, BookOpen, Newspaper, Image, Grid3X3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Link } from "react-router-dom";
 
 interface StatItem {
-  icon: React.ElementType;
+  icon: ElementType;
   value: string;
   label: string;
   labelAr?: string;
@@ -49,12 +50,7 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
   const canGoPrev = currentIndex > 0;
 
   return (
-    <section 
-      className="py-16 relative overflow-hidden"
-      style={{
-        background: 'linear-gradient(135deg, hsl(49 100% 96%) 0%, hsl(50 100% 92%) 50%, hsl(48 80% 88%) 100%)'
-      }}
-    >
+    <section className="py-16 relative overflow-hidden bg-gradient-to-br from-gold-bn-surface via-gold-bn-light to-gold-bn-light-alt">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-12">
