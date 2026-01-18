@@ -766,27 +766,27 @@ const Header = () => {
             <div className="space-y-4">
               <h3 className="text-lg font-bold text-primary border-b border-primary/20 pb-2">Navigation</h3>
               
-              <Link to="/" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-morocco-green hover:bg-morocco-green/10 transition-all duration-300 rounded-xl border border-transparent hover:border-morocco-green/20">
+              <Link to="/" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-blue-primary-dark hover:bg-blue-surface transition-all duration-300 rounded-xl border border-transparent hover:border-blue-primary/20">
                 <BookOpen className="w-5 h-5" />
                 <span className="font-medium">{t('nav.discover')}</span>
               </Link>
               
-              <a href="/services" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-morocco-green hover:bg-morocco-green/10 transition-all duration-300 rounded-xl border border-transparent hover:border-morocco-green/20">
+              <a href="/services" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-blue-primary-dark hover:bg-blue-surface transition-all duration-300 rounded-xl border border-transparent hover:border-blue-primary/20">
                 <Users className="w-5 h-5" />
                 <span className="font-medium">{t('nav.services')}</span>
               </a>
               
-              <a href="/collections" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-morocco-green hover:bg-morocco-green/10 transition-all duration-300 rounded-xl border border-transparent hover:border-morocco-green/20">
+              <a href="/collections" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-blue-primary-dark hover:bg-blue-surface transition-all duration-300 rounded-xl border border-transparent hover:border-blue-primary/20">
                 <Book className="w-5 h-5" />
                 <span className="font-medium">{t('nav.explore')}</span>
               </a>
               
-              <a href="/news" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-morocco-green hover:bg-morocco-green/10 transition-all duration-300 rounded-xl border border-transparent hover:border-morocco-green/20">
+              <a href="/news" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-blue-primary-dark hover:bg-blue-surface transition-all duration-300 rounded-xl border border-transparent hover:border-blue-primary/20">
                 <Calendar className="w-5 h-5" />
                 <span className="font-medium">{t('nav.consult.news')}</span>
               </a>
               
-              <a href="/collaboration" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-morocco-green hover:bg-morocco-green/10 transition-all duration-300 rounded-xl border border-transparent hover:border-morocco-green/20">
+              <a href="/collaboration" className="flex items-center gap-3 py-3 px-4 text-foreground hover:text-blue-primary-dark hover:bg-blue-surface transition-all duration-300 rounded-xl border border-transparent hover:border-blue-primary/20">
                 <Building className="w-5 h-5" />
                 <span className="font-medium">{t('nav.collaborate')}</span>
               </a>
