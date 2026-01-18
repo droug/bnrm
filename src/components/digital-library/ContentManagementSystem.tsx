@@ -11,6 +11,7 @@ import CmsBannersManager from "@/components/cms/CmsBannersManager";
 import CmsFooterManager from "@/components/cms/CmsFooterManager";
 import CmsSectionsManager from "@/components/cms/CmsSectionsManager";
 import CmsHeroManagerBN from "@/components/cms/CmsHeroManagerBN";
+import CmsStyleManager from "@/components/cms/CmsStyleManager";
 import FeaturedWorksManager from "@/components/admin/FeaturedWorksManager";
 import { 
   Sparkles, 
@@ -29,7 +30,8 @@ import {
   Home,
   BookOpen,
   Library,
-  Scroll
+  Scroll,
+  Palette
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -49,6 +51,16 @@ const tabs = [
     borderColor: "border-rose-500/30",
     gradient: "from-rose-500/20 to-rose-600/5",
     description: "Section Hero de la Bibliothèque Numérique"
+  },
+  { 
+    id: "styles", 
+    label: "Styles & Design", 
+    icon: Palette, 
+    color: "text-fuchsia-500",
+    bgColor: "bg-fuchsia-500/10",
+    borderColor: "border-fuchsia-500/30",
+    gradient: "from-fuchsia-500/20 to-fuchsia-600/5",
+    description: "Couleurs, polices et boutons"
   },
   { 
     id: "carrousel-bn", 
@@ -260,6 +272,8 @@ export default function ContentManagementSystem() {
     switch (activeTab) {
       case "hero":
         return <CmsHeroManagerBN />;
+      case "styles":
+        return <CmsStyleManager />;
       case "carrousel-bn":
         return <FeaturedWorksManager />;
       case "collections":
