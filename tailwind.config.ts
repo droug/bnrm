@@ -66,7 +66,7 @@ export default {
           shadow: "hsl(var(--slate-shadow))",         // #020617
         },
         
-        // Blue Family - Primary brand colors (from Variables Portail)
+        // Blue Family - Primary brand colors (Portail BNRM)
         blue: {
           surface: "hsl(var(--blue-surface))",        // #EFF6FF
           light: "hsl(var(--blue-light))",            // #DBEAFE
@@ -79,6 +79,21 @@ export default {
           'deep-alt': "hsl(var(--blue-deep-alt))",    // #1E40AF
           dark: "hsl(var(--blue-dark))",              // #1E3A8A
           shadow: "hsl(var(--blue-shadow))",          // #172554
+        },
+        
+        // BN Blue Family - Bibliothèque Numérique specific colors
+        'bn-blue': {
+          surface: "hsl(var(--bn-blue-surface))",        // #F4F6F8
+          light: "hsl(var(--bn-blue-light))",            // #D9E1E8
+          'light-alt': "hsl(var(--bn-blue-light-alt))",  // #BFCAD4
+          soft: "hsl(var(--bn-blue-soft))",              // #A5B3C0
+          'primary-light': "hsl(var(--bn-blue-primary-light))", // #8093A8
+          primary: "hsl(var(--bn-blue-primary))",        // #33475C - Official BN Blue
+          'primary-dark': "hsl(var(--bn-blue-primary-dark))", // #253241
+          deep: "hsl(var(--bn-blue-deep))",              // #1B2735
+          'deep-alt': "hsl(var(--bn-blue-deep-alt))",    // #151E2A
+          dark: "hsl(var(--bn-blue-dark))",              // #0E151E
+          shadow: "hsl(var(--bn-blue-shadow))",          // #070C12
         },
         
         // Gold Family - Accent colors
