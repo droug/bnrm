@@ -192,7 +192,7 @@ const Index = () => {
                       <Button 
                         size="lg"
                         onClick={handleSearch}
-                        className="absolute right-2 top-2 h-10 px-6 bg-primary hover:bg-blue-primary-dark text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
+                        className="absolute right-2 top-2 h-10 px-6 bg-blue-primary-dark hover:bg-blue-deep text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
                       >
                         <Search className="h-5 w-5 mr-2" />
                         {language === 'ar' ? 'بحث' : 'Rechercher'}

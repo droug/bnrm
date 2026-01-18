@@ -107,7 +107,7 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
           <Button
             onClick={() => navigate('/digital-library')}
             size="lg"
-            className="bg-primary hover:bg-blue-primary-dark text-white px-8 py-6 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105"
+            className="bg-blue-primary-dark hover:bg-blue-deep text-white px-8 py-6 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105"
           >
             <Library className={`h-5 w-5 ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
             {language === 'ar' ? 'استكشف الوسائط المتعددة' : 'Explorer la médiathèque'}
