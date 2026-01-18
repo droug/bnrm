@@ -70,12 +70,12 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
         {/* Header */}
         <div className="px-8 pt-8 pb-6">
           {/* Badge Média */}
-          <div className="inline-block bg-blue-primary-dark px-3 py-1 rounded text-xs font-semibold uppercase tracking-wide mb-4">
-            {language === 'ar' ? 'وسائط' : 'Média'}
-          </div>
+          <p className="tagline text-blue-soft mb-2">
+            BNRM
+          </p>
           
           {/* Title */}
-          <h2 className="text-3xl font-bold text-white mb-2">
+          <h2 className="heading-3 text-white mb-4">
             {language === 'ar' ? 'الوسائط المتعددة' : 'Médiathèque'}
           </h2>
           
@@ -83,7 +83,7 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
           <div className="w-24 h-1 bg-gold-primary mb-4"></div>
           
           {/* Description */}
-          <p className="text-white/80 text-base max-w-2xl">
+          <p className="text-regular text-white/80 max-w-2xl">
             {language === 'ar' 
               ? 'استكشف مجموعاتنا الصوتية والمرئية الغنية'
               : 'Explorez nos riches collections audiovisuelles et multimédias'
