@@ -297,6 +297,10 @@ export default function PortalContentManagementSystem() {
     switch (activeTab) {
       case "hero":
         return <CmsHeroManagerPortal />;
+      case "styles":
+        return <CmsStyleManager />;
+      case "services-numeriques":
+        return <CmsDigitalServicesManager />;
       case "bannieres":
         return <CmsBannersManager />;
       case "actualites":
@@ -344,17 +348,7 @@ export default function PortalContentManagementSystem() {
       case "sections":
         return <CmsSectionsManager />;
       case "mediatheque":
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Médiathèque</CardTitle>
-              <CardDescription>Gestion des vidéos YouTube et galeries pour la section Médiathèque du portail</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Module en développement - Gérez les vidéos affichées dans la section Médiathèque de la page d'accueil.</p>
-            </CardContent>
-          </Card>
-        );
+        return <CmsMediathequeManager />;
       case "media":
         return <CmsMediaManager />;
       case "menus":
