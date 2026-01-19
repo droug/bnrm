@@ -77,7 +77,8 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
 
   const collectionsSubmenu = [
     { labelKey: "dl.collections.manuscripts", descKey: "dl.collections.manuscripts.desc", tooltipKey: "dl.collections.manuscripts.tooltip", href: "/digital-library/collections/manuscripts", icon: Scroll, count: "12,450" },
-    { labelKey: "dl.collections.books", descKey: "dl.collections.books.desc", tooltipKey: "dl.collections.books.tooltip", href: "/digital-library/collections/books", icon: Book, count: "45,670" },
+    { labelKey: "dl.collections.books", descKey: "dl.collections.books.desc", tooltipKey: "dl.collections.books.tooltip", href: "/digital-library/collections/books", icon: Book, count: "35,000" },
+    { labelKey: "dl.collections.lithography", descKey: "dl.collections.lithography.desc", tooltipKey: "dl.collections.lithography.tooltip", href: "/digital-library/collections/lithography", icon: FileText, count: "10,670" },
     { labelKey: "dl.collections.periodicals", descKey: "dl.collections.periodicals.desc", tooltipKey: "dl.collections.periodicals.tooltip", href: "/digital-library/collections/periodicals", icon: Newspaper, count: "8,320" },
     { labelKey: "dl.collections.specialized", descKey: "dl.collections.specialized.desc", tooltipKey: "dl.collections.specialized.tooltip", href: "/digital-library/collections/photos", icon: Map, count: "15,890" },
     { labelKey: "dl.collections.audiovisual", descKey: "dl.collections.audiovisual.desc", tooltipKey: "dl.collections.audiovisual.tooltip", href: "/digital-library/collections/audiovisual", icon: Music, count: "2,890" },
