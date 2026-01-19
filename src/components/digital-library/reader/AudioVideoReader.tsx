@@ -87,8 +87,6 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
   const [showTranscript, setShowTranscript] = useState(true);
   const [transcriptionLoaded, setTranscriptionLoaded] = useState(false);
   const [copiedText, setCopiedText] = useState(false);
-  const [transcriptionProgress, setTranscriptionProgress] = useState(0);
-  const [transcriptionMethod, setTranscriptionMethod] = useState<'whisper' | 'browser'>('whisper');
   
   // Teleprompter state
   const [autoScroll, setAutoScroll] = useState(true);
@@ -99,6 +97,8 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
   const containerRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const mediaSourceRef = useRef<MediaElementAudioSourceNode | null>(null);
 
   // Check if media is audio or video
   const isVideo = documentData.document_type === 'video';
@@ -247,92 +247,12 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
     setIsFullscreen(!isFullscreen);
   };
 
-  // Start transcription with Whisper API
-  const startWhisperTranscription = async () => {
-    if (!documentData.pdf_url) {
-      toast({
-        title: "Erreur",
-        description: "URL du fichier média non disponible",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsTranscribing(true);
-    setTranscriptionProgress(10);
-
-    try {
-      // Fetch the media file
-      setTranscriptionProgress(20);
-      const response = await fetch(documentData.pdf_url);
-      if (!response.ok) throw new Error('Impossible de télécharger le fichier');
-      
-      setTranscriptionProgress(40);
-      const blob = await response.blob();
-      
-      // Convert to base64
-      const reader = new FileReader();
-      const base64Promise = new Promise<string>((resolve, reject) => {
-        reader.onload = () => {
-          const result = reader.result as string;
-          const base64 = result.split(',')[1];
-          resolve(base64);
-        };
-        reader.onerror = reject;
-      });
-      reader.readAsDataURL(blob);
-      
-      setTranscriptionProgress(60);
-      const base64Audio = await base64Promise;
-      
-      // Send to Whisper API
-      setTranscriptionProgress(80);
-      const { data, error } = await supabase.functions.invoke('voice-to-text', {
-        body: { 
-          audio: base64Audio,
-          language: transcriptionLanguage
-        }
-      });
-
-      if (error) throw error;
-      
-      if (data?.text) {
-        setTranscript(data.text);
-        // Create a single segment for the full transcription
-        setSegments([{
-          id: 'seg-full',
-          text: data.text,
-          startTime: 0,
-          endTime: duration || 0
-        }]);
-        toast({
-          title: "Transcription terminée",
-          description: "Le fichier a été transcrit avec succès"
-        });
-      } else {
-        throw new Error('Aucune transcription reçue');
-      }
-      
-      setTranscriptionProgress(100);
-    } catch (error) {
-      console.error('Transcription error:', error);
-      toast({
-        title: "Erreur de transcription",
-        description: error instanceof Error ? error.message : "Une erreur est survenue",
-        variant: "destructive"
-      });
-    } finally {
-      setIsTranscribing(false);
-      setTranscriptionProgress(0);
-    }
-  };
-
-  // Start transcription with browser Speech Recognition
-  const startBrowserTranscription = () => {
+  // Start transcription with browser Speech Recognition (FREE - captures audio from media element)
+  const startTranscription = () => {
     if (!SpeechRecognition) {
       toast({
         title: "Non supporté",
-        description: "La reconnaissance vocale n'est pas supportée par ce navigateur",
+        description: "La reconnaissance vocale n'est pas supportée par ce navigateur. Utilisez Chrome, Edge ou Safari.",
         variant: "destructive"
       });
       return;
@@ -349,7 +269,6 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
     let currentSegments = [...segments];
 
     recognition.onresult = (event: any) => {
-      let interimText = '';
       let finalText = '';
       
       for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -357,17 +276,15 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
         if (result.isFinal) {
           finalText += result[0].transcript + ' ';
           
-          // Add new segment
+          // Add new segment with timestamp
           const newSegment: TranscriptSegment = {
             id: `seg-${Date.now()}-${i}`,
             text: result[0].transcript,
-            startTime: currentTime,
-            endTime: currentTime + 5
+            startTime: mediaRef.current?.currentTime || 0,
+            endTime: (mediaRef.current?.currentTime || 0) + 5
           };
           currentSegments.push(newSegment);
           setSegments([...currentSegments]);
-        } else {
-          interimText += result[0].transcript;
         }
       }
       
@@ -379,33 +296,50 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
 
     recognition.onerror = (event: any) => {
       console.error('Transcription error:', event.error);
-      setIsTranscribing(false);
+      if (event.error !== 'no-speech') {
+        toast({
+          title: "Erreur",
+          description: `Erreur de reconnaissance: ${event.error}`,
+          variant: "destructive"
+        });
+      }
     };
 
     recognition.onend = () => {
-      if (isTranscribing && isPlaying) {
-        recognition.start();
+      // Restart if still transcribing and media is playing
+      if (isTranscribing && mediaRef.current && !mediaRef.current.paused) {
+        try {
+          recognition.start();
+        } catch (e) {
+          // Ignore - already started
+        }
       } else {
         setIsTranscribing(false);
       }
     };
 
     recognitionRef.current = recognition;
-    recognition.start();
-    setIsTranscribing(true);
+    
+    try {
+      recognition.start();
+      setIsTranscribing(true);
+      
+      toast({
+        title: "Transcription démarrée",
+        description: "Lancez la lecture et parlez près du micro ou jouez l'audio sur vos haut-parleurs. La reconnaissance vocale écoute votre microphone.",
+      });
 
-    // Start media playback
-    if (mediaRef.current && !isPlaying) {
-      mediaRef.current.play();
-    }
-  };
-
-  // Start transcription based on selected method
-  const startTranscription = () => {
-    if (transcriptionMethod === 'whisper') {
-      startWhisperTranscription();
-    } else {
-      startBrowserTranscription();
+      // Start media playback
+      if (mediaRef.current && !isPlaying) {
+        mediaRef.current.play();
+      }
+    } catch (error) {
+      console.error('Failed to start recognition:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de démarrer la reconnaissance vocale. Vérifiez les permissions du microphone.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -664,19 +598,16 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
           <Collapsible open={showTranscript}>
             <CollapsibleContent>
               <CardContent className="pt-0 flex-1 flex flex-col">
+                {/* Info banner */}
+                <div className="bg-muted/50 rounded-lg p-3 mb-4 text-sm">
+                  <p className="text-muted-foreground">
+                    <strong>💡 Gratuit :</strong> La transcription utilise la reconnaissance vocale de votre navigateur. 
+                    Lancez la lecture et jouez l'audio sur vos haut-parleurs - le microphone captera le son pour le transcrire.
+                  </p>
+                </div>
+
                 {/* Transcription controls */}
                 <div className="flex flex-wrap items-center gap-2 mb-4">
-                  {/* Method selection */}
-                  <Select value={transcriptionMethod} onValueChange={(v) => setTranscriptionMethod(v as 'whisper' | 'browser')}>
-                    <SelectTrigger className="w-40">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="whisper">IA Whisper (Auto)</SelectItem>
-                      <SelectItem value="browser">Navigateur (Micro)</SelectItem>
-                    </SelectContent>
-                  </Select>
-
                   <Select value={transcriptionLanguage} onValueChange={setTranscriptionLanguage}>
                     <SelectTrigger className="w-32">
                       <SelectValue />
@@ -691,23 +622,22 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
 
                   {!isTranscribing ? (
                     <Button 
-                      variant="outline" 
+                      variant="default" 
                       size="sm"
                       onClick={startTranscription}
-                      disabled={transcriptionMethod === 'browser' && !SpeechRecognition}
+                      disabled={!SpeechRecognition}
                     >
                       <Mic className="h-4 w-4 mr-2" />
-                      {transcriptionMethod === 'whisper' ? 'Transcrire automatiquement' : 'Transcrire (micro)'}
+                      Démarrer la transcription
                     </Button>
                   ) : (
                     <Button 
                       variant="destructive" 
                       size="sm"
                       onClick={stopTranscription}
-                      disabled={transcriptionMethod === 'whisper'}
                     >
                       <MicOff className="h-4 w-4 mr-2" />
-                      {transcriptionMethod === 'whisper' ? 'Transcription en cours...' : 'Arrêter'}
+                      Arrêter
                     </Button>
                   )}
 
@@ -731,23 +661,13 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
                       </Button>
                     </>
                   )}
-                </div>
 
-                {/* Progress bar for Whisper transcription */}
-                {isTranscribing && transcriptionMethod === 'whisper' && transcriptionProgress > 0 && (
-                  <div className="mb-4">
-                    <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
-                      <span>Transcription en cours...</span>
-                      <span>{transcriptionProgress}%</span>
-                    </div>
-                    <div className="h-2 bg-muted rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-primary transition-all duration-300"
-                        style={{ width: `${transcriptionProgress}%` }}
-                      />
-                    </div>
-                  </div>
-                )}
+                  {isTranscribing && (
+                    <Badge variant="secondary" className="animate-pulse">
+                      🎤 Écoute en cours...
+                    </Badge>
+                  )}
+                </div>
 
                 {/* Font size control */}
                 <div className="flex items-center gap-2 mb-3">
