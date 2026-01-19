@@ -184,12 +184,14 @@ export const BNRMNumberAttribution = () => {
 
   const fetchData = async () => {
     try {
-      // Fetch all validated requests (valide_par_b)
+      setLoading(true);
+      
+      // Fetch all validated requests (valide_par_b) - plus récentes en premier
       const { data: validatedRequests, error: validatedError } = await supabase
         .from("legal_deposit_requests")
         .select("*")
         .eq("status", "valide_par_b")
-        .order("created_at", { ascending: true });
+        .order("created_at", { ascending: false });
 
       if (validatedError) {
         console.error("Error fetching validated requests:", validatedError);
