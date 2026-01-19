@@ -35,10 +35,7 @@ serve(async (req) => {
     // Récupérer les informations de la demande
     const { data: request, error: requestError } = await supabaseAdmin
       .from("legal_deposit_requests")
-      .select(`
-        *,
-        user:profiles!legal_deposit_requests_user_id_fkey(id, first_name, last_name, email)
-      `)
+      .select("*")
       .eq("id", requestId)
       .single();
 
@@ -62,8 +59,16 @@ serve(async (req) => {
     }
 
     const userEmail = authData.user.email;
-    const userName = request.user?.first_name && request.user?.last_name 
-      ? `${request.user.first_name} ${request.user.last_name}` 
+    
+    // Récupérer le profil utilisateur séparément
+    const { data: profile } = await supabaseAdmin
+      .from("profiles")
+      .select("first_name, last_name")
+      .eq("id", request.user_id)
+      .single();
+
+    const userName = profile?.first_name && profile?.last_name 
+      ? `${profile.first_name} ${profile.last_name}` 
       : userEmail;
 
     if (!userEmail) {
