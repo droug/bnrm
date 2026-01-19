@@ -10,7 +10,6 @@ import GlobalSearchBar from "@/components/GlobalSearchBar";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import DigitalLibraryFooter from "@/components/digital-library/DigitalLibraryFooter";
 import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
-import logoBnrm from "@/assets/logo-bnrm.png";
 import logoDigitalLibrary from "@/assets/digital-library-logo.png";
 import {
   DropdownMenu,
@@ -117,22 +116,8 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
       <nav className="bg-card border-b sticky top-0 z-50 shadow-sm" role="navigation" aria-label="Navigation principale">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            {/* Logo BNRM + Titre */}
+            {/* Logo + Titre de la bibliothèque numérique */}
             <div className="flex items-center gap-6">
-              {/* Logo BNRM cliquable vers le portail */}
-              <Link 
-                to="/" 
-                className="hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md"
-                aria-label="Retour au portail principal BNRM"
-              >
-                <img 
-                  src={logoBnrm} 
-                  alt="Logo BNRM" 
-                  className="h-12 w-auto object-contain"
-                />
-              </Link>
-
-              {/* Logo + Titre de la bibliothèque numérique */}
               <Link 
                 to="/digital-library" 
                 className="flex items-center gap-3 hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-md"
@@ -140,11 +125,11 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               >
                 <img 
                   src={logoDigitalLibrary} 
-                  alt="Ibn Battuta - Bibliothèque Numérique" 
+                  alt="Ibn Battuta - Bibliothèque Numérique Marocaine" 
                   className="h-14 w-auto object-contain"
                 />
                 <div>
-                  <h1 className="text-lg font-bold text-foreground">{t('dl.title')}</h1>
+                  <h1 className="text-lg font-bold text-foreground">Bibliothèque Numérique Marocaine</h1>
                   <p className="text-xs text-muted-foreground">{t('dl.subtitle')}</p>
                 </div>
               </Link>
