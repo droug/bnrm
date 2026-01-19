@@ -48,10 +48,14 @@ serve(async (req) => {
       throw new Error("Request not found");
     }
 
-    // Récupérer l'email de l'utilisateur depuis auth.users
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.getUserById(
-      request.user_id
-    );
+    // Récupérer l'email de l'utilisateur depuis auth.users (utiliser initiator_id)
+    const userId = request.initiator_id;
+    
+    if (!userId) {
+      throw new Error("Initiator ID not found in request");
+    }
+
+    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.getUserById(userId);
 
     if (authError) {
       console.error("[NOTIFY-ATTRIBUTION] Error fetching user:", authError);
@@ -64,7 +68,7 @@ serve(async (req) => {
     const { data: profile } = await supabaseAdmin
       .from("profiles")
       .select("first_name, last_name")
-      .eq("id", request.user_id)
+      .eq("id", userId)
       .single();
 
     const userName = profile?.first_name && profile?.last_name 
@@ -78,14 +82,14 @@ serve(async (req) => {
     console.log(`[NOTIFY-ATTRIBUTION] Sending to ${userEmail} for request ${request.request_number}`);
 
     // Construire la liste des numéros attribués
-    const numbers = attributedNumbers || request.attributed_numbers || {};
+    const numbers = attributedNumbers || {};
     let numbersHtml = '';
     
-    if (numbers.isbn) {
-      numbersHtml += `<p><strong>ISBN:</strong> ${numbers.isbn}</p>`;
+    if (numbers.isbn || request.isbn_assigned) {
+      numbersHtml += `<p><strong>ISBN:</strong> ${numbers.isbn || request.isbn_assigned}</p>`;
     }
-    if (numbers.issn) {
-      numbersHtml += `<p><strong>ISSN:</strong> ${numbers.issn}</p>`;
+    if (numbers.issn || request.issn_assigned) {
+      numbersHtml += `<p><strong>ISSN:</strong> ${numbers.issn || request.issn_assigned}</p>`;
     }
     if (numbers.dlNumber || request.dl_number) {
       numbersHtml += `<p><strong>Numéro de Dépôt Légal:</strong> ${numbers.dlNumber || request.dl_number}</p>`;
@@ -98,7 +102,7 @@ serve(async (req) => {
     // Créer une notification dans la base de données
     await supabaseAdmin.from("deposit_notifications").insert({
       request_id: requestId,
-      recipient_id: request.user_id,
+      recipient_id: userId,
       notification_type: "attribution",
       title: "Attribution de numéros - Dépôt Légal",
       message: `Votre demande de dépôt légal "${request.title}" (${request.request_number}) a été validée et les numéros ont été attribués.`,
