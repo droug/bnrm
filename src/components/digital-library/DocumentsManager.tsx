@@ -32,7 +32,8 @@ const TESSERACT_LANG_MAP: Record<string, string> = {
   'ar': 'ara',
   'fr': 'fra',
   'en': 'eng',
-  'ber': 'ara+fra+eng'
+  'ber': 'ara+fra+eng',
+  'lat': 'lat'
 };
 
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -2695,6 +2696,7 @@ export default function DocumentsManager() {
                   <SelectItem value="ar">Arabe</SelectItem>
                   <SelectItem value="fr">Français</SelectItem>
                   <SelectItem value="en">Anglais</SelectItem>
+                  <SelectItem value="lat">Latin</SelectItem>
                   <SelectItem value="ber">Amazigh (Tifinagh)</SelectItem>
                   <SelectItem value="mixed">Mixte (Arabe/Français)</SelectItem>
                 </SelectContent>
