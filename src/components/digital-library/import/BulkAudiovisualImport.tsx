@@ -320,7 +320,7 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
             <input
               ref={fileInputRef}
               type="file"
-              accept="video/*,audio/*,.mp3,.mp4,.wav,.webm,.ogg,.mov,.avi,.aac,.flac,.m4a"
+              accept="video/mp4,video/webm,video/ogg,video/quicktime,video/x-msvideo,audio/mpeg,audio/wav,audio/ogg,audio/mp4,audio/aac,audio/flac,audio/x-m4a,.mp3,.mp4,.wav,.webm,.ogg,.mov,.avi,.aac,.flac,.m4a,.mkv"
               multiple
               onChange={handleFilesChange}
               className="hidden"
