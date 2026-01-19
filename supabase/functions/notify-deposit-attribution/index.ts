@@ -131,7 +131,6 @@ serve(async (req) => {
         message: `Votre demande de dépôt légal "${request.title}" (${request.request_number}) a été validée et les numéros ont été attribués.`,
       });
     }
-    });
 
     // Envoyer l'email via Resend
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
