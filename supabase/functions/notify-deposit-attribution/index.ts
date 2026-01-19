@@ -132,17 +132,17 @@ serve(async (req) => {
       });
     }
 
-    // Configuration SMTP Gmail via nodemailer
+    // Configuration SMTP Gmail via nodemailer (alignée sur send-registration-email)
     const SMTP_HOST = Deno.env.get("SMTP_HOST");
-    const SMTP_PORT = Deno.env.get("SMTP_PORT") || "465";
+    const SMTP_PORT = Deno.env.get("SMTP_PORT");
     const SMTP_USER = Deno.env.get("SMTP_USER");
     const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
-    const SMTP_FROM = Deno.env.get("SMTP_FROM") || SMTP_USER;
+    const SMTP_FROM = Deno.env.get("SMTP_FROM");
 
     console.log(`[NOTIFY-ATTRIBUTION] SMTP Config - Host: ${SMTP_HOST}, Port: ${SMTP_PORT}, User: ${SMTP_USER}, From: ${SMTP_FROM}`);
 
-    if (!SMTP_HOST || !SMTP_USER || !SMTP_PASSWORD) {
-      console.warn("[NOTIFY-ATTRIBUTION] SMTP not configured");
+    if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASSWORD) {
+      console.warn("[NOTIFY-ATTRIBUTION] SMTP not fully configured");
       return new Response(
         JSON.stringify({
           success: true,
@@ -156,6 +156,9 @@ serve(async (req) => {
         }
       );
     }
+    
+    // Utiliser l'email d'authentification comme expéditeur si SMTP_FROM est invalide
+    const fromAddress = SMTP_FROM && SMTP_FROM.includes('@') ? SMTP_FROM : SMTP_USER;
 
     const emailHtml = `
       <!DOCTYPE html>
@@ -241,6 +244,8 @@ serve(async (req) => {
       // Gmail: port 465 = secure (SSL), port 587 = STARTTLS
       const isSecure = port === 465;
 
+      console.log(`[NOTIFY-ATTRIBUTION] Creating SMTP transport - port: ${port}, secure: ${isSecure}`);
+
       const transport = nodemailer.createTransport({
         host: SMTP_HOST,
         port: port,
@@ -251,14 +256,11 @@ serve(async (req) => {
         },
       });
 
-      // Utiliser l'email d'authentification comme expéditeur (requis par Gmail)
-      const fromAddress = SMTP_FROM && SMTP_FROM.includes('@') ? SMTP_FROM : SMTP_USER;
-
       console.log(`[NOTIFY-ATTRIBUTION] Using fromAddress: ${fromAddress}`);
 
       const info = await transport.sendMail({
         from: fromAddress,
-        to: userEmail!,
+        to: userEmail,
         subject: `Attribution Dépôt Légal - ${request.request_number} - Demande Validée`,
         html: emailHtml,
       });
