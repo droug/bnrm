@@ -316,7 +316,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   // Styles variés pour chaque badge - design non-linéaire
                   const badgeStyles = [
                     "bg-gradient-to-r from-gold-bn-primary to-amber-500 text-white shadow-lg shadow-gold-bn-primary/30 rotate-2",
-                    "bg-gradient-to-br from-bn-blue to-blue-600 text-white shadow-lg shadow-bn-blue/30 -rotate-1",
+                    "bg-white border-2 border-bn-blue text-gray-900 shadow-lg shadow-bn-blue/20 -rotate-1",
                     "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30 rotate-1",
                     "bg-gradient-to-br from-purple-500 to-violet-600 text-white shadow-lg shadow-purple-500/30 -rotate-2",
                     "bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-500/30 rotate-1",
