@@ -31,7 +31,7 @@ export const SimpleTooltip: React.FC<SimpleTooltipProps> = ({
       {isVisible && (
         <div
           className={cn(
-            "absolute z-[9999] px-4 py-2 text-sm text-white bg-slate-900 rounded-lg shadow-xl pointer-events-none whitespace-normal max-w-xs",
+            "absolute z-[9999] px-4 py-2 text-sm text-white bg-slate-900 rounded-none shadow-xl pointer-events-none whitespace-normal max-w-xs",
             "animate-in fade-in-0 zoom-in-95 duration-200",
             positionClasses[side]
           )}
