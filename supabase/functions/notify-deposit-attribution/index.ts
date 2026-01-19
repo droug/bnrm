@@ -48,35 +48,57 @@ serve(async (req) => {
       throw new Error("Request not found");
     }
 
-    // Récupérer l'email de l'utilisateur depuis auth.users (utiliser initiator_id)
+    // Récupérer l'email de l'utilisateur
     const userId = request.initiator_id;
-    
-    if (!userId) {
-      throw new Error("Initiator ID not found in request");
+    let userEmail: string | null = null;
+    let userName: string = "Utilisateur";
+
+    // Essayer d'abord de récupérer depuis auth.users si initiator_id existe
+    if (userId) {
+      try {
+        const { data: authData, error: authError } = await supabaseAdmin.auth.admin.getUserById(userId);
+        if (!authError && authData?.user?.email) {
+          userEmail = authData.user.email;
+          
+          // Récupérer le profil utilisateur pour le nom
+          const { data: profile } = await supabaseAdmin
+            .from("profiles")
+            .select("first_name, last_name")
+            .eq("id", userId)
+            .single();
+
+          if (profile?.first_name && profile?.last_name) {
+            userName = `${profile.first_name} ${profile.last_name}`;
+          }
+        }
+      } catch (err) {
+        console.warn("[NOTIFY-ATTRIBUTION] Could not fetch user from auth:", err);
+      }
     }
 
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.getUserById(userId);
-
-    if (authError) {
-      console.error("[NOTIFY-ATTRIBUTION] Error fetching user:", authError);
-      throw authError;
+    // Fallback: récupérer l'email depuis les metadata de la demande
+    if (!userEmail) {
+      const metadata = request.metadata as any;
+      if (metadata?.customFields?.author_email) {
+        userEmail = metadata.customFields.author_email;
+        userName = metadata.customFields.author_name || "Utilisateur";
+        console.log("[NOTIFY-ATTRIBUTION] Using email from metadata:", userEmail);
+      }
     }
-
-    const userEmail = authData.user.email;
-    
-    // Récupérer le profil utilisateur séparément
-    const { data: profile } = await supabaseAdmin
-      .from("profiles")
-      .select("first_name, last_name")
-      .eq("id", userId)
-      .single();
-
-    const userName = profile?.first_name && profile?.last_name 
-      ? `${profile.first_name} ${profile.last_name}` 
-      : userEmail;
 
     if (!userEmail) {
-      throw new Error("User email not found");
+      console.warn("[NOTIFY-ATTRIBUTION] No email found for request:", requestId);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          message: "No recipient email found - notification skipped",
+          requestId
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
 
     console.log(`[NOTIFY-ATTRIBUTION] Sending to ${userEmail} for request ${request.request_number}`);
@@ -99,13 +121,16 @@ serve(async (req) => {
       numbersHtml = '<p>Les numéros d\'identification seront communiqués ultérieurement.</p>';
     }
 
-    // Créer une notification dans la base de données
-    await supabaseAdmin.from("deposit_notifications").insert({
-      request_id: requestId,
-      recipient_id: userId,
-      notification_type: "attribution",
-      title: "Attribution de numéros - Dépôt Légal",
-      message: `Votre demande de dépôt légal "${request.title}" (${request.request_number}) a été validée et les numéros ont été attribués.`,
+    // Créer une notification dans la base de données (seulement si userId existe)
+    if (userId) {
+      await supabaseAdmin.from("deposit_notifications").insert({
+        request_id: requestId,
+        recipient_id: userId,
+        notification_type: "attribution",
+        title: "Attribution de numéros - Dépôt Légal",
+        message: `Votre demande de dépôt légal "${request.title}" (${request.request_number}) a été validée et les numéros ont été attribués.`,
+      });
+    }
     });
 
     // Envoyer l'email via Resend
