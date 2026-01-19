@@ -556,18 +556,27 @@ export function DepositValidationWorkflow() {
       if (error) throw error;
 
       // Envoyer une notification d'attribution si validation finale (department)
+      let emailNotificationStatus = "";
       if (status === "approved" && validationType === "department") {
         try {
-          const { error: notifError } = await supabase.functions.invoke('notify-deposit-attribution', {
+          const { data: notifResult, error: notifError } = await supabase.functions.invoke('notify-deposit-attribution', {
             body: { requestId }
           });
+          
           if (notifError) {
             console.error("Error sending attribution notification:", notifError);
+            emailNotificationStatus = " (Erreur envoi notification)";
+          } else if (notifResult?.emailSent) {
+            emailNotificationStatus = ` - Email envoyé à ${notifResult.recipient}`;
+          } else if (notifResult?.error) {
+            console.warn("Email not sent:", notifResult.error);
+            emailNotificationStatus = ` - Email non envoyé: ${notifResult.message || 'Domaine non vérifié'}`;
           } else {
-            console.log("Attribution notification sent successfully");
+            emailNotificationStatus = " - Notification enregistrée";
           }
         } catch (notifError) {
           console.error("Error invoking notify-deposit-attribution:", notifError);
+          emailNotificationStatus = " (Erreur technique notification)";
         }
       }
 
@@ -579,7 +588,7 @@ export function DepositValidationWorkflow() {
 
       toast({
         title: "Succès",
-        description: `Demande ${status === "approved" ? "approuvée" : "rejetée"} avec succès${status === "approved" && validationType === "department" ? " - Notification envoyée au demandeur" : ""}`,
+        description: `Demande ${status === "approved" ? "approuvée" : "rejetée"} avec succès${emailNotificationStatus}`,
       });
 
       setSelectedRequest(null);

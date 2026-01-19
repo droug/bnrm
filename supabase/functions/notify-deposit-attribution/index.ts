@@ -224,22 +224,51 @@ serve(async (req) => {
         html: emailHtml,
       });
 
+      if (emailResult.error) {
+        console.error(`[NOTIFY-ATTRIBUTION] Email error:`, emailResult.error);
+        return new Response(
+          JSON.stringify({ 
+            success: false, 
+            message: `Email non envoyé: ${emailResult.error.message}`,
+            error: emailResult.error,
+            recipient: userEmail
+          }),
+          {
+            status: 200,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        );
+      }
+
       console.log(`[NOTIFY-ATTRIBUTION] Email sent successfully to ${userEmail}:`, emailResult);
+      
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          emailSent: true,
+          message: "Notification envoyée avec succès",
+          recipient: userEmail
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     } else {
       console.warn("[NOTIFY-ATTRIBUTION] RESEND_API_KEY not configured, email not sent");
+      return new Response(
+        JSON.stringify({ 
+          success: true, 
+          emailSent: false,
+          message: "Notification enregistrée (email non configuré)",
+          recipient: userEmail
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
-
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        message: "Attribution notification sent successfully",
-        recipient: userEmail
-      }),
-      {
-        status: 200,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
   } catch (error: any) {
     console.error("[NOTIFY-ATTRIBUTION] Error:", error);
     return new Response(
