@@ -83,10 +83,12 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
   const [transcript, setTranscript] = useState("");
   const [segments, setSegments] = useState<TranscriptSegment[]>([]);
   const [isTranscribing, setIsTranscribing] = useState(false);
-  const [transcriptionLanguage, setTranscriptionLanguage] = useState("fr-FR");
+  const [transcriptionLanguage, setTranscriptionLanguage] = useState("fr");
   const [showTranscript, setShowTranscript] = useState(true);
   const [transcriptionLoaded, setTranscriptionLoaded] = useState(false);
   const [copiedText, setCopiedText] = useState(false);
+  const [transcriptionProgress, setTranscriptionProgress] = useState(0);
+  const [transcriptionMethod, setTranscriptionMethod] = useState<'whisper' | 'browser'>('whisper');
   
   // Teleprompter state
   const [autoScroll, setAutoScroll] = useState(true);
@@ -245,8 +247,88 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
     setIsFullscreen(!isFullscreen);
   };
 
-  // Start transcription
-  const startTranscription = () => {
+  // Start transcription with Whisper API
+  const startWhisperTranscription = async () => {
+    if (!documentData.pdf_url) {
+      toast({
+        title: "Erreur",
+        description: "URL du fichier média non disponible",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsTranscribing(true);
+    setTranscriptionProgress(10);
+
+    try {
+      // Fetch the media file
+      setTranscriptionProgress(20);
+      const response = await fetch(documentData.pdf_url);
+      if (!response.ok) throw new Error('Impossible de télécharger le fichier');
+      
+      setTranscriptionProgress(40);
+      const blob = await response.blob();
+      
+      // Convert to base64
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve, reject) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          const base64 = result.split(',')[1];
+          resolve(base64);
+        };
+        reader.onerror = reject;
+      });
+      reader.readAsDataURL(blob);
+      
+      setTranscriptionProgress(60);
+      const base64Audio = await base64Promise;
+      
+      // Send to Whisper API
+      setTranscriptionProgress(80);
+      const { data, error } = await supabase.functions.invoke('voice-to-text', {
+        body: { 
+          audio: base64Audio,
+          language: transcriptionLanguage
+        }
+      });
+
+      if (error) throw error;
+      
+      if (data?.text) {
+        setTranscript(data.text);
+        // Create a single segment for the full transcription
+        setSegments([{
+          id: 'seg-full',
+          text: data.text,
+          startTime: 0,
+          endTime: duration || 0
+        }]);
+        toast({
+          title: "Transcription terminée",
+          description: "Le fichier a été transcrit avec succès"
+        });
+      } else {
+        throw new Error('Aucune transcription reçue');
+      }
+      
+      setTranscriptionProgress(100);
+    } catch (error) {
+      console.error('Transcription error:', error);
+      toast({
+        title: "Erreur de transcription",
+        description: error instanceof Error ? error.message : "Une erreur est survenue",
+        variant: "destructive"
+      });
+    } finally {
+      setIsTranscribing(false);
+      setTranscriptionProgress(0);
+    }
+  };
+
+  // Start transcription with browser Speech Recognition
+  const startBrowserTranscription = () => {
     if (!SpeechRecognition) {
       toast({
         title: "Non supporté",
@@ -259,7 +341,9 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = transcriptionLanguage;
+    recognition.lang = transcriptionLanguage === 'fr' ? 'fr-FR' : 
+                       transcriptionLanguage === 'ar' ? 'ar-MA' :
+                       transcriptionLanguage === 'en' ? 'en-US' : 'es-ES';
 
     let currentText = transcript;
     let currentSegments = [...segments];
@@ -313,6 +397,15 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
     // Start media playback
     if (mediaRef.current && !isPlaying) {
       mediaRef.current.play();
+    }
+  };
+
+  // Start transcription based on selected method
+  const startTranscription = () => {
+    if (transcriptionMethod === 'whisper') {
+      startWhisperTranscription();
+    } else {
+      startBrowserTranscription();
     }
   };
 
@@ -573,15 +666,26 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
               <CardContent className="pt-0 flex-1 flex flex-col">
                 {/* Transcription controls */}
                 <div className="flex flex-wrap items-center gap-2 mb-4">
+                  {/* Method selection */}
+                  <Select value={transcriptionMethod} onValueChange={(v) => setTranscriptionMethod(v as 'whisper' | 'browser')}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="whisper">IA Whisper (Auto)</SelectItem>
+                      <SelectItem value="browser">Navigateur (Micro)</SelectItem>
+                    </SelectContent>
+                  </Select>
+
                   <Select value={transcriptionLanguage} onValueChange={setTranscriptionLanguage}>
                     <SelectTrigger className="w-32">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="fr-FR">Français</SelectItem>
-                      <SelectItem value="ar-MA">العربية</SelectItem>
-                      <SelectItem value="en-US">English</SelectItem>
-                      <SelectItem value="es-ES">Español</SelectItem>
+                      <SelectItem value="fr">Français</SelectItem>
+                      <SelectItem value="ar">العربية</SelectItem>
+                      <SelectItem value="en">English</SelectItem>
+                      <SelectItem value="es">Español</SelectItem>
                     </SelectContent>
                   </Select>
 
@@ -590,19 +694,20 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
                       variant="outline" 
                       size="sm"
                       onClick={startTranscription}
-                      disabled={!SpeechRecognition}
+                      disabled={transcriptionMethod === 'browser' && !SpeechRecognition}
                     >
                       <Mic className="h-4 w-4 mr-2" />
-                      Transcrire
+                      {transcriptionMethod === 'whisper' ? 'Transcrire automatiquement' : 'Transcrire (micro)'}
                     </Button>
                   ) : (
                     <Button 
                       variant="destructive" 
                       size="sm"
                       onClick={stopTranscription}
+                      disabled={transcriptionMethod === 'whisper'}
                     >
                       <MicOff className="h-4 w-4 mr-2" />
-                      Arrêter
+                      {transcriptionMethod === 'whisper' ? 'Transcription en cours...' : 'Arrêter'}
                     </Button>
                   )}
 
@@ -627,6 +732,22 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
                     </>
                   )}
                 </div>
+
+                {/* Progress bar for Whisper transcription */}
+                {isTranscribing && transcriptionMethod === 'whisper' && transcriptionProgress > 0 && (
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between text-xs text-muted-foreground mb-1">
+                      <span>Transcription en cours...</span>
+                      <span>{transcriptionProgress}%</span>
+                    </div>
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-primary transition-all duration-300"
+                        style={{ width: `${transcriptionProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
 
                 {/* Font size control */}
                 <div className="flex items-center gap-2 mb-3">
