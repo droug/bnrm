@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
+import nodemailer from "npm:nodemailer@6.9.10";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -132,22 +132,14 @@ serve(async (req) => {
       });
     }
 
-    // Configuration SMTP Gmail
+    // Configuration SMTP Gmail via nodemailer
     const SMTP_HOST = Deno.env.get("SMTP_HOST");
-    const SMTP_PORT_RAW = Deno.env.get("SMTP_PORT");
+    const SMTP_PORT = Deno.env.get("SMTP_PORT") || "465";
     const SMTP_USER = Deno.env.get("SMTP_USER");
     const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
     const SMTP_FROM = Deno.env.get("SMTP_FROM") || SMTP_USER;
 
-    const parsedPort = SMTP_PORT_RAW ? parseInt(SMTP_PORT_RAW, 10) : NaN;
-    const smtpPrimaryPort = Number.isFinite(parsedPort) ? parsedPort : 465;
-    const smtpPortsToTry = Array.from(
-      new Set([smtpPrimaryPort, smtpPrimaryPort === 465 ? 587 : 465])
-    );
-
-    console.log(
-      `[NOTIFY-ATTRIBUTION] SMTP Config - Host: ${SMTP_HOST}, Ports: ${smtpPortsToTry.join(",")}, User: ${SMTP_USER}, From: ${SMTP_FROM}`
-    );
+    console.log(`[NOTIFY-ATTRIBUTION] SMTP Config - Host: ${SMTP_HOST}, Port: ${SMTP_PORT}, User: ${SMTP_USER}, From: ${SMTP_FROM}`);
 
     if (!SMTP_HOST || !SMTP_USER || !SMTP_PASSWORD) {
       console.warn("[NOTIFY-ATTRIBUTION] SMTP not configured");
@@ -245,91 +237,61 @@ serve(async (req) => {
     `;
 
     try {
+      const port = parseInt(SMTP_PORT, 10);
+      // Gmail: port 465 = secure (SSL), port 587 = STARTTLS
+      const isSecure = port === 465;
+
+      const transport = nodemailer.createTransport({
+        host: SMTP_HOST,
+        port: port,
+        secure: isSecure,
+        auth: {
+          user: SMTP_USER,
+          pass: SMTP_PASSWORD,
+        },
+      });
+
       const fromHeader = SMTP_FROM?.includes("<")
         ? SMTP_FROM
         : `BNRM - Dépôt Légal <${SMTP_FROM}>`;
 
-      let lastSmtpError: any = null;
-
-      for (const port of smtpPortsToTry) {
-        const client = new SMTPClient({
-          connection: {
-            hostname: SMTP_HOST,
-            port,
-            // Gmail: 465 = SMTPS (TLS), 587 = STARTTLS
-            tls: port === 465,
-            auth: {
-              username: SMTP_USER,
-              password: SMTP_PASSWORD,
-            },
-          },
-        });
-
-        try {
-          await client.send({
-            from: fromHeader,
-            to: userEmail,
-            subject: `Attribution Dépôt Légal - ${request.request_number} - Demande Validée`,
-            content: "auto",
-            html: emailHtml,
-          });
-
-          console.log(
-            `[NOTIFY-ATTRIBUTION] Email sent successfully via SMTP (port=${port}) to ${userEmail}`
-          );
-
-          return new Response(
-            JSON.stringify({
-              success: true,
-              emailSent: true,
-              message: `Notification envoyée avec succès via SMTP Gmail (port ${port})`,
-              recipient: userEmail,
-            }),
-            {
-              status: 200,
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-            }
-          );
-        } catch (smtpError: any) {
-          lastSmtpError = smtpError;
-          console.error(
-            `[NOTIFY-ATTRIBUTION] SMTP error on port ${port}:`,
-            smtpError
-          );
-        } finally {
-          try {
-            await client.close();
-          } catch {
-            // ignore
+      await new Promise<void>((resolve, reject) => {
+        transport.sendMail({
+          from: fromHeader,
+          to: userEmail!,
+          subject: `Attribution Dépôt Légal - ${request.request_number} - Demande Validée`,
+          html: emailHtml,
+        }, (error: any) => {
+          if (error) {
+            return reject(error);
           }
-        }
-      }
+          resolve();
+        });
+      });
 
-      const msg = lastSmtpError?.message ?? String(lastSmtpError ?? "SMTP error");
+      console.log(`[NOTIFY-ATTRIBUTION] Email sent successfully via nodemailer to ${userEmail}`);
 
       return new Response(
         JSON.stringify({
-          success: false,
-          emailSent: false,
-          message: `Erreur SMTP: ${msg}`,
-          error: msg,
+          success: true,
+          emailSent: true,
+          message: "Notification envoyée avec succès via SMTP Gmail",
           recipient: userEmail,
-          attemptedPorts: smtpPortsToTry,
         }),
         {
           status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );
-    } catch (error: any) {
-      console.error("[NOTIFY-ATTRIBUTION] SMTP wrapper error:", error);
+    } catch (smtpError: any) {
+      console.error("[NOTIFY-ATTRIBUTION] SMTP error:", smtpError);
 
       return new Response(
         JSON.stringify({
           success: false,
           emailSent: false,
-          message: `Erreur SMTP: ${error.message}`,
-          error: error.message,
+          message: `Erreur SMTP: ${smtpError.message}`,
+          error: smtpError.message,
           recipient: userEmail,
         }),
         {
