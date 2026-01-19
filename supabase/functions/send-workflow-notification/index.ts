@@ -16,45 +16,68 @@ interface NotificationRequest {
 }
 
 // Fonction d'envoi d'email via SMTP ou Resend (fallback)
-async function sendEmail(to: string, subject: string, html: string): Promise<{ success: boolean; error?: string }> {
+async function sendEmail(
+  to: string,
+  subject: string,
+  html: string
+): Promise<{ success: boolean; error?: string }> {
   const SMTP_HOST = Deno.env.get("SMTP_HOST");
-  const SMTP_PORT = Deno.env.get("SMTP_PORT");
+  const SMTP_PORT_RAW = Deno.env.get("SMTP_PORT");
   const SMTP_USER = Deno.env.get("SMTP_USER");
   const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
   const SMTP_FROM = Deno.env.get("SMTP_FROM");
 
   // Essayer SMTP d'abord
-  if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASSWORD) {
-    try {
-      console.log(`Sending email via SMTP to: ${to}`);
-      
-      const client = new SMTPClient({
-        connection: {
-          hostname: SMTP_HOST,
-          port: parseInt(SMTP_PORT, 10),
-          tls: parseInt(SMTP_PORT, 10) === 465,
-          auth: {
-            username: SMTP_USER,
-            password: SMTP_PASSWORD,
+  if (SMTP_HOST && SMTP_USER && SMTP_PASSWORD) {
+    const parsedPort = SMTP_PORT_RAW ? parseInt(SMTP_PORT_RAW, 10) : NaN;
+    const primaryPort = Number.isFinite(parsedPort) ? parsedPort : 465;
+    const portsToTry = Array.from(new Set([primaryPort, primaryPort === 465 ? 587 : 465]));
+
+    for (const port of portsToTry) {
+      try {
+        console.log(`Sending email via SMTP (port=${port}) to: ${to}`);
+
+        const client = new SMTPClient({
+          connection: {
+            hostname: SMTP_HOST,
+            port,
+            // Gmail: 465 = SMTPS (TLS), 587 = STARTTLS
+            tls: port === 465,
+            auth: {
+              username: SMTP_USER,
+              password: SMTP_PASSWORD,
+            },
           },
-        },
-      });
+        });
 
-      await client.send({
-        from: SMTP_FROM || "BNRM - Bibliothèque Nationale <noreply@bnrm.ma>",
-        to: to,
-        subject: subject,
-        content: "auto",
-        html: html,
-      });
+        const fromHeader = (SMTP_FROM || SMTP_USER)?.includes("<")
+          ? (SMTP_FROM || SMTP_USER)!
+          : `BNRM - Bibliothèque Nationale <${SMTP_FROM || SMTP_USER}>`;
 
-      await client.close();
-      console.log("Email sent successfully via SMTP");
-      return { success: true };
-    } catch (error: any) {
-      console.error("SMTP error:", error);
-      // Continuer vers Resend si SMTP échoue
+        try {
+          await client.send({
+            from: fromHeader,
+            to,
+            subject,
+            content: "auto",
+            html,
+          });
+
+          console.log("Email sent successfully via SMTP");
+          return { success: true };
+        } finally {
+          try {
+            await client.close();
+          } catch {
+            // ignore
+          }
+        }
+      } catch (error: any) {
+        console.error(`SMTP error on port ${port}:`, error);
+        // Continuer sur l'autre port (465/587) si besoin
+      }
     }
+    // Continuer vers Resend si SMTP échoue
   }
 
   // Fallback vers Resend
