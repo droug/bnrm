@@ -562,8 +562,9 @@ export const BNRMNumberAttribution = () => {
       if (data?.success) {
         toast({
           title: "Notification envoyée",
-          description: `Email envoyé avec succès à ${data.recipientEmail || 'l\'utilisateur'}`,
+          description: `Email envoyé avec succès à ${data.recipient || data.recipientEmail || 'l\'utilisateur'}`,
         });
+        setIsDetailsOpen(false);
       } else {
         throw new Error(data?.error || "Échec de l'envoi");
       }
