@@ -197,7 +197,7 @@ serve(async (req) => {
               </div>
               
               <p style="text-align: center;">
-                <a href="https://www.bnrm.ma/my-space" class="btn">Accéder à mon espace</a>
+                <a href="https://bnrm.lovable.app/my-space" class="btn">Accéder à mon espace</a>
               </p>
               
               <p>Pour toute question, n'hésitez pas à nous contacter.</p>
