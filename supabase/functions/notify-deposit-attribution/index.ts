@@ -134,21 +134,29 @@ serve(async (req) => {
 
     // Configuration SMTP Gmail
     const SMTP_HOST = Deno.env.get("SMTP_HOST");
-    const SMTP_PORT = parseInt(Deno.env.get("SMTP_PORT") || "587");
+    const SMTP_PORT_RAW = Deno.env.get("SMTP_PORT");
     const SMTP_USER = Deno.env.get("SMTP_USER");
     const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
     const SMTP_FROM = Deno.env.get("SMTP_FROM") || SMTP_USER;
 
-    console.log(`[NOTIFY-ATTRIBUTION] SMTP Config - Host: ${SMTP_HOST}, Port: ${SMTP_PORT}, User: ${SMTP_USER}, From: ${SMTP_FROM}`);
+    const parsedPort = SMTP_PORT_RAW ? parseInt(SMTP_PORT_RAW, 10) : NaN;
+    const smtpPrimaryPort = Number.isFinite(parsedPort) ? parsedPort : 465;
+    const smtpPortsToTry = Array.from(
+      new Set([smtpPrimaryPort, smtpPrimaryPort === 465 ? 587 : 465])
+    );
+
+    console.log(
+      `[NOTIFY-ATTRIBUTION] SMTP Config - Host: ${SMTP_HOST}, Ports: ${smtpPortsToTry.join(",")}, User: ${SMTP_USER}, From: ${SMTP_FROM}`
+    );
 
     if (!SMTP_HOST || !SMTP_USER || !SMTP_PASSWORD) {
       console.warn("[NOTIFY-ATTRIBUTION] SMTP not configured");
       return new Response(
-        JSON.stringify({ 
-          success: true, 
+        JSON.stringify({
+          success: true,
           emailSent: false,
           message: "Notification enregistrée (SMTP non configuré)",
-          recipient: userEmail
+          recipient: userEmail,
         }),
         {
           status: 200,
@@ -237,51 +245,92 @@ serve(async (req) => {
     `;
 
     try {
-      const client = new SMTPClient({
-        connection: {
-          hostname: SMTP_HOST,
-          port: SMTP_PORT,
-          tls: true,
-          auth: {
-            username: SMTP_USER,
-            password: SMTP_PASSWORD,
+      const fromHeader = SMTP_FROM?.includes("<")
+        ? SMTP_FROM
+        : `BNRM - Dépôt Légal <${SMTP_FROM}>`;
+
+      let lastSmtpError: any = null;
+
+      for (const port of smtpPortsToTry) {
+        const client = new SMTPClient({
+          connection: {
+            hostname: SMTP_HOST,
+            port,
+            // Gmail: 465 = SMTPS (TLS), 587 = STARTTLS
+            tls: port === 465,
+            auth: {
+              username: SMTP_USER,
+              password: SMTP_PASSWORD,
+            },
           },
-        },
-      });
+        });
 
-      await client.send({
-        from: SMTP_FROM!,
-        to: userEmail,
-        subject: `Attribution Dépôt Légal - ${request.request_number} - Demande Validée`,
-        html: emailHtml,
-      });
+        try {
+          await client.send({
+            from: fromHeader,
+            to: userEmail,
+            subject: `Attribution Dépôt Légal - ${request.request_number} - Demande Validée`,
+            content: "auto",
+            html: emailHtml,
+          });
 
-      await client.close();
+          console.log(
+            `[NOTIFY-ATTRIBUTION] Email sent successfully via SMTP (port=${port}) to ${userEmail}`
+          );
 
-      console.log(`[NOTIFY-ATTRIBUTION] Email sent successfully via SMTP to ${userEmail}`);
-      
+          return new Response(
+            JSON.stringify({
+              success: true,
+              emailSent: true,
+              message: `Notification envoyée avec succès via SMTP Gmail (port ${port})`,
+              recipient: userEmail,
+            }),
+            {
+              status: 200,
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+            }
+          );
+        } catch (smtpError: any) {
+          lastSmtpError = smtpError;
+          console.error(
+            `[NOTIFY-ATTRIBUTION] SMTP error on port ${port}:`,
+            smtpError
+          );
+        } finally {
+          try {
+            await client.close();
+          } catch {
+            // ignore
+          }
+        }
+      }
+
+      const msg = lastSmtpError?.message ?? String(lastSmtpError ?? "SMTP error");
+
       return new Response(
-        JSON.stringify({ 
-          success: true, 
-          emailSent: true,
-          message: "Notification envoyée avec succès via SMTP Gmail",
-          recipient: userEmail
+        JSON.stringify({
+          success: false,
+          emailSent: false,
+          message: `Erreur SMTP: ${msg}`,
+          error: msg,
+          recipient: userEmail,
+          attemptedPorts: smtpPortsToTry,
         }),
         {
           status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );
-    } catch (smtpError: any) {
-      console.error("[NOTIFY-ATTRIBUTION] SMTP error:", smtpError);
-      
+    } catch (error: any) {
+      console.error("[NOTIFY-ATTRIBUTION] SMTP wrapper error:", error);
+
       return new Response(
-        JSON.stringify({ 
-          success: false, 
+        JSON.stringify({
+          success: false,
           emailSent: false,
-          message: `Erreur SMTP: ${smtpError.message}`,
-          error: smtpError.message,
-          recipient: userEmail
+          message: `Erreur SMTP: ${error.message}`,
+          error: error.message,
+          recipient: userEmail,
         }),
         {
           status: 200,
@@ -289,7 +338,7 @@ serve(async (req) => {
         }
       );
     }
-  } catch (error: any) {
+
     console.error("[NOTIFY-ATTRIBUTION] Error:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
