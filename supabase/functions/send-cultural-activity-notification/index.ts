@@ -1,7 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+import nodemailer from "npm:nodemailer@6.9.12";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,15 +11,12 @@ interface NotificationRequest {
   recipient_email: string;
   recipient_name: string;
   data: {
-    // Pour les réservations d'espaces
     space_name?: string;
     organization_name?: string;
     start_date?: string;
     end_date?: string;
     booking_id?: string;
     rejection_reason?: string;
-    
-    // Pour les visites guidées
     visit_date?: string;
     visit_time?: string;
     visit_language?: string;
@@ -30,8 +25,80 @@ interface NotificationRequest {
   };
 }
 
+// Fonction d'envoi d'email via SMTP (configuration admin) avec fallback Resend
+async function sendEmail(
+  to: string,
+  subject: string,
+  html: string
+): Promise<{ success: boolean; error?: string; id?: string }> {
+  const SMTP_HOST = Deno.env.get("SMTP_HOST");
+  const SMTP_PORT = Deno.env.get("SMTP_PORT");
+  const SMTP_USER = Deno.env.get("SMTP_USER");
+  const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
+  const SMTP_FROM = Deno.env.get("SMTP_FROM");
+
+  if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASSWORD) {
+    try {
+      console.log(`[CULTURAL-NOTIF] Sending email via SMTP to: ${to}`);
+      
+      const port = parseInt(SMTP_PORT, 10);
+      const fromAddress = SMTP_FROM && SMTP_FROM.includes('@') ? SMTP_FROM : SMTP_USER;
+      
+      const transporter = nodemailer.createTransport({
+        host: SMTP_HOST,
+        port: port,
+        secure: port === 465,
+        auth: { user: SMTP_USER, pass: SMTP_PASSWORD },
+      });
+
+      const info = await transporter.sendMail({
+        from: fromAddress,
+        to: to,
+        subject: subject,
+        html: html,
+      });
+
+      console.log("[CULTURAL-NOTIF] Email sent via SMTP, messageId:", info.messageId);
+      return { success: true, id: info.messageId };
+    } catch (error: any) {
+      console.error("[CULTURAL-NOTIF] SMTP error:", error.message);
+    }
+  }
+
+  // Fallback Resend
+  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+  if (RESEND_API_KEY) {
+    try {
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${RESEND_API_KEY}`,
+        },
+        body: JSON.stringify({
+          from: "BNRM Activités Culturelles <onboarding@resend.dev>",
+          to: [to],
+          subject: subject,
+          html: html,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { success: false, error: errorData.message };
+      }
+
+      const data = await response.json();
+      return { success: true, id: data.id };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  return { success: false, error: "No email service configured" };
+}
+
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -64,56 +131,26 @@ const handler = async (req: Request): Promise<Response> => {
                 .info-row { margin: 10px 0; }
                 .label { font-weight: bold; color: #666; }
                 .footer { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; color: #888; font-size: 12px; }
-                .button { display: inline-block; padding: 12px 30px; background: #D4AF37; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
               </style>
             </head>
             <body>
               <div class="container">
-                <div class="header">
-                  <h1>✅ Réservation Confirmée</h1>
-                </div>
+                <div class="header"><h1>✅ Réservation Confirmée</h1></div>
                 <div class="content">
                   <p>Cher(e) ${requestData.recipient_name},</p>
-                  
                   <p>Nous avons le plaisir de vous confirmer que votre demande de réservation d'espace a été <strong>approuvée</strong>.</p>
-                  
                   <div class="info-box">
                     <h3>Détails de votre réservation :</h3>
-                    <div class="info-row">
-                      <span class="label">Espace :</span> ${requestData.data.space_name}
-                    </div>
-                    <div class="info-row">
-                      <span class="label">Organisation :</span> ${requestData.data.organization_name}
-                    </div>
-                    <div class="info-row">
-                      <span class="label">Date de début :</span> ${requestData.data.start_date}
-                    </div>
-                    <div class="info-row">
-                      <span class="label">Date de fin :</span> ${requestData.data.end_date}
-                    </div>
-                    <div class="info-row">
-                      <span class="label">Référence :</span> ${requestData.data.booking_id}
-                    </div>
+                    <div class="info-row"><span class="label">Espace :</span> ${requestData.data.space_name}</div>
+                    <div class="info-row"><span class="label">Organisation :</span> ${requestData.data.organization_name}</div>
+                    <div class="info-row"><span class="label">Date de début :</span> ${requestData.data.start_date}</div>
+                    <div class="info-row"><span class="label">Date de fin :</span> ${requestData.data.end_date}</div>
+                    <div class="info-row"><span class="label">Référence :</span> ${requestData.data.booking_id}</div>
                   </div>
-                  
-                  <p>Vous recevrez prochainement :</p>
-                  <ul>
-                    <li>La lettre de confirmation officielle</li>
-                    <li>Le contrat de réservation</li>
-                    <li>La facture</li>
-                    <li>L'état des lieux</li>
-                  </ul>
-                  
                   <p>Notre équipe vous contactera dans les plus brefs délais pour finaliser les modalités pratiques.</p>
-                  
-                  <p>Cordialement,<br>
-                  <strong>Le Département des Activités Culturelles</strong><br>
-                  Bibliothèque Nationale du Royaume du Maroc</p>
-                  
+                  <p>Cordialement,<br><strong>Le Département des Activités Culturelles</strong><br>Bibliothèque Nationale du Royaume du Maroc</p>
                   <div class="footer">
-                    <p>Bibliothèque Nationale du Royaume du Maroc<br>
-                    Avenue Al Hadyquiya, Secteur Ryad, Rabat<br>
-                    Tél: +212 5 37 77 18 88</p>
+                    <p>Bibliothèque Nationale du Royaume du Maroc<br>Avenue Al Hadyquiya, Secteur Ryad, Rabat<br>Tél: +212 5 37 77 18 88</p>
                   </div>
                 </div>
               </div>
@@ -142,38 +179,24 @@ const handler = async (req: Request): Promise<Response> => {
             </head>
             <body>
               <div class="container">
-                <div class="header">
-                  <h1>❌ Réservation Refusée</h1>
-                </div>
+                <div class="header"><h1>❌ Réservation Refusée</h1></div>
                 <div class="content">
                   <p>Cher(e) ${requestData.recipient_name},</p>
-                  
                   <p>Nous accusons réception de votre demande de réservation d'espace. Malheureusement, nous ne pouvons donner suite à votre demande.</p>
-                  
                   <div class="info-box">
                     <h3>Informations de la demande :</h3>
                     <p><strong>Espace :</strong> ${requestData.data.space_name}</p>
                     <p><strong>Organisation :</strong> ${requestData.data.organization_name}</p>
                     <p><strong>Période :</strong> ${requestData.data.start_date} - ${requestData.data.end_date}</p>
                   </div>
-                  
                   <div class="reason-box">
                     <h3>Motif du refus :</h3>
                     <p>${requestData.data.rejection_reason}</p>
                   </div>
-                  
-                  <p>Nous vous remercions de l'intérêt que vous portez à la Bibliothèque Nationale du Royaume du Maroc et vous encourageons à nous soumettre d'autres demandes.</p>
-                  
-                  <p>Pour toute question, n'hésitez pas à nous contacter.</p>
-                  
-                  <p>Cordialement,<br>
-                  <strong>Le Département des Activités Culturelles</strong><br>
-                  Bibliothèque Nationale du Royaume du Maroc</p>
-                  
+                  <p>Nous vous remercions de l'intérêt que vous portez à la BNRM.</p>
+                  <p>Cordialement,<br><strong>Le Département des Activités Culturelles</strong></p>
                   <div class="footer">
-                    <p>Bibliothèque Nationale du Royaume du Maroc<br>
-                    Avenue Al Hadyquiya, Secteur Ryad, Rabat<br>
-                    Tél: +212 5 37 77 18 88</p>
+                    <p>Bibliothèque Nationale du Royaume du Maroc<br>Tél: +212 5 37 77 18 88</p>
                   </div>
                 </div>
               </div>
@@ -204,57 +227,24 @@ const handler = async (req: Request): Promise<Response> => {
             </head>
             <body>
               <div class="container">
-                <div class="header">
-                  <h1>⚠️ Annulation de Visite Guidée</h1>
-                </div>
+                <div class="header"><h1>⚠️ Annulation de Visite Guidée</h1></div>
                 <div class="content">
                   <p>Cher(e) ${requestData.recipient_name},</p>
-                  
                   <div class="alert-box">
                     <strong>⚠️ Information importante :</strong> Nous sommes au regret de vous informer que la visite guidée pour laquelle vous étiez inscrit(e) a été annulée.
                   </div>
-                  
                   <div class="info-box">
                     <h3>Détails de la visite annulée :</h3>
-                    <div class="info-row">
-                      <span class="label">Date :</span> ${requestData.data.visit_date}
-                    </div>
-                    <div class="info-row">
-                      <span class="label">Heure :</span> ${requestData.data.visit_time}
-                    </div>
-                    <div class="info-row">
-                      <span class="label">Langue :</span> ${requestData.data.visit_language}
-                    </div>
-                    <div class="info-row">
-                      <span class="label">Nombre de visiteurs :</span> ${requestData.data.nb_visiteurs}
-                    </div>
+                    <div class="info-row"><span class="label">Date :</span> ${requestData.data.visit_date}</div>
+                    <div class="info-row"><span class="label">Heure :</span> ${requestData.data.visit_time}</div>
+                    <div class="info-row"><span class="label">Langue :</span> ${requestData.data.visit_language}</div>
+                    <div class="info-row"><span class="label">Nombre de visiteurs :</span> ${requestData.data.nb_visiteurs}</div>
                   </div>
-                  
-                  ${requestData.data.cancellation_reason ? `
-                    <div class="info-box">
-                      <h3>Raison de l'annulation :</h3>
-                      <p>${requestData.data.cancellation_reason}</p>
-                    </div>
-                  ` : ''}
-                  
-                  <p>Nous nous excusons pour ce désagrément. Nous vous invitons à consulter notre site web pour découvrir les prochains créneaux disponibles et réserver une nouvelle visite.</p>
-                  
-                  <p>Pour toute question ou pour réserver un autre créneau, n'hésitez pas à nous contacter :</p>
-                  <ul>
-                    <li>Email : activites@bnrm.ma</li>
-                    <li>Téléphone : +212 5 37 77 18 88</li>
-                  </ul>
-                  
-                  <p>Nous espérons pouvoir vous accueillir prochainement.</p>
-                  
-                  <p>Cordialement,<br>
-                  <strong>Le Département des Activités Culturelles</strong><br>
-                  Bibliothèque Nationale du Royaume du Maroc</p>
-                  
+                  ${requestData.data.cancellation_reason ? `<div class="info-box"><h3>Raison de l'annulation :</h3><p>${requestData.data.cancellation_reason}</p></div>` : ''}
+                  <p>Nous nous excusons pour ce désagrément. Nous vous invitons à réserver un autre créneau sur notre site.</p>
+                  <p>Cordialement,<br><strong>Le Département des Activités Culturelles</strong></p>
                   <div class="footer">
-                    <p>Bibliothèque Nationale du Royaume du Maroc<br>
-                    Avenue Al Hadyquiya, Secteur Ryad, Rabat<br>
-                    Tél: +212 5 37 77 18 88</p>
+                    <p>Bibliothèque Nationale du Royaume du Maroc<br>Tél: +212 5 37 77 18 88</p>
                   </div>
                 </div>
               </div>
@@ -270,43 +260,19 @@ const handler = async (req: Request): Promise<Response> => {
 
     console.log(`Sending ${requestData.type} email to ${requestData.recipient_email}`);
 
-    const emailResponse = await resend.emails.send({
-      from: "BNRM Activités Culturelles <onboarding@resend.dev>",
-      to: [requestData.recipient_email],
-      subject: subject,
-      html: htmlContent,
-    });
+    const result = await sendEmail(requestData.recipient_email, subject, htmlContent);
 
-    console.log("Email sent successfully:", emailResponse);
+    console.log("Email result:", result);
 
     return new Response(
-      JSON.stringify({ 
-        success: true,
-        message: "Email sent successfully",
-        email_id: emailResponse.data?.id 
-      }),
-      {
-        status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          ...corsHeaders,
-        },
-      }
+      JSON.stringify({ success: result.success, message: "Email sent successfully", email_id: result.id }),
+      { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   } catch (error: any) {
     console.error("Error in send-cultural-activity-notification function:", error);
     return new Response(
-      JSON.stringify({ 
-        success: false,
-        error: error.message 
-      }),
-      {
-        status: 500,
-        headers: { 
-          "Content-Type": "application/json", 
-          ...corsHeaders 
-        },
-      }
+      JSON.stringify({ success: false, error: error.message }),
+      { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
 };

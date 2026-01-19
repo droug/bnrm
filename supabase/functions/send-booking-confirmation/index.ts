@@ -1,12 +1,9 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+import nodemailer from "npm:nodemailer@6.9.12";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 interface BookingConfirmationRequest {
@@ -28,8 +25,88 @@ interface BookingConfirmationRequest {
   contactCountry: string;
 }
 
+// Fonction d'envoi d'email via SMTP (configuration admin) avec fallback Resend
+async function sendEmail(
+  to: string,
+  subject: string,
+  html: string
+): Promise<{ success: boolean; error?: string; id?: string }> {
+  const SMTP_HOST = Deno.env.get("SMTP_HOST");
+  const SMTP_PORT = Deno.env.get("SMTP_PORT");
+  const SMTP_USER = Deno.env.get("SMTP_USER");
+  const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
+  const SMTP_FROM = Deno.env.get("SMTP_FROM");
+
+  // Essayer SMTP d'abord
+  if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASSWORD) {
+    try {
+      console.log(`[BOOKING-CONFIRM] Sending email via SMTP to: ${to}`);
+      
+      const port = parseInt(SMTP_PORT, 10);
+      const fromAddress = SMTP_FROM && SMTP_FROM.includes('@') ? SMTP_FROM : SMTP_USER;
+      
+      const transporter = nodemailer.createTransport({
+        host: SMTP_HOST,
+        port: port,
+        secure: port === 465,
+        auth: {
+          user: SMTP_USER,
+          pass: SMTP_PASSWORD,
+        },
+      });
+
+      const info = await transporter.sendMail({
+        from: fromAddress,
+        to: to,
+        subject: subject,
+        html: html,
+      });
+
+      console.log("[BOOKING-CONFIRM] Email sent successfully via SMTP, messageId:", info.messageId);
+      return { success: true, id: info.messageId };
+    } catch (error: any) {
+      console.error("[BOOKING-CONFIRM] SMTP error:", error.message);
+      // Continuer vers Resend
+    }
+  }
+
+  // Fallback vers Resend
+  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+  if (RESEND_API_KEY) {
+    try {
+      console.log(`[BOOKING-CONFIRM] Sending email via Resend (fallback) to: ${to}`);
+      
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${RESEND_API_KEY}`,
+        },
+        body: JSON.stringify({
+          from: "BNRM Réservations <onboarding@resend.dev>",
+          to: [to],
+          subject: subject,
+          html: html,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { success: false, error: errorData.message };
+      }
+
+      const data = await response.json();
+      console.log("[BOOKING-CONFIRM] Email sent via Resend");
+      return { success: true, id: data.id };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  return { success: false, error: "No email service configured" };
+}
+
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -39,8 +116,8 @@ const handler = async (req: Request): Promise<Response> => {
     const bookingData: BookingConfirmationRequest = await req.json();
     console.log("Booking data:", JSON.stringify(bookingData, null, 2));
 
-    // Email HTML template
-    const emailHtml = `
+    // Email HTML template pour le client
+    const clientEmailHtml = `
       <!DOCTYPE html>
       <html>
         <head>
@@ -48,10 +125,10 @@ const handler = async (req: Request): Promise<Response> => {
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #1e40af 0%, #7c3aed 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+            .header { background: linear-gradient(135deg, #002B45 0%, #004d7a 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
             .content { background: #f9fafb; padding: 30px; border-radius: 0 0 8px 8px; }
             .info-row { margin: 15px 0; padding: 10px; background: white; border-radius: 4px; }
-            .label { font-weight: bold; color: #1e40af; }
+            .label { font-weight: bold; color: #002B45; }
             .footer { margin-top: 30px; padding: 20px; text-align: center; color: #6b7280; font-size: 14px; }
             .alert { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 15px; margin: 20px 0; }
           </style>
@@ -74,47 +151,18 @@ const handler = async (req: Request): Promise<Response> => {
               
               <h2>Détails de votre réservation</h2>
               
-              <div class="info-row">
-                <span class="label">Organisme :</span> ${bookingData.organizationName}
-              </div>
-              
-              <div class="info-row">
-                <span class="label">Événement :</span> ${bookingData.eventTitle}
-              </div>
-              
-              <div class="info-row">
-                <span class="label">Description :</span> ${bookingData.eventDescription}
-              </div>
-              
-              <div class="info-row">
-                <span class="label">Espace :</span> ${bookingData.spaceName}
-              </div>
-              
-              <div class="info-row">
-                <span class="label">Date de début :</span> ${new Date(bookingData.startDate).toLocaleDateString('fr-FR')} à ${bookingData.startTime}
-              </div>
-              
-              <div class="info-row">
-                <span class="label">Date de fin :</span> ${new Date(bookingData.endDate).toLocaleDateString('fr-FR')} à ${bookingData.endTime}
-              </div>
-              
-              <div class="info-row">
-                <span class="label">Nombre de participants :</span> ${bookingData.expectedAttendees}
-              </div>
+              <div class="info-row"><span class="label">Organisme :</span> ${bookingData.organizationName}</div>
+              <div class="info-row"><span class="label">Événement :</span> ${bookingData.eventTitle}</div>
+              <div class="info-row"><span class="label">Description :</span> ${bookingData.eventDescription}</div>
+              <div class="info-row"><span class="label">Espace :</span> ${bookingData.spaceName}</div>
+              <div class="info-row"><span class="label">Date de début :</span> ${new Date(bookingData.startDate).toLocaleDateString('fr-FR')} à ${bookingData.startTime}</div>
+              <div class="info-row"><span class="label">Date de fin :</span> ${new Date(bookingData.endDate).toLocaleDateString('fr-FR')} à ${bookingData.endTime}</div>
+              <div class="info-row"><span class="label">Nombre de participants :</span> ${bookingData.expectedAttendees}</div>
               
               <h3>Informations de contact</h3>
-              
-              <div class="info-row">
-                <span class="label">Email :</span> ${bookingData.userEmail}
-              </div>
-              
-              <div class="info-row">
-                <span class="label">Téléphone :</span> ${bookingData.contactPhone}
-              </div>
-              
-              <div class="info-row">
-                <span class="label">Adresse :</span> ${bookingData.contactAddress}, ${bookingData.contactCity}, ${bookingData.contactCountry}
-              </div>
+              <div class="info-row"><span class="label">Email :</span> ${bookingData.userEmail}</div>
+              <div class="info-row"><span class="label">Téléphone :</span> ${bookingData.contactPhone}</div>
+              <div class="info-row"><span class="label">Adresse :</span> ${bookingData.contactAddress}, ${bookingData.contactCity}, ${bookingData.contactCountry}</div>
               
               <div class="alert">
                 <strong>Prochaines étapes :</strong>
@@ -138,16 +186,15 @@ const handler = async (req: Request): Promise<Response> => {
     `;
 
     // Envoyer l'email au client
-    const clientEmailResponse = await resend.emails.send({
-      from: "BNRM Réservations <onboarding@resend.dev>",
-      to: [bookingData.userEmail],
-      subject: `Demande de réservation – Activités culturelles BNRM`,
-      html: emailHtml,
-    });
+    const clientResult = await sendEmail(
+      bookingData.userEmail,
+      "Demande de réservation – Activités culturelles BNRM",
+      clientEmailHtml
+    );
 
-    console.log("Client email sent successfully:", clientEmailResponse);
+    console.log("Client email result:", clientResult);
 
-    // Envoyer une copie à l'équipe BNRM
+    // Email admin
     const adminEmailHtml = `
       <!DOCTYPE html>
       <html>
@@ -172,71 +219,48 @@ const handler = async (req: Request): Promise<Response> => {
               <p><strong>Référence :</strong> ${bookingData.bookingId.slice(0, 8).toUpperCase()}</p>
               
               <h2>Informations du demandeur</h2>
-              <div class="info-row">
-                <span class="label">Nom :</span> ${bookingData.userName}
-              </div>
-              <div class="info-row">
-                <span class="label">Email :</span> ${bookingData.userEmail}
-              </div>
-              <div class="info-row">
-                <span class="label">Téléphone :</span> ${bookingData.contactPhone}
-              </div>
-              <div class="info-row">
-                <span class="label">Organisme :</span> ${bookingData.organizationName}
-              </div>
+              <div class="info-row"><span class="label">Nom :</span> ${bookingData.userName}</div>
+              <div class="info-row"><span class="label">Email :</span> ${bookingData.userEmail}</div>
+              <div class="info-row"><span class="label">Téléphone :</span> ${bookingData.contactPhone}</div>
+              <div class="info-row"><span class="label">Organisme :</span> ${bookingData.organizationName}</div>
               
               <h2>Détails de l'événement</h2>
-              <div class="info-row">
-                <span class="label">Titre :</span> ${bookingData.eventTitle}
-              </div>
-              <div class="info-row">
-                <span class="label">Description :</span> ${bookingData.eventDescription}
-              </div>
-              <div class="info-row">
-                <span class="label">Espace demandé :</span> ${bookingData.spaceName}
-              </div>
-              <div class="info-row">
-                <span class="label">Date/Heure :</span> ${new Date(bookingData.startDate).toLocaleDateString('fr-FR')} ${bookingData.startTime} - ${new Date(bookingData.endDate).toLocaleDateString('fr-FR')} ${bookingData.endTime}
-              </div>
-              <div class="info-row">
-                <span class="label">Participants :</span> ${bookingData.expectedAttendees}
-              </div>
+              <div class="info-row"><span class="label">Titre :</span> ${bookingData.eventTitle}</div>
+              <div class="info-row"><span class="label">Description :</span> ${bookingData.eventDescription}</div>
+              <div class="info-row"><span class="label">Espace demandé :</span> ${bookingData.spaceName}</div>
+              <div class="info-row"><span class="label">Date/Heure :</span> ${new Date(bookingData.startDate).toLocaleDateString('fr-FR')} ${bookingData.startTime} - ${new Date(bookingData.endDate).toLocaleDateString('fr-FR')} ${bookingData.endTime}</div>
+              <div class="info-row"><span class="label">Participants :</span> ${bookingData.expectedAttendees}</div>
             </div>
           </div>
         </body>
       </html>
     `;
 
-    const adminEmailResponse = await resend.emails.send({
-      from: "BNRM Système <onboarding@resend.dev>",
-      to: ["useryouness@gmail.com"],
-      subject: `[BNRM] Nouvelle réservation - ${bookingData.eventTitle}`,
-      html: adminEmailHtml,
-    });
+    // Envoyer email admin
+    const adminEmail = Deno.env.get("SMTP_FROM") || Deno.env.get("SMTP_USER") || "useryouness@gmail.com";
+    const adminResult = await sendEmail(
+      adminEmail,
+      `[BNRM] Nouvelle réservation - ${bookingData.eventTitle}`,
+      adminEmailHtml
+    );
 
-    console.log("Admin email sent successfully:", adminEmailResponse);
+    console.log("Admin email result:", adminResult);
 
     return new Response(
       JSON.stringify({ 
         success: true,
-        clientEmailId: clientEmailResponse.data?.id,
-        adminEmailId: adminEmailResponse.data?.id
+        clientEmailId: clientResult.id,
+        adminEmailId: adminResult.id
       }),
       {
         status: 200,
-        headers: {
-          "Content-Type": "application/json",
-          ...corsHeaders,
-        },
+        headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );
   } catch (error: any) {
     console.error("Error in send-booking-confirmation function:", error);
     return new Response(
-      JSON.stringify({ 
-        error: error.message,
-        details: error.toString()
-      }),
+      JSON.stringify({ error: error.message, details: error.toString() }),
       {
         status: 500,
         headers: { "Content-Type": "application/json", ...corsHeaders },

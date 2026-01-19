@@ -1,13 +1,10 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { Resend } from "npm:resend@2.0.0";
+import nodemailer from "npm:nodemailer@6.9.12";
 import { jsPDF } from "npm:jspdf@2.5.1";
-
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 interface VisitConfirmationRequest {
@@ -20,15 +17,116 @@ interface VisitConfirmationRequest {
   nbVisiteurs: number;
 }
 
+// Fonction d'envoi d'email via SMTP (configuration admin) avec fallback Resend
+async function sendEmail(
+  to: string,
+  subject: string,
+  html: string,
+  attachments?: Array<{ filename: string; content: string }>
+): Promise<{ success: boolean; error?: string; id?: string }> {
+  const SMTP_HOST = Deno.env.get("SMTP_HOST");
+  const SMTP_PORT = Deno.env.get("SMTP_PORT");
+  const SMTP_USER = Deno.env.get("SMTP_USER");
+  const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
+  const SMTP_FROM = Deno.env.get("SMTP_FROM");
+
+  // Essayer SMTP d'abord
+  if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASSWORD) {
+    try {
+      console.log(`[VISIT-CONFIRM] Sending email via SMTP to: ${to}`);
+      
+      const port = parseInt(SMTP_PORT, 10);
+      const fromAddress = SMTP_FROM && SMTP_FROM.includes('@') ? SMTP_FROM : SMTP_USER;
+      
+      const transporter = nodemailer.createTransport({
+        host: SMTP_HOST,
+        port: port,
+        secure: port === 465,
+        auth: {
+          user: SMTP_USER,
+          pass: SMTP_PASSWORD,
+        },
+      });
+
+      const mailOptions: any = {
+        from: fromAddress,
+        to: to,
+        subject: subject,
+        html: html,
+      };
+
+      if (attachments && attachments.length > 0) {
+        mailOptions.attachments = attachments.map(att => ({
+          filename: att.filename,
+          content: att.content,
+          encoding: 'base64',
+        }));
+      }
+
+      const info = await transporter.sendMail(mailOptions);
+
+      console.log("[VISIT-CONFIRM] Email sent successfully via SMTP, messageId:", info.messageId);
+      return { success: true, id: info.messageId };
+    } catch (error: any) {
+      console.error("[VISIT-CONFIRM] SMTP error:", error.message);
+      // Continuer vers Resend
+    }
+  }
+
+  // Fallback vers Resend
+  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+  if (RESEND_API_KEY) {
+    try {
+      console.log(`[VISIT-CONFIRM] Sending email via Resend (fallback) to: ${to}`);
+      
+      const body: any = {
+        from: "BNRM Activités Culturelles <onboarding@resend.dev>",
+        to: [to],
+        subject: subject,
+        html: html,
+      };
+
+      if (attachments && attachments.length > 0) {
+        body.attachments = attachments.map(att => ({
+          filename: att.filename,
+          content: att.content,
+        }));
+      }
+
+      const response = await fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${RESEND_API_KEY}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { success: false, error: errorData.message };
+      }
+
+      const data = await response.json();
+      console.log("[VISIT-CONFIRM] Email sent via Resend");
+      return { success: true, id: data.id };
+    } catch (error: any) {
+      return { success: false, error: error.message };
+    }
+  }
+
+  return { success: false, error: "No email service configured" };
+}
+
 const generateConfirmationPDF = (data: VisitConfirmationRequest): Uint8Array => {
   const doc = new jsPDF();
   
-  // En-tête avec logo BNRM (texte stylisé en attendant l'image)
-  doc.setFillColor(0, 43, 69); // #002B45 - Bleu BNRM
+  // En-tête avec logo BNRM
+  doc.setFillColor(0, 43, 69);
   doc.rect(0, 0, 210, 40, "F");
   
   doc.setFontSize(24);
-  doc.setTextColor(212, 175, 55); // #D4AF37 - Or BNRM
+  doc.setTextColor(212, 175, 55);
   doc.setFont(undefined, "bold");
   doc.text("BNRM", 105, 15, { align: "center" });
   
@@ -42,7 +140,7 @@ const generateConfirmationPDF = (data: VisitConfirmationRequest): Uint8Array => 
   doc.text("Confirmation de visite guidée", 105, 35, { align: "center" });
   
   // Ligne de séparation dorée
-  doc.setDrawColor(212, 175, 55); // #D4AF37
+  doc.setDrawColor(212, 175, 55);
   doc.setLineWidth(1);
   doc.line(20, 48, 190, 48);
   
@@ -156,7 +254,6 @@ const generateConfirmationPDF = (data: VisitConfirmationRequest): Uint8Array => 
 };
 
 const handler = async (req: Request): Promise<Response> => {
-  // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
@@ -177,145 +274,94 @@ const handler = async (req: Request): Promise<Response> => {
       day: "numeric",
     });
 
-    // Envoyer l'email avec le PDF en pièce jointe
-    const emailResponse = await resend.emails.send({
-      from: "BNRM Activités Culturelles <onboarding@resend.dev>",
-      to: [requestData.email],
-      subject: "Confirmation de votre réservation de visite guidée – BNRM",
-      html: `
-        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
-          <!-- En-tête avec logo BNRM -->
-          <div style="background: linear-gradient(135deg, #002B45 0%, #003d5c 100%); color: white; padding: 40px 30px; text-align: center;">
-            <div style="background-color: #D4AF37; width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; line-height: 80px;">
-              BNRM
-            </div>
-            <h1 style="margin: 0; font-size: 24px; font-weight: 600;">Bibliothèque Nationale du Royaume du Maroc</h1>
-            <p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 14px;">Confirmation de réservation</p>
+    const emailHtml = `
+      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+        <div style="background: linear-gradient(135deg, #002B45 0%, #003d5c 100%); color: white; padding: 40px 30px; text-align: center;">
+          <h1 style="margin: 0; font-size: 24px; font-weight: 600;">Bibliothèque Nationale du Royaume du Maroc</h1>
+          <p style="margin: 10px 0 0 0; opacity: 0.9; font-size: 14px;">Confirmation de réservation</p>
+        </div>
+        
+        <div style="padding: 40px 30px; background-color: #f9fafb;">
+          <h2 style="color: #002B45; margin-top: 0; font-size: 20px;">Bonjour ${requestData.nom},</h2>
+          
+          <p style="font-size: 16px; line-height: 1.8; color: #374151; margin: 20px 0;">
+            Votre réservation pour la visite guidée du <strong style="color: #002B45;">${formattedDate}</strong> 
+            à <strong style="color: #002B45;">${requestData.slotTime.substring(0, 5)}</strong> a bien été enregistrée.
+          </p>
+          
+          <div style="background-color: white; padding: 25px; border-left: 5px solid #D4AF37; margin: 25px 0; border-radius: 8px;">
+            <h3 style="margin: 0 0 15px 0; color: #002B45; font-size: 16px;">📋 Détails de votre visite</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Langue :</td>
+                <td style="padding: 8px 0; color: #1f2937; font-weight: 600; font-size: 14px; text-align: right;">${requestData.langue.charAt(0).toUpperCase() + requestData.langue.slice(1)}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Nombre de visiteurs :</td>
+                <td style="padding: 8px 0; color: #1f2937; font-weight: 600; font-size: 14px; text-align: right;">${requestData.nbVisiteurs}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Durée :</td>
+                <td style="padding: 8px 0; color: #1f2937; font-weight: 600; font-size: 14px; text-align: right;">environ 45 minutes</td>
+              </tr>
+            </table>
           </div>
           
-          <!-- Contenu principal -->
-          <div style="padding: 40px 30px; background-color: #f9fafb;">
-            <h2 style="color: #002B45; margin-top: 0; font-size: 20px;">Bonjour ${requestData.nom},</h2>
-            
-            <p style="font-size: 16px; line-height: 1.8; color: #374151; margin: 20px 0;">
-              Votre réservation pour la visite guidée du <strong style="color: #002B45;">${formattedDate}</strong> 
-              à <strong style="color: #002B45;">${requestData.slotTime.substring(0, 5)}</strong> a bien été enregistrée.
+          <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 20px; border-radius: 8px; margin: 25px 0; border: 2px solid #D4AF37;">
+            <p style="margin: 0; font-size: 15px; color: #78350f; line-height: 1.6;">
+              📎 <strong>Vous trouverez ci-joint votre confirmation de réservation en PDF.</strong><br/>
+              Merci de la présenter à l'accueil le jour de votre visite.
             </p>
-            
-            <!-- Détails de la visite -->
-            <div style="background-color: white; padding: 25px; border-left: 5px solid #D4AF37; margin: 25px 0; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
-              <h3 style="margin: 0 0 15px 0; color: #002B45; font-size: 16px;">📋 Détails de votre visite</h3>
-              <table style="width: 100%; border-collapse: collapse;">
-                <tr>
-                  <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Langue :</td>
-                  <td style="padding: 8px 0; color: #1f2937; font-weight: 600; font-size: 14px; text-align: right;">${requestData.langue.charAt(0).toUpperCase() + requestData.langue.slice(1)}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Nombre de visiteurs :</td>
-                  <td style="padding: 8px 0; color: #1f2937; font-weight: 600; font-size: 14px; text-align: right;">${requestData.nbVisiteurs}</td>
-                </tr>
-                <tr>
-                  <td style="padding: 8px 0; color: #6b7280; font-size: 14px;">Durée :</td>
-                  <td style="padding: 8px 0; color: #1f2937; font-weight: 600; font-size: 14px; text-align: right;">environ 45 minutes</td>
-                </tr>
-              </table>
-            </div>
-            
-            <p style="font-size: 16px; line-height: 1.8; color: #374151; margin: 25px 0;">
-              Nous vous remercions de votre intérêt pour la Bibliothèque Nationale du Royaume du Maroc.
-            </p>
-            
-            <!-- Message important avec PDF -->
-            <div style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 20px; border-radius: 8px; margin: 25px 0; border: 2px solid #D4AF37;">
-              <p style="margin: 0; font-size: 15px; color: #78350f; line-height: 1.6;">
-                📎 <strong>Vous trouverez ci-joint votre confirmation de réservation en PDF avec le logo BNRM.</strong><br/>
-                Merci de la présenter à l'accueil le jour de votre visite.
-              </p>
-            </div>
-            
-            <!-- Bouton d'annulation -->
-            <div style="text-align: center; margin: 30px 0;">
-              <a href="https://1ae914e2-2780-444f-9fa4-6e404c335c35.lovableproject.com/cancel-booking?token=${requestData.bookingId}&email=${encodeURIComponent(requestData.email)}" 
-                 style="display: inline-block; background-color: #dc2626; color: white; padding: 12px 30px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px;">
-                Annuler cette réservation
-              </a>
-              <p style="margin: 10px 0 0 0; font-size: 12px; color: #6b7280;">
-                Vous pouvez annuler votre réservation jusqu'à 24h avant la date prévue
-              </p>
-            </div>
-            
-            <!-- Informations pratiques -->
-            <div style="background-color: #e0f2fe; padding: 20px; border-radius: 8px; margin: 25px 0;">
-              <h3 style="margin: 0 0 12px 0; color: #075985; font-size: 15px;">ℹ️ Informations pratiques</h3>
-              <ul style="margin: 0; padding-left: 20px; color: #0c4a6e; font-size: 14px; line-height: 1.8;">
-                <li>Veuillez arriver 10 minutes avant l'heure prévue</li>
-                <li>Présentez-vous à l'accueil avec cette confirmation</li>
-                <li>En cas d'empêchement, merci de nous prévenir 24h à l'avance</li>
-              </ul>
-            </div>
-            
-            <!-- Contact et adresse -->
-            <div style="margin-top: 30px; padding-top: 25px; border-top: 2px solid #e5e7eb;">
-              <h3 style="color: #002B45; font-size: 16px; margin: 0 0 15px 0;">📍 Contact</h3>
-              <table style="width: 100%; font-size: 14px; color: #4b5563;">
-                <tr>
-                  <td style="padding: 5px 0;"><strong style="color: #1f2937;">Adresse :</strong></td>
-                  <td style="padding: 5px 0;">Avenue Ibn Batouta, Rabat</td>
-                </tr>
-                <tr>
-                  <td style="padding: 5px 0;"><strong style="color: #1f2937;">Téléphone :</strong></td>
-                  <td style="padding: 5px 0;">+212 5 37 77 18 03</td>
-                </tr>
-                <tr>
-                  <td style="padding: 5px 0;"><strong style="color: #1f2937;">Email :</strong></td>
-                  <td style="padding: 5px 0;">contact@bnrm.ma</td>
-                </tr>
-              </table>
-            </div>
           </div>
           
-          <!-- Pied de page -->
-          <div style="background-color: #002B45; color: white; padding: 25px 30px; text-align: center;">
-            <p style="margin: 0; font-size: 12px; opacity: 0.8;">
-              Numéro de confirmation : <strong>${requestData.bookingId.substring(0, 8).toUpperCase()}</strong>
-            </p>
-            <p style="margin: 10px 0 0 0; font-size: 11px; opacity: 0.7;">
-              © ${new Date().getFullYear()} Bibliothèque Nationale du Royaume du Maroc - Tous droits réservés
-            </p>
+          <div style="background-color: #e0f2fe; padding: 20px; border-radius: 8px; margin: 25px 0;">
+            <h3 style="margin: 0 0 12px 0; color: #075985; font-size: 15px;">ℹ️ Informations pratiques</h3>
+            <ul style="margin: 0; padding-left: 20px; color: #0c4a6e; font-size: 14px; line-height: 1.8;">
+              <li>Veuillez arriver 10 minutes avant l'heure prévue</li>
+              <li>Présentez-vous à l'accueil avec cette confirmation</li>
+              <li>En cas d'empêchement, merci de nous prévenir 24h à l'avance</li>
+            </ul>
+          </div>
+          
+          <div style="margin-top: 30px; padding-top: 25px; border-top: 2px solid #e5e7eb;">
+            <h3 style="color: #002B45; font-size: 16px; margin: 0 0 15px 0;">📍 Contact</h3>
+            <p style="font-size: 14px; color: #4b5563; margin: 5px 0;"><strong>Adresse :</strong> Avenue Ibn Batouta, Rabat</p>
+            <p style="font-size: 14px; color: #4b5563; margin: 5px 0;"><strong>Téléphone :</strong> +212 5 37 77 18 03</p>
+            <p style="font-size: 14px; color: #4b5563; margin: 5px 0;"><strong>Email :</strong> contact@bnrm.ma</p>
           </div>
         </div>
-      `,
-      attachments: [
-        {
-          filename: "confirmation-visite-bnrm.pdf",
-          content: pdfBase64,
-        },
-      ],
-    });
+        
+        <div style="background-color: #002B45; color: white; padding: 25px 30px; text-align: center;">
+          <p style="margin: 0; font-size: 12px; opacity: 0.8;">
+            Numéro de confirmation : <strong>${requestData.bookingId.substring(0, 8).toUpperCase()}</strong>
+          </p>
+          <p style="margin: 10px 0 0 0; font-size: 11px; opacity: 0.7;">
+            © ${new Date().getFullYear()} Bibliothèque Nationale du Royaume du Maroc
+          </p>
+        </div>
+      </div>
+    `;
 
-    console.log("Email sent successfully:", emailResponse);
+    const result = await sendEmail(
+      requestData.email,
+      "Confirmation de votre réservation de visite guidée – BNRM",
+      emailHtml,
+      [{ filename: "confirmation-visite-bnrm.pdf", content: pdfBase64 }]
+    );
 
-    return new Response(JSON.stringify({ success: true, data: emailResponse }), {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        ...corsHeaders,
-      },
+    console.log("Email result:", result);
+
+    return new Response(JSON.stringify({ success: result.success, data: result }), {
+      status: result.success ? 200 : 500,
+      headers: { "Content-Type": "application/json", ...corsHeaders },
     });
   } catch (error: any) {
     console.error("Error in send-visit-confirmation function:", error);
     return new Response(
-      JSON.stringify({ 
-        success: false, 
-        error: error.message,
-        details: error.toString()
-      }),
+      JSON.stringify({ success: false, error: error.message, details: error.toString() }),
       {
         status: 500,
-        headers: { 
-          "Content-Type": "application/json", 
-          ...corsHeaders 
-        },
+        headers: { "Content-Type": "application/json", ...corsHeaders },
       }
     );
   }
