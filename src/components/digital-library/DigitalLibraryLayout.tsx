@@ -311,25 +311,37 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   <ChevronDown className="h-3 w-3" aria-hidden="true" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="bg-card z-50 min-w-[280px]" role="menu" aria-label={t('dl.collections')}>
-                {collectionsSubmenu.map((item) => (
-                  <Link key={item.href} to={item.href} className="block" title={t(item.tooltipKey)}>
-                    <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3">
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="p-1.5 rounded-md bg-gold-bn-primary/10">
-                          <item.icon className="h-4 w-4 text-gold-bn-primary" aria-hidden="true" />
+              <DropdownMenuContent align="start" className="bg-card z-50 min-w-[320px] p-2" role="menu" aria-label={t('dl.collections')}>
+                {collectionsSubmenu.map((item, index) => {
+                  // Styles variés pour chaque badge - design non-linéaire
+                  const badgeStyles = [
+                    "bg-gradient-to-r from-gold-bn-primary to-amber-500 text-white shadow-lg shadow-gold-bn-primary/30 rotate-2",
+                    "bg-gradient-to-br from-bn-blue to-blue-600 text-white shadow-lg shadow-bn-blue/30 -rotate-1",
+                    "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30 rotate-1",
+                    "bg-gradient-to-br from-purple-500 to-violet-600 text-white shadow-lg shadow-purple-500/30 -rotate-2",
+                    "bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-500/30 rotate-1",
+                    "bg-gradient-to-br from-orange-500 to-amber-600 text-white shadow-lg shadow-orange-500/30 -rotate-1",
+                  ];
+                  
+                  return (
+                    <Link key={item.href} to={item.href} className="block" title={t(item.tooltipKey)}>
+                      <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group">
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="p-2 rounded-xl bg-gradient-to-br from-gold-bn-primary/20 to-gold-bn-primary/5 group-hover:from-gold-bn-primary/30 group-hover:to-gold-bn-primary/10 transition-all duration-200 group-hover:scale-110">
+                            <item.icon className="h-5 w-5 text-gold-bn-primary" aria-hidden="true" />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="font-semibold text-foreground group-hover:text-gold-bn-primary transition-colors">{t(item.labelKey)}</span>
+                            <span className="text-xs text-muted-foreground">{t(item.descKey)}</span>
+                          </div>
                         </div>
-                        <div className="flex flex-col">
-                          <span className="font-medium">{t(item.labelKey)}</span>
-                          <span className="text-xs text-muted-foreground">{t(item.descKey)}</span>
-                        </div>
-                      </div>
-                      <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-gold-bn-primary/10 text-gold-bn-primary">
-                        {item.count}
-                      </span>
-                    </DropdownMenuItem>
-                  </Link>
-                ))}
+                        <span className={`px-2.5 py-1 text-xs font-bold rounded-full transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-0 ${badgeStyles[index % badgeStyles.length]}`}>
+                          {item.count}
+                        </span>
+                      </DropdownMenuItem>
+                    </Link>
+                  );
+                })}
               </DropdownMenuContent>
             </DropdownMenu>
 
