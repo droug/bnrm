@@ -1897,7 +1897,7 @@ export function DepositValidationWorkflow() {
 
       {/* Modale "En attente de traitement" */}
       <Dialog open={showPendingModal} onOpenChange={setShowPendingModal}>
-        <DialogContent className="max-w-md z-[100]">
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>Mettre en attente</DialogTitle>
             <DialogDescription>
@@ -1934,7 +1934,7 @@ export function DepositValidationWorkflow() {
 
       {/* Modale de rejet avec motif obligatoire */}
       <Dialog open={showRejectionModal} onOpenChange={setShowRejectionModal}>
-        <DialogContent className="max-w-md z-[100]">
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-destructive">
               <XCircle className="h-5 w-5" />
@@ -1987,7 +1987,7 @@ export function DepositValidationWorkflow() {
 
       {/* Modale de confirmation d'approbation Comité */}
       <Dialog open={showCommitteeConfirmModal} onOpenChange={setShowCommitteeConfirmModal}>
-        <DialogContent className="max-w-md z-[100]">
+        <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-primary">
               <CheckCircle className="h-5 w-5" />
