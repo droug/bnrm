@@ -535,6 +535,48 @@ export const BNRMNumberAttribution = () => {
     }
   };
 
+  // Fonction pour envoyer la notification d'attribution
+  const handleNotifyAttribution = async (attribution: NumberAttribution) => {
+    try {
+      toast({
+        title: "Envoi en cours",
+        description: "Envoi de la notification par email...",
+      });
+
+      const { data, error } = await supabase.functions.invoke("notify-deposit-attribution", {
+        body: {
+          requestId: attribution.deposit_id,
+          attributedNumbers: {
+            isbn: attribution.number_type === 'isbn' ? attribution.attributed_number : undefined,
+            issn: attribution.number_type === 'issn' ? attribution.attributed_number : undefined,
+            dlNumber: attribution.metadata?.dl_number,
+          }
+        }
+      });
+
+      if (error) {
+        console.error("Error sending notification:", error);
+        throw error;
+      }
+
+      if (data?.success) {
+        toast({
+          title: "Notification envoyée",
+          description: `Email envoyé avec succès à ${data.recipientEmail || 'l\'utilisateur'}`,
+        });
+      } else {
+        throw new Error(data?.error || "Échec de l'envoi");
+      }
+    } catch (error: any) {
+      console.error("Notification error:", error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible d'envoyer la notification",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleAddRange = () => {
     const calculateTotalNumbers = () => {
       if (newRange.number_type === 'isbn') {
@@ -1447,7 +1489,7 @@ export const BNRMNumberAttribution = () => {
                 <Button variant="outline" onClick={() => setIsDetailsOpen(false)}>
                   Fermer
                 </Button>
-                <Button>
+                <Button onClick={() => selectedAttribution && handleNotifyAttribution(selectedAttribution)}>
                   <Send className="w-4 h-4 mr-2" />
                   Notifier attribution
                 </Button>
