@@ -126,9 +126,11 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
   };
 
   // Transcribe audio/video using Web Speech API (FREE)
+  // NOTE: This requires microphone permission which may not work in iframes
   const transcribeMedia = (file: File): Promise<string> => {
     return new Promise((resolve) => {
       if (!SpeechRecognition) {
+        console.warn('Speech Recognition not supported');
         resolve('');
         return;
       }
@@ -143,39 +145,63 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
       element.muted = false;
       element.volume = 0.1; // Low volume to not disturb
 
-      const recognition = new SpeechRecognition();
-      recognition.continuous = true;
-      recognition.interimResults = false;
-      recognition.lang = transcriptionLanguage === 'fr' ? 'fr-FR' : 
-                         transcriptionLanguage === 'ar' ? 'ar-MA' :
-                         transcriptionLanguage === 'en' ? 'en-US' : 'es-ES';
-
+      let recognition: any = null;
       let transcript = '';
-      let timeoutId: any;
+      let timeoutId: ReturnType<typeof setTimeout> | null = null;
+      let recognitionFailed = false;
 
-      recognition.onresult = (event: any) => {
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          if (event.results[i].isFinal) {
-            transcript += event.results[i][0].transcript + ' ';
-          }
+      const cleanup = () => {
+        if (timeoutId) clearTimeout(timeoutId);
+        if (recognition) {
+          try { recognition.stop(); } catch (e) { /* ignore */ }
         }
+        try { element.pause(); } catch (e) { /* ignore */ }
+        URL.revokeObjectURL(element.src);
       };
 
-      recognition.onerror = (event: any) => {
-        console.log('Recognition error:', event.error);
-        // Continue even on errors like 'no-speech'
-      };
+      try {
+        recognition = new SpeechRecognition();
+        recognition.continuous = true;
+        recognition.interimResults = false;
+        recognition.lang = transcriptionLanguage === 'fr' ? 'fr-FR' : 
+                           transcriptionLanguage === 'ar' ? 'ar-MA' :
+                           transcriptionLanguage === 'en' ? 'en-US' : 'es-ES';
 
-      recognition.onend = () => {
-        // Restart if media is still playing
-        if (!element.paused && !element.ended) {
-          try {
-            recognition.start();
-          } catch (e) {
-            // Ignore
+        recognition.onresult = (event: any) => {
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            if (event.results[i].isFinal) {
+              transcript += event.results[i][0].transcript + ' ';
+            }
           }
-        }
-      };
+        };
+
+        recognition.onerror = (event: any) => {
+          console.warn('Recognition error:', event.error);
+          // Critical errors that should stop the process
+          if (['not-allowed', 'service-not-allowed', 'audio-capture'].includes(event.error)) {
+            recognitionFailed = true;
+            cleanup();
+            resolve(''); // Resolve immediately on permission errors
+          }
+        };
+
+        recognition.onend = () => {
+          // Only restart if media is still playing and recognition hasn't failed
+          if (!element.paused && !element.ended && !recognitionFailed) {
+            try {
+              recognition.start();
+            } catch (e) {
+              // Ignore restart errors
+            }
+          }
+        };
+
+      } catch (e) {
+        console.error('Failed to create recognition:', e);
+        URL.revokeObjectURL(element.src);
+        resolve('');
+        return;
+      }
 
       element.onloadedmetadata = () => {
         const duration = element.duration;
@@ -184,37 +210,38 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
         const maxTranscriptionTime = Math.min(duration * 1000, 120000);
         
         timeoutId = setTimeout(() => {
-          element.pause();
-          recognition.stop();
-          URL.revokeObjectURL(element.src);
+          cleanup();
           resolve(transcript.trim());
         }, maxTranscriptionTime + 5000);
 
         // Start playback and recognition
         element.play().then(() => {
+          if (recognitionFailed) {
+            cleanup();
+            resolve('');
+            return;
+          }
           try {
             recognition.start();
           } catch (e) {
             console.error('Failed to start recognition:', e);
+            cleanup();
+            resolve('');
           }
         }).catch(err => {
           console.error('Failed to play media:', err);
-          clearTimeout(timeoutId);
-          URL.revokeObjectURL(element.src);
+          cleanup();
           resolve('');
         });
       };
 
       element.onended = () => {
-        clearTimeout(timeoutId);
-        recognition.stop();
-        URL.revokeObjectURL(element.src);
+        cleanup();
         resolve(transcript.trim());
       };
 
       element.onerror = () => {
-        clearTimeout(timeoutId);
-        URL.revokeObjectURL(element.src);
+        cleanup();
         resolve('');
       };
     });
@@ -274,12 +301,21 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
         
         const documentType = detectedType === 'audio' ? 'audio' : 'video';
 
-        // Transcription (if enabled)
+        // Transcription (if enabled) - with timeout protection
         let transcription = '';
         if (enableTranscription && speechRecognitionSupported) {
           setCurrentStep("Transcription en cours...");
           setIsTranscribing(true);
-          transcription = await transcribeMedia(file);
+          try {
+            // Add a global timeout to prevent infinite waiting
+            transcription = await Promise.race([
+              transcribeMedia(file),
+              new Promise<string>((resolve) => setTimeout(() => resolve(''), 30000)) // 30s max
+            ]);
+          } catch (e) {
+            console.warn('Transcription failed:', e);
+            transcription = '';
+          }
           setIsTranscribing(false);
         }
 
