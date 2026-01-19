@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
+import nodemailer from "npm:nodemailer@6.9.10";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,7 +15,7 @@ interface NotificationRequest {
   additional_data?: any;
 }
 
-// Fonction d'envoi d'email via SMTP ou Resend (fallback)
+// Fonction d'envoi d'email via nodemailer SMTP ou Resend (fallback)
 async function sendEmail(
   to: string,
   subject: string,
@@ -27,57 +27,48 @@ async function sendEmail(
   const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
   const SMTP_FROM = Deno.env.get("SMTP_FROM");
 
-  // Essayer SMTP d'abord
+  // Essayer SMTP d'abord via nodemailer
   if (SMTP_HOST && SMTP_USER && SMTP_PASSWORD) {
-    const parsedPort = SMTP_PORT_RAW ? parseInt(SMTP_PORT_RAW, 10) : NaN;
-    const primaryPort = Number.isFinite(parsedPort) ? parsedPort : 465;
-    const portsToTry = Array.from(new Set([primaryPort, primaryPort === 465 ? 587 : 465]));
+    try {
+      const port = SMTP_PORT_RAW ? parseInt(SMTP_PORT_RAW, 10) : 465;
+      const isSecure = port === 465;
 
-    for (const port of portsToTry) {
-      try {
-        console.log(`Sending email via SMTP (port=${port}) to: ${to}`);
+      console.log(`Sending email via nodemailer SMTP (port=${port}) to: ${to}`);
 
-        const client = new SMTPClient({
-          connection: {
-            hostname: SMTP_HOST,
-            port,
-            // Gmail: 465 = SMTPS (TLS), 587 = STARTTLS
-            tls: port === 465,
-            auth: {
-              username: SMTP_USER,
-              password: SMTP_PASSWORD,
-            },
-          },
-        });
+      const transport = nodemailer.createTransport({
+        host: SMTP_HOST,
+        port: port,
+        secure: isSecure,
+        auth: {
+          user: SMTP_USER,
+          pass: SMTP_PASSWORD,
+        },
+      });
 
-        const fromHeader = (SMTP_FROM || SMTP_USER)?.includes("<")
-          ? (SMTP_FROM || SMTP_USER)!
-          : `BNRM - Bibliothèque Nationale <${SMTP_FROM || SMTP_USER}>`;
+      const fromHeader = (SMTP_FROM || SMTP_USER)?.includes("<")
+        ? (SMTP_FROM || SMTP_USER)!
+        : `BNRM - Bibliothèque Nationale <${SMTP_FROM || SMTP_USER}>`;
 
-        try {
-          await client.send({
-            from: fromHeader,
-            to,
-            subject,
-            content: "auto",
-            html,
-          });
-
-          console.log("Email sent successfully via SMTP");
-          return { success: true };
-        } finally {
-          try {
-            await client.close();
-          } catch {
-            // ignore
+      await new Promise<void>((resolve, reject) => {
+        transport.sendMail({
+          from: fromHeader,
+          to: to,
+          subject: subject,
+          html: html,
+        }, (error: any) => {
+          if (error) {
+            return reject(error);
           }
-        }
-      } catch (error: any) {
-        console.error(`SMTP error on port ${port}:`, error);
-        // Continuer sur l'autre port (465/587) si besoin
-      }
+          resolve();
+        });
+      });
+
+      console.log("Email sent successfully via nodemailer SMTP");
+      return { success: true };
+    } catch (error: any) {
+      console.error("SMTP error:", error);
+      // Continuer vers Resend si SMTP échoue
     }
-    // Continuer vers Resend si SMTP échoue
   }
 
   // Fallback vers Resend
