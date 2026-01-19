@@ -97,8 +97,8 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
   const containerRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const mediaSourceRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const isTranscribingRef = useRef(false);
+  const transcriptionBlockedRef = useRef(false);
 
   // Check if media is audio or video
   const isVideo = documentData.document_type === 'video';
@@ -247,8 +247,23 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
     setIsFullscreen(!isFullscreen);
   };
 
-  // Start transcription with browser Speech Recognition (FREE - captures audio from media element)
+  // Start transcription with browser Speech Recognition (FREE)
   const startTranscription = () => {
+    const isEmbedded = (() => {
+      try {
+        return window.self !== window.top;
+      } catch {
+        return true;
+      }
+    })();
+
+    if (isEmbedded) {
+      toast({
+        title: "Prévisualisation",
+        description: "La transcription micro est souvent bloquée dans l'aperçu Lovable. Ouvrez cette page dans un nouvel onglet pour autoriser le micro.",
+      });
+    }
+
     if (!SpeechRecognition) {
       toast({
         title: "Non supporté",
@@ -258,10 +273,12 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
       return;
     }
 
+    transcriptionBlockedRef.current = false;
+
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = transcriptionLanguage === 'fr' ? 'fr-FR' : 
+    recognition.lang = transcriptionLanguage === 'fr' ? 'fr-FR' :
                        transcriptionLanguage === 'ar' ? 'ar-MA' :
                        transcriptionLanguage === 'en' ? 'en-US' : 'es-ES';
 
@@ -270,24 +287,25 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
 
     recognition.onresult = (event: any) => {
       let finalText = '';
-      
+
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const result = event.results[i];
         if (result.isFinal) {
           finalText += result[0].transcript + ' ';
-          
+
           // Add new segment with timestamp
+          const t = mediaRef.current?.currentTime || 0;
           const newSegment: TranscriptSegment = {
             id: `seg-${Date.now()}-${i}`,
             text: result[0].transcript,
-            startTime: mediaRef.current?.currentTime || 0,
-            endTime: (mediaRef.current?.currentTime || 0) + 5
+            startTime: t,
+            endTime: t + 5,
           };
           currentSegments.push(newSegment);
           setSegments([...currentSegments]);
         }
       }
-      
+
       if (finalText) {
         currentText += finalText;
         setTranscript(currentText);
@@ -295,7 +313,22 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
     };
 
     recognition.onerror = (event: any) => {
-      console.error('Transcription error:', event.error);
+      console.warn('Transcription error:', event.error);
+
+      if (['not-allowed', 'service-not-allowed', 'audio-capture'].includes(event.error)) {
+        transcriptionBlockedRef.current = true;
+        isTranscribingRef.current = false;
+        setIsTranscribing(false);
+        try { recognition.stop(); } catch { /* ignore */ }
+
+        toast({
+          title: "Microphone refusé",
+          description: "Autorisez l'accès au micro dans le navigateur (icône cadenas), puis réessayez. Dans l'aperçu Lovable, ouvrez la page dans un nouvel onglet.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       if (event.error !== 'no-speech') {
         toast({
           title: "Erreur",
@@ -306,27 +339,34 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
     };
 
     recognition.onend = () => {
-      // Restart if still transcribing and media is playing
-      if (isTranscribing && mediaRef.current && !mediaRef.current.paused) {
+      // Restart if still transcribing and media is playing (and not blocked)
+      if (
+        isTranscribingRef.current &&
+        !transcriptionBlockedRef.current &&
+        mediaRef.current &&
+        !mediaRef.current.paused
+      ) {
         try {
           recognition.start();
-        } catch (e) {
-          // Ignore - already started
+        } catch {
+          // ignore
         }
       } else {
+        isTranscribingRef.current = false;
         setIsTranscribing(false);
       }
     };
 
     recognitionRef.current = recognition;
-    
+
     try {
       recognition.start();
+      isTranscribingRef.current = true;
       setIsTranscribing(true);
-      
+
       toast({
         title: "Transcription démarrée",
-        description: "Lancez la lecture et parlez près du micro ou jouez l'audio sur vos haut-parleurs. La reconnaissance vocale écoute votre microphone.",
+        description: "Lancez la lecture et jouez l'audio sur vos haut-parleurs : le navigateur écoutera via le microphone.",
       });
 
       // Start media playback
@@ -335,6 +375,8 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
       }
     } catch (error) {
       console.error('Failed to start recognition:', error);
+      isTranscribingRef.current = false;
+      setIsTranscribing(false);
       toast({
         title: "Erreur",
         description: "Impossible de démarrer la reconnaissance vocale. Vérifiez les permissions du microphone.",
@@ -345,9 +387,13 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
 
   // Stop transcription
   const stopTranscription = () => {
+    isTranscribingRef.current = false;
+    transcriptionBlockedRef.current = false;
+
     if (recognitionRef.current) {
-      recognitionRef.current.stop();
+      try { recognitionRef.current.stop(); } catch { /* ignore */ }
     }
+
     setIsTranscribing(false);
   };
 
@@ -581,7 +627,7 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
               <div className="flex items-center gap-2">
                 {transcript && (
                   <Button variant="ghost" size="icon" onClick={copyTranscript}>
-                    {copiedText ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                    {copiedText ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
                   </Button>
                 )}
                 <Button

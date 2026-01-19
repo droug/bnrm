@@ -474,9 +474,9 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
   return (
     <div className="space-y-6">
       {/* Info Alert */}
-      <Alert className="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800">
-        <Film className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-        <AlertDescription className="text-blue-700 dark:text-blue-300">
+      <Alert>
+        <Film className="h-4 w-4 text-muted-foreground" />
+        <AlertDescription>
           <strong>Formats supportés :</strong> MP4, WebM, MOV, AVI (vidéo) | MP3, WAV, AAC, FLAC, M4A (audio)
         </AlertDescription>
       </Alert>
@@ -708,7 +708,7 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
                       </TableCell>
                       <TableCell>
                         {result.status === 'success' ? (
-                          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+                          <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/10">
                             <CheckCircle2 className="h-3 w-3 mr-1" />
                             OK
                           </Badge>
@@ -724,14 +724,14 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
                       </TableCell>
                       {enableTranscription && (
                         <TableCell className="text-sm">
-                          {result.transcription ? (
-                            <div className="flex items-center gap-1">
-                              <FileText className="h-3 w-3 text-green-600" />
-                              <span className="truncate max-w-32" title={result.transcription}>
-                                {result.transcription}
-                              </span>
-                            </div>
-                          ) : (
+                            {result.transcription ? (
+                              <div className="flex items-center gap-1">
+                                <FileText className="h-3 w-3 text-primary" />
+                                <span className="truncate max-w-32" title={result.transcription}>
+                                  {result.transcription}
+                                </span>
+                              </div>
+                            ) : (
                             <span className="text-muted-foreground">-</span>
                           )}
                         </TableCell>
