@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-import nodemailer from "npm:nodemailer@6.9.10";
+import nodemailer from "npm:nodemailer@6.9.12";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -251,25 +251,19 @@ serve(async (req) => {
         },
       });
 
-      const fromHeader = SMTP_FROM?.includes("<")
-        ? SMTP_FROM
-        : `BNRM - Dépôt Légal <${SMTP_FROM}>`;
+      // Utiliser l'email d'authentification comme expéditeur (requis par Gmail)
+      const fromAddress = SMTP_FROM && SMTP_FROM.includes('@') ? SMTP_FROM : SMTP_USER;
 
-      await new Promise<void>((resolve, reject) => {
-        transport.sendMail({
-          from: fromHeader,
-          to: userEmail!,
-          subject: `Attribution Dépôt Légal - ${request.request_number} - Demande Validée`,
-          html: emailHtml,
-        }, (error: any) => {
-          if (error) {
-            return reject(error);
-          }
-          resolve();
-        });
+      console.log(`[NOTIFY-ATTRIBUTION] Using fromAddress: ${fromAddress}`);
+
+      const info = await transport.sendMail({
+        from: fromAddress,
+        to: userEmail!,
+        subject: `Attribution Dépôt Légal - ${request.request_number} - Demande Validée`,
+        html: emailHtml,
       });
 
-      console.log(`[NOTIFY-ATTRIBUTION] Email sent successfully via nodemailer to ${userEmail}`);
+      console.log(`[NOTIFY-ATTRIBUTION] Email sent successfully via nodemailer to ${userEmail}, messageId: ${info.messageId}`);
 
       return new Response(
         JSON.stringify({
