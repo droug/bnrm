@@ -338,7 +338,7 @@ serve(async (req) => {
         }
       );
     }
-
+  } catch (error: any) {
     console.error("[NOTIFY-ATTRIBUTION] Error:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
