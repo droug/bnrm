@@ -14,6 +14,7 @@ import { DocumentSearchInBook } from "@/components/digital-library/DocumentSearc
 import { SidebarSearchInBook } from "@/components/digital-library/SidebarSearchInBook";
 import { PdfPageRenderer } from "@/components/digital-library/PdfPageRenderer";
 import { ReproductionAuthChoiceModal } from "@/components/digital-library/ReproductionAuthChoiceModal";
+import AudioVideoReader from "@/components/digital-library/reader/AudioVideoReader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -403,6 +404,7 @@ const BookReader = () => {
             publication_year: dlData.publication_year,
             document_type: dlData.document_type,
             pdf_url: dlData.pdf_url,
+            cover_image_url: dlData.cover_image_url,
             excerpt: `Document numérisé - ${pagesCount || 50} pages`,
           });
 
@@ -786,6 +788,30 @@ const BookReader = () => {
     setLanguage(lang as "fr" | "ar" | "en");
     toast.success(`Langue changée: ${lang === "fr" ? "Français" : lang === "ar" ? "العربية" : "English"}`);
   };
+
+  // Check if document is audiovisual type
+  const isAudioVisualDocument = documentData?.document_type === 'audio' || documentData?.document_type === 'video';
+
+  // Render AudioVideoReader for audio/video documents
+  if (isAudioVisualDocument && documentData?.pdf_url) {
+    return (
+      <div className="h-[100dvh] bg-background flex flex-col overflow-hidden">
+        <Header />
+        <AudioVideoReader 
+          documentData={{
+            id: documentData.id,
+            title: documentData.title,
+            author: documentData.author,
+            publication_year: documentData.publication_year,
+            document_type: documentData.document_type as 'audio' | 'video',
+            pdf_url: documentData.pdf_url,
+            cover_image_url: documentData.cover_image_url
+          }}
+          onBack={() => window.history.length > 1 ? navigate(-1) : navigate('/bibliotheque-numerique')}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="h-[100dvh] bg-background flex flex-col overflow-hidden">
