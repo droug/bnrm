@@ -391,11 +391,11 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
 
   return (
     <div ref={containerRef} className={cn(
-      "flex flex-col h-full bg-background",
+      "flex flex-col flex-1 bg-background overflow-auto",
       isFullscreen && "fixed inset-0 z-50"
     )}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b">
+      <div className="flex items-center justify-between p-4 border-b shrink-0">
         <div className="flex items-center gap-3">
           {onBack && (
             <Button variant="ghost" size="icon" onClick={onBack}>
@@ -419,31 +419,29 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
         </div>
       </div>
 
-      {/* Main content */}
-      <div className={cn(
-        "flex-1 grid gap-4 p-4 overflow-hidden",
-        isVideo ? "lg:grid-cols-2" : "lg:grid-cols-1"
-      )}>
-        {/* Media Player */}
-        <Card className="flex flex-col">
-          <CardContent className="flex-1 p-4 flex flex-col">
-            {/* Video element */}
+      {/* Main content - Vertical layout for better video visibility */}
+      <div className="flex-1 flex flex-col gap-4 p-4 overflow-auto">
+        {/* Media Player - Full width */}
+        <Card className="shrink-0">
+          <CardContent className="p-4">
+            {/* Video element - Full width with proper aspect ratio */}
             {isVideo && (
-              <div className="relative flex-1 bg-black rounded-lg overflow-hidden mb-4">
+              <div className="relative w-full bg-black rounded-lg overflow-hidden mb-4" style={{ aspectRatio: '16/9' }}>
                 <video
                   ref={mediaRef as React.RefObject<HTMLVideoElement>}
                   src={documentData.pdf_url}
                   className="w-full h-full object-contain"
                   preload="metadata"
                   poster={documentData.cover_image_url}
+                  controls={false}
                 />
               </div>
             )}
 
             {/* Audio element */}
             {!isVideo && (
-              <div className="flex-1 flex items-center justify-center mb-4">
-                <div className="text-center p-8">
+              <div className="flex items-center justify-center py-8 mb-4">
+                <div className="text-center">
                   <div className="w-32 h-32 mx-auto mb-4 bg-primary/10 rounded-full flex items-center justify-center">
                     <Volume2 className="h-16 w-16 text-primary" />
                   </div>
@@ -542,13 +540,16 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
           </CardContent>
         </Card>
 
-        {/* Transcription Panel */}
-        <Card className="flex flex-col">
+        {/* Transcription Panel - Always visible */}
+        <Card className="shrink-0">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-base flex items-center gap-2">
                 <FileText className="h-4 w-4" />
                 Transcription
+                {!SpeechRecognition && (
+                  <Badge variant="destructive" className="text-xs">Non supporté</Badge>
+                )}
               </CardTitle>
               <div className="flex items-center gap-2">
                 {transcript && (
