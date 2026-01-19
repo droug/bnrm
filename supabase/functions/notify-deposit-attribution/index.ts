@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-import { Resend } from "npm:resend@2.0.0";
+import { SMTPClient } from "https://deno.land/x/denomailer@1.6.0/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -132,143 +132,155 @@ serve(async (req) => {
       });
     }
 
-    // Envoyer l'email via Resend
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    
-    if (RESEND_API_KEY) {
-      const resend = new Resend(RESEND_API_KEY);
-      
-      const emailHtml = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-          <meta charset="UTF-8">
-          <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-            .header { background: linear-gradient(135deg, #002B45 0%, #004d7a 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-            .header h1 { margin: 0; font-size: 24px; }
-            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
-            .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
-            .success-badge { display: inline-block; background: #10b981; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold; margin-bottom: 20px; }
-            .info-box { background: white; padding: 20px; margin: 20px 0; border-left: 4px solid #002B45; border-radius: 4px; }
-            .numbers-box { background: #e8f5e9; padding: 20px; margin: 20px 0; border-left: 4px solid #10b981; border-radius: 4px; }
-            .numbers-box p { margin: 8px 0; }
-            .btn { display: inline-block; padding: 12px 30px; background: #002B45; color: white; text-decoration: none; border-radius: 4px; margin: 20px 0; }
-            .next-steps { background: #fff3cd; padding: 15px; margin: 20px 0; border-radius: 4px; border-left: 4px solid #ffc107; }
-            .next-steps h4 { margin: 0 0 10px 0; color: #856404; }
-            .next-steps ul { margin: 0; padding-left: 20px; }
-          </style>
-        </head>
-        <body>
-          <div class="container">
-            <div class="header">
-              <h1>Bibliothèque Nationale du Royaume du Maroc</h1>
-              <p style="margin: 10px 0 0 0; opacity: 0.9;">Département du Dépôt Légal</p>
-            </div>
-            <div class="content">
-              <div style="text-align: center;">
-                <span class="success-badge">✓ DEMANDE VALIDÉE</span>
-              </div>
-              
-              <h2>Félicitations ${userName} !</h2>
-              
-              <p>Nous avons le plaisir de vous informer que votre demande de dépôt légal a été <strong>validée</strong> et que les numéros d'identification ont été attribués à votre œuvre.</p>
-              
-              <div class="info-box">
-                <p><strong>Titre de l'œuvre:</strong> ${request.title}</p>
-                ${request.subtitle ? `<p><strong>Sous-titre:</strong> ${request.subtitle}</p>` : ''}
-                <p><strong>Numéro de demande:</strong> ${request.request_number}</p>
-                <p><strong>Type de support:</strong> ${request.support_type}</p>
-              </div>
-              
-              <div class="numbers-box">
-                <h3 style="margin: 0 0 15px 0; color: #10b981;">Numéros attribués</h3>
-                ${numbersHtml}
-              </div>
-              
-              <div class="next-steps">
-                <h4>Prochaines étapes</h4>
-                <ul>
-                  <li>Téléchargez votre accusé de réception depuis votre espace personnel</li>
-                  <li>Déposez les exemplaires requis à la BNRM dans un délai de 30 jours</li>
-                  <li>Conservez précieusement les numéros attribués pour vos publications</li>
-                </ul>
-              </div>
-              
-              <p style="text-align: center;">
-                <a href="https://bnrm.lovable.app/my-space" class="btn">Accéder à mon espace</a>
-              </p>
-              
-              <p>Pour toute question, n'hésitez pas à nous contacter.</p>
-              
-              <p>Cordialement,<br><strong>L'équipe du Dépôt Légal - BNRM</strong></p>
-            </div>
-            <div class="footer">
-              <p>Bibliothèque Nationale du Royaume du Maroc<br>
-              Avenue Ibn Khaldoun, Rabat, Maroc<br>
-              Tél: +212 537 77 18 33 | Email: depot.legal@bnrm.ma</p>
-              <p style="margin-top: 10px; font-size: 11px; color: #999;">
-                Ce message a été envoyé automatiquement. Merci de ne pas y répondre directement.
-              </p>
-            </div>
-          </div>
-        </body>
-        </html>
-      `;
+    // Configuration SMTP Gmail
+    const SMTP_HOST = Deno.env.get("SMTP_HOST");
+    const SMTP_PORT = parseInt(Deno.env.get("SMTP_PORT") || "587");
+    const SMTP_USER = Deno.env.get("SMTP_USER");
+    const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
+    const SMTP_FROM = Deno.env.get("SMTP_FROM") || SMTP_USER;
 
-      const { data, error: emailError } = await resend.emails.send({
-        from: "BNRM Dépôt Légal <onboarding@resend.dev>",
-        to: [userEmail],
-        subject: `Attribution Dépôt Légal - ${request.request_number} - Demande Validée`,
-        html: emailHtml,
-      });
+    console.log(`[NOTIFY-ATTRIBUTION] SMTP Config - Host: ${SMTP_HOST}, Port: ${SMTP_PORT}, User: ${SMTP_USER}, From: ${SMTP_FROM}`);
 
-      // Vérifier explicitement si data est null ou si error existe
-      if (emailError || !data) {
-        console.error(`[NOTIFY-ATTRIBUTION] Email error:`, emailError);
-        const errorMessage = emailError?.message || "Erreur inconnue lors de l'envoi";
-        const isDomainError = errorMessage.includes("verify a domain") || errorMessage.includes("testing emails");
-        
-        return new Response(
-          JSON.stringify({ 
-            success: false, 
-            emailSent: false,
-            message: isDomainError 
-              ? "Domaine non vérifié sur Resend - veuillez vérifier un domaine ou tester avec useryouness@gmail.com" 
-              : `Email non envoyé: ${errorMessage}`,
-            error: emailError,
-            recipient: userEmail
-          }),
-          {
-            status: 200,
-            headers: { ...corsHeaders, "Content-Type": "application/json" },
-          }
-        );
-      }
-
-      console.log(`[NOTIFY-ATTRIBUTION] Email sent successfully to ${userEmail}, id:`, data.id);
-      
+    if (!SMTP_HOST || !SMTP_USER || !SMTP_PASSWORD) {
+      console.warn("[NOTIFY-ATTRIBUTION] SMTP not configured");
       return new Response(
         JSON.stringify({ 
           success: true, 
-          emailSent: true,
-          message: "Notification envoyée avec succès",
-          recipient: userEmail,
-          emailId: data.id
+          emailSent: false,
+          message: "Notification enregistrée (SMTP non configuré)",
+          recipient: userEmail
         }),
         {
           status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );
-    } else {
-      console.warn("[NOTIFY-ATTRIBUTION] RESEND_API_KEY not configured, email not sent");
+    }
+
+    const emailHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <style>
+          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+          .header { background: linear-gradient(135deg, #002B45 0%, #004d7a 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+          .header h1 { margin: 0; font-size: 24px; }
+          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
+          .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+          .success-badge { display: inline-block; background: #10b981; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold; margin-bottom: 20px; }
+          .info-box { background: white; padding: 20px; margin: 20px 0; border-left: 4px solid #002B45; border-radius: 4px; }
+          .numbers-box { background: #e8f5e9; padding: 20px; margin: 20px 0; border-left: 4px solid #10b981; border-radius: 4px; }
+          .numbers-box p { margin: 8px 0; }
+          .btn { display: inline-block; padding: 12px 30px; background: #002B45; color: white; text-decoration: none; border-radius: 4px; margin: 20px 0; }
+          .next-steps { background: #fff3cd; padding: 15px; margin: 20px 0; border-radius: 4px; border-left: 4px solid #ffc107; }
+          .next-steps h4 { margin: 0 0 10px 0; color: #856404; }
+          .next-steps ul { margin: 0; padding-left: 20px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>Bibliothèque Nationale du Royaume du Maroc</h1>
+            <p style="margin: 10px 0 0 0; opacity: 0.9;">Département du Dépôt Légal</p>
+          </div>
+          <div class="content">
+            <div style="text-align: center;">
+              <span class="success-badge">✓ DEMANDE VALIDÉE</span>
+            </div>
+            
+            <h2>Félicitations ${userName} !</h2>
+            
+            <p>Nous avons le plaisir de vous informer que votre demande de dépôt légal a été <strong>validée</strong> et que les numéros d'identification ont été attribués à votre œuvre.</p>
+            
+            <div class="info-box">
+              <p><strong>Titre de l'œuvre:</strong> ${request.title}</p>
+              ${request.subtitle ? `<p><strong>Sous-titre:</strong> ${request.subtitle}</p>` : ''}
+              <p><strong>Numéro de demande:</strong> ${request.request_number}</p>
+              <p><strong>Type de support:</strong> ${request.support_type}</p>
+            </div>
+            
+            <div class="numbers-box">
+              <h3 style="margin: 0 0 15px 0; color: #10b981;">Numéros attribués</h3>
+              ${numbersHtml}
+            </div>
+            
+            <div class="next-steps">
+              <h4>Prochaines étapes</h4>
+              <ul>
+                <li>Téléchargez votre accusé de réception depuis votre espace personnel</li>
+                <li>Déposez les exemplaires requis à la BNRM dans un délai de 30 jours</li>
+                <li>Conservez précieusement les numéros attribués pour vos publications</li>
+              </ul>
+            </div>
+            
+            <p style="text-align: center;">
+              <a href="https://bnrm.lovable.app/my-space" class="btn">Accéder à mon espace</a>
+            </p>
+            
+            <p>Pour toute question, n'hésitez pas à nous contacter.</p>
+            
+            <p>Cordialement,<br><strong>L'équipe du Dépôt Légal - BNRM</strong></p>
+          </div>
+          <div class="footer">
+            <p>Bibliothèque Nationale du Royaume du Maroc<br>
+            Avenue Ibn Khaldoun, Rabat, Maroc<br>
+            Tél: +212 537 77 18 33 | Email: depot.legal@bnrm.ma</p>
+            <p style="margin-top: 10px; font-size: 11px; color: #999;">
+              Ce message a été envoyé automatiquement. Merci de ne pas y répondre directement.
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `;
+
+    try {
+      const client = new SMTPClient({
+        connection: {
+          hostname: SMTP_HOST,
+          port: SMTP_PORT,
+          tls: true,
+          auth: {
+            username: SMTP_USER,
+            password: SMTP_PASSWORD,
+          },
+        },
+      });
+
+      await client.send({
+        from: SMTP_FROM!,
+        to: userEmail,
+        subject: `Attribution Dépôt Légal - ${request.request_number} - Demande Validée`,
+        html: emailHtml,
+      });
+
+      await client.close();
+
+      console.log(`[NOTIFY-ATTRIBUTION] Email sent successfully via SMTP to ${userEmail}`);
+      
       return new Response(
         JSON.stringify({ 
           success: true, 
+          emailSent: true,
+          message: "Notification envoyée avec succès via SMTP Gmail",
+          recipient: userEmail
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    } catch (smtpError: any) {
+      console.error("[NOTIFY-ATTRIBUTION] SMTP error:", smtpError);
+      
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
           emailSent: false,
-          message: "Notification enregistrée (email non configuré)",
+          message: `Erreur SMTP: ${smtpError.message}`,
+          error: smtpError.message,
           recipient: userEmail
         }),
         {
