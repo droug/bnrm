@@ -7,7 +7,8 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Bell, Save, Loader2, Mail, Smartphone, MonitorSpeaker, Users, FileText, CreditCard, CheckCircle, XCircle, Hash, Package, ClipboardCheck, UserPlus, Settings, AlertTriangle, FileEdit, Eye, RotateCcw } from "lucide-react";
+import { Bell, Save, Loader2, Mail, Smartphone, MonitorSpeaker, Users, FileText, CreditCard, CheckCircle, XCircle, Hash, Package, ClipboardCheck, UserPlus, Settings, AlertTriangle, FileEdit, Eye, RotateCcw, ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
@@ -636,6 +637,22 @@ export function BNRMPaymentNotificationSettings() {
         <CardDescription>
           Configurez les notifications automatiques par canal (Email, Système, SMS) pour toutes les actions du système
         </CardDescription>
+        
+        {/* Info: lien vers la configuration SMTP */}
+        <Alert className="mt-4 bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800">
+          <Mail className="h-4 w-4 text-blue-600" />
+          <AlertDescription className="text-blue-700 dark:text-blue-300">
+            <span className="font-medium">Configuration du serveur SMTP :</span>{" "}
+            Les notifications par email utilisent la configuration définie dans{" "}
+            <Link 
+              to="/admin/settings" 
+              className="inline-flex items-center gap-1 font-medium underline hover:text-blue-800 dark:hover:text-blue-200"
+            >
+              Paramètres système → Configuration Notification Mail
+              <ExternalLink className="h-3 w-3" />
+            </Link>
+          </AlertDescription>
+        </Alert>
       </CardHeader>
       <CardContent>
         {/* Dialog pour éditer un template */}
