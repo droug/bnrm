@@ -27,6 +27,7 @@ const TESSERACT_LANG_MAP: Record<string, string> = {
   'ar': 'ara',
   'fr': 'fra',
   'en': 'eng',
+  'lat': 'lat',
   'mixed': 'ara+fra+eng'
 };
 
@@ -350,6 +351,7 @@ export default function PdfOcrTool() {
                 <SelectItem value="ar">Arabe</SelectItem>
                 <SelectItem value="fr">Français</SelectItem>
                 <SelectItem value="en">Anglais</SelectItem>
+                <SelectItem value="lat">Latin</SelectItem>
                 <SelectItem value="mixed">Mixte (AR+FR+EN)</SelectItem>
               </SelectContent>
             </Select>

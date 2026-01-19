@@ -39,6 +39,7 @@ const TESSERACT_LANG_MAP: Record<string, string> = {
   ar: "ara",
   fr: "fra",
   en: "eng",
+  lat: "lat",
   mixed: "ara+fra+eng",
 };
 
@@ -529,6 +530,18 @@ export default function OcrImportTool() {
                           <span className="flex items-center gap-2">
                             <Languages className="h-4 w-4" />
                             Français
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="en">
+                          <span className="flex items-center gap-2">
+                            <Languages className="h-4 w-4" />
+                            Anglais
+                          </span>
+                        </SelectItem>
+                        <SelectItem value="lat">
+                          <span className="flex items-center gap-2">
+                            <Languages className="h-4 w-4" />
+                            Latin
                           </span>
                         </SelectItem>
                         <SelectItem value="mixed">

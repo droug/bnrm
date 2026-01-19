@@ -272,6 +272,7 @@ export default function SingleDocumentImport({ onSuccess }: SingleDocumentImport
                       <SelectItem value="fr">Français</SelectItem>
                       <SelectItem value="ar">Arabe</SelectItem>
                       <SelectItem value="en">Anglais</SelectItem>
+                      <SelectItem value="lat">Latin</SelectItem>
                       <SelectItem value="es">Espagnol</SelectItem>
                       <SelectItem value="multi">Multilingue</SelectItem>
                     </SelectContent>

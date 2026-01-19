@@ -1007,6 +1007,7 @@ export default function BulkImportModal({ open, onOpenChange, onSuccess }: BulkI
                             <SelectItem value="fra">Français</SelectItem>
                             <SelectItem value="ara">Arabe</SelectItem>
                             <SelectItem value="eng">Anglais</SelectItem>
+                            <SelectItem value="lat">Latin</SelectItem>
                             <SelectItem value="fra+ara">Français + Arabe</SelectItem>
                             <SelectItem value="fra+eng">Français + Anglais</SelectItem>
                             <SelectItem value="ara+eng">Arabe + Anglais</SelectItem>
