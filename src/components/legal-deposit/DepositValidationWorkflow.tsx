@@ -532,7 +532,7 @@ export function DepositValidationWorkflow() {
           updateData.validated_by_department = user!.id;
           updateData.department_validated_at = new Date().toISOString();
           updateData.department_validation_notes = comments || null;
-          updateData.status = "valide_par_b";
+          updateData.status = "attribue";
         }
       } else {
         updateData.rejected_by = user!.id;
@@ -555,6 +555,22 @@ export function DepositValidationWorkflow() {
 
       if (error) throw error;
 
+      // Envoyer une notification d'attribution si validation finale (department)
+      if (status === "approved" && validationType === "department") {
+        try {
+          const { error: notifError } = await supabase.functions.invoke('notify-deposit-attribution', {
+            body: { requestId }
+          });
+          if (notifError) {
+            console.error("Error sending attribution notification:", notifError);
+          } else {
+            console.log("Attribution notification sent successfully");
+          }
+        } catch (notifError) {
+          console.error("Error invoking notify-deposit-attribution:", notifError);
+        }
+      }
+
       // Générer le document approprié selon le type d'approbation (seulement pour le rejet)
       if (status === "rejected") {
         await generateRejectionLetter(selectedRequest!);
@@ -563,7 +579,7 @@ export function DepositValidationWorkflow() {
 
       toast({
         title: "Succès",
-        description: `Demande ${status === "approved" ? "approuvée" : "rejetée"} avec succès`,
+        description: `Demande ${status === "approved" ? "approuvée" : "rejetée"} avec succès${status === "approved" && validationType === "department" ? " - Notification envoyée au demandeur" : ""}`,
       });
 
       setSelectedRequest(null);
