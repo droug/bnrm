@@ -41,8 +41,13 @@ export default function CollectionDetails() {
   const collectionInfo: Record<string, any> = {
     books: { 
       title: "Livres", 
-      description: "Ouvrages numérisés sur le patrimoine marocain, littérature classique et contemporaine",
+      description: "Ouvrages imprimés sur le patrimoine marocain, littérature classique et contemporaine",
       icon: "📚"
+    },
+    lithography: { 
+      title: "Lithographie", 
+      description: "Lithographies anciennes et ouvrages imprimés par technique lithographique",
+      icon: "🖼️"
     },
     periodicals: { 
       title: "Revues et journaux", 
@@ -56,8 +61,8 @@ export default function CollectionDetails() {
     },
     photos: { 
       title: "Collections spécialisées", 
-      description: "Collections de photographies historiques, cartes anciennes et lithographies",
-      icon: "🖼️"
+      description: "Collections de photographies historiques et cartes anciennes",
+      icon: "🗺️"
     },
     audiovisual: { 
       title: "Audio-visuel", 
