@@ -217,20 +217,27 @@ serve(async (req) => {
         </html>
       `;
 
-      const emailResult = await resend.emails.send({
+      const { data, error: emailError } = await resend.emails.send({
         from: "BNRM Dépôt Légal <onboarding@resend.dev>",
         to: [userEmail],
         subject: `Attribution Dépôt Légal - ${request.request_number} - Demande Validée`,
         html: emailHtml,
       });
 
-      if (emailResult.error) {
-        console.error(`[NOTIFY-ATTRIBUTION] Email error:`, emailResult.error);
+      // Vérifier explicitement si data est null ou si error existe
+      if (emailError || !data) {
+        console.error(`[NOTIFY-ATTRIBUTION] Email error:`, emailError);
+        const errorMessage = emailError?.message || "Erreur inconnue lors de l'envoi";
+        const isDomainError = errorMessage.includes("verify a domain") || errorMessage.includes("testing emails");
+        
         return new Response(
           JSON.stringify({ 
             success: false, 
-            message: `Email non envoyé: ${emailResult.error.message}`,
-            error: emailResult.error,
+            emailSent: false,
+            message: isDomainError 
+              ? "Domaine non vérifié sur Resend - veuillez vérifier un domaine ou tester avec useryouness@gmail.com" 
+              : `Email non envoyé: ${errorMessage}`,
+            error: emailError,
             recipient: userEmail
           }),
           {
@@ -240,14 +247,15 @@ serve(async (req) => {
         );
       }
 
-      console.log(`[NOTIFY-ATTRIBUTION] Email sent successfully to ${userEmail}:`, emailResult);
+      console.log(`[NOTIFY-ATTRIBUTION] Email sent successfully to ${userEmail}, id:`, data.id);
       
       return new Response(
         JSON.stringify({ 
           success: true, 
           emailSent: true,
           message: "Notification envoyée avec succès",
-          recipient: userEmail
+          recipient: userEmail,
+          emailId: data.id
         }),
         {
           status: 200,
