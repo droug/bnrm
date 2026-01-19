@@ -11,6 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { 
   Upload, 
   Video, 
@@ -21,7 +22,9 @@ import {
   Loader2,
   FileDown,
   Trash2,
-  Film
+  Film,
+  Mic,
+  FileText
 } from "lucide-react";
 import * as XLSX from 'xlsx';
 
@@ -32,11 +35,14 @@ interface ImportResult {
   message: string;
   mediaType?: string;
   duration?: string;
+  transcription?: string;
 }
 
 interface BulkAudiovisualImportProps {
   onSuccess?: () => void;
 }
+
+const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
 const ACCEPTED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/ogg', 'video/quicktime', 'video/x-msvideo'];
 const ACCEPTED_AUDIO_TYPES = ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/mp4', 'audio/aac', 'audio/flac'];
@@ -66,8 +72,16 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentFile, setCurrentFile] = useState<string>("");
+  const [currentStep, setCurrentStep] = useState<string>("");
   const [results, setResults] = useState<ImportResult[]>([]);
   const [defaultMediaType, setDefaultMediaType] = useState<string>("video");
+  
+  // Transcription options
+  const [enableTranscription, setEnableTranscription] = useState(false);
+  const [transcriptionLanguage, setTranscriptionLanguage] = useState("fr");
+  const [isTranscribing, setIsTranscribing] = useState(false);
+
+  const speechRecognitionSupported = !!SpeechRecognition;
 
   const handleFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const pickedFiles = Array.from(e.target.files || []);
@@ -109,6 +123,101 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
   const clearAllFiles = () => {
     setMediaFiles([]);
     setResults([]);
+  };
+
+  // Transcribe audio/video using Web Speech API (FREE)
+  const transcribeMedia = (file: File): Promise<string> => {
+    return new Promise((resolve) => {
+      if (!SpeechRecognition) {
+        resolve('');
+        return;
+      }
+
+      const mediaType = getMediaTypeFromMime(file.type) || 
+        (['mp3', 'wav', 'aac', 'flac', 'm4a'].includes(getFileExtension(file.name)) ? 'audio' : 'video');
+
+      // Create media element
+      const element = document.createElement(mediaType) as HTMLMediaElement;
+      element.preload = 'auto';
+      element.src = URL.createObjectURL(file);
+      element.muted = false;
+      element.volume = 0.1; // Low volume to not disturb
+
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = false;
+      recognition.lang = transcriptionLanguage === 'fr' ? 'fr-FR' : 
+                         transcriptionLanguage === 'ar' ? 'ar-MA' :
+                         transcriptionLanguage === 'en' ? 'en-US' : 'es-ES';
+
+      let transcript = '';
+      let timeoutId: any;
+
+      recognition.onresult = (event: any) => {
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          if (event.results[i].isFinal) {
+            transcript += event.results[i][0].transcript + ' ';
+          }
+        }
+      };
+
+      recognition.onerror = (event: any) => {
+        console.log('Recognition error:', event.error);
+        // Continue even on errors like 'no-speech'
+      };
+
+      recognition.onend = () => {
+        // Restart if media is still playing
+        if (!element.paused && !element.ended) {
+          try {
+            recognition.start();
+          } catch (e) {
+            // Ignore
+          }
+        }
+      };
+
+      element.onloadedmetadata = () => {
+        const duration = element.duration;
+        
+        // Set a timeout based on media duration (max 2 minutes for transcription)
+        const maxTranscriptionTime = Math.min(duration * 1000, 120000);
+        
+        timeoutId = setTimeout(() => {
+          element.pause();
+          recognition.stop();
+          URL.revokeObjectURL(element.src);
+          resolve(transcript.trim());
+        }, maxTranscriptionTime + 5000);
+
+        // Start playback and recognition
+        element.play().then(() => {
+          try {
+            recognition.start();
+          } catch (e) {
+            console.error('Failed to start recognition:', e);
+          }
+        }).catch(err => {
+          console.error('Failed to play media:', err);
+          clearTimeout(timeoutId);
+          URL.revokeObjectURL(element.src);
+          resolve('');
+        });
+      };
+
+      element.onended = () => {
+        clearTimeout(timeoutId);
+        recognition.stop();
+        URL.revokeObjectURL(element.src);
+        resolve(transcript.trim());
+      };
+
+      element.onerror = () => {
+        clearTimeout(timeoutId);
+        URL.revokeObjectURL(element.src);
+        resolve('');
+      };
+    });
   };
 
   const getMediaDuration = (file: File): Promise<string> => {
@@ -156,6 +265,7 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
 
       try {
         // Get media duration
+        setCurrentStep("Analyse de la durée...");
         const duration = await getMediaDuration(file);
         
         // Determine media type
@@ -164,7 +274,20 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
         
         const documentType = detectedType === 'audio' ? 'audio' : 'video';
 
+        // Transcription (if enabled)
+        let transcription = '';
+        if (enableTranscription && speechRecognitionSupported) {
+          setCurrentStep("Transcription en cours...");
+          setIsTranscribing(true);
+          transcription = await transcribeMedia(file);
+          setIsTranscribing(false);
+        }
+
+        // Upload file
+        setCurrentStep("Téléversement...");
+
         // Sanitize filename for storage
+        setCurrentStep("Enregistrement...");
         const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
         const storagePath = `audiovisual/${Date.now()}-${sanitizedFileName}`;
         
@@ -215,13 +338,38 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
 
         if (docError) throw docError;
 
+        // Save transcription as OCR page if available
+        if (transcription) {
+          const { data: docData } = await supabase
+            .from('digital_library_documents')
+            .select('id')
+            .eq('cbn_document_id', newCbn.id)
+            .single();
+
+          if (docData) {
+            await supabase
+              .from('digital_library_pages')
+              .insert({
+                document_id: docData.id,
+                page_number: 1,
+                ocr_text: transcription
+              });
+
+            await supabase
+              .from('digital_library_documents')
+              .update({ ocr_processed: true })
+              .eq('id', docData.id);
+          }
+        }
+
         importResults.push({
           fileName,
           title: baseName,
           status: 'success',
-          message: `Importé avec succès (${duration})`,
+          message: transcription ? `Importé avec transcription (${duration})` : `Importé avec succès (${duration})`,
           mediaType: documentType,
           duration,
+          transcription: transcription ? transcription.substring(0, 100) + (transcription.length > 100 ? '...' : '') : undefined,
         });
 
       } catch (error: any) {
@@ -238,6 +386,9 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
     setProgress(100);
     setResults(importResults);
     setIsProcessing(false);
+    setIsTranscribing(false);
+    setCurrentFile("");
+    setCurrentStep("");
     setCurrentFile("");
 
     const successCount = importResults.filter(r => r.status === 'success').length;
@@ -266,6 +417,7 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
       'Durée': r.duration || '-',
       'Statut': r.status === 'success' ? 'Succès' : 'Erreur',
       'Message': r.message,
+      'Transcription': r.transcription || '-',
     })));
 
     const wb = XLSX.utils.book_new();
@@ -286,12 +438,71 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
   return (
     <div className="space-y-6">
       {/* Info Alert */}
-      <Alert className="bg-blue-50 border-blue-200">
-        <Film className="h-4 w-4 text-blue-600" />
-        <AlertDescription className="text-blue-700">
+      <Alert className="bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800">
+        <Film className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+        <AlertDescription className="text-blue-700 dark:text-blue-300">
           <strong>Formats supportés :</strong> MP4, WebM, MOV, AVI (vidéo) | MP3, WAV, AAC, FLAC, M4A (audio)
         </AlertDescription>
       </Alert>
+
+      {/* Transcription Options */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Mic className="h-5 w-5" />
+            Options de transcription
+          </CardTitle>
+          <CardDescription>
+            Transcription automatique gratuite via la reconnaissance vocale du navigateur
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label htmlFor="enable-transcription" className="text-base">
+                Activer la transcription automatique
+              </Label>
+              <p className="text-sm text-muted-foreground">
+                {speechRecognitionSupported 
+                  ? "Le fichier sera lu et transcrit pendant l'import (max 2 min par fichier)"
+                  : "Non supporté par ce navigateur (utilisez Chrome, Edge ou Safari)"}
+              </p>
+            </div>
+            <Switch
+              id="enable-transcription"
+              checked={enableTranscription}
+              onCheckedChange={setEnableTranscription}
+              disabled={!speechRecognitionSupported}
+            />
+          </div>
+
+          {enableTranscription && (
+            <div className="flex items-center gap-4 pt-2 border-t">
+              <Label htmlFor="transcription-language" className="shrink-0">Langue :</Label>
+              <Select value={transcriptionLanguage} onValueChange={setTranscriptionLanguage}>
+                <SelectTrigger id="transcription-language" className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="fr">Français</SelectItem>
+                  <SelectItem value="ar">العربية</SelectItem>
+                  <SelectItem value="en">English</SelectItem>
+                  <SelectItem value="es">Español</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {!speechRecognitionSupported && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>
+                La transcription automatique nécessite Chrome, Edge ou Safari.
+              </AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Upload Zone */}
       <Card>
@@ -372,9 +583,20 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
           {isProcessing && (
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="truncate">{currentFile || "Import en cours..."}</span>
-                <span>{progress}%</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="truncate">{currentFile || "Import en cours..."}</span>
+                  {isTranscribing && (
+                    <Badge variant="secondary" className="animate-pulse shrink-0">
+                      <Mic className="h-3 w-3 mr-1" />
+                      Transcription
+                    </Badge>
+                  )}
+                </div>
+                <span className="shrink-0">{progress}%</span>
               </div>
+              {currentStep && (
+                <p className="text-xs text-muted-foreground">{currentStep}</p>
+              )}
               <Progress value={progress} />
             </div>
           )}
@@ -425,6 +647,7 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
                     <TableHead className="w-20">Durée</TableHead>
                     <TableHead className="w-24">Statut</TableHead>
                     <TableHead>Message</TableHead>
+                    {enableTranscription && <TableHead className="w-40">Transcription</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -463,6 +686,20 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
                       <TableCell className="text-sm text-muted-foreground">
                         {result.message}
                       </TableCell>
+                      {enableTranscription && (
+                        <TableCell className="text-sm">
+                          {result.transcription ? (
+                            <div className="flex items-center gap-1">
+                              <FileText className="h-3 w-3 text-green-600" />
+                              <span className="truncate max-w-32" title={result.transcription}>
+                                {result.transcription}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
+                          )}
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>
