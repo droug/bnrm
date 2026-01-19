@@ -1,4 +1,4 @@
-// Force cache regeneration: v4 - 2026-01-18
+// Force cache regeneration: v5 - 2026-01-19
 import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
