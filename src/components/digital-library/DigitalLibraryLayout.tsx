@@ -335,7 +335,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                             <span className="text-xs text-muted-foreground">{t(item.descKey)}</span>
                           </div>
                         </div>
-                        <span className={`px-3 py-1 text-xs font-bold rounded-sm transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-0 ${badgeStyles[index % badgeStyles.length]}`}>
+                        <span className={`px-3 py-1 text-xs font-bold rounded-none transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-0 ${badgeStyles[index % badgeStyles.length]}`}>
                           {item.count}
                         </span>
                       </DropdownMenuItem>
