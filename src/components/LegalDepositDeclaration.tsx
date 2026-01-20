@@ -40,6 +40,7 @@ import { PublisherAutocomplete } from "@/components/ui/publisher-autocomplete";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { PrinterInlineForm } from "@/components/legal-deposit/PrinterInlineForm";
+import { EditorInlineForm } from "@/components/legal-deposit/EditorInlineForm";
 
 interface Publisher {
   id: string;
@@ -155,6 +156,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
   const [publisherNature, setPublisherNature] = useState<string>("");
   const [editorIdentification, setEditorIdentification] = useState<string>("");
   const [selectedPublisher, setSelectedPublisher] = useState<Publisher | null>(null);
+  const [showEditorInlineForm, setShowEditorInlineForm] = useState(false);
   const [publicationDate, setPublicationDate] = useState<Date>();
   const [publicationDateInput, setPublicationDateInput] = useState<string>("");
   const [showCalendar, setShowCalendar] = useState<boolean>(false);
@@ -1080,7 +1082,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                             ))}
                           {publishers.filter(pub => 
                             pub.name.toLowerCase().includes(publisherSearch.toLowerCase())
-                          ).length === 0 && (
+                          ).length === 0 && !showEditorInlineForm && (
                             <div className="px-4 py-3">
                               <div className="text-sm text-muted-foreground mb-2">
                                 Aucun éditeur trouvé
@@ -1090,27 +1092,23 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                                 variant="outline"
                                 size="sm"
                                 className="w-full"
-                                onClick={async () => {
-                                  const newName = publisherSearch;
-                                  const { data, error } = await supabase
-                                    .from('publishers')
-                                    .insert([{ name: newName }])
-                                    .select('id, name, city, country, publisher_type, address, phone, email, google_maps_link')
-                                    .single();
-                                  
-                                  if (error) {
-                                    toast.error('Erreur lors de l\'ajout de l\'éditeur');
-                                  } else if (data) {
-                                    setPublishers([...publishers, data as unknown as Publisher]);
-                                    setSelectedPublisher(data as unknown as Publisher);
-                                    setPublisherSearch('');
-                                    toast.success('Éditeur ajouté avec succès');
-                                  }
-                                }}
+                                onClick={() => setShowEditorInlineForm(true)}
                               >
-                                + Ajouter "{publisherSearch}"
+                                + Ajouter un éditeur avec invitation
                               </Button>
                             </div>
+                          )}
+                          {showEditorInlineForm && (
+                            <EditorInlineForm
+                              initialName={publisherSearch}
+                              onEditorAdded={(editor) => {
+                                setPublishers([...publishers, editor]);
+                                setSelectedPublisher(editor);
+                                setPublisherSearch('');
+                                setShowEditorInlineForm(false);
+                              }}
+                              onCancel={() => setShowEditorInlineForm(false)}
+                            />
                           )}
                         </div>
                       )}
@@ -1735,7 +1733,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                             ))}
                           {publishers.filter(pub => 
                             pub.name.toLowerCase().includes(publisherSearch.toLowerCase())
-                          ).length === 0 && (
+                          ).length === 0 && !showEditorInlineForm && (
                             <div className="px-4 py-3">
                               <div className="text-sm text-muted-foreground mb-2">
                                 Aucun éditeur trouvé
@@ -1745,27 +1743,23 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                                 variant="outline"
                                 size="sm"
                                 className="w-full"
-                                onClick={async () => {
-                                  const newName = publisherSearch;
-                                  const { data, error } = await supabase
-                                    .from('publishers')
-                                    .insert([{ name: newName }])
-                                    .select('id, name, city, country, publisher_type, address, phone, email, google_maps_link')
-                                    .single();
-                                  
-                                  if (error) {
-                                    toast.error('Erreur lors de l\'ajout de l\'éditeur');
-                                  } else if (data) {
-                                    setPublishers([...publishers, data as unknown as Publisher]);
-                                    setSelectedPublisher(data as unknown as Publisher);
-                                    setPublisherSearch('');
-                                    toast.success('Éditeur ajouté avec succès');
-                                  }
-                                }}
+                                onClick={() => setShowEditorInlineForm(true)}
                               >
-                                + Ajouter "{publisherSearch}"
+                                + Ajouter un éditeur avec invitation
                               </Button>
                             </div>
+                          )}
+                          {showEditorInlineForm && (
+                            <EditorInlineForm
+                              initialName={publisherSearch}
+                              onEditorAdded={(editor) => {
+                                setPublishers([...publishers, editor]);
+                                setSelectedPublisher(editor);
+                                setPublisherSearch('');
+                                setShowEditorInlineForm(false);
+                              }}
+                              onCancel={() => setShowEditorInlineForm(false)}
+                            />
                           )}
                         </div>
                       )}
@@ -3198,7 +3192,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                             ))}
                           {publishers.filter(pub => 
                             pub.name.toLowerCase().includes(publisherSearch.toLowerCase())
-                          ).length === 0 && (
+                          ).length === 0 && !showEditorInlineForm && (
                             <div className="px-4 py-3">
                               <div className="text-sm text-muted-foreground mb-2">
                                 Aucun éditeur trouvé
@@ -3208,27 +3202,23 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                                 variant="outline"
                                 size="sm"
                                 className="w-full"
-                                onClick={async () => {
-                                  const newName = publisherSearch;
-                                  const { data, error } = await supabase
-                                    .from('publishers')
-                                    .insert([{ name: newName }])
-                                    .select('id, name, city, country, publisher_type, address, phone, email, google_maps_link')
-                                    .single();
-                                  
-                                  if (error) {
-                                    toast.error('Erreur lors de l\'ajout de l\'éditeur');
-                                  } else if (data) {
-                                    setPublishers([...publishers, data as unknown as Publisher]);
-                                    setSelectedPublisher(data as unknown as Publisher);
-                                    setPublisherSearch('');
-                                    toast.success('Éditeur ajouté avec succès');
-                                  }
-                                }}
+                                onClick={() => setShowEditorInlineForm(true)}
                               >
-                                + Ajouter "{publisherSearch}"
+                                + Ajouter un éditeur avec invitation
                               </Button>
                             </div>
+                          )}
+                          {showEditorInlineForm && (
+                            <EditorInlineForm
+                              initialName={publisherSearch}
+                              onEditorAdded={(editor) => {
+                                setPublishers([...publishers, editor]);
+                                setSelectedPublisher(editor);
+                                setPublisherSearch('');
+                                setShowEditorInlineForm(false);
+                              }}
+                              onCancel={() => setShowEditorInlineForm(false)}
+                            />
                           )}
                         </div>
                       )}
