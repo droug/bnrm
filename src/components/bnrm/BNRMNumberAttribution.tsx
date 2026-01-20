@@ -186,11 +186,12 @@ export const BNRMNumberAttribution = () => {
     try {
       setLoading(true);
       
-      // Fetch all validated requests (valide_par_b) - plus récentes en premier
+      // Fetch all validated requests (valide_par_b et valide_par_comite) - plus récentes en premier
+      // Les demandes validées dans "Gestion des Demandes" > "Validés" apparaissent ici
       const { data: validatedRequests, error: validatedError } = await supabase
         .from("legal_deposit_requests")
         .select("*")
-        .eq("status", "valide_par_b")
+        .in("status", ["valide_par_b", "valide_par_comite"])
         .order("created_at", { ascending: false });
 
       if (validatedError) {
