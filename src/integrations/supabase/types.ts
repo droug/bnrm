@@ -3673,6 +3673,72 @@ export type Database = {
           },
         ]
       }
+      deposit_confirmation_tokens: {
+        Row: {
+          confirmed_at: string | null
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          ip_address: unknown
+          party_type: string
+          rejected_at: string | null
+          rejection_reason: string | null
+          request_id: string
+          status: Database["public"]["Enums"]["confirmation_status"]
+          token: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          confirmed_at?: string | null
+          created_at?: string
+          email: string
+          expires_at?: string
+          id?: string
+          ip_address?: unknown
+          party_type: string
+          rejected_at?: string | null
+          rejection_reason?: string | null
+          request_id: string
+          status?: Database["public"]["Enums"]["confirmation_status"]
+          token?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          confirmed_at?: string | null
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          ip_address?: unknown
+          party_type?: string
+          rejected_at?: string | null
+          rejection_reason?: string | null
+          request_id?: string
+          status?: Database["public"]["Enums"]["confirmation_status"]
+          token?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deposit_confirmation_tokens_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "kitab_publications"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deposit_confirmation_tokens_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "legal_deposit_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deposit_notifications: {
         Row: {
           id: string
@@ -6639,11 +6705,14 @@ export type Database = {
           collaborator_id: string | null
           committee_validated_at: string | null
           committee_validation_notes: string | null
+          confirmation_status: string | null
           created_at: string | null
           department_validated_at: string | null
           department_validation_notes: string | null
           dl_number: string | null
           documents_urls: Json | null
+          editor_confirmation_at: string | null
+          editor_confirmed: boolean | null
           id: string
           initiator_id: string
           isbn: string | null
@@ -6657,6 +6726,8 @@ export type Database = {
           metadata: Json | null
           monograph_type: Database["public"]["Enums"]["monograph_type"]
           page_count: number | null
+          printer_confirmation_at: string | null
+          printer_confirmed: boolean | null
           processing_start_date: string | null
           publication_date: string | null
           publication_status: string | null
@@ -6687,11 +6758,14 @@ export type Database = {
           collaborator_id?: string | null
           committee_validated_at?: string | null
           committee_validation_notes?: string | null
+          confirmation_status?: string | null
           created_at?: string | null
           department_validated_at?: string | null
           department_validation_notes?: string | null
           dl_number?: string | null
           documents_urls?: Json | null
+          editor_confirmation_at?: string | null
+          editor_confirmed?: boolean | null
           id?: string
           initiator_id: string
           isbn?: string | null
@@ -6705,6 +6779,8 @@ export type Database = {
           metadata?: Json | null
           monograph_type: Database["public"]["Enums"]["monograph_type"]
           page_count?: number | null
+          printer_confirmation_at?: string | null
+          printer_confirmed?: boolean | null
           processing_start_date?: string | null
           publication_date?: string | null
           publication_status?: string | null
@@ -6735,11 +6811,14 @@ export type Database = {
           collaborator_id?: string | null
           committee_validated_at?: string | null
           committee_validation_notes?: string | null
+          confirmation_status?: string | null
           created_at?: string | null
           department_validated_at?: string | null
           department_validation_notes?: string | null
           dl_number?: string | null
           documents_urls?: Json | null
+          editor_confirmation_at?: string | null
+          editor_confirmed?: boolean | null
           id?: string
           initiator_id?: string
           isbn?: string | null
@@ -6753,6 +6832,8 @@ export type Database = {
           metadata?: Json | null
           monograph_type?: Database["public"]["Enums"]["monograph_type"]
           page_count?: number | null
+          printer_confirmation_at?: string | null
+          printer_confirmed?: boolean | null
           processing_start_date?: string | null
           publication_date?: string | null
           publication_status?: string | null
@@ -13761,6 +13842,18 @@ export type Database = {
           step_name: string
         }[]
       }
+      get_confirmation_token_by_token: {
+        Args: { p_token: string }
+        Returns: {
+          email: string
+          expires_at: string
+          id: string
+          party_type: string
+          request_id: string
+          status: Database["public"]["Enums"]["confirmation_status"]
+          user_id: string
+        }[]
+      }
       get_forms_by_platform: {
         Args: { p_platform: string }
         Returns: {
@@ -13776,6 +13869,19 @@ export type Database = {
         Args: { p_platform: string }
         Returns: {
           module: string
+        }[]
+      }
+      get_pending_confirmations_for_user: {
+        Args: { p_user_id: string }
+        Returns: {
+          created_at: string
+          expires_at: string
+          initiator_name: string
+          party_type: string
+          request_id: string
+          request_number: string
+          title: string
+          token_id: string
         }[]
       }
       get_professional_role: { Args: { p_user_id: string }; Returns: string }
@@ -14022,6 +14128,7 @@ export type Database = {
     }
     Enums: {
       access_level: "public" | "restricted" | "confidential"
+      confirmation_status: "pending" | "confirmed" | "rejected" | "expired"
       content_status: "draft" | "published" | "archived"
       content_type: "news" | "event" | "exhibition" | "page"
       deposit_status:
@@ -14237,6 +14344,7 @@ export const Constants = {
   public: {
     Enums: {
       access_level: ["public", "restricted", "confidential"],
+      confirmation_status: ["pending", "confirmed", "rejected", "expired"],
       content_status: ["draft", "published", "archived"],
       content_type: ["news", "event", "exhibition", "page"],
       deposit_status: [
