@@ -256,64 +256,236 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
     fetchPublicationTypes();
   }, []);
 
-  // Fetch publishers from database
+  // Fetch publishers from database (static table + approved professionals)
   useEffect(() => {
     const fetchPublishers = async () => {
-      const { data, error } = await supabase
+      // Fetch from static publishers table
+      const { data: staticData, error: staticError } = await supabase
         .from('publishers')
         .select('id, name, city, country, publisher_type, address, phone, email, google_maps_link')
         .order('name');
       
-      if (error) {
-        console.error('Error fetching publishers:', error);
-        const errorMsg = depositType === 'bd_logiciels' ? 'Erreur lors du chargement des producteurs' : 'Erreur lors du chargement des éditeurs';
-        toast.error(errorMsg);
-      } else {
-        setPublishers((data as unknown as Publisher[]) || []);
+      // Fetch approved editors from professional_registration_requests
+      const { data: approvedData, error: approvedError } = await supabase
+        .from('professional_registration_requests')
+        .select('id, company_name, registration_data')
+        .eq('professional_type', 'editor')
+        .eq('status', 'approved');
+      
+      if (staticError) {
+        console.error('Error fetching publishers:', staticError);
       }
+      if (approvedError) {
+        console.error('Error fetching approved editors:', approvedError);
+      }
+      
+      // Merge static publishers with approved professionals
+      const staticPublishers: Publisher[] = (staticData || []).map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        city: p.city,
+        country: p.country,
+        publisher_type: p.publisher_type,
+        address: p.address,
+        phone: p.phone,
+        email: p.email,
+        google_maps_link: p.google_maps_link
+      }));
+      
+      const approvedPublishers: Publisher[] = (approvedData || []).map((p: any) => ({
+        id: p.id,
+        name: p.company_name || 'Éditeur inconnu',
+        city: p.registration_data?.city || null,
+        country: p.registration_data?.country || 'Maroc',
+        publisher_type: null,
+        address: p.registration_data?.address || null,
+        phone: p.registration_data?.phone || null,
+        email: p.registration_data?.email || null,
+        google_maps_link: null
+      }));
+      
+      // Combine and deduplicate by name (case insensitive)
+      const allPublishers = [...staticPublishers, ...approvedPublishers];
+      const uniquePublishers = allPublishers.reduce((acc: Publisher[], current) => {
+        const exists = acc.find(p => p.name.toLowerCase() === current.name.toLowerCase());
+        if (!exists) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+      
+      uniquePublishers.sort((a, b) => a.name.localeCompare(b.name));
+      setPublishers(uniquePublishers);
     };
 
     const fetchPrinters = async () => {
-      const { data, error } = await supabase
+      // Fetch from static printers table
+      const { data: staticData, error: staticError } = await supabase
         .from('printers')
         .select('id, name, city, country, address, phone, email, google_maps_link')
         .order('name');
       
-      if (error) {
-        console.error('Error fetching printers:', error);
-        const errorMsg = depositType === 'bd_logiciels' ? 'Erreur lors du chargement des distributeurs' : 'Erreur lors du chargement des imprimeries';
-        toast.error(errorMsg);
-      } else {
-        setPrinters((data as unknown as Printer[]) || []);
+      // Fetch approved printers from professional_registration_requests
+      const { data: approvedData, error: approvedError } = await supabase
+        .from('professional_registration_requests')
+        .select('id, company_name, registration_data')
+        .eq('professional_type', 'printer')
+        .eq('status', 'approved');
+      
+      if (staticError) {
+        console.error('Error fetching printers:', staticError);
       }
+      if (approvedError) {
+        console.error('Error fetching approved printers:', approvedError);
+      }
+      
+      // Merge static printers with approved professionals
+      const staticPrinters: Printer[] = (staticData || []).map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        city: p.city,
+        country: p.country,
+        address: p.address,
+        phone: p.phone,
+        email: p.email,
+        google_maps_link: p.google_maps_link
+      }));
+      
+      const approvedPrinters: Printer[] = (approvedData || []).map((p: any) => ({
+        id: p.id,
+        name: p.company_name || 'Imprimeur inconnu',
+        city: p.registration_data?.city || null,
+        country: p.registration_data?.country || 'Maroc',
+        address: p.registration_data?.address || null,
+        phone: p.registration_data?.phone || null,
+        email: p.registration_data?.email || null,
+        google_maps_link: null
+      }));
+      
+      // Combine and deduplicate by name (case insensitive)
+      const allPrinters = [...staticPrinters, ...approvedPrinters];
+      const uniquePrinters = allPrinters.reduce((acc: Printer[], current) => {
+        const exists = acc.find(p => p.name.toLowerCase() === current.name.toLowerCase());
+        if (!exists) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+      
+      uniquePrinters.sort((a, b) => a.name.localeCompare(b.name));
+      setPrinters(uniquePrinters);
     };
 
     const fetchProducers = async () => {
-      const { data, error } = await supabase
+      // Fetch from static producers table
+      const { data: staticData, error: staticError } = await supabase
         .from('producers')
         .select('id, name, address, city, country, phone, email, google_maps_link')
         .order('name');
       
-      if (error) {
-        console.error('Error fetching producers:', error);
-        toast.error('Erreur lors du chargement des producteurs');
-      } else {
-        setProducers((data as unknown as Producer[]) || []);
+      // Fetch approved producers from professional_registration_requests
+      const { data: approvedData, error: approvedError } = await supabase
+        .from('professional_registration_requests')
+        .select('id, company_name, registration_data')
+        .eq('professional_type', 'producer')
+        .eq('status', 'approved');
+      
+      if (staticError) {
+        console.error('Error fetching producers:', staticError);
       }
+      if (approvedError) {
+        console.error('Error fetching approved producers:', approvedError);
+      }
+      
+      const staticProducers: Producer[] = (staticData || []).map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        address: p.address,
+        city: p.city,
+        country: p.country,
+        phone: p.phone,
+        email: p.email,
+        google_maps_link: p.google_maps_link
+      }));
+      
+      const approvedProducers: Producer[] = (approvedData || []).map((p: any) => ({
+        id: p.id,
+        name: p.company_name || 'Producteur inconnu',
+        address: p.registration_data?.address || null,
+        city: p.registration_data?.city || null,
+        country: p.registration_data?.country || 'Maroc',
+        phone: p.registration_data?.phone || null,
+        email: p.registration_data?.email || null,
+        google_maps_link: null
+      }));
+      
+      const allProducers = [...staticProducers, ...approvedProducers];
+      const uniqueProducers = allProducers.reduce((acc: Producer[], current) => {
+        const exists = acc.find(p => p.name.toLowerCase() === current.name.toLowerCase());
+        if (!exists) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+      
+      uniqueProducers.sort((a, b) => a.name.localeCompare(b.name));
+      setProducers(uniqueProducers);
     };
 
     const fetchDistributors = async () => {
-      const { data, error } = await supabase
+      // Fetch from static distributors table
+      const { data: staticData, error: staticError } = await supabase
         .from('distributors')
         .select('id, name, address, city, country, phone, email, google_maps_link')
         .order('name');
       
-      if (error) {
-        console.error('Error fetching distributors:', error);
-        toast.error('Erreur lors du chargement des distributeurs');
-      } else {
-        setDistributors((data as unknown as Distributor[]) || []);
+      // Fetch approved distributors from professional_registration_requests
+      const { data: approvedData, error: approvedError } = await supabase
+        .from('professional_registration_requests')
+        .select('id, company_name, registration_data')
+        .eq('professional_type', 'distributor')
+        .eq('status', 'approved');
+      
+      if (staticError) {
+        console.error('Error fetching distributors:', staticError);
       }
+      if (approvedError) {
+        console.error('Error fetching approved distributors:', approvedError);
+      }
+      
+      const staticDistributors: Distributor[] = (staticData || []).map((p: any) => ({
+        id: p.id,
+        name: p.name,
+        address: p.address,
+        city: p.city,
+        country: p.country,
+        phone: p.phone,
+        email: p.email,
+        google_maps_link: p.google_maps_link
+      }));
+      
+      const approvedDistributors: Distributor[] = (approvedData || []).map((p: any) => ({
+        id: p.id,
+        name: p.company_name || 'Distributeur inconnu',
+        address: p.registration_data?.address || null,
+        city: p.registration_data?.city || null,
+        country: p.registration_data?.country || 'Maroc',
+        phone: p.registration_data?.phone || null,
+        email: p.registration_data?.email || null,
+        google_maps_link: null
+      }));
+      
+      const allDistributors = [...staticDistributors, ...approvedDistributors];
+      const uniqueDistributors = allDistributors.reduce((acc: Distributor[], current) => {
+        const exists = acc.find(p => p.name.toLowerCase() === current.name.toLowerCase());
+        if (!exists) {
+          acc.push(current);
+        }
+        return acc;
+      }, []);
+      
+      uniqueDistributors.sort((a, b) => a.name.localeCompare(b.name));
+      setDistributors(uniqueDistributors);
     };
 
     fetchPublishers();
