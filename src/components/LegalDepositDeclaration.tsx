@@ -41,6 +41,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { PrinterInlineForm } from "@/components/legal-deposit/PrinterInlineForm";
 import { EditorInlineForm } from "@/components/legal-deposit/EditorInlineForm";
+import { WatermarkContainer } from "@/components/ui/watermark";
 
 interface Publisher {
   id: string;
@@ -4778,14 +4779,40 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
     return null;
   };
 
-  // Render avec Header fixe
+  // Render avec Header fixe et filigrane BNRM
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <Header />
-      <main className="flex-1 container mx-auto px-4 py-8">
-        {renderStepContent()}
-      </main>
-      <Footer />
-    </div>
+    <WatermarkContainer
+      watermarkProps={{
+        text: "BNRM - Bibliothèque Nationale du Royaume du Maroc",
+        variant: "library",
+        position: "scattered",
+        opacity: 0.03
+      }}
+    >
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-background to-muted/20">
+        <Header />
+        <main className="flex-1 container mx-auto px-4 py-8">
+          <Card className="border-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent shadow-sm mb-6">
+            <CardContent className="p-4 md:p-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-xl bg-primary/10 shadow-md">
+                  <FileText className="h-6 w-6 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <h1 className="text-xl md:text-2xl font-bold text-foreground">
+                    Déclaration de dépôt légal - {depositTypeLabels[depositType]}
+                  </h1>
+                  <p className="text-muted-foreground text-sm mt-1">
+                    Remplissez le formulaire ci-dessous pour soumettre votre déclaration
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          {renderStepContent()}
+        </main>
+        <Footer />
+      </div>
+    </WatermarkContainer>
   );
 }
