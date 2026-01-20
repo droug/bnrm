@@ -99,6 +99,7 @@ const DepositApprovals = lazy(() => import("./pages/DepositApprovals"));
 const CommitteeDashboard = lazy(() => import("./pages/CommitteeDashboard"));
 const ProfessionalManagement = lazy(() => import("./pages/ProfessionalManagement"));
 const ProfessionalSignup = lazy(() => import("./pages/ProfessionalSignup"));
+const ConfirmDeposit = lazy(() => import("./pages/ConfirmDeposit"));
 
 // Digital Library (lazy)
 const DigitalLibraryHome = lazy(() => import("./pages/digital-library/Home"));
@@ -315,6 +316,7 @@ const App = () => {
         <Route path="/admin/committee" element={<CommitteeDashboard />} />
         <Route path="/legal-deposit/approvals" element={<LegalDepositApprovals />} />
         <Route path="/depot-legal/approbations" element={<LegalDepositApprovals />} />
+        <Route path="/confirm-deposit/:token" element={<ConfirmDeposit />} />
           <Route path="/digital-library" element={<DigitalLibraryHome />} />
           <Route path="/digital-library/collections" element={<Collections />} />
           <Route path="/digital-library/collections/:collectionId" element={<CollectionDetails />} />
