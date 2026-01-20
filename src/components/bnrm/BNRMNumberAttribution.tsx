@@ -168,8 +168,10 @@ export const BNRMNumberAttribution = () => {
     }
     
     // Monographie ou périodique
+    // "imprime" est aussi un type de monographie imprimée
     if (supportType.includes('livre') || supportType.includes('monograph') || 
-        depositType.includes('monograph') || depositType.includes('livres')) {
+        depositType.includes('monograph') || depositType.includes('livres') ||
+        supportType === 'imprime' || supportType.includes('imprimé')) {
       // Distinguer les 3 types de monographies
       if (isElectronic && isCollection) {
         return 'monographie_electronique_collection';
@@ -179,7 +181,15 @@ export const BNRMNumberAttribution = () => {
       return 'monographie_imprime';
     }
     
-    return 'periodique';
+    // Périodique explicite
+    if (supportType.includes('periodique') || supportType.includes('périodique') || 
+        supportType.includes('journal') || supportType.includes('revue') ||
+        depositType.includes('periodique') || depositType.includes('périodique')) {
+      return 'periodique';
+    }
+    
+    // Par défaut, considérer comme monographie imprimée si pas de type spécifique
+    return 'monographie_imprime';
   };
 
   const fetchData = async () => {
