@@ -28,6 +28,17 @@ serve(async (req) => {
   }
 
   try {
+    const resolvePublicSiteUrl = () => {
+      // Prefer an explicit public URL for the frontend. This avoids accidentally
+      // using a stale/incorrect SITE_URL (e.g., old environments).
+      const raw =
+        Deno.env.get("PUBLIC_SITE_URL") ||
+        Deno.env.get("SITE_URL") ||
+        "https://bnrm.lovable.app";
+
+      return raw.trim().replace(/\/$/, "");
+    };
+
     const { request_id, professional_type }: ApproveRequest = await req.json();
 
     console.log("Approving professional request:", { request_id, professional_type });
@@ -144,10 +155,10 @@ serve(async (req) => {
       }
 
       // Générer le lien de réinitialisation de mot de passe
-      // Utiliser l'URL du site depuis les variables d'environnement ou l'URL Lovable
-      const rawSiteUrl = Deno.env.get("SITE_URL") || Deno.env.get("PUBLIC_SITE_URL") || "https://bnrm.lovable.app";
-      const siteUrl = rawSiteUrl.replace(/\/$/, "");
+      const siteUrl = resolvePublicSiteUrl();
       const redirectTo = `${siteUrl}/auth?reset=true`;
+
+      console.log("Generating recovery link with redirectTo:", redirectTo);
 
       const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
         type: "recovery",
@@ -244,7 +255,7 @@ serve(async (req) => {
 
     // Envoyer l'email de notification au demandeur
     if (userEmail) {
-      const siteUrl = (Deno.env.get("SITE_URL") || Deno.env.get("PUBLIC_SITE_URL") || "https://bnrm.lovable.app").replace(/\/$/, "");
+      const siteUrl = resolvePublicSiteUrl();
       const professionalTypeLabel = getProfessionalTypeLabel(professional_type);
       
       const emailHtml = `
