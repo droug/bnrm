@@ -42,6 +42,7 @@ import Footer from "@/components/Footer";
 import { PrinterInlineForm } from "@/components/legal-deposit/PrinterInlineForm";
 import { EditorInlineForm } from "@/components/legal-deposit/EditorInlineForm";
 import { WatermarkContainer } from "@/components/ui/watermark";
+import { MultipleAuthorsSection, Author, initializeAuthors } from "@/components/legal-deposit/MultipleAuthorsSection";
 
 interface Publisher {
   id: string;
@@ -143,6 +144,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
   const [selectedCity, setSelectedCity] = useState<string>("");
   const [authorGender, setAuthorGender] = useState<string>("");
   const [declarationNature, setDeclarationNature] = useState<string>("");
+  const [authors, setAuthors] = useState<Author[]>(initializeAuthors());
   const [authorStatus, setAuthorStatus] = useState<string>("");
   const [selectedDiscipline, setSelectedDiscipline] = useState<string>("");
   const [disciplineSearch, setDisciplineSearch] = useState<string>("");
@@ -499,181 +501,14 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
       if (depositType === "monographie") {
         return (
           <>
-            {/* Identification de l'auteur */}
-            <div>
-              <h3 className="text-2xl font-semibold mb-4">Identification de l'auteur</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Champs dynamiques depuis la base de données avec insertion du champ Genre après le nom */}
-                {customFields
-                  .filter((field) => 
-                    field.section_key === "identification_auteur" &&
-                    !field.field_key.toLowerCase().includes('region') &&
-                    !field.field_key.toLowerCase().includes('ville') &&
-                    !field.field_key.toLowerCase().includes('city')
-                  )
-                  .map((field, index, array) => {
-                    // Vérifier si c'est le champ "Type de l'auteur"
-                    const isTypeField = field.field_key.toLowerCase().includes('type') || 
-                                       field.label_fr?.toLowerCase().includes('type de l');
-                    
-                    // Vérifier si c'est le champ "Nom de l'auteur"
-                    const isNameField = field.field_key.toLowerCase().includes('name') || 
-                                       field.field_key.toLowerCase().includes('nom') ||
-                                       field.label_fr?.toLowerCase().includes('nom de l\'auteur') ||
-                                       field.label_fr?.toLowerCase().includes('name');
-                    
-                    // Vérifier si c'est le champ "Pseudonyme"
-                    const isPseudonymField = field.field_key.toLowerCase().includes('pseudonym') ||
-                                            field.field_key.toLowerCase().includes('pseudonyme') ||
-                                            field.label_fr?.toLowerCase().includes('pseudonyme');
-                    
-                    // Récupérer la valeur actuelle du type d'auteur depuis les différentes sources possibles
-                    const currentAuthorTypeValue = customFieldsData["author_type"] || 
-                                                   customFieldsData[field.field_key] || 
-                                                   authorType || "";
-                    
-                    console.log('DEBUG - Field:', field.field_key, 'Current value:', currentAuthorTypeValue);
-                    
-                    // Vérifier si on est en mode "Personne physique"
-                    const isPersonnePhysique = currentAuthorTypeValue.toLowerCase().includes("physique") ||
-                                              currentAuthorTypeValue === "physique" ||
-                                              currentAuthorTypeValue === "Personne physique";
-                    
-                    // Vérifier si on est en mode "Personne morale"
-                    const isPersonneMorale = currentAuthorTypeValue.toLowerCase().includes("morale") ||
-                                            currentAuthorTypeValue === "morale" ||
-                                            currentAuthorTypeValue === "Personne morale";
-                    
-                    console.log('DEBUG - isPersonnePhysique:', isPersonnePhysique, 'isPersonneMorale:', isPersonneMorale);
-                    
-                    // Créer une copie du champ avec le label modifié si c'est le champ Pseudonyme et Personne Morale
-                    const modifiedField = isPseudonymField && isPersonneMorale 
-                      ? { ...field, label_fr: 'Sigle', label_ar: 'الاختصار' }
-                      : field;
-                    
-                    // Ne pas afficher le champ "Nom de l'auteur" si on est en mode "Personne morale"
-                    if (isNameField && isPersonneMorale) {
-                      console.log('DEBUG - Hiding Nom de l\'auteur for Personne Morale');
-                      return null;
-                    }
-                    
-                    // Vérifier si c'est le champ Nationalité
-                    const isNationalityField = field.field_key === 'author_nationality' || 
-                                               field.field_key.toLowerCase().includes('nationalit');
-                    
-                    return (
-                      <>
-                        <DynamicFieldRenderer
-                          key={field.id}
-                          field={modifiedField}
-                          language={language}
-                          value={customFieldsData[field.field_key]}
-                          onChange={(value) => {
-                            console.log('Field changed:', field.field_key, '=', value);
-                            setCustomFieldsData((prev) => ({
-                              ...prev,
-                              [field.field_key]: value,
-                            }));
-                            // Mettre à jour authorType si c'est un champ de type d'auteur
-                            if (isTypeField) {
-                              setAuthorType(value);
-                              console.log('Author type updated:', value);
-                            }
-                          }}
-                          // Passer les props pour le champ nationalité
-                          gender={isNationalityField ? (authorGender as 'homme' | 'femme' | '') : undefined}
-                          otherNationalityValue={isNationalityField ? otherNationalityValue : undefined}
-                          onOtherNationalityChange={isNationalityField ? setOtherNationalityValue : undefined}
-                        />
-                        
-                        {/* Insérer le champ "Représentant" juste après le champ Type de l'auteur si Personne Morale */}
-                        {isTypeField && isPersonneMorale && (
-                          <div className="space-y-2" key={`representant-${field.id}`}>
-                            <Label>Représentant <span className="text-destructive">*</span></Label>
-                            <Input
-                              placeholder="Nom du représentant"
-                              value={customFieldsData["representant"] || ""}
-                              onChange={(e) => setCustomFieldsData((prev) => ({
-                                ...prev,
-                                representant: e.target.value
-                              }))}
-                            />
-                          </div>
-                        )}
-                        
-                        {/* Insérer le champ Genre juste après le champ Nom de l'auteur si Personne Physique */}
-                        {isNameField && isPersonnePhysique && (
-                          <div className="space-y-2" key={`genre-${field.id}`}>
-                            <Label>Genre</Label>
-                            <SimpleEntitySelect
-                              placeholder="Sélectionner le genre"
-                              value={authorGender}
-                              onChange={setAuthorGender}
-                              options={[
-                                { value: "homme", label: "Homme" },
-                                { value: "femme", label: "Femme" },
-                              ]}
-                            />
-                          </div>
-                        )}
-                      </>
-                    );
-                  })}
-                
-                {/* Champs Téléphone Fixe et Mobile */}
-                <div className="space-y-2">
-                  <Label>Téléphone Fixe</Label>
-                  <PhoneInput
-                    value={formData.authorPhoneFixed || ""}
-                    onChange={(value) => setFormData({ ...formData, authorPhoneFixed: value })}
-                    defaultCountry="MA"
-                    placeholder="5 XX XX XX XX"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Téléphone Mobile</Label>
-                  <PhoneInput
-                    value={formData.authorPhoneMobile || ""}
-                    onChange={(value) => setFormData({ ...formData, authorPhoneMobile: value })}
-                    defaultCountry="MA"
-                    placeholder="6 XX XX XX XX"
-                  />
-                </div>
-                
-                {/* Champs Région et Ville */}
-                <div className="space-y-2">
-                  <Label>Région</Label>
-                  <InlineSelect
-                    placeholder="Sélectionner une région"
-                    value={selectedRegion}
-                    onChange={(value) => {
-                      setSelectedRegion(value);
-                      setSelectedCity(''); // Reset city when region changes
-                    }}
-                    options={moroccanRegions.map(region => ({
-                      value: region.name,
-                      label: region.name
-                    }))}
-                  />
-                </div>
-
-                {selectedRegion && (
-                  <div className="space-y-2">
-                    <Label>Ville</Label>
-                    <InlineSelect
-                      placeholder="Sélectionner une ville"
-                      value={selectedCity}
-                      onChange={setSelectedCity}
-                      options={getCitiesByRegion(selectedRegion).map(city => ({
-                        value: city,
-                        label: city
-                      }))}
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
+            {/* Identification de l'auteur - avec support multi-auteurs */}
+            <MultipleAuthorsSection
+              authors={authors}
+              onAuthorsChange={setAuthors}
+              customFields={customFields}
+              language={language}
+              maxAuthors={10}
+            />
 
             <Separator />
 
@@ -2071,131 +1906,14 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
       if (depositType === "bd_logiciels") {
         return (
           <>
-            {/* Identification de l'auteur */}
-            <div>
-              <h3 className="text-2xl font-semibold mb-4">Identification de l'auteur</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Type de l'auteur</Label>
-                  <InlineSelect
-                    placeholder="Sélectionner le type"
-                    options={[
-                      { value: "physique", label: "Personne physique" },
-                      { value: "morale", label: "Personne morale (collectivités)" },
-                    ]}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Nom de la collectivité / Nom de l'Auteur</Label>
-                  <Input placeholder="Nom complet" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Sigle</Label>
-                  <Input placeholder="Sigle" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Nature du déclarant</Label>
-                  <Input placeholder="Nature du déclarant" />
-                </div>
-
-                {/* Champ Nationalité - inséré ici pour être juste après Nature du déclarant */}
-                {customFields
-                  .filter((field) => field.section_key === "identification_auteur" && field.field_key === "author_nationality")
-                  .map((field) => (
-                    <DynamicFieldRenderer
-                      key={field.id}
-                      field={field}
-                      language={language}
-                      value={customFieldsData[field.field_key]}
-                      onChange={(value) =>
-                        setCustomFieldsData((prev) => ({
-                          ...prev,
-                          [field.field_key]: value,
-                        }))
-                      }
-                      gender={authorGender as 'homme' | 'femme' | ''}
-                      otherNationalityValue={otherNationalityValue}
-                      onOtherNationalityChange={setOtherNationalityValue}
-                    />
-                  ))}
-
-                <div className="space-y-2">
-                  <Label>Téléphone Fixe</Label>
-                  <PhoneInput
-                    value={formData.authorPhoneFixed || ""}
-                    onChange={(value) => setFormData({ ...formData, authorPhoneFixed: value })}
-                    defaultCountry="MA"
-                    placeholder="5 XX XX XX XX"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Téléphone Mobile</Label>
-                  <PhoneInput
-                    value={formData.authorPhoneMobile || ""}
-                    onChange={(value) => setFormData({ ...formData, authorPhoneMobile: value })}
-                    defaultCountry="MA"
-                    placeholder="6 XX XX XX XX"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Email <span className="text-destructive">*</span></Label>
-                  <Input type="email" placeholder="Adresse email" required />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Région</Label>
-                  <InlineSelect
-                    value={selectedRegion}
-                    onChange={(value) => {
-                      setSelectedRegion(value);
-                      setSelectedCity('');
-                    }}
-                    placeholder="Sélectionner la région"
-                    options={moroccanRegions.map(region => ({ 
-                      value: region.name, 
-                      label: region.name 
-                    }))}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Ville</Label>
-                  <InlineSelect
-                    value={selectedCity}
-                    onChange={setSelectedCity}
-                    placeholder={selectedRegion ? "Sélectionner la ville" : "Sélectionner d'abord une région"}
-                    options={selectedRegion ? getCitiesByRegion(selectedRegion).map(city => ({ 
-                      value: city, 
-                      label: city 
-                    })) : []}
-                    disabled={!selectedRegion}
-                  />
-                </div>
-
-                {/* Champs personnalisés (sauf nationality qui est déjà affiché plus haut) */}
-                {customFields
-                  .filter((field) => field.section_key === "identification_auteur" && field.field_key !== "author_nationality")
-                  .map((field) => (
-                    <DynamicFieldRenderer
-                      key={field.id}
-                      field={field}
-                      language={language}
-                      value={customFieldsData[field.field_key]}
-                      onChange={(value) =>
-                        setCustomFieldsData((prev) => ({
-                          ...prev,
-                          [field.field_key]: value,
-                        }))
-                      }
-                    />
-                  ))}
-              </div>
-            </div>
+            {/* Identification de l'auteur - avec support multi-auteurs */}
+            <MultipleAuthorsSection
+              authors={authors}
+              onAuthorsChange={setAuthors}
+              customFields={customFields}
+              language={language}
+              maxAuthors={10}
+            />
 
             <Separator />
 
@@ -2842,131 +2560,14 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
       if (depositType === "collections_specialisees") {
         return (
           <>
-            {/* Identification de l'auteur */}
-            <div>
-              <h3 className="text-2xl font-semibold mb-4">Identification de l'auteur</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Type de l'auteur</Label>
-                  <InlineSelect
-                    placeholder="Sélectionner le type"
-                    options={[
-                      { value: "physique", label: "Personne physique" },
-                      { value: "morale", label: "Personne morale (collectivités)" },
-                    ]}
-                  />
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Nom de la collectivité / Nom de l'auteur</Label>
-                  <Input placeholder="Nom complet" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Sigle</Label>
-                  <Input placeholder="Sigle" />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Nature du déclarant</Label>
-                  <Input placeholder="Nature du déclarant" />
-                </div>
-
-                {/* Champ Nationalité - inséré ici pour être juste après Nature du déclarant */}
-                {customFields
-                  .filter((field) => field.section_key === "identification_auteur" && field.field_key === "author_nationality")
-                  .map((field) => (
-                    <DynamicFieldRenderer
-                      key={field.id}
-                      field={field}
-                      language={language}
-                      value={customFieldsData[field.field_key]}
-                      onChange={(value) =>
-                        setCustomFieldsData((prev) => ({
-                          ...prev,
-                          [field.field_key]: value,
-                        }))
-                      }
-                      gender={authorGender as 'homme' | 'femme' | ''}
-                      otherNationalityValue={otherNationalityValue}
-                      onOtherNationalityChange={setOtherNationalityValue}
-                    />
-                  ))}
-
-                <div className="space-y-2">
-                  <Label>Téléphone Fixe</Label>
-                  <PhoneInput
-                    value={formData.authorPhoneFixed || ""}
-                    onChange={(value) => setFormData({ ...formData, authorPhoneFixed: value })}
-                    defaultCountry="MA"
-                    placeholder="5 XX XX XX XX"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Téléphone Mobile</Label>
-                  <PhoneInput
-                    value={formData.authorPhoneMobile || ""}
-                    onChange={(value) => setFormData({ ...formData, authorPhoneMobile: value })}
-                    defaultCountry="MA"
-                    placeholder="6 XX XX XX XX"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Email <span className="text-destructive">*</span></Label>
-                  <Input type="email" placeholder="Adresse email" required />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Région</Label>
-                  <InlineSelect
-                    value={selectedRegion}
-                    onChange={(value) => {
-                      setSelectedRegion(value);
-                      setSelectedCity('');
-                    }}
-                    placeholder="Sélectionner la région"
-                    options={moroccanRegions.map(region => ({ 
-                      value: region.name, 
-                      label: region.name 
-                    }))}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Ville</Label>
-                  <InlineSelect
-                    value={selectedCity}
-                    onChange={setSelectedCity}
-                    placeholder={selectedRegion ? "Sélectionner la ville" : "Sélectionner d'abord une région"}
-                    options={selectedRegion ? getCitiesByRegion(selectedRegion).map(city => ({ 
-                      value: city, 
-                      label: city 
-                    })) : []}
-                    disabled={!selectedRegion}
-                  />
-                </div>
-
-                {/* Champs personnalisés (sauf nationality qui est déjà affiché plus haut) */}
-                {customFields
-                  .filter((field) => field.section_key === "responsible_info" || (field.section_key === "identification_auteur" && field.field_key !== "author_nationality"))
-                  .map((field) => (
-                    <DynamicFieldRenderer
-                      key={field.id}
-                      field={field}
-                      language={language}
-                      value={customFieldsData[field.field_key]}
-                      onChange={(value) =>
-                        setCustomFieldsData((prev) => ({
-                          ...prev,
-                          [field.field_key]: value,
-                        }))
-                      }
-                    />
-                  ))}
-              </div>
-            </div>
+            {/* Identification de l'auteur - avec support multi-auteurs */}
+            <MultipleAuthorsSection
+              authors={authors}
+              onAuthorsChange={setAuthors}
+              customFields={customFields}
+              language={language}
+              maxAuthors={10}
+            />
 
             <Separator />
 
