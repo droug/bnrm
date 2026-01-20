@@ -620,6 +620,27 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                     );
                   })}
                 
+                {/* Champs Téléphone Fixe et Mobile */}
+                <div className="space-y-2">
+                  <Label>Téléphone Fixe</Label>
+                  <PhoneInput
+                    value={formData.authorPhoneFixed || ""}
+                    onChange={(value) => setFormData({ ...formData, authorPhoneFixed: value })}
+                    defaultCountry="MA"
+                    placeholder="5 XX XX XX XX"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>Téléphone Mobile</Label>
+                  <PhoneInput
+                    value={formData.authorPhoneMobile || ""}
+                    onChange={(value) => setFormData({ ...formData, authorPhoneMobile: value })}
+                    defaultCountry="MA"
+                    placeholder="6 XX XX XX XX"
+                  />
+                </div>
+                
                 {/* Champs Région et Ville */}
                 <div className="space-y-2">
                   <Label>Région</Label>
