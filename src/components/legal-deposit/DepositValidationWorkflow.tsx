@@ -175,7 +175,7 @@ export function DepositValidationWorkflow() {
     if (activeTab === "pending") {
       query = query.in("status", ["brouillon", "soumis", "en_attente_validation_b", "en_cours"]);
     } else if (activeTab === "validated") {
-      query = query.in("status", ["valide_par_b", "attribue"]);
+      query = query.in("status", ["valide_par_b", "valide_par_comite", "attribue"]);
     } else if (activeTab === "rejected") {
       query = query.in("status", ["rejete", "rejete_par_b", "rejete_par_comite"]);
     }
