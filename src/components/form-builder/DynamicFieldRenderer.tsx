@@ -5,6 +5,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { InlineSelect } from "@/components/ui/inline-select";
 import { GenericAutocomplete } from "@/components/ui/generic-autocomplete";
 import { NationalityAutocomplete } from "@/components/ui/nationality-autocomplete";
+import { PhoneInput } from "@/components/ui/phone-input";
 import { CustomField } from "@/types/formBuilder";
 
 interface DynamicFieldRendererProps {
@@ -34,7 +35,6 @@ export function DynamicFieldRenderer({
     switch (field.field_type) {
       case "text":
       case "email":
-      case "tel":
       case "url":
         return (
           <Input
@@ -44,6 +44,16 @@ export function DynamicFieldRenderer({
             placeholder={label}
             required={field.is_required}
             disabled={field.is_readonly}
+          />
+        );
+
+      case "tel":
+        return (
+          <PhoneInput
+            value={value || ""}
+            onChange={onChange}
+            placeholder={label}
+            defaultCountry="MA"
           />
         );
 
