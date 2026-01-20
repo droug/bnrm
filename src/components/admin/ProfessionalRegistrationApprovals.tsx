@@ -85,25 +85,34 @@ export function ProfessionalRegistrationApprovals() {
 
     setLoading(true);
 
-    const { error } = await supabase
-      .rpc('approve_professional_registration', {
-        p_request_id: selectedRequest.id,
-        p_role: selectedRequest.professional_type
+    try {
+      const { data, error } = await supabase.functions.invoke('approve-professional', {
+        body: {
+          request_id: selectedRequest.id,
+          professional_type: selectedRequest.professional_type
+        }
       });
 
-    if (error) {
+      if (error) {
+        throw error;
+      }
+
+      if (data?.success) {
+        toast({
+          title: 'Demande approuvée',
+          description: 'Le compte professionnel a été créé et un email de notification a été envoyé'
+        });
+        setSelectedRequest(null);
+        loadRequests();
+      } else {
+        throw new Error(data?.error || 'Erreur inconnue');
+      }
+    } catch (error: any) {
       toast({
         title: 'Erreur',
-        description: error.message,
+        description: error.message || 'Impossible d\'approuver la demande',
         variant: 'destructive'
       });
-    } else {
-      toast({
-        title: 'Demande approuvée',
-        description: 'Le compte professionnel a été créé avec succès'
-      });
-      setSelectedRequest(null);
-      loadRequests();
     }
 
     setLoading(false);

@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
+import { sendEmail } from "../_shared/smtp-client.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,6 +11,16 @@ interface ApproveRequest {
   request_id: string;
   professional_type: string;
 }
+
+const getProfessionalTypeLabel = (type: string): string => {
+  const labels: Record<string, string> = {
+    editor: "Éditeur",
+    printer: "Imprimeur",
+    producer: "Producteur",
+    distributor: "Distributeur"
+  };
+  return labels[type] || type;
+};
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -228,6 +239,114 @@ serve(async (req) => {
         .from("professional_invitations")
         .update({ status: "used", updated_at: new Date().toISOString() })
         .eq("id", request.invitation_id);
+    }
+
+    // Envoyer l'email de notification au demandeur
+    if (userEmail) {
+      const siteUrl = (Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma").replace(/\/$/, "");
+      const professionalTypeLabel = getProfessionalTypeLabel(professional_type);
+      
+      const emailHtml = `
+        <!DOCTYPE html>
+        <html lang="fr">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
+          <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+            <!-- Header -->
+            <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); padding: 30px; text-align: center;">
+              <h1 style="color: #ffffff; margin: 0; font-size: 24px;">BNRM - Bibliothèque Nationale</h1>
+              <p style="color: #e2e8f0; margin: 10px 0 0 0; font-size: 14px;">Royaume du Maroc</p>
+            </div>
+            
+            <!-- Content -->
+            <div style="padding: 40px 30px;">
+              <div style="text-align: center; margin-bottom: 30px;">
+                <div style="width: 60px; height: 60px; background-color: #48bb78; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;">
+                  <span style="color: white; font-size: 30px;">✓</span>
+                </div>
+                <h2 style="color: #1e3a5f; margin: 0; font-size: 22px;">Demande Approuvée</h2>
+              </div>
+              
+              <p style="color: #4a5568; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                Bonjour,
+              </p>
+              
+              <p style="color: #4a5568; font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
+                Nous avons le plaisir de vous informer que votre demande d'inscription en tant que 
+                <strong style="color: #1e3a5f;">${professionalTypeLabel}</strong> auprès de la Bibliothèque Nationale du Royaume du Maroc a été <strong style="color: #48bb78;">approuvée</strong>.
+              </p>
+              
+              <div style="background-color: #f7fafc; border-left: 4px solid #1e3a5f; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0;">
+                <h3 style="color: #1e3a5f; margin: 0 0 10px 0; font-size: 16px;">Informations du compte :</h3>
+                <p style="color: #4a5568; margin: 5px 0; font-size: 14px;"><strong>Email :</strong> ${userEmail}</p>
+                <p style="color: #4a5568; margin: 5px 0; font-size: 14px;"><strong>Type de compte :</strong> ${professionalTypeLabel}</p>
+                <p style="color: #4a5568; margin: 5px 0; font-size: 14px;"><strong>Entreprise :</strong> ${request.company_name}</p>
+              </div>
+              
+              ${passwordResetLink ? `
+              <div style="background-color: #fffaf0; border: 1px solid #ed8936; padding: 20px; margin: 25px 0; border-radius: 8px;">
+                <h3 style="color: #c05621; margin: 0 0 10px 0; font-size: 16px;">⚠️ Action requise : Créez votre mot de passe</h3>
+                <p style="color: #744210; font-size: 14px; margin-bottom: 15px;">
+                  Pour accéder à votre espace professionnel, vous devez créer votre mot de passe en cliquant sur le bouton ci-dessous.
+                </p>
+                <div style="text-align: center;">
+                  <a href="${passwordResetLink}" style="display: inline-block; background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: #ffffff; text-decoration: none; padding: 14px 30px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                    Créer mon mot de passe
+                  </a>
+                </div>
+                <p style="color: #744210; font-size: 12px; margin-top: 15px; text-align: center;">
+                  Ce lien est valide pendant 24 heures.
+                </p>
+              </div>
+              ` : `
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${siteUrl}/auth" style="display: inline-block; background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: #ffffff; text-decoration: none; padding: 14px 30px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                  Accéder à mon espace
+                </a>
+              </div>
+              `}
+              
+              <p style="color: #4a5568; font-size: 16px; line-height: 1.6; margin-top: 25px;">
+                Une fois connecté, vous pourrez :
+              </p>
+              <ul style="color: #4a5568; font-size: 14px; line-height: 1.8; padding-left: 20px;">
+                <li>Effectuer vos dépôts légaux en ligne</li>
+                <li>Suivre l'état de vos demandes</li>
+                <li>Gérer vos informations professionnelles</li>
+                <li>Accéder à l'historique de vos déclarations</li>
+              </ul>
+            </div>
+            
+            <!-- Footer -->
+            <div style="background-color: #f7fafc; padding: 25px 30px; text-align: center; border-top: 1px solid #e2e8f0;">
+              <p style="color: #718096; font-size: 13px; margin: 0 0 10px 0;">
+                Bibliothèque Nationale du Royaume du Maroc
+              </p>
+              <p style="color: #a0aec0; font-size: 12px; margin: 0;">
+                Cet email a été envoyé automatiquement. Merci de ne pas y répondre directement.
+              </p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      console.log("Sending approval notification email to:", userEmail);
+      
+      const emailResult = await sendEmail({
+        to: userEmail,
+        subject: `✅ Votre demande d'inscription ${professionalTypeLabel} a été approuvée - BNRM`,
+        html: emailHtml,
+      });
+
+      if (emailResult.success) {
+        console.log("Approval email sent successfully via", emailResult.method);
+      } else {
+        console.error("Failed to send approval email:", emailResult.error);
+      }
     }
 
     console.log("Professional registration approved successfully");
