@@ -5,7 +5,6 @@ import { Navigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
@@ -49,6 +48,11 @@ import { BNRMPaymentNotificationSettings } from "@/components/bnrm/BNRMPaymentNo
 import { BNRMStatistics } from "@/components/bnrm/BNRMStatistics";
 import BNRMEditorialMonitoring from "@/components/bnrm/BNRMEditorialMonitoring";
 import { DepositValidationWorkflow } from "@/components/legal-deposit/DepositValidationWorkflow";
+import { AdminBackOfficeHeader } from "@/components/admin/AdminBackOfficeHeader";
+import { AdminBackOfficeNavigation } from "@/components/admin/AdminBackOfficeNavigation";
+import { AdminBackOfficeStats } from "@/components/admin/AdminBackOfficeStats";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function BNRMBackOffice() {
   const { user, profile, loading } = useAuth();
@@ -58,6 +62,50 @@ export default function BNRMBackOffice() {
   const [selectedDepositData, setSelectedDepositData] = useState<any>(null);
   const [confirmAction, setConfirmAction] = useState<{type: string, data?: any} | null>(null);
   const [documentForm, setDocumentForm] = useState<{type: string, data?: any} | null>(null);
+
+  // Fetch stats for the header
+  const { data: statsData } = useQuery({
+    queryKey: ['admin-depot-legal-stats'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('legal_deposit_requests')
+        .select('status', { count: 'exact' });
+      
+      if (error) throw error;
+      
+      const statuses = data || [];
+      const pending = statuses.filter(r => ['soumis', 'en_cours', 'en_attente_validation_b', 'en_attente_comite_validation'].includes(r.status || '')).length;
+      const validated = statuses.filter(r => ['valide_par_b', 'valide_par_comite', 'attribue'].includes(r.status || '')).length;
+      const rejected = statuses.filter(r => ['rejete', 'rejete_par_b', 'rejete_par_comite'].includes(r.status || '')).length;
+      const attributed = statuses.filter(r => r.status === 'attribue').length;
+      
+      return {
+        totalRequests: statuses.length,
+        pendingRequests: pending,
+        validatedRequests: validated,
+        rejectedRequests: rejected,
+        attributedNumbers: attributed,
+        monthlyGrowth: 12 // placeholder
+      };
+    }
+  });
+
+  // Fetch counts for navigation badges
+  const { data: navCounts } = useQuery({
+    queryKey: ['admin-depot-legal-nav-counts'],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from('legal_deposit_requests')
+        .select('status');
+      
+      const statuses = data || [];
+      return {
+        pending: statuses.filter(r => ['soumis', 'en_cours', 'en_attente_validation_b'].includes(r.status || '')).length,
+        validated: statuses.filter(r => ['valide_par_b', 'valide_par_comite'].includes(r.status || '')).length,
+        toAttribute: statuses.filter(r => ['valide_par_b', 'valide_par_comite'].includes(r.status || '')).length,
+      };
+    }
+  });
 
   if (loading) {
     return (
@@ -76,6 +124,153 @@ export default function BNRMBackOffice() {
   if (!profile?.is_approved || (profile?.role !== 'admin' && profile?.role !== 'librarian') || professionalRoles.includes(profile?.role)) {
     return <Navigate to="/dashboard" replace />;
   }
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return <BNRMDashboard />;
+      case 'requests':
+        return (
+          <>
+            <div className="flex justify-end mb-6">
+              <CreateTestDepositButton />
+            </div>
+            <DepositValidationWorkflow />
+          </>
+        );
+      case 'attribution':
+        return <BNRMNumberAttribution />;
+      case 'editorial-monitoring':
+        return <BNRMEditorialMonitoring />;
+      case 'notifications':
+        return <BNRMPaymentNotificationSettings />;
+      case 'statistics':
+        return <BNRMStatistics />;
+      case 'reports':
+        return (
+          <div className="space-y-6">
+            <div className="grid gap-6 md:grid-cols-2">
+              <Card className="border-0 shadow-md hover:shadow-lg transition-shadow">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-3">
+                    <div className="p-2 bg-primary/10 rounded-lg">
+                      <Database className="h-5 w-5 text-primary" />
+                    </div>
+                    <span>Rapports Statistiques</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Tableaux de bord interactifs et export de données
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start h-12 hover:bg-primary/5 hover:border-primary/30 transition-colors"
+                      onClick={generateISBNMonthlyReport}
+                    >
+                      <BarChart3 className="h-4 w-4 mr-3 text-primary" />
+                      Rapport mensuel agence ISBN
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start h-12 hover:bg-primary/5 hover:border-primary/30 transition-colors"
+                      onClick={generateISSNReport}
+                    >
+                      <FileText className="h-4 w-4 mr-3 text-primary" />
+                      Rapport centre international ISSN
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start h-12 hover:bg-primary/5 hover:border-primary/30 transition-colors"
+                      onClick={generateDepositTypeStats}
+                    >
+                      <FileBarChart className="h-4 w-4 mr-3 text-primary" />
+                      Statistiques de dépôt par type
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      className="w-full justify-start h-12 hover:bg-primary/5 hover:border-primary/30 transition-colors"
+                      onClick={generatePublishersActivityReport}
+                    >
+                      <TrendingUp className="h-4 w-4 mr-3 text-primary" />
+                      Rapport activité éditeurs
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="border-0 shadow-md hover:shadow-lg transition-shadow">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-500/10 rounded-lg">
+                      <Search className="h-5 w-5 text-blue-600" />
+                    </div>
+                    <span>Filtres Avancés</span>
+                  </CardTitle>
+                  <CardDescription>
+                    Recherche multicritères et exports personnalisés
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <Button variant="outline" className="w-full justify-start h-12 hover:bg-blue-500/5 hover:border-blue-500/30 transition-colors">
+                      <Clock className="h-4 w-4 mr-3 text-blue-600" />
+                      Filtrer par période
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start h-12 hover:bg-blue-500/5 hover:border-blue-500/30 transition-colors">
+                      <Users className="h-4 w-4 mr-3 text-blue-600" />
+                      Filtrer par éditeur
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start h-12 hover:bg-blue-500/5 hover:border-blue-500/30 transition-colors">
+                      <Archive className="h-4 w-4 mr-3 text-blue-600" />
+                      Filtrer par type de support
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start h-12 hover:bg-blue-500/5 hover:border-blue-500/30 transition-colors">
+                      <Download className="h-4 w-4 mr-3 text-blue-600" />
+                      Export Excel personnalisé
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card className="border-0 shadow-md bg-gradient-to-br from-slate-50 to-background">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-3">
+                  <div className="p-2 bg-emerald-500/10 rounded-lg">
+                    <TrendingUp className="h-5 w-5 text-emerald-600" />
+                  </div>
+                  <span>Aperçu des statistiques globales</span>
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid gap-6 md:grid-cols-4">
+                  <div className="text-center p-4 rounded-xl bg-card shadow-sm border">
+                    <div className="text-3xl font-bold text-primary">{statsData?.totalRequests || 0}</div>
+                    <div className="text-sm text-muted-foreground mt-1">Demandes traitées</div>
+                  </div>
+                  <div className="text-center p-4 rounded-xl bg-card shadow-sm border">
+                    <div className="text-3xl font-bold text-emerald-600">{statsData?.validatedRequests || 0}</div>
+                    <div className="text-sm text-muted-foreground mt-1">Validées</div>
+                  </div>
+                  <div className="text-center p-4 rounded-xl bg-card shadow-sm border">
+                    <div className="text-3xl font-bold text-blue-600">{statsData?.attributedNumbers || 0}</div>
+                    <div className="text-sm text-muted-foreground mt-1">N° attribués</div>
+                  </div>
+                  <div className="text-center p-4 rounded-xl bg-card shadow-sm border">
+                    <div className="text-3xl font-bold text-purple-600">2.3j</div>
+                    <div className="text-sm text-muted-foreground mt-1">Délai moyen</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        );
+      default:
+        return <BNRMDashboard />;
+    }
+  };
 
   return (
     <WatermarkContainer 
@@ -97,263 +292,47 @@ export default function BNRMBackOffice() {
 
         {/* Main Content */}
         <main className="container py-8">
-          <div className="space-y-8">
-            {/* Page Title with gradient background */}
-            <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary/10 via-blue-500/10 to-emerald-500/10 p-6 md:p-8">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-bl from-primary/20 to-transparent rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-              <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div>
-                  <h1 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-                    Gestion du Dépôt Légal
-                  </h1>
-                  <p className="text-muted-foreground mt-2 text-lg">
-                    Interface de gestion complète du dépôt légal BNRM
-                  </p>
-                </div>
-                
-                <div className="flex flex-wrap gap-3">
-                  <Button 
-                    variant="outline"
-                    onClick={() => setActiveTab('reports')}
-                    className="bg-background/80 backdrop-blur-sm hover:bg-background shadow-sm"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    {t('bnrm.reports.btn')}
-                  </Button>
-                  <Button 
-                    onClick={() => window.open('/', '_blank')}
-                    className="bg-primary hover:bg-primary/90 shadow-sm"
-                  >
-                    <Globe className="w-4 h-4 mr-2" />
-                    {t('bnrm.publicPortal.btn')}
-                  </Button>
-                </div>
+          <div className="space-y-6">
+            {/* Header inspiré de MySpace */}
+            <AdminBackOfficeHeader 
+              title="Gestion du Dépôt Légal"
+              subtitle="Interface de gestion complète du dépôt légal BNRM"
+              badgeText="Administration"
+            />
+
+            {/* Stats Cards inspirées de MySpace */}
+            <AdminBackOfficeStats 
+              stats={statsData || {
+                totalRequests: 0,
+                pendingRequests: 0,
+                validatedRequests: 0,
+                rejectedRequests: 0,
+                attributedNumbers: 0,
+                monthlyGrowth: 0
+              }}
+              loading={!statsData}
+            />
+
+            {/* Layout en grille: Navigation sidebar + Contenu */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              {/* Sidebar Navigation */}
+              <div className="lg:col-span-1">
+                <AdminBackOfficeNavigation 
+                  activeTab={activeTab}
+                  onTabChange={setActiveTab}
+                  counts={navCounts || { pending: 0, validated: 0, toAttribute: 0 }}
+                />
+              </div>
+
+              {/* Main Content Area */}
+              <div className="lg:col-span-3">
+                <Card className="border-0 shadow-sm">
+                  <CardContent className="p-6">
+                    {renderContent()}
+                  </CardContent>
+                </Card>
               </div>
             </div>
-
-            {/* Navigation Tabs - Modern card style */}
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <div className="bg-card rounded-xl shadow-sm border p-2">
-                <TabsList className="w-full flex flex-wrap justify-start gap-2 h-auto p-0 bg-transparent">
-                  <TabsTrigger 
-                    value="dashboard" 
-                    className="flex items-center gap-2 px-4 py-3 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all duration-200 hover:bg-muted"
-                  >
-                    <BarChart3 className="h-4 w-4 flex-shrink-0" />
-                    <span className="font-medium">Tableau de bord</span>
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="requests" 
-                    className="flex items-center gap-2 px-4 py-3 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all duration-200 hover:bg-muted"
-                  >
-                    <FileText className="h-4 w-4 flex-shrink-0" />
-                    <span className="font-medium">Gestion des Demandes</span>
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="attribution" 
-                    className="flex items-center gap-2 px-4 py-3 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all duration-200 hover:bg-muted"
-                  >
-                    <FileBarChart className="h-4 w-4 flex-shrink-0" />
-                    <span className="font-medium">Gestion Attributions N°</span>
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="editorial-monitoring" 
-                    className="flex items-center gap-2 px-4 py-3 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all duration-200 hover:bg-muted"
-                  >
-                    <Search className="h-4 w-4 flex-shrink-0" />
-                    <span className="font-medium">Veille</span>
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="notifications" 
-                    className="flex items-center gap-2 px-4 py-3 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all duration-200 hover:bg-muted"
-                  >
-                    <Bell className="h-4 w-4 flex-shrink-0" />
-                    <span className="font-medium">Notifications</span>
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="statistics" 
-                    className="flex items-center gap-2 px-4 py-3 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all duration-200 hover:bg-muted"
-                  >
-                    <TrendingUp className="h-4 w-4 flex-shrink-0" />
-                    <span className="font-medium">Statistiques</span>
-                  </TabsTrigger>
-                  <TabsTrigger 
-                    value="reports" 
-                    className="flex items-center gap-2 px-4 py-3 rounded-lg data-[state=active]:bg-primary data-[state=active]:text-primary-foreground data-[state=active]:shadow-md transition-all duration-200 hover:bg-muted"
-                  >
-                    <Database className="h-4 w-4 flex-shrink-0" />
-                    <span className="font-medium">Rapports</span>
-                  </TabsTrigger>
-                </TabsList>
-              </div>
-
-              {/* Dashboard Tab */}
-              <TabsContent value="dashboard" className="mt-6">
-                <div className="bg-card rounded-xl shadow-sm border p-6">
-                  <BNRMDashboard />
-                </div>
-              </TabsContent>
-
-              {/* Request Management Tab */}
-              <TabsContent value="requests" className="mt-6">
-                <div className="bg-card rounded-xl shadow-sm border p-6">
-                  <div className="flex justify-end mb-6">
-                    <CreateTestDepositButton />
-                  </div>
-                  <DepositValidationWorkflow />
-                </div>
-              </TabsContent>
-
-              {/* Number Attribution Tab */}
-              <TabsContent value="attribution" className="mt-6">
-                <div className="bg-card rounded-xl shadow-sm border p-6">
-                  <BNRMNumberAttribution />
-                </div>
-              </TabsContent>
-
-              {/* Statistics Tab */}
-              <TabsContent value="statistics" className="mt-6">
-                <div className="bg-card rounded-xl shadow-sm border p-6">
-                  <BNRMStatistics />
-                </div>
-              </TabsContent>
-
-              {/* Editorial Monitoring Tab */}
-              <TabsContent value="editorial-monitoring" className="mt-6">
-                <div className="bg-card rounded-xl shadow-sm border p-6">
-                  <BNRMEditorialMonitoring />
-                </div>
-              </TabsContent>
-
-              {/* Payment Notifications Tab */}
-              <TabsContent value="notifications" className="mt-6">
-                <div className="bg-card rounded-xl shadow-sm border p-6">
-                  <BNRMPaymentNotificationSettings />
-                </div>
-              </TabsContent>
-
-              {/* Reports Tab */}
-              <TabsContent value="reports" className="mt-6">
-                <div className="bg-card rounded-xl shadow-sm border p-6">
-                  <div className="grid gap-6 md:grid-cols-2">
-                    <Card className="border-0 shadow-md hover:shadow-lg transition-shadow">
-                      <CardHeader className="pb-4">
-                        <CardTitle className="flex items-center gap-3">
-                          <div className="p-2 bg-primary/10 rounded-lg">
-                            <Database className="h-5 w-5 text-primary" />
-                          </div>
-                          <span>Rapports Statistiques</span>
-                        </CardTitle>
-                        <CardDescription>
-                          Tableaux de bord interactifs et export de données
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          <Button 
-                            variant="outline" 
-                            className="w-full justify-start h-12 hover:bg-primary/5 hover:border-primary/30 transition-colors"
-                            onClick={generateISBNMonthlyReport}
-                          >
-                            <BarChart3 className="h-4 w-4 mr-3 text-primary" />
-                            Rapport mensuel agence ISBN
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            className="w-full justify-start h-12 hover:bg-primary/5 hover:border-primary/30 transition-colors"
-                            onClick={generateISSNReport}
-                          >
-                            <FileText className="h-4 w-4 mr-3 text-primary" />
-                            Rapport centre international ISSN
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            className="w-full justify-start h-12 hover:bg-primary/5 hover:border-primary/30 transition-colors"
-                            onClick={generateDepositTypeStats}
-                          >
-                            <FileBarChart className="h-4 w-4 mr-3 text-primary" />
-                            Statistiques de dépôt par type
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            className="w-full justify-start h-12 hover:bg-primary/5 hover:border-primary/30 transition-colors"
-                            onClick={generatePublishersActivityReport}
-                          >
-                            <TrendingUp className="h-4 w-4 mr-3 text-primary" />
-                            Rapport activité éditeurs
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card className="border-0 shadow-md hover:shadow-lg transition-shadow">
-                      <CardHeader className="pb-4">
-                        <CardTitle className="flex items-center gap-3">
-                          <div className="p-2 bg-blue-500/10 rounded-lg">
-                            <Search className="h-5 w-5 text-blue-600" />
-                          </div>
-                          <span>Filtres Avancés</span>
-                        </CardTitle>
-                        <CardDescription>
-                          Recherche multicritères et exports personnalisés
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="space-y-3">
-                          <Button variant="outline" className="w-full justify-start h-12 hover:bg-blue-500/5 hover:border-blue-500/30 transition-colors">
-                            <Clock className="h-4 w-4 mr-3 text-blue-600" />
-                            Filtrer par période
-                          </Button>
-                          <Button variant="outline" className="w-full justify-start h-12 hover:bg-blue-500/5 hover:border-blue-500/30 transition-colors">
-                            <Users className="h-4 w-4 mr-3 text-blue-600" />
-                            Filtrer par éditeur
-                          </Button>
-                          <Button variant="outline" className="w-full justify-start h-12 hover:bg-blue-500/5 hover:border-blue-500/30 transition-colors">
-                            <Archive className="h-4 w-4 mr-3 text-blue-600" />
-                            Filtrer par type de support
-                          </Button>
-                          <Button variant="outline" className="w-full justify-start h-12 hover:bg-blue-500/5 hover:border-blue-500/30 transition-colors">
-                            <Download className="h-4 w-4 mr-3 text-blue-600" />
-                            Export Excel personnalisé
-                          </Button>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </div>
-
-                  <Card className="mt-6 border-0 shadow-md bg-gradient-to-br from-slate-50 to-background">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-3">
-                        <div className="p-2 bg-emerald-500/10 rounded-lg">
-                          <TrendingUp className="h-5 w-5 text-emerald-600" />
-                        </div>
-                        <span>Aperçu des statistiques globales</span>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid gap-6 md:grid-cols-4">
-                        <div className="text-center p-4 rounded-xl bg-card shadow-sm border">
-                          <div className="text-3xl font-bold text-primary">2,847</div>
-                          <div className="text-sm text-muted-foreground mt-1">Demandes traitées</div>
-                        </div>
-                        <div className="text-center p-4 rounded-xl bg-card shadow-sm border">
-                          <div className="text-3xl font-bold text-emerald-600">1,234</div>
-                          <div className="text-sm text-muted-foreground mt-1">ISBN attribués</div>
-                        </div>
-                        <div className="text-center p-4 rounded-xl bg-card shadow-sm border">
-                          <div className="text-3xl font-bold text-blue-600">87</div>
-                          <div className="text-sm text-muted-foreground mt-1">ISSN attribués</div>
-                        </div>
-                        <div className="text-center p-4 rounded-xl bg-card shadow-sm border">
-                          <div className="text-3xl font-bold text-purple-600">2.3j</div>
-                          <div className="text-sm text-muted-foreground mt-1">Délai moyen</div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-            </Tabs>
           </div>
         </main>
 
