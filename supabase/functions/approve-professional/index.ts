@@ -144,7 +144,8 @@ serve(async (req) => {
       }
 
       // Générer le lien de réinitialisation de mot de passe
-      const rawSiteUrl = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
+      // Utiliser l'URL du site depuis les variables d'environnement ou l'URL Lovable
+      const rawSiteUrl = Deno.env.get("SITE_URL") || Deno.env.get("PUBLIC_SITE_URL") || "https://bnrm.lovable.app";
       const siteUrl = rawSiteUrl.replace(/\/$/, "");
       const redirectTo = `${siteUrl}/auth?reset=true`;
 
@@ -243,7 +244,7 @@ serve(async (req) => {
 
     // Envoyer l'email de notification au demandeur
     if (userEmail) {
-      const siteUrl = (Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma").replace(/\/$/, "");
+      const siteUrl = (Deno.env.get("SITE_URL") || Deno.env.get("PUBLIC_SITE_URL") || "https://bnrm.lovable.app").replace(/\/$/, "");
       const professionalTypeLabel = getProfessionalTypeLabel(professional_type);
       
       const emailHtml = `
