@@ -1379,20 +1379,22 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Téléphone Fixe <span className="text-muted-foreground text-xs">(5 XX XX XX XX)</span></Label>
+                  <Label>Téléphone Fixe</Label>
                   <PhoneInput
                     value={formData.directorPhoneFixed || ""}
                     onChange={(value) => setFormData({ ...formData, directorPhoneFixed: value })}
                     defaultCountry="MA"
+                    placeholder="5 XX XX XX XX"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Téléphone Mobile <span className="text-muted-foreground text-xs">(6 XX XX XX XX)</span></Label>
+                  <Label>Téléphone Mobile</Label>
                   <PhoneInput
                     value={formData.directorPhoneMobile || ""}
                     onChange={(value) => setFormData({ ...formData, directorPhoneMobile: value })}
                     defaultCountry="MA"
+                    placeholder="6 XX XX XX XX"
                   />
                 </div>
 
@@ -2100,20 +2102,22 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                   ))}
 
                 <div className="space-y-2">
-                  <Label>Téléphone Fixe <span className="text-muted-foreground text-xs">(5 XX XX XX XX)</span></Label>
+                  <Label>Téléphone Fixe</Label>
                   <PhoneInput
                     value={formData.authorPhoneFixed || ""}
                     onChange={(value) => setFormData({ ...formData, authorPhoneFixed: value })}
                     defaultCountry="MA"
+                    placeholder="5 XX XX XX XX"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Téléphone Mobile <span className="text-muted-foreground text-xs">(6 XX XX XX XX)</span></Label>
+                  <Label>Téléphone Mobile</Label>
                   <PhoneInput
                     value={formData.authorPhoneMobile || ""}
                     onChange={(value) => setFormData({ ...formData, authorPhoneMobile: value })}
                     defaultCountry="MA"
+                    placeholder="6 XX XX XX XX"
                   />
                 </div>
 
@@ -2869,20 +2873,22 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                   ))}
 
                 <div className="space-y-2">
-                  <Label>Téléphone Fixe <span className="text-muted-foreground text-xs">(5 XX XX XX XX)</span></Label>
+                  <Label>Téléphone Fixe</Label>
                   <PhoneInput
                     value={formData.authorPhoneFixed || ""}
                     onChange={(value) => setFormData({ ...formData, authorPhoneFixed: value })}
                     defaultCountry="MA"
+                    placeholder="5 XX XX XX XX"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Téléphone Mobile <span className="text-muted-foreground text-xs">(6 XX XX XX XX)</span></Label>
+                  <Label>Téléphone Mobile</Label>
                   <PhoneInput
                     value={formData.authorPhoneMobile || ""}
                     onChange={(value) => setFormData({ ...formData, authorPhoneMobile: value })}
                     defaultCountry="MA"
+                    placeholder="6 XX XX XX XX"
                   />
                 </div>
 
