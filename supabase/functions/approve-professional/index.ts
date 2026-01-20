@@ -29,12 +29,10 @@ serve(async (req) => {
 
   try {
     const resolvePublicSiteUrl = () => {
-      // Prefer an explicit public URL for the frontend. This avoids accidentally
-      // using a stale/incorrect SITE_URL (e.g., old environments).
       const raw =
-        Deno.env.get("PUBLIC_SITE_URL") ||
         Deno.env.get("SITE_URL") ||
-        "https://bnrm.lovable.app";
+        Deno.env.get("PUBLIC_SITE_URL") ||
+        "https://bnrm-dev.digiup.ma";
 
       return raw.trim().replace(/\/$/, "");
     };
