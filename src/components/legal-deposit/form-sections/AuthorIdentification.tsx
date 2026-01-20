@@ -212,9 +212,9 @@ export function AuthorIdentification({
           name="author.phoneFixed"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Téléphone Fixe <span className="text-muted-foreground text-xs">(5 XX XX XX XX)</span></FormLabel>
+              <FormLabel>Téléphone Fixe</FormLabel>
               <FormControl>
-                <Input placeholder="Numéro de téléphone fixe" {...field} />
+                <Input placeholder="5 XX XX XX XX" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -226,9 +226,9 @@ export function AuthorIdentification({
           name="author.phoneMobile"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Téléphone Mobile <span className="text-muted-foreground text-xs">(6 XX XX XX XX)</span></FormLabel>
+              <FormLabel>Téléphone Mobile</FormLabel>
               <FormControl>
-                <Input placeholder="Numéro de téléphone mobile" {...field} />
+                <Input placeholder="6 XX XX XX XX" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
