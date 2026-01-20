@@ -221,13 +221,13 @@ export const BNRMNumberAttribution = () => {
 
       const validatedRows = validatedRequests || [];
       
-      // Séparer les demandes valide_par_b:
-      // - Sans numéro attribué → "Demandes à traiter"
-      // - Avec numéro attribué → "Attribués"
-      const pendingRows = validatedRows.filter((r) => !hasAnyAttributedNumber(r));
+      // IMPORTANT: afficher TOUTES les demandes approuvées (comme dans 
+      // "Gestion des Demandes" > "Validés"), même si un numéro a déjà été attribué.
+      // Le bouton d'attribution sera masqué si un numéro existe déjà.
+      const pendingRows = validatedRows;
       const attributedRowsFromValidated = validatedRows.filter((r) => hasAnyAttributedNumber(r));
-
-      // Pending requests (à traiter) - seulement celles sans numéro
+ 
+      // Pending requests (à traiter) - toutes les approuvées, triées (plus récentes en premier)
       const transformedRequests = pendingRows.map((req) => {
         const metadata = (req.metadata as Record<string, any>) || {};
         const depositCategory = getDepositCategory(req);
