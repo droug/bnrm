@@ -420,50 +420,14 @@ export function ProfessionalRequestsManager() {
       user_id: data.user_id
     });
 
-    // Récupérer l'email de l'utilisateur
+    // L'email est déjà envoyé par l'edge function approve-professional
     const userEmail = data.user_email || 
                       selectedRequest.registration_data?.email || 
                       selectedRequest.registration_data?.contact_email;
 
-    if (userEmail) {
-      // Envoyer l'email de validation avec le lien de mot de passe
-      const { error: emailError } = await supabase.functions.invoke('send-registration-email', {
-        body: {
-          email_type: 'account_validated',
-          recipient_email: userEmail,
-          recipient_name: selectedRequest.registration_data?.contact_name || selectedRequest.company_name,
-          user_type: selectedRequest.professional_type,
-          user_id: data.user_id,
-          reset_link: data.password_reset_link // Utiliser le lien généré par l'Edge Function
-        }
-      });
-
-      if (emailError) {
-        console.error("Erreur envoi email:", emailError);
-        toast({
-          title: 'Email non envoyé',
-          description: `Impossible d'envoyer l'email à ${userEmail} : ${emailError.message || 'Erreur inconnue'}`,
-          variant: 'destructive'
-        });
-      } else {
-        toast({
-          title: 'Email envoyé',
-          description: `Un email avec le lien de création de mot de passe a été envoyé à ${userEmail}`,
-          className: 'bg-blue-50 border-blue-200'
-        });
-      }
-    } else {
-      console.warn("Aucun email trouvé pour l'utilisateur");
-      toast({
-        title: 'Email manquant',
-        description: "Aucune adresse email n'est associée à cette demande.",
-        variant: 'destructive'
-      });
-    }
-
     toast({
       title: 'Demande approuvée',
-      description: `Le compte professionnel "${selectedRequest.company_name}" a été créé avec succès`,
+      description: `Le compte professionnel "${selectedRequest.company_name}" a été créé et un email de notification a été envoyé à ${userEmail || 'l\'utilisateur'}`,
       className: 'bg-green-50 border-green-200'
     });
 
