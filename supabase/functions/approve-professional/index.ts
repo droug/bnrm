@@ -28,6 +28,85 @@ serve(async (req) => {
   }
 
   try {
+    const normalizeName = (name: string) => name.trim().replace(/\s+/g, " ");
+
+    const syncProfessionalDirectoryEntry = async (args: {
+      supabaseAdmin: any;
+      professionalType: string;
+      companyName: string;
+      registrationData: any;
+    }) => {
+      const { supabaseAdmin, professionalType, companyName, registrationData } = args;
+      const name = normalizeName(companyName || "");
+      if (!name) return;
+
+      const common = {
+        name,
+        city: registrationData?.city ?? null,
+        country: registrationData?.country ?? "Maroc",
+        address: registrationData?.address ?? null,
+        phone: registrationData?.phone ?? null,
+        email: registrationData?.email ?? registrationData?.contact_email ?? null,
+        google_maps_link: registrationData?.google_maps_link ?? null,
+        updated_at: new Date().toISOString(),
+      };
+
+      // Note: 'editor' entries live in the 'publishers' table (used by legal deposit forms).
+      const tableByType: Record<string, string> = {
+        editor: "publishers",
+        printer: "printers",
+        producer: "producers",
+        distributor: "distributors",
+      };
+
+      const table = tableByType[professionalType];
+      if (!table) return;
+
+      console.log("Directory sync start:", { table, name, professionalType });
+
+      // Try to find an existing entry by name (case-insensitive exact match)
+      const { data: existing, error: findError } = await supabaseAdmin
+        .from(table)
+        .select("id, name")
+        .ilike("name", name)
+        .maybeSingle();
+
+      if (findError) {
+        console.error("Directory sync find error:", { table, name, findError });
+        throw new Error(`Erreur lors de la recherche dans ${table}: ${findError.message}`);
+      }
+
+      if (existing?.id) {
+        const { error: updateError } = await supabaseAdmin
+          .from(table)
+          .update(common)
+          .eq("id", existing.id);
+
+        if (updateError) {
+          console.error("Directory sync update error:", { table, id: existing.id, updateError });
+          throw new Error(`Erreur lors de la mise à jour dans ${table}: ${updateError.message}`);
+        }
+
+        console.log("Directory sync updated:", { table, id: existing.id, name });
+        return;
+      }
+
+      const insertPayload = {
+        id: crypto.randomUUID(),
+        created_at: new Date().toISOString(),
+        ...common,
+      };
+
+      const { error: insertError } = await supabaseAdmin.from(table).insert(insertPayload);
+
+      if (insertError) {
+        console.error("Directory sync insert error:", { table, name, insertError });
+        throw new Error(`Erreur lors de l'insertion dans ${table}: ${insertError.message}`);
+      }
+
+      console.log("Directory sync inserted:", { table, name });
+    };
+
     const resolvePublicSiteUrl = () => {
       const raw =
         Deno.env.get("SITE_URL") ||
@@ -199,6 +278,15 @@ serve(async (req) => {
       );
       adminId = adminUser?.id || null;
     }
+
+    // IMPORTANT: For every approved registration, also sync the corresponding directory table
+    // so it appears everywhere the system reads from publishers/printers/producers/distributors.
+    await syncProfessionalDirectoryEntry({
+      supabaseAdmin,
+      professionalType: professional_type,
+      companyName: request.company_name,
+      registrationData: request.registration_data,
+    });
 
     // Mettre à jour la demande comme approuvée
     const { error: updateError } = await supabaseAdmin
