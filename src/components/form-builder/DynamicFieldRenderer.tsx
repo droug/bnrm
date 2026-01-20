@@ -31,7 +31,26 @@ export function DynamicFieldRenderer({
   const label = language === "ar" ? field.label_ar || field.label_fr : field.label_fr;
   const description = language === "ar" ? field.description_ar : field.description_fr;
 
+  // Détecter si c'est un champ téléphone par field_key ou label
+  const isPhoneField = field.field_type === "tel" || 
+                       field.field_key?.toLowerCase().includes('phone') ||
+                       field.field_key?.toLowerCase().includes('telephone') ||
+                       field.label_fr?.toLowerCase().includes('téléphone') ||
+                       field.label_fr?.toLowerCase().includes('telephone');
+
   const renderField = () => {
+    // Si c'est un champ téléphone, utiliser PhoneInput
+    if (isPhoneField) {
+      return (
+        <PhoneInput
+          value={value || ""}
+          onChange={onChange}
+          placeholder={label}
+          defaultCountry="MA"
+        />
+      );
+    }
+
     switch (field.field_type) {
       case "text":
       case "email":
