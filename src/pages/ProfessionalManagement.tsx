@@ -1,3 +1,4 @@
+// Professional Management Page
 import { AdminHeader } from "@/components/AdminHeader";
 import { ProfessionalInvitationsManager } from "@/components/admin/ProfessionalInvitationsManager";
 import { ProfessionalRequestsManager } from "@/components/admin/ProfessionalRequestsManager";
