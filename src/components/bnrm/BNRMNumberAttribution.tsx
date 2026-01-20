@@ -196,12 +196,12 @@ export const BNRMNumberAttribution = () => {
     try {
       setLoading(true);
       
-      // Fetch all validated requests (valide_par_b et valide_par_comite) - plus récentes en premier
-      // Les demandes validées dans "Gestion des Demandes" > "Validés" apparaissent ici
+      // Fetch all validated requests (valide_par_b, valide_par_comite, attribue) - plus récentes en premier
+      // (Même logique que /admin/legal-deposit → Gestion des demandes → Validés)
       const { data: validatedRequests, error: validatedError } = await supabase
         .from("legal_deposit_requests")
         .select("*")
-        .in("status", ["valide_par_b", "valide_par_comite"])
+        .in("status", ["valide_par_b", "valide_par_comite", "attribue"])
         .order("created_at", { ascending: false });
 
       if (validatedError) {
@@ -220,13 +220,13 @@ export const BNRMNumberAttribution = () => {
       }
 
       const validatedRows = validatedRequests || [];
-      
-      // IMPORTANT: afficher TOUTES les demandes approuvées (comme dans 
+
+      // IMPORTANT: afficher TOUTES les demandes approuvées (comme dans
       // "Gestion des Demandes" > "Validés"), même si un numéro a déjà été attribué.
       // Le bouton d'attribution sera masqué si un numéro existe déjà.
       const pendingRows = validatedRows;
       const attributedRowsFromValidated = validatedRows.filter((r) => hasAnyAttributedNumber(r));
- 
+
       // Pending requests (à traiter) - toutes les approuvées, triées (plus récentes en premier)
       const transformedRequests = pendingRows.map((req) => {
         const metadata = (req.metadata as Record<string, any>) || {};
@@ -260,8 +260,13 @@ export const BNRMNumberAttribution = () => {
 
       setPendingRequests(transformedRequests);
 
-      // Attributions = demandes avec status 'attribue' + demandes valide_par_b ayant un numéro
-      const allAttributedRows = [...(attributedRequests || []), ...attributedRowsFromValidated];
+      // Attributions = demandes avec status 'attribue' + demandes validées ayant un numéro
+      // (dédoublonnage par id pour éviter les doublons quand une demande est à la fois attribuée et présente dans validatedRows)
+      const allAttributedRows = Array.from(
+        new Map(
+          [...(attributedRequests || []), ...attributedRowsFromValidated].map((r: any) => [r.id, r])
+        ).values()
+      );
 
       const transformedAttributions: NumberAttribution[] = allAttributedRows.map((req) => {
         const metadata = (req.metadata as Record<string, any>) || {};
