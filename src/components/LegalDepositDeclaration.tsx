@@ -3590,19 +3590,73 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         }
       }
 
-      // Soumettre la demande
-      const { error: submitError } = await supabase
-        .from('legal_deposit_requests')
-        .update({ 
-          status: 'soumis',
-          submission_date: new Date().toISOString()
-        })
-        .eq('id', requestData.id);
+      // Vérifier si une confirmation réciproque est requise (Monographies et Périodiques uniquement, support imprimé)
+      const requiresReciprocalConfirmation = 
+        (depositType === 'monographie' || depositType === 'periodique') && 
+        supportType !== 'electronique' &&
+        editorData?.email && 
+        printerData?.email;
 
-      if (submitError) throw submitError;
+      if (requiresReciprocalConfirmation) {
+        // Mettre le statut en attente de confirmation réciproque
+        // On utilise 'soumis' mais avec confirmation_status 'pending_confirmation'
+        const { error: updateStatusError } = await supabase
+          .from('legal_deposit_requests')
+          .update({ 
+            status: 'soumis',
+            confirmation_status: 'pending_confirmation',
+            submission_date: new Date().toISOString()
+          })
+          .eq('id', requestData.id);
 
-      toast.dismiss();
-      toast.success(language === 'ar' ? "تم إرسال التصريح بنجاح" : "Déclaration de dépôt légal soumise avec succès");
+        if (updateStatusError) throw updateStatusError;
+
+        // Appeler l'edge function pour créer les tokens et envoyer les emails
+        toast.loading('Envoi des demandes de confirmation...');
+        
+        const { data: confirmData, error: confirmError } = await supabase.functions.invoke('deposit-confirmation', {
+          body: {
+            action: 'create_tokens',
+            request_id: requestData.id,
+            editor_email: editorData.email,
+            editor_name: editorData.name || selectedPublisher?.name || 'Éditeur',
+            printer_email: printerData.email,
+            printer_name: printerData.name || selectedPrinter?.name || 'Imprimeur',
+            deposit_type: depositTypeLabels[depositType],
+            title: formData.title || 'Sans titre',
+            initiator_type: userType === 'editor' || userType === 'producer' ? 'editor' : 'printer'
+          }
+        });
+
+        toast.dismiss();
+
+        if (confirmError) {
+          console.error('Confirmation workflow error:', confirmError);
+          toast.warning('Demande créée mais erreur lors de l\'envoi des confirmations. Vous pouvez relancer depuis votre espace.');
+        } else {
+          console.log('Confirmation workflow initiated:', confirmData);
+          toast.success(
+            language === 'ar' 
+              ? "تم إرسال التصريح. في انتظار تأكيد الطرفين" 
+              : "Demande soumise. En attente de confirmation de l'éditeur et de l'imprimeur"
+          );
+        }
+      } else {
+        // Pas de confirmation réciproque requise - soumettre directement
+        const { error: submitError } = await supabase
+          .from('legal_deposit_requests')
+          .update({ 
+            status: 'soumis',
+            submission_date: new Date().toISOString()
+          })
+          .eq('id', requestData.id);
+
+        if (submitError) throw submitError;
+
+        toast.dismiss();
+        toast.success(language === 'ar' ? "تم إرسال التصريح بنجاح" : "Déclaration de dépôt légal soumise avec succès");
+      }
+
       setCurrentStep("confirmation");
       
       // Rediriger vers la page des approbations après 2 secondes
