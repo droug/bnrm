@@ -1383,7 +1383,11 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
 
                 <div className="space-y-2">
                   <Label>Téléphone</Label>
-                  <Input placeholder="Téléphone" />
+                  <PhoneInput
+                    value={formData.directorPhone || ""}
+                    onChange={(value) => setFormData({ ...formData, directorPhone: value })}
+                    defaultCountry="MA"
+                  />
                 </div>
 
                 {/* Informations géographiques */}
