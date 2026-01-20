@@ -7,7 +7,9 @@ const authorIdentificationSchema = z.object({
   }),
   authorName: z.string().min(1, 'Le nom est obligatoire'),
   pseudonym: z.string().optional(),
-  phone: z.string().min(1, 'Le téléphone est obligatoire'),
+  phone: z.string().optional(), // Legacy field kept for compatibility
+  phoneFixed: z.string().optional(),
+  phoneMobile: z.string().optional(),
   email: z.string().email('Email invalide').min(1, 'L\'email est obligatoire'),
   region: z.string().optional(),
   city: z.string().optional(),
