@@ -39,6 +39,7 @@ import { CountrySingleAutocomplete } from "@/components/ui/country-single-autoco
 import { PublisherAutocomplete } from "@/components/ui/publisher-autocomplete";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { PrinterInlineForm } from "@/components/legal-deposit/PrinterInlineForm";
 
 interface Publisher {
   id: string;
@@ -208,6 +209,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
   const [printers, setPrinters] = useState<Printer[]>([]);
   const [printerSearch, setPrinterSearch] = useState<string>("");
   const [selectedPrinter, setSelectedPrinter] = useState<Printer | null>(null);
+  const [showPrinterInlineForm, setShowPrinterInlineForm] = useState(false);
   const [producers, setProducers] = useState<Producer[]>([]);
   const [producerSearch, setProducerSearch] = useState<string>("");
   const [selectedProducer, setSelectedProducer] = useState<Producer | null>(null);
@@ -1248,7 +1250,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                                 ))}
                               {printers.filter(printer => 
                                 printer.name.toLowerCase().includes(printerSearch.toLowerCase())
-                              ).length === 0 && (
+                              ).length === 0 && !showPrinterInlineForm && (
                                 <div className="px-4 py-3">
                                   <div className="text-sm text-muted-foreground mb-2">
                                     Aucune imprimerie trouvée
@@ -1258,27 +1260,23 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                                     variant="outline"
                                     size="sm"
                                     className="w-full"
-                                    onClick={async () => {
-                                      const newName = printerSearch;
-                                      const { data, error } = await supabase
-                                        .from('printers')
-                                        .insert([{ name: newName }])
-                                        .select('id, name, city, country, address, phone, email, google_maps_link')
-                                        .single();
-                                      
-                                      if (error) {
-                                        toast.error('Erreur lors de l\'ajout de l\'imprimerie');
-                                      } else if (data) {
-                                        setPrinters([...printers, data as unknown as Printer]);
-                                        setSelectedPrinter(data as unknown as Printer);
-                                        setPrinterSearch('');
-                                        toast.success('Imprimerie ajoutée avec succès');
-                                      }
-                                    }}
+                                    onClick={() => setShowPrinterInlineForm(true)}
                                   >
-                                    + Ajouter "{printerSearch}"
+                                    + Ajouter une imprimerie avec invitation
                                   </Button>
                                 </div>
+                              )}
+                              {showPrinterInlineForm && (
+                                <PrinterInlineForm
+                                  initialName={printerSearch}
+                                  onPrinterAdded={(printer) => {
+                                    setPrinters([...printers, printer]);
+                                    setSelectedPrinter(printer);
+                                    setPrinterSearch('');
+                                    setShowPrinterInlineForm(false);
+                                  }}
+                                  onCancel={() => setShowPrinterInlineForm(false)}
+                                />
                               )}
                             </div>
                           )}
@@ -1925,7 +1923,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                                 ))}
                               {printers.filter(printer => 
                                 printer.name.toLowerCase().includes(printerSearch.toLowerCase())
-                              ).length === 0 && (
+                              ).length === 0 && !showPrinterInlineForm && (
                                 <div className="px-4 py-3">
                                   <div className="text-sm text-muted-foreground mb-2">
                                     Aucune imprimerie trouvée
@@ -1935,27 +1933,23 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                                     variant="outline"
                                     size="sm"
                                     className="w-full"
-                                    onClick={async () => {
-                                      const newName = printerSearch;
-                                      const { data, error } = await supabase
-                                        .from('printers')
-                                        .insert([{ name: newName }])
-                                        .select('id, name, city, country, address, phone, email, google_maps_link')
-                                        .single();
-                                      
-                                      if (error) {
-                                        toast.error('Erreur lors de l\'ajout de l\'imprimerie');
-                                      } else if (data) {
-                                        setPrinters([...printers, data as unknown as Printer]);
-                                        setSelectedPrinter(data as unknown as Printer);
-                                        setPrinterSearch('');
-                                        toast.success('Imprimerie ajoutée avec succès');
-                                      }
-                                    }}
+                                    onClick={() => setShowPrinterInlineForm(true)}
                                   >
-                                    + Ajouter "{printerSearch}"
+                                    + Ajouter une imprimerie avec invitation
                                   </Button>
                                 </div>
+                              )}
+                              {showPrinterInlineForm && (
+                                <PrinterInlineForm
+                                  initialName={printerSearch}
+                                  onPrinterAdded={(printer) => {
+                                    setPrinters([...printers, printer]);
+                                    setSelectedPrinter(printer);
+                                    setPrinterSearch('');
+                                    setShowPrinterInlineForm(false);
+                                  }}
+                                  onCancel={() => setShowPrinterInlineForm(false)}
+                                />
                               )}
                             </div>
                           )}
@@ -3372,7 +3366,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                             ))}
                           {printers.filter(printer => 
                             printer.name.toLowerCase().includes(printerSearch.toLowerCase())
-                          ).length === 0 && (
+                          ).length === 0 && !showPrinterInlineForm && (
                             <div className="px-4 py-3">
                               <div className="text-sm text-muted-foreground mb-2">
                                 Aucune imprimerie trouvée
@@ -3382,27 +3376,23 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                                 variant="outline"
                                 size="sm"
                                 className="w-full"
-                                onClick={async () => {
-                                  const newName = printerSearch;
-                                  const { data, error } = await supabase
-                                    .from('printers')
-                                    .insert([{ name: newName }])
-                                    .select('id, name, city, country, address, phone, email, google_maps_link')
-                                    .single();
-                                  
-                                  if (error) {
-                                    toast.error('Erreur lors de l\'ajout de l\'imprimerie');
-                                  } else if (data) {
-                                    setPrinters([...printers, data as unknown as Printer]);
-                                    setSelectedPrinter(data as unknown as Printer);
-                                    setPrinterSearch('');
-                                    toast.success('Imprimerie ajoutée avec succès');
-                                  }
-                                }}
+                                onClick={() => setShowPrinterInlineForm(true)}
                               >
-                                + Ajouter "{printerSearch}"
+                                + Ajouter une imprimerie avec invitation
                               </Button>
                             </div>
+                          )}
+                          {showPrinterInlineForm && (
+                            <PrinterInlineForm
+                              initialName={printerSearch}
+                              onPrinterAdded={(printer) => {
+                                setPrinters([...printers, printer]);
+                                setSelectedPrinter(printer);
+                                setPrinterSearch('');
+                                setShowPrinterInlineForm(false);
+                              }}
+                              onCancel={() => setShowPrinterInlineForm(false)}
+                            />
                           )}
                         </div>
                       )}
