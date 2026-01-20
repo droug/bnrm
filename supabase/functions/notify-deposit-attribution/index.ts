@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-import nodemailer from "npm:nodemailer@6.9.12";
+import { sendEmail } from "../_shared/smtp-client.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -132,34 +132,6 @@ serve(async (req) => {
       });
     }
 
-    // Configuration SMTP Gmail via nodemailer (alignée sur send-registration-email)
-    const SMTP_HOST = Deno.env.get("SMTP_HOST");
-    const SMTP_PORT = Deno.env.get("SMTP_PORT");
-    const SMTP_USER = Deno.env.get("SMTP_USER");
-    const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
-    const SMTP_FROM = Deno.env.get("SMTP_FROM");
-
-    console.log(`[NOTIFY-ATTRIBUTION] SMTP Config - Host: ${SMTP_HOST}, Port: ${SMTP_PORT}, User: ${SMTP_USER}, From: ${SMTP_FROM}`);
-
-    if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASSWORD) {
-      console.warn("[NOTIFY-ATTRIBUTION] SMTP not fully configured");
-      return new Response(
-        JSON.stringify({
-          success: true,
-          emailSent: false,
-          message: "Notification enregistrée (SMTP non configuré)",
-          recipient: userEmail,
-        }),
-        {
-          status: 200,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
-    }
-    
-    // Utiliser l'email d'authentification comme expéditeur si SMTP_FROM est invalide
-    const fromAddress = SMTP_FROM && SMTP_FROM.includes('@') ? SMTP_FROM : SMTP_USER;
-
     const emailHtml = `
       <!DOCTYPE html>
       <html>
@@ -239,55 +211,38 @@ serve(async (req) => {
       </html>
     `;
 
-    try {
-      const port = parseInt(SMTP_PORT, 10);
-      // Gmail: port 465 = secure (SSL), port 587 = STARTTLS
-      const isSecure = port === 465;
+    // Utiliser le client SMTP partagé unifié
+    const emailResult = await sendEmail({
+      to: userEmail,
+      subject: `Attribution Dépôt Légal - ${request.request_number} - Demande Validée`,
+      html: emailHtml,
+    });
 
-      console.log(`[NOTIFY-ATTRIBUTION] Creating SMTP transport - port: ${port}, secure: ${isSecure}`);
-
-      const transport = nodemailer.createTransport({
-        host: SMTP_HOST,
-        port: port,
-        secure: isSecure,
-        auth: {
-          user: SMTP_USER,
-          pass: SMTP_PASSWORD,
-        },
-      });
-
-      console.log(`[NOTIFY-ATTRIBUTION] Using fromAddress: ${fromAddress}`);
-
-      const info = await transport.sendMail({
-        from: fromAddress,
-        to: userEmail,
-        subject: `Attribution Dépôt Légal - ${request.request_number} - Demande Validée`,
-        html: emailHtml,
-      });
-
-      console.log(`[NOTIFY-ATTRIBUTION] Email sent successfully via nodemailer to ${userEmail}, messageId: ${info.messageId}`);
+    if (emailResult.success) {
+      console.log(`[NOTIFY-ATTRIBUTION] Email sent successfully via ${emailResult.method} to ${userEmail}, messageId: ${emailResult.messageId}`);
 
       return new Response(
         JSON.stringify({
           success: true,
           emailSent: true,
-          message: "Notification envoyée avec succès via SMTP Gmail",
+          message: `Notification envoyée avec succès via ${emailResult.method === 'smtp' ? 'SMTP' : 'Resend'}`,
           recipient: userEmail,
+          method: emailResult.method,
         }),
         {
           status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         }
       );
-    } catch (smtpError: any) {
-      console.error("[NOTIFY-ATTRIBUTION] SMTP error:", smtpError);
+    } else {
+      console.error("[NOTIFY-ATTRIBUTION] Email send failed:", emailResult.error);
 
       return new Response(
         JSON.stringify({
           success: false,
           emailSent: false,
-          message: `Erreur SMTP: ${smtpError.message}`,
-          error: smtpError.message,
+          message: `Erreur d'envoi: ${emailResult.error}`,
+          error: emailResult.error,
           recipient: userEmail,
         }),
         {
