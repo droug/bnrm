@@ -665,6 +665,15 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                 </div>
 
                 <div className="space-y-2">
+                  <Label>Titre parallèle</Label>
+                  <Input 
+                    placeholder="Titre parallèle (titre dans une autre langue)" 
+                    value={formData.parallelTitle || ""}
+                    onChange={(e) => setFormData({ ...formData, parallelTitle: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label>Discipline de l'ouvrage</Label>
                   <div className="relative">
                     <Input
