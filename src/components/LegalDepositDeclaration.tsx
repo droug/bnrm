@@ -2099,7 +2099,11 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
 
                 <div className="space-y-2">
                   <Label>Téléphone</Label>
-                  <Input placeholder="Numéro de téléphone" />
+                  <PhoneInput
+                    value={formData.authorPhone || ""}
+                    onChange={(value) => setFormData({ ...formData, authorPhone: value })}
+                    defaultCountry="MA"
+                  />
                 </div>
 
                 <div className="space-y-2">
