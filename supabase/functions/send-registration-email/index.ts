@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-import nodemailer from "npm:nodemailer@6.9.12";
+import { sendEmail } from "../_shared/smtp-client.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -16,98 +16,6 @@ interface RegistrationEmailRequest {
   reset_link?: string;
   user_id?: string;
   additional_data?: Record<string, any>;
-}
-
-// Fonction d'envoi d'email via SMTP ou Resend (fallback)
-async function sendEmail(to: string, subject: string, html: string): Promise<{ success: boolean; error?: string; id?: string }> {
-  const SMTP_HOST = Deno.env.get("SMTP_HOST");
-  const SMTP_PORT = Deno.env.get("SMTP_PORT");
-  const SMTP_USER = Deno.env.get("SMTP_USER");
-  const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
-  const SMTP_FROM = Deno.env.get("SMTP_FROM");
-
-  // Essayer SMTP d'abord
-  if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASSWORD) {
-    try {
-      console.log(`Sending email via SMTP to: ${to}`);
-      console.log(`SMTP config: host=${SMTP_HOST}, port=${SMTP_PORT}, from=${SMTP_FROM}`);
-      
-      const port = parseInt(SMTP_PORT, 10);
-      
-      // Utiliser l'email d'authentification comme expéditeur si SMTP_FROM est invalide
-      const fromAddress = SMTP_FROM && SMTP_FROM.includes('@') ? SMTP_FROM : SMTP_USER;
-      
-      // Configuration nodemailer pour Gmail (port 587 = STARTTLS, port 465 = SSL)
-      const transporter = nodemailer.createTransport({
-        host: SMTP_HOST,
-        port: port,
-        secure: port === 465, // true pour 465, false pour autres ports
-        auth: {
-          user: SMTP_USER,
-          pass: SMTP_PASSWORD,
-        },
-      });
-
-      console.log(`Using fromAddress: ${fromAddress}`);
-      
-      const info = await transporter.sendMail({
-        from: fromAddress,
-        to: to,
-        subject: subject,
-        html: html,
-      });
-
-      console.log("Email sent successfully via SMTP, messageId:", info.messageId);
-      return { success: true, id: info.messageId };
-    } catch (error: any) {
-      console.error("SMTP error:", error.message || error);
-      console.log("Falling back to Resend...");
-      // Continuer vers Resend si SMTP échoue
-    }
-  } else {
-    console.log("SMTP not configured, trying Resend...");
-  }
-
-  // Fallback vers Resend
-  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-  if (RESEND_API_KEY) {
-    try {
-      console.log(`Sending email via Resend (fallback) to: ${to}`);
-      
-      // IMPORTANT: Resend en mode test ne peut envoyer qu'avec le domaine par défaut
-      // Pour utiliser un domaine personnalisé, vérifiez-le sur https://resend.com/domains
-      const resendFrom = "BNRM - Bibliothèque Nationale <onboarding@resend.dev>";
-      
-      const response = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${RESEND_API_KEY}`,
-        },
-        body: JSON.stringify({
-          from: resendFrom,
-          to: [to],
-          subject: subject,
-          html: html,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Resend error:", errorData);
-        return { success: false, error: errorData.message || "Resend error" };
-      }
-
-      const data = await response.json();
-      console.log("Email sent successfully via Resend");
-      return { success: true, id: data.id };
-    } catch (error: any) {
-      console.error("Resend error:", error);
-      return { success: false, error: error.message };
-    }
-  }
-
-  return { success: false, error: "No email service configured (SMTP or Resend)" };
 }
 
 serve(async (req) => {
@@ -169,8 +77,12 @@ serve(async (req) => {
       additional_data
     });
 
-    // Envoyer l'email
-    const emailResult = await sendEmail(recipient_email, subject, html);
+    // Envoyer l'email via le client SMTP unifié
+    const emailResult = await sendEmail({
+      to: recipient_email,
+      subject: subject,
+      html: html
+    });
 
     if (!emailResult.success) {
       console.error("Email sending failed:", emailResult.error);
@@ -209,7 +121,8 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         message: "Email envoyé avec succès",
-        email_id: emailResult.id 
+        email_id: emailResult.messageId,
+        method: emailResult.method
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
