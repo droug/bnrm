@@ -3875,25 +3875,35 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
       let initiatorId: string | null = null;
       
       // Essayer d'abord professional_registry
-      const { data: registryData } = await supabase
+      const { data: registryData, error: registryError } = await supabase
         .from('professional_registry')
         .select('id')
         .eq('user_id', user.id)
         .maybeSingle();
       
+      if (registryError) {
+        console.error('[DEPOSIT] Registry query error:', registryError);
+      }
+      
       if (registryData) {
         initiatorId = registryData.id;
+        console.log('[DEPOSIT] Found in professional_registry:', initiatorId);
       } else {
         // Sinon chercher dans professional_registration_requests (inscriptions approuvées)
-        const { data: requestData } = await supabase
+        const { data: requestData, error: requestQueryError } = await supabase
           .from('professional_registration_requests')
           .select('id')
           .eq('user_id', user.id)
           .eq('status', 'approved')
           .maybeSingle();
         
+        if (requestQueryError) {
+          console.error('[DEPOSIT] Request query error:', requestQueryError);
+        }
+        
         if (requestData) {
           initiatorId = requestData.id;
+          console.log('[DEPOSIT] Found in professional_registration_requests:', initiatorId);
         }
       }
       
@@ -3902,6 +3912,10 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         toast.error("Vous devez être enregistré comme professionnel pour soumettre une déclaration");
         return;
       }
+
+      console.log('[DEPOSIT DEBUG] User ID:', user.id);
+      console.log('[DEPOSIT DEBUG] Initiator ID:', initiatorId);
+      console.log('[DEPOSIT DEBUG] User type:', userType);
 
       // Créer la demande de dépôt légal
       const requestNumber = `DL-${new Date().getFullYear()}-${Date.now()}`;
