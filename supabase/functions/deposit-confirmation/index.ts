@@ -287,12 +287,18 @@ serve(async (req) => {
       }
 
       // Confirmer le token
+      // Extract first IP from x-forwarded-for (can contain multiple IPs separated by comma)
+      const forwardedFor = req.headers.get("x-forwarded-for");
+      const ipAddress = forwardedFor 
+        ? forwardedFor.split(",")[0].trim() 
+        : (req.headers.get("x-real-ip") || null);
+      
       const { error: updateError } = await supabase
         .from("deposit_confirmation_tokens")
         .update({
           status: "confirmed",
           confirmed_at: new Date().toISOString(),
-          ip_address: req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip"),
+          ip_address: ipAddress,
           user_agent: req.headers.get("user-agent"),
         })
         .eq("id", tokenData.id);
