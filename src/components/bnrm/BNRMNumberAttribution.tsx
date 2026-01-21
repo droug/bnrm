@@ -39,6 +39,7 @@ import { ReservedRangesManager } from "@/components/legal-deposit/ReservedRanges
 import { NumberManagementTab } from "@/components/legal-deposit/NumberManagementTab";
 import { SearchPagination } from "@/components/ui/search-pagination";
 import IssnRequestsManager from "@/components/legal-deposit/IssnRequestsManager";
+import * as XLSX from 'xlsx';
 
 interface NumberAttribution {
   id: string;
@@ -85,6 +86,7 @@ export const BNRMNumberAttribution = () => {
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [isRangeDialogOpen, setIsRangeDialogOpen] = useState(false);
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
+  const [importNumberType, setImportNumberType] = useState<'isbn' | 'issn' | 'ismn' | 'dl'>('isbn');
   const [isViewRequestDialogOpen, setIsViewRequestDialogOpen] = useState(false);
   const [selectedRequestForView, setSelectedRequestForView] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -807,10 +809,59 @@ export const BNRMNumberAttribution = () => {
   const paginatedAttributions = filteredAttributions.slice(startIndex, endIndex);
 
   const downloadExcelTemplate = () => {
-    // In real app, generate actual Excel template
+    // Generate actual Excel template using XLSX
+    const templateData = [
+      {
+        'Type': 'isbn',
+        'Numéro Début': '978-9981-100-00-0',
+        'Numéro Fin': '978-9981-100-99-9',
+        'Agence': 'BNRM',
+        'Date Expiration': '2025-12-31',
+        'Notes': 'Commentaires (optionnel)'
+      },
+      {
+        'Type': 'issn',
+        'Numéro Début': '2550-0001',
+        'Numéro Fin': '2550-0100',
+        'Agence': 'CIEPS',
+        'Date Expiration': '',
+        'Notes': ''
+      },
+      {
+        'Type': 'ismn',
+        'Numéro Début': '979-0-000000-00-0',
+        'Numéro Fin': '979-0-000000-99-9',
+        'Agence': 'ISMN International',
+        'Date Expiration': '',
+        'Notes': ''
+      },
+      {
+        'Type': 'dl',
+        'Numéro Début': 'DL-2025-000001',
+        'Numéro Fin': 'DL-2025-001000',
+        'Agence': 'BNRM',
+        'Date Expiration': '',
+        'Notes': ''
+      }
+    ];
+
+    const ws = XLSX.utils.json_to_sheet(templateData);
+    // Set column widths
+    ws['!cols'] = [
+      { wch: 8 },  // Type
+      { wch: 22 }, // Numéro Début
+      { wch: 22 }, // Numéro Fin
+      { wch: 20 }, // Agence
+      { wch: 15 }, // Date Expiration
+      { wch: 25 }  // Notes
+    ];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Tranches Numéros');
+    XLSX.writeFile(wb, 'template_import_numeros.xlsx');
+    
     toast({
-      title: "Téléchargement",
-      description: "Template Excel en cours de téléchargement...",
+      title: "Téléchargement réussi",
+      description: "Le template Excel a été téléchargé",
     });
   };
 
@@ -844,7 +895,7 @@ export const BNRMNumberAttribution = () => {
               <div className="space-y-4">
                 <div>
                   <Label>Type de numéros</Label>
-                  <Select>
+                  <Select value={importNumberType} onValueChange={(v) => setImportNumberType(v as typeof importNumberType)}>
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner le type" />
                     </SelectTrigger>
