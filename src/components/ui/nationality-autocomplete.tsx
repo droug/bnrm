@@ -210,6 +210,12 @@ export function NationalityAutocomplete({
   const [open, setOpen] = useState(false);
   const [nationalities, setNationalities] = useState<Nationality[]>([]);
   const [loading, setLoading] = useState(true);
+  // Valeur interne pour afficher immédiatement la sélection même si le parent tarde à se re-render
+  const [internalValue, setInternalValue] = useState<string>(value ?? '');
+
+  useEffect(() => {
+    setInternalValue(value ?? '');
+  }, [value]);
 
   useEffect(() => {
     loadNationalities();
@@ -242,15 +248,24 @@ export function NationalityAutocomplete({
     return label;
   };
 
-  const selectedNationality = nationalities.find((n) => n.code === value);
-  const isOtherSelected = value === 'OTHER';
+  const selectedNationality = nationalities.find((n) => n.code === internalValue);
+  const isOtherSelected = internalValue === 'OTHER';
+
+  const handleSelectCode = (code: string) => {
+    setInternalValue(code);
+    onChange(code);
+    if (code !== 'OTHER') {
+      onOtherValueChange?.('');
+    }
+    setOpen(false);
+  };
 
   // Afficher le label sélectionné (avec fallback si pas encore chargé)
   const getSelectedLabel = (): string => {
     if (isOtherSelected) return 'Autre';
     if (selectedNationality) return getDisplayLabel(selectedNationality.label_fr);
-    if (value && loading) return 'Chargement...';
-    if (value && !selectedNationality && !loading) return value; // Fallback: show code if not found
+    if (internalValue && loading) return 'Chargement...';
+    if (internalValue && !selectedNationality && !loading) return internalValue; // Fallback: show code if not found
     return placeholder;
   };
 
@@ -287,18 +302,18 @@ export function NationalityAutocomplete({
                 <CommandItem
                   key={nationality.code}
                   value={nationality.code === 'OTHER' ? 'Autre' : getDisplayLabel(nationality.label_fr)}
-                  onSelect={() => {
-                    onChange(nationality.code);
-                    if (nationality.code !== 'OTHER' && onOtherValueChange) {
-                      onOtherValueChange('');
-                    }
-                    setOpen(false);
+                  onPointerDown={(e) => {
+                    // Rend la sélection fiable même dans des layouts avec des overlays/z-index
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleSelectCode(nationality.code);
                   }}
+                  onSelect={() => handleSelectCode(nationality.code)}
                 >
                   <Check
                     className={cn(
                       'mr-2 h-4 w-4',
-                      value === nationality.code ? 'opacity-100' : 'opacity-0'
+                      internalValue === nationality.code ? 'opacity-100' : 'opacity-0'
                     )}
                   />
                   {nationality.code === 'OTHER' ? 'Autre' : getDisplayLabel(nationality.label_fr)}
