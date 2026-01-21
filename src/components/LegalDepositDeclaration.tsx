@@ -499,8 +499,46 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
     const autoFillPublisher = async () => {
       if (!user || initialUserType !== 'editor' || selectedPublisher) return;
       
-      // Check if user is an approved editor
-      const { data: editorRequest } = await supabase
+      console.log('[AutoFill Editor] Checking for user:', user.id, 'email:', user.email);
+      
+      // 1. First check in professional_registry (verified professionals)
+      const { data: registryData, error: registryError } = await supabase
+        .from('professional_registry')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('professional_type', 'editeur')
+        .eq('is_verified', true)
+        .maybeSingle();
+      
+      if (registryError) {
+        console.error('[AutoFill Editor] Registry error:', registryError);
+      }
+      
+      if (registryData) {
+        console.log('[AutoFill Editor] Found in professional_registry:', registryData.company_name);
+        const autoPublisher: Publisher = {
+          id: registryData.id,
+          name: registryData.company_name || 'Mon entreprise',
+          city: registryData.city || null,
+          country: 'Maroc',
+          publisher_type: null,
+          address: registryData.address || null,
+          phone: registryData.phone || null,
+          email: registryData.email || null,
+          google_maps_link: null
+        };
+        setSelectedPublisher(autoPublisher);
+        setEditorData({
+          name: autoPublisher.name,
+          email: autoPublisher.email,
+          city: autoPublisher.city,
+          country: autoPublisher.country
+        });
+        return;
+      }
+      
+      // 2. Check if user is an approved editor in registration requests
+      const { data: editorRequest, error: requestError } = await supabase
         .from('professional_registration_requests')
         .select('id, company_name, registration_data')
         .eq('user_id', user.id)
@@ -508,7 +546,12 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         .eq('status', 'approved')
         .maybeSingle();
       
+      if (requestError) {
+        console.error('[AutoFill Editor] Request error:', requestError);
+      }
+      
       if (editorRequest) {
+        console.log('[AutoFill Editor] Found in professional_registration_requests:', editorRequest.company_name);
         const regData = editorRequest.registration_data as Record<string, any> | null;
         const autoPublisher: Publisher = {
           id: editorRequest.id,
@@ -528,35 +571,44 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           city: autoPublisher.city,
           country: autoPublisher.country
         });
-      } else {
-        // Also check in publishers table (synced from approve-professional)
-        const { data: publisherData } = await supabase
-          .from('publishers')
-          .select('*')
-          .eq('email', user.email)
-          .maybeSingle();
-        
-        if (publisherData) {
-          const autoPublisher: Publisher = {
-            id: publisherData.id,
-            name: publisherData.name,
-            city: publisherData.city,
-            country: publisherData.country,
-            publisher_type: publisherData.publisher_type,
-            address: publisherData.address,
-            phone: publisherData.phone,
-            email: publisherData.email,
-            google_maps_link: publisherData.google_maps_link
-          };
-          setSelectedPublisher(autoPublisher);
-          setEditorData({
-            name: autoPublisher.name,
-            email: autoPublisher.email,
-            city: autoPublisher.city,
-            country: autoPublisher.country
-          });
-        }
+        return;
       }
+      
+      // 3. Also check in publishers table (synced from approve-professional)
+      const { data: publisherData, error: publisherError } = await supabase
+        .from('publishers')
+        .select('*')
+        .eq('email', user.email)
+        .maybeSingle();
+      
+      if (publisherError) {
+        console.error('[AutoFill Editor] Publisher error:', publisherError);
+      }
+      
+      if (publisherData) {
+        console.log('[AutoFill Editor] Found in publishers table:', publisherData.name);
+        const autoPublisher: Publisher = {
+          id: publisherData.id,
+          name: publisherData.name,
+          city: publisherData.city,
+          country: publisherData.country,
+          publisher_type: publisherData.publisher_type,
+          address: publisherData.address,
+          phone: publisherData.phone,
+          email: publisherData.email,
+          google_maps_link: publisherData.google_maps_link
+        };
+        setSelectedPublisher(autoPublisher);
+        setEditorData({
+          name: autoPublisher.name,
+          email: autoPublisher.email,
+          city: autoPublisher.city,
+          country: autoPublisher.country
+        });
+        return;
+      }
+      
+      console.log('[AutoFill Editor] No editor record found for user');
     };
     
     autoFillPublisher();
@@ -567,8 +619,45 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
     const autoFillPrinter = async () => {
       if (!user || initialUserType !== 'printer' || selectedPrinter) return;
       
-      // Check if user is an approved printer
-      const { data: printerRequest } = await supabase
+      console.log('[AutoFill Printer] Checking for user:', user.id, 'email:', user.email);
+      
+      // 1. First check in professional_registry (verified professionals)
+      const { data: registryData, error: registryError } = await supabase
+        .from('professional_registry')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('professional_type', 'imprimeur')
+        .eq('is_verified', true)
+        .maybeSingle();
+      
+      if (registryError) {
+        console.error('[AutoFill Printer] Registry error:', registryError);
+      }
+      
+      if (registryData) {
+        console.log('[AutoFill Printer] Found in professional_registry:', registryData.company_name);
+        const autoPrinter: Printer = {
+          id: registryData.id,
+          name: registryData.company_name || 'Mon imprimerie',
+          city: registryData.city || null,
+          country: 'Maroc',
+          address: registryData.address || null,
+          phone: registryData.phone || null,
+          email: registryData.email || null,
+          google_maps_link: null
+        };
+        setSelectedPrinter(autoPrinter);
+        setPrinterData({
+          name: autoPrinter.name,
+          email: autoPrinter.email,
+          city: autoPrinter.city,
+          country: autoPrinter.country
+        });
+        return;
+      }
+      
+      // 2. Check if user is an approved printer in registration requests
+      const { data: printerRequest, error: requestError } = await supabase
         .from('professional_registration_requests')
         .select('id, company_name, registration_data')
         .eq('user_id', user.id)
@@ -576,7 +665,12 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         .eq('status', 'approved')
         .maybeSingle();
       
+      if (requestError) {
+        console.error('[AutoFill Printer] Request error:', requestError);
+      }
+      
       if (printerRequest) {
+        console.log('[AutoFill Printer] Found in professional_registration_requests:', printerRequest.company_name);
         const regData = printerRequest.registration_data as Record<string, any> | null;
         const autoPrinter: Printer = {
           id: printerRequest.id,
@@ -595,34 +689,43 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           city: autoPrinter.city,
           country: autoPrinter.country
         });
-      } else {
-        // Also check in printers table (synced from approve-professional)
-        const { data: printerData } = await supabase
-          .from('printers')
-          .select('*')
-          .eq('email', user.email)
-          .maybeSingle();
-        
-        if (printerData) {
-          const autoPrinter: Printer = {
-            id: printerData.id,
-            name: printerData.name,
-            city: printerData.city,
-            country: printerData.country,
-            address: printerData.address,
-            phone: printerData.phone,
-            email: printerData.email,
-            google_maps_link: printerData.google_maps_link
-          };
-          setSelectedPrinter(autoPrinter);
-          setPrinterData({
-            name: autoPrinter.name,
-            email: autoPrinter.email,
-            city: autoPrinter.city,
-            country: autoPrinter.country
-          });
-        }
+        return;
       }
+      
+      // 3. Also check in printers table (synced from approve-professional)
+      const { data: printerTableData, error: printerError } = await supabase
+        .from('printers')
+        .select('*')
+        .eq('email', user.email)
+        .maybeSingle();
+      
+      if (printerError) {
+        console.error('[AutoFill Printer] Printers table error:', printerError);
+      }
+      
+      if (printerTableData) {
+        console.log('[AutoFill Printer] Found in printers table:', printerTableData.name);
+        const autoPrinter: Printer = {
+          id: printerTableData.id,
+          name: printerTableData.name,
+          city: printerTableData.city,
+          country: printerTableData.country,
+          address: printerTableData.address,
+          phone: printerTableData.phone,
+          email: printerTableData.email,
+          google_maps_link: printerTableData.google_maps_link
+        };
+        setSelectedPrinter(autoPrinter);
+        setPrinterData({
+          name: autoPrinter.name,
+          email: autoPrinter.email,
+          city: autoPrinter.city,
+          country: autoPrinter.country
+        });
+        return;
+      }
+      
+      console.log('[AutoFill Printer] No printer record found for user');
     };
     
     autoFillPrinter();
