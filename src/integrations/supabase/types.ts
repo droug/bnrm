@@ -6865,13 +6865,6 @@ export type Database = {
             referencedRelation: "professional_registry"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "legal_deposit_requests_initiator_id_fkey"
-            columns: ["initiator_id"]
-            isOneToOne: false
-            referencedRelation: "professional_registry"
-            referencedColumns: ["id"]
-          },
         ]
       }
       legal_deposit_validation_committee: {
