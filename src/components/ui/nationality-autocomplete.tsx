@@ -245,6 +245,15 @@ export function NationalityAutocomplete({
   const selectedNationality = nationalities.find((n) => n.code === value);
   const isOtherSelected = value === 'OTHER';
 
+  // Afficher le label sélectionné (avec fallback si pas encore chargé)
+  const getSelectedLabel = (): string => {
+    if (isOtherSelected) return 'Autre';
+    if (selectedNationality) return getDisplayLabel(selectedNationality.label_fr);
+    if (value && loading) return 'Chargement...';
+    if (value && !selectedNationality && !loading) return value; // Fallback: show code if not found
+    return placeholder;
+  };
+
   // Préparer la liste avec "Autre" à la fin (seulement si pas déjà présent dans la DB)
   const hasOtherInDb = nationalities.some(n => n.code === 'OTHER');
   const displayNationalities = hasOtherInDb 
@@ -259,17 +268,15 @@ export function NationalityAutocomplete({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between"
+            className="w-full justify-between font-normal"
           >
-            {isOtherSelected 
-              ? 'Autre' 
-              : selectedNationality 
-                ? getDisplayLabel(selectedNationality.label_fr) 
-                : placeholder}
+            <span className="truncate">
+              {getSelectedLabel()}
+            </span>
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0 bg-popover border border-border shadow-lg z-50" align="start">
+        <PopoverContent className="w-[--radix-popover-trigger-width] min-w-[200px] p-0 bg-popover border border-border shadow-lg z-[100]" align="start">
           <Command>
             <CommandInput placeholder="Rechercher une nationalité..." />
             <CommandEmpty>
