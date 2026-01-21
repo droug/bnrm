@@ -97,6 +97,16 @@ export const BNRMNumberAttribution = () => {
     expiry_date: ''
   });
   
+  // État pour la sélection de numéro
+  const [isNumberSelectionOpen, setIsNumberSelectionOpen] = useState(false);
+  const [selectedNumberType, setSelectedNumberType] = useState<'isbn' | 'issn' | 'ismn' | null>(null);
+  const [availableRanges, setAvailableRanges] = useState<NumberRange[]>([]);
+  const [reservedRanges, setReservedRanges] = useState<any[]>([]);
+  const [selectedRangeId, setSelectedRangeId] = useState<string>("");
+  const [customNumber, setCustomNumber] = useState<string>("");
+  const [useCustomNumber, setUseCustomNumber] = useState(false);
+  const [isAttributing, setIsAttributing] = useState(false);
+  
   // Paramétrage des numéros par type de document - avec persistance localStorage
   const defaultSettings = {
     monographie_imprime: { isbn: true, issn: false, ismn: false, dl: true },
@@ -465,6 +475,146 @@ export const BNRMNumberAttribution = () => {
         description: "Impossible d'attribuer le numéro",
         variant: "destructive",
       });
+    }
+  };
+
+  // Ouvrir l'interface de sélection de numéro
+  const openNumberSelection = async (numberType: 'isbn' | 'issn' | 'ismn') => {
+    setSelectedNumberType(numberType);
+    setUseCustomNumber(false);
+    setCustomNumber("");
+    setSelectedRangeId("");
+    
+    // Filtrer les tranches disponibles pour ce type
+    const filteredRanges = ranges.filter(r => r.number_type === numberType && r.status === 'active');
+    setAvailableRanges(filteredRanges);
+    
+    // Charger les tranches réservées depuis la base de données
+    try {
+      const { data: reserved, error } = await supabase
+        .from('reserved_number_ranges')
+        .select('*')
+        .eq('number_type', numberType)
+        .eq('status', 'active');
+      
+      if (!error && reserved) {
+        setReservedRanges(reserved);
+      }
+    } catch (e) {
+      console.error("Error fetching reserved ranges:", e);
+    }
+    
+    setIsNumberSelectionOpen(true);
+  };
+
+  // Confirmer l'attribution du numéro sélectionné
+  const confirmNumberAttribution = async () => {
+    if (!selectedRequest || !selectedNumberType) return;
+    
+    setIsAttributing(true);
+    
+    try {
+      let attributedNumber = '';
+      
+      if (useCustomNumber && customNumber.trim()) {
+        // Utiliser le numéro personnalisé
+        attributedNumber = customNumber.trim();
+      } else if (selectedRangeId) {
+        // Générer depuis la tranche sélectionnée
+        const range = availableRanges.find(r => r.id === selectedRangeId);
+        if (range) {
+          attributedNumber = generateNextNumber(selectedNumberType, range);
+        } else {
+          // Vérifier si c'est une tranche réservée
+          const reservedRange = reservedRanges.find(r => r.id === selectedRangeId);
+          if (reservedRange) {
+            // Générer le prochain numéro pour la tranche réservée
+            const currentNum = parseInt(reservedRange.current_number?.replace(/\D/g, '') || reservedRange.range_start?.replace(/\D/g, ''));
+            attributedNumber = formatNumberForType(selectedNumberType, currentNum + 1);
+          }
+        }
+      } else {
+        // Prendre le premier range disponible par défaut
+        const defaultRange = availableRanges[0];
+        if (defaultRange) {
+          attributedNumber = generateNextNumber(selectedNumberType, defaultRange);
+        } else {
+          throw new Error(`Aucune tranche ${selectedNumberType.toUpperCase()} disponible`);
+        }
+      }
+
+      if (!attributedNumber) {
+        throw new Error("Impossible de générer le numéro");
+      }
+
+      // Mettre à jour la demande
+      const request = pendingRequests.find(r => r.id === selectedRequest.id);
+      const currentMetadata = request?.metadata || {};
+      
+      const updateData: any = {
+        metadata: {
+          ...currentMetadata,
+          [`${selectedNumberType}_assigned`]: attributedNumber,
+          [`${selectedNumberType}_attribution_date`]: new Date().toISOString()
+        }
+      };
+
+      const { error } = await supabase
+        .from("legal_deposit_requests")
+        .update(updateData)
+        .eq("id", selectedRequest.id);
+
+      if (error) throw error;
+
+      // Ajouter à la liste des attributions
+      const newAttribution: NumberAttribution = {
+        id: Date.now().toString(),
+        deposit_id: selectedRequest.id,
+        number_type: selectedNumberType,
+        attributed_number: attributedNumber,
+        attribution_date: new Date().toISOString(),
+        status: 'attributed',
+        metadata: {
+          publication_title: request?.title || request?.metadata?.publication?.title,
+          declarant_name: request?.author_name || request?.metadata?.declarant?.name,
+          dl_number: request?.request_number || request?.dl_number
+        }
+      };
+
+      setAttributions(prev => [newAttribution, ...prev]);
+      await fetchData();
+
+      toast({
+        title: "Succès",
+        description: `Numéro ${selectedNumberType.toUpperCase()} attribué: ${attributedNumber}`,
+      });
+
+      // Fermer les modales
+      setIsNumberSelectionOpen(false);
+      setIsAttributionDialogOpen(false);
+      setSelectedRequest(null);
+      setSelectedNumberType(null);
+
+    } catch (error) {
+      console.error("Error attributing number:", error);
+      toast({
+        title: "Erreur",
+        description: error instanceof Error ? error.message : "Impossible d'attribuer le numéro",
+        variant: "destructive",
+      });
+    } finally {
+      setIsAttributing(false);
+    }
+  };
+
+  // Formater un numéro selon le type
+  const formatNumberForType = (type: 'isbn' | 'issn' | 'ismn', num: number): string => {
+    if (type === 'isbn' || type === 'ismn') {
+      const padded = num.toString().padStart(13, '0');
+      return `${padded.slice(0, 3)}-${padded.slice(3, 7)}-${padded.slice(7, 10)}-${padded.slice(10, 12)}-${padded.slice(12)}`;
+    } else {
+      const padded = num.toString().padStart(8, '0');
+      return `${padded.slice(0, 4)}-${padded.slice(4)}`;
     }
   };
 
@@ -1563,7 +1713,7 @@ export const BNRMNumberAttribution = () => {
                   {getSettingsForType(selectedRequest.deposit_type).isbn && (
                     <Button 
                       className="w-full justify-start"
-                      onClick={() => attributeNumber(selectedRequest.id, 'isbn')}
+                      onClick={() => openNumberSelection('isbn')}
                     >
                       <BookOpen className="h-4 w-4 mr-2" />
                       Attribuer un numéro ISBN
@@ -1574,7 +1724,7 @@ export const BNRMNumberAttribution = () => {
                   {getSettingsForType(selectedRequest.deposit_type).issn && (
                     <Button 
                       className="w-full justify-start"
-                      onClick={() => attributeNumber(selectedRequest.id, 'issn')}
+                      onClick={() => openNumberSelection('issn')}
                     >
                       <Newspaper className="h-4 w-4 mr-2" />
                       Attribuer un numéro ISSN
@@ -1585,7 +1735,7 @@ export const BNRMNumberAttribution = () => {
                   {getSettingsForType(selectedRequest.deposit_type).ismn && (
                     <Button 
                       className="w-full justify-start"
-                      onClick={() => attributeNumber(selectedRequest.id, 'ismn')}
+                      onClick={() => openNumberSelection('ismn')}
                     >
                       <Hash className="h-4 w-4 mr-2" />
                       Attribuer un numéro ISMN
@@ -1604,6 +1754,187 @@ export const BNRMNumberAttribution = () => {
               </div>
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Number Selection Dialog */}
+      <Dialog open={isNumberSelectionOpen} onOpenChange={setIsNumberSelectionOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              {selectedNumberType === 'isbn' && <BookOpen className="h-5 w-5" />}
+              {selectedNumberType === 'issn' && <Newspaper className="h-5 w-5" />}
+              {selectedNumberType === 'ismn' && <Hash className="h-5 w-5" />}
+              Sélection du numéro {selectedNumberType?.toUpperCase()}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* Tranches BNRM disponibles */}
+            <div>
+              <Label className="text-sm font-medium mb-2 block">Tranches BNRM disponibles</Label>
+              {availableRanges.length === 0 ? (
+                <div className="bg-muted/50 border border-dashed rounded-lg p-4 text-center text-muted-foreground text-sm">
+                  Aucune tranche {selectedNumberType?.toUpperCase()} disponible
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {availableRanges.map((range) => {
+                    const usagePercent = Math.round((range.used_numbers / range.total_numbers) * 100);
+                    const nextNumber = generateNextNumber(selectedNumberType!, range);
+                    return (
+                      <div 
+                        key={range.id}
+                        className={`border rounded-lg p-3 cursor-pointer transition-colors ${
+                          selectedRangeId === range.id 
+                            ? 'border-primary bg-primary/5' 
+                            : 'hover:border-muted-foreground/50'
+                        }`}
+                        onClick={() => {
+                          setSelectedRangeId(range.id);
+                          setUseCustomNumber(false);
+                        }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <input 
+                              type="radio" 
+                              checked={selectedRangeId === range.id && !useCustomNumber}
+                              onChange={() => {
+                                setSelectedRangeId(range.id);
+                                setUseCustomNumber(false);
+                              }}
+                              className="h-4 w-4 text-primary"
+                            />
+                            <div>
+                              <div className="font-mono text-sm font-medium">
+                                {range.range_start} → {range.range_end}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {range.agency || 'Source manuelle'} • {range.used_numbers}/{range.total_numbers} utilisés ({usagePercent}%)
+                              </div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-xs text-muted-foreground">Prochain numéro</div>
+                            <div className="font-mono text-sm font-bold text-primary">{nextNumber}</div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Tranches réservées aux professionnels */}
+            {reservedRanges.length > 0 && (
+              <div>
+                <Label className="text-sm font-medium mb-2 block">Tranches réservées (comptes professionnels)</Label>
+                <div className="space-y-2">
+                  {reservedRanges.map((range) => (
+                    <div 
+                      key={range.id}
+                      className={`border rounded-lg p-3 cursor-pointer transition-colors bg-amber-50/50 ${
+                        selectedRangeId === range.id 
+                          ? 'border-amber-500 bg-amber-100/50' 
+                          : 'border-amber-200 hover:border-amber-400'
+                      }`}
+                      onClick={() => {
+                        setSelectedRangeId(range.id);
+                        setUseCustomNumber(false);
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <input 
+                            type="radio" 
+                            checked={selectedRangeId === range.id && !useCustomNumber}
+                            onChange={() => {
+                              setSelectedRangeId(range.id);
+                              setUseCustomNumber(false);
+                            }}
+                            className="h-4 w-4 text-amber-600"
+                          />
+                          <div>
+                            <div className="font-mono text-sm font-medium">
+                              {range.range_start} → {range.range_end}
+                            </div>
+                            <div className="text-xs text-amber-700">
+                              Réservé pour: {range.requester_name || 'Professionnel'}
+                            </div>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300">
+                          Réservé
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Option numéro personnalisé */}
+            <div>
+              <div 
+                className={`border rounded-lg p-3 cursor-pointer transition-colors ${
+                  useCustomNumber 
+                    ? 'border-primary bg-primary/5' 
+                    : 'hover:border-muted-foreground/50'
+                }`}
+                onClick={() => setUseCustomNumber(true)}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <input 
+                    type="radio" 
+                    checked={useCustomNumber}
+                    onChange={() => setUseCustomNumber(true)}
+                    className="h-4 w-4 text-primary"
+                  />
+                  <Label className="text-sm font-medium cursor-pointer">Saisir un numéro personnalisé</Label>
+                </div>
+                {useCustomNumber && (
+                  <Input
+                    placeholder={`Entrez le numéro ${selectedNumberType?.toUpperCase()}...`}
+                    value={customNumber}
+                    onChange={(e) => setCustomNumber(e.target.value)}
+                    className="mt-2 font-mono"
+                    autoFocus
+                  />
+                )}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end gap-2 pt-4 border-t">
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setIsNumberSelectionOpen(false);
+                  setSelectedNumberType(null);
+                }}
+              >
+                Annuler
+              </Button>
+              <Button 
+                onClick={confirmNumberAttribution}
+                disabled={isAttributing || (!selectedRangeId && !useCustomNumber) || (useCustomNumber && !customNumber.trim())}
+              >
+                {isAttributing ? (
+                  <>
+                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                    Attribution...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Confirmer l'attribution
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
 
