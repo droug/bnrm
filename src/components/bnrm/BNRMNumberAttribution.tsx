@@ -899,7 +899,7 @@ export const BNRMNumberAttribution = () => {
                     <SelectTrigger>
                       <SelectValue placeholder="Sélectionner le type" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="z-[10002]">
                       <SelectItem value="isbn">ISBN</SelectItem>
                       <SelectItem value="issn">ISSN</SelectItem>
                       <SelectItem value="ismn">ISMN</SelectItem>
