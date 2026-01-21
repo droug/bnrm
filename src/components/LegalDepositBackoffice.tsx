@@ -41,6 +41,9 @@ interface LegalDepositRequest {
   status: 'brouillon' | 'soumis' | 'en_attente_validation_b' | 'valide_par_b' | 'rejete_par_b' | 'en_cours' | 'attribue' | 'receptionne' | 'rejete' | 'en_attente_comite_validation' | 'valide_par_comite' | 'rejete_par_comite';
   support_type: 'imprime' | 'electronique';
   monograph_type: string;
+  confirmation_status?: string | null;
+  editor_confirmed?: boolean;
+  printer_confirmed?: boolean;
   submission_date?: string;
   attribution_date?: string;
   dl_number?: string;
@@ -130,6 +133,8 @@ export const LegalDepositBackoffice = () => {
             email
           )
         `)
+        // Exclure les demandes en attente de confirmation réciproque (elles ne sont pas encore prêtes pour le backoffice)
+        .or('confirmation_status.is.null,confirmation_status.neq.pending_confirmation')
         .order('created_at', { ascending: false });
 
       // Appliquer les filtres
