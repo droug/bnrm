@@ -3851,11 +3851,26 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
       }
 
       // Vérifier si une confirmation réciproque est requise (Monographies et Périodiques uniquement, support imprimé)
+      // Utiliser les données du publisher/printer sélectionnés si editorData/printerData sont vides
+      const effectiveEditorEmail = editorData?.email || selectedPublisher?.email;
+      const effectivePrinterEmail = printerData?.email || selectedPrinter?.email;
+      
+      console.log('[DEPOSIT] Checking reciprocal confirmation:', {
+        depositType,
+        supportType,
+        effectiveEditorEmail,
+        effectivePrinterEmail,
+        editorDataEmail: editorData?.email,
+        printerDataEmail: printerData?.email,
+        selectedPublisherEmail: selectedPublisher?.email,
+        selectedPrinterEmail: selectedPrinter?.email
+      });
+      
       const requiresReciprocalConfirmation = 
         (depositType === 'monographie' || depositType === 'periodique') && 
         supportType !== 'electronique' &&
-        editorData?.email && 
-        printerData?.email;
+        effectiveEditorEmail && 
+        effectivePrinterEmail;
 
       if (requiresReciprocalConfirmation) {
         // Mettre le statut en attente de confirmation réciproque
@@ -3878,10 +3893,10 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           body: {
             action: 'create_tokens',
             request_id: requestData.id,
-            editor_email: editorData.email,
-            editor_name: editorData.name || selectedPublisher?.name || 'Éditeur',
-            printer_email: printerData.email,
-            printer_name: printerData.name || selectedPrinter?.name || 'Imprimeur',
+            editor_email: effectiveEditorEmail,
+            editor_name: editorData?.name || selectedPublisher?.name || 'Éditeur',
+            printer_email: effectivePrinterEmail,
+            printer_name: printerData?.name || selectedPrinter?.name || 'Imprimeur',
             deposit_type: depositTypeLabels[depositType],
             title: formData.title || 'Sans titre',
             initiator_type: userType === 'editor' || userType === 'producer' ? 'editor' : 'printer'
