@@ -321,7 +321,7 @@ export const NumberManagementTab = () => {
   return (
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="import" className="flex items-center gap-2">
             <Upload className="h-4 w-4" />
             Import Excel
@@ -329,10 +329,6 @@ export const NumberManagementTab = () => {
           <TabsTrigger value="assign" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             Attribution Plages
-          </TabsTrigger>
-          <TabsTrigger value="ranges" className="flex items-center gap-2">
-            <FileSpreadsheet className="h-4 w-4" />
-            Tranches Réservées
           </TabsTrigger>
         </TabsList>
 
@@ -497,10 +493,6 @@ export const NumberManagementTab = () => {
           </Card>
         </TabsContent>
 
-        {/* Reserved Ranges Tab */}
-        <TabsContent value="ranges" className="space-y-4">
-          <ReservedRangesManager />
-        </TabsContent>
       </Tabs>
 
       {/* Range Assignment Dialog */}
