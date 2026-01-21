@@ -335,7 +335,11 @@ export function MultipleAuthorsSection({
                             !field.field_key.toLowerCase().includes("nom") &&
                             !field.field_key.toLowerCase().includes("phone") &&
                             !field.field_key.toLowerCase().includes("email") &&
-                            !field.field_key.toLowerCase().includes("pseudonym")
+                            !field.field_key.toLowerCase().includes("pseudonym") &&
+                            !field.field_key.toLowerCase().includes("nationalit") &&
+                            !field.field_key.toLowerCase().includes("nationality") &&
+                            !field.field_key.toLowerCase().includes("genre") &&
+                            !field.field_key.toLowerCase().includes("gender")
                         )
                         .map((field) => (
                           <DynamicFieldRenderer
