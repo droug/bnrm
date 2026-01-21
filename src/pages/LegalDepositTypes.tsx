@@ -3,11 +3,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Book, Newspaper, Video, FolderOpen } from "lucide-react";
-import { useLanguage } from "@/hooks/useLanguage";
 
 export default function LegalDepositTypes() {
   const navigate = useNavigate();
-  const { t } = useLanguage();
 
   const depositTypes = [
     {
