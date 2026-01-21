@@ -13764,14 +13764,16 @@ export type Database = {
         Args: { p_start_date: string; p_subscription_type: string }
         Returns: string
       }
-      can_access_legal_deposit_request: {
-        Args: {
-          p_collaborator_id: string
-          p_initiator_id: string
-          p_user_id: string
-        }
-        Returns: boolean
-      }
+      can_access_legal_deposit_request:
+        | {
+            Args: {
+              p_collaborator_id: string
+              p_initiator_id: string
+              p_user_id: string
+            }
+            Returns: boolean
+          }
+        | { Args: { p_request_id: string }; Returns: boolean }
       can_use_daily_pass: {
         Args: { p_service_id?: string; p_user_id: string }
         Returns: boolean
@@ -13995,10 +13997,12 @@ export type Database = {
         Returns: string
       }
       is_admin_or_librarian: { Args: { user_uuid: string }; Returns: boolean }
-      is_legal_deposit_initiator: {
-        Args: { p_initiator_id: string; p_user_id: string }
-        Returns: boolean
-      }
+      is_legal_deposit_initiator:
+        | { Args: { p_initiator_id: string }; Returns: boolean }
+        | {
+            Args: { p_initiator_id: string; p_user_id: string }
+            Returns: boolean
+          }
       is_manuscript_admin: { Args: { _user_id: string }; Returns: boolean }
       log_search: {
         Args: {
