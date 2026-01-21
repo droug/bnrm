@@ -1540,9 +1540,22 @@ export const BNRMNumberAttribution = () => {
                 </div>
               </div>
 
+              {/* N° de Dépôt Légal - Attribué automatiquement */}
+              {getSettingsForType(selectedRequest.deposit_type).dl && (
+                <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <FileText className="h-4 w-4 text-green-600" />
+                    <Label className="text-sm font-medium text-green-800">N° de Dépôt Légal (attribué automatiquement)</Label>
+                  </div>
+                  <div className="font-mono font-bold text-green-700">
+                    {selectedRequest.metadata?.dl_assigned || 'Sera généré à la validation'}
+                  </div>
+                </div>
+              )}
+
               <div className="space-y-3">
                 <p className="text-sm text-muted-foreground">
-                  Sélectionnez le type de numéro à attribuer pour cette publication :
+                  Sélectionnez le type de numéro complémentaire à attribuer :
                 </p>
                 
                 <div className="grid gap-2">
@@ -1576,18 +1589,6 @@ export const BNRMNumberAttribution = () => {
                     >
                       <Hash className="h-4 w-4 mr-2" />
                       Attribuer un numéro ISMN
-                    </Button>
-                  )}
-                  
-                  {/* Dépôt Légal - si activé pour ce type */}
-                  {getSettingsForType(selectedRequest.deposit_type).dl && (
-                    <Button 
-                      variant="outline"
-                      className="w-full justify-start"
-                      onClick={() => attributeNumber(selectedRequest.id, 'dl')}
-                    >
-                      <FileText className="h-4 w-4 mr-2" />
-                      Attribuer le N° de Dépôt Légal
                     </Button>
                   )}
                 </div>
