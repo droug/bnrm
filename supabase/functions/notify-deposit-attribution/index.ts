@@ -79,10 +79,28 @@ serve(async (req) => {
     // Fallback: récupérer l'email depuis les metadata de la demande
     if (!userEmail) {
       const metadata = request.metadata as any;
+      
+      // Essayer différentes sources d'email dans les metadata
       if (metadata?.customFields?.author_email) {
         userEmail = metadata.customFields.author_email;
         userName = metadata.customFields.author_name || "Utilisateur";
-        console.log("[NOTIFY-ATTRIBUTION] Using email from metadata:", userEmail);
+        console.log("[NOTIFY-ATTRIBUTION] Using email from customFields.author_email:", userEmail);
+      } else if (metadata?.editor?.email) {
+        userEmail = metadata.editor.email;
+        userName = metadata.editor.name || "Éditeur";
+        console.log("[NOTIFY-ATTRIBUTION] Using email from editor:", userEmail);
+      } else if (metadata?.publisher?.email) {
+        userEmail = metadata.publisher.email;
+        userName = metadata.publisher.name || "Éditeur";
+        console.log("[NOTIFY-ATTRIBUTION] Using email from publisher:", userEmail);
+      } else if (metadata?.printer?.email) {
+        userEmail = metadata.printer.email;
+        userName = metadata.printer.name || "Imprimeur";
+        console.log("[NOTIFY-ATTRIBUTION] Using email from printer:", userEmail);
+      } else if (metadata?.producer?.email) {
+        userEmail = metadata.producer.email;
+        userName = metadata.producer.name || "Producteur";
+        console.log("[NOTIFY-ATTRIBUTION] Using email from producer:", userEmail);
       }
     }
 
