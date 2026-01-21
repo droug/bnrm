@@ -562,6 +562,72 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
     autoFillPublisher();
   }, [user, initialUserType, selectedPublisher]);
 
+  // Auto-fill printer if user is logged in as an approved printer
+  useEffect(() => {
+    const autoFillPrinter = async () => {
+      if (!user || initialUserType !== 'printer' || selectedPrinter) return;
+      
+      // Check if user is an approved printer
+      const { data: printerRequest } = await supabase
+        .from('professional_registration_requests')
+        .select('id, company_name, registration_data')
+        .eq('user_id', user.id)
+        .eq('professional_type', 'printer')
+        .eq('status', 'approved')
+        .maybeSingle();
+      
+      if (printerRequest) {
+        const regData = printerRequest.registration_data as Record<string, any> | null;
+        const autoPrinter: Printer = {
+          id: printerRequest.id,
+          name: printerRequest.company_name || 'Mon imprimerie',
+          city: regData?.city || null,
+          country: regData?.country || 'Maroc',
+          address: regData?.address || null,
+          phone: regData?.phone || null,
+          email: regData?.email || null,
+          google_maps_link: regData?.google_maps_link || null
+        };
+        setSelectedPrinter(autoPrinter);
+        setPrinterData({
+          name: autoPrinter.name,
+          email: autoPrinter.email,
+          city: autoPrinter.city,
+          country: autoPrinter.country
+        });
+      } else {
+        // Also check in printers table (synced from approve-professional)
+        const { data: printerData } = await supabase
+          .from('printers')
+          .select('*')
+          .eq('email', user.email)
+          .maybeSingle();
+        
+        if (printerData) {
+          const autoPrinter: Printer = {
+            id: printerData.id,
+            name: printerData.name,
+            city: printerData.city,
+            country: printerData.country,
+            address: printerData.address,
+            phone: printerData.phone,
+            email: printerData.email,
+            google_maps_link: printerData.google_maps_link
+          };
+          setSelectedPrinter(autoPrinter);
+          setPrinterData({
+            name: autoPrinter.name,
+            email: autoPrinter.email,
+            city: autoPrinter.city,
+            country: autoPrinter.country
+          });
+        }
+      }
+    };
+    
+    autoFillPrinter();
+  }, [user, initialUserType, selectedPrinter]);
+
   const depositTypeLabels = {
     monographie: "Monographies",
     periodique: "Publications Périodiques",
