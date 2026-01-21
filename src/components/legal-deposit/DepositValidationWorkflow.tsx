@@ -45,6 +45,10 @@ interface DepositRequest {
   rejected_by?: string;
   rejected_at?: string;
   rejection_reason?: string;
+  // Champs de confirmation
+  confirmation_status?: string;
+  editor_confirmed?: boolean;
+  printer_confirmed?: boolean;
 }
 
 export function DepositValidationWorkflow() {
@@ -131,7 +135,10 @@ export function DepositValidationWorkflow() {
         committee_validation_notes,
         rejected_by,
         rejected_at,
-        rejection_reason
+        rejection_reason,
+        confirmation_status,
+        editor_confirmed,
+        printer_confirmed
       `)
       .order("created_at", { ascending: false });
 
@@ -168,7 +175,10 @@ export function DepositValidationWorkflow() {
         committee_validation_notes,
         rejected_by,
         rejected_at,
-        rejection_reason
+        rejection_reason,
+        confirmation_status,
+        editor_confirmed,
+        printer_confirmed
       `)
       .order("created_at", { ascending: false });
 
@@ -1448,7 +1458,11 @@ export function DepositValidationWorkflow() {
                                       onClick={() => {
                                         setSelectedRequest(request);
                                         setEditTitle(request.title || "");
-                                        setEditPrinter(request.metadata?.printer_name || request.metadata?.customFields?.printer_name || "");
+                                        // Récupérer le nom de l'imprimeur depuis metadata.printer.name ou autres sources
+                                        const printerName = request.metadata?.printer?.name || 
+                                                           request.metadata?.printer_name || 
+                                                           request.metadata?.customFields?.printer_name || "";
+                                        setEditPrinter(printerName);
                                         setEditPageCount(request.metadata?.page_count?.toString() || request.metadata?.customFields?.page_count?.toString() || "");
                                       }}
                                     >
@@ -1656,6 +1670,47 @@ export function DepositValidationWorkflow() {
               {/* Étapes du workflow */}
               {renderWorkflowSteps(selectedRequest)}
 
+              {/* Statut de confirmation Éditeur/Imprimeur */}
+              {selectedRequest.confirmation_status && selectedRequest.confirmation_status !== 'not_required' && (
+                <Card className={`${
+                  selectedRequest.confirmation_status === 'confirmed' 
+                    ? 'border-green-500/50 bg-green-50' 
+                    : 'border-orange-500/50 bg-orange-50'
+                }`}>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm flex items-center gap-2">
+                      {selectedRequest.confirmation_status === 'confirmed' ? (
+                        <CheckCircle className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <AlertCircle className="h-4 w-4 text-orange-600" />
+                      )}
+                      Statut de confirmation réciproque
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pb-3">
+                    <div className="flex flex-wrap gap-2">
+                      <Badge variant={selectedRequest.editor_confirmed ? "default" : "secondary"} 
+                             className={selectedRequest.editor_confirmed ? "bg-green-600" : ""}>
+                        {selectedRequest.editor_confirmed 
+                          ? "✓ Demande confirmée par l'Éditeur" 
+                          : "En attente de confirmation Éditeur"}
+                      </Badge>
+                      <Badge variant={selectedRequest.printer_confirmed ? "default" : "secondary"}
+                             className={selectedRequest.printer_confirmed ? "bg-green-600" : ""}>
+                        {selectedRequest.printer_confirmed 
+                          ? "✓ Demande confirmée par l'Imprimeur" 
+                          : "En attente de confirmation Imprimeur"}
+                      </Badge>
+                    </div>
+                    {selectedRequest.confirmation_status === 'pending_confirmation' && (
+                      <p className="text-sm text-orange-700 mt-2">
+                        ⚠️ Le workflow de validation est bloqué jusqu'à ce que les deux parties aient confirmé la demande.
+                      </p>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+
               {/* Section des champs modifiables */}
               <Card className="border-primary/20 bg-primary/5">
                 <CardHeader className="pb-3">
@@ -1814,6 +1869,29 @@ export function DepositValidationWorkflow() {
 
               {/* Actions de validation - Sticky footer */}
               <div className="sticky bottom-0 bg-background border-t pt-4 pb-2 -mx-6 px-6">
+                {/* Vérifier si la confirmation réciproque est requise mais pas encore complète */}
+                {(() => {
+                  const confirmationRequired = selectedRequest.confirmation_status === 'pending_confirmation';
+                  const isConfirmed = selectedRequest.confirmation_status === 'confirmed' || 
+                                     selectedRequest.confirmation_status === 'not_required' ||
+                                     !selectedRequest.confirmation_status;
+                  
+                  if (confirmationRequired && !isConfirmed) {
+                    return (
+                      <div className="flex items-center gap-3 justify-center py-2 text-orange-600 bg-orange-50 rounded-lg border border-orange-200 mb-3">
+                        <AlertCircle className="h-5 w-5" />
+                        <span className="text-sm font-medium">
+                          Le workflow de validation est bloqué - En attente de la confirmation de 
+                          {!selectedRequest.editor_confirmed && !selectedRequest.printer_confirmed && " l'Éditeur et de l'Imprimeur"}
+                          {!selectedRequest.editor_confirmed && selectedRequest.printer_confirmed && " l'Éditeur"}
+                          {selectedRequest.editor_confirmed && !selectedRequest.printer_confirmed && " l'Imprimeur"}
+                        </span>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+                
                 {!selectedRequest.rejected_by && (
                   <div className="flex flex-wrap gap-3 justify-end">
                     {!selectedRequest.validated_by_committee && (
@@ -1828,7 +1906,10 @@ export function DepositValidationWorkflow() {
                         </Button>
                         <Button
                           onClick={() => setShowCommitteeConfirmModal(true)}
-                          disabled={isLoading}
+                          disabled={isLoading || selectedRequest.confirmation_status === 'pending_confirmation'}
+                          title={selectedRequest.confirmation_status === 'pending_confirmation' 
+                            ? "En attente de confirmation réciproque" 
+                            : "Approuver par le Comité"}
                         >
                           <CheckCircle className="h-4 w-4 mr-2" />
                           Approuver (Comité)
@@ -1856,7 +1937,10 @@ export function DepositValidationWorkflow() {
                         </Button>
                         <Button
                           onClick={() => handleValidation(selectedRequest.id, "department", "approved")}
-                          disabled={isLoading}
+                          disabled={isLoading || selectedRequest.confirmation_status === 'pending_confirmation'}
+                          title={selectedRequest.confirmation_status === 'pending_confirmation' 
+                            ? "En attente de confirmation réciproque" 
+                            : "Approuver par le Département ABN"}
                         >
                           <CheckCircle className="h-4 w-4 mr-2" />
                           Approuver (ABN)
