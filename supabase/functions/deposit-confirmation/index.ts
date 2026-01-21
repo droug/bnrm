@@ -23,9 +23,30 @@ interface ConfirmationRequest {
 
 // Helper to get the public site URL consistently
 function resolvePublicSiteUrl(): string {
-  const siteUrl = Deno.env.get("SITE_URL");
-  const publicSiteUrl = Deno.env.get("PUBLIC_SITE_URL");
-  return siteUrl || publicSiteUrl || "https://bnrm-dev.digiup.ma";
+  const raw =
+    Deno.env.get("SITE_URL") ||
+    Deno.env.get("PUBLIC_SITE_URL") ||
+    "https://bnrm-dev.digiup.ma";
+
+  const trimmed = raw.trim().replace(/\/$/, "");
+
+  try {
+    const url = new URL(trimmed);
+
+    const protocolOk = url.protocol === "https:" || url.protocol === "http:";
+    const hostOk = url.hostname.includes(".") && !url.hostname.includes("@");
+    const credsOk = !url.username && !url.password;
+
+    if (!protocolOk || !hostOk || !credsOk) throw new Error("Invalid site URL");
+
+    // Keep only the origin (no path/query) to avoid malformed links.
+    return url.origin;
+  } catch {
+    console.warn(
+      `[DEPOSIT-CONFIRMATION] Invalid SITE_URL/PUBLIC_SITE_URL ('${trimmed}'), falling back to https://bnrm-dev.digiup.ma`
+    );
+    return "https://bnrm-dev.digiup.ma";
+  }
 }
 
 serve(async (req) => {
@@ -142,7 +163,9 @@ serve(async (req) => {
       // Envoyer l'email à la partie non-initiatrice
       const pendingToken = createdTokens?.find(t => t.status === "pending");
       if (pendingToken) {
-        const confirmUrl = `${resolvePublicSiteUrl()}/confirm-deposit/${pendingToken.token}`;
+        const siteUrl = resolvePublicSiteUrl();
+        const confirmUrl = `${siteUrl}/confirm-deposit/${pendingToken.token}`;
+        console.log("[DEPOSIT-CONFIRMATION] Confirmation link:", confirmUrl);
         const partyName = pendingToken.party_type === "editor" ? editor_name : printer_name;
         const partyTypeFr = pendingToken.party_type === "editor" ? "Éditeur" : "Imprimeur";
         const initiatorTypeFr = initiator_type === "editor" ? "l'éditeur" : "l'imprimeur";
