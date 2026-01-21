@@ -13,6 +13,7 @@ interface AttributionNotificationRequest {
   attributedNumbers?: {
     isbn?: string;
     issn?: string;
+    ismn?: string;
     dlNumber?: string;
   };
 }
@@ -121,33 +122,91 @@ serve(async (req) => {
 
     console.log(`[NOTIFY-ATTRIBUTION] Sending to ${userEmail} for request ${request.request_number}`);
 
+    // Extraire les metadata pour afficher plus de détails
+    const metadata = request.metadata as any || {};
+    
     // Construire la liste des numéros attribués
     const numbers = attributedNumbers || {};
     let numbersHtml = '';
+    let hasNumbers = false;
     
     if (numbers.isbn || request.isbn_assigned) {
-      numbersHtml += `<p><strong>ISBN:</strong> ${numbers.isbn || request.isbn_assigned}</p>`;
+      numbersHtml += `<tr><td style="padding: 10px 15px; font-weight: 600; color: #333;">ISBN</td><td style="padding: 10px 15px; font-family: monospace; font-size: 16px; color: #10b981; font-weight: bold;">${numbers.isbn || request.isbn_assigned}</td></tr>`;
+      hasNumbers = true;
     }
     if (numbers.issn || request.issn_assigned) {
-      numbersHtml += `<p><strong>ISSN:</strong> ${numbers.issn || request.issn_assigned}</p>`;
+      numbersHtml += `<tr><td style="padding: 10px 15px; font-weight: 600; color: #333;">ISSN</td><td style="padding: 10px 15px; font-family: monospace; font-size: 16px; color: #10b981; font-weight: bold;">${numbers.issn || request.issn_assigned}</td></tr>`;
+      hasNumbers = true;
+    }
+    if (numbers.ismn || request.ismn_assigned) {
+      numbersHtml += `<tr><td style="padding: 10px 15px; font-weight: 600; color: #333;">ISMN</td><td style="padding: 10px 15px; font-family: monospace; font-size: 16px; color: #10b981; font-weight: bold;">${numbers.ismn || request.ismn_assigned}</td></tr>`;
+      hasNumbers = true;
     }
     if (numbers.dlNumber || request.dl_number) {
-      numbersHtml += `<p><strong>Numéro de Dépôt Légal:</strong> ${numbers.dlNumber || request.dl_number}</p>`;
+      numbersHtml += `<tr><td style="padding: 10px 15px; font-weight: 600; color: #333;">N° Dépôt Légal</td><td style="padding: 10px 15px; font-family: monospace; font-size: 16px; color: #002B45; font-weight: bold;">${numbers.dlNumber || request.dl_number}</td></tr>`;
+      hasNumbers = true;
     }
 
-    if (!numbersHtml) {
-      numbersHtml = '<p>Les numéros d\'identification seront communiqués ultérieurement.</p>';
+    if (!hasNumbers) {
+      numbersHtml = '<tr><td colspan="2" style="padding: 15px; text-align: center; color: #666;">Les numéros d\'identification seront communiqués ultérieurement.</td></tr>';
     }
 
-    // Créer une notification dans la base de données (seulement si userId existe)
-    if (userId) {
-      await supabaseAdmin.from("deposit_notifications").insert({
-        request_id: requestId,
-        recipient_id: userId,
-        notification_type: "attribution",
-        title: "Attribution de numéros - Dépôt Légal",
-        message: `Votre demande de dépôt légal "${request.title}" (${request.request_number}) a été validée et les numéros ont été attribués.`,
-      });
+    // Extraire les informations de l'auteur/éditeur/imprimeur
+    const authorName = metadata?.customFields?.author_name || metadata?.author?.name || '';
+    const authorType = metadata?.customFields?.author_type === 'moral' ? 'Personne morale' : 'Personne physique';
+    const editorName = metadata?.editor?.name || metadata?.publisher?.name || '';
+    const editorAddress = metadata?.editor?.address || metadata?.publisher?.address || '';
+    const printerName = metadata?.printer?.name || '';
+    const printerAddress = metadata?.printer?.address || '';
+    
+    // Informations de publication
+    const publicationType = request.support_type || 'Non spécifié';
+    const language = metadata?.publication?.languages?.join(', ') || metadata?.language || '';
+    const discipline = metadata?.publication?.discipline || '';
+    const pageCount = metadata?.publication?.pageCount || '';
+    const format = metadata?.publication?.format || '';
+    const printRun = metadata?.publication?.printRun || '';
+    const publicationDate = metadata?.publication?.publicationDate || '';
+    
+    // Formater la date de soumission
+    const submissionDate = request.created_at ? new Date(request.created_at).toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    }) : '';
+
+    // Construire les détails de la demande
+    let detailsHtml = '';
+    
+    if (authorName) {
+      detailsHtml += `<tr><td style="padding: 8px 0; color: #666; width: 40%;">Auteur</td><td style="padding: 8px 0; font-weight: 500;">${authorName} <span style="color: #888; font-size: 12px;">(${authorType})</span></td></tr>`;
+    }
+    if (editorName) {
+      detailsHtml += `<tr><td style="padding: 8px 0; color: #666;">Éditeur</td><td style="padding: 8px 0; font-weight: 500;">${editorName}</td></tr>`;
+    }
+    if (editorAddress) {
+      detailsHtml += `<tr><td style="padding: 8px 0; color: #666;">Adresse éditeur</td><td style="padding: 8px 0;">${editorAddress}</td></tr>`;
+    }
+    if (printerName) {
+      detailsHtml += `<tr><td style="padding: 8px 0; color: #666;">Imprimeur</td><td style="padding: 8px 0;">${printerName}</td></tr>`;
+    }
+    if (language) {
+      detailsHtml += `<tr><td style="padding: 8px 0; color: #666;">Langue(s)</td><td style="padding: 8px 0;">${language}</td></tr>`;
+    }
+    if (discipline) {
+      detailsHtml += `<tr><td style="padding: 8px 0; color: #666;">Discipline</td><td style="padding: 8px 0;">${discipline}</td></tr>`;
+    }
+    if (pageCount) {
+      detailsHtml += `<tr><td style="padding: 8px 0; color: #666;">Nombre de pages</td><td style="padding: 8px 0;">${pageCount}</td></tr>`;
+    }
+    if (format) {
+      detailsHtml += `<tr><td style="padding: 8px 0; color: #666;">Format</td><td style="padding: 8px 0;">${format}</td></tr>`;
+    }
+    if (printRun) {
+      detailsHtml += `<tr><td style="padding: 8px 0; color: #666;">Tirage</td><td style="padding: 8px 0;">${printRun} exemplaires</td></tr>`;
+    }
+    if (publicationDate) {
+      detailsHtml += `<tr><td style="padding: 8px 0; color: #666;">Date de publication</td><td style="padding: 8px 0;">${publicationDate}</td></tr>`;
     }
 
     const emailHtml = `
@@ -155,73 +214,120 @@ serve(async (req) => {
       <html>
       <head>
         <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #002B45 0%, #004d7a 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
-          .header h1 { margin: 0; font-size: 24px; }
-          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
-          .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
-          .success-badge { display: inline-block; background: #10b981; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold; margin-bottom: 20px; }
-          .info-box { background: white; padding: 20px; margin: 20px 0; border-left: 4px solid #002B45; border-radius: 4px; }
-          .numbers-box { background: #e8f5e9; padding: 20px; margin: 20px 0; border-left: 4px solid #10b981; border-radius: 4px; }
-          .numbers-box p { margin: 8px 0; }
-          .btn { display: inline-block; padding: 12px 30px; background: #002B45; color: white; text-decoration: none; border-radius: 4px; margin: 20px 0; }
-          .next-steps { background: #fff3cd; padding: 15px; margin: 20px 0; border-radius: 4px; border-left: 4px solid #ffc107; }
-          .next-steps h4 { margin: 0 0 10px 0; color: #856404; }
-          .next-steps ul { margin: 0; padding-left: 20px; }
+          body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background: #f5f5f5; }
+          .container { max-width: 650px; margin: 0 auto; background: white; }
+          .header { background: linear-gradient(135deg, #002B45 0%, #004d7a 100%); color: white; padding: 35px 30px; text-align: center; }
+          .header h1 { margin: 0; font-size: 22px; font-weight: 600; }
+          .header p { margin: 8px 0 0 0; opacity: 0.9; font-size: 14px; }
+          .content { padding: 35px 30px; }
+          .footer { background: #f8f9fa; padding: 25px 30px; text-align: center; border-top: 1px solid #e9ecef; }
+          .footer p { margin: 5px 0; font-size: 12px; color: #666; }
+          .success-badge { display: inline-block; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 10px 25px; border-radius: 25px; font-weight: 600; font-size: 14px; margin-bottom: 25px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3); }
+          .info-card { background: #f8fafc; border-radius: 12px; padding: 25px; margin: 25px 0; border: 1px solid #e2e8f0; }
+          .info-card h3 { margin: 0 0 15px 0; color: #002B45; font-size: 16px; display: flex; align-items: center; gap: 8px; }
+          .numbers-card { background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%); border-radius: 12px; padding: 25px; margin: 25px 0; border: 2px solid #10b981; }
+          .numbers-card h3 { margin: 0 0 15px 0; color: #065f46; font-size: 18px; text-align: center; }
+          .numbers-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+          .numbers-table tr:not(:last-child) { border-bottom: 1px solid #e5e7eb; }
+          .details-table { width: 100%; border-collapse: collapse; }
+          .btn { display: inline-block; padding: 14px 35px; background: linear-gradient(135deg, #002B45 0%, #004d7a 100%); color: white !important; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 14px; box-shadow: 0 4px 12px rgba(0, 43, 69, 0.3); }
+          .next-steps { background: #fffbeb; padding: 20px; margin: 25px 0; border-radius: 8px; border-left: 4px solid #f59e0b; }
+          .next-steps h4 { margin: 0 0 12px 0; color: #92400e; font-size: 14px; font-weight: 600; }
+          .next-steps ul { margin: 0; padding-left: 20px; color: #78350f; }
+          .next-steps li { margin: 6px 0; }
+          .divider { height: 1px; background: #e5e7eb; margin: 25px 0; }
+          .ref-badge { display: inline-block; background: #e0e7ff; color: #3730a3; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; }
         </style>
       </head>
       <body>
         <div class="container">
           <div class="header">
-            <h1>Bibliothèque Nationale du Royaume du Maroc</h1>
-            <p style="margin: 10px 0 0 0; opacity: 0.9;">Département du Dépôt Légal</p>
+            <h1>المكتبة الوطنية للمملكة المغربية</h1>
+            <h1 style="margin-top: 5px;">Bibliothèque Nationale du Royaume du Maroc</h1>
+            <p>Département du Dépôt Légal - ISBN/ISSN/ISMN</p>
           </div>
           <div class="content">
             <div style="text-align: center;">
-              <span class="success-badge">✓ DEMANDE VALIDÉE</span>
+              <span class="success-badge">✓ DEMANDE VALIDÉE & NUMÉROS ATTRIBUÉS</span>
             </div>
             
-            <h2>Félicitations ${userName} !</h2>
+            <h2 style="margin: 0 0 20px 0; color: #1f2937;">Bonjour ${userName},</h2>
             
-            <p>Nous avons le plaisir de vous informer que votre demande de dépôt légal a été <strong>validée</strong> et que les numéros d'identification ont été attribués à votre œuvre.</p>
+            <p style="font-size: 15px; color: #4b5563;">Nous avons le plaisir de vous informer que votre demande de dépôt légal a été <strong style="color: #10b981;">validée</strong> par le Département du Dépôt Légal de la BNRM.</p>
             
-            <div class="info-box">
-              <p><strong>Titre de l'œuvre:</strong> ${request.title}</p>
-              ${request.subtitle ? `<p><strong>Sous-titre:</strong> ${request.subtitle}</p>` : ''}
-              <p><strong>Numéro de demande:</strong> ${request.request_number}</p>
-              <p><strong>Type de support:</strong> ${request.support_type}</p>
+            <!-- Informations de base de la demande -->
+            <div class="info-card">
+              <h3>📄 Informations de la demande</h3>
+              <table class="details-table">
+                <tr>
+                  <td style="padding: 8px 0; color: #666; width: 40%;">Numéro de demande</td>
+                  <td style="padding: 8px 0;"><span class="ref-badge">${request.request_number}</span></td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; color: #666;">Titre de l'œuvre</td>
+                  <td style="padding: 8px 0; font-weight: 600; color: #1f2937;">${request.title}</td>
+                </tr>
+                ${request.subtitle ? `<tr><td style="padding: 8px 0; color: #666;">Sous-titre</td><td style="padding: 8px 0;">${request.subtitle}</td></tr>` : ''}
+                <tr>
+                  <td style="padding: 8px 0; color: #666;">Type de support</td>
+                  <td style="padding: 8px 0;">${publicationType}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; color: #666;">Date de soumission</td>
+                  <td style="padding: 8px 0;">${submissionDate}</td>
+                </tr>
+              </table>
             </div>
             
-            <div class="numbers-box">
-              <h3 style="margin: 0 0 15px 0; color: #10b981;">Numéros attribués</h3>
-              ${numbersHtml}
+            <!-- Numéros attribués -->
+            <div class="numbers-card">
+              <h3>🏆 Numéros attribués</h3>
+              <table class="numbers-table">
+                ${numbersHtml}
+              </table>
+              <p style="text-align: center; margin: 15px 0 0 0; font-size: 13px; color: #065f46;">
+                Conservez précieusement ces numéros pour vos publications.
+              </p>
             </div>
+            
+            <!-- Détails de la publication -->
+            ${detailsHtml ? `
+            <div class="info-card">
+              <h3>📚 Détails de la publication</h3>
+              <table class="details-table">
+                ${detailsHtml}
+              </table>
+            </div>
+            ` : ''}
             
             <div class="next-steps">
-              <h4>Prochaines étapes</h4>
+              <h4>📋 Prochaines étapes</h4>
               <ul>
-                <li>Téléchargez votre accusé de réception depuis votre espace personnel</li>
-                <li>Déposez les exemplaires requis à la BNRM dans un délai de 30 jours</li>
-                <li>Conservez précieusement les numéros attribués pour vos publications</li>
+                <li>Téléchargez votre attestation depuis votre espace personnel</li>
+                <li>Déposez les exemplaires requis à la BNRM dans un délai de <strong>30 jours</strong></li>
+                <li>Intégrez les numéros attribués (ISBN/ISSN/ISMN) sur vos publications</li>
               </ul>
             </div>
             
-            <p style="text-align: center;">
+            <div style="text-align: center; margin: 30px 0;">
               <a href="https://bnrm.lovable.app/my-space" class="btn">Accéder à mon espace</a>
-            </p>
+            </div>
             
-            <p>Pour toute question, n'hésitez pas à nous contacter.</p>
+            <div class="divider"></div>
             
-            <p>Cordialement,<br><strong>L'équipe du Dépôt Légal - BNRM</strong></p>
+            <p style="font-size: 14px; color: #6b7280;">Pour toute question concernant votre demande, vous pouvez nous contacter par email ou par téléphone.</p>
+            
+            <p style="margin-top: 20px;">Cordialement,<br><strong style="color: #002B45;">L'équipe du Dépôt Légal - BNRM</strong></p>
           </div>
           <div class="footer">
-            <p>Bibliothèque Nationale du Royaume du Maroc<br>
-            Avenue Ibn Khaldoun, Rabat, Maroc<br>
-            Tél: +212 537 77 18 33 | Email: depot.legal@bnrm.ma</p>
-            <p style="margin-top: 10px; font-size: 11px; color: #999;">
-              Ce message a été envoyé automatiquement. Merci de ne pas y répondre directement.
+            <p style="font-weight: 600; color: #333;">Bibliothèque Nationale du Royaume du Maroc</p>
+            <p>Avenue Ibn Khaldoun, Agdal - Rabat, Maroc</p>
+            <p>📞 +212 537 77 18 33 | ✉️ depot.legal@bnrm.ma</p>
+            <p style="margin-top: 15px; font-size: 11px; color: #999;">
+              Ce message a été envoyé automatiquement suite à la validation de votre demande.<br>
+              Merci de ne pas répondre directement à cet email.
             </p>
           </div>
         </div>
