@@ -494,6 +494,74 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
     fetchDistributors();
   }, []);
 
+  // Auto-fill publisher if user is logged in as an approved editor
+  useEffect(() => {
+    const autoFillPublisher = async () => {
+      if (!user || initialUserType !== 'editor' || selectedPublisher) return;
+      
+      // Check if user is an approved editor
+      const { data: editorRequest } = await supabase
+        .from('professional_registration_requests')
+        .select('id, company_name, registration_data')
+        .eq('user_id', user.id)
+        .eq('professional_type', 'editor')
+        .eq('status', 'approved')
+        .maybeSingle();
+      
+      if (editorRequest) {
+        const regData = editorRequest.registration_data as Record<string, any> | null;
+        const autoPublisher: Publisher = {
+          id: editorRequest.id,
+          name: editorRequest.company_name || 'Mon entreprise',
+          city: regData?.city || null,
+          country: regData?.country || 'Maroc',
+          publisher_type: regData?.type || null,
+          address: regData?.address || null,
+          phone: regData?.phone || null,
+          email: regData?.email || null,
+          google_maps_link: regData?.google_maps_link || null
+        };
+        setSelectedPublisher(autoPublisher);
+        setEditorData({
+          name: autoPublisher.name,
+          email: autoPublisher.email,
+          city: autoPublisher.city,
+          country: autoPublisher.country
+        });
+      } else {
+        // Also check in publishers table (synced from approve-professional)
+        const { data: publisherData } = await supabase
+          .from('publishers')
+          .select('*')
+          .eq('email', user.email)
+          .maybeSingle();
+        
+        if (publisherData) {
+          const autoPublisher: Publisher = {
+            id: publisherData.id,
+            name: publisherData.name,
+            city: publisherData.city,
+            country: publisherData.country,
+            publisher_type: publisherData.publisher_type,
+            address: publisherData.address,
+            phone: publisherData.phone,
+            email: publisherData.email,
+            google_maps_link: publisherData.google_maps_link
+          };
+          setSelectedPublisher(autoPublisher);
+          setEditorData({
+            name: autoPublisher.name,
+            email: autoPublisher.email,
+            city: autoPublisher.city,
+            country: autoPublisher.country
+          });
+        }
+      }
+    };
+    
+    autoFillPublisher();
+  }, [user, initialUserType, selectedPublisher]);
+
   const depositTypeLabels = {
     monographie: "Monographies",
     periodique: "Publications Périodiques",
@@ -3634,14 +3702,34 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
       toast.dismiss();
       toast.loading('Création de la demande...');
 
-      // 2. Récupérer l'ID du registre professionnel de l'utilisateur
-      const { data: professionalData, error: professionalError } = await supabase
+      // 2. Récupérer l'ID du professionnel - chercher d'abord dans professional_registry, sinon dans professional_registration_requests
+      let initiatorId: string | null = null;
+      
+      // Essayer d'abord professional_registry
+      const { data: registryData } = await supabase
         .from('professional_registry')
         .select('id')
         .eq('user_id', user.id)
-        .single();
-
-      if (professionalError || !professionalData) {
+        .maybeSingle();
+      
+      if (registryData) {
+        initiatorId = registryData.id;
+      } else {
+        // Sinon chercher dans professional_registration_requests (inscriptions approuvées)
+        const { data: requestData } = await supabase
+          .from('professional_registration_requests')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('status', 'approved')
+          .maybeSingle();
+        
+        if (requestData) {
+          initiatorId = requestData.id;
+        }
+      }
+      
+      if (!initiatorId) {
+        toast.dismiss();
         toast.error("Vous devez être enregistré comme professionnel pour soumettre une déclaration");
         return;
       }
@@ -3657,7 +3745,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
       else if (depositType === 'bd_logiciels') monographType = 'musique'; // Default for BD/software
       
       const newRequest = {
-        initiator_id: professionalData.id,
+        initiator_id: initiatorId,
         request_number: requestNumber,
         support_type: 'imprime' as const,
         monograph_type: monographType,
