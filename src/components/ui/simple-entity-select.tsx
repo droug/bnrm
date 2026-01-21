@@ -49,7 +49,7 @@ export function SimpleEntitySelect({ options, value, onChange, placeholder = "SÃ
       </button>
 
       {isOpen && (
-        <div className="absolute w-full mt-1 bg-background border border-input rounded-md shadow-lg z-50 max-h-60 overflow-auto">
+        <div className="absolute w-full mt-1 bg-popover border border-input rounded-md shadow-lg z-[100] max-h-60 overflow-auto">
           {options.map((option) => (
             <button
               key={option.value}

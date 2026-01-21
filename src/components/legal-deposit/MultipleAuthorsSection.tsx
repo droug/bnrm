@@ -6,6 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { InlineSelect } from "@/components/ui/inline-select";
 import { SimpleEntitySelect } from "@/components/ui/simple-entity-select";
 import { PhoneInput } from "@/components/ui/phone-input";
+import { NationalityAutocomplete } from "@/components/ui/nationality-autocomplete";
 import { Plus, Trash2, User, ChevronDown, ChevronUp } from "lucide-react";
 import { moroccanRegions, getCitiesByRegion } from "@/data/moroccanRegions";
 import { DynamicFieldRenderer } from "@/components/form-builder/DynamicFieldRenderer";
@@ -129,7 +130,7 @@ export function MultipleAuthorsSection({
             author.authorType === "Personne morale";
 
           return (
-            <Card key={author.id} className="border">
+            <Card key={author.id} className="border overflow-visible">
               <Collapsible open={isExpanded} onOpenChange={() => toggleExpanded(author.id)}>
                 <CollapsibleTrigger asChild>
                   <div className="flex items-center justify-between p-4 cursor-pointer hover:bg-muted/50 transition-colors">
@@ -175,8 +176,8 @@ export function MultipleAuthorsSection({
                   </div>
                 </CollapsibleTrigger>
 
-                <CollapsibleContent>
-                  <CardContent className="pt-0 pb-4">
+                <CollapsibleContent className="overflow-visible">
+                  <CardContent className="pt-0 pb-4 overflow-visible">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {/* Type de l'auteur */}
                       <div className="space-y-2">
@@ -247,10 +248,13 @@ export function MultipleAuthorsSection({
                       {isPersonnePhysique && (
                         <div className="space-y-2">
                           <Label>Nationalité</Label>
-                          <Input
-                            placeholder="Nationalité"
+                          <NationalityAutocomplete
                             value={author.nationality}
-                            onChange={(e) => updateAuthor(author.id, { nationality: e.target.value })}
+                            onChange={(value) => updateAuthor(author.id, { nationality: value })}
+                            placeholder="Sélectionner nationalité"
+                            gender={author.gender as 'homme' | 'femme' | ''}
+                            otherValue={author.otherNationality}
+                            onOtherValueChange={(value) => updateAuthor(author.id, { otherNationality: value })}
                           />
                         </div>
                       )}
