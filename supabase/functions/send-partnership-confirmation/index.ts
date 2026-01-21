@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-import nodemailer from "npm:nodemailer@6.9.12";
+import { sendEmail } from "../_shared/smtp-client.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,79 +13,6 @@ interface RequestBody {
   organisme: string;
 }
 
-// Fonction d'envoi d'email via SMTP (configuration admin) avec fallback Resend
-async function sendEmail(
-  to: string,
-  subject: string,
-  html: string
-): Promise<{ success: boolean; error?: string; id?: string }> {
-  const SMTP_HOST = Deno.env.get("SMTP_HOST");
-  const SMTP_PORT = Deno.env.get("SMTP_PORT");
-  const SMTP_USER = Deno.env.get("SMTP_USER");
-  const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
-  const SMTP_FROM = Deno.env.get("SMTP_FROM");
-
-  if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASSWORD) {
-    try {
-      console.log(`[PARTNERSHIP-CONFIRM] Sending email via SMTP to: ${to}`);
-      
-      const port = parseInt(SMTP_PORT, 10);
-      const fromAddress = SMTP_FROM && SMTP_FROM.includes('@') ? SMTP_FROM : SMTP_USER;
-      
-      const transporter = nodemailer.createTransport({
-        host: SMTP_HOST,
-        port: port,
-        secure: port === 465,
-        auth: { user: SMTP_USER, pass: SMTP_PASSWORD },
-      });
-
-      const info = await transporter.sendMail({
-        from: fromAddress,
-        to: to,
-        subject: subject,
-        html: html,
-      });
-
-      console.log("[PARTNERSHIP-CONFIRM] Email sent via SMTP, messageId:", info.messageId);
-      return { success: true, id: info.messageId };
-    } catch (error: any) {
-      console.error("[PARTNERSHIP-CONFIRM] SMTP error:", error.message);
-    }
-  }
-
-  // Fallback Resend
-  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-  if (RESEND_API_KEY) {
-    try {
-      const response = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${RESEND_API_KEY}`,
-        },
-        body: JSON.stringify({
-          from: "BNRM Activités Culturelles <onboarding@resend.dev>",
-          to: [to],
-          subject: subject,
-          html: html,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        return { success: false, error: errorData.message };
-      }
-
-      const data = await response.json();
-      return { success: true, id: data.id };
-    } catch (error: any) {
-      return { success: false, error: error.message };
-    }
-  }
-
-  return { success: false, error: "No email service configured" };
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -94,7 +21,7 @@ serve(async (req) => {
   try {
     const { partnership_id, email, organisme }: RequestBody = await req.json();
 
-    console.log("Sending partnership confirmation email:", { partnership_id, email, organisme });
+    console.log("[PARTNERSHIP-CONFIRM] Sending confirmation:", { partnership_id, email, organisme });
 
     // Préparer l'email HTML
     const emailHtml = `
@@ -155,12 +82,17 @@ serve(async (req) => {
       </html>
     `;
 
-    const result = await sendEmail(email, "Accusé de réception – Demande de partenariat BNRM", emailHtml);
+    // Utiliser le client SMTP unifié
+    const emailResult = await sendEmail({
+      to: email,
+      subject: "Accusé de réception – Demande de partenariat BNRM",
+      html: emailHtml,
+    });
 
-    if (result.success) {
-      console.log("Email sent successfully");
+    if (emailResult.success) {
+      console.log(`[PARTNERSHIP-CONFIRM] Email sent successfully via ${emailResult.method}`);
     } else {
-      console.warn("Email sending failed:", result.error);
+      console.warn("[PARTNERSHIP-CONFIRM] Email sending failed:", emailResult.error);
     }
 
     return new Response(
@@ -168,7 +100,8 @@ serve(async (req) => {
         success: true,
         message: "Email de confirmation envoyé",
         partnership_id,
-        email_sent: result.success,
+        email_sent: emailResult.success,
+        method: emailResult.method,
       }),
       {
         status: 200,
@@ -176,7 +109,7 @@ serve(async (req) => {
       }
     );
   } catch (error: any) {
-    console.error("Error in send-partnership-confirmation:", error);
+    console.error("[PARTNERSHIP-CONFIRM] Error:", error);
     return new Response(
       JSON.stringify({ error: error.message || "Erreur interne du serveur" }),
       {

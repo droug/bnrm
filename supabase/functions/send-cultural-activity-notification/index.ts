@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import nodemailer from "npm:nodemailer@6.9.12";
+import { sendEmail } from "../_shared/smtp-client.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -25,79 +25,6 @@ interface NotificationRequest {
   };
 }
 
-// Fonction d'envoi d'email via SMTP (configuration admin) avec fallback Resend
-async function sendEmail(
-  to: string,
-  subject: string,
-  html: string
-): Promise<{ success: boolean; error?: string; id?: string }> {
-  const SMTP_HOST = Deno.env.get("SMTP_HOST");
-  const SMTP_PORT = Deno.env.get("SMTP_PORT");
-  const SMTP_USER = Deno.env.get("SMTP_USER");
-  const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
-  const SMTP_FROM = Deno.env.get("SMTP_FROM");
-
-  if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASSWORD) {
-    try {
-      console.log(`[CULTURAL-NOTIF] Sending email via SMTP to: ${to}`);
-      
-      const port = parseInt(SMTP_PORT, 10);
-      const fromAddress = SMTP_FROM && SMTP_FROM.includes('@') ? SMTP_FROM : SMTP_USER;
-      
-      const transporter = nodemailer.createTransport({
-        host: SMTP_HOST,
-        port: port,
-        secure: port === 465,
-        auth: { user: SMTP_USER, pass: SMTP_PASSWORD },
-      });
-
-      const info = await transporter.sendMail({
-        from: fromAddress,
-        to: to,
-        subject: subject,
-        html: html,
-      });
-
-      console.log("[CULTURAL-NOTIF] Email sent via SMTP, messageId:", info.messageId);
-      return { success: true, id: info.messageId };
-    } catch (error: any) {
-      console.error("[CULTURAL-NOTIF] SMTP error:", error.message);
-    }
-  }
-
-  // Fallback Resend
-  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-  if (RESEND_API_KEY) {
-    try {
-      const response = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${RESEND_API_KEY}`,
-        },
-        body: JSON.stringify({
-          from: "BNRM Activités Culturelles <onboarding@resend.dev>",
-          to: [to],
-          subject: subject,
-          html: html,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        return { success: false, error: errorData.message };
-      }
-
-      const data = await response.json();
-      return { success: true, id: data.id };
-    } catch (error: any) {
-      return { success: false, error: error.message };
-    }
-  }
-
-  return { success: false, error: "No email service configured" };
-}
-
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -106,7 +33,7 @@ const handler = async (req: Request): Promise<Response> => {
   try {
     const requestData: NotificationRequest = await req.json();
     
-    console.log("Processing notification:", {
+    console.log("[CULTURAL-NOTIF] Processing notification:", {
       type: requestData.type,
       email: requestData.recipient_email
     });
@@ -258,18 +185,28 @@ const handler = async (req: Request): Promise<Response> => {
         throw new Error(`Unknown notification type: ${requestData.type}`);
     }
 
-    console.log(`Sending ${requestData.type} email to ${requestData.recipient_email}`);
+    console.log(`[CULTURAL-NOTIF] Sending ${requestData.type} email to ${requestData.recipient_email}`);
 
-    const result = await sendEmail(requestData.recipient_email, subject, htmlContent);
+    // Utiliser le client SMTP unifié
+    const emailResult = await sendEmail({
+      to: requestData.recipient_email,
+      subject,
+      html: htmlContent,
+    });
 
-    console.log("Email result:", result);
+    console.log(`[CULTURAL-NOTIF] Email result: ${emailResult.success ? 'success' : 'failed'} via ${emailResult.method || 'N/A'}`);
 
     return new Response(
-      JSON.stringify({ success: result.success, message: "Email sent successfully", email_id: result.id }),
+      JSON.stringify({ 
+        success: emailResult.success, 
+        message: emailResult.success ? "Email sent successfully" : emailResult.error, 
+        email_id: emailResult.messageId,
+        method: emailResult.method,
+      }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   } catch (error: any) {
-    console.error("Error in send-cultural-activity-notification function:", error);
+    console.error("[CULTURAL-NOTIF] Error:", error);
     return new Response(
       JSON.stringify({ success: false, error: error.message }),
       { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }

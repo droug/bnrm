@@ -1,8 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-import { Resend } from "npm:resend@2.0.0";
+import { sendEmail } from "../_shared/smtp-client.ts";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -24,7 +23,7 @@ const handler = async (req: Request): Promise<Response> => {
     const supabase = createClient(supabaseUrl, supabaseKey);
     const { campaignId }: EmailRequest = await req.json();
 
-    console.log("Processing mass email campaign:", campaignId);
+    console.log("[MASS-EMAIL] Processing campaign:", campaignId);
 
     // Get campaign details
     const { data: campaign, error: campaignError } = await supabase
@@ -73,6 +72,8 @@ const handler = async (req: Request): Promise<Response> => {
       }
     }
 
+    console.log(`[MASS-EMAIL] Found ${recipients.length} recipients`);
+
     // Update campaign status
     await supabase
       .from("email_campaigns")
@@ -107,26 +108,31 @@ const handler = async (req: Request): Promise<Response> => {
             }
           }
 
-          const emailResponse = await resend.emails.send({
-            from: `${campaign.from_name} <${campaign.from_email}>`,
-            to: [email],
+          // Utiliser le client SMTP unifié
+          const emailResult = await sendEmail({
+            to: email,
             subject: campaign.subject,
             html: htmlContent,
+            from: `${campaign.from_name} <${campaign.from_email}>`,
           });
 
-          console.log("Email sent to:", email, emailResponse);
+          if (emailResult.success) {
+            console.log(`[MASS-EMAIL] Email sent to: ${email} via ${emailResult.method}`);
 
-          // Log success
-          await supabase.from("email_campaign_logs").insert({
-            campaign_id: campaignId,
-            recipient_email: email,
-            status: "sent",
-            metadata: { resend_id: emailResponse.data?.id },
-          });
+            // Log success
+            await supabase.from("email_campaign_logs").insert({
+              campaign_id: campaignId,
+              recipient_email: email,
+              status: "sent",
+              metadata: { message_id: emailResult.messageId, method: emailResult.method },
+            });
 
-          totalSent++;
+            totalSent++;
+          } else {
+            throw new Error(emailResult.error);
+          }
         } catch (error: any) {
-          console.error("Error sending email to:", email, error);
+          console.error("[MASS-EMAIL] Error sending email to:", email, error);
 
           // Log failure
           await supabase.from("email_campaign_logs").insert({
@@ -155,6 +161,8 @@ const handler = async (req: Request): Promise<Response> => {
       })
       .eq("id", campaignId);
 
+    console.log(`[MASS-EMAIL] Campaign completed: ${totalSent} sent, ${totalFailed} failed`);
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -168,7 +176,7 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
   } catch (error: any) {
-    console.error("Error in send-mass-email function:", error);
+    console.error("[MASS-EMAIL] Error:", error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {
