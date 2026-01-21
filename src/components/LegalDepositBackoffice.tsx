@@ -120,19 +120,7 @@ export const LegalDepositBackoffice = () => {
       
       let query = supabase
         .from('legal_deposit_requests')
-        .select(`
-          *,
-          initiator:professional_registry!initiator_id (
-            company_name,
-            professional_type,
-            email
-          ),
-          collaborator:professional_registry!collaborator_id (
-            company_name,
-            professional_type,
-            email
-          )
-        `)
+        .select(`*`)
         // Exclure les demandes en attente de confirmation réciproque (elles ne sont pas encore prêtes pour le backoffice)
         .or('confirmation_status.is.null,confirmation_status.neq.pending_confirmation')
         .order('created_at', { ascending: false });
