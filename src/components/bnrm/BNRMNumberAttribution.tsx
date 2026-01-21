@@ -679,26 +679,99 @@ export const BNRMNumberAttribution = () => {
     if (!file) return;
 
     try {
-      // Simulate Excel import - in real app, use a library like xlsx
       toast({
         title: "Import en cours",
         description: "Traitement du fichier Excel...",
       });
 
-      // Mock processing
-      setTimeout(() => {
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data);
+      const sheetName = workbook.SheetNames[0];
+      const worksheet = workbook.Sheets[sheetName];
+      const jsonData = XLSX.utils.sheet_to_json(worksheet) as any[];
+
+      if (jsonData.length === 0) {
         toast({
-          title: "Succès",
-          description: "50 numéros importés avec succès",
+          title: "Fichier vide",
+          description: "Aucune donnée trouvée dans le fichier",
+          variant: "destructive"
         });
-        setIsImportDialogOpen(false);
-      }, 2000);
+        return;
+      }
+
+      // Parse and validate imported ranges
+      const importedRanges: NumberRange[] = jsonData.map((row, index) => {
+        const numberType = (row['Type'] || row['type'] || importNumberType).toLowerCase() as 'isbn' | 'issn' | 'ismn' | 'dl';
+        const rangeStart = String(row['Numéro Début'] || row['numero_debut'] || row['range_start'] || '');
+        const rangeEnd = String(row['Numéro Fin'] || row['numero_fin'] || row['range_end'] || '');
+        const agency = row['Agence'] || row['agence'] || row['agency'] || 'BNRM';
+        const expiryDate = row['Date Expiration'] || row['date_expiration'] || row['expiry_date'] || '';
+        
+        return {
+          id: `import-${Date.now()}-${index}`,
+          number_type: numberType,
+          range_start: rangeStart,
+          range_end: rangeEnd,
+          current_position: rangeStart,
+          total_numbers: 100, // Default estimate
+          used_numbers: 0,
+          status: 'active' as const,
+          assigned_date: new Date().toISOString().split('T')[0],
+          expiry_date: expiryDate || undefined,
+          source: 'imported' as const,
+          agency: agency
+        };
+      }).filter(r => r.range_start && r.range_end);
+
+      if (importedRanges.length === 0) {
+        toast({
+          title: "Format invalide",
+          description: "Aucune plage valide trouvée. Vérifiez le format du fichier.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Add imported ranges to state
+      setRanges(prev => [...prev, ...importedRanges]);
+
+      // Also save to database if possible
+      try {
+        const user = await supabase.auth.getUser();
+        const rangesToInsert = importedRanges.map(r => ({
+          requester_id: user.data.user?.id || '',
+          requester_name: r.agency || 'BNRM (Import)',
+          deposit_type: 'import',
+          number_type: r.number_type,
+          range_start: r.range_start,
+          range_end: r.range_end,
+          current_position: r.range_start,
+          total_numbers: r.total_numbers,
+          used_numbers: 0,
+          status: 'active',
+          notes: `Import Excel - ${r.agency}`,
+          reserved_by: user.data.user?.id
+        }));
+
+        await supabase.from('reserved_number_ranges').insert(rangesToInsert);
+      } catch (dbError) {
+        console.log("Could not save to database:", dbError);
+      }
+
+      toast({
+        title: "Import réussi",
+        description: `${importedRanges.length} plage(s) de numéros importée(s)`,
+      });
+      setIsImportDialogOpen(false);
+
+      // Reset file input
+      event.target.value = '';
 
     } catch (error) {
       console.error("Error importing Excel:", error);
       toast({
         title: "Erreur",
-        description: "Impossible d'importer le fichier",
+        description: "Impossible d'importer le fichier. Vérifiez le format.",
         variant: "destructive",
       });
     }
