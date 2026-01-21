@@ -21,6 +21,13 @@ interface ConfirmationRequest {
   initiator_type?: "editor" | "printer";
 }
 
+// Helper to get the public site URL consistently
+function resolvePublicSiteUrl(): string {
+  const siteUrl = Deno.env.get("SITE_URL");
+  const publicSiteUrl = Deno.env.get("PUBLIC_SITE_URL");
+  return siteUrl || publicSiteUrl || "https://bnrm-dev.digiup.ma";
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -135,7 +142,7 @@ serve(async (req) => {
       // Envoyer l'email à la partie non-initiatrice
       const pendingToken = createdTokens?.find(t => t.status === "pending");
       if (pendingToken) {
-        const confirmUrl = `${req.headers.get("origin") || "https://bnrm.lovable.app"}/confirm-deposit/${pendingToken.token}`;
+        const confirmUrl = `${resolvePublicSiteUrl()}/confirm-deposit/${pendingToken.token}`;
         const partyName = pendingToken.party_type === "editor" ? editor_name : printer_name;
         const partyTypeFr = pendingToken.party_type === "editor" ? "Éditeur" : "Imprimeur";
         const initiatorTypeFr = initiator_type === "editor" ? "l'éditeur" : "l'imprimeur";
