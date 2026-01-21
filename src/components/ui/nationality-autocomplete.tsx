@@ -252,6 +252,7 @@ export function NationalityAutocomplete({
   const isOtherSelected = internalValue === 'OTHER';
 
   const handleSelectCode = (code: string) => {
+    console.log('[NationalityAutocomplete] Selecting code:', code);
     setInternalValue(code);
     onChange(code);
     if (code !== 'OTHER') {
@@ -262,10 +263,36 @@ export function NationalityAutocomplete({
 
   // Afficher le label sélectionné (avec fallback si pas encore chargé)
   const getSelectedLabel = (): string => {
+    // Si "Autre" est sélectionné
     if (isOtherSelected) return 'Autre';
-    if (selectedNationality) return getDisplayLabel(selectedNationality.label_fr);
-    if (internalValue && loading) return 'Chargement...';
-    if (internalValue && !selectedNationality && !loading) return internalValue; // Fallback: show code if not found
+    
+    // Si on a la nationalité dans la liste
+    if (selectedNationality) {
+      return getDisplayLabel(selectedNationality.label_fr);
+    }
+    
+    // Si on a une valeur mais les données sont en cours de chargement
+    if (internalValue && loading) {
+      return 'Chargement...';
+    }
+    
+    // Si on a une valeur mais pas trouvée dans la liste (données chargées)
+    // Cela peut arriver si la valeur a été définie avant le chargement des données
+    if (internalValue && !loading && nationalities.length > 0) {
+      // Re-chercher dans la liste après chargement
+      const found = nationalities.find((n) => n.code === internalValue);
+      if (found) {
+        return getDisplayLabel(found.label_fr);
+      }
+      // Fallback: afficher le code si vraiment pas trouvé
+      return internalValue;
+    }
+    
+    // Si valeur définie mais liste vide (encore en chargement initial)
+    if (internalValue && nationalities.length === 0) {
+      return 'Chargement...';
+    }
+    
     return placeholder;
   };
 
