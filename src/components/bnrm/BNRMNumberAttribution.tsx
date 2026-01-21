@@ -36,6 +36,7 @@ import {
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { ReservedRangesManager } from "@/components/legal-deposit/ReservedRangesManager";
+import { NumberManagementTab } from "@/components/legal-deposit/NumberManagementTab";
 import { SearchPagination } from "@/components/ui/search-pagination";
 import IssnRequestsManager from "@/components/legal-deposit/IssnRequestsManager";
 
@@ -894,7 +895,7 @@ export const BNRMNumberAttribution = () => {
             Demandes N°
           </TabsTrigger>
           <TabsTrigger value="attributions" className="text-base font-medium">Attribués</TabsTrigger>
-          <TabsTrigger value="reserved" className="text-base font-medium">Tranches réservées</TabsTrigger>
+          <TabsTrigger value="reserved" className="text-base font-medium">Gestion N°</TabsTrigger>
           <TabsTrigger value="settings" className="text-base font-medium">Paramétrage N°</TabsTrigger>
           <TabsTrigger value="statistics" className="text-base font-medium">Statistiques</TabsTrigger>
         </TabsList>
@@ -1124,9 +1125,9 @@ export const BNRMNumberAttribution = () => {
           </Card>
         </TabsContent>
 
-        {/* Reserved Ranges Management */}
+        {/* Number Management - Import & Range Assignment */}
         <TabsContent value="reserved" className="space-y-4">
-          <ReservedRangesManager />
+          <NumberManagementTab />
         </TabsContent>
 
         {/* Number Settings Tab */}
