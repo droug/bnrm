@@ -1353,13 +1353,12 @@ export default function DocumentsManager() {
                               value={field.value}
                               onChange={field.onChange}
                               options={[
-                                { value: "livre", label: "Livre" },
-                                { value: "livre_rare", label: "Livre rare" },
-                                { value: "article", label: "Article" },
-                                { value: "video", label: "Vidéo" },
-                                { value: "audio", label: "Audio" },
-                                { value: "manuscrit", label: "Manuscrit" },
-                                { value: "periodique", label: "Périodique" },
+                                { value: "manuscrit", label: "Manuscrits" },
+                                { value: "livre", label: "Livres" },
+                                { value: "lithographie", label: "Lithographie" },
+                                { value: "periodique", label: "Périodiques" },
+                                { value: "collection_specialisee", label: "Collections Spécialisées" },
+                                { value: "audiovisuel", label: "Audiovisuel" },
                               ]}
                             />
                           </FormControl>
@@ -1642,13 +1641,12 @@ export default function DocumentsManager() {
                               value={field.value}
                               onChange={field.onChange}
                               options={[
-                                { value: "livre", label: "Livre" },
-                                { value: "livre_rare", label: "Livre rare" },
-                                { value: "article", label: "Article" },
-                                { value: "video", label: "Vidéo" },
-                                { value: "audio", label: "Audio" },
-                                { value: "manuscrit", label: "Manuscrit" },
-                                { value: "periodique", label: "Périodique" },
+                                { value: "manuscrit", label: "Manuscrits" },
+                                { value: "livre", label: "Livres" },
+                                { value: "lithographie", label: "Lithographie" },
+                                { value: "periodique", label: "Périodiques" },
+                                { value: "collection_specialisee", label: "Collections Spécialisées" },
+                                { value: "audiovisuel", label: "Audiovisuel" },
                               ]}
                             />
                           </FormControl>
