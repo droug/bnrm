@@ -11,6 +11,7 @@ import { Progress } from "@/components/ui/progress";
 interface VExpoImageUploadProps {
   value: string;
   onChange: (url: string) => void;
+  onUploadingChange?: (isUploading: boolean) => void;
   label?: string;
   description?: string;
   folder?: string;
@@ -31,6 +32,7 @@ const sanitizeFilename = (filename: string): string => {
 export function VExpoImageUpload({
   value,
   onChange,
+  onUploadingChange,
   label = "Image",
   description,
   folder = "covers",
@@ -43,6 +45,11 @@ export function VExpoImageUpload({
   const [uploadProgress, setUploadProgress] = useState(0);
   const [urlInput, setUrlInput] = useState(value || "");
   const [activeTab, setActiveTab] = useState<string>(value ? "url" : "upload");
+
+  const setUploading = (next: boolean) => {
+    setIsUploading(next);
+    onUploadingChange?.(next);
+  };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -70,7 +77,7 @@ export function VExpoImageUpload({
       return;
     }
 
-    setIsUploading(true);
+    setUploading(true);
     setUploadProgress(10);
 
     try {
@@ -114,7 +121,7 @@ export function VExpoImageUpload({
         variant: "destructive"
       });
     } finally {
-      setIsUploading(false);
+      setUploading(false);
       setUploadProgress(0);
       // Reset input
       if (fileInputRef.current) {
