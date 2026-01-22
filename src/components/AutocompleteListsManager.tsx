@@ -22,7 +22,11 @@ interface ExtendedValue extends Omit<AutocompleteListValue, 'id'> {
   is_active: boolean;
 }
 
-export const AutocompleteListsManager = () => {
+interface AutocompleteListsManagerProps {
+  platformFilter?: string;
+}
+
+export const AutocompleteListsManager = ({ platformFilter = "all" }: AutocompleteListsManagerProps) => {
   const { toast } = useToast();
   const [lists, setLists] = useState<AutocompleteList[]>([]);
   const [selectedList, setSelectedList] = useState<string | null>(null);
@@ -49,6 +53,25 @@ export const AutocompleteListsManager = () => {
   useEffect(() => {
     fetchLists();
   }, []);
+  
+  // Filtrer les listes selon la plateforme sélectionnée
+  const filteredLists = platformFilter === "all" 
+    ? lists 
+    : lists.filter(list => {
+        if (list.platform === platformFilter) return true;
+        if (platformFilter === "BNRM" && list.portal === "BNRM" && list.platform === "BNRM") return true;
+        if (platformFilter === "CULTURAL_ACTIVITIES" && 
+            (list.service === "Activités Culturelles" || list.platform === "CULTURAL_ACTIVITIES")) return true;
+        if (platformFilter === "DIGITAL_LIBRARY" && 
+            (list.service === "Bibliothèque Numérique" || list.platform === "DIGITAL_LIBRARY")) return true;
+        if (platformFilter === "MANUSCRIPTS" && 
+            (list.service === "Manuscrits" || list.platform === "MANUSCRIPTS")) return true;
+        if (platformFilter === "CBM" && 
+            (list.platform === "CBM" || list.portal === "CBM")) return true;
+        if (platformFilter === "KITAB" && 
+            (list.platform === "KITAB" || list.service === "Kitab")) return true;
+        return false;
+      });
 
   useEffect(() => {
     if (selectedList) {
@@ -370,8 +393,8 @@ export const AutocompleteListsManager = () => {
   };
 
   // Organiser les listes en hiérarchie
-  const listsWithHierarchy = lists.filter(list => list.portal && list.platform && list.service);
-  const listsWithoutHierarchy = lists.filter(list => !list.portal || !list.platform || !list.service);
+  const listsWithHierarchy = filteredLists.filter(list => list.portal && list.platform && list.service);
+  const listsWithoutHierarchy = filteredLists.filter(list => !list.portal || !list.platform || !list.service);
   
   const groupedLists = listsWithHierarchy
     .reduce((acc, list) => {
