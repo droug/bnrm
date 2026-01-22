@@ -21,11 +21,16 @@ export interface SectionStyles {
 
 export interface Typography {
   headingFont: string;
-  bodyFont: string;
   headingSize: string;
-  bodySize: string;
   headingWeight: string;
+  headingStyle: string;
+  bodyFont: string;
+  bodySize: string;
   bodyWeight: string;
+  bodyStyle: string;
+  buttonFont: string;
+  buttonSize: string;
+  buttonWeight: string;
 }
 
 export interface ButtonStyles {
@@ -50,11 +55,16 @@ const defaultStyles: SectionStyles = {
 
 const defaultTypography: Typography = {
   headingFont: 'Playfair Display',
-  bodyFont: 'Inter',
-  headingSize: '2.5rem',
-  bodySize: '1rem',
+  headingSize: '2rem',
   headingWeight: '700',
-  bodyWeight: '400'
+  headingStyle: 'normal',
+  bodyFont: 'Inter',
+  bodySize: '1rem',
+  bodyWeight: '400',
+  bodyStyle: 'normal',
+  buttonFont: 'Inter',
+  buttonSize: '0.875rem',
+  buttonWeight: '500'
 };
 
 const defaultButtonStyles: ButtonStyles = {
@@ -129,9 +139,16 @@ export function getCssVariables(styles: {
     '--section-accent': sectionStyles?.actualites_evenements.accentColor,
     // Typography
     '--heading-font': typography?.headingFont,
-    '--body-font': typography?.bodyFont,
     '--heading-size': typography?.headingSize,
+    '--heading-weight': typography?.headingWeight,
+    '--heading-style': typography?.headingStyle,
+    '--body-font': typography?.bodyFont,
     '--body-size': typography?.bodySize,
+    '--body-weight': typography?.bodyWeight,
+    '--body-style': typography?.bodyStyle,
+    '--button-font': typography?.buttonFont,
+    '--button-size': typography?.buttonSize,
+    '--button-weight': typography?.buttonWeight,
     // Buttons
     '--btn-primary-bg': buttonStyles?.primaryBg,
     '--btn-primary-text': buttonStyles?.primaryText,
