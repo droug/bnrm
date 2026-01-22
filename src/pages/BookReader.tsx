@@ -1569,11 +1569,11 @@ const BookReader = () => {
                   })}
                 </div>
               ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <Card className="shadow-2xl max-w-full max-h-full">
+                <div className="w-full h-full flex items-center justify-center overflow-auto p-4">
+                  <Card className="shadow-2xl">
                     <CardContent className="p-0">
                       <div 
-                        className="w-full max-w-[600px] h-[calc(100vh-200px)] min-h-[320px] bg-gradient-to-br from-background to-muted flex items-center justify-center relative overflow-hidden"
+                        className="relative"
                         style={{
                           transform: `scale(${zoom / 100}) rotate(${rotation + (pageRotations[currentPage] ?? 0)}deg)`,
                           transformOrigin: 'center',
@@ -1584,9 +1584,8 @@ const BookReader = () => {
                           <PdfPageRenderer
                             pdfUrl={pdfUrl}
                             pageNumber={currentPage}
-                            scale={1.5}
+                            scale={1.2}
                             rotation={rotation + (pageRotations[currentPage] ?? 0)}
-                            className="w-full h-full flex items-center justify-center"
                             onPageLoad={(totalPages) => {
                               if (actualTotalPages !== totalPages) {
                                 setActualTotalPages(totalPages);
@@ -1597,7 +1596,7 @@ const BookReader = () => {
                           <img 
                             src={getCurrentPageImage(currentPage)}
                             alt={`Page ${currentPage}`}
-                            className="block max-w-full max-h-full w-auto h-auto object-contain"
+                            className="block max-w-full h-auto object-contain"
                           />
                         )}
                         {bookmarks.includes(currentPage) && (
