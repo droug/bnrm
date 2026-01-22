@@ -57,7 +57,7 @@ export default function AudiovisualTranscriptionTool() {
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState<string>("");
-  const [language, setLanguage] = useState<string>("auto");
+  const [language, setLanguage] = useState<string>("ar"); // Default to Arabic
   const [transcript, setTranscript] = useState<string>("");
   const [segments, setSegments] = useState<TranscriptSegment[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -240,6 +240,7 @@ export default function AudiovisualTranscriptionTool() {
       // Prepare form data for the edge function
       const formData = new FormData();
       formData.append("audio", audioBlob, selectedFile?.name || "audio.mp3");
+      formData.append("language", language); // Send selected language
 
       // Get the session for authentication
       const { data: { session } } = await supabase.auth.getSession();

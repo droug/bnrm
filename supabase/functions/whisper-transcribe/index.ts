@@ -58,21 +58,28 @@ serve(async (req) => {
 
     // Build the prompt for transcription
     let languageInstruction = "";
+    let outputInstruction = "";
+    
     if (language && language !== "auto") {
       const languageNames: Record<string, string> = {
         "ar": "Arabic (العربية)",
         "fr": "French (Français)",
         "en": "English",
-        "ber": "Amazigh/Berber (ⵜⴰⵎⴰⵣⵉⵖⵜ)"
+        "ber": "Amazigh/Berber (ⵜⴰⵎⴰⵣⵉⵖⵜ)",
+        "es": "Spanish (Español)",
+        "de": "German (Deutsch)",
+        "it": "Italian (Italiano)",
+        "pt": "Portuguese (Português)"
       };
       languageInstruction = `The audio is in ${languageNames[language] || language}. `;
+      outputInstruction = `IMPORTANT: Output the transcription in the SAME language as the audio (${languageNames[language] || language}). Do NOT translate to English or any other language. `;
     }
 
     const systemPrompt = `You are an expert audio transcription assistant. Your task is to transcribe audio content accurately and completely.
 
-${languageInstruction}Please transcribe the entire audio content verbatim. Include all spoken words. 
+${languageInstruction}${outputInstruction}Please transcribe the entire audio content verbatim. Include all spoken words. 
 If there are multiple speakers, you may indicate speaker changes with line breaks.
-Output ONLY the transcription text, nothing else. No explanations, no comments, just the pure transcription.`;
+Output ONLY the transcription text in the original language of the audio, nothing else. No explanations, no comments, just the pure transcription.`;
 
     console.log("Calling Lovable AI Gateway for transcription...");
 
