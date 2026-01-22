@@ -43,11 +43,7 @@ export function useLocalWhisperTranscription() {
       });
 
       // Dynamically import transformers.js to avoid loading on page load
-      const { pipeline, env } = await import('@huggingface/transformers');
-      
-      // Configure for browser environment
-      env.allowLocalModels = false;
-      env.useBrowserCache = true;
+      const { pipeline, read_audio } = await import('@huggingface/transformers');
 
       setProgress({
         status: 'loading-model',
@@ -63,7 +59,6 @@ export function useLocalWhisperTranscription() {
           'onnx-community/whisper-tiny',
           {
             dtype: 'q8', // Quantized for smaller size and faster inference
-            device: 'webgpu', // Use WebGPU if available, falls back to WASM
             progress_callback: (info: any) => {
               if (info.status === 'progress' && info.progress) {
                 setProgress({
@@ -83,19 +78,26 @@ export function useLocalWhisperTranscription() {
         message: 'Préparation de l\'audio...'
       });
 
-      // Get audio data
-      let audioData: ArrayBuffer;
+      // Get audio URL for read_audio function
+      let audioUrl: string;
       
       if (typeof audioSource === 'string') {
-        // URL - fetch the audio
-        const response = await fetch(audioSource);
-        if (!response.ok) {
-          throw new Error(`Impossible de télécharger l'audio: ${response.status}`);
-        }
-        audioData = await response.arrayBuffer();
+        // Already a URL
+        audioUrl = audioSource;
       } else {
-        // File or Blob
-        audioData = await audioSource.arrayBuffer();
+        // File or Blob - create a blob URL
+        audioUrl = URL.createObjectURL(audioSource);
+      }
+
+      // Use read_audio to properly decode the audio file to Float32Array
+      // Whisper expects 16kHz audio
+      console.log('Reading audio from URL:', audioUrl);
+      const audioData = await read_audio(audioUrl, 16000);
+      console.log('Audio data type:', audioData.constructor.name, 'length:', audioData.length);
+
+      // Clean up blob URL if we created one
+      if (typeof audioSource !== 'string') {
+        URL.revokeObjectURL(audioUrl);
       }
 
       setProgress({
@@ -117,11 +119,8 @@ export function useLocalWhisperTranscription() {
         options.task = 'transcribe';
       }
 
-      // Run transcription
-      const result = await pipelineRef.current(
-        new Uint8Array(audioData),
-        options
-      );
+      // Run transcription with properly decoded audio
+      const result = await pipelineRef.current(audioData, options);
 
       setProgress({
         status: 'complete',
@@ -143,13 +142,17 @@ export function useLocalWhisperTranscription() {
     } catch (error: any) {
       console.error('Local Whisper transcription error:', error);
       
-      // Check for WebGPU/WebAssembly support errors
+      // Check for common errors
       let errorMessage = error.message || 'Erreur de transcription';
       
       if (error.message?.includes('WebGPU')) {
-        errorMessage = 'WebGPU non supporté. La transcription utilise WASM (plus lent).';
+        errorMessage = 'WebGPU non supporté. La transcription utilise WASM.';
       } else if (error.message?.includes('SharedArrayBuffer')) {
         errorMessage = 'Certaines fonctionnalités du navigateur ne sont pas disponibles. Essayez avec Chrome ou Edge.';
+      } else if (error.message?.includes('CORS')) {
+        errorMessage = 'Erreur d\'accès au fichier audio. Vérifiez les permissions.';
+      } else if (error.message?.includes('read_audio') || error.message?.includes('decode')) {
+        errorMessage = 'Format audio non supporté. Essayez avec un fichier MP3, WAV ou WebM.';
       }
 
       setProgress({
