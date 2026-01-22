@@ -737,7 +737,7 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                 <div className="grid grid-cols-4 gap-4 mb-2">
                   <Label className="text-sm font-medium">Police</Label>
                   <Label className="text-sm font-medium">Taille</Label>
-                  <Label className="text-sm font-medium">Épaisseur</Label>
+                  <Label className="text-sm font-medium">Style</Label>
                   <Label className="text-sm font-medium">Style</Label>
                 </div>
                 <div className="grid grid-cols-4 gap-4">
@@ -811,7 +811,7 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                 <div className="grid grid-cols-4 gap-4 mb-2">
                   <Label className="text-sm font-medium">Police</Label>
                   <Label className="text-sm font-medium">Taille</Label>
-                  <Label className="text-sm font-medium">Épaisseur</Label>
+                  <Label className="text-sm font-medium">Style</Label>
                   <Label className="text-sm font-medium">Style</Label>
                 </div>
                 <div className="grid grid-cols-4 gap-4">
@@ -883,7 +883,7 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                 <div className="grid grid-cols-4 gap-4 mb-2">
                   <Label className="text-sm font-medium">Police</Label>
                   <Label className="text-sm font-medium">Taille</Label>
-                  <Label className="text-sm font-medium">Épaisseur</Label>
+                  <Label className="text-sm font-medium">Style</Label>
                   <Label className="text-sm font-medium text-transparent">-</Label>
                 </div>
                 <div className="grid grid-cols-4 gap-4">
