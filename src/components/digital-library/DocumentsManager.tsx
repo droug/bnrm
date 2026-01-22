@@ -881,6 +881,8 @@ export default function DocumentsManager() {
     try {
       let transcriptionText = "";
       let segments: string[] = [];
+      // Track what we actually used (OpenAI can fallback to Local if no valid key)
+      let usedMethod: "local" | "openai" = transcriptionMethod;
 
       if (transcriptionMethod === "openai") {
         // Use OpenAI Whisper API (paid, more accurate)
@@ -922,18 +924,60 @@ export default function DocumentsManager() {
         setTranscriptionProgress(70);
 
         if (!result.ok) {
-          const errorData = await result.json();
-          throw new Error(errorData.error || "Erreur lors de la transcription OpenAI");
+          // Be defensive: the edge function should return JSON, but don't assume it.
+          let errorData: any = null;
+          let errorMessage = "Erreur lors de la transcription OpenAI";
+          try {
+            errorData = await result.json();
+            errorMessage = errorData?.error || errorMessage;
+          } catch {
+            try {
+              const t = await result.text();
+              if (t) errorMessage = t;
+            } catch {
+              // ignore
+            }
+          }
+
+          const status = errorData?.status ?? result.status;
+          const isOpenAiKeyProblem = status === 401 || /api key|clé api/i.test(errorMessage);
+
+          if (isOpenAiKeyProblem) {
+            // If user has no OpenAI key (or it is invalid), automatically fallback to Local.
+            usedMethod = "local";
+            toast({
+              title: "OpenAI indisponible",
+              description: "Aucune clé OpenAI valide n'est configurée. Bascule automatique vers la transcription locale (gratuite).",
+              variant: "destructive",
+            });
+
+            const localResult = await localTranscribe(doc.pdf_url, language);
+            if (!localResult || !localResult.text) {
+              throw new Error("Aucun texte transcrit (local)");
+            }
+            transcriptionText = localResult.text;
+
+            if (localResult.chunks && localResult.chunks.length > 0) {
+              segments = localResult.chunks.map(c => c.text.trim()).filter(s => s);
+            } else {
+              segments = transcriptionText.split(/[.!?]+/).filter((s: string) => s.trim());
+            }
+          } else {
+            throw new Error(errorMessage);
+          }
         }
 
-        const data = await result.json();
-        transcriptionText = data.text || "";
-        
-        // Use segments from OpenAI if available
-        if (data.segments && data.segments.length > 0) {
-          segments = data.segments.map((s: any) => s.text.trim()).filter((s: string) => s);
-        } else {
-          segments = transcriptionText.split(/[.!?]+/).filter((s: string) => s.trim());
+        // If OpenAI succeeded, parse and use it.
+        if (usedMethod === "openai") {
+          const data = await result.json();
+          transcriptionText = data.text || "";
+          
+          // Use segments from OpenAI if available
+          if (data.segments && data.segments.length > 0) {
+            segments = data.segments.map((s: any) => s.text.trim()).filter((s: string) => s);
+          } else {
+            segments = transcriptionText.split(/[.!?]+/).filter((s: string) => s.trim());
+          }
         }
 
       } else {
@@ -1003,7 +1047,7 @@ export default function DocumentsManager() {
 
       toast({
         title: "Transcription terminée",
-        description: `${segments.length} segment(s) transcrits pour "${doc.title}" (${transcriptionMethod === "openai" ? "OpenAI Whisper" : "Local"})`
+        description: `${segments.length} segment(s) transcrits pour "${doc.title}" (${usedMethod === "openai" ? "OpenAI Whisper" : "Local"})`
       });
 
       setTranscriptionProgress(100);
