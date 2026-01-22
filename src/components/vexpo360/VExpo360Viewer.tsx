@@ -284,14 +284,20 @@ export function VExpo360Viewer({
       </Canvas>
 
       {/* Top Controls */}
-      <div className="absolute top-4 left-4 right-4 flex justify-between items-start pointer-events-none">
-        <div className="pointer-events-auto flex items-center gap-2">
+      <div className="absolute top-4 left-4 right-4 flex justify-between items-start pointer-events-none z-20">
+        <div className="pointer-events-auto flex items-center gap-3">
           {onClose && (
-            <Button variant="secondary" size="icon" onClick={onClose} className="bg-black/50 hover:bg-black/70">
-              <X className="h-4 w-4" />
+            <Button 
+              variant="destructive" 
+              size="default" 
+              onClick={onClose} 
+              className="bg-red-600 hover:bg-red-700 text-white shadow-lg"
+            >
+              <X className="h-5 w-5 mr-2" />
+              Fermer
             </Button>
           )}
-          <div className="bg-black/50 backdrop-blur-sm rounded-lg px-3 py-2">
+          <div className="bg-black/70 backdrop-blur-sm rounded-lg px-4 py-2 shadow-lg">
             <p className="text-white text-sm font-medium">
               {language === 'ar' ? currentPanorama.name_ar : currentPanorama.name_fr}
             </p>
@@ -306,7 +312,8 @@ export function VExpo360Viewer({
             variant="secondary" 
             size="icon" 
             onClick={() => setShowInfo(!showInfo)}
-            className="bg-black/50 hover:bg-black/70"
+            className="bg-black/70 hover:bg-black/90 text-white shadow-lg"
+            title="Afficher/Masquer les informations"
           >
             <Info className="h-4 w-4" />
           </Button>
@@ -314,7 +321,8 @@ export function VExpo360Viewer({
             variant="secondary" 
             size="icon" 
             onClick={toggleFullscreen}
-            className="bg-black/50 hover:bg-black/70"
+            className="bg-black/70 hover:bg-black/90 text-white shadow-lg"
+            title={isFullscreen ? "Quitter plein écran" : "Plein écran"}
           >
             {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
           </Button>
@@ -322,13 +330,14 @@ export function VExpo360Viewer({
       </div>
 
       {/* Zoom Controls */}
-      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 pointer-events-auto">
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-2 pointer-events-auto z-10">
         <Button 
           variant="secondary" 
           size="icon" 
           onClick={() => handleZoom('in')}
-          className="bg-black/50 hover:bg-black/70"
+          className="bg-black/70 hover:bg-black/90 text-white shadow-lg"
           disabled={fov <= 30}
+          title="Zoomer"
         >
           <ZoomIn className="h-4 w-4" />
         </Button>
@@ -336,8 +345,9 @@ export function VExpo360Viewer({
           variant="secondary" 
           size="icon" 
           onClick={() => handleZoom('out')}
-          className="bg-black/50 hover:bg-black/70"
+          className="bg-black/70 hover:bg-black/90 text-white shadow-lg"
           disabled={fov >= 100}
+          title="Dézoomer"
         >
           <ZoomOut className="h-4 w-4" />
         </Button>
@@ -345,7 +355,8 @@ export function VExpo360Viewer({
           variant="secondary" 
           size="icon" 
           onClick={resetView}
-          className="bg-black/50 hover:bg-black/70"
+          className="bg-black/70 hover:bg-black/90 text-white shadow-lg"
+          title="Réinitialiser la vue"
         >
           <RotateCcw className="h-4 w-4" />
         </Button>
@@ -356,44 +367,46 @@ export function VExpo360Viewer({
         <>
           <Button
             variant="secondary"
-            size="icon"
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 pointer-events-auto"
+            size="lg"
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-black/90 text-white pointer-events-auto shadow-lg z-10 h-14 w-14"
             onClick={() => navigatePanorama('prev')}
             disabled={panoramas.findIndex(p => p.id === currentPanoramaId) === 0}
+            title="Panorama précédent"
           >
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronLeft className="h-8 w-8" />
           </Button>
           <Button
             variant="secondary"
-            size="icon"
-            className="absolute right-16 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 pointer-events-auto"
+            size="lg"
+            className="absolute right-20 top-1/2 -translate-y-1/2 bg-black/70 hover:bg-black/90 text-white pointer-events-auto shadow-lg z-10 h-14 w-14"
             onClick={() => navigatePanorama('next')}
             disabled={panoramas.findIndex(p => p.id === currentPanoramaId) === panoramas.length - 1}
+            title="Panorama suivant"
           >
-            <ChevronRight className="h-6 w-6" />
+            <ChevronRight className="h-8 w-8" />
           </Button>
         </>
       )}
 
       {/* Bottom Hotspot Legend */}
       {showInfo && currentHotspots.length > 0 && (
-        <div className="absolute bottom-4 left-4 right-4 pointer-events-auto">
-          <div className="bg-black/70 backdrop-blur-sm rounded-lg p-3">
-            <p className="text-white/60 text-xs mb-2">Points d'intérêt ({currentHotspots.length})</p>
-            <div className="flex flex-wrap gap-2">
+        <div className="absolute bottom-4 left-4 right-4 pointer-events-auto z-10">
+          <div className="bg-black/80 backdrop-blur-sm rounded-lg p-4 shadow-xl">
+            <p className="text-white/80 text-sm font-medium mb-3">Points d'intérêt ({currentHotspots.length})</p>
+            <div className="flex flex-wrap gap-2 max-h-24 overflow-y-auto">
               {currentHotspots.map((hotspot) => (
                 <Badge
                   key={hotspot.id}
                   variant="secondary"
-                  className={`cursor-pointer transition-all ${
-                    hoveredHotspotId === hotspot.id ? 'ring-2 ring-white' : ''
+                  className={`cursor-pointer transition-all bg-white/20 hover:bg-white/30 text-white border-white/30 ${
+                    hoveredHotspotId === hotspot.id ? 'ring-2 ring-amber-400 bg-amber-500/30' : ''
                   }`}
                   onClick={() => handleHotspotClick(hotspot)}
                   onMouseEnter={() => setHoveredHotspotId(hotspot.id)}
                   onMouseLeave={() => setHoveredHotspotId(null)}
                 >
                   {getHotspotIcon(hotspot.hotspot_type)}
-                  <span className="ml-1">{language === 'ar' ? hotspot.label_ar : hotspot.label_fr}</span>
+                  <span className="ml-1.5">{language === 'ar' ? hotspot.label_ar : hotspot.label_fr}</span>
                 </Badge>
               ))}
             </div>
