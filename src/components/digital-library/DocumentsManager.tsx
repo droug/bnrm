@@ -112,6 +112,9 @@ export default function DocumentsManager() {
   // Transcription state (for audio/video documents)
   const [transcriptionProcessingDocId, setTranscriptionProcessingDocId] = useState<string | null>(null);
   const [transcriptionProgress, setTranscriptionProgress] = useState(0);
+  const [showTranscriptionDialog, setShowTranscriptionDialog] = useState(false);
+  const [transcriptionLanguage, setTranscriptionLanguage] = useState<string>("ar");
+  const [documentToTranscribe, setDocumentToTranscribe] = useState<any>(null);
 
   // Exemple de doublons détectés
   const sampleDuplicates = [
@@ -843,9 +846,25 @@ export default function DocumentsManager() {
     }
   }, [localTranscriptionProgress]);
 
+  // Language options for transcription
+  const transcriptionLanguageOptions = [
+    { value: "ar", label: "العربية (Arabe)" },
+    { value: "fr", label: "Français" },
+    { value: "en", label: "English (Anglais)" },
+    { value: "ber", label: "ⵜⴰⵎⴰⵣⵉⵖⵜ (Amazigh)" },
+    { value: "auto", label: "Détection automatique" },
+  ];
+
+  // Open transcription dialog to select language
+  const openTranscriptionDialog = (doc: any) => {
+    setDocumentToTranscribe(doc);
+    setShowTranscriptionDialog(true);
+  };
+
   // Run transcription for audio/video documents using LOCAL Whisper (Transformers.js)
-  const runTranscriptionForDocument = async (doc: any) => {
-    if (!doc.pdf_url) {
+  const runTranscriptionForDocument = async (language: string) => {
+    const doc = documentToTranscribe;
+    if (!doc?.pdf_url) {
       toast({
         title: "Erreur",
         description: "Ce document n'a pas de fichier média associé.",
@@ -854,17 +873,18 @@ export default function DocumentsManager() {
       return;
     }
 
+    setShowTranscriptionDialog(false);
     setTranscriptionProcessingDocId(doc.id);
     setTranscriptionProgress(5);
 
     try {
       toast({
         title: "Transcription locale (Whisper)",
-        description: "Chargement du modèle dans le navigateur..."
+        description: `Chargement du modèle... Langue: ${transcriptionLanguageOptions.find(l => l.value === language)?.label || language}`
       });
 
       // Use local Whisper transcription - runs entirely in browser
-      const result = await localTranscribe(doc.pdf_url, 'auto');
+      const result = await localTranscribe(doc.pdf_url, language);
       
       if (!result || !result.text) {
         throw new Error("Aucun texte transcrit");
@@ -2144,7 +2164,7 @@ export default function DocumentsManager() {
                           <Button
                             size="sm"
                             variant="outline"
-                            onClick={() => runTranscriptionForDocument(doc)}
+                            onClick={() => openTranscriptionDialog(doc)}
                             disabled={transcriptionProcessingDocId === doc.id}
                             title={transcriptionProcessingDocId === doc.id 
                               ? `Transcription en cours (${transcriptionProgress}%)`
@@ -2832,6 +2852,60 @@ export default function DocumentsManager() {
             >
               <Wand2 className="h-4 w-4 mr-2" />
               Lancer l'OCR
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Transcription Language Selection Dialog */}
+      <Dialog open={showTranscriptionDialog} onOpenChange={setShowTranscriptionDialog}>
+        <DialogContent className="z-[10001]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Mic className="h-5 w-5" />
+              Transcription audio/vidéo
+            </DialogTitle>
+            <DialogDescription>
+              Sélectionnez la langue du contenu audio pour une meilleure transcription.
+              {documentToTranscribe && (
+                <span className="block mt-2 font-medium text-foreground">
+                  Document : {documentToTranscribe.title}
+                </span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="transcription-language">Langue de l'audio</Label>
+              <Select 
+                value={transcriptionLanguage} 
+                onValueChange={setTranscriptionLanguage}
+              >
+                <SelectTrigger id="transcription-language" className="bg-background">
+                  <SelectValue placeholder="Sélectionner une langue" />
+                </SelectTrigger>
+                <SelectContent className="bg-background z-[10002]">
+                  {transcriptionLanguageOptions.map(opt => (
+                    <SelectItem key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Pour de meilleurs résultats, sélectionnez la langue exacte du contenu audio.
+              </p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowTranscriptionDialog(false)}>
+              Annuler
+            </Button>
+            <Button onClick={() => runTranscriptionForDocument(transcriptionLanguage)}>
+              <Mic className="h-4 w-4 mr-2" />
+              Lancer la transcription
             </Button>
           </DialogFooter>
         </DialogContent>
