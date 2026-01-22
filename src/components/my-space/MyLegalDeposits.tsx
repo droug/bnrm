@@ -141,7 +141,14 @@ export function MyLegalDeposits() {
   const handleEditDraft = (deposit: LegalDepositRequest) => {
     // Navigation vers le formulaire de dépôt légal avec l'ID du brouillon
     const depositType = deposit.metadata?.depositType || 'monographie';
-    navigate(`/legal-deposit?edit=${deposit.id}&type=${depositType}`);
+    const routeMap: Record<string, string> = {
+      'monographie': '/depot-legal/livres',
+      'periodique': '/depot-legal/periodiques',
+      'bd_logiciels': '/depot-legal/audiovisuel',
+      'collections_specialisees': '/depot-legal/collections-specialisees'
+    };
+    const route = routeMap[depositType] || '/depot-legal/livres';
+    navigate(`${route}?edit=${deposit.id}`);
   };
 
   if (loading) {
