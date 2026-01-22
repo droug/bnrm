@@ -123,22 +123,28 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
     loadTranscription();
   }, [documentData.id]);
 
+  // Track if timestamps have been calculated
+  const [timestampsCalculated, setTimestampsCalculated] = useState(false);
+
   // Recalculate segment timestamps when duration is known
   useEffect(() => {
-    if (duration > 0 && segments.length > 0 && segments[0].endTime === 0) {
+    if (duration > 0 && segments.length > 0 && !timestampsCalculated) {
+      console.log('📊 Calculating segment timestamps:', { duration, segmentsCount: segments.length });
       const segmentDuration = duration / segments.length;
       const updatedSegments = segments.map((seg, idx) => ({
         ...seg,
         startTime: idx * segmentDuration,
         endTime: (idx + 1) * segmentDuration
       }));
+      console.log('📊 Updated segments:', updatedSegments.slice(0, 3));
       setSegments(updatedSegments);
+      setTimestampsCalculated(true);
     }
-  }, [duration, segments]);
+  }, [duration, segments.length, timestampsCalculated]);
 
-  // Update active subtitle text
+  // Update active subtitle text based on currentTime
   useEffect(() => {
-    if (segments.length === 0) {
+    if (segments.length === 0 || !timestampsCalculated) {
       setActiveSubtitle("");
       return;
     }
@@ -146,8 +152,13 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
     const active = segments.find(
       s => currentTime >= s.startTime && currentTime < s.endTime
     );
+    
+    if (active) {
+      console.log('🎬 Active subtitle:', { currentTime, segment: active.text.substring(0, 30) });
+    }
+    
     setActiveSubtitle(active?.text || "");
-  }, [currentTime, segments]);
+  }, [currentTime, segments, timestampsCalculated]);
 
   // Media event handlers
   useEffect(() => {
