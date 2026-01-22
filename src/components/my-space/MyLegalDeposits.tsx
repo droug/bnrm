@@ -138,12 +138,10 @@ export function MyLegalDeposits() {
     setShowDetailsDialog(true);
   };
 
-  const handleEditDraft = (depositId: string) => {
-    // Navigation vers le formulaire d'édition du dépôt légal
-    toast({
-      title: "Fonctionnalité à venir",
-      description: "L'édition des brouillons sera bientôt disponible"
-    });
+  const handleEditDraft = (deposit: LegalDepositRequest) => {
+    // Navigation vers le formulaire de dépôt légal avec l'ID du brouillon
+    const depositType = deposit.metadata?.depositType || 'monographie';
+    navigate(`/legal-deposit?edit=${deposit.id}&type=${depositType}`);
   };
 
   if (loading) {
@@ -304,7 +302,7 @@ export function MyLegalDeposits() {
                                 size="sm" 
                                 variant="default"
                                 className="flex-1"
-                                onClick={() => handleEditDraft(deposit.id)}
+                                onClick={() => handleEditDraft(deposit)}
                               >
                                 <Edit className="h-4 w-4 mr-2" />
                                 Reprendre l'édition
