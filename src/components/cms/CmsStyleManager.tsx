@@ -733,9 +733,14 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
               <CardHeader className="py-3">
                 <CardTitle className="text-lg">Police des titres</CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="space-y-2">
-                  <Label>Police</Label>
+              <CardContent>
+                <div className="grid grid-cols-4 gap-4 mb-2">
+                  <Label className="text-sm font-medium">Police</Label>
+                  <Label className="text-sm font-medium">Taille</Label>
+                  <Label className="text-sm font-medium">Épaisseur</Label>
+                  <Label className="text-sm font-medium">Style</Label>
+                </div>
+                <div className="grid grid-cols-4 gap-4">
                   <Select
                     value={typography.heading_font}
                     onValueChange={(value) => setTypography(prev => ({ ...prev, heading_font: value }))}
@@ -751,9 +756,6 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Taille</Label>
                   <Select
                     value={typography.heading_size}
                     onValueChange={(value) => setTypography(prev => ({ ...prev, heading_size: value }))}
@@ -769,9 +771,6 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                       <SelectItem value="3rem">Très grand (48px)</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Graisse</Label>
                   <Select
                     value={typography.heading_weight}
                     onValueChange={(value) => setTypography(prev => ({ ...prev, heading_weight: value }))}
@@ -787,9 +786,6 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                       <SelectItem value="800">Extra-bold (800)</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Style</Label>
                   <Select
                     value={typography.heading_style}
                     onValueChange={(value) => setTypography(prev => ({ ...prev, heading_style: value }))}
@@ -811,9 +807,14 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
               <CardHeader className="py-3">
                 <CardTitle className="text-lg">Police du corps de texte</CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="space-y-2">
-                  <Label>Police</Label>
+              <CardContent>
+                <div className="grid grid-cols-4 gap-4 mb-2">
+                  <Label className="text-sm font-medium">Police</Label>
+                  <Label className="text-sm font-medium">Taille</Label>
+                  <Label className="text-sm font-medium">Épaisseur</Label>
+                  <Label className="text-sm font-medium">Style</Label>
+                </div>
+                <div className="grid grid-cols-4 gap-4">
                   <Select
                     value={typography.body_font}
                     onValueChange={(value) => setTypography(prev => ({ ...prev, body_font: value }))}
@@ -829,9 +830,6 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Taille</Label>
                   <Select
                     value={typography.body_size}
                     onValueChange={(value) => setTypography(prev => ({ ...prev, body_size: value }))}
@@ -846,9 +844,6 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                       <SelectItem value="1.25rem">Grand (20px)</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Graisse</Label>
                   <Select
                     value={typography.body_weight}
                     onValueChange={(value) => setTypography(prev => ({ ...prev, body_weight: value }))}
@@ -863,9 +858,6 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                       <SelectItem value="600">Semi-bold (600)</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Style</Label>
                   <Select
                     value={typography.body_style}
                     onValueChange={(value) => setTypography(prev => ({ ...prev, body_style: value }))}
@@ -887,9 +879,14 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
               <CardHeader className="py-3">
                 <CardTitle className="text-lg">Police des boutons</CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="space-y-2">
-                  <Label>Police</Label>
+              <CardContent>
+                <div className="grid grid-cols-4 gap-4 mb-2">
+                  <Label className="text-sm font-medium">Police</Label>
+                  <Label className="text-sm font-medium">Taille</Label>
+                  <Label className="text-sm font-medium">Épaisseur</Label>
+                  <Label className="text-sm font-medium text-transparent">-</Label>
+                </div>
+                <div className="grid grid-cols-4 gap-4">
                   <Select
                     value={typography.button_font}
                     onValueChange={(value) => setTypography(prev => ({ ...prev, button_font: value }))}
@@ -905,9 +902,6 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                       ))}
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Taille</Label>
                   <Select
                     value={typography.button_size}
                     onValueChange={(value) => setTypography(prev => ({ ...prev, button_size: value }))}
@@ -922,9 +916,6 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                       <SelectItem value="1.125rem">Grand (18px)</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Graisse</Label>
                   <Select
                     value={typography.button_weight}
                     onValueChange={(value) => setTypography(prev => ({ ...prev, button_weight: value }))}
@@ -939,9 +930,8 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                       <SelectItem value="700">Bold (700)</SelectItem>
                     </SelectContent>
                   </Select>
+                  <div></div>
                 </div>
-                {/* Empty column for alignment */}
-                <div className="hidden lg:block"></div>
               </CardContent>
             </Card>
 
