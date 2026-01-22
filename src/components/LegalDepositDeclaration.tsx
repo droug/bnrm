@@ -4240,9 +4240,11 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         selectedPrinterEmail: selectedPrinter?.email
       });
       
+      // Confirmation réciproque requise pour tous les types de dépôt légal
+      // quand les deux parties (éditeur et imprimeur) sont identifiées
       const requiresReciprocalConfirmation = 
-        (depositType === 'monographie' || depositType === 'periodique') && 
-        supportType !== 'electronic' &&
+        (depositType === 'monographie' || depositType === 'periodique' || 
+         depositType === 'bd_logiciels' || depositType === 'collections_specialisees') && 
         effectiveEditorEmail && 
         effectivePrinterEmail;
 
