@@ -504,10 +504,10 @@ export default function DocumentsManager() {
   // Delete document
   const deleteDocument = useMutation({
     mutationFn: async (id: string) => {
-      // First, get the document to check for associated files in storage
+      // First, get the document to check for cbn_document_id
       const { data: docData } = await supabase
         .from('digital_library_documents')
-        .select('file_url, cover_image_url')
+        .select('pdf_url, cover_image_url, cbn_document_id')
         .eq('id', id)
         .single();
 
@@ -524,6 +524,14 @@ export default function DocumentsManager() {
         .eq('id', id);
       
       if (error) throw error;
+
+      // Also mark the corresponding cbn_document as deleted (soft delete)
+      if (docData?.cbn_document_id) {
+        await supabase
+          .from('cbn_documents')
+          .update({ deleted_at: new Date().toISOString() })
+          .eq('id', docData.cbn_document_id);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
