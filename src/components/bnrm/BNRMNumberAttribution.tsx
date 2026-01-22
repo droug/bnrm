@@ -468,6 +468,9 @@ export const BNRMNumberAttribution = () => {
         description: `Numéro ${numberType.toUpperCase()} attribué: ${attributedNumber}`,
       });
 
+      // Envoyer automatiquement la notification par email
+      await handleNotifyAttribution(newAttribution);
+
       setIsAttributionDialogOpen(false);
       setSelectedRequest(null);
 
@@ -591,6 +594,9 @@ export const BNRMNumberAttribution = () => {
         title: "Succès",
         description: `Numéro ${selectedNumberType.toUpperCase()} attribué: ${attributedNumber}`,
       });
+
+      // Envoyer automatiquement la notification par email
+      await handleNotifyAttribution(newAttribution);
 
       // Fermer les modales
       setIsNumberSelectionOpen(false);
