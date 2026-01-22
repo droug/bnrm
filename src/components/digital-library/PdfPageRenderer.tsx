@@ -124,7 +124,7 @@ export function PdfPageRenderer({
       )}
       <canvas 
         ref={canvasRef} 
-        className="max-w-full h-auto"
+        className="block max-w-full max-h-full w-auto h-auto"
         style={{ display: loading ? 'none' : 'block' }}
       />
     </div>
