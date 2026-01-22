@@ -1,18 +1,15 @@
-import { useState, useRef, useCallback, useEffect } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useRef, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Slider } from "@/components/ui/slider";
-import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 import { 
-  Mic, 
   FileAudio, 
   Loader2, 
   AlertCircle, 
@@ -23,18 +20,18 @@ import {
   Download,
   Copy,
   Languages,
-  Upload,
   Video,
   Music,
   Type,
   Maximize2,
   Minimize2,
-  Gauge,
   Volume2,
   VolumeX,
   SkipBack,
   SkipForward,
-  Save
+  Save,
+  Wand2,
+  Info
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
@@ -45,9 +42,6 @@ interface TranscriptSegment {
   startTime: number;
   endTime: number;
 }
-
-// Web Speech API recognition
-const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
 export default function AudiovisualTranscriptionTool() {
   const { toast } = useToast();
@@ -63,11 +57,10 @@ export default function AudiovisualTranscriptionTool() {
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState<string>("");
-  const [language, setLanguage] = useState<string>("fr-FR");
+  const [language, setLanguage] = useState<string>("fra");
   const [transcript, setTranscript] = useState<string>("");
   const [segments, setSegments] = useState<TranscriptSegment[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [isSupported] = useState(!!SpeechRecognition);
   
   // Media player state
   const [isPlaying, setIsPlaying] = useState(false);
@@ -83,23 +76,21 @@ export default function AudiovisualTranscriptionTool() {
   
   // Refs
   const mediaRef = useRef<HTMLVideoElement | HTMLAudioElement>(null);
-  const recognitionRef = useRef<any>(null);
   const mediaSourceRef = useRef<string | null>(null);
   const teleprompterRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const activeSegmentRef = useRef<HTMLDivElement>(null);
 
-  // Language options
+  // Language options for ElevenLabs (ISO 639-3 codes)
   const languageOptions = [
-    { value: "fr-FR", label: "Français" },
-    { value: "ar-SA", label: "Arabe" },
-    { value: "en-US", label: "Anglais (US)" },
-    { value: "en-GB", label: "Anglais (UK)" },
-    { value: "es-ES", label: "Espagnol" },
-    { value: "de-DE", label: "Allemand" },
-    { value: "it-IT", label: "Italien" },
-    { value: "pt-PT", label: "Portugais" },
-    { value: "la", label: "Latin" },
+    { value: "fra", label: "Français" },
+    { value: "ara", label: "Arabe" },
+    { value: "eng", label: "Anglais" },
+    { value: "spa", label: "Espagnol" },
+    { value: "deu", label: "Allemand" },
+    { value: "ita", label: "Italien" },
+    { value: "por", label: "Portugais" },
+    { value: "auto", label: "Détection automatique" },
   ];
 
   // Load documents from database
@@ -185,9 +176,6 @@ export default function AudiovisualTranscriptionTool() {
     const handleLoadedMetadata = () => setDuration(media.duration);
     const handleEnded = () => {
       setIsPlaying(false);
-      if (recognitionRef.current) {
-        recognitionRef.current.stop();
-      }
     };
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
@@ -207,126 +195,150 @@ export default function AudiovisualTranscriptionTool() {
     };
   }, [getMediaSource()]);
 
-  // Start transcription
+  // Start transcription with ElevenLabs API (server-side, no microphone)
   const startTranscription = async () => {
-    if (!SpeechRecognition) {
-      setError("Votre navigateur ne supporte pas la reconnaissance vocale. Utilisez Chrome ou Edge.");
+    // We need either a file or a document with a URL
+    if (!selectedFile && !selectedDocumentId) {
+      setError("Veuillez sélectionner un fichier ou un document à transcrire.");
       return;
     }
 
     setIsTranscribing(true);
-    setProgress(0);
-    setStatus("Initialisation de la reconnaissance vocale...");
+    setProgress(10);
+    setStatus("Préparation du fichier audio...");
     setError(null);
     setTranscript("");
     setSegments([]);
 
     try {
-      const recognition = new SpeechRecognition();
-      recognitionRef.current = recognition;
+      let audioBlob: Blob;
 
-      recognition.lang = language;
-      recognition.continuous = true;
-      recognition.interimResults = true;
-      recognition.maxAlternatives = 1;
-
-      const newSegments: TranscriptSegment[] = [];
-      let currentText = "";
-      let lastFinalTime = 0;
-
-      recognition.onstart = () => {
-        setStatus("Reconnaissance vocale en cours...");
-        const media = mediaRef.current;
-        if (media) {
-          media.currentTime = 0;
-          media.play();
+      if (selectedFile) {
+        // Use the selected file directly
+        audioBlob = selectedFile;
+        setProgress(20);
+      } else {
+        // Download the audio from the document URL
+        setStatus("Téléchargement du fichier média...");
+        const doc = documents.find(d => d.id === selectedDocumentId);
+        if (!doc?.pdf_url) {
+          throw new Error("URL du document introuvable");
         }
-      };
 
-      recognition.onresult = (event: any) => {
-        let interimTranscript = "";
-        let finalTranscript = "";
+        const response = await fetch(doc.pdf_url);
+        if (!response.ok) {
+          throw new Error("Impossible de télécharger le fichier média");
+        }
+        audioBlob = await response.blob();
+        setProgress(30);
+      }
 
-        const media = mediaRef.current;
-        const currentMediaTime = media?.currentTime || 0;
+      setStatus("Envoi vers ElevenLabs pour transcription...");
+      setProgress(40);
 
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const result = event.results[i];
-          if (result.isFinal) {
-            finalTranscript += result[0].transcript;
-            
-            const segment: TranscriptSegment = {
-              id: `seg-${newSegments.length}`,
-              text: result[0].transcript.trim(),
-              startTime: lastFinalTime,
-              endTime: currentMediaTime
-            };
-            
-            if (segment.text) {
-              newSegments.push(segment);
-              setSegments([...newSegments]);
+      // Prepare form data for the edge function
+      const formData = new FormData();
+      formData.append("audio", audioBlob, selectedFile?.name || "audio.mp3");
+      formData.append("language", language);
+      formData.append("diarize", "false");
+
+      // Get the session for authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Vous devez être connecté pour utiliser la transcription");
+      }
+
+      // Call the edge function
+      const transcribeResponse = await fetch(
+        `https://safeppmznupzqkqmzjzt.supabase.co/functions/v1/elevenlabs-transcribe`,
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${session.access_token}`,
+          },
+          body: formData,
+        }
+      );
+
+      setProgress(70);
+      setStatus("Traitement de la transcription...");
+
+      if (!transcribeResponse.ok) {
+        const errorData = await transcribeResponse.json().catch(() => ({}));
+        throw new Error(errorData.error || `Erreur de transcription: ${transcribeResponse.status}`);
+      }
+
+      const result = await transcribeResponse.json();
+      setProgress(90);
+
+      // Process the response
+      if (result.text) {
+        setTranscript(result.text);
+
+        // Create segments from words if available
+        if (result.words && result.words.length > 0) {
+          const newSegments: TranscriptSegment[] = [];
+          let currentSegmentText = "";
+          let segmentStartTime = 0;
+          let wordCount = 0;
+
+          result.words.forEach((word: any, index: number) => {
+            currentSegmentText += (currentSegmentText ? " " : "") + word.text;
+            wordCount++;
+
+            // Create a segment every 10-15 words or at punctuation
+            const isPunctuation = /[.!?]$/.test(word.text);
+            const isLastWord = index === result.words.length - 1;
+
+            if (wordCount >= 12 || isPunctuation || isLastWord) {
+              newSegments.push({
+                id: `seg-${newSegments.length}`,
+                text: currentSegmentText.trim(),
+                startTime: segmentStartTime,
+                endTime: word.end || 0,
+              });
+              currentSegmentText = "";
+              segmentStartTime = word.end || 0;
+              wordCount = 0;
             }
-            
-            lastFinalTime = currentMediaTime;
-          } else {
-            interimTranscript += result[0].transcript;
-          }
+          });
+
+          setSegments(newSegments);
+        } else {
+          // Create simple segments from text if no word timestamps
+          const sentences = result.text.split(/[.!?]+/).filter((s: string) => s.trim());
+          const newSegments: TranscriptSegment[] = sentences.map((text: string, idx: number) => ({
+            id: `seg-${idx}`,
+            text: text.trim(),
+            startTime: idx * 5,
+            endTime: (idx + 1) * 5,
+          }));
+          setSegments(newSegments);
         }
+      }
 
-        currentText += finalTranscript;
-        setTranscript(currentText + (interimTranscript ? ` [${interimTranscript}]` : ""));
+      setProgress(100);
+      setStatus("Transcription terminée");
+      setIsTranscribing(false);
 
-        if (media && media.duration) {
-          setProgress(Math.round((currentMediaTime / media.duration) * 100));
-        }
-      };
-
-      recognition.onerror = (event: any) => {
-        console.error("Speech recognition error:", event.error);
-        if (event.error === 'no-speech') return;
-        setError(`Erreur de reconnaissance: ${event.error}`);
-      };
-
-      recognition.onend = () => {
-        const media = mediaRef.current;
-        
-        if (media && !media.paused && !media.ended) {
-          recognition.start();
-          return;
-        }
-
-        setIsTranscribing(false);
-        setProgress(100);
-        setStatus("Transcription terminée");
-        
-        const cleanTranscript = transcript.replace(/\s*\[.*?\]\s*/g, " ").trim();
-        setTranscript(cleanTranscript || currentText);
-
-        toast({
-          title: "Transcription terminée",
-          description: `${newSegments.length} segments transcrits`
-        });
-      };
-
-      recognition.start();
+      toast({
+        title: "Transcription terminée",
+        description: `${result.text?.split(' ').length || 0} mots transcrits avec succès`
+      });
 
     } catch (err: any) {
       console.error("Transcription error:", err);
       setError(err.message || "Erreur lors de la transcription");
       setIsTranscribing(false);
+      setProgress(0);
+      setStatus("");
     }
   };
 
-  // Stop transcription
+  // Stop transcription (cancel the process)
   const stopTranscription = () => {
-    if (recognitionRef.current) {
-      recognitionRef.current.stop();
-    }
-    const media = mediaRef.current;
-    if (media) {
-      media.pause();
-    }
     setIsTranscribing(false);
+    setStatus("Transcription annulée");
   };
 
   // Reset
@@ -456,23 +468,12 @@ export default function AudiovisualTranscriptionTool() {
 
   return (
     <div className="space-y-6">
-      {/* Browser Support Warning */}
-      {!isSupported && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            Votre navigateur ne supporte pas la reconnaissance vocale Web Speech API.
-            Veuillez utiliser Google Chrome ou Microsoft Edge.
-          </AlertDescription>
-        </Alert>
-      )}
-
       {/* Info Alert */}
-      <Alert className="bg-blue-50 border-blue-200">
-        <Mic className="h-4 w-4 text-blue-600" />
-        <AlertDescription className="text-blue-700">
-          <strong>Transcription vocale :</strong> Sélectionnez un fichier audio/vidéo ou un document existant, 
-          puis lancez la transcription pour générer le texte avec le téléprompteur synchronisé.
+      <Alert className="bg-primary/5 border-primary/20">
+        <Wand2 className="h-4 w-4 text-primary" />
+        <AlertDescription>
+          <strong>Transcription automatique (ElevenLabs) :</strong> Sélectionnez un fichier audio/vidéo ou un document existant, 
+          puis lancez la transcription automatique. Aucun microphone requis - le traitement se fait côté serveur.
         </AlertDescription>
       </Alert>
 
@@ -583,11 +584,11 @@ export default function AudiovisualTranscriptionTool() {
                   {!isTranscribing ? (
                     <Button 
                       onClick={startTranscription} 
-                      disabled={!mediaSrc || !isSupported}
+                      disabled={!mediaSrc && !selectedFile}
                       className="flex-1"
                     >
-                      <Mic className="h-4 w-4 mr-2" />
-                      Transcrire
+                      <Wand2 className="h-4 w-4 mr-2" />
+                      Transcrire automatiquement
                     </Button>
                   ) : (
                     <Button 
@@ -827,7 +828,7 @@ export default function AudiovisualTranscriptionTool() {
       {/* Success Badge */}
       {!isTranscribing && transcript && (
         <div className="flex items-center justify-center">
-          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+          <Badge variant="secondary" className="bg-primary/10 text-primary border-primary/20">
             <CheckCircle2 className="h-3 w-3 mr-1" />
             {segments.length} segments transcrits • {transcript.split(' ').filter(Boolean).length} mots
           </Badge>
