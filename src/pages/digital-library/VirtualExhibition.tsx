@@ -291,124 +291,22 @@ export default function VirtualExhibition() {
   return (
     <DigitalLibraryLayout>
       {/* Hero Section */}
-      <section className="relative min-h-[70vh] flex items-center overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-indigo-900 to-slate-900" />
+      <section className="relative py-16 bg-gradient-to-br from-bn-blue-primary via-bn-blue-deep to-bn-blue-primary overflow-hidden">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
-        
-        {/* Floating elements */}
-        <div className="absolute top-20 left-20 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-20 right-20 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 left-1/3 w-24 h-24 bg-pink-500/10 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }} />
+        <div className="absolute top-20 left-20 w-32 h-32 bg-gold-bn-primary/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 right-20 w-48 h-48 bg-gold-bn-primary/10 rounded-full blur-3xl" />
 
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Content */}
-            <div className="text-white space-y-6">
-              <Badge className="bg-white/10 text-white border-white/20 backdrop-blur-sm px-4 py-2">
-                <Layers className="h-4 w-4 mr-2" />
-                {activeExhibition?.title || "Exposition Virtuelle 2025"}
-              </Badge>
-              
-              <h1 className="text-4xl md:text-6xl font-bold leading-tight">
-                Le Maroc
-                <span className="block text-amber-400 pb-2">
-                  à travers les âges
-                </span>
-              </h1>
-              
-              <p className="text-lg md:text-xl text-white/80 max-w-xl">
-                Un voyage immersif à travers des siècles d'histoire, de culture et de patrimoine. 
-                Explorez plus de 250 documents rares, manuscrits précieux et photographies historiques.
-              </p>
-
-              <div className="flex flex-wrap gap-4 pt-4">
-                <Button 
-                  size="lg" 
-                  className="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-lg shadow-orange-500/25"
-                  onClick={startTour}
-                >
-                  <Play className="h-5 w-5 mr-2" />
-                  Commencer la visite
-                </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="border-white/50 text-white hover:bg-white/20 backdrop-blur-sm bg-white/10"
-                  onClick={() => timelineRef.current?.scrollIntoView({ behavior: 'smooth' })}
-                >
-                  <Info className="h-5 w-5 mr-2" />
-                  <span>Explorer librement</span>
-                </Button>
-              </div>
-
-              {/* Stats */}
-              <div className="flex gap-8 pt-6">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-amber-400">250+</div>
-                  <div className="text-sm text-white/60">Documents</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-orange-400">5</div>
-                  <div className="text-sm text-white/60">Périodes</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-rose-400">12</div>
-                  <div className="text-sm text-white/60">Siècles</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right - Featured Carousel */}
-            <div className="relative">
-              <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl shadow-purple-500/20">
-                <img 
-                  src={featuredExhibits[currentSlide].image}
-                  alt={featuredExhibits[currentSlide].title}
-                  className="w-full h-full object-cover transition-all duration-700"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                
-                {/* Slide Info */}
-                <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                  <Badge className="bg-white/20 backdrop-blur-sm mb-3">
-                    {featuredExhibits[currentSlide].itemCount} pièces
-                  </Badge>
-                  <h3 className="text-2xl font-bold mb-2">{featuredExhibits[currentSlide].title}</h3>
-                  <p className="text-white/80 text-sm line-clamp-2">{featuredExhibits[currentSlide].description}</p>
-                </div>
-
-                {/* Navigation */}
-                <button 
-                  onClick={prevSlide}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 p-2 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-colors"
-                >
-                  <ChevronLeft className="h-6 w-6 text-white" />
-                </button>
-                <button 
-                  onClick={nextSlide}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-colors"
-                >
-                  <ChevronRight className="h-6 w-6 text-white" />
-                </button>
-              </div>
-
-              {/* Carousel Dots */}
-              <div className="flex justify-center gap-2 mt-4">
-                {featuredExhibits.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentSlide(index)}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      index === currentSlide 
-                        ? 'w-8 bg-amber-400' 
-                        : 'bg-white/40 hover:bg-white/60'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
+        <div className="container mx-auto px-4 relative z-10 text-center">
+          <div className="inline-flex items-center justify-center w-16 h-16 border-2 border-gold-bn-primary bg-white/10 backdrop-blur-sm rounded-xl mb-6">
+            <Layers className="h-8 w-8 text-gold-bn-primary" />
           </div>
+          
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+            Expositions Virtuelles 360°
+          </h1>
+          <p className="text-lg text-white/80 max-w-2xl mx-auto">
+            Découvrez nos expositions immersives avec panoramas 360° et hotspots interactifs
+          </p>
         </div>
       </section>
 
