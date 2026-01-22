@@ -1086,39 +1086,7 @@ const BookReader = () => {
                       </DialogContent>
                     </Dialog>
 
-                    <Dialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
-                      <DialogTrigger asChild>
-                        <Button variant="outline" className="w-full justify-start" size="sm">
-                          <Mail className="h-4 w-4 mr-2" />
-                          Envoyer par email
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Envoyer par email</DialogTitle>
-                          <DialogDescription>
-                            Entrez l'adresse email du destinataire
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4 mt-4">
-                          <div>
-                            <Label htmlFor="email">Email</Label>
-                            <Input 
-                              id="email"
-                              type="email"
-                              placeholder="destinataire@email.com"
-                              value={emailAddress}
-                              onChange={(e) => setEmailAddress(e.target.value)}
-                            />
-                          </div>
-                          <Button onClick={handleSendEmail} className="w-full">
-                            Envoyer
-                          </Button>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-
-                    <Button 
+                    <Button
                       variant="outline" 
                       className="w-full justify-start" 
                       size="sm"
