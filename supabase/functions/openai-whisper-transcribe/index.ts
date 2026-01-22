@@ -19,7 +19,7 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    const OPENAI_API_KEY = (Deno.env.get("OPENAI_API_KEY") ?? "").trim();
     
     if (!OPENAI_API_KEY) {
       logStep("ERROR: OPENAI_API_KEY not configured");
@@ -28,7 +28,11 @@ serve(async (req) => {
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    logStep("OpenAI API key verified");
+    // Avoid logging secrets. Only log shape/length for debugging.
+    logStep("OpenAI API key loaded", {
+      length: OPENAI_API_KEY.length,
+      startsWithSk: OPENAI_API_KEY.startsWith("sk-"),
+    });
 
     const formData = await req.formData();
     const audioFile = formData.get("audio") as File;
@@ -84,7 +88,11 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorText = await response.text();
-      logStep("ERROR: OpenAI API error", { status: response.status, error: errorText });
+      // Sanitize the most common key-leak pattern from OpenAI error messages.
+      const safeErrorText = errorText
+        .replace(/(Incorrect API key provided: )[^.\n]+/gi, "$1[REDACTED]")
+        .slice(0, 2000);
+      logStep("ERROR: OpenAI API error", { status: response.status, error: safeErrorText });
       
       if (response.status === 429) {
         return new Response(
@@ -149,9 +157,9 @@ serve(async (req) => {
     );
 
   } catch (error) {
-    logStep("ERROR in function", { message: error.message });
+    logStep("ERROR in function", { message: error?.message ?? String(error) });
     return new Response(
-      JSON.stringify({ error: error.message || "Internal server error" }),
+      JSON.stringify({ error: error?.message || "Internal server error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
