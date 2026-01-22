@@ -18,7 +18,7 @@ export default function VirtualExhibitions360CMS() {
   const { user } = useAuth();
   const { isLibrarian, loading } = useSecureRoles();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeTab, setActiveTab] = useState("exhibitions");
 
   if (loading) {
     return (
