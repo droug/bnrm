@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { format } from "date-fns";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DynamicHierarchicalSelect } from "@/components/ui/dynamic-hierarchical-select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { AlertTriangle, CheckCircle, Clock, FileText, Upload, X, File, ArrowLeft, CalendarIcon, ExternalLink, Check, ChevronsUpDown } from "lucide-react";
+import { AlertTriangle, CheckCircle, Clock, FileText, Upload, X, File, ArrowLeft, CalendarIcon, ExternalLink, Check, ChevronsUpDown, Save, Loader2 } from "lucide-react";
 import { ScrollableDialog, ScrollableDialogNestedRoot, ScrollableDialogContent, ScrollableDialogHeader, ScrollableDialogTitle, ScrollableDialogDescription, ScrollableDialogFooter, ScrollableDialogBody } from "@/components/ui/scrollable-dialog";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -93,13 +93,18 @@ interface LegalDepositDeclarationProps {
   depositType: "monographie" | "periodique" | "bd_logiciels" | "collections_specialisees";
   onClose: () => void;
   initialUserType?: "editor" | "printer" | "producer";
+  editId?: string | null;
 }
 
-export default function LegalDepositDeclaration({ depositType, onClose, initialUserType }: LegalDepositDeclarationProps) {
+export default function LegalDepositDeclaration({ depositType, onClose, initialUserType, editId }: LegalDepositDeclarationProps) {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editIdFromUrl = editId || searchParams.get('edit');
   const { language, isRTL } = useLanguage();
   const { user } = useAuth();
   const { uploadMultipleDocuments, uploading: uploadingDocuments } = useLegalDepositStorage();
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+  const [existingRequestId, setExistingRequestId] = useState<string | null>(editIdFromUrl);
   
   // Charger les champs personnalisés - chercher aussi dans les versions non publiées en dev
   const { fields: customFields, loading: customFieldsLoading } = useDynamicForm({ 
@@ -118,6 +123,79 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
       console.log("Custom fields loaded:", customFields);
     }
   }, [customFields]);
+
+  // Charger un brouillon existant si editId est fourni
+  useEffect(() => {
+    const loadDraft = async () => {
+      if (!editIdFromUrl || !user) return;
+      
+      console.log('[DRAFT] Loading draft:', editIdFromUrl);
+      
+      try {
+        const { data, error } = await supabase
+          .from('legal_deposit_requests')
+          .select('*')
+          .eq('id', editIdFromUrl)
+          .maybeSingle();
+
+        if (error) {
+          console.error('[DRAFT] Error loading draft:', error);
+          toast.error('Erreur lors du chargement du brouillon');
+          return;
+        }
+
+        if (!data) {
+          console.log('[DRAFT] No draft found');
+          toast.error('Brouillon introuvable');
+          return;
+        }
+
+        console.log('[DRAFT] Draft loaded:', data);
+        
+        // Remplir les données du formulaire
+        setFormData({
+          title: data.title || '',
+          subtitle: data.subtitle || '',
+          author_name: data.author_name || '',
+          language: data.language || '',
+          page_count: data.page_count?.toString() || '',
+          isbn: data.isbn || '',
+          issn: data.issn || '',
+          ismn: data.ismn || '',
+          publication_date: data.publication_date || '',
+          amazon_link: data.amazon_link || '',
+          ...(typeof data.metadata === 'object' && data.metadata !== null ? data.metadata : {})
+        });
+
+        // Remplir les métadonnées
+        const metadata = data.metadata as any || {};
+        
+        if (metadata.editor) setEditorData(metadata.editor);
+        if (metadata.printer) setPrinterData(metadata.printer);
+        if (metadata.publisher) setSelectedPublisher(metadata.publisher);
+        if (metadata.publicationType) setPublicationType(metadata.publicationType);
+        if (metadata.periodicity) setPeriodicity(metadata.periodicity);
+        if (metadata.printRun) setPrintRun(metadata.printRun);
+        if (metadata.supportType) setSupportType(metadata.supportType);
+        if (metadata.customFields) setCustomFieldsData(metadata.customFields);
+        if (metadata.authorGender) setAuthorGender(metadata.authorGender);
+        if (metadata.editorIdentification) setEditorIdentification(metadata.editorIdentification);
+        if (metadata.hasScale) setHasScale(metadata.hasScale);
+        if (metadata.hasLegend) setHasLegend(metadata.hasLegend);
+        if (metadata.collectionTitle) setCollectionTitle(metadata.collectionTitle);
+        
+        // Aller directement au formulaire
+        setCurrentStep("form_filling");
+        
+        toast.success('Brouillon chargé');
+      } catch (err) {
+        console.error('[DRAFT] Error:', err);
+        toast.error('Erreur lors du chargement');
+      }
+    };
+
+    loadDraft();
+  }, [editIdFromUrl, user]);
   
   const [customFieldsData, setCustomFieldsData] = useState<Record<string, any>>({});
   
@@ -3825,6 +3903,119 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
     toast.success("Confirmation réciproque validée");
   };
 
+  // Fonction pour enregistrer un brouillon
+  const handleSaveDraft = async () => {
+    if (!user) {
+      toast.error("Vous devez être connecté pour enregistrer un brouillon");
+      return;
+    }
+
+    setIsSavingDraft(true);
+    
+    try {
+      // Récupérer l'ID du professionnel
+      let initiatorId: string | null = null;
+      
+      const { data: registryData } = await supabase
+        .from('professional_registry')
+        .select('id')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      if (registryData) {
+        initiatorId = registryData.id;
+      } else {
+        const { data: requestData } = await supabase
+          .from('professional_registration_requests')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('status', 'approved')
+          .maybeSingle();
+        
+        if (requestData) {
+          initiatorId = requestData.id;
+        }
+      }
+      
+      if (!initiatorId) {
+        toast.error("Vous devez être enregistré comme professionnel");
+        setIsSavingDraft(false);
+        return;
+      }
+
+      // Préparer les données du brouillon
+      const draftData = {
+        initiator_id: initiatorId,
+        request_number: existingRequestId ? undefined : `DL-${new Date().getFullYear()}-${Date.now()}`,
+        support_type: ((supportType === 'electronique' ? 'electronique' : 'imprime') as 'imprime' | 'electronique'),
+        monograph_type: (depositType === 'monographie' ? 'livres' : 
+                       depositType === 'periodique' ? 'periodiques' : 
+                       depositType === 'collections_specialisees' ? 'beaux_livres' : 'musique') as 'livres' | 'periodiques' | 'theses' | 'corans' | 'beaux_livres' | 'musique' | 'encyclopedies' | 'ouvrages_scolaires',
+        status: 'brouillon' as const,
+        title: formData.title || 'Sans titre',
+        subtitle: formData.subtitle || null,
+        author_name: formData.author_name || '',
+        language: formData.language || language || 'fr',
+        publication_date: formData.publication_date || null,
+        page_count: formData.page_count ? parseInt(formData.page_count) : null,
+        isbn: formData.isbn || null,
+        issn: formData.issn || null,
+        ismn: formData.ismn || null,
+        amazon_link: formData.amazon_link || null,
+        metadata: {
+          depositType,
+          editor: editorData,
+          printer: printerData,
+          publisher: selectedPublisher,
+          publicationType,
+          periodicity,
+          printRun,
+          supportType,
+          editorIdentification,
+          authorGender,
+          customFields: customFieldsData,
+          hasScale,
+          hasLegend,
+          collectionTitle,
+          ...formData
+        }
+      };
+
+      let savedId: string;
+      
+      if (existingRequestId) {
+        // Mise à jour du brouillon existant
+        const { error } = await supabase
+          .from('legal_deposit_requests')
+          .update(draftData)
+          .eq('id', existingRequestId);
+        
+        if (error) throw error;
+        savedId = existingRequestId;
+        toast.success('Brouillon mis à jour');
+      } else {
+        // Création d'un nouveau brouillon
+        const { data, error } = await supabase
+          .from('legal_deposit_requests')
+          .insert([draftData])
+          .select('id')
+          .single();
+        
+        if (error) throw error;
+        savedId = data.id;
+        setExistingRequestId(savedId);
+        toast.success('Brouillon enregistré');
+      }
+
+      console.log('[DRAFT] Saved:', savedId);
+    } catch (error: any) {
+      console.error('[DRAFT] Error saving:', error);
+      toast.error(`Erreur: ${error.message}`);
+    } finally {
+      setIsSavingDraft(false);
+    }
+  };
+
   const handleFormSubmit = async () => {
     if (!user) {
       toast.error("Vous devez être connecté pour soumettre une déclaration");
@@ -4572,13 +4763,30 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
             {language === 'ar' ? renderArabicForm() : renderFrenchForm()}
           </CardContent>
 
-          <CardFooter className="flex justify-between">
+          <CardFooter className="flex justify-between flex-wrap gap-2">
             <Button variant="outline" onClick={onClose} className="text-red-600 hover:text-red-700">
               {language === 'ar' ? 'إلغاء' : 'Annuler'}
             </Button>
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap">
               <Button variant="ghost" onClick={() => setCurrentStep("printer_auth")}>
                 {language === 'ar' ? 'رجوع' : 'Retour'}
+              </Button>
+              <Button 
+                variant="secondary"
+                onClick={handleSaveDraft}
+                disabled={isSavingDraft}
+              >
+                {isSavingDraft ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    {language === 'ar' ? 'جارٍ الحفظ...' : 'Enregistrement...'}
+                  </>
+                ) : (
+                  <>
+                    <Save className="mr-2 h-4 w-4" />
+                    {language === 'ar' ? 'حفظ' : 'Enregistrer'}
+                  </>
+                )}
               </Button>
               <Button 
                 onClick={handleFormSubmit}

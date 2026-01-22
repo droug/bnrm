@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LegalDepositDeclaration from "@/components/LegalDepositDeclaration";
@@ -11,11 +12,20 @@ import { LegalDepositInfoCard } from "@/components/legal-deposit/LegalDepositInf
 import { WatermarkContainer } from "@/components/ui/watermark";
 
 export default function BooksDeposit() {
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get('edit');
   const [showForm, setShowForm] = useState(false);
   const [showUserTypeModal, setShowUserTypeModal] = useState(false);
   const [showAuthChoiceModal, setShowAuthChoiceModal] = useState(false);
   const [selectedUserType, setSelectedUserType] = useState<"editeur" | "imprimeur">("editeur");
   const { user } = useAuth();
+
+  // Si un editId est présent, ouvrir directement le formulaire
+  useEffect(() => {
+    if (editId && user) {
+      setShowForm(true);
+    }
+  }, [editId, user]);
 
   const handleStartDeclaration = () => {
     setShowUserTypeModal(true);
@@ -35,7 +45,7 @@ export default function BooksDeposit() {
   const mappedUserType = selectedUserType === "editeur" ? "editor" : "printer";
 
   if (showForm) {
-    return <LegalDepositDeclaration depositType="monographie" onClose={() => setShowForm(false)} initialUserType={mappedUserType} />;
+    return <LegalDepositDeclaration depositType="monographie" onClose={() => setShowForm(false)} initialUserType={editId ? "editor" : mappedUserType} editId={editId} />;
   }
 
   const documents = [
