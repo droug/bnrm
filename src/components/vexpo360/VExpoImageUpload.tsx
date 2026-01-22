@@ -51,6 +51,13 @@ export function VExpoImageUpload({
     onUploadingChange?.(next);
   };
 
+  const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+  const isTransientFetchError = (err: any) => {
+    const msg = String(err?.message || err?.originalError?.message || "").toLowerCase();
+    return msg.includes("failed to fetch");
+  };
+
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -88,22 +95,42 @@ export function VExpoImageUpload({
 
       setUploadProgress(30);
 
-      // Upload to Supabase Storage
-      const { data, error } = await supabase.storage
-        .from("vexpo-assets")
-        .upload(filePath, file, {
-          cacheControl: "3600",
-          upsert: false
-        });
+      // Upload to Supabase Storage (retry transient network errors)
+      let uploadedPath: string | null = null;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          const { data, error } = await supabase.storage
+            .from("vexpo-assets")
+            .upload(filePath, file, {
+              cacheControl: "3600",
+              upsert: false,
+              contentType: file.type,
+            });
 
-      if (error) throw error;
+          if (error) throw error;
+          uploadedPath = data.path;
+          break;
+        } catch (err: any) {
+          if (attempt < 2 && isTransientFetchError(err)) {
+            // Small backoff
+            setUploadProgress(30);
+            await sleep(500 * (attempt + 1));
+            continue;
+          }
+          throw err;
+        }
+      }
+
+      if (!uploadedPath) {
+        throw new Error("Upload incomplet");
+      }
 
       setUploadProgress(80);
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from("vexpo-assets")
-        .getPublicUrl(data.path);
+        .getPublicUrl(uploadedPath);
 
       setUploadProgress(100);
       onChange(publicUrl);
