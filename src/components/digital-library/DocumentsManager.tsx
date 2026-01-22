@@ -886,92 +886,120 @@ export default function DocumentsManager() {
 
       if (transcriptionMethod === "lovable-ai") {
         // Use Lovable AI (Gemini) - included in Lovable platform
-        toast({
-          title: "Transcription Lovable AI (Gemini)",
-          description: `Envoi au serveur... Langue: ${transcriptionLanguageOptions.find(l => l.value === language)?.label || language}`
-        });
-
-        setTranscriptionProgress(20);
-
-        // Fetch the audio file
-        const response = await fetch(doc.pdf_url);
-        const blob = await response.blob();
+        // Note: Gemini has limits on audio file size via base64 encoding
         
-        const urlParts = doc.pdf_url.split('.');
-        const extension = urlParts[urlParts.length - 1].split('?')[0] || 'mp4';
+        // Check file size first (limit to ~10MB to avoid memory issues)
+        const response = await fetch(doc.pdf_url, { method: 'HEAD' });
+        const contentLength = response.headers.get('content-length');
+        const fileSizeMB = contentLength ? parseInt(contentLength) / (1024 * 1024) : 0;
         
-        const formData = new FormData();
-        formData.append('audio', blob, `audio.${extension}`);
-        formData.append('language', language);
+        if (fileSizeMB > 10) {
+          // File too large for Gemini, fallback to Local
+          usedMethod = "local";
+          toast({
+            title: "Fichier trop volumineux pour Gemini",
+            description: `Le fichier fait ${fileSizeMB.toFixed(1)} Mo. Bascule vers transcription locale.`,
+          });
 
-        setTranscriptionProgress(40);
-
-        const { data: sessionData } = await supabase.auth.getSession();
-        const token = sessionData?.session?.access_token;
-
-        const result = await fetch(
-          `https://safeppmznupzqkqmzjzt.supabase.co/functions/v1/lovable-ai-transcribe`,
-          {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
-            body: formData
+          const localResult = await localTranscribe(doc.pdf_url, language);
+          if (!localResult || !localResult.text) {
+            throw new Error("Aucun texte transcrit (local)");
           }
-        );
+          transcriptionText = localResult.text;
 
-        setTranscriptionProgress(70);
-
-        if (!result.ok) {
-          let errorData: any = null;
-          let errorMessage = "Erreur lors de la transcription Lovable AI";
-          try {
-            errorData = await result.json();
-            errorMessage = errorData?.error || errorMessage;
-          } catch {
-            try {
-              const t = await result.text();
-              if (t) errorMessage = t;
-            } catch {
-              // ignore
-            }
+          if (localResult.chunks && localResult.chunks.length > 0) {
+            segments = localResult.chunks.map(c => c.text.trim()).filter(s => s);
+          } else {
+            segments = transcriptionText.split(/[.!?]+/).filter((s: string) => s.trim());
           }
+        } else {
+          toast({
+            title: "Transcription Gemini",
+            description: `Envoi au serveur... Langue: ${transcriptionLanguageOptions.find(l => l.value === language)?.label || language}`
+          });
 
-          const code = errorData?.code;
+          setTranscriptionProgress(20);
+
+          // Fetch the audio file
+          const audioResponse = await fetch(doc.pdf_url);
+          const blob = await audioResponse.blob();
           
-          if (code === "UNSUPPORTED" || code === "RATE_LIMIT" || code === "PAYMENT_REQUIRED") {
-            // Fallback to Local
-            usedMethod = "local";
-            toast({
-              title: "Lovable AI indisponible",
-              description: `${errorMessage}. Bascule vers transcription locale.`,
-              variant: "destructive",
-            });
+          const urlParts = doc.pdf_url.split('.');
+          const extension = urlParts[urlParts.length - 1].split('?')[0] || 'mp4';
+          
+          const formData = new FormData();
+          formData.append('audio', blob, `audio.${extension}`);
+          formData.append('language', language);
 
-            const localResult = await localTranscribe(doc.pdf_url, language);
-            if (!localResult || !localResult.text) {
-              throw new Error("Aucun texte transcrit (local)");
+          setTranscriptionProgress(40);
+
+          const { data: sessionData } = await supabase.auth.getSession();
+          const token = sessionData?.session?.access_token;
+
+          const result = await fetch(
+            `https://safeppmznupzqkqmzjzt.supabase.co/functions/v1/lovable-ai-transcribe`,
+            {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+              },
+              body: formData
             }
-            transcriptionText = localResult.text;
+          );
 
-            if (localResult.chunks && localResult.chunks.length > 0) {
-              segments = localResult.chunks.map(c => c.text.trim()).filter(s => s);
+          setTranscriptionProgress(70);
+
+          if (!result.ok) {
+            let errorData: any = null;
+            let errorMessage = "Erreur lors de la transcription Gemini";
+            try {
+              errorData = await result.json();
+              errorMessage = errorData?.error || errorMessage;
+            } catch {
+              try {
+                const t = await result.text();
+                if (t) errorMessage = t;
+              } catch {
+                // ignore
+              }
+            }
+
+            const code = errorData?.code;
+            
+            if (code === "UNSUPPORTED" || code === "RATE_LIMIT" || code === "PAYMENT_REQUIRED" || errorMessage.includes("Memory")) {
+              // Fallback to Local
+              usedMethod = "local";
+              toast({
+                title: "Gemini indisponible",
+                description: `${errorMessage}. Bascule vers transcription locale.`,
+                variant: "destructive",
+              });
+
+              const localResult = await localTranscribe(doc.pdf_url, language);
+              if (!localResult || !localResult.text) {
+                throw new Error("Aucun texte transcrit (local)");
+              }
+              transcriptionText = localResult.text;
+
+              if (localResult.chunks && localResult.chunks.length > 0) {
+                segments = localResult.chunks.map(c => c.text.trim()).filter(s => s);
+              } else {
+                segments = transcriptionText.split(/[.!?]+/).filter((s: string) => s.trim());
+              }
+            } else {
+              throw new Error(errorMessage);
+            }
+          }
+
+          if (usedMethod === "lovable-ai") {
+            const data = await result.json();
+            transcriptionText = data.text || "";
+            
+            if (data.segments && data.segments.length > 0) {
+              segments = data.segments.map((s: any) => s.text.trim()).filter((s: string) => s);
             } else {
               segments = transcriptionText.split(/[.!?]+/).filter((s: string) => s.trim());
             }
-          } else {
-            throw new Error(errorMessage);
-          }
-        }
-
-        if (usedMethod === "lovable-ai") {
-          const data = await result.json();
-          transcriptionText = data.text || "";
-          
-          if (data.segments && data.segments.length > 0) {
-            segments = data.segments.map((s: any) => s.text.trim()).filter((s: string) => s);
-          } else {
-            segments = transcriptionText.split(/[.!?]+/).filter((s: string) => s.trim());
           }
         }
 
