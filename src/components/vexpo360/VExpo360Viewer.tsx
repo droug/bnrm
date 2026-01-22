@@ -52,11 +52,12 @@ interface Artwork {
   title_ar: string | null;
   description_fr: string | null;
   description_ar: string | null;
-  author: string | null;
-  date_created: string | null;
-  medium: string | null;
-  dimensions: string | null;
-  image_url: string | null;
+  creator_author: string | null;
+  creation_date: string | null;
+  artwork_type: string | null;
+  inventory_id: string | null;
+  images: Array<{ url: string; alt: string }> | null;
+  external_catalog_url: string | null;
 }
 
 interface VExpo360ViewerProps {
@@ -459,36 +460,36 @@ export function VExpo360Viewer({
                       if (!artwork) return null;
                       return (
                         <div className="space-y-4">
-                          {artwork.image_url && (
+                          {artwork.images && artwork.images.length > 0 && (
                             <img 
-                              src={artwork.image_url} 
-                              alt={artwork.title_fr}
+                              src={artwork.images[0].url} 
+                              alt={artwork.images[0].alt || artwork.title_fr}
                               className="w-full max-h-80 object-contain rounded-lg bg-muted"
                             />
                           )}
                           <div className="grid grid-cols-2 gap-4 text-sm">
-                            {artwork.author && (
+                            {artwork.creator_author && (
                               <div>
                                 <span className="text-muted-foreground">Auteur:</span>
-                                <p className="font-medium">{artwork.author}</p>
+                                <p className="font-medium">{artwork.creator_author}</p>
                               </div>
                             )}
-                            {artwork.date_created && (
+                            {artwork.creation_date && (
                               <div>
                                 <span className="text-muted-foreground">Date:</span>
-                                <p className="font-medium">{artwork.date_created}</p>
+                                <p className="font-medium">{artwork.creation_date}</p>
                               </div>
                             )}
-                            {artwork.medium && (
+                            {artwork.artwork_type && (
                               <div>
-                                <span className="text-muted-foreground">Technique:</span>
-                                <p className="font-medium">{artwork.medium}</p>
+                                <span className="text-muted-foreground">Type:</span>
+                                <p className="font-medium capitalize">{artwork.artwork_type}</p>
                               </div>
                             )}
-                            {artwork.dimensions && (
+                            {artwork.inventory_id && (
                               <div>
-                                <span className="text-muted-foreground">Dimensions:</span>
-                                <p className="font-medium">{artwork.dimensions}</p>
+                                <span className="text-muted-foreground">Cote:</span>
+                                <p className="font-medium">{artwork.inventory_id}</p>
                               </div>
                             )}
                           </div>
@@ -496,6 +497,15 @@ export function VExpo360Viewer({
                             <p className="text-muted-foreground">
                               {language === 'ar' ? artwork.description_ar : artwork.description_fr}
                             </p>
+                          )}
+                          {artwork.external_catalog_url && (
+                            <a 
+                              href={artwork.external_catalog_url} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center text-primary hover:underline text-sm"
+                            >
+                            </a>
                           )}
                         </div>
                       );
