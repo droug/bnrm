@@ -1,10 +1,8 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { Navigate, useNavigate } from "react-router-dom";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import SEOHead from "@/components/seo/SEOHead";
-import SEOImage from "@/components/seo/SEOImage";
 import DocumentsManager from "@/components/digital-library/DocumentsManager";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -27,14 +25,13 @@ export default function DigitalLibraryDocuments() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <DigitalLibraryLayout>
       <SEOHead
         title="Gestion des Documents Numérisés"
         description="Interface d'administration pour la gestion des documents numérisés de la bibliothèque. Espace réservé aux bibliothécaires."
         noindex={true}
       />
       
-      <Header />
       <main className="container mx-auto p-6">
         <Button
           variant="ghost"
@@ -46,7 +43,6 @@ export default function DigitalLibraryDocuments() {
         </Button>
         <DocumentsManager />
       </main>
-      <Footer />
-    </div>
+    </DigitalLibraryLayout>
   );
 }
