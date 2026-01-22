@@ -2130,7 +2130,7 @@ export default function DocumentsManager() {
                   <TableHead className="w-28 text-center">N° Cote</TableHead>
                   <TableHead className="w-28">Type</TableHead>
                   <TableHead className="w-36">Auteur</TableHead>
-                  <TableHead className="w-16 text-center">OCR</TableHead>
+                  <TableHead className="w-24 text-center">OCR/Transcription</TableHead>
                   <TableHead className="w-32 text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
