@@ -734,13 +734,12 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                 <CardTitle className="text-lg">Police des titres</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-4 gap-4 mb-2">
+                <div className="grid grid-cols-3 gap-4 mb-2">
                   <Label className="text-sm font-medium">Police</Label>
                   <Label className="text-sm font-medium">Taille</Label>
                   <Label className="text-sm font-medium">Style</Label>
-                  <Label className="text-sm font-medium">Style</Label>
                 </div>
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <Select
                     value={typography.heading_font}
                     onValueChange={(value) => setTypography(prev => ({ ...prev, heading_font: value }))}
@@ -772,30 +771,25 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                     </SelectContent>
                   </Select>
                   <Select
-                    value={typography.heading_weight}
-                    onValueChange={(value) => setTypography(prev => ({ ...prev, heading_weight: value }))}
+                    value={`${typography.heading_weight}-${typography.heading_style}`}
+                    onValueChange={(value) => {
+                      const [weight, style] = value.split('-');
+                      setTypography(prev => ({ ...prev, heading_weight: weight, heading_style: style }));
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-background border z-50">
-                      <SelectItem value="400">Normal (400)</SelectItem>
-                      <SelectItem value="500">Medium (500)</SelectItem>
-                      <SelectItem value="600">Semi-bold (600)</SelectItem>
-                      <SelectItem value="700">Bold (700)</SelectItem>
-                      <SelectItem value="800">Extra-bold (800)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select
-                    value={typography.heading_style}
-                    onValueChange={(value) => setTypography(prev => ({ ...prev, heading_style: value }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-background border z-50">
-                      <SelectItem value="normal">Normal</SelectItem>
-                      <SelectItem value="italic">Italique</SelectItem>
+                      <SelectItem value="400-normal">Normal</SelectItem>
+                      <SelectItem value="500-normal">Medium</SelectItem>
+                      <SelectItem value="600-normal">Semi-gras</SelectItem>
+                      <SelectItem value="700-normal">Gras</SelectItem>
+                      <SelectItem value="800-normal">Extra-gras</SelectItem>
+                      <SelectItem value="400-italic">Italique</SelectItem>
+                      <SelectItem value="500-italic">Medium Italique</SelectItem>
+                      <SelectItem value="600-italic">Semi-gras Italique</SelectItem>
+                      <SelectItem value="700-italic">Gras Italique</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -808,13 +802,12 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                 <CardTitle className="text-lg">Police du corps de texte</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-4 gap-4 mb-2">
+                <div className="grid grid-cols-3 gap-4 mb-2">
                   <Label className="text-sm font-medium">Police</Label>
                   <Label className="text-sm font-medium">Taille</Label>
                   <Label className="text-sm font-medium">Style</Label>
-                  <Label className="text-sm font-medium">Style</Label>
                 </div>
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <Select
                     value={typography.body_font}
                     onValueChange={(value) => setTypography(prev => ({ ...prev, body_font: value }))}
@@ -845,29 +838,24 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                     </SelectContent>
                   </Select>
                   <Select
-                    value={typography.body_weight}
-                    onValueChange={(value) => setTypography(prev => ({ ...prev, body_weight: value }))}
+                    value={`${typography.body_weight}-${typography.body_style}`}
+                    onValueChange={(value) => {
+                      const [weight, style] = value.split('-');
+                      setTypography(prev => ({ ...prev, body_weight: weight, body_style: style }));
+                    }}
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-background border z-50">
-                      <SelectItem value="300">Light (300)</SelectItem>
-                      <SelectItem value="400">Normal (400)</SelectItem>
-                      <SelectItem value="500">Medium (500)</SelectItem>
-                      <SelectItem value="600">Semi-bold (600)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Select
-                    value={typography.body_style}
-                    onValueChange={(value) => setTypography(prev => ({ ...prev, body_style: value }))}
-                  >
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-background border z-50">
-                      <SelectItem value="normal">Normal</SelectItem>
-                      <SelectItem value="italic">Italique</SelectItem>
+                      <SelectItem value="300-normal">Léger</SelectItem>
+                      <SelectItem value="400-normal">Normal</SelectItem>
+                      <SelectItem value="500-normal">Medium</SelectItem>
+                      <SelectItem value="600-normal">Semi-gras</SelectItem>
+                      <SelectItem value="300-italic">Léger Italique</SelectItem>
+                      <SelectItem value="400-italic">Italique</SelectItem>
+                      <SelectItem value="500-italic">Medium Italique</SelectItem>
+                      <SelectItem value="600-italic">Semi-gras Italique</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -880,13 +868,12 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                 <CardTitle className="text-lg">Police des boutons</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-4 gap-4 mb-2">
+                <div className="grid grid-cols-3 gap-4 mb-2">
                   <Label className="text-sm font-medium">Police</Label>
                   <Label className="text-sm font-medium">Taille</Label>
                   <Label className="text-sm font-medium">Style</Label>
-                  <Label className="text-sm font-medium text-transparent">-</Label>
                 </div>
-                <div className="grid grid-cols-4 gap-4">
+                <div className="grid grid-cols-3 gap-4">
                   <Select
                     value={typography.button_font}
                     onValueChange={(value) => setTypography(prev => ({ ...prev, button_font: value }))}
@@ -924,13 +911,12 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="bg-background border z-50">
-                      <SelectItem value="400">Normal (400)</SelectItem>
-                      <SelectItem value="500">Medium (500)</SelectItem>
-                      <SelectItem value="600">Semi-bold (600)</SelectItem>
-                      <SelectItem value="700">Bold (700)</SelectItem>
+                      <SelectItem value="400">Normal</SelectItem>
+                      <SelectItem value="500">Medium</SelectItem>
+                      <SelectItem value="600">Semi-gras</SelectItem>
+                      <SelectItem value="700">Gras</SelectItem>
                     </SelectContent>
                   </Select>
-                  <div></div>
                 </div>
               </CardContent>
             </Card>
