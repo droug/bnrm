@@ -114,3 +114,6 @@ verify_jwt = true
 
 [functions.whisper-transcribe]
 verify_jwt = true
+
+[functions.openai-whisper-transcribe]
+verify_jwt = true

@@ -114,6 +114,7 @@ export default function DocumentsManager() {
   const [transcriptionProgress, setTranscriptionProgress] = useState(0);
   const [showTranscriptionDialog, setShowTranscriptionDialog] = useState(false);
   const [transcriptionLanguage, setTranscriptionLanguage] = useState<string>("ar");
+  const [transcriptionMethod, setTranscriptionMethod] = useState<"local" | "openai">("local");
   const [documentToTranscribe, setDocumentToTranscribe] = useState<any>(null);
 
   // Exemple de doublons détectés
@@ -861,7 +862,7 @@ export default function DocumentsManager() {
     setShowTranscriptionDialog(true);
   };
 
-  // Run transcription for audio/video documents using LOCAL Whisper (Transformers.js)
+  // Run transcription for audio/video documents
   const runTranscriptionForDocument = async (language: string) => {
     const doc = documentToTranscribe;
     if (!doc?.pdf_url) {
@@ -878,16 +879,83 @@ export default function DocumentsManager() {
     setTranscriptionProgress(5);
 
     try {
-      toast({
-        title: "Transcription locale (Whisper)",
-        description: `Chargement du modèle... Langue: ${transcriptionLanguageOptions.find(l => l.value === language)?.label || language}`
-      });
+      let transcriptionText = "";
+      let segments: string[] = [];
 
-      // Use local Whisper transcription - runs entirely in browser
-      const result = await localTranscribe(doc.pdf_url, language);
-      
-      if (!result || !result.text) {
-        throw new Error("Aucun texte transcrit");
+      if (transcriptionMethod === "openai") {
+        // Use OpenAI Whisper API (paid, more accurate)
+        toast({
+          title: "Transcription OpenAI Whisper",
+          description: `Envoi au serveur... Langue: ${transcriptionLanguageOptions.find(l => l.value === language)?.label || language}`
+        });
+
+        setTranscriptionProgress(20);
+
+        // Fetch the audio file
+        const response = await fetch(doc.pdf_url);
+        const blob = await response.blob();
+        
+        // Get file extension from URL
+        const urlParts = doc.pdf_url.split('.');
+        const extension = urlParts[urlParts.length - 1].split('?')[0] || 'mp4';
+        
+        const formData = new FormData();
+        formData.append('audio', blob, `audio.${extension}`);
+        formData.append('language', language);
+
+        setTranscriptionProgress(40);
+
+        const { data: sessionData } = await supabase.auth.getSession();
+        const token = sessionData?.session?.access_token;
+
+        const result = await fetch(
+          `https://safeppmznupzqkqmzjzt.supabase.co/functions/v1/openai-whisper-transcribe`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+            body: formData
+          }
+        );
+
+        setTranscriptionProgress(70);
+
+        if (!result.ok) {
+          const errorData = await result.json();
+          throw new Error(errorData.error || "Erreur lors de la transcription OpenAI");
+        }
+
+        const data = await result.json();
+        transcriptionText = data.text || "";
+        
+        // Use segments from OpenAI if available
+        if (data.segments && data.segments.length > 0) {
+          segments = data.segments.map((s: any) => s.text.trim()).filter((s: string) => s);
+        } else {
+          segments = transcriptionText.split(/[.!?]+/).filter((s: string) => s.trim());
+        }
+
+      } else {
+        // Use local Whisper (free, browser-based)
+        toast({
+          title: "Transcription locale (Whisper)",
+          description: `Chargement du modèle... Langue: ${transcriptionLanguageOptions.find(l => l.value === language)?.label || language}`
+        });
+
+        const result = await localTranscribe(doc.pdf_url, language);
+        
+        if (!result || !result.text) {
+          throw new Error("Aucun texte transcrit");
+        }
+
+        transcriptionText = result.text;
+        
+        if (result.chunks && result.chunks.length > 0) {
+          segments = result.chunks.map(c => c.text.trim()).filter(s => s);
+        } else {
+          segments = transcriptionText.split(/[.!?]+/).filter((s: string) => s.trim());
+        }
       }
 
       toast({
@@ -895,15 +963,9 @@ export default function DocumentsManager() {
         description: "Enregistrement de la transcription"
       });
 
+      setTranscriptionProgress(85);
+
       // Save transcription as OCR text in digital_library_pages
-      // Use chunks if available, otherwise split by sentences
-      let segments: string[];
-      if (result.chunks && result.chunks.length > 0) {
-        segments = result.chunks.map(c => c.text.trim()).filter(s => s);
-      } else {
-        segments = result.text.split(/[.!?]+/).filter((s: string) => s.trim());
-      }
-      
       for (let idx = 0; idx < segments.length; idx++) {
         const { data: existingPage } = await supabase
           .from('digital_library_pages')
@@ -941,7 +1003,7 @@ export default function DocumentsManager() {
 
       toast({
         title: "Transcription terminée",
-        description: `${segments.length} segment(s) transcrits pour "${doc.title}"`
+        description: `${segments.length} segment(s) transcrits pour "${doc.title}" (${transcriptionMethod === "openai" ? "OpenAI Whisper" : "Local"})`
       });
 
       setTranscriptionProgress(100);
@@ -950,7 +1012,7 @@ export default function DocumentsManager() {
       console.error('Transcription error:', error);
       toast({
         title: "Erreur de transcription",
-        description: error.message || "Erreur lors de la transcription locale",
+        description: error.message || "Erreur lors de la transcription",
         variant: "destructive"
       });
     } finally {
@@ -2876,6 +2938,42 @@ export default function DocumentsManager() {
           </DialogHeader>
           
           <div className="space-y-4 py-4">
+            {/* Transcription Method Selection */}
+            <div className="space-y-2">
+              <Label>Méthode de transcription</Label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setTranscriptionMethod("local")}
+                  className={`p-3 rounded-lg border-2 text-left transition-all ${
+                    transcriptionMethod === "local" 
+                      ? "border-primary bg-primary/5" 
+                      : "border-border hover:border-muted-foreground"
+                  }`}
+                >
+                  <div className="font-medium text-sm">🖥️ Local (Gratuit)</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Whisper dans le navigateur. Aucun coût, données privées.
+                  </p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTranscriptionMethod("openai")}
+                  className={`p-3 rounded-lg border-2 text-left transition-all ${
+                    transcriptionMethod === "openai" 
+                      ? "border-primary bg-primary/5" 
+                      : "border-border hover:border-muted-foreground"
+                  }`}
+                >
+                  <div className="font-medium text-sm">☁️ OpenAI Whisper</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Plus précis et rapide. Payant (~0.006$/min).
+                  </p>
+                </button>
+              </div>
+            </div>
+
+            {/* Language Selection */}
             <div className="space-y-2">
               <Label htmlFor="transcription-language">Langue de l'audio</Label>
               <Select 
@@ -2897,6 +2995,15 @@ export default function DocumentsManager() {
                 Pour de meilleurs résultats, sélectionnez la langue exacte du contenu audio.
               </p>
             </div>
+
+            {/* Method Info */}
+            {transcriptionMethod === "openai" && (
+              <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+                <p className="text-xs text-amber-700 dark:text-amber-400">
+                  <strong>Note :</strong> L'API OpenAI Whisper est payante. Le coût est d'environ $0.006 par minute d'audio.
+                </p>
+              </div>
+            )}
           </div>
 
           <DialogFooter>
@@ -2905,7 +3012,7 @@ export default function DocumentsManager() {
             </Button>
             <Button onClick={() => runTranscriptionForDocument(transcriptionLanguage)}>
               <Mic className="h-4 w-4 mr-2" />
-              Lancer la transcription
+              {transcriptionMethod === "openai" ? "Transcrire (OpenAI)" : "Transcrire (Local)"}
             </Button>
           </DialogFooter>
         </DialogContent>
