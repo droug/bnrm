@@ -111,3 +111,6 @@ verify_jwt = false
 
 [functions.elevenlabs-transcribe]
 verify_jwt = true
+
+[functions.whisper-transcribe]
+verify_jwt = true
