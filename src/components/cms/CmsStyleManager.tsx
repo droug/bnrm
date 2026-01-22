@@ -887,7 +887,7 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
               <CardHeader className="py-3">
                 <CardTitle className="text-lg">Police des boutons</CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-2">
                   <Label>Police</Label>
                   <Select
@@ -940,6 +940,8 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                     </SelectContent>
                   </Select>
                 </div>
+                {/* Empty column for alignment */}
+                <div className="hidden lg:block"></div>
               </CardContent>
             </Card>
 
