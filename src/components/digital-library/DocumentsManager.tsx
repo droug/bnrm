@@ -1810,44 +1810,6 @@ export default function DocumentsManager() {
                     />
                   </div>
 
-                  {/* Droits d'auteur */}
-                  <div className="border rounded-lg p-4 space-y-4">
-                    <h3 className="font-semibold">Droits d'auteur</h3>
-                    
-                    <FormField
-                      control={form.control}
-                      name="copyright_derogation"
-                      render={({ field }) => (
-                        <FormItem className="flex items-center justify-between">
-                          <div>
-                            <FormLabel>Dérogation temporaire</FormLabel>
-                            <FormDescription>Document sous droits avec dérogation limitée</FormDescription>
-                          </div>
-                          <FormControl>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="copyright_expires_at"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Date d'expiration du copyright</FormLabel>
-                          <FormControl>
-                            <Input {...field} type="date" />
-                          </FormControl>
-                          <FormDescription>
-                            Une alerte sera générée 3 mois avant l'expiration
-                          </FormDescription>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
                   <DialogFooter>
                     <Button type="button" variant="outline" onClick={() => {
                       setShowEditDialog(false);
