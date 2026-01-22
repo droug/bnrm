@@ -42,7 +42,11 @@ interface SystemListValue {
   parent_value_id: string | null;
 }
 
-export const SystemListsManager = () => {
+interface SystemListsManagerProps {
+  platformFilter?: string;
+}
+
+export const SystemListsManager = ({ platformFilter = "all" }: SystemListsManagerProps) => {
   const { toast } = useToast();
   const [lists, setLists] = useState<SystemList[]>([]);
   const [selectedList, setSelectedList] = useState<string | null>(null);
@@ -86,6 +90,32 @@ export const SystemListsManager = () => {
     fetchLists();
     fetchParentLists();
   }, []);
+  
+  // Filtrer les listes selon la plateforme sélectionnée
+  const filteredLists = platformFilter === "all" 
+    ? lists 
+    : lists.filter(list => {
+        // Correspondance directe avec platform
+        if (list.platform === platformFilter) return true;
+        // Correspondance avec service pour les cas "BNRM"
+        if (platformFilter === "BNRM" && list.portal === "BNRM" && list.platform === "BNRM") return true;
+        // Correspondance avec Activités Culturelles
+        if (platformFilter === "CULTURAL_ACTIVITIES" && 
+            (list.service === "Activités Culturelles" || list.platform === "CULTURAL_ACTIVITIES")) return true;
+        // Correspondance avec Bibliothèque Numérique
+        if (platformFilter === "DIGITAL_LIBRARY" && 
+            (list.service === "Bibliothèque Numérique" || list.platform === "DIGITAL_LIBRARY" || list.service === "Bibliothèque")) return true;
+        // Correspondance avec Manuscrits
+        if (platformFilter === "MANUSCRIPTS" && 
+            (list.service === "Manuscrits" || list.platform === "MANUSCRIPTS")) return true;
+        // Correspondance avec CBM
+        if (platformFilter === "CBM" && 
+            (list.platform === "CBM" || list.portal === "CBM")) return true;
+        // Correspondance avec KITAB (à définir selon les données)
+        if (platformFilter === "KITAB" && 
+            (list.platform === "KITAB" || list.service === "Kitab")) return true;
+        return false;
+      });
 
   useEffect(() => {
     if (selectedList) {
@@ -112,7 +142,7 @@ export const SystemListsManager = () => {
   }, [searchTerm, listValues]);
   
   // Organiser les listes en hiérarchie (exclure les valeurs nulles/vides)
-  const groupedLists = lists
+  const groupedLists = filteredLists
     .filter(list => list.portal && list.platform && list.service) // Exclure les listes sans hiérarchie complète
     .reduce((acc, list) => {
       const portalKey = list.portal!;
