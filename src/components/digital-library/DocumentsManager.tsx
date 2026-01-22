@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useLocalWhisperTranscription } from "@/hooks/useLocalWhisperTranscription";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -820,7 +821,21 @@ export default function DocumentsManager() {
     return ['audio', 'video', 'audiovisuel', 'audiovisual'].includes(docType);
   };
 
-  // Run transcription for audio/video documents using Whisper (Hugging Face)
+  // Local Whisper transcription hook (100% free, runs in browser)
+  const { 
+    transcribe: localTranscribe, 
+    progress: localTranscriptionProgress, 
+    isTranscribing: isLocalTranscribing 
+  } = useLocalWhisperTranscription();
+
+  // Sync transcription progress to component state
+  useEffect(() => {
+    if (localTranscriptionProgress.status !== 'idle') {
+      setTranscriptionProgress(localTranscriptionProgress.progress);
+    }
+  }, [localTranscriptionProgress]);
+
+  // Run transcription for audio/video documents using LOCAL Whisper (Transformers.js)
   const runTranscriptionForDocument = async (doc: any) => {
     if (!doc.pdf_url) {
       toast({
@@ -832,128 +847,74 @@ export default function DocumentsManager() {
     }
 
     setTranscriptionProcessingDocId(doc.id);
-    setTranscriptionProgress(10);
+    setTranscriptionProgress(5);
 
     try {
       toast({
-        title: "Téléchargement du fichier média...",
-        description: "Préparation de la transcription"
+        title: "Transcription locale (Whisper)",
+        description: "Chargement du modèle dans le navigateur..."
       });
 
-      // Download the audio/video file
-      const mediaResponse = await fetch(doc.pdf_url);
-      if (!mediaResponse.ok) {
-        throw new Error(`Impossible de télécharger le fichier: ${mediaResponse.status}`);
+      // Use local Whisper transcription - runs entirely in browser
+      const result = await localTranscribe(doc.pdf_url, 'auto');
+      
+      if (!result || !result.text) {
+        throw new Error("Aucun texte transcrit");
       }
-      const mediaBlob = await mediaResponse.blob();
-      setTranscriptionProgress(30);
-
-      // Get session for authentication
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        throw new Error("Vous devez être connecté pour utiliser la transcription");
-      }
-
-      // Prepare form data for Whisper edge function
-      const formData = new FormData();
-      formData.append("audio", mediaBlob, doc.title || "audio.mp3");
 
       toast({
-        title: "Transcription en cours...",
-        description: "Envoi vers Whisper (Hugging Face)"
+        title: "Sauvegarde en cours...",
+        description: "Enregistrement de la transcription"
       });
-      setTranscriptionProgress(50);
 
-      // Call Whisper edge function
-      let transcribeResponse = await fetch(
-        `https://safeppmznupzqkqmzjzt.supabase.co/functions/v1/whisper-transcribe`,
-        {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${session.access_token}`,
-          },
-          body: formData,
-        }
-      );
-
-      // Handle model loading (503 with retry)
-      if (transcribeResponse.status === 503) {
-        const retryData = await transcribeResponse.json().catch(() => ({}));
-        if (retryData.retry) {
-          toast({
-            title: "Modèle Whisper en chargement...",
-            description: "Nouvelle tentative dans 10 secondes"
-          });
-          await new Promise(resolve => setTimeout(resolve, 10000));
-          
-          transcribeResponse = await fetch(
-            `https://safeppmznupzqkqmzjzt.supabase.co/functions/v1/whisper-transcribe`,
-            {
-              method: "POST",
-              headers: {
-                "Authorization": `Bearer ${session.access_token}`,
-              },
-              body: formData,
-            }
-          );
-        }
-      }
-
-      setTranscriptionProgress(80);
-
-      if (!transcribeResponse.ok) {
-        const errorData = await transcribeResponse.json().catch(() => ({}));
-        throw new Error(errorData.error || `Erreur de transcription: ${transcribeResponse.status}`);
-      }
-
-      const result = await transcribeResponse.json();
-      
-      if (result.text) {
-        // Save transcription as OCR text in digital_library_pages
-        const sentences = result.text.split(/[.!?]+/).filter((s: string) => s.trim());
-        
-        for (let idx = 0; idx < sentences.length; idx++) {
-          const { data: existingPage } = await supabase
-            .from('digital_library_pages')
-            .select('id')
-            .eq('document_id', doc.id)
-            .eq('page_number', idx + 1)
-            .maybeSingle();
-
-          if (existingPage) {
-            await supabase
-              .from('digital_library_pages')
-              .update({ ocr_text: sentences[idx].trim() })
-              .eq('id', existingPage.id);
-          } else {
-            await supabase
-              .from('digital_library_pages')
-              .insert({
-                document_id: doc.id,
-                page_number: idx + 1,
-                ocr_text: sentences[idx].trim()
-              });
-          }
-        }
-
-        // Mark document as OCR processed
-        await supabase
-          .from('digital_library_documents')
-          .update({ 
-            ocr_processed: true,
-            pages_count: sentences.length
-          })
-          .eq('id', doc.id);
-
-        queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
-
-        toast({
-          title: "Transcription terminée",
-          description: `${sentences.length} segment(s) transcrits pour "${doc.title}"`
-        });
+      // Save transcription as OCR text in digital_library_pages
+      // Use chunks if available, otherwise split by sentences
+      let segments: string[];
+      if (result.chunks && result.chunks.length > 0) {
+        segments = result.chunks.map(c => c.text.trim()).filter(s => s);
       } else {
-        throw new Error("Aucun texte transcrit retourné");
+        segments = result.text.split(/[.!?]+/).filter((s: string) => s.trim());
       }
+      
+      for (let idx = 0; idx < segments.length; idx++) {
+        const { data: existingPage } = await supabase
+          .from('digital_library_pages')
+          .select('id')
+          .eq('document_id', doc.id)
+          .eq('page_number', idx + 1)
+          .maybeSingle();
+
+        if (existingPage) {
+          await supabase
+            .from('digital_library_pages')
+            .update({ ocr_text: segments[idx].trim() })
+            .eq('id', existingPage.id);
+        } else {
+          await supabase
+            .from('digital_library_pages')
+            .insert({
+              document_id: doc.id,
+              page_number: idx + 1,
+              ocr_text: segments[idx].trim()
+            });
+        }
+      }
+
+      // Mark document as OCR processed
+      await supabase
+        .from('digital_library_documents')
+        .update({ 
+          ocr_processed: true,
+          pages_count: segments.length
+        })
+        .eq('id', doc.id);
+
+      queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
+
+      toast({
+        title: "Transcription terminée",
+        description: `${segments.length} segment(s) transcrits pour "${doc.title}"`
+      });
 
       setTranscriptionProgress(100);
 
@@ -961,7 +922,7 @@ export default function DocumentsManager() {
       console.error('Transcription error:', error);
       toast({
         title: "Erreur de transcription",
-        description: error.message,
+        description: error.message || "Erreur lors de la transcription locale",
         variant: "destructive"
       });
     } finally {
