@@ -1138,7 +1138,7 @@ export default function DocumentsManager() {
 
       const methodLabels: Record<string, string> = {
         "local": "Local",
-        "lovable-ai": "Lovable AI (Gemini)",
+        "lovable-ai": "Gemini",
         "openai": "OpenAI Whisper"
       };
 
@@ -3106,9 +3106,9 @@ export default function DocumentsManager() {
                       : "border-border hover:border-muted-foreground"
                   }`}
                 >
-                  <div className="font-medium text-sm">✨ Lovable AI</div>
+                  <div className="font-medium text-sm">✨ Gemini</div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Gemini. Quota inclus gratuit.
+                    Cloud rapide. ~$0.001/min.
                   </p>
                 </button>
                 <button
@@ -3155,7 +3155,7 @@ export default function DocumentsManager() {
             {transcriptionMethod === "lovable-ai" && (
               <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
                 <p className="text-xs text-emerald-700 dark:text-emerald-400">
-                  <strong>Lovable AI :</strong> Utilise Gemini via la plateforme Lovable. Vous bénéficiez d'un quota gratuit inclus chaque mois. Pour plus de crédits, ajoutez-les dans Settings → Workspace → Usage.
+                  <strong>Gemini :</strong> Transcription cloud via Google Gemini. Coût estimé : ~$0.001/min.
                 </p>
               </div>
             )}
@@ -3175,7 +3175,7 @@ export default function DocumentsManager() {
             <Button onClick={() => runTranscriptionForDocument(transcriptionLanguage)}>
               <Mic className="h-4 w-4 mr-2" />
               {transcriptionMethod === "lovable-ai" 
-                ? "Transcrire (Lovable AI)" 
+                ? "Transcrire (Gemini)" 
                 : transcriptionMethod === "openai" 
                   ? "Transcrire (OpenAI)" 
                   : "Transcrire (Local)"}
