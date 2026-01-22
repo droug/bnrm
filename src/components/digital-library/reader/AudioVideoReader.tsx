@@ -19,7 +19,8 @@ import {
   Copy,
   Check,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Subtitles
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -79,10 +80,12 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
   const [showTranscript, setShowTranscript] = useState(true);
   const [transcriptionLoaded, setTranscriptionLoaded] = useState(false);
   const [copiedText, setCopiedText] = useState(false);
+  const [showSubtitles, setShowSubtitles] = useState(true);
+  const [activeSubtitle, setActiveSubtitle] = useState<string>("");
   
   // Teleprompter state
   const [autoScroll, setAutoScroll] = useState(true);
-  const [fontSize, setFontSize] = useState(16);
+  const [fontSize, setFontSize] = useState(18);
   
   // Refs
   const mediaRef = useRef<HTMLVideoElement | HTMLAudioElement>(null);
@@ -105,12 +108,12 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
         const fullText = data.map(p => p.ocr_text).join('\n');
         setTranscript(fullText);
         
-        // Create segments from pages
+        // Create segments from pages - timestamps will be recalculated when duration is known
         const segs: TranscriptSegment[] = data.map((p, idx) => ({
           id: `seg-${idx}`,
           text: p.ocr_text || '',
-          startTime: idx * 30,
-          endTime: (idx + 1) * 30
+          startTime: 0,
+          endTime: 0
         }));
         setSegments(segs);
         setTranscriptionLoaded(true);
@@ -119,6 +122,32 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
     
     loadTranscription();
   }, [documentData.id]);
+
+  // Recalculate segment timestamps when duration is known
+  useEffect(() => {
+    if (duration > 0 && segments.length > 0 && segments[0].endTime === 0) {
+      const segmentDuration = duration / segments.length;
+      const updatedSegments = segments.map((seg, idx) => ({
+        ...seg,
+        startTime: idx * segmentDuration,
+        endTime: (idx + 1) * segmentDuration
+      }));
+      setSegments(updatedSegments);
+    }
+  }, [duration, segments]);
+
+  // Update active subtitle text
+  useEffect(() => {
+    if (segments.length === 0) {
+      setActiveSubtitle("");
+      return;
+    }
+    
+    const active = segments.find(
+      s => currentTime >= s.startTime && currentTime < s.endTime
+    );
+    setActiveSubtitle(active?.text || "");
+  }, [currentTime, segments]);
 
   // Media event handlers
   useEffect(() => {
@@ -308,26 +337,20 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
                   controls={false}
                 />
                 
-                {/* Subtitles overlay */}
-                {transcriptionLoaded && showTranscript && segments.length > 0 && (
-                  <div className="absolute bottom-8 left-0 right-0 flex justify-center px-4 pointer-events-none">
-                    {segments.map((segment) => {
-                      const isActive = currentTime >= segment.startTime && currentTime < segment.endTime;
-                      if (!isActive) return null;
-                      
-                      return (
-                        <div
-                          key={segment.id}
-                          className="bg-black/80 text-white px-4 py-2 rounded-lg max-w-[90%] text-center"
-                          style={{ 
-                            fontSize: `${fontSize}px`
-                          }}
-                          dir="auto"
-                        >
-                          {segment.text}
-                        </div>
-                      );
-                    })}
+                {/* Subtitles overlay - Always visible when enabled */}
+                {transcriptionLoaded && showSubtitles && activeSubtitle && (
+                  <div className="absolute bottom-4 left-0 right-0 flex justify-center px-4 pointer-events-none z-10">
+                    <div
+                      className="bg-black/85 text-white px-6 py-3 rounded-lg max-w-[95%] text-center shadow-lg"
+                      style={{ 
+                        fontSize: `${Math.max(fontSize, 18)}px`,
+                        lineHeight: 1.5,
+                        textShadow: '0 1px 3px rgba(0,0,0,0.8)'
+                      }}
+                      dir="auto"
+                    >
+                      {activeSubtitle}
+                    </div>
                   </div>
                 )}
               </div>
@@ -411,6 +434,18 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
                       <SelectItem value="2">2x</SelectItem>
                     </SelectContent>
                   </Select>
+
+                  {/* Subtitles toggle */}
+                  {transcriptionLoaded && isVideo && (
+                    <Button 
+                      variant={showSubtitles ? "default" : "outline"} 
+                      size="icon"
+                      onClick={() => setShowSubtitles(!showSubtitles)}
+                      title={showSubtitles ? "Masquer les sous-titres" : "Afficher les sous-titres"}
+                    >
+                      <Subtitles className="h-4 w-4" />
+                    </Button>
+                  )}
 
                   {/* Volume */}
                   <div className="flex items-center gap-2">
