@@ -114,7 +114,7 @@ export default function DocumentsManager() {
   const [transcriptionProgress, setTranscriptionProgress] = useState(0);
   const [showTranscriptionDialog, setShowTranscriptionDialog] = useState(false);
   const [transcriptionLanguage, setTranscriptionLanguage] = useState<string>("ar");
-  const [transcriptionMethod, setTranscriptionMethod] = useState<"local" | "openai">("local");
+  const [transcriptionMethod, setTranscriptionMethod] = useState<"local" | "lovable-ai" | "openai">("local");
   const [documentToTranscribe, setDocumentToTranscribe] = useState<any>(null);
 
   // Exemple de doublons détectés
@@ -881,10 +881,101 @@ export default function DocumentsManager() {
     try {
       let transcriptionText = "";
       let segments: string[] = [];
-      // Track what we actually used (OpenAI can fallback to Local if no valid key)
-      let usedMethod: "local" | "openai" = transcriptionMethod;
+      // Track what we actually used (can fallback to Local if cloud fails)
+      let usedMethod: "local" | "lovable-ai" | "openai" = transcriptionMethod;
 
-      if (transcriptionMethod === "openai") {
+      if (transcriptionMethod === "lovable-ai") {
+        // Use Lovable AI (Gemini) - included in Lovable platform
+        toast({
+          title: "Transcription Lovable AI (Gemini)",
+          description: `Envoi au serveur... Langue: ${transcriptionLanguageOptions.find(l => l.value === language)?.label || language}`
+        });
+
+        setTranscriptionProgress(20);
+
+        // Fetch the audio file
+        const response = await fetch(doc.pdf_url);
+        const blob = await response.blob();
+        
+        const urlParts = doc.pdf_url.split('.');
+        const extension = urlParts[urlParts.length - 1].split('?')[0] || 'mp4';
+        
+        const formData = new FormData();
+        formData.append('audio', blob, `audio.${extension}`);
+        formData.append('language', language);
+
+        setTranscriptionProgress(40);
+
+        const { data: sessionData } = await supabase.auth.getSession();
+        const token = sessionData?.session?.access_token;
+
+        const result = await fetch(
+          `https://safeppmznupzqkqmzjzt.supabase.co/functions/v1/lovable-ai-transcribe`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+            body: formData
+          }
+        );
+
+        setTranscriptionProgress(70);
+
+        if (!result.ok) {
+          let errorData: any = null;
+          let errorMessage = "Erreur lors de la transcription Lovable AI";
+          try {
+            errorData = await result.json();
+            errorMessage = errorData?.error || errorMessage;
+          } catch {
+            try {
+              const t = await result.text();
+              if (t) errorMessage = t;
+            } catch {
+              // ignore
+            }
+          }
+
+          const code = errorData?.code;
+          
+          if (code === "UNSUPPORTED" || code === "RATE_LIMIT" || code === "PAYMENT_REQUIRED") {
+            // Fallback to Local
+            usedMethod = "local";
+            toast({
+              title: "Lovable AI indisponible",
+              description: `${errorMessage}. Bascule vers transcription locale.`,
+              variant: "destructive",
+            });
+
+            const localResult = await localTranscribe(doc.pdf_url, language);
+            if (!localResult || !localResult.text) {
+              throw new Error("Aucun texte transcrit (local)");
+            }
+            transcriptionText = localResult.text;
+
+            if (localResult.chunks && localResult.chunks.length > 0) {
+              segments = localResult.chunks.map(c => c.text.trim()).filter(s => s);
+            } else {
+              segments = transcriptionText.split(/[.!?]+/).filter((s: string) => s.trim());
+            }
+          } else {
+            throw new Error(errorMessage);
+          }
+        }
+
+        if (usedMethod === "lovable-ai") {
+          const data = await result.json();
+          transcriptionText = data.text || "";
+          
+          if (data.segments && data.segments.length > 0) {
+            segments = data.segments.map((s: any) => s.text.trim()).filter((s: string) => s);
+          } else {
+            segments = transcriptionText.split(/[.!?]+/).filter((s: string) => s.trim());
+          }
+        }
+
+      } else if (transcriptionMethod === "openai") {
         // Use OpenAI Whisper API (paid, more accurate)
         toast({
           title: "Transcription OpenAI Whisper",
@@ -1045,9 +1136,15 @@ export default function DocumentsManager() {
 
       queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
 
+      const methodLabels: Record<string, string> = {
+        "local": "Local",
+        "lovable-ai": "Lovable AI (Gemini)",
+        "openai": "OpenAI Whisper"
+      };
+
       toast({
         title: "Transcription terminée",
-        description: `${segments.length} segment(s) transcrits pour "${doc.title}" (${usedMethod === "openai" ? "OpenAI Whisper" : "Local"})`
+        description: `${segments.length} segment(s) transcrits pour "${doc.title}" (${methodLabels[usedMethod] || usedMethod})`
       });
 
       setTranscriptionProgress(100);
@@ -2985,7 +3082,7 @@ export default function DocumentsManager() {
             {/* Transcription Method Selection */}
             <div className="space-y-2">
               <Label>Méthode de transcription</Label>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => setTranscriptionMethod("local")}
@@ -2995,9 +3092,23 @@ export default function DocumentsManager() {
                       : "border-border hover:border-muted-foreground"
                   }`}
                 >
-                  <div className="font-medium text-sm">🖥️ Local (Gratuit)</div>
+                  <div className="font-medium text-sm">🖥️ Local</div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Whisper dans le navigateur. Aucun coût, données privées.
+                    100% gratuit, dans le navigateur.
+                  </p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTranscriptionMethod("lovable-ai")}
+                  className={`p-3 rounded-lg border-2 text-left transition-all ${
+                    transcriptionMethod === "lovable-ai" 
+                      ? "border-primary bg-primary/5" 
+                      : "border-border hover:border-muted-foreground"
+                  }`}
+                >
+                  <div className="font-medium text-sm">✨ Lovable AI</div>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Gemini. Quota inclus gratuit.
                   </p>
                 </button>
                 <button
@@ -3009,9 +3120,9 @@ export default function DocumentsManager() {
                       : "border-border hover:border-muted-foreground"
                   }`}
                 >
-                  <div className="font-medium text-sm">☁️ OpenAI Whisper</div>
+                  <div className="font-medium text-sm">☁️ OpenAI</div>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Plus précis et rapide. Payant (~0.006$/min).
+                    Whisper API. ~$0.006/min.
                   </p>
                 </button>
               </div>
@@ -3041,10 +3152,17 @@ export default function DocumentsManager() {
             </div>
 
             {/* Method Info */}
+            {transcriptionMethod === "lovable-ai" && (
+              <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg">
+                <p className="text-xs text-emerald-700 dark:text-emerald-400">
+                  <strong>Lovable AI :</strong> Utilise Gemini via la plateforme Lovable. Vous bénéficiez d'un quota gratuit inclus chaque mois. Pour plus de crédits, ajoutez-les dans Settings → Workspace → Usage.
+                </p>
+              </div>
+            )}
             {transcriptionMethod === "openai" && (
               <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-lg">
                 <p className="text-xs text-amber-700 dark:text-amber-400">
-                  <strong>Note :</strong> L'API OpenAI Whisper est payante. Le coût est d'environ $0.006 par minute d'audio.
+                  <strong>Note :</strong> L'API OpenAI Whisper nécessite une clé API valide. Coût : ~$0.006 par minute d'audio.
                 </p>
               </div>
             )}
@@ -3056,7 +3174,11 @@ export default function DocumentsManager() {
             </Button>
             <Button onClick={() => runTranscriptionForDocument(transcriptionLanguage)}>
               <Mic className="h-4 w-4 mr-2" />
-              {transcriptionMethod === "openai" ? "Transcrire (OpenAI)" : "Transcrire (Local)"}
+              {transcriptionMethod === "lovable-ai" 
+                ? "Transcrire (Lovable AI)" 
+                : transcriptionMethod === "openai" 
+                  ? "Transcrire (OpenAI)" 
+                  : "Transcrire (Local)"}
             </Button>
           </DialogFooter>
         </DialogContent>
