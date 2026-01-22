@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, LayoutDashboard, Image, Palette, Users, FileText, Settings, Plus } from "lucide-react";
@@ -30,9 +29,8 @@ export default function VirtualExhibitions360CMS() {
 
   if (!user || !isLibrarian) {
     return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto py-8 px-4">
+      <DigitalLibraryLayout>
+        <div className="container mx-auto py-8 px-4">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-destructive mb-4">Accès refusé</h1>
             <p className="text-muted-foreground">
@@ -42,16 +40,14 @@ export default function VirtualExhibitions360CMS() {
               Se connecter
             </Button>
           </div>
-        </main>
-        <Footer />
-      </div>
+        </div>
+      </DigitalLibraryLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container mx-auto py-8 px-4">
+    <DigitalLibraryLayout>
+      <div className="container mx-auto py-8 px-4">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-4">
             <Button variant="ghost" size="sm" onClick={() => navigate("/admin/digital-library/exhibitions")}>
@@ -59,7 +55,7 @@ export default function VirtualExhibitions360CMS() {
               Retour
             </Button>
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold text-bn-blue-primary">
                 CMS Expositions Virtuelles 360°
               </h1>
               <p className="text-muted-foreground">
@@ -67,7 +63,7 @@ export default function VirtualExhibitions360CMS() {
               </p>
             </div>
           </div>
-          <Button onClick={() => navigate("/admin/vexpo360/new")}>
+          <Button onClick={() => navigate("/admin/vexpo360/new")} className="bg-gold-bn hover:bg-gold-bn/90 text-white">
             <Plus className="h-4 w-4 mr-2" />
             Nouvelle Exposition
           </Button>
@@ -125,8 +121,7 @@ export default function VirtualExhibitions360CMS() {
             <VExpo360Settings />
           </TabsContent>
         </Tabs>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </DigitalLibraryLayout>
   );
 }
