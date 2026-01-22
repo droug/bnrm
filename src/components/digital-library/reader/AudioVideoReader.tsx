@@ -307,6 +307,29 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
                   poster={documentData.cover_image_url}
                   controls={false}
                 />
+                
+                {/* Subtitles overlay */}
+                {transcriptionLoaded && showTranscript && segments.length > 0 && (
+                  <div className="absolute bottom-8 left-0 right-0 flex justify-center px-4 pointer-events-none">
+                    {segments.map((segment) => {
+                      const isActive = currentTime >= segment.startTime && currentTime < segment.endTime;
+                      if (!isActive) return null;
+                      
+                      return (
+                        <div
+                          key={segment.id}
+                          className="bg-black/80 text-white px-4 py-2 rounded-lg max-w-[90%] text-center"
+                          style={{ 
+                            fontSize: `${fontSize}px`
+                          }}
+                          dir="auto"
+                        >
+                          {segment.text}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
 
