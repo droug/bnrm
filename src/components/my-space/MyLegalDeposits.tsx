@@ -45,15 +45,36 @@ export function MyLegalDeposits() {
     if (!user) return;
 
     try {
-      // Récupérer l'ID du registre professionnel de l'utilisateur
-      const { data: professionalData, error: profError } = await supabase
+      // Chercher l'ID professionnel dans professional_registry OU professional_registration_requests
+      let professionalId: string | null = null;
+
+      // 1. Chercher dans professional_registry
+      const { data: registryData } = await supabase
         .from('professional_registry')
         .select('id')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (profError || !professionalData) {
-        console.log('No professional registry found for user');
+      if (registryData) {
+        professionalId = registryData.id;
+        console.log('[MyLegalDeposits] Found in professional_registry:', professionalId);
+      } else {
+        // 2. Chercher dans professional_registration_requests (demandes approuvées)
+        const { data: requestData } = await supabase
+          .from('professional_registration_requests')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('status', 'approved')
+          .maybeSingle();
+
+        if (requestData) {
+          professionalId = requestData.id;
+          console.log('[MyLegalDeposits] Found in professional_registration_requests:', professionalId);
+        }
+      }
+
+      if (!professionalId) {
+        console.log('[MyLegalDeposits] No professional ID found for user');
         setLoading(false);
         return;
       }
@@ -61,10 +82,11 @@ export function MyLegalDeposits() {
       const { data, error } = await supabase
         .from('legal_deposit_requests')
         .select('*')
-        .eq('initiator_id', professionalData.id)
+        .eq('initiator_id', professionalId)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
+      console.log('[MyLegalDeposits] Fetched deposits:', data?.length || 0);
       if (data) setDeposits(data);
     } catch (error) {
       console.error('Error fetching legal deposits:', error);
