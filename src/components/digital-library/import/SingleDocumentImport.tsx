@@ -240,15 +240,13 @@ export default function SingleDocumentImport({ onSuccess }: SingleDocumentImport
                         <SelectValue placeholder="Sélectionner" />
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent>
-                      <SelectItem value="livre">Livre</SelectItem>
-                      <SelectItem value="article">Article</SelectItem>
-                      <SelectItem value="these">Thèse</SelectItem>
-                      <SelectItem value="rapport">Rapport</SelectItem>
-                      <SelectItem value="periodique">Périodique</SelectItem>
-                      <SelectItem value="manuscrit">Manuscrit</SelectItem>
-                      <SelectItem value="carte">Carte</SelectItem>
-                      <SelectItem value="multimedia">Multimédia</SelectItem>
+                    <SelectContent className="bg-background border z-50">
+                      <SelectItem value="manuscrit">Manuscrits</SelectItem>
+                      <SelectItem value="livre">Livres</SelectItem>
+                      <SelectItem value="lithographie">Lithographie</SelectItem>
+                      <SelectItem value="periodique">Périodiques</SelectItem>
+                      <SelectItem value="collection_specialisee">Collections Spécialisées</SelectItem>
+                      <SelectItem value="audiovisuel">Audiovisuel</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />
