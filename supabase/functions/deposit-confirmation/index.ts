@@ -255,6 +255,89 @@ serve(async (req) => {
         console.log(`[DEPOSIT-CONFIRMATION] Email sent to ${pendingToken.email}:`, emailResult);
       }
 
+      // Envoyer un email d'accusé de réception à l'initiateur
+      const confirmedToken = createdTokens?.find(t => t.status === "confirmed");
+      if (confirmedToken) {
+        const initiatorName = confirmedToken.party_type === "editor" ? editor_name : printer_name;
+        const initiatorTypeFr = confirmedToken.party_type === "editor" ? "Éditeur" : "Imprimeur";
+        const pendingPartyTypeFr = confirmedToken.party_type === "editor" ? "l'imprimeur" : "l'éditeur";
+
+        const ackEmailHtml = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          </head>
+          <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f7fa;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+              <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); padding: 30px; text-align: center;">
+                <h1 style="color: #ffffff; margin: 0; font-size: 24px;">🏛️ BNRM - Dépôt Légal</h1>
+                <p style="color: #e2e8f0; margin: 10px 0 0;">Accusé de Réception</p>
+              </div>
+              
+              <div style="padding: 30px;">
+                <p style="color: #2d3748; font-size: 16px;">Bonjour ${initiatorName || initiatorTypeFr},</p>
+                
+                <p style="color: #4a5568; line-height: 1.6;">
+                  Votre demande de dépôt légal a été enregistrée avec succès. En tant qu'initiateur (${initiatorTypeFr}), votre confirmation a été automatiquement validée.
+                </p>
+                
+                <div style="background-color: #c6f6d5; border-left: 4px solid #38a169; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+                  <p style="color: #276749; margin: 0; font-size: 14px;">
+                    <strong>✅ Votre confirmation :</strong> Validée automatiquement
+                  </p>
+                </div>
+                
+                <div style="background-color: #edf2f7; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                  <h3 style="color: #2d3748; margin: 0 0 15px;">📋 Détails de la demande</h3>
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                      <td style="padding: 8px 0; color: #718096;">N° de demande:</td>
+                      <td style="padding: 8px 0; color: #2d3748; font-weight: 600;">${requestData?.request_number || "N/A"}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0; color: #718096;">Titre:</td>
+                      <td style="padding: 8px 0; color: #2d3748; font-weight: 600;">${title || "Non spécifié"}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0; color: #718096;">Type:</td>
+                      <td style="padding: 8px 0; color: #2d3748; font-weight: 600;">${deposit_type || "Dépôt légal"}</td>
+                    </tr>
+                  </table>
+                </div>
+                
+                <div style="background-color: #fef3c7; border-left: 4px solid #f6ad55; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+                  <p style="color: #744210; margin: 0; font-size: 14px;">
+                    <strong>⏳ En attente :</strong> La confirmation de ${pendingPartyTypeFr} est requise pour que votre demande soit transmise à la BNRM. Un délai de 15 jours est accordé.
+                  </p>
+                </div>
+                
+                <p style="color: #4a5568; line-height: 1.6;">
+                  Vous recevrez une notification dès que ${pendingPartyTypeFr} aura confirmé sa participation.
+                </p>
+              </div>
+              
+              <div style="background-color: #edf2f7; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0;">
+                <p style="color: #718096; font-size: 12px; margin: 0;">
+                  © ${new Date().getFullYear()} Bibliothèque Nationale du Royaume du Maroc<br>
+                  Cet email a été envoyé automatiquement, merci de ne pas y répondre.
+                </p>
+              </div>
+            </div>
+          </body>
+          </html>
+        `;
+
+        const ackEmailResult = await sendEmail({
+          to: confirmedToken.email,
+          subject: `[BNRM] Accusé de réception - Dépôt Légal ${requestData?.request_number || ""}`,
+          html: ackEmailHtml,
+        });
+
+        console.log(`[DEPOSIT-CONFIRMATION] Acknowledgment email sent to initiator ${confirmedToken.email}:`, ackEmailResult);
+      }
+
       return new Response(
         JSON.stringify({ 
           success: true, 
