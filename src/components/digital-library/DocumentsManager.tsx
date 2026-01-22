@@ -18,7 +18,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye, BookOpen, FileDown, Pencil, Wand2, Loader2, FileSearch, CheckCircle2, AlertCircle, Database } from "lucide-react";
+import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye, BookOpen, FileDown, Pencil, Wand2, Loader2, FileSearch, CheckCircle2, AlertCircle, Database, Mic } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import OcrImportTool from "@/components/digital-library/import/OcrImportTool";
 import PdfOcrTool from "@/components/digital-library/import/PdfOcrTool";
@@ -107,6 +107,10 @@ export default function DocumentsManager() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [documentToDelete, setDocumentToDelete] = useState<any>(null);
   const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
+  
+  // Transcription state (for audio/video documents)
+  const [transcriptionProcessingDocId, setTranscriptionProcessingDocId] = useState<string | null>(null);
+  const [transcriptionProgress, setTranscriptionProgress] = useState(0);
 
   // Exemple de doublons détectés
   const sampleDuplicates = [
@@ -807,6 +811,162 @@ export default function DocumentsManager() {
       setClientOcrProgress(0);
       setClientOcrCurrentPage(0);
       setClientOcrTotalPages(0);
+    }
+  };
+
+  // Helper function to check if document is audio/video
+  const isAudioVideoDocument = (doc: any): boolean => {
+    const docType = (doc.document_type || doc.file_format || '').toLowerCase();
+    return ['audio', 'video', 'audiovisuel', 'audiovisual'].includes(docType);
+  };
+
+  // Run transcription for audio/video documents using Whisper (Hugging Face)
+  const runTranscriptionForDocument = async (doc: any) => {
+    if (!doc.pdf_url) {
+      toast({
+        title: "Erreur",
+        description: "Ce document n'a pas de fichier média associé.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setTranscriptionProcessingDocId(doc.id);
+    setTranscriptionProgress(10);
+
+    try {
+      toast({
+        title: "Téléchargement du fichier média...",
+        description: "Préparation de la transcription"
+      });
+
+      // Download the audio/video file
+      const mediaResponse = await fetch(doc.pdf_url);
+      if (!mediaResponse.ok) {
+        throw new Error(`Impossible de télécharger le fichier: ${mediaResponse.status}`);
+      }
+      const mediaBlob = await mediaResponse.blob();
+      setTranscriptionProgress(30);
+
+      // Get session for authentication
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("Vous devez être connecté pour utiliser la transcription");
+      }
+
+      // Prepare form data for Whisper edge function
+      const formData = new FormData();
+      formData.append("audio", mediaBlob, doc.title || "audio.mp3");
+
+      toast({
+        title: "Transcription en cours...",
+        description: "Envoi vers Whisper (Hugging Face)"
+      });
+      setTranscriptionProgress(50);
+
+      // Call Whisper edge function
+      let transcribeResponse = await fetch(
+        `https://safeppmznupzqkqmzjzt.supabase.co/functions/v1/whisper-transcribe`,
+        {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${session.access_token}`,
+          },
+          body: formData,
+        }
+      );
+
+      // Handle model loading (503 with retry)
+      if (transcribeResponse.status === 503) {
+        const retryData = await transcribeResponse.json().catch(() => ({}));
+        if (retryData.retry) {
+          toast({
+            title: "Modèle Whisper en chargement...",
+            description: "Nouvelle tentative dans 10 secondes"
+          });
+          await new Promise(resolve => setTimeout(resolve, 10000));
+          
+          transcribeResponse = await fetch(
+            `https://safeppmznupzqkqmzjzt.supabase.co/functions/v1/whisper-transcribe`,
+            {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${session.access_token}`,
+              },
+              body: formData,
+            }
+          );
+        }
+      }
+
+      setTranscriptionProgress(80);
+
+      if (!transcribeResponse.ok) {
+        const errorData = await transcribeResponse.json().catch(() => ({}));
+        throw new Error(errorData.error || `Erreur de transcription: ${transcribeResponse.status}`);
+      }
+
+      const result = await transcribeResponse.json();
+      
+      if (result.text) {
+        // Save transcription as OCR text in digital_library_pages
+        const sentences = result.text.split(/[.!?]+/).filter((s: string) => s.trim());
+        
+        for (let idx = 0; idx < sentences.length; idx++) {
+          const { data: existingPage } = await supabase
+            .from('digital_library_pages')
+            .select('id')
+            .eq('document_id', doc.id)
+            .eq('page_number', idx + 1)
+            .maybeSingle();
+
+          if (existingPage) {
+            await supabase
+              .from('digital_library_pages')
+              .update({ ocr_text: sentences[idx].trim() })
+              .eq('id', existingPage.id);
+          } else {
+            await supabase
+              .from('digital_library_pages')
+              .insert({
+                document_id: doc.id,
+                page_number: idx + 1,
+                ocr_text: sentences[idx].trim()
+              });
+          }
+        }
+
+        // Mark document as OCR processed
+        await supabase
+          .from('digital_library_documents')
+          .update({ 
+            ocr_processed: true,
+            pages_count: sentences.length
+          })
+          .eq('id', doc.id);
+
+        queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
+
+        toast({
+          title: "Transcription terminée",
+          description: `${sentences.length} segment(s) transcrits pour "${doc.title}"`
+        });
+      } else {
+        throw new Error("Aucun texte transcrit retourné");
+      }
+
+      setTranscriptionProgress(100);
+
+    } catch (error: any) {
+      console.error('Transcription error:', error);
+      toast({
+        title: "Erreur de transcription",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setTranscriptionProcessingDocId(null);
+      setTranscriptionProgress(0);
     }
   };
 
@@ -2010,26 +2170,49 @@ export default function DocumentsManager() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex gap-2 justify-end">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => openOcrDialog(doc)}
-                          disabled={ocrProcessingDocId === doc.id}
-                          title={ocrProcessingDocId === doc.id && clientOcrTotalPages > 0 
-                            ? `OCR en cours: page ${clientOcrCurrentPage}/${clientOcrTotalPages} (${clientOcrProgress}%)`
-                            : "Lancer l'OCR"}
-                        >
-                          {ocrProcessingDocId === doc.id ? (
-                            <div className="flex items-center gap-1">
-                              <Loader2 className="h-4 w-4 animate-spin" />
-                              {clientOcrTotalPages > 0 && (
-                                <span className="text-xs">{clientOcrProgress}%</span>
-                              )}
-                            </div>
-                          ) : (
-                            <Wand2 className="h-4 w-4" />
-                          )}
-                        </Button>
+                        {isAudioVideoDocument(doc) ? (
+                          // Transcription button for audio/video documents
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => runTranscriptionForDocument(doc)}
+                            disabled={transcriptionProcessingDocId === doc.id}
+                            title={transcriptionProcessingDocId === doc.id 
+                              ? `Transcription en cours (${transcriptionProgress}%)`
+                              : "Lancer la transcription (Whisper)"}
+                          >
+                            {transcriptionProcessingDocId === doc.id ? (
+                              <div className="flex items-center gap-1">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                <span className="text-xs">{transcriptionProgress}%</span>
+                              </div>
+                            ) : (
+                              <Mic className="h-4 w-4" />
+                            )}
+                          </Button>
+                        ) : (
+                          // OCR button for other documents
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => openOcrDialog(doc)}
+                            disabled={ocrProcessingDocId === doc.id}
+                            title={ocrProcessingDocId === doc.id && clientOcrTotalPages > 0 
+                              ? `OCR en cours: page ${clientOcrCurrentPage}/${clientOcrTotalPages} (${clientOcrProgress}%)`
+                              : "Lancer l'OCR"}
+                          >
+                            {ocrProcessingDocId === doc.id ? (
+                              <div className="flex items-center gap-1">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                {clientOcrTotalPages > 0 && (
+                                  <span className="text-xs">{clientOcrProgress}%</span>
+                                )}
+                              </div>
+                            ) : (
+                              <Wand2 className="h-4 w-4" />
+                            )}
+                          </Button>
+                        )}
                         <Button
                           size="sm"
                           variant="outline"
