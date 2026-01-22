@@ -4242,7 +4242,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
       
       const requiresReciprocalConfirmation = 
         (depositType === 'monographie' || depositType === 'periodique') && 
-        supportType !== 'electronique' &&
+        supportType !== 'electronic' &&
         effectiveEditorEmail && 
         effectivePrinterEmail;
 
