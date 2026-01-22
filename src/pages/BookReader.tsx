@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import Header from "@/components/Header";
+import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
@@ -795,27 +795,28 @@ const BookReader = () => {
   // Render AudioVideoReader for audio/video documents
   if (isAudioVisualDocument && documentData?.pdf_url) {
     return (
-      <div className="h-[100dvh] bg-background flex flex-col overflow-hidden">
-        <Header />
-        <AudioVideoReader 
-          documentData={{
-            id: documentData.id,
-            title: documentData.title,
-            author: documentData.author,
-            publication_year: documentData.publication_year,
-            document_type: documentData.document_type as 'audio' | 'video',
-            pdf_url: documentData.pdf_url,
-            cover_image_url: documentData.cover_image_url
-          }}
-          onBack={() => window.history.length > 1 ? navigate(-1) : navigate('/bibliotheque-numerique')}
-        />
-      </div>
+      <DigitalLibraryLayout>
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <AudioVideoReader 
+            documentData={{
+              id: documentData.id,
+              title: documentData.title,
+              author: documentData.author,
+              publication_year: documentData.publication_year,
+              document_type: documentData.document_type as 'audio' | 'video',
+              pdf_url: documentData.pdf_url,
+              cover_image_url: documentData.cover_image_url
+            }}
+            onBack={() => window.history.length > 1 ? navigate(-1) : navigate('/bibliotheque-numerique')}
+          />
+        </div>
+      </DigitalLibraryLayout>
     );
   }
 
   return (
-    <div className="h-[100dvh] bg-background flex flex-col overflow-hidden">
-      <Header />
+    <DigitalLibraryLayout>
+      <div className="flex-1 flex flex-col overflow-hidden bg-background">
       
       {/* Breadcrumb with Language Selector */}
       <div className="bg-muted/30 border-b">
@@ -1701,7 +1702,8 @@ const BookReader = () => {
         documentTitle={documentData?.title}
       />
 
-    </div>
+      </div>
+    </DigitalLibraryLayout>
   );
 };
 
