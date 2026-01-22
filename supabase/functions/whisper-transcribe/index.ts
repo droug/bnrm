@@ -12,18 +12,19 @@ serve(async (req) => {
   }
 
   try {
-    const HUGGINGFACE_API_TOKEN = Deno.env.get("HUGGINGFACE_API_TOKEN");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
-    if (!HUGGINGFACE_API_TOKEN) {
-      console.error("HUGGINGFACE_API_TOKEN not configured");
+    if (!LOVABLE_API_KEY) {
+      console.error("LOVABLE_API_KEY not configured");
       return new Response(
-        JSON.stringify({ error: "Hugging Face API token not configured" }),
+        JSON.stringify({ error: "Lovable API key not configured" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
     const formData = await req.formData();
     const audioFile = formData.get("audio") as File;
+    const language = formData.get("language") as string || "auto";
 
     if (!audioFile) {
       console.error("No audio file provided");
@@ -33,47 +34,101 @@ serve(async (req) => {
       );
     }
 
-    console.log(`Processing transcription for file: ${audioFile.name}, size: ${audioFile.size}, type: ${audioFile.type}`);
+    console.log(`Processing transcription for file: ${audioFile.name}, size: ${audioFile.size}, type: ${audioFile.type}, language: ${language}`);
 
-    // Get audio bytes
+    // Convert audio file to base64
     const audioBytes = await audioFile.arrayBuffer();
-
-    // Use Whisper large-v3 for best multilingual support (Arabic, French, English)
-    // Alternative models: openai/whisper-medium, openai/whisper-small
-    const modelId = "openai/whisper-large-v3";
-    
-    console.log(`Calling Hugging Face Inference API with model: ${modelId}`);
-
-    const response = await fetch(
-      `https://api-inference.huggingface.co/models/${modelId}`,
-      {
-        method: "POST",
-        headers: {
-          "Authorization": `Bearer ${HUGGINGFACE_API_TOKEN}`,
-          "Content-Type": audioFile.type || "audio/mpeg",
-        },
-        body: audioBytes,
-      }
+    const base64Audio = btoa(
+      new Uint8Array(audioBytes).reduce((data, byte) => data + String.fromCharCode(byte), '')
     );
+
+    // Determine MIME type
+    let mimeType = audioFile.type || "audio/mpeg";
+    if (audioFile.name.endsWith('.mp4') || audioFile.name.endsWith('.m4a')) {
+      mimeType = "audio/mp4";
+    } else if (audioFile.name.endsWith('.webm')) {
+      mimeType = "audio/webm";
+    } else if (audioFile.name.endsWith('.wav')) {
+      mimeType = "audio/wav";
+    } else if (audioFile.name.endsWith('.ogg')) {
+      mimeType = "audio/ogg";
+    }
+
+    console.log(`Using MIME type: ${mimeType}`);
+
+    // Build the prompt for transcription
+    let languageInstruction = "";
+    if (language && language !== "auto") {
+      const languageNames: Record<string, string> = {
+        "ar": "Arabic (العربية)",
+        "fr": "French (Français)",
+        "en": "English",
+        "ber": "Amazigh/Berber (ⵜⴰⵎⴰⵣⵉⵖⵜ)"
+      };
+      languageInstruction = `The audio is in ${languageNames[language] || language}. `;
+    }
+
+    const systemPrompt = `You are an expert audio transcription assistant. Your task is to transcribe audio content accurately and completely.
+
+${languageInstruction}Please transcribe the entire audio content verbatim. Include all spoken words. 
+If there are multiple speakers, you may indicate speaker changes with line breaks.
+Output ONLY the transcription text, nothing else. No explanations, no comments, just the pure transcription.`;
+
+    console.log("Calling Lovable AI Gateway for transcription...");
+
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { 
+            role: "user", 
+            content: [
+              {
+                type: "text",
+                text: "Please transcribe this audio file completely and accurately:"
+              },
+              {
+                type: "input_audio",
+                input_audio: {
+                  data: base64Audio,
+                  format: mimeType.split('/')[1] || "mp3"
+                }
+              }
+            ]
+          }
+        ],
+        max_tokens: 8000,
+      }),
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Hugging Face API error: ${response.status} - ${errorText}`);
+      console.error(`Lovable AI API error: ${response.status} - ${errorText}`);
       
-      // Check for model loading state
-      if (response.status === 503) {
-        const errorJson = JSON.parse(errorText);
-        if (errorJson.error?.includes("loading")) {
-          return new Response(
-            JSON.stringify({ 
-              error: "Le modèle Whisper est en cours de chargement. Réessayez dans quelques secondes.",
-              details: errorText,
-              status: 503,
-              retry: true
-            }),
-            { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
+      if (response.status === 429) {
+        return new Response(
+          JSON.stringify({ 
+            error: "Trop de requêtes. Veuillez réessayer dans quelques instants.",
+            status: 429
+          }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      
+      if (response.status === 402) {
+        return new Response(
+          JSON.stringify({ 
+            error: "Crédits API insuffisants. Veuillez recharger votre compte.",
+            status: 402
+          }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
       
       return new Response(
@@ -87,13 +142,26 @@ serve(async (req) => {
     }
 
     const result = await response.json();
-    console.log(`Transcription completed successfully`);
+    console.log("Lovable AI response received");
 
-    // Hugging Face Whisper returns { text: "..." }
+    // Extract the transcription text from the response
+    const transcriptionText = result.choices?.[0]?.message?.content || "";
+    
+    if (!transcriptionText) {
+      console.error("No transcription text in response");
+      return new Response(
+        JSON.stringify({ 
+          error: "No transcription generated",
+          details: "The AI model did not return any transcription text"
+        }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    console.log(`Transcription completed successfully, length: ${transcriptionText.length} characters`);
+
     const transcription = {
-      text: result.text || "",
-      // Hugging Face inference API doesn't return word timestamps
-      // but we can simulate basic segments from the text
+      text: transcriptionText.trim(),
       words: []
     };
 
