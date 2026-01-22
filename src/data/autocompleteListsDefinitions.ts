@@ -202,9 +202,138 @@ export const LANGUAGES_LIST: AutocompleteListDefinition = {
 };
 
 /**
+ * Liste des nationalités
+ */
+export const NATIONALITIES_LIST: AutocompleteListDefinition = {
+  list_code: 'nationalities',
+  list_name: 'Nationalités',
+  description: 'Liste des nationalités pour les formulaires',
+  portal: 'BNRM',
+  platform: 'BNRM',
+  service: 'Données de référence',
+  sub_service: 'Identité',
+  form_name: 'Général',
+  max_levels: 1,
+  values: [
+    { value_code: "MA", value_label: "Marocaine", value_label_ar: "مغربي(ة)", level: 1, sort_order: 1 },
+    { value_code: "DZ", value_label: "Algérienne", value_label_ar: "جزائري(ة)", level: 1, sort_order: 2 },
+    { value_code: "TN", value_label: "Tunisienne", value_label_ar: "تونسي(ة)", level: 1, sort_order: 3 },
+    { value_code: "EG", value_label: "Égyptienne", value_label_ar: "مصري(ة)", level: 1, sort_order: 4 },
+    { value_code: "LY", value_label: "Libyenne", value_label_ar: "ليبي(ة)", level: 1, sort_order: 5 },
+    { value_code: "MR", value_label: "Mauritanienne", value_label_ar: "موريتاني(ة)", level: 1, sort_order: 6 },
+    { value_code: "FR", value_label: "Française", value_label_ar: "فرنسي(ة)", level: 1, sort_order: 7 },
+    { value_code: "ES", value_label: "Espagnole", value_label_ar: "إسباني(ة)", level: 1, sort_order: 8 },
+    { value_code: "PT", value_label: "Portugaise", value_label_ar: "برتغالي(ة)", level: 1, sort_order: 9 },
+    { value_code: "IT", value_label: "Italienne", value_label_ar: "إيطالي(ة)", level: 1, sort_order: 10 },
+    { value_code: "DE", value_label: "Allemande", value_label_ar: "ألماني(ة)", level: 1, sort_order: 11 },
+    { value_code: "GB", value_label: "Britannique", value_label_ar: "بريطاني(ة)", level: 1, sort_order: 12 },
+    { value_code: "BE", value_label: "Belge", value_label_ar: "بلجيكي(ة)", level: 1, sort_order: 13 },
+    { value_code: "NL", value_label: "Néerlandaise", value_label_ar: "هولندي(ة)", level: 1, sort_order: 14 },
+    { value_code: "CH", value_label: "Suisse", value_label_ar: "سويسري(ة)", level: 1, sort_order: 15 },
+    { value_code: "US", value_label: "Américaine", value_label_ar: "أمريكي(ة)", level: 1, sort_order: 16 },
+    { value_code: "CA", value_label: "Canadienne", value_label_ar: "كندي(ة)", level: 1, sort_order: 17 },
+    { value_code: "SA", value_label: "Saoudienne", value_label_ar: "سعودي(ة)", level: 1, sort_order: 18 },
+    { value_code: "AE", value_label: "Émiratie", value_label_ar: "إماراتي(ة)", level: 1, sort_order: 19 },
+    { value_code: "QA", value_label: "Qatarienne", value_label_ar: "قطري(ة)", level: 1, sort_order: 20 },
+    { value_code: "KW", value_label: "Koweïtienne", value_label_ar: "كويتي(ة)", level: 1, sort_order: 21 },
+    { value_code: "JO", value_label: "Jordanienne", value_label_ar: "أردني(ة)", level: 1, sort_order: 22 },
+    { value_code: "LB", value_label: "Libanaise", value_label_ar: "لبناني(ة)", level: 1, sort_order: 23 },
+    { value_code: "SY", value_label: "Syrienne", value_label_ar: "سوري(ة)", level: 1, sort_order: 24 },
+    { value_code: "IQ", value_label: "Irakienne", value_label_ar: "عراقي(ة)", level: 1, sort_order: 25 },
+    { value_code: "PS", value_label: "Palestinienne", value_label_ar: "فلسطيني(ة)", level: 1, sort_order: 26 },
+    { value_code: "TR", value_label: "Turque", value_label_ar: "تركي(ة)", level: 1, sort_order: 27 },
+    { value_code: "CN", value_label: "Chinoise", value_label_ar: "صيني(ة)", level: 1, sort_order: 28 },
+    { value_code: "JP", value_label: "Japonaise", value_label_ar: "ياباني(ة)", level: 1, sort_order: 29 },
+    { value_code: "KR", value_label: "Coréenne (Sud)", value_label_ar: "كوري(ة) جنوبي(ة)", level: 1, sort_order: 30 },
+    { value_code: "IN", value_label: "Indienne", value_label_ar: "هندي(ة)", level: 1, sort_order: 31 },
+    { value_code: "BR", value_label: "Brésilienne", value_label_ar: "برازيلي(ة)", level: 1, sort_order: 32 },
+    { value_code: "AR", value_label: "Argentine", value_label_ar: "أرجنتيني(ة)", level: 1, sort_order: 33 },
+    { value_code: "MX", value_label: "Mexicaine", value_label_ar: "مكسيكي(ة)", level: 1, sort_order: 34 },
+    { value_code: "ZA", value_label: "Sud-Africaine", value_label_ar: "جنوب أفريقي(ة)", level: 1, sort_order: 35 },
+    { value_code: "NG", value_label: "Nigériane", value_label_ar: "نيجيري(ة)", level: 1, sort_order: 36 },
+    { value_code: "SN", value_label: "Sénégalaise", value_label_ar: "سنغالي(ة)", level: 1, sort_order: 37 },
+    { value_code: "CI", value_label: "Ivoirienne", value_label_ar: "إيفواري(ة)", level: 1, sort_order: 38 },
+    { value_code: "ML", value_label: "Malienne", value_label_ar: "مالي(ة)", level: 1, sort_order: 39 },
+    { value_code: "RU", value_label: "Russe", value_label_ar: "روسي(ة)", level: 1, sort_order: 40 },
+    { value_code: "OTHER", value_label: "Autre", value_label_ar: "أخرى", level: 1, sort_order: 99 },
+  ]
+};
+
+/**
+ * Langues des manuscrits (pour la plateforme Manuscrits)
+ */
+export const MANUSCRIPT_LANGUAGES_LIST: AutocompleteListDefinition = {
+  list_code: 'langues_manuscrits',
+  list_name: 'Langues des manuscrits',
+  description: 'Langues utilisées dans les manuscrits',
+  portal: 'MANUSCRIPTS',
+  platform: 'MANUSCRIPTS',
+  service: 'Manuscrits',
+  sub_service: 'Catalogage',
+  form_name: 'Fiche Manuscrit',
+  max_levels: 1,
+  values: [
+    { value_code: "arabe", value_label: "Arabe", value_label_ar: "العربية", level: 1, sort_order: 1 },
+    { value_code: "arabe_classique", value_label: "Arabe classique", value_label_ar: "العربية الفصحى", level: 1, sort_order: 2 },
+    { value_code: "amazigh", value_label: "Amazigh (Tifinagh)", value_label_ar: "ⴰⵎⴰⵣⵉⵖ", level: 1, sort_order: 3 },
+    { value_code: "hebreu", value_label: "Hébreu", value_label_ar: "العبرية", level: 1, sort_order: 4 },
+    { value_code: "latin", value_label: "Latin", value_label_ar: "اللاتينية", level: 1, sort_order: 5 },
+    { value_code: "espagnol_ancien", value_label: "Espagnol ancien", value_label_ar: "الإسبانية القديمة", level: 1, sort_order: 6 },
+    { value_code: "francais_ancien", value_label: "Français ancien", value_label_ar: "الفرنسية القديمة", level: 1, sort_order: 7 },
+    { value_code: "persan", value_label: "Persan", value_label_ar: "الفارسية", level: 1, sort_order: 8 },
+    { value_code: "turc_ottoman", value_label: "Turc ottoman", value_label_ar: "التركية العثمانية", level: 1, sort_order: 9 },
+    { value_code: "grec", value_label: "Grec ancien", value_label_ar: "اليونانية القديمة", level: 1, sort_order: 10 },
+    { value_code: "syriaque", value_label: "Syriaque", value_label_ar: "السريانية", level: 1, sort_order: 11 },
+    { value_code: "autre", value_label: "Autre", value_label_ar: "أخرى", level: 1, sort_order: 99 },
+  ]
+};
+
+/**
+ * Thématiques des manuscrits (pour la plateforme Manuscrits)
+ */
+export const MANUSCRIPT_THEMES_LIST: AutocompleteListDefinition = {
+  list_code: 'thematique_manuscrits',
+  list_name: 'Thématiques des manuscrits',
+  description: 'Thématiques et sujets des manuscrits',
+  portal: 'MANUSCRIPTS',
+  platform: 'MANUSCRIPTS',
+  service: 'Manuscrits',
+  sub_service: 'Catalogage',
+  form_name: 'Fiche Manuscrit',
+  max_levels: 1,
+  values: [
+    { value_code: "sciences_religieuses", value_label: "Sciences religieuses", value_label_ar: "العلوم الدينية", level: 1, sort_order: 1 },
+    { value_code: "coran_exegese", value_label: "Coran et exégèse", value_label_ar: "القرآن والتفسير", level: 1, sort_order: 2 },
+    { value_code: "hadith", value_label: "Hadith", value_label_ar: "الحديث", level: 1, sort_order: 3 },
+    { value_code: "fiqh", value_label: "Fiqh (Jurisprudence)", value_label_ar: "الفقه", level: 1, sort_order: 4 },
+    { value_code: "soufisme", value_label: "Soufisme", value_label_ar: "التصوف", level: 1, sort_order: 5 },
+    { value_code: "theologie", value_label: "Théologie (Aqida)", value_label_ar: "العقيدة", level: 1, sort_order: 6 },
+    { value_code: "litterature", value_label: "Littérature", value_label_ar: "الأدب", level: 1, sort_order: 7 },
+    { value_code: "poesie", value_label: "Poésie", value_label_ar: "الشعر", level: 1, sort_order: 8 },
+    { value_code: "grammaire", value_label: "Grammaire et linguistique", value_label_ar: "النحو واللغة", level: 1, sort_order: 9 },
+    { value_code: "histoire", value_label: "Histoire", value_label_ar: "التاريخ", level: 1, sort_order: 10 },
+    { value_code: "geographie", value_label: "Géographie", value_label_ar: "الجغرافيا", level: 1, sort_order: 11 },
+    { value_code: "medecine", value_label: "Médecine", value_label_ar: "الطب", level: 1, sort_order: 12 },
+    { value_code: "astronomie", value_label: "Astronomie", value_label_ar: "الفلك", level: 1, sort_order: 13 },
+    { value_code: "mathematiques", value_label: "Mathématiques", value_label_ar: "الرياضيات", level: 1, sort_order: 14 },
+    { value_code: "philosophie", value_label: "Philosophie", value_label_ar: "الفلسفة", level: 1, sort_order: 15 },
+    { value_code: "logique", value_label: "Logique", value_label_ar: "المنطق", level: 1, sort_order: 16 },
+    { value_code: "musique", value_label: "Musique", value_label_ar: "الموسيقى", level: 1, sort_order: 17 },
+    { value_code: "alchimie", value_label: "Alchimie", value_label_ar: "الكيمياء", level: 1, sort_order: 18 },
+    { value_code: "magie_talismans", value_label: "Magie et talismans", value_label_ar: "السحر والطلاسم", level: 1, sort_order: 19 },
+    { value_code: "correspondance", value_label: "Correspondance", value_label_ar: "المراسلات", level: 1, sort_order: 20 },
+    { value_code: "actes_officiels", value_label: "Actes officiels", value_label_ar: "الوثائق الرسمية", level: 1, sort_order: 21 },
+    { value_code: "autre", value_label: "Autre", value_label_ar: "أخرى", level: 1, sort_order: 99 },
+  ]
+};
+
+/**
  * Liste complète de toutes les listes auto-complètes à synchroniser
  */
 export const AUTOCOMPLETE_LISTS_DEFINITIONS: AutocompleteListDefinition[] = [
   COUNTRIES_LIST,
-  LANGUAGES_LIST
+  LANGUAGES_LIST,
+  NATIONALITIES_LIST,
+  MANUSCRIPT_LANGUAGES_LIST,
+  MANUSCRIPT_THEMES_LIST
 ];
