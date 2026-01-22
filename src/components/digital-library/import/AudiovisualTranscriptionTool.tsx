@@ -57,7 +57,7 @@ export default function AudiovisualTranscriptionTool() {
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState<string>("");
-  const [language, setLanguage] = useState<string>("fra");
+  const [language, setLanguage] = useState<string>("auto");
   const [transcript, setTranscript] = useState<string>("");
   const [segments, setSegments] = useState<TranscriptSegment[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -81,16 +81,17 @@ export default function AudiovisualTranscriptionTool() {
   const containerRef = useRef<HTMLDivElement>(null);
   const activeSegmentRef = useRef<HTMLDivElement>(null);
 
-  // Language options for ElevenLabs (ISO 639-3 codes)
+  // Language options for Whisper (auto-detected, but shown for user info)
   const languageOptions = [
-    { value: "fra", label: "Français" },
-    { value: "ara", label: "Arabe" },
-    { value: "eng", label: "Anglais" },
-    { value: "spa", label: "Espagnol" },
-    { value: "deu", label: "Allemand" },
-    { value: "ita", label: "Italien" },
-    { value: "por", label: "Portugais" },
     { value: "auto", label: "Détection automatique" },
+    { value: "fr", label: "Français" },
+    { value: "ar", label: "Arabe" },
+    { value: "en", label: "Anglais" },
+    { value: "es", label: "Espagnol" },
+    { value: "de", label: "Allemand" },
+    { value: "it", label: "Italien" },
+    { value: "pt", label: "Portugais" },
+    { value: "ber", label: "Amazigh" },
   ];
 
   // Load documents from database
@@ -233,14 +234,12 @@ export default function AudiovisualTranscriptionTool() {
         setProgress(30);
       }
 
-      setStatus("Envoi vers ElevenLabs pour transcription...");
+      setStatus("Envoi vers Whisper (Hugging Face) pour transcription...");
       setProgress(40);
 
       // Prepare form data for the edge function
       const formData = new FormData();
       formData.append("audio", audioBlob, selectedFile?.name || "audio.mp3");
-      formData.append("language", language);
-      formData.append("diarize", "false");
 
       // Get the session for authentication
       const { data: { session } } = await supabase.auth.getSession();
@@ -248,9 +247,9 @@ export default function AudiovisualTranscriptionTool() {
         throw new Error("Vous devez être connecté pour utiliser la transcription");
       }
 
-      // Call the edge function
-      const transcribeResponse = await fetch(
-        `https://safeppmznupzqkqmzjzt.supabase.co/functions/v1/elevenlabs-transcribe`,
+      // Call the Whisper edge function (uses Hugging Face Inference API - free & open source)
+      let transcribeResponse = await fetch(
+        `https://safeppmznupzqkqmzjzt.supabase.co/functions/v1/whisper-transcribe`,
         {
           method: "POST",
           headers: {
@@ -259,6 +258,26 @@ export default function AudiovisualTranscriptionTool() {
           body: formData,
         }
       );
+
+      // Handle model loading (503 with retry)
+      if (transcribeResponse.status === 503) {
+        const retryData = await transcribeResponse.json().catch(() => ({}));
+        if (retryData.retry) {
+          setStatus("Le modèle Whisper se charge... Nouvelle tentative dans 10s");
+          await new Promise(resolve => setTimeout(resolve, 10000));
+          
+          transcribeResponse = await fetch(
+            `https://safeppmznupzqkqmzjzt.supabase.co/functions/v1/whisper-transcribe`,
+            {
+              method: "POST",
+              headers: {
+                "Authorization": `Bearer ${session.access_token}`,
+              },
+              body: formData,
+            }
+          );
+        }
+      }
 
       setProgress(70);
       setStatus("Traitement de la transcription...");
