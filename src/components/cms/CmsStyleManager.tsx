@@ -79,8 +79,16 @@ interface SectionStyles {
 
 interface Typography {
   heading_font: string;
+  heading_size: string;
+  heading_weight: string;
+  heading_style: string;
   body_font: string;
+  body_size: string;
+  body_weight: string;
+  body_style: string;
   button_font: string;
+  button_size: string;
+  button_weight: string;
 }
 
 interface ButtonStyles {
@@ -179,8 +187,16 @@ const defaultStyles: SectionStyles = {
 
 const defaultTypography: Typography = {
   heading_font: "Playfair Display",
+  heading_size: "2rem",
+  heading_weight: "700",
+  heading_style: "normal",
   body_font: "Inter",
-  button_font: "Inter"
+  body_size: "1rem",
+  body_weight: "400",
+  body_style: "normal",
+  button_font: "Inter",
+  button_size: "0.875rem",
+  button_weight: "500"
 };
 
 const defaultButtonStyles: ButtonStyles = {
@@ -712,13 +728,14 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
           </TabsContent>
 
           <TabsContent value="typography" className="space-y-4 mt-4">
+            {/* Titres */}
             <Card className="border-dashed">
               <CardHeader className="py-3">
-                <CardTitle className="text-lg">Polices typographiques</CardTitle>
+                <CardTitle className="text-lg">Police des titres</CardTitle>
               </CardHeader>
-              <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="space-y-2">
-                  <Label>Police des titres</Label>
+                  <Label>Police</Label>
                   <Select
                     value={typography.heading_font}
                     onValueChange={(value) => setTypography(prev => ({ ...prev, heading_font: value }))}
@@ -726,7 +743,7 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-background border z-50">
                       {availableFonts.map((font) => (
                         <SelectItem key={font} value={font} style={{ fontFamily: font }}>
                           {font}
@@ -734,10 +751,69 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground">Appliquée aux titres H1-H6</p>
                 </div>
                 <div className="space-y-2">
-                  <Label>Police du corps</Label>
+                  <Label>Taille</Label>
+                  <Select
+                    value={typography.heading_size}
+                    onValueChange={(value) => setTypography(prev => ({ ...prev, heading_size: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border z-50">
+                      <SelectItem value="1.5rem">Petit (24px)</SelectItem>
+                      <SelectItem value="1.75rem">Medium (28px)</SelectItem>
+                      <SelectItem value="2rem">Standard (32px)</SelectItem>
+                      <SelectItem value="2.5rem">Grand (40px)</SelectItem>
+                      <SelectItem value="3rem">Très grand (48px)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Graisse</Label>
+                  <Select
+                    value={typography.heading_weight}
+                    onValueChange={(value) => setTypography(prev => ({ ...prev, heading_weight: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border z-50">
+                      <SelectItem value="400">Normal (400)</SelectItem>
+                      <SelectItem value="500">Medium (500)</SelectItem>
+                      <SelectItem value="600">Semi-bold (600)</SelectItem>
+                      <SelectItem value="700">Bold (700)</SelectItem>
+                      <SelectItem value="800">Extra-bold (800)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Style</Label>
+                  <Select
+                    value={typography.heading_style}
+                    onValueChange={(value) => setTypography(prev => ({ ...prev, heading_style: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border z-50">
+                      <SelectItem value="normal">Normal</SelectItem>
+                      <SelectItem value="italic">Italique</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Corps de texte */}
+            <Card className="border-dashed">
+              <CardHeader className="py-3">
+                <CardTitle className="text-lg">Police du corps de texte</CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="space-y-2">
+                  <Label>Police</Label>
                   <Select
                     value={typography.body_font}
                     onValueChange={(value) => setTypography(prev => ({ ...prev, body_font: value }))}
@@ -745,7 +821,7 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-background border z-50">
                       {availableFonts.map((font) => (
                         <SelectItem key={font} value={font} style={{ fontFamily: font }}>
                           {font}
@@ -753,10 +829,67 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground">Appliquée aux paragraphes</p>
                 </div>
                 <div className="space-y-2">
-                  <Label>Police des boutons</Label>
+                  <Label>Taille</Label>
+                  <Select
+                    value={typography.body_size}
+                    onValueChange={(value) => setTypography(prev => ({ ...prev, body_size: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border z-50">
+                      <SelectItem value="0.875rem">Petit (14px)</SelectItem>
+                      <SelectItem value="1rem">Standard (16px)</SelectItem>
+                      <SelectItem value="1.125rem">Medium (18px)</SelectItem>
+                      <SelectItem value="1.25rem">Grand (20px)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Graisse</Label>
+                  <Select
+                    value={typography.body_weight}
+                    onValueChange={(value) => setTypography(prev => ({ ...prev, body_weight: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border z-50">
+                      <SelectItem value="300">Light (300)</SelectItem>
+                      <SelectItem value="400">Normal (400)</SelectItem>
+                      <SelectItem value="500">Medium (500)</SelectItem>
+                      <SelectItem value="600">Semi-bold (600)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Style</Label>
+                  <Select
+                    value={typography.body_style}
+                    onValueChange={(value) => setTypography(prev => ({ ...prev, body_style: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border z-50">
+                      <SelectItem value="normal">Normal</SelectItem>
+                      <SelectItem value="italic">Italique</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Boutons */}
+            <Card className="border-dashed">
+              <CardHeader className="py-3">
+                <CardTitle className="text-lg">Police des boutons</CardTitle>
+              </CardHeader>
+              <CardContent className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label>Police</Label>
                   <Select
                     value={typography.button_font}
                     onValueChange={(value) => setTypography(prev => ({ ...prev, button_font: value }))}
@@ -764,7 +897,7 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-background border z-50">
                       {availableFonts.map((font) => (
                         <SelectItem key={font} value={font} style={{ fontFamily: font }}>
                           {font}
@@ -772,7 +905,40 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                       ))}
                     </SelectContent>
                   </Select>
-                  <p className="text-xs text-muted-foreground">Appliquée aux boutons et CTA</p>
+                </div>
+                <div className="space-y-2">
+                  <Label>Taille</Label>
+                  <Select
+                    value={typography.button_size}
+                    onValueChange={(value) => setTypography(prev => ({ ...prev, button_size: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border z-50">
+                      <SelectItem value="0.75rem">Petit (12px)</SelectItem>
+                      <SelectItem value="0.875rem">Standard (14px)</SelectItem>
+                      <SelectItem value="1rem">Medium (16px)</SelectItem>
+                      <SelectItem value="1.125rem">Grand (18px)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Graisse</Label>
+                  <Select
+                    value={typography.button_weight}
+                    onValueChange={(value) => setTypography(prev => ({ ...prev, button_weight: value }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-background border z-50">
+                      <SelectItem value="400">Normal (400)</SelectItem>
+                      <SelectItem value="500">Medium (500)</SelectItem>
+                      <SelectItem value="600">Semi-bold (600)</SelectItem>
+                      <SelectItem value="700">Bold (700)</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
               </CardContent>
             </Card>
@@ -784,13 +950,35 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="p-4 bg-muted rounded-lg">
-                  <h2 style={{ fontFamily: typography.heading_font }} className="text-2xl font-bold mb-2">
-                    Titre de section (Playfair Display)
+                  <h2 
+                    style={{ 
+                      fontFamily: typography.heading_font,
+                      fontSize: typography.heading_size,
+                      fontWeight: typography.heading_weight,
+                      fontStyle: typography.heading_style
+                    }} 
+                    className="mb-2"
+                  >
+                    Titre de section
                   </h2>
-                  <p style={{ fontFamily: typography.body_font }} className="text-base mb-4">
+                  <p 
+                    style={{ 
+                      fontFamily: typography.body_font,
+                      fontSize: typography.body_size,
+                      fontWeight: typography.body_weight,
+                      fontStyle: typography.body_style
+                    }} 
+                    className="mb-4"
+                  >
                     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
                   </p>
-                  <Button style={{ fontFamily: typography.button_font }}>
+                  <Button 
+                    style={{ 
+                      fontFamily: typography.button_font,
+                      fontSize: typography.button_size,
+                      fontWeight: typography.button_weight
+                    }}
+                  >
                     Bouton exemple
                   </Button>
                 </div>
