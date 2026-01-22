@@ -78,8 +78,9 @@ export default function AdvancedSearch() {
     setIsSearching(true);
     try {
       // Utiliser any pour éviter l'erreur de type profond avec Supabase
-      let baseQuery: any = supabase.from('cbn_documents').select('*', { count: 'exact' });
-      console.log('🗄️ Base query created');
+      // Exclure les documents supprimés (soft delete)
+      let baseQuery: any = supabase.from('cbn_documents').select('*', { count: 'exact' }).is('deleted_at', null);
+      console.log('🗄️ Base query created (excluding deleted documents)');
       
       // Recherche générale
       if (params.keyword) {
