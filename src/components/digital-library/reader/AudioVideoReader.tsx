@@ -15,17 +15,11 @@ import {
   Maximize,
   Minimize,
   FileText,
-  Download,
-  Share2,
   ArrowLeft,
-  Mic,
-  MicOff,
-  RotateCcw,
   Copy,
   Check,
   ChevronDown,
-  ChevronUp,
-  Settings
+  ChevronUp
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -65,7 +59,7 @@ interface AudioVideoReaderProps {
   onBack?: () => void;
 }
 
-const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+
 
 export default function AudioVideoReader({ documentData, onBack }: AudioVideoReaderProps) {
   const { toast } = useToast();
@@ -79,11 +73,9 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(1);
   
-  // Transcription state
+  // Transcription state (read-only from database)
   const [transcript, setTranscript] = useState("");
   const [segments, setSegments] = useState<TranscriptSegment[]>([]);
-  const [isTranscribing, setIsTranscribing] = useState(false);
-  const [transcriptionLanguage, setTranscriptionLanguage] = useState("fr");
   const [showTranscript, setShowTranscript] = useState(true);
   const [transcriptionLoaded, setTranscriptionLoaded] = useState(false);
   const [copiedText, setCopiedText] = useState(false);
@@ -95,10 +87,7 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
   // Refs
   const mediaRef = useRef<HTMLVideoElement | HTMLAudioElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const recognitionRef = useRef<any>(null);
   const transcriptRef = useRef<HTMLDivElement>(null);
-  const isTranscribingRef = useRef(false);
-  const transcriptionBlockedRef = useRef(false);
 
   // Check if media is audio or video
   const isVideo = documentData.document_type === 'video';
@@ -247,196 +236,6 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
     setIsFullscreen(!isFullscreen);
   };
 
-  // Start transcription with browser Speech Recognition (FREE)
-  const startTranscription = () => {
-    const isEmbedded = (() => {
-      try {
-        return window.self !== window.top;
-      } catch {
-        return true;
-      }
-    })();
-
-    if (isEmbedded) {
-      toast({
-        title: "Prévisualisation",
-        description: "La transcription micro est souvent bloquée dans l'aperçu Lovable. Ouvrez cette page dans un nouvel onglet pour autoriser le micro.",
-      });
-    }
-
-    if (!SpeechRecognition) {
-      toast({
-        title: "Non supporté",
-        description: "La reconnaissance vocale n'est pas supportée par ce navigateur. Utilisez Chrome, Edge ou Safari.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    transcriptionBlockedRef.current = false;
-
-    const recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = transcriptionLanguage === 'fr' ? 'fr-FR' :
-                       transcriptionLanguage === 'ar' ? 'ar-MA' :
-                       transcriptionLanguage === 'en' ? 'en-US' : 'es-ES';
-
-    let currentText = transcript;
-    let currentSegments = [...segments];
-
-    recognition.onresult = (event: any) => {
-      let finalText = '';
-
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const result = event.results[i];
-        if (result.isFinal) {
-          finalText += result[0].transcript + ' ';
-
-          // Add new segment with timestamp
-          const t = mediaRef.current?.currentTime || 0;
-          const newSegment: TranscriptSegment = {
-            id: `seg-${Date.now()}-${i}`,
-            text: result[0].transcript,
-            startTime: t,
-            endTime: t + 5,
-          };
-          currentSegments.push(newSegment);
-          setSegments([...currentSegments]);
-        }
-      }
-
-      if (finalText) {
-        currentText += finalText;
-        setTranscript(currentText);
-      }
-    };
-
-    recognition.onerror = (event: any) => {
-      console.warn('Transcription error:', event.error);
-
-      if (['not-allowed', 'service-not-allowed', 'audio-capture'].includes(event.error)) {
-        transcriptionBlockedRef.current = true;
-        isTranscribingRef.current = false;
-        setIsTranscribing(false);
-        try { recognition.stop(); } catch { /* ignore */ }
-
-        toast({
-          title: "Microphone refusé",
-          description: "Autorisez l'accès au micro dans le navigateur (icône cadenas), puis réessayez. Dans l'aperçu Lovable, ouvrez la page dans un nouvel onglet.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      if (event.error !== 'no-speech') {
-        toast({
-          title: "Erreur",
-          description: `Erreur de reconnaissance: ${event.error}`,
-          variant: "destructive"
-        });
-      }
-    };
-
-    recognition.onend = () => {
-      // Restart if still transcribing and media is playing (and not blocked)
-      if (
-        isTranscribingRef.current &&
-        !transcriptionBlockedRef.current &&
-        mediaRef.current &&
-        !mediaRef.current.paused
-      ) {
-        try {
-          recognition.start();
-        } catch {
-          // ignore
-        }
-      } else {
-        isTranscribingRef.current = false;
-        setIsTranscribing(false);
-      }
-    };
-
-    recognitionRef.current = recognition;
-
-    try {
-      recognition.start();
-      isTranscribingRef.current = true;
-      setIsTranscribing(true);
-
-      toast({
-        title: "Transcription démarrée",
-        description: "Lancez la lecture et jouez l'audio sur vos haut-parleurs : le navigateur écoutera via le microphone.",
-      });
-
-      // Start media playback
-      if (mediaRef.current && !isPlaying) {
-        mediaRef.current.play();
-      }
-    } catch (error) {
-      console.error('Failed to start recognition:', error);
-      isTranscribingRef.current = false;
-      setIsTranscribing(false);
-      toast({
-        title: "Erreur",
-        description: "Impossible de démarrer la reconnaissance vocale. Vérifiez les permissions du microphone.",
-        variant: "destructive"
-      });
-    }
-  };
-
-  // Stop transcription
-  const stopTranscription = () => {
-    isTranscribingRef.current = false;
-    transcriptionBlockedRef.current = false;
-
-    if (recognitionRef.current) {
-      try { recognitionRef.current.stop(); } catch { /* ignore */ }
-    }
-
-    setIsTranscribing(false);
-  };
-
-  // Save transcription
-  const saveTranscription = async () => {
-    try {
-      // Delete existing pages
-      await supabase
-        .from('digital_library_pages')
-        .delete()
-        .eq('document_id', documentData.id);
-
-      // Save transcript as pages
-      const pages = transcript.split('\n').filter(t => t.trim());
-      const pageRecords = pages.map((text, idx) => ({
-        document_id: documentData.id,
-        page_number: idx + 1,
-        ocr_text: text
-      }));
-
-      if (pageRecords.length > 0) {
-        await supabase.from('digital_library_pages').insert(pageRecords);
-      }
-
-      // Mark document as OCR processed
-      await supabase
-        .from('digital_library_documents')
-        .update({ ocr_processed: true })
-        .eq('id', documentData.id);
-
-      toast({
-        title: "Transcription sauvegardée",
-        description: "La transcription a été enregistrée avec succès"
-      });
-    } catch (error) {
-      console.error('Error saving transcription:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de sauvegarder la transcription",
-        variant: "destructive"
-      });
-    }
-  };
 
   // Copy transcript
   const copyTranscript = async () => {
@@ -613,178 +412,109 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
           </CardContent>
         </Card>
 
-        {/* Transcription Panel - Always visible */}
-        <Card className="shrink-0">
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-base flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                Transcription
-                {!SpeechRecognition && (
-                  <Badge variant="destructive" className="text-xs">Non supporté</Badge>
-                )}
-              </CardTitle>
-              <div className="flex items-center gap-2">
-                {transcript && (
-                  <Button variant="ghost" size="icon" onClick={copyTranscript}>
-                    {copiedText ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
-                  </Button>
-                )}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setShowTranscript(!showTranscript)}
-                >
-                  {showTranscript ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-          
-          <Collapsible open={showTranscript}>
-            <CollapsibleContent>
-              <CardContent className="pt-0 flex-1 flex flex-col">
-                {/* Info banner */}
-                <div className="bg-muted/50 rounded-lg p-3 mb-4 text-sm">
-                  <p className="text-muted-foreground">
-                    <strong>💡 Gratuit :</strong> La transcription utilise la reconnaissance vocale de votre navigateur. 
-                    Lancez la lecture et jouez l'audio sur vos haut-parleurs - le microphone captera le son pour le transcrire.
-                  </p>
-                </div>
-
-                {/* Transcription controls */}
-                <div className="flex flex-wrap items-center gap-2 mb-4">
-                  <Select value={transcriptionLanguage} onValueChange={setTranscriptionLanguage}>
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="fr">Français</SelectItem>
-                      <SelectItem value="ar">العربية</SelectItem>
-                      <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="es">Español</SelectItem>
-                    </SelectContent>
-                  </Select>
-
-                  {!isTranscribing ? (
-                    <Button 
-                      variant="default" 
-                      size="sm"
-                      onClick={startTranscription}
-                      disabled={!SpeechRecognition}
-                    >
-                      <Mic className="h-4 w-4 mr-2" />
-                      Démarrer la transcription
-                    </Button>
-                  ) : (
-                    <Button 
-                      variant="destructive" 
-                      size="sm"
-                      onClick={stopTranscription}
-                    >
-                      <MicOff className="h-4 w-4 mr-2" />
-                      Arrêter
-                    </Button>
+        {/* Transcription Panel - Toggle to show/hide existing transcription */}
+        {(transcript || transcriptionLoaded) && (
+          <Card className="shrink-0">
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Transcription
+                  {transcriptionLoaded && (
+                    <Badge variant="secondary" className="text-xs">Disponible</Badge>
                   )}
-
+                </CardTitle>
+                <div className="flex items-center gap-2">
                   {transcript && (
-                    <>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={saveTranscription}
-                      >
-                        <Download className="h-4 w-4 mr-2" />
-                        Sauvegarder
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => { setTranscript(''); setSegments([]); }}
-                      >
-                        <RotateCcw className="h-4 w-4 mr-2" />
-                        Réinitialiser
-                      </Button>
-                    </>
+                    <Button variant="ghost" size="icon" onClick={copyTranscript}>
+                      {copiedText ? <Check className="h-4 w-4 text-primary" /> : <Copy className="h-4 w-4" />}
+                    </Button>
                   )}
-
-                  {isTranscribing && (
-                    <Badge variant="secondary" className="animate-pulse">
-                      🎤 Écoute en cours...
-                    </Badge>
-                  )}
+                  <Button
+                    variant={showTranscript ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setShowTranscript(!showTranscript)}
+                  >
+                    {showTranscript ? (
+                      <>
+                        <ChevronUp className="h-4 w-4 mr-2" />
+                        Masquer
+                      </>
+                    ) : (
+                      <>
+                        <ChevronDown className="h-4 w-4 mr-2" />
+                        Afficher
+                      </>
+                    )}
+                  </Button>
                 </div>
+              </div>
+            </CardHeader>
+            
+            <Collapsible open={showTranscript}>
+              <CollapsibleContent>
+                <CardContent className="pt-0 flex-1 flex flex-col">
+                  {/* Font size control */}
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-xs text-muted-foreground">Taille du texte:</span>
+                    <Slider
+                      value={[fontSize]}
+                      onValueChange={([v]) => setFontSize(v)}
+                      min={12}
+                      max={24}
+                      step={1}
+                      className="w-24"
+                    />
+                    <span className="text-xs text-muted-foreground">{fontSize}px</span>
+                  </div>
 
-                {/* Font size control */}
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="text-xs text-muted-foreground">Taille:</span>
-                  <Slider
-                    value={[fontSize]}
-                    onValueChange={([v]) => setFontSize(v)}
-                    min={12}
-                    max={24}
-                    step={1}
-                    className="w-24"
-                  />
-                  <span className="text-xs text-muted-foreground">{fontSize}px</span>
-                </div>
+                  <Separator className="mb-3" />
 
-                <Separator className="mb-3" />
-
-                {/* Transcript display */}
-                <ScrollArea className="flex-1 h-[300px]" ref={transcriptRef}>
-                  {!transcript && !transcriptionLoaded && (
-                    <div className="text-center py-8 text-muted-foreground">
-                      <Mic className="h-12 w-12 mx-auto mb-3 opacity-50" />
-                      <p>Aucune transcription disponible</p>
-                      <p className="text-sm mt-1">
-                        Cliquez sur "Transcrire" pour démarrer la reconnaissance vocale
-                      </p>
-                    </div>
-                  )}
-                  
-                  {segments.length > 0 ? (
-                    <div className="space-y-2 pr-4">
-                      {segments.map((segment, idx) => {
-                        const isActive = currentTime >= segment.startTime && currentTime < segment.endTime;
-                        const isPast = currentTime >= segment.endTime;
-                        
-                        return (
-                          <div
-                            key={segment.id}
-                            id={`segment-${segment.id}`}
-                            className={cn(
-                              "p-3 rounded-lg cursor-pointer transition-all",
-                              isActive && "bg-primary/10 border-l-4 border-primary",
-                              isPast && !isActive && "opacity-60",
-                              !isActive && !isPast && "hover:bg-muted/50"
-                            )}
-                            style={{ fontSize: `${fontSize}px` }}
-                            onClick={() => handleSeek(segment.startTime)}
-                          >
-                            <div className="flex items-start gap-2">
-                              <span className="text-xs text-muted-foreground font-mono mt-1">
-                                {formatTime(segment.startTime)}
-                              </span>
-                              <p className="flex-1 leading-relaxed">{segment.text}</p>
+                  {/* Transcript display */}
+                  <ScrollArea className="flex-1 h-[300px]" ref={transcriptRef}>
+                    {segments.length > 0 ? (
+                      <div className="space-y-2 pr-4">
+                        {segments.map((segment, idx) => {
+                          const isActive = currentTime >= segment.startTime && currentTime < segment.endTime;
+                          const isPast = currentTime >= segment.endTime;
+                          
+                          return (
+                            <div
+                              key={segment.id}
+                              id={`segment-${segment.id}`}
+                              className={cn(
+                                "p-3 rounded-lg cursor-pointer transition-all",
+                                isActive && "bg-primary/10 border-l-4 border-primary",
+                                isPast && !isActive && "opacity-60",
+                                !isActive && !isPast && "hover:bg-muted/50"
+                              )}
+                              style={{ fontSize: `${fontSize}px` }}
+                              onClick={() => handleSeek(segment.startTime)}
+                            >
+                              <div className="flex items-start gap-2">
+                                <span className="text-xs text-muted-foreground font-mono mt-1">
+                                  {formatTime(segment.startTime)}
+                                </span>
+                                <p className="flex-1 leading-relaxed">{segment.text}</p>
+                              </div>
                             </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : transcript ? (
-                    <p 
-                      className="whitespace-pre-wrap leading-relaxed pr-4"
-                      style={{ fontSize: `${fontSize}px` }}
-                    >
-                      {transcript}
-                    </p>
-                  ) : null}
-                </ScrollArea>
-              </CardContent>
-            </CollapsibleContent>
-          </Collapsible>
-        </Card>
+                          );
+                        })}
+                      </div>
+                    ) : transcript ? (
+                      <p 
+                        className="whitespace-pre-wrap leading-relaxed pr-4"
+                        style={{ fontSize: `${fontSize}px` }}
+                      >
+                        {transcript}
+                      </p>
+                    ) : null}
+                  </ScrollArea>
+                </CardContent>
+              </CollapsibleContent>
+            </Collapsible>
+          </Card>
+        )}
       </div>
     </div>
   );
