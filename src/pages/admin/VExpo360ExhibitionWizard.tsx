@@ -74,6 +74,7 @@ export default function VExpo360ExhibitionWizard() {
   const [formData, setFormData] = useState<ExhibitionFormData>(defaultFormData);
   const [activeTab, setActiveTab] = useState("content");
   const [isCoverUploading, setIsCoverUploading] = useState(false);
+  const [formInitialized, setFormInitialized] = useState(false);
 
   // Fetch exhibition if editing
   const { data: exhibition, isLoading } = useQuery({
@@ -88,12 +89,13 @@ export default function VExpo360ExhibitionWizard() {
       if (error) throw error;
       return data;
     },
-    enabled: isEditing
+    enabled: isEditing,
+    staleTime: Infinity, // Prevent automatic refetches while editing
   });
 
-  // Populate form when editing
+  // Populate form ONLY on initial load (not on refetch)
   useEffect(() => {
-    if (exhibition) {
+    if (exhibition && !formInitialized) {
       setFormData({
         title_fr: exhibition.title_fr || "",
         title_ar: exhibition.title_ar || "",
@@ -118,8 +120,9 @@ export default function VExpo360ExhibitionWizard() {
         start_date: exhibition.start_date?.split('T')[0] || "",
         end_date: exhibition.end_date?.split('T')[0] || "",
       });
+      setFormInitialized(true);
     }
-  }, [exhibition]);
+  }, [exhibition, formInitialized]);
 
   // Save mutation
   const saveMutation = useMutation({
