@@ -350,7 +350,7 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
                 
                 {/* Subtitles overlay - Always visible when enabled */}
                 {transcriptionLoaded && showSubtitles && activeSubtitle && (
-                  <div className="absolute bottom-4 left-0 right-0 flex justify-center px-4 pointer-events-none z-10">
+                  <div className="absolute top-4 left-0 right-0 flex justify-center px-4 pointer-events-none z-10">
                     <div
                       className="bg-black/85 text-white px-6 py-3 rounded-lg max-w-[95%] text-center shadow-lg"
                       style={{ 
