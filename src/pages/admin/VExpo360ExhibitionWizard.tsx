@@ -73,6 +73,7 @@ export default function VExpo360ExhibitionWizard() {
 
   const [formData, setFormData] = useState<ExhibitionFormData>(defaultFormData);
   const [activeTab, setActiveTab] = useState("content");
+  const [isCoverUploading, setIsCoverUploading] = useState(false);
 
   // Fetch exhibition if editing
   const { data: exhibition, isLoading } = useQuery({
@@ -148,7 +149,15 @@ export default function VExpo360ExhibitionWizard() {
       }
     },
     onSuccess: (exhibitionId) => {
+      // Admin lists
       queryClient.invalidateQueries({ queryKey: ['vexpo360-exhibitions'] });
+      // Current editor view
+      queryClient.invalidateQueries({ queryKey: ['vexpo360-exhibition', exhibitionId] });
+      // Front-office caches
+      queryClient.invalidateQueries({ queryKey: ['vexpo360-public-exhibitions'] });
+      queryClient.invalidateQueries({ queryKey: ['vexpo360-public-exhibition'] });
+      queryClient.invalidateQueries({ queryKey: ['latest-vexpo-exhibition'] });
+
       toast({ title: isEditing ? "Exposition mise à jour" : "Exposition créée" });
       if (!isEditing) {
         navigate(`/admin/vexpo360/edit/${exhibitionId}`);
@@ -165,6 +174,14 @@ export default function VExpo360ExhibitionWizard() {
   };
 
   const handleSave = () => {
+    if (isCoverUploading) {
+      toast({
+        title: "Téléversement en cours",
+        description: "Veuillez attendre la fin du téléversement avant d'enregistrer.",
+        variant: "destructive",
+      });
+      return;
+    }
     if (!formData.title_fr.trim()) {
       toast({ title: "Erreur", description: "Le titre français est obligatoire", variant: "destructive" });
       return;
@@ -222,9 +239,13 @@ export default function VExpo360ExhibitionWizard() {
                 <span>Enregistrez d'abord pour gérer les panoramas</span>
               </div>
             )}
-            <Button onClick={handleSave} disabled={saveMutation.isPending}>
+            <Button onClick={handleSave} disabled={saveMutation.isPending || isCoverUploading}>
               <Save className="h-4 w-4 mr-2" />
-              {saveMutation.isPending ? "Enregistrement..." : "Enregistrer"}
+              {isCoverUploading
+                ? "Téléversement…"
+                : saveMutation.isPending
+                  ? "Enregistrement..."
+                  : "Enregistrer"}
             </Button>
           </div>
         </div>
@@ -378,6 +399,7 @@ export default function VExpo360ExhibitionWizard() {
                 <VExpoImageUpload
                   value={formData.cover_image_url}
                   onChange={(url) => handleChange('cover_image_url', url)}
+                  onUploadingChange={setIsCoverUploading}
                   label=""
                   folder="covers"
                   maxSizeMB={10}

@@ -96,6 +96,10 @@ export default function VExpo360ExhibitionsList() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['vexpo360-exhibitions'] });
+      // Front-office caches
+      queryClient.invalidateQueries({ queryKey: ['vexpo360-public-exhibitions'] });
+      queryClient.invalidateQueries({ queryKey: ['vexpo360-public-exhibition'] });
+      queryClient.invalidateQueries({ queryKey: ['latest-vexpo-exhibition'] });
       toast({ title: "Statut mis à jour" });
     },
     onError: () => {
