@@ -205,7 +205,7 @@ export default function VExpo360ExhibitionWizard() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            {isEditing && (
+            {isEditing ? (
               <>
                 <Button variant="outline" onClick={() => navigate(`/admin/vexpo360/panoramas/${id}`)}>
                   <Image className="h-4 w-4 mr-2" />
@@ -216,6 +216,11 @@ export default function VExpo360ExhibitionWizard() {
                   Prévisualiser
                 </Button>
               </>
+            ) : (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/50 px-3 py-1.5 rounded-md">
+                <Image className="h-4 w-4" />
+                <span>Enregistrez d'abord pour gérer les panoramas</span>
+              </div>
             )}
             <Button onClick={handleSave} disabled={saveMutation.isPending}>
               <Save className="h-4 w-4 mr-2" />
