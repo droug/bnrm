@@ -55,6 +55,13 @@ export default function Administration() {
       color: "bg-violet-100 text-violet-600",
     },
     {
+      title: "CMS Expositions 360°",
+      description: "Créer et gérer des expositions virtuelles immersives",
+      icon: View,
+      path: "/admin/vexpo360",
+      color: "bg-teal-100 text-teal-600",
+    },
+    {
       title: "Tableau de bord",
       description: "Vue d'ensemble, KPIs et statistiques",
       icon: LayoutDashboard,
@@ -88,20 +95,6 @@ export default function Administration() {
       icon: BarChart3,
       path: "/admin/digital-library/analytics",
       color: "bg-indigo-100 text-indigo-600",
-    },
-    {
-      title: "Expositions virtuelles",
-      description: "Gestion des expositions",
-      icon: FileImage,
-      path: "/admin/digital-library/exhibitions",
-      color: "bg-pink-100 text-pink-600",
-    },
-    {
-      title: "CMS Expositions 360°",
-      description: "Créer et gérer des expositions virtuelles immersives",
-      icon: View,
-      path: "/admin/vexpo360",
-      color: "bg-teal-100 text-teal-600",
     },
     {
       title: "Demandes de reproduction",
