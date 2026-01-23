@@ -8,6 +8,7 @@ import { lazy, Suspense } from "react";
 import ScrollToTop from "@/components/ScrollToTop";
 import { useAutoSync } from "@/hooks/useAutoSync";
 import { PerformanceOptimizer } from "@/components/seo/PerformanceOptimizer";
+import { CriticalCssOptimizer, usePerformanceMetrics } from "@/components/seo/CriticalCss";
 import { CookieBanner } from "@/components/cookies/CookieBanner";
 import { AuthRecoveryRedirect } from "@/components/auth/AuthRecoveryRedirect";
 
@@ -238,10 +239,14 @@ const App = () => {
   // Synchronisation automatique des listes système au démarrage
   useAutoSync(true);
   
+  // Track performance metrics
+  usePerformanceMetrics();
+  
   return (
     <ThemeProvider>
       <LanguageProvider>
         <PerformanceOptimizer />
+        <CriticalCssOptimizer />
         <ScrollToTop />
         <Toaster />
         <Sonner />
