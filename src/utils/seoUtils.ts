@@ -173,9 +173,4 @@ export function extractKeywords(text: string, maxKeywords: number = 10): string[
     .map(([word]) => word);
 }
 
-// Extend Window interface for gtag
-declare global {
-  interface Window {
-    gtag?: (command: string, eventName: string, params: any) => void;
-  }
-}
+// Note: gtag types are declared globally in src/types/analytics.d.ts
