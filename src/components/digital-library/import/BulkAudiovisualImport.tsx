@@ -548,7 +548,7 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
                       </SelectItem>
                       <SelectItem value="gemini">
                         <span className="flex items-center gap-2">
-                          ✨ Gemini (Lovable AI, &lt;10MB)
+                          ✨ Gemini (&lt;10MB)
                         </span>
                       </SelectItem>
                       <SelectItem value="openai">
