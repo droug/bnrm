@@ -15,15 +15,7 @@ export default function ManuscriptsBackoffice() {
   const { isAdmin, isLibrarian, loading: rolesLoading } = useSecureRoles();
   const navigate = useNavigate();
 
-  if (rolesLoading) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
-  }
-
-  if (!user || (!isAdmin && !isLibrarian)) {
-    return <Navigate to="/" replace />;
-  }
-
-  // Fetch manuscripts count
+  // Fetch manuscripts count - hooks must be called before any conditional returns
   const { data: manuscripts } = useQuery({
     queryKey: ['manuscripts-count'],
     queryFn: async () => {
@@ -33,7 +25,8 @@ export default function ManuscriptsBackoffice() {
       
       if (error) throw error;
       return count;
-    }
+    },
+    enabled: !!user && (isAdmin || isLibrarian)
   });
 
   // Fetch users count
@@ -46,8 +39,18 @@ export default function ManuscriptsBackoffice() {
       
       if (error) throw error;
       return count;
-    }
+    },
+    enabled: !!user && (isAdmin || isLibrarian)
   });
+
+  // Conditional returns AFTER all hooks
+  if (rolesLoading) {
+    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+  }
+
+  if (!user || (!isAdmin && !isLibrarian)) {
+    return <Navigate to="/" replace />;
+  }
 
   const menuCards = [
     {
