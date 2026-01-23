@@ -99,7 +99,8 @@ export function useCookieConsent() {
 
 function initializeAnalytics() {
   if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('consent', 'update', {
+    // Cast to any to handle gtag consent command which has a different signature
+    (window.gtag as any)('consent', 'update', {
       analytics_storage: 'granted',
       ad_storage: 'denied',
     });
@@ -108,7 +109,8 @@ function initializeAnalytics() {
 
 function disableAnalytics() {
   if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('consent', 'update', {
+    // Cast to any to handle gtag consent command which has a different signature
+    (window.gtag as any)('consent', 'update', {
       analytics_storage: 'denied',
       ad_storage: 'denied',
     });

@@ -41,13 +41,21 @@ type MatomoCommand = [string, ...any[]];
 
 declare global {
   interface Window {
-    // Google Analytics
+    // Google Analytics - overloaded function
     gtag: {
       (command: 'js', date: Date): void;
       (command: 'config', targetId: string, config?: GtagConfig): void;
       (command: 'event', eventName: string, params?: GtagEventParams): void;
       (command: 'set', params: GtagConfig): void;
       (command: 'set', key: string, params: GtagConfig): void;
+      (command: 'consent', action: 'default' | 'update', params: {
+        analytics_storage?: 'granted' | 'denied';
+        ad_storage?: 'granted' | 'denied';
+        functionality_storage?: 'granted' | 'denied';
+        personalization_storage?: 'granted' | 'denied';
+        security_storage?: 'granted' | 'denied';
+        wait_for_update?: number;
+      }): void;
     };
     dataLayer: any[];
     
