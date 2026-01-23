@@ -2,8 +2,7 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { Navigate, useNavigate } from "react-router-dom";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { PageAccessRestrictionsManager } from "@/components/digital-library/PageAccessRestrictionsManager";
 import { BatchRestrictionsManager } from "@/components/digital-library/BatchRestrictionsManager";
 import { Button } from "@/components/ui/button";
@@ -29,9 +28,8 @@ export default function PageAccessRestrictionsBackoffice() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container mx-auto p-6">
+    <DigitalLibraryLayout>
+      <div className="container mx-auto p-6">
         <Button
           variant="ghost"
           onClick={() => navigate("/admin/digital-library")}
@@ -61,8 +59,7 @@ export default function PageAccessRestrictionsBackoffice() {
             <BatchRestrictionsManager />
           </TabsContent>
         </Tabs>
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </DigitalLibraryLayout>
   );
 }

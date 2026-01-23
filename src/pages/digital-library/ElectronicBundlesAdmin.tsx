@@ -1,13 +1,15 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
-import { Navigate } from "react-router-dom";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { Navigate, useNavigate } from "react-router-dom";
+import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import ElectronicBundlesManagement from "@/components/digital-library/admin/ElectronicBundlesManagement";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 export default function ElectronicBundlesAdmin() {
   const { user } = useAuth();
   const { isLibrarian, loading } = useSecureRoles();
+  const navigate = useNavigate();
 
   if (loading) {
     return (
@@ -22,12 +24,18 @@ export default function ElectronicBundlesAdmin() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main>
+    <DigitalLibraryLayout>
+      <div className="container mx-auto p-6">
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/admin/digital-library")}
+          className="mb-4"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Retour
+        </Button>
         <ElectronicBundlesManagement />
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </DigitalLibraryLayout>
   );
 }
