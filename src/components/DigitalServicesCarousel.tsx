@@ -129,7 +129,7 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
         ? 'سجل للوصول إلى موارد وخدمات المكتبة.'
         : 'Inscrivez-vous pour accéder aux ressources et services de la bibliothèque.',
       category: language === 'ar' ? 'اشتراك' : 'Abonnement',
-      onClick: () => navigate('/abonnements')
+      onClick: () => navigate('/abonnements?platform=portal')
     },
     {
       id: 'espaces-culturels',
