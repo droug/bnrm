@@ -146,8 +146,14 @@ function HotspotMarker({
         e.stopPropagation();
         onClick();
       }}
-      onPointerOver={() => onHover(true)}
-      onPointerOut={() => onHover(false)}
+      onPointerOver={(e) => {
+        document.body.style.cursor = 'pointer';
+        onHover(true);
+      }}
+      onPointerOut={() => {
+        document.body.style.cursor = '';
+        onHover(false);
+      }}
     >
       <circleGeometry args={[3, 32]} />
       <meshBasicMaterial 
@@ -269,7 +275,7 @@ export function VExpo360Viewer({
   return (
     <div 
       ref={containerRef}
-      className={`relative bg-black overflow-hidden ${effectiveFullscreen ? 'h-full w-full' : 'h-[600px] rounded-lg'} ${isFullscreen ? 'fixed inset-0 z-50' : ''}`}
+      className={`relative bg-black overflow-hidden cursor-grab active:cursor-grabbing ${effectiveFullscreen ? 'h-full w-full' : 'h-[600px] rounded-lg'} ${isFullscreen ? 'fixed inset-0 z-50' : ''}`}
     >
       {/* 3D Canvas */}
       <Canvas camera={{ fov: 75, position: [0, 0, 0.1] }}>
