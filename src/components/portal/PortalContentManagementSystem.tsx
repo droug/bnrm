@@ -14,6 +14,7 @@ import CmsStyleManager from "@/components/cms/CmsStyleManager";
 import CmsMediathequeManager from "@/components/cms/CmsMediathequeManager";
 import CmsDigitalServicesManager from "@/components/cms/CmsDigitalServicesManager";
 import CmsWysiwygModule from "@/components/cms/CmsWysiwygModule";
+import CmsSeoManager from "@/components/cms/CmsSeoManager";
 import {
   FileText, 
   Webhook, 
@@ -216,6 +217,16 @@ const tabs = [
     gradient: "from-gray-500/20 to-gray-600/5",
     description: "Intégrations et notifications"
   },
+  { 
+    id: "seo", 
+    label: "SEO & Référencement", 
+    icon: TrendingUp, 
+    color: "text-emerald-500",
+    bgColor: "bg-emerald-500/10",
+    borderColor: "border-emerald-500/30",
+    gradient: "from-emerald-500/20 to-emerald-600/5",
+    description: "Optimisation moteurs de recherche"
+  },
 ];
 
 function StatCard({ 
@@ -371,6 +382,8 @@ export default function PortalContentManagementSystem() {
         return <CmsFooterManager />;
       case "webhooks":
         return <CmsWebhooksManager />;
+      case "seo":
+        return <CmsSeoManager />;
       default:
         return null;
     }
