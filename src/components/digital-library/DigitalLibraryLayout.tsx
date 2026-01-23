@@ -194,7 +194,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                       <span className="hidden sm:inline">{t('dl.login')}</span>
                     </Button>
                   </Link>
-                  <Link to="/abonnements">
+                  <Link to="/abonnements?platform=bn">
                     <Button 
                       size="sm" 
                       className="gap-2 text-sm bg-gold-bn-primary hover:bg-gold-bn-primary-dark text-white focus-visible:ring-2 focus-visible:ring-gold-bn-primary focus-visible:ring-offset-2"
@@ -413,7 +413,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="bg-card z-50" role="menu" aria-label={t('dl.readerServices')}>
-                  <Link to="/abonnements">
+                  <Link to="/abonnements?platform=bn">
                     <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
                       <UserPlus className="h-4 w-4" aria-hidden="true" />
                       {t('dl.membership')}
