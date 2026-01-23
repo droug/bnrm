@@ -58,6 +58,7 @@ export default function AudiovisualTranscriptionTool() {
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState<string>("");
   const [language, setLanguage] = useState<string>("ar"); // Default to Arabic
+  const [transcriptionMethod, setTranscriptionMethod] = useState<"local" | "gemini" | "openai">("local");
   const [transcript, setTranscript] = useState<string>("");
   const [segments, setSegments] = useState<TranscriptSegment[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -599,6 +600,39 @@ export default function AudiovisualTranscriptionTool() {
                     </SelectContent>
                   </Select>
                 </div>
+
+                <div className="space-y-2">
+                  <Label>Méthode de transcription</Label>
+                  <Select 
+                    value={transcriptionMethod} 
+                    onValueChange={(v) => setTranscriptionMethod(v as "local" | "gemini" | "openai")} 
+                    disabled={isTranscribing}
+                  >
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="local">
+                        <span className="flex items-center gap-2">
+                          🖥️ Local (Gratuit, navigateur)
+                        </span>
+                      </SelectItem>
+                      <SelectItem value="gemini">
+                        <span className="flex items-center gap-2">
+                          ✨ Gemini (Lovable AI, &lt;10MB)
+                        </span>
+                      </SelectItem>
+                      <SelectItem value="openai">
+                        <span className="flex items-center gap-2">
+                          🔑 OpenAI Whisper (Payant)
+                        </span>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
                 
                 <div className="flex items-end gap-2">
                   {!isTranscribing ? (
