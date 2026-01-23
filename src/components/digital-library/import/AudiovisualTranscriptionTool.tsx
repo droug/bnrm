@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Slider } from "@/components/ui/slider";
 import { supabase } from "@/integrations/supabase/client";
+import { useLocalWhisperTranscription } from "@/hooks/useLocalWhisperTranscription";
 import { 
   FileAudio, 
   Loader2, 
@@ -45,6 +46,7 @@ interface TranscriptSegment {
 
 export default function AudiovisualTranscriptionTool() {
   const { toast } = useToast();
+  const { transcribe: localTranscribe, progress: localProgress, isTranscribing: isLocalTranscribing } = useLocalWhisperTranscription();
   
   // File state
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -58,7 +60,7 @@ export default function AudiovisualTranscriptionTool() {
   const [progress, setProgress] = useState(0);
   const [status, setStatus] = useState<string>("");
   const [language, setLanguage] = useState<string>("ar"); // Default to Arabic
-  const [transcriptionMethod, setTranscriptionMethod] = useState<"local" | "gemini" | "openai">("local");
+  const [transcriptionMethod, setTranscriptionMethod] = useState<"local" | "gemini" | "openai">("gemini");
   const [transcript, setTranscript] = useState<string>("");
   const [segments, setSegments] = useState<TranscriptSegment[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -197,7 +199,7 @@ export default function AudiovisualTranscriptionTool() {
     };
   }, [getMediaSource()]);
 
-  // Start transcription with ElevenLabs API (server-side, no microphone)
+  // Start transcription based on selected method
   const startTranscription = async () => {
     // We need either a file or a document with a URL
     if (!selectedFile && !selectedDocumentId) {
@@ -235,62 +237,21 @@ export default function AudiovisualTranscriptionTool() {
         setProgress(30);
       }
 
-      setStatus("Envoi vers Whisper (Hugging Face) pour transcription...");
-      setProgress(40);
+      let result: { text: string; words?: any[] } | null = null;
+      let usedMethod = transcriptionMethod;
 
-      // Prepare form data for the edge function
-      const formData = new FormData();
-      formData.append("audio", audioBlob, selectedFile?.name || "audio.mp3");
-      formData.append("language", language); // Send selected language
-
-      // Get the session for authentication
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        throw new Error("Vous devez être connecté pour utiliser la transcription");
+      // Try the selected method, with fallback to local if needed
+      if (transcriptionMethod === "local") {
+        result = await performLocalTranscription(audioBlob);
+      } else if (transcriptionMethod === "gemini") {
+        result = await performGeminiTranscription(audioBlob, usedMethod);
+      } else if (transcriptionMethod === "openai") {
+        result = await performOpenAITranscription(audioBlob);
       }
 
-      // Call the Whisper edge function (uses Hugging Face Inference API - free & open source)
-      let transcribeResponse = await fetch(
-        `https://safeppmznupzqkqmzjzt.supabase.co/functions/v1/whisper-transcribe`,
-        {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${session.access_token}`,
-          },
-          body: formData,
-        }
-      );
-
-      // Handle model loading (503 with retry)
-      if (transcribeResponse.status === 503) {
-        const retryData = await transcribeResponse.json().catch(() => ({}));
-        if (retryData.retry) {
-          setStatus("Le modèle Whisper se charge... Nouvelle tentative dans 10s");
-          await new Promise(resolve => setTimeout(resolve, 10000));
-          
-          transcribeResponse = await fetch(
-            `https://safeppmznupzqkqmzjzt.supabase.co/functions/v1/whisper-transcribe`,
-            {
-              method: "POST",
-              headers: {
-                "Authorization": `Bearer ${session.access_token}`,
-              },
-              body: formData,
-            }
-          );
-        }
+      if (!result) {
+        throw new Error("Aucun résultat de transcription");
       }
-
-      setProgress(70);
-      setStatus("Traitement de la transcription...");
-
-      if (!transcribeResponse.ok) {
-        const errorData = await transcribeResponse.json().catch(() => ({}));
-        throw new Error(errorData.error || `Erreur de transcription: ${transcribeResponse.status}`);
-      }
-
-      const result = await transcribeResponse.json();
-      setProgress(90);
 
       // Process the response
       if (result.text) {
@@ -309,7 +270,7 @@ export default function AudiovisualTranscriptionTool() {
 
             // Create a segment every 10-15 words or at punctuation
             const isPunctuation = /[.!?]$/.test(word.text);
-            const isLastWord = index === result.words.length - 1;
+            const isLastWord = index === result!.words!.length - 1;
 
             if (wordCount >= 12 || isPunctuation || isLastWord) {
               newSegments.push({
@@ -354,6 +315,131 @@ export default function AudiovisualTranscriptionTool() {
       setProgress(0);
       setStatus("");
     }
+  };
+
+  // Local transcription using browser-based Whisper
+  const performLocalTranscription = async (audioBlob: Blob): Promise<{ text: string; words?: any[] } | null> => {
+    setStatus("Transcription locale en cours (peut prendre quelques minutes)...");
+    setProgress(40);
+
+    const result = await localTranscribe(audioBlob, language);
+    
+    if (!result) {
+      throw new Error("Échec de la transcription locale");
+    }
+
+    setProgress(90);
+    return {
+      text: result.text,
+      words: result.chunks?.map((chunk, idx) => ({
+        text: chunk.text,
+        start: chunk.timestamp[0],
+        end: chunk.timestamp[1]
+      }))
+    };
+  };
+
+  // Gemini transcription via edge function with fallback
+  const performGeminiTranscription = async (audioBlob: Blob, _method: string): Promise<{ text: string; words?: any[] } | null> => {
+    setStatus("Envoi vers Gemini pour transcription...");
+    setProgress(40);
+
+    // Prepare form data for the edge function
+    const formData = new FormData();
+    formData.append("audio", audioBlob, selectedFile?.name || "audio.mp3");
+    formData.append("language", language);
+
+    // Get the session for authentication
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      throw new Error("Vous devez être connecté pour utiliser la transcription");
+    }
+
+    const transcribeResponse = await fetch(
+      `https://safeppmznupzqkqmzjzt.supabase.co/functions/v1/whisper-transcribe`,
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${session.access_token}`,
+        },
+        body: formData,
+      }
+    );
+
+    setProgress(70);
+    setStatus("Traitement de la transcription...");
+
+    if (!transcribeResponse.ok) {
+      const errorData = await transcribeResponse.json().catch(() => ({}));
+      
+      // If file is too large, fallback to local method
+      if (transcribeResponse.status === 413 && errorData.fallbackToLocal) {
+        toast({
+          title: "Fichier volumineux",
+          description: "Basculement automatique vers la méthode locale...",
+          variant: "default"
+        });
+        return await performLocalTranscription(audioBlob);
+      }
+      
+      throw new Error(errorData.error || `Erreur de transcription: ${transcribeResponse.status}`);
+    }
+
+    const result = await transcribeResponse.json();
+    setProgress(90);
+
+    return {
+      text: result.text,
+      words: result.words
+    };
+  };
+
+  // OpenAI Whisper transcription via edge function
+  const performOpenAITranscription = async (audioBlob: Blob): Promise<{ text: string; words?: any[] } | null> => {
+    setStatus("Envoi vers OpenAI Whisper pour transcription...");
+    setProgress(40);
+
+    // Prepare form data for the edge function
+    const formData = new FormData();
+    formData.append("audio", audioBlob, selectedFile?.name || "audio.mp3");
+    formData.append("language", language);
+
+    // Get the session for authentication
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) {
+      throw new Error("Vous devez être connecté pour utiliser la transcription");
+    }
+
+    const transcribeResponse = await fetch(
+      `https://safeppmznupzqkqmzjzt.supabase.co/functions/v1/openai-whisper-transcribe`,
+      {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${session.access_token}`,
+        },
+        body: formData,
+      }
+    );
+
+    setProgress(70);
+    setStatus("Traitement de la transcription...");
+
+    if (!transcribeResponse.ok) {
+      const errorData = await transcribeResponse.json().catch(() => ({}));
+      throw new Error(errorData.error || `Erreur de transcription: ${transcribeResponse.status}`);
+    }
+
+    const result = await transcribeResponse.json();
+    setProgress(90);
+
+    return {
+      text: result.text,
+      words: result.segments?.map((seg: any) => ({
+        text: seg.text,
+        start: seg.start,
+        end: seg.end
+      }))
+    };
   };
 
   // Stop transcription (cancel the process)
