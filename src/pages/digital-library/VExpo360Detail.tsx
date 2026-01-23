@@ -151,13 +151,14 @@ export default function VExpo360Detail() {
   // If viewer is open, show fullscreen viewer
   if (isViewerOpen && panoramas && panoramas.length > 0) {
     return (
-      <div className="fixed inset-0 z-50 bg-black">
+      <div className="fixed inset-0 z-50 bg-black h-screen w-screen overflow-hidden">
         <VExpo360Viewer
           panoramas={panoramas}
           hotspots={allHotspots || {}}
           artworks={artworksMap || {}}
           onClose={() => setIsViewerOpen(false)}
           language={language}
+          externalFullscreen={true}
         />
       </div>
     );

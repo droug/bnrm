@@ -67,6 +67,7 @@ interface VExpo360ViewerProps {
   onClose?: () => void;
   initialPanoramaId?: string;
   language?: 'fr' | 'ar';
+  externalFullscreen?: boolean;
 }
 
 // Panorama Sphere Component
@@ -186,7 +187,8 @@ export function VExpo360Viewer({
   artworks,
   onClose,
   initialPanoramaId,
-  language = 'fr'
+  language = 'fr',
+  externalFullscreen = false
 }: VExpo360ViewerProps) {
   const [currentPanoramaId, setCurrentPanoramaId] = useState(initialPanoramaId || panoramas[0]?.id);
   const [selectedHotspot, setSelectedHotspot] = useState<Hotspot | null>(null);
@@ -262,10 +264,12 @@ export function VExpo360Viewer({
     );
   }
 
+  const effectiveFullscreen = isFullscreen || externalFullscreen;
+  
   return (
     <div 
       ref={containerRef}
-      className={`relative bg-black rounded-lg overflow-hidden ${isFullscreen ? 'fixed inset-0 z-50' : 'h-[600px]'}`}
+      className={`relative bg-black overflow-hidden ${effectiveFullscreen ? 'h-full w-full' : 'h-[600px] rounded-lg'} ${isFullscreen ? 'fixed inset-0 z-50' : ''}`}
     >
       {/* 3D Canvas */}
       <Canvas camera={{ fov: 75, position: [0, 0, 0.1] }}>
