@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, FileText, Clock, Archive, Scale, Edit, Library, UserCog, Calendar, Wrench } from "lucide-react";
+import { Settings, Shield, FileText, Clock, Archive, Scale, Library, UserCog, Calendar, Wrench } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useNavigate } from "react-router-dom";
@@ -44,13 +44,6 @@ export function AdminSettingsCards() {
       description: t('admin.archiving.description'),
       href: "/admin/archiving",
       permission: "content.archive"
-    },
-    {
-      icon: Edit,
-      title: "Éditeur WYSIWYG",
-      description: "Éditeur visuel pour créer et modifier du contenu",
-      href: "/admin/wysiwyg",
-      permission: "content.manage"
     },
     {
       icon: Settings,
