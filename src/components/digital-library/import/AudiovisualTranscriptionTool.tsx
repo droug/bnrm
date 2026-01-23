@@ -432,6 +432,13 @@ export default function AudiovisualTranscriptionTool() {
 
     if (!transcribeResponse.ok) {
       const errorData = await transcribeResponse.json().catch(() => ({}));
+      const serverCode = (errorData as any)?.code as string | undefined;
+      const serverMsg = ((errorData as any)?.message || (errorData as any)?.error || "") as string;
+
+      const isWorkerLimit =
+        transcribeResponse.status === 546 ||
+        serverCode === "WORKER_LIMIT" ||
+        /compute resources|memory/i.test(serverMsg);
       
       // If file is too large, fallback to local method
       if (transcribeResponse.status === 413 && errorData.fallbackToLocal) {
@@ -439,6 +446,16 @@ export default function AudiovisualTranscriptionTool() {
           title: "Fichier volumineux",
           description: "Basculement automatique vers la méthode locale...",
           variant: "default"
+        });
+        return await performLocalTranscription(audioBlob);
+      }
+
+      // If the edge function runs out of resources, fallback to local method
+      if (isWorkerLimit) {
+        toast({
+          title: "Serveur surchargé",
+          description: "Ressources insuffisantes pour cette transcription. Basculement automatique vers la méthode locale...",
+          variant: "default",
         });
         return await performLocalTranscription(audioBlob);
       }

@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { encodeBase64 } from "https://deno.land/std@0.168.0/encoding/base64.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -52,11 +53,9 @@ serve(async (req) => {
       );
     }
 
-    // Convert audio file to base64
-    const audioBytes = await audioFile.arrayBuffer();
-    const base64Audio = btoa(
-      new Uint8Array(audioBytes).reduce((data, byte) => data + String.fromCharCode(byte), '')
-    );
+    // Convert audio file to base64 (efficient, avoids O(n^2) string concatenation)
+    const bytes = new Uint8Array(await audioFile.arrayBuffer());
+    const base64Audio = encodeBase64(bytes);
 
     // Determine MIME type
     let mimeType = audioFile.type || "audio/mpeg";
@@ -126,7 +125,7 @@ Output ONLY the transcription text in the original language of the audio, nothin
             ]
           }
         ],
-        max_tokens: 8000,
+        max_tokens: 4000,
       }),
     });
 
