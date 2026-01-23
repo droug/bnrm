@@ -179,6 +179,69 @@ export type Database = {
         }
         Relationships: []
       }
+      analytics_events: {
+        Row: {
+          browser: string | null
+          country: string | null
+          created_at: string
+          custom_dimensions: Json | null
+          device_type: string | null
+          event_action: string | null
+          event_category: string | null
+          event_label: string | null
+          event_type: string
+          event_value: number | null
+          id: string
+          language: string | null
+          page_path: string
+          page_title: string | null
+          platform: string
+          referrer: string | null
+          session_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          browser?: string | null
+          country?: string | null
+          created_at?: string
+          custom_dimensions?: Json | null
+          device_type?: string | null
+          event_action?: string | null
+          event_category?: string | null
+          event_label?: string | null
+          event_type?: string
+          event_value?: number | null
+          id?: string
+          language?: string | null
+          page_path: string
+          page_title?: string | null
+          platform?: string
+          referrer?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          browser?: string | null
+          country?: string | null
+          created_at?: string
+          custom_dimensions?: Json | null
+          device_type?: string | null
+          event_action?: string | null
+          event_category?: string | null
+          event_label?: string | null
+          event_type?: string
+          event_value?: number | null
+          id?: string
+          language?: string | null
+          page_path?: string
+          page_title?: string | null
+          platform?: string
+          referrer?: string | null
+          session_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       archiving_logs: {
         Row: {
           action: string
