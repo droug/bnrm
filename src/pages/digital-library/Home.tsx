@@ -68,6 +68,42 @@ export default function DigitalLibraryHome() {
     refetchOnMount: "always",
   });
 
+  // Type for VExpo Hero settings
+  interface VExpoHeroSettings {
+    image_url?: string;
+    title_fr?: string;
+    title_ar?: string;
+    subtitle_fr?: string;
+    subtitle_ar?: string;
+    cta_label_fr?: string;
+    cta_label_ar?: string;
+    cta_url?: string;
+    secondary_cta_label_fr?: string;
+    secondary_cta_label_ar?: string;
+    secondary_cta_url?: string;
+  }
+
+  // Fetch VExpo Hero settings from CMS (for background image, title, subtitle)
+  const { data: vexpoHeroSettings } = useQuery<VExpoHeroSettings | null>({
+    queryKey: ["vexpo-hero-settings-bn"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("cms_portal_settings")
+        .select("*")
+        .eq("setting_key", "vexpo_hero_bn")
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error fetching vexpo hero settings:", error);
+        return null;
+      }
+      return (data?.setting_value as VExpoHeroSettings) ?? null;
+    },
+    staleTime: 0,
+    refetchOnWindowFocus: true,
+    refetchOnMount: "always",
+  });
+
   // Fetch latest published virtual exhibition
   const { data: latestExhibition } = useQuery({
     queryKey: ["latest-vexpo-exhibition"],
@@ -625,10 +661,16 @@ export default function DigitalLibraryHome() {
       {/* Section Exposition Virtuelle */}
       {latestExhibition && (
         <section className="py-16 relative overflow-hidden">
-          {/* Background Image */}
+          {/* Background Image - uses CMS settings (vexpo_hero_bn) if available */}
           <div 
             className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: latestExhibition.cover_image_url ? `url(${latestExhibition.cover_image_url})` : `url(${virtualExhibitionBg})` }}
+            style={{ 
+              backgroundImage: vexpoHeroSettings?.image_url 
+                ? `url(${vexpoHeroSettings.image_url})` 
+                : latestExhibition.cover_image_url 
+                  ? `url(${latestExhibition.cover_image_url})` 
+                  : `url(${virtualExhibitionBg})` 
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-br from-bn-blue-primary/80 via-bn-blue-primary/70 to-bn-blue-deep/80" />
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
@@ -642,15 +684,19 @@ export default function DigitalLibraryHome() {
               </div>
               
               <h2 className="heading-3 text-white font-heading">
-                Exposition Virtuelle
+                {language === 'ar' 
+                  ? vexpoHeroSettings?.title_ar || 'معرض افتراضي'
+                  : vexpoHeroSettings?.title_fr || 'Exposition Virtuelle'}
               </h2>
               <p className="font-body text-regular text-white/80 max-w-2xl mx-auto mt-4">
-                Explorez l'histoire et le patrimoine du Maroc à travers nos expositions interactives
+                {language === 'ar'
+                  ? vexpoHeroSettings?.subtitle_ar || 'استكشف تاريخ وتراث المغرب من خلال معارضنا التفاعلية'
+                  : vexpoHeroSettings?.subtitle_fr || 'Explorez l\'histoire et le patrimoine du Maroc à travers nos expositions interactives'}
               </p>
             </div>
 
             <div className="max-w-4xl mx-auto">
-              <Link to={`/digital-library/exposition-virtuelle/${latestExhibition.slug}`}>
+              <Link to={vexpoHeroSettings?.cta_url || `/digital-library/exposition-virtuelle/${latestExhibition.slug}`}>
                 <Card className="group relative overflow-hidden border-2 border-white/20 hover:border-gold-bn-primary/50 transition-all duration-500 bg-white/10 backdrop-blur-md cursor-pointer">
                   <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-gold-bn-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   
@@ -690,7 +736,9 @@ export default function DigitalLibraryHome() {
                         <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
                           <Button className="bg-gradient-to-r from-gold-bn-primary to-gold-bn-primary-dark hover:from-gold-bn-primary-dark hover:to-gold-bn-deep text-white shadow-lg shadow-gold-bn-primary/25 group-hover:shadow-gold-bn-primary/40 transition-all duration-300">
                             <Eye className="h-4 w-4 mr-2" />
-                            Visiter l'exposition
+                            {language === 'ar' 
+                              ? vexpoHeroSettings?.cta_label_ar || 'زيارة المعرض'
+                              : vexpoHeroSettings?.cta_label_fr || 'Visiter l\'exposition'}
                           </Button>
                         </div>
                       </div>
