@@ -1,7 +1,7 @@
 import { ReactNode, useState, useEffect } from "react";
 import { useLanguage, Language } from "@/hooks/useLanguage";
 import { Link } from "react-router-dom";
-import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles, BookmarkCheck, FileDigit, Shield, Library, UserPlus, LogIn, LogOut, Scroll, Newspaper, Map } from "lucide-react";
+import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles, BookmarkCheck, FileDigit, Shield, Library, UserPlus, LogIn, LogOut, Scroll, Newspaper, Map, LayoutGrid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SimpleTooltip } from "@/components/ui/simple-tooltip";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -145,6 +145,48 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                 </Button>
               </Link>
             )}
+
+            {/* Menu Portails */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-gold-bn-primary focus-visible:ring-offset-2"
+                  aria-label="Portails"
+                >
+                  <LayoutGrid className="h-4 w-4" aria-hidden="true" />
+                  <span className="hidden sm:inline">Portails</span>
+                  <ChevronDown className="h-3 w-3" aria-hidden="true" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="bg-card z-50" role="menu" aria-label="Portails">
+                <Link to="/">
+                  <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
+                    <Home className="h-4 w-4" aria-hidden="true" />
+                    Portail Principal
+                  </DropdownMenuItem>
+                </Link>
+                <Link to="/digital-library">
+                  <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
+                    <Library className="h-4 w-4" aria-hidden="true" />
+                    Bibliothèque Numérique
+                  </DropdownMenuItem>
+                </Link>
+                <Link to="/manuscripts">
+                  <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
+                    <Scroll className="h-4 w-4" aria-hidden="true" />
+                    Manuscrits Numérisés
+                  </DropdownMenuItem>
+                </Link>
+                <Link to="/portail-cbm">
+                  <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
+                    <Globe className="h-4 w-4" aria-hidden="true" />
+                    Portail CBM
+                  </DropdownMenuItem>
+                </Link>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
             {/* Language Selector, Theme Switcher & User Menu */}
             <div className="flex items-center gap-2">
