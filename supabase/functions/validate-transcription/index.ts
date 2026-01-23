@@ -26,7 +26,7 @@ serve(async (req) => {
 
     if (!text || text.trim().length === 0) {
       return new Response(
-        JSON.stringify({ validatedText: "", corrections: [], confidence: 1 }),
+        JSON.stringify({ validatedText: "", corrections: [], confidence: 1, qualityScore: 100 }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
@@ -36,7 +36,7 @@ serve(async (req) => {
     // Language names for the prompt
     const languageNames: Record<string, string> = {
       "ar": "Arabe",
-      "fr": "Français",
+      "fr": "Français", 
       "en": "Anglais",
       "ber": "Amazigh/Berbère",
       "es": "Espagnol",
@@ -47,32 +47,38 @@ serve(async (req) => {
 
     const langName = languageNames[language] || language || "la langue d'origine";
 
-    const systemPrompt = `Tu es un expert linguiste spécialisé dans la correction et la validation de transcriptions audio.
+    const systemPrompt = `Tu es un expert linguiste spécialisé dans la reconstruction de transcriptions audio de mauvaise qualité.
 
-Ta tâche est d'analyser une transcription brute et de:
-1. Identifier et corriger les mots mal transcrits ou inexistants
-2. Vérifier la cohérence grammaticale et syntaxique des phrases
-3. Corriger les erreurs de ponctuation
-4. Préserver le sens original et le style du locuteur
+CONTEXTE: Cette transcription provient d'un modèle de reconnaissance vocale basique qui a produit beaucoup d'erreurs. Ton travail est de la RECONSTRUIRE intelligemment.
 
-RÈGLES IMPORTANTES:
-- La langue de la transcription est: ${langName}
-- NE PAS traduire le texte - garde la même langue
-- NE PAS ajouter de contenu qui n'existe pas dans l'original
-- Corriger uniquement les erreurs évidentes de transcription
-- Préserver les expressions idiomatiques et le registre de langue
-- Pour l'arabe, respecter la grammaire et l'orthographe arabes standards
+TÂCHE PRINCIPALE:
+1. Identifier les mots qui n'existent PAS dans la langue ${langName} ou qui sont manifestement mal transcrits
+2. REMPLACER ces mots par des mots RÉELS qui ont du sens dans le contexte
+3. Reconstruire des phrases cohérentes et grammaticalement correctes
+4. Évaluer la qualité globale de la transcription originale
 
-Réponds UNIQUEMENT avec un objet JSON valide au format suivant:
+RÈGLES CRITIQUES:
+- Langue: ${langName} - NE PAS traduire
+- Sois AGRESSIF dans les corrections - préfère une phrase sensée à du charabia
+- Si un mot n'existe pas, trouve le mot réel le plus probable selon le contexte
+- Pour l'arabe: utilise l'arabe standard moderne, corrige les mots déformés
+- Supprime les répétitions inutiles et les faux mots
+
+ÉVALUATION DE QUALITÉ:
+- 0-30: Transcription très mauvaise, beaucoup de mots inexistants
+- 31-60: Qualité médiocre, plusieurs erreurs importantes  
+- 61-80: Qualité acceptable, quelques corrections nécessaires
+- 81-100: Bonne qualité, corrections mineures seulement
+
+Réponds UNIQUEMENT avec un objet JSON valide:
 {
-  "validatedText": "le texte corrigé complet",
+  "validatedText": "le texte ENTIÈREMENT corrigé et cohérent",
   "corrections": [
-    {"original": "mot erroné", "corrected": "mot corrigé", "reason": "explication courte"}
+    {"original": "mot erroné", "corrected": "mot correct", "type": "inexistant|grammaire|orthographe"}
   ],
-  "confidence": 0.95
-}
-
-Le champ "confidence" est un score entre 0 et 1 indiquant ta confiance dans la qualité de la transcription originale.`;
+  "qualityScore": 45,
+  "recommendation": "Si qualityScore < 50, suggère d'utiliser Gemini ou OpenAI pour une meilleure transcription"
+}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -84,7 +90,7 @@ Le champ "confidence" est un score entre 0 et 1 indiquant ta confiance dans la q
         model: "google/gemini-2.5-flash",
         messages: [
           { role: "system", content: systemPrompt },
-          { role: "user", content: `Voici la transcription à valider et corriger:\n\n${text}` }
+          { role: "user", content: `Transcription à corriger et reconstruire:\n\n"${text}"\n\nAnalyse chaque mot, identifie ceux qui n'existent pas, et reconstruis un texte cohérent.` }
         ],
         max_tokens: 4000,
       }),
@@ -100,18 +106,17 @@ Le champ "confidence" est un score entre 0 et 1 indiquant ta confiance dans la q
             error: "Trop de requêtes. Veuillez réessayer.",
             validatedText: text,
             corrections: [],
-            confidence: 0.5
+            qualityScore: 50
           }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       
-      // Return original text on error
       return new Response(
         JSON.stringify({ 
           validatedText: text,
           corrections: [],
-          confidence: 0.5,
+          qualityScore: 50,
           error: "Validation failed, returning original text"
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -126,7 +131,6 @@ Le champ "confidence" est un score entre 0 et 1 indiquant ta confiance dans la q
     // Try to parse JSON from the response
     let validationResult;
     try {
-      // Try to extract JSON from the response
       const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         validationResult = JSON.parse(jsonMatch[0]);
@@ -135,15 +139,14 @@ Le champ "confidence" est un score entre 0 et 1 indiquant ta confiance dans la q
       }
     } catch (parseError) {
       console.error("Failed to parse AI response as JSON:", parseError);
-      // Return original text if parsing fails
       validationResult = {
         validatedText: text,
         corrections: [],
-        confidence: 0.7
+        qualityScore: 50
       };
     }
 
-    console.log(`Validation complete: ${validationResult.corrections?.length || 0} corrections, confidence: ${validationResult.confidence}`);
+    console.log(`Validation complete: ${validationResult.corrections?.length || 0} corrections, quality: ${validationResult.qualityScore}%`);
 
     return new Response(
       JSON.stringify(validationResult),
