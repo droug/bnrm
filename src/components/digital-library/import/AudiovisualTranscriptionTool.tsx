@@ -317,10 +317,10 @@ export default function AudiovisualTranscriptionTool() {
     }
   };
 
-  // Local transcription using browser-based Whisper
+  // Local transcription using browser-based Whisper with AI validation
   const performLocalTranscription = async (audioBlob: Blob): Promise<{ text: string; words?: any[] } | null> => {
     setStatus("Transcription locale en cours (peut prendre quelques minutes)...");
-    setProgress(40);
+    setProgress(30);
 
     const result = await localTranscribe(audioBlob, language);
     
@@ -328,10 +328,58 @@ export default function AudiovisualTranscriptionTool() {
       throw new Error("Échec de la transcription locale");
     }
 
+    setProgress(60);
+    setStatus("Validation intelligente du texte (vérification des mots et phrases)...");
+
+    // Get session for AI validation
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    let validatedText = result.text;
+    let corrections: Array<{ original: string; corrected: string; reason: string }> = [];
+    
+    if (session && result.text.trim().length > 0) {
+      try {
+        const validateResponse = await fetch(
+          `https://safeppmznupzqkqmzjzt.supabase.co/functions/v1/validate-transcription`,
+          {
+            method: "POST",
+            headers: {
+              "Authorization": `Bearer ${session.access_token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              text: result.text,
+              language: language
+            }),
+          }
+        );
+
+        if (validateResponse.ok) {
+          const validationResult = await validateResponse.json();
+          if (validationResult.validatedText) {
+            validatedText = validationResult.validatedText;
+            corrections = validationResult.corrections || [];
+            
+            if (corrections.length > 0) {
+              toast({
+                title: "Validation effectuée",
+                description: `${corrections.length} correction(s) appliquée(s) automatiquement`,
+              });
+            }
+          }
+        } else {
+          console.warn("Validation failed, using original text");
+        }
+      } catch (validationError) {
+        console.error("Validation error:", validationError);
+        // Continue with original text if validation fails
+      }
+    }
+
     setProgress(90);
     return {
-      text: result.text,
-      words: result.chunks?.map((chunk, idx) => ({
+      text: validatedText,
+      words: result.chunks?.map((chunk) => ({
         text: chunk.text,
         start: chunk.timestamp[0],
         end: chunk.timestamp[1]
