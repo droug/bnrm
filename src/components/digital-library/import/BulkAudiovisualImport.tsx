@@ -79,6 +79,7 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
   // Transcription options
   const [enableTranscription, setEnableTranscription] = useState(false);
   const [transcriptionLanguage, setTranscriptionLanguage] = useState("fr");
+  const [transcriptionMethod, setTranscriptionMethod] = useState<"local" | "gemini" | "openai">("local");
   const [isTranscribing, setIsTranscribing] = useState(false);
 
   const speechRecognitionSupported = !!SpeechRecognition;
@@ -513,19 +514,52 @@ export default function BulkAudiovisualImport({ onSuccess }: BulkAudiovisualImpo
           </div>
 
           {enableTranscription && (
-            <div className="flex items-center gap-4 pt-2 border-t">
-              <Label htmlFor="transcription-language" className="shrink-0">Langue :</Label>
-              <Select value={transcriptionLanguage} onValueChange={setTranscriptionLanguage}>
-                <SelectTrigger id="transcription-language" className="w-40">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="fr">Français</SelectItem>
-                  <SelectItem value="ar">العربية</SelectItem>
-                  <SelectItem value="en">English</SelectItem>
-                  <SelectItem value="es">Español</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="space-y-4 pt-2 border-t">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="transcription-language">Langue</Label>
+                  <Select value={transcriptionLanguage} onValueChange={setTranscriptionLanguage}>
+                    <SelectTrigger id="transcription-language">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="fr">Français</SelectItem>
+                      <SelectItem value="ar">العربية</SelectItem>
+                      <SelectItem value="en">English</SelectItem>
+                      <SelectItem value="es">Español</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="transcription-method">Méthode de transcription</Label>
+                  <Select 
+                    value={transcriptionMethod} 
+                    onValueChange={(v) => setTranscriptionMethod(v as "local" | "gemini" | "openai")}
+                  >
+                    <SelectTrigger id="transcription-method">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="local">
+                        <span className="flex items-center gap-2">
+                          🖥️ Local (Gratuit, navigateur)
+                        </span>
+                      </SelectItem>
+                      <SelectItem value="gemini">
+                        <span className="flex items-center gap-2">
+                          ✨ Gemini (Lovable AI, &lt;10MB)
+                        </span>
+                      </SelectItem>
+                      <SelectItem value="openai">
+                        <span className="flex items-center gap-2">
+                          🔑 OpenAI Whisper (Payant)
+                        </span>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </div>
           )}
 
