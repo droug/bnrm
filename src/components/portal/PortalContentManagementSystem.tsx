@@ -471,52 +471,45 @@ export default function PortalContentManagementSystem() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-2">
-              <ScrollArea className="h-auto max-h-[calc(100vh-300px)]">
-                <nav className="space-y-1">
-                  {tabs.map((tab, index) => {
-                    const Icon = tab.icon;
-                    const isActive = activeTab === tab.id;
-                    
-                    return (
-                      <motion.button
-                        key={tab.id}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.2, delay: index * 0.05 }}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={cn(
-                          "w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left transition-all duration-200 group relative",
-                          isActive 
-                            ? `bg-gradient-to-r ${tab.gradient} border ${tab.borderColor}` 
-                            : "hover:bg-muted/50"
-                        )}
-                      >
-                        <div className={cn(
-                          "p-2 rounded-lg transition-colors",
-                          isActive ? tab.bgColor : "bg-muted group-hover:bg-muted"
-                        )}>
-                          <Icon className={cn("h-4 w-4", tab.color)} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <span className={cn(
-                            "font-medium text-sm truncate block",
-                            isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
-                          )}>
-                            {tab.label}
-                          </span>
-                          <p className="text-xs text-muted-foreground truncate mt-0.5">
-                            {tab.description}
-                          </p>
-                        </div>
-                        <ChevronRight className={cn(
-                          "h-4 w-4 transition-all",
-                          isActive ? "opacity-100 text-muted-foreground" : "opacity-0 group-hover:opacity-50"
-                        )} />
-                      </motion.button>
-                    );
-                  })}
-                </nav>
-              </ScrollArea>
+              <nav className="space-y-1">
+                {tabs.map((tab, index) => {
+                  const Icon = tab.icon;
+                  const isActive = activeTab === tab.id;
+                  
+                  return (
+                    <motion.button
+                      key={tab.id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.2, delay: index * 0.03 }}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={cn(
+                        "w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-all duration-200 group relative",
+                        isActive 
+                          ? `bg-gradient-to-r ${tab.gradient} border ${tab.borderColor}` 
+                          : "hover:bg-muted/50"
+                      )}
+                    >
+                      <div className={cn(
+                        "p-1.5 rounded-md transition-colors flex-shrink-0",
+                        isActive ? tab.bgColor : "bg-muted group-hover:bg-muted"
+                      )}>
+                        <Icon className={cn("h-3.5 w-3.5", tab.color)} />
+                      </div>
+                      <span className={cn(
+                        "font-medium text-xs truncate flex-1",
+                        isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
+                      )}>
+                        {tab.label}
+                      </span>
+                      <ChevronRight className={cn(
+                        "h-3 w-3 flex-shrink-0 transition-all",
+                        isActive ? "opacity-100 text-muted-foreground" : "opacity-0 group-hover:opacity-50"
+                      )} />
+                    </motion.button>
+                  );
+                })}
+              </nav>
             </CardContent>
           </Card>
         </motion.div>
