@@ -329,13 +329,14 @@ export default function AudiovisualTranscriptionTool() {
     }
 
     setProgress(60);
-    setStatus("Validation intelligente du texte (vérification des mots et phrases)...");
+    setStatus("Correction intelligente du texte (reconstruction des mots et phrases)...");
 
     // Get session for AI validation
     const { data: { session } } = await supabase.auth.getSession();
     
     let validatedText = result.text;
-    let corrections: Array<{ original: string; corrected: string; reason: string }> = [];
+    let corrections: Array<{ original: string; corrected: string; type: string }> = [];
+    let qualityScore = 100;
     
     if (session && result.text.trim().length > 0) {
       try {
@@ -359,20 +360,32 @@ export default function AudiovisualTranscriptionTool() {
           if (validationResult.validatedText) {
             validatedText = validationResult.validatedText;
             corrections = validationResult.corrections || [];
+            qualityScore = validationResult.qualityScore || 50;
             
-            if (corrections.length > 0) {
+            // Show appropriate message based on quality
+            if (qualityScore < 40) {
               toast({
-                title: "Validation effectuée",
-                description: `${corrections.length} correction(s) appliquée(s) automatiquement`,
+                title: "⚠️ Qualité de transcription faible",
+                description: `Score: ${qualityScore}%. ${corrections.length} mot(s) corrigé(s). Pour de meilleurs résultats, utilisez Gemini ou OpenAI.`,
+                variant: "destructive"
+              });
+            } else if (corrections.length > 0) {
+              toast({
+                title: "✓ Texte corrigé",
+                description: `${corrections.length} correction(s) - Qualité: ${qualityScore}%`,
               });
             }
           }
         } else {
           console.warn("Validation failed, using original text");
+          toast({
+            title: "Validation non disponible",
+            description: "Le texte brut est affiché. La qualité peut être limitée.",
+            variant: "default"
+          });
         }
       } catch (validationError) {
         console.error("Validation error:", validationError);
-        // Continue with original text if validation fails
       }
     }
 
