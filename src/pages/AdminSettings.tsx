@@ -109,14 +109,6 @@ export default function AdminSettings() {
       gradient: "from-slate-500 to-slate-600"
     },
     {
-      icon: PenSquare,
-      title: "Éditeur WYSIWYG",
-      description: "Éditeur visuel pour créer et modifier du contenu",
-      href: "/admin/wysiwyg",
-      permission: "content.manage",
-      gradient: "from-pink-500 to-rose-600"
-    },
-    {
       icon: Coins,
       title: "Gestion des Tarifs BNRM",
       description: "Gérer les tarifs et services de la Bibliothèque Nationale",
