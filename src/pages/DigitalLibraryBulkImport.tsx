@@ -2,8 +2,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { useNavigationHistory } from "@/hooks/useNavigationHistory";
 import { Navigate } from "react-router-dom";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import DigitalLibraryDocumentImporter from "@/components/digital-library/import/DigitalLibraryDocumentImporter";
@@ -26,9 +25,8 @@ export default function DigitalLibraryBulkImport() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container mx-auto p-6">
+    <DigitalLibraryLayout>
+      <div className="container mx-auto p-6">
         <Button
           variant="ghost"
           onClick={() => goBack("/admin/digital-library/documents")}
@@ -44,8 +42,7 @@ export default function DigitalLibraryBulkImport() {
             // Optionnel : naviguer vers la liste après succès
           }}
         />
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </DigitalLibraryLayout>
   );
 }

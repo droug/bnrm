@@ -1,8 +1,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { Navigate, useNavigate } from "react-router-dom";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import ReproductionManager from "@/components/digital-library/ReproductionManager";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -25,9 +24,8 @@ export default function DigitalLibraryReproduction() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="container mx-auto p-6">
+    <DigitalLibraryLayout>
+      <div className="container mx-auto p-6">
         <Button
           variant="ghost"
           onClick={() => navigate("/admin/digital-library")}
@@ -37,8 +35,7 @@ export default function DigitalLibraryReproduction() {
           Retour
         </Button>
         <ReproductionManager />
-      </main>
-      <Footer />
-    </div>
+      </div>
+    </DigitalLibraryLayout>
   );
 }
