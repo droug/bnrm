@@ -181,6 +181,14 @@ export default function DigitalLibraryBackoffice() {
       gradient: "from-violet-500 to-purple-600"
     },
     {
+      icon: Globe,
+      title: "CMS Exposition 360°",
+      description: "Gérer les expositions virtuelles 360° avec panoramas et hotspots interactifs",
+      count: null,
+      action: () => navigate('/admin/vexpo360'),
+      gradient: "from-teal-500 to-cyan-600"
+    },
+    {
       icon: BookOpen,
       title: "Gestion des documents numérisés",
       description: "Ajout/suppression de documents, gestion des permissions et visibilité",
