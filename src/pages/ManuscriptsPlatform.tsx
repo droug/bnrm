@@ -217,40 +217,40 @@ export default function ManuscriptsPlatform() {
         />
         <Header />
         
-        <main className="container mx-auto px-4 py-8">
-          {/* Hero Section */}
-          <section className="relative mb-12 py-20 px-8 rounded-3xl border-4 border-gold/40 overflow-hidden shadow-2xl">
+        <main className="container mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
+          {/* Hero Section - Mobile First */}
+          <section className="relative mb-6 sm:mb-8 md:mb-12 py-8 sm:py-12 md:py-20 px-4 sm:px-6 md:px-8 rounded-xl sm:rounded-2xl md:rounded-3xl border-2 sm:border-4 border-gold/40 overflow-hidden shadow-lg sm:shadow-xl md:shadow-2xl">
             {/* Background Image */}
             <div 
               className="absolute inset-0 bg-cover bg-center"
               style={{ backgroundImage: `url(${manuscriptBanner})` }}
             ></div>
-            {/* Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/60 to-royal/80"></div>
-            <div className="absolute inset-0 bg-pattern-zellige-complex opacity-20"></div>
-            <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-15"></div>
+            {/* Overlay - stronger on mobile for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/70 to-royal/90 sm:from-black/70 sm:via-black/60 sm:to-royal/80"></div>
+            <div className="absolute inset-0 bg-pattern-zellige-complex opacity-10 sm:opacity-20"></div>
+            <div className="absolute inset-0 bg-pattern-moroccan-stars opacity-10 sm:opacity-15"></div>
             
             <div className="relative z-10 text-center">
-              <div className="flex items-center justify-center space-x-4 mb-6">
-                <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-10 w-10 object-contain drop-shadow-lg" />
-                <h1 className="text-5xl font-moroccan font-bold text-white drop-shadow-2xl">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 mb-4 sm:mb-6">
+                <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-8 w-8 sm:h-10 sm:w-10 object-contain drop-shadow-lg hidden sm:block" />
+                <h1 className="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-moroccan font-bold text-white drop-shadow-2xl leading-tight px-2">
                   Plateforme des Manuscrits Numérisés
                 </h1>
-                <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-10 w-10 object-contain drop-shadow-lg" />
+                <img src={emblemeMaroc} alt="Emblème du Maroc" className="h-8 w-8 sm:h-10 sm:w-10 object-contain drop-shadow-lg hidden sm:block" />
               </div>
-              <p className="text-xl text-white/95 mb-6 max-w-3xl mx-auto drop-shadow-md font-elegant">
+              <p className="text-sm sm:text-lg md:text-xl text-white/95 mb-4 sm:mb-6 max-w-full sm:max-w-2xl md:max-w-3xl mx-auto drop-shadow-md font-elegant px-2">
                 Découvrez les trésors manuscrits de la BNRM et des institutions partenaires marocaines
               </p>
               
-              {/* Boutons d'action */}
-              <div className="flex flex-wrap justify-center gap-3 mb-6">
+              {/* Boutons d'action - Stack on mobile */}
+              <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-2 sm:gap-3 mb-4 sm:mb-6 px-2">
                 <Button 
-                  size="lg" 
+                  size="default" 
                   asChild 
-                  className="bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white shadow-lg hover:shadow-xl transition-all"
+                  className="bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white shadow-lg hover:shadow-xl transition-all w-full sm:w-auto text-sm sm:text-base"
                 >
                   <Link to="/manuscripts/help">
-                    <HelpCircle className="h-5 w-5 mr-2" />
+                    <HelpCircle className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                     Centre d'Aide
                   </Link>
                 </Button>
@@ -258,12 +258,12 @@ export default function ManuscriptsPlatform() {
                 {user && (
                   <Dialog open={partnerDialogOpen} onOpenChange={setPartnerDialogOpen}>
                     <DialogTrigger asChild>
-                      <Button size="lg" className="bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white shadow-lg hover:shadow-xl transition-all">
-                        <Users className="h-5 w-5 mr-2" />
+                      <Button size="default" className="bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white shadow-lg hover:shadow-xl transition-all w-full sm:w-auto text-sm sm:text-base">
+                        <Users className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                         Devenir Partenaire
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+                    <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto mx-2 sm:mx-auto">
                       <DialogHeader>
                         <DialogTitle>Demande de Partenariat BNRM</DialogTitle>
                       </DialogHeader>
@@ -272,41 +272,43 @@ export default function ManuscriptsPlatform() {
                   </Dialog>
                 )}
                 {profile?.role === 'partner' && (
-                  <Button size="lg" asChild className="bg-gold hover:bg-gold/90 text-white shadow-lg">
+                  <Button size="default" asChild className="bg-gold hover:bg-gold/90 text-white shadow-lg w-full sm:w-auto text-sm sm:text-base">
                     <Link to="/partner-dashboard">
-                      <Building2 className="h-5 w-5 mr-2" />
+                      <Building2 className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                       Espace Partenaire
                     </Link>
                   </Button>
                 )}
               </div>
               
-              <div className="flex justify-center space-x-2 mb-6">
+              <div className="flex justify-center space-x-1 sm:space-x-2 mb-4 sm:mb-6">
                 {[...Array(7)].map((_, i) => (
-                  <Star key={i} className="h-5 w-5 text-gold fill-gold animate-pulse drop-shadow-lg" style={{ animationDelay: `${i * 0.15}s` }} />
+                  <Star key={i} className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-gold fill-gold animate-pulse drop-shadow-lg" style={{ animationDelay: `${i * 0.15}s` }} />
                 ))}
               </div>
 
               {/* Barre de recherche */}
-              <ManuscriptSearchBar 
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-              />
+              <div className="px-2 sm:px-0">
+                <ManuscriptSearchBar 
+                  searchQuery={searchQuery}
+                  setSearchQuery={setSearchQuery}
+                />
+              </div>
               
               {/* Bouton Recherche Avancée */}
-              <div className="mt-4">
+              <div className="mt-3 sm:mt-4 px-2 sm:px-0">
                 <Button 
-                  size="lg" 
+                  size="default" 
                   variant="secondary"
                   onClick={() => navigate('/manuscripts/search')}
-                  className="bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white shadow-lg hover:shadow-xl transition-all"
+                  className="bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white shadow-lg hover:shadow-xl transition-all w-full sm:w-auto text-sm sm:text-base"
                 >
-                  <SlidersHorizontal className="h-5 w-5 mr-2" />
+                  <SlidersHorizontal className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                   Recherche Avancée
                 </Button>
               </div>
               
-              <div className="w-48 h-2 bg-gradient-berber mx-auto rounded-full shadow-gold mt-6"></div>
+              <div className="w-32 sm:w-40 md:w-48 h-1 sm:h-2 bg-gradient-berber mx-auto rounded-full shadow-gold mt-4 sm:mt-6"></div>
             </div>
           </section>
 

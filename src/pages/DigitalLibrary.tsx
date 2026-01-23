@@ -293,22 +293,22 @@ const DigitalLibrary = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container mx-auto px-4 py-8">
-        {/* Hero Section */}
-        <section className="relative mb-12 py-24 md:py-32 px-8 rounded-3xl border-4 border-gold-bn-primary/40 overflow-hidden shadow-2xl">
+      <main className="container mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8">
+        {/* Hero Section - Mobile First */}
+        <section className="relative mb-6 sm:mb-8 md:mb-12 py-10 sm:py-16 md:py-24 lg:py-32 px-4 sm:px-6 md:px-8 rounded-xl sm:rounded-2xl md:rounded-3xl border-2 sm:border-4 border-gold-bn-primary/40 overflow-hidden shadow-lg sm:shadow-xl md:shadow-2xl">
           {/* Background Image - Dynamic from CMS */}
           <div 
-            className="absolute inset-0 bg-cover bg-center opacity-70"
+            className="absolute inset-0 bg-cover bg-center opacity-60 sm:opacity-70"
             style={{ backgroundImage: `url(${heroImageUrl})` }}
           ></div>
-          {/* Overlay - BN Blue tones */}
-          <div className="absolute inset-0 bg-gradient-to-r from-bn-blue-primary/70 via-bn-blue-primary/60 to-bn-blue-deep/70"></div>
-          <div className="absolute inset-0 bg-pattern-zellige-complex opacity-10"></div>
-          <div className="relative z-10 text-center">
-            <h1 className="text-6xl md:text-7xl lg:text-8xl font-moroccan font-bold text-white mb-6 drop-shadow-2xl">
+          {/* Overlay - BN Blue tones - stronger on mobile */}
+          <div className="absolute inset-0 bg-gradient-to-r from-bn-blue-primary/80 via-bn-blue-primary/70 to-bn-blue-deep/80 sm:from-bn-blue-primary/70 sm:via-bn-blue-primary/60 sm:to-bn-blue-deep/70"></div>
+          <div className="absolute inset-0 bg-pattern-zellige-complex opacity-5 sm:opacity-10"></div>
+          <div className="relative z-10 text-center px-2">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl 2xl:text-8xl font-moroccan font-bold text-white mb-4 sm:mb-5 md:mb-6 drop-shadow-2xl leading-tight">
               {heroTitle}
             </h1>
-            <p className="text-2xl md:text-3xl text-white mb-10 max-w-4xl mx-auto drop-shadow-2xl font-elegant">
+            <p className="text-sm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl text-white mb-6 sm:mb-8 md:mb-10 max-w-full sm:max-w-2xl md:max-w-3xl lg:max-w-4xl mx-auto drop-shadow-2xl font-elegant line-clamp-3 sm:line-clamp-none">
               {heroSubtitle}
             </p>
             

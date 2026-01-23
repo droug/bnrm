@@ -37,25 +37,25 @@ const CulturalActivities = () => {
         </div>
       )}
       
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-[#002B45] to-[#004d7a] text-white py-16 overflow-hidden">
+      {/* Hero Section - Mobile First */}
+      <section className="relative bg-gradient-to-br from-[#002B45] to-[#004d7a] text-white py-10 sm:py-12 md:py-16 overflow-hidden">
         {/* Watermark BNRM Logo */}
         <div 
           className="absolute inset-0 flex items-center justify-center opacity-5"
           style={{
             backgroundImage: `url(${logoBnrm})`,
-            backgroundSize: '40%',
+            backgroundSize: '60%',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat'
           }}
         />
         
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center space-y-4">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+        <div className="container mx-auto px-4 sm:px-6 relative z-10">
+          <div className="max-w-full sm:max-w-3xl md:max-w-4xl mx-auto text-center space-y-3 sm:space-y-4">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 leading-tight px-2">
               Activités culturelles de la Bibliothèque Nationale du Royaume du Maroc
             </h1>
-            <p className="text-lg md:text-xl text-blue-100">
+            <p className="text-sm sm:text-base md:text-lg lg:text-xl text-blue-100 px-2">
               Découvrez la programmation culturelle de la BNRM, réservez vos espaces, participez aux événements ou proposez vos activités.
             </p>
           </div>
@@ -63,9 +63,9 @@ const CulturalActivities = () => {
       </section>
 
       {/* Events Carousel Section */}
-      <section className="py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-[#002B45] mb-8 text-center">
+      <section className="py-8 sm:py-10 md:py-12 bg-white">
+        <div className="container mx-auto px-3 sm:px-4 md:px-6">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#002B45] mb-4 sm:mb-6 md:mb-8 text-center">
             Événements à venir
           </h2>
           <EventsCarousel />
@@ -73,9 +73,9 @@ const CulturalActivities = () => {
       </section>
 
       {/* Calendar Section */}
-      <section className="py-12">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-[#002B45] mb-8 text-center">
+      <section className="py-8 sm:py-10 md:py-12">
+        <div className="container mx-auto px-3 sm:px-4 md:px-6">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#002B45] mb-4 sm:mb-6 md:mb-8 text-center">
             Calendrier des activités
           </h2>
           <CulturalCalendar />
@@ -83,12 +83,12 @@ const CulturalActivities = () => {
       </section>
 
       {/* Navigation Cards Section */}
-      <section className="py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-[#002B45] mb-8 text-center">
+      <section className="py-8 sm:py-10 md:py-12 bg-white">
+        <div className="container mx-auto px-3 sm:px-4 md:px-6">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#002B45] mb-4 sm:mb-6 md:mb-8 text-center">
             Nos services
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
             {/* Card 1: Réservation des espaces */}
             <Link to="/cultural-activities/booking">
               <Card className="h-full hover:shadow-xl transition-all duration-300 group border-2 hover:border-[#D4AF37] rounded-2xl">

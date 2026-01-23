@@ -98,8 +98,8 @@ const Index = () => {
           onClose={() => setShowWelcomePopup(false)}
         />
 
-        {/* Hero Banner */}
-        <section className="relative min-h-[70vh] overflow-hidden pt-20">
+        {/* Hero Banner - Mobile First */}
+        <section className="relative min-h-[50vh] sm:min-h-[60vh] md:min-h-[70vh] overflow-hidden pt-16 sm:pt-20">
           <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{ 
@@ -107,32 +107,32 @@ const Index = () => {
             }}
           />
           
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40 sm:from-black/70 sm:via-black/50 sm:to-black/30" />
           
-          <div className="relative z-10 container mx-auto px-4 h-full flex items-center min-h-[70vh]">
-            <div className="max-w-2xl">
+          <div className="relative z-10 container mx-auto px-4 sm:px-6 h-full flex items-center min-h-[50vh] sm:min-h-[60vh] md:min-h-[70vh]">
+            <div className="max-w-full sm:max-w-xl md:max-w-2xl">
               {/* Tagline */}
-              <p className="tagline text-blue-primary-light mb-4">
+              <p className="tagline text-blue-primary-light mb-2 sm:mb-4 text-xs sm:text-sm">
                 {language === 'ar' ? 'التراث الوطني المغربي' : 'Patrimoine National Marocain'}
               </p>
               
-              {/* Heading 2 - Main title */}
-              <h1 className="heading-2 text-white mb-6">
+              {/* Heading 2 - Main title - Responsive font sizes */}
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4 md:mb-6 leading-tight">
                 {heroTitle}
               </h1>
               
               {/* Text medium - Description */}
-              <p className="text-medium text-white/90 mb-8 max-w-xl">
+              <p className="text-sm sm:text-base md:text-lg text-white/90 mb-4 sm:mb-6 md:mb-8 max-w-full sm:max-w-lg md:max-w-xl line-clamp-3 sm:line-clamp-none">
                 {heroSubtitle}
               </p>
               
               <div>
                 <Button 
-                  size="lg"
+                  size="default"
                   onClick={() => navigate('/help')}
-                  className="bg-blue-primary-dark hover:bg-blue-deep text-white px-8 py-6 text-regular font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
+                  className="bg-blue-primary-dark hover:bg-blue-deep text-white px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 text-sm sm:text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
                 >
-                  <HelpCircle className={`h-5 w-5 text-white ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
+                  <HelpCircle className={`h-4 w-4 sm:h-5 sm:w-5 text-white ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
                   <span className="text-white">{language === 'ar' ? 'المساعدة والدعم' : 'Aide & Support'}</span>
                 </Button>
               </div>
@@ -140,26 +140,26 @@ const Index = () => {
           </div>
         </section>
         
-        {/* Main Content */}
-        <main className="container mx-auto px-4 py-8">
+        {/* Main Content - Mobile First */}
+        <main className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8">
           <div className="max-w-6xl mx-auto space-y-4">
               
               {/* News and Events Section */}
               <NewsEventsSection language={language} />
 
               {/* Digital Services Section */}
-              <div className="mb-6">
-                <div className="py-8 bg-gradient-to-b from-slate-50 to-white rounded-lg">
-                  <div className="container mx-auto px-4">
-                    <div className="mb-10">
-                      <p className="tagline text-primary mb-2">
+              <div className="mb-4 sm:mb-6">
+                <div className="py-4 sm:py-6 md:py-8 bg-gradient-to-b from-slate-50 to-white rounded-lg">
+                  <div className="container mx-auto px-3 sm:px-4">
+                    <div className="mb-6 sm:mb-8 md:mb-10">
+                      <p className="tagline text-primary mb-1 sm:mb-2 text-xs sm:text-sm">
                         BNRM
                       </p>
-                      <h2 className="heading-3 text-[#1e3a8a] mb-4">
+                      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1e3a8a] mb-2 sm:mb-4">
                         {language === 'ar' ? 'خدماتنا الرقمية' : 'Nos Services Numériques'}
                       </h2>
-                      <div className="w-24 h-1 bg-primary mb-4"></div>
-                      <p className="text-regular text-muted-foreground">
+                      <div className="w-16 sm:w-20 md:w-24 h-1 bg-primary mb-2 sm:mb-4"></div>
+                      <p className="text-sm sm:text-base text-muted-foreground">
                         {language === 'ar'
                           ? 'اكتشف مجموعة واسعة من الخدمات الرقمية المتاحة'
                           : 'Découvrez notre large gamme de services numériques disponibles'
@@ -176,23 +176,23 @@ const Index = () => {
               <PlatformsSection language={language} />
 
               {/* Quick Links */}
-              <div className="mb-12">
-                <div className={`mb-10 ${language === 'ar' ? 'text-center' : 'text-left'}`}>
-                  <p className="tagline text-primary mb-2">
+              <div className="mb-8 sm:mb-10 md:mb-12">
+                <div className={`mb-6 sm:mb-8 md:mb-10 ${language === 'ar' ? 'text-center' : 'text-left'}`}>
+                  <p className="tagline text-primary mb-1 sm:mb-2 text-xs sm:text-sm">
                     BNRM
                   </p>
-                  <h2 className="heading-3 text-[#1e3a8a] mb-4">
+                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1e3a8a] mb-2 sm:mb-4">
                     {language === 'ar' ? 'روابط سريعة' : 'Liens rapides'}
                   </h2>
-                  <div className={`w-24 h-1 bg-primary mb-4 ${language === 'ar' ? 'mx-auto' : ''}`}></div>
-                  <p className="text-regular text-muted-foreground">
+                  <div className={`w-16 sm:w-20 md:w-24 h-1 bg-primary mb-2 sm:mb-4 ${language === 'ar' ? 'mx-auto' : ''}`}></div>
+                  <p className="text-sm sm:text-base text-muted-foreground">
                     {language === 'ar'
                       ? 'الوصول السريع إلى خدماتنا الأساسية'
                       : 'Accès rapide à nos services essentiels'
                     }
                   </p>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
                   <Card 
                     className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50 bg-gradient-to-br from-blue-50 to-blue-100 relative overflow-hidden"
                     onClick={() => navigate('/signup')}
