@@ -1,9 +1,7 @@
-// Abonnements BNRM - Page de gestion des abonnements
+// Abonnements BN - Page de gestion des abonnements
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
+import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -94,40 +92,36 @@ export default function Abonnements() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 py-8">
+      <DigitalLibraryLayout>
+        <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center min-h-[40vh]">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-bn-blue-primary"></div>
           </div>
-        </main>
-        <Footer />
-      </div>
+        </div>
+      </DigitalLibraryLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <main className="container mx-auto px-4 py-8">
+    <DigitalLibraryLayout>
+      <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Back Button */}
-          <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors">
+          <Link to="/digital-library" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors">
             <ArrowLeft className="h-4 w-4" />
-            Retour à l'accueil
+            Retour à la bibliothèque numérique
           </Link>
 
           {/* Header Section */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
-              <UserCheck className="h-8 w-8 text-primary" />
+              <UserCheck className="h-8 w-8 text-bn-blue-primary" />
               <h1 className="text-3xl font-bold text-foreground">
-                Abonnements BNRM
+                Abonnements
               </h1>
             </div>
             <p className="text-muted-foreground text-lg">
-              Découvrez nos différentes formules d'abonnement à la Bibliothèque Nationale
+              Découvrez nos différentes formules d'abonnement à la Bibliothèque Numérique Marocaine
             </p>
           </div>
 
@@ -158,7 +152,7 @@ export default function Abonnements() {
                         <CardTitle className="text-lg">{service.nom_service}</CardTitle>
                       </div>
                     </div>
-                    <Badge className="bg-blue-100 text-blue-800">
+                    <Badge className="bg-bn-blue-primary/10 text-bn-blue-primary">
                       Abonnement
                     </Badge>
                   </CardHeader>
@@ -232,12 +226,7 @@ export default function Abonnements() {
             </div>
           )}
         </div>
-      </main>
-      
-      <Footer />
-      
-      {/* Outils globaux (Accessibilité + Chatbot) */}
-      <GlobalAccessibilityTools />
+      </div>
 
       {/* Registration Dialog - only render when service exists */}
       {selectedServiceForRegistration && (
@@ -248,6 +237,6 @@ export default function Abonnements() {
           tariff={selectedTariffForRegistration}
         />
       )}
-    </div>
+    </DigitalLibraryLayout>
   );
 }
