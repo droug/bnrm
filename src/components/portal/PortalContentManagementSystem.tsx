@@ -13,6 +13,7 @@ import CmsHeroManagerPortal from "@/components/cms/CmsHeroManagerPortal";
 import CmsStyleManager from "@/components/cms/CmsStyleManager";
 import CmsMediathequeManager from "@/components/cms/CmsMediathequeManager";
 import CmsDigitalServicesManager from "@/components/cms/CmsDigitalServicesManager";
+import CmsWysiwygModule from "@/components/cms/CmsWysiwygModule";
 import {
   FileText, 
   Webhook, 
@@ -34,7 +35,8 @@ import {
   Users,
   BookOpen,
   Palette,
-  Settings2
+  Settings2,
+  PenSquare
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -53,6 +55,16 @@ const tabs = [
     borderColor: "border-blue-500/30",
     gradient: "from-blue-500/20 to-blue-600/5",
     description: "Section Hero de la page d'accueil"
+  },
+  { 
+    id: "wysiwyg", 
+    label: "Éditeur WYSIWYG", 
+    icon: PenSquare, 
+    color: "text-pink-600",
+    bgColor: "bg-pink-500/10",
+    borderColor: "border-pink-500/30",
+    gradient: "from-pink-500/20 to-pink-600/5",
+    description: "Éditeur visuel multilingue"
   },
   { 
     id: "styles", 
@@ -297,6 +309,8 @@ export default function PortalContentManagementSystem() {
     switch (activeTab) {
       case "hero":
         return <CmsHeroManagerPortal />;
+      case "wysiwyg":
+        return <CmsWysiwygModule />;
       case "styles":
         return <CmsStyleManager />;
       case "services-numeriques":
