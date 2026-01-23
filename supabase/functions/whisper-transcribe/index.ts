@@ -36,6 +36,21 @@ serve(async (req) => {
 
     console.log(`Processing transcription for file: ${audioFile.name}, size: ${audioFile.size}, type: ${audioFile.type}, language: ${language}`);
 
+    // Check file size limit (5MB max to avoid memory issues with base64 encoding)
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+    if (audioFile.size > MAX_FILE_SIZE) {
+      console.error(`File too large: ${audioFile.size} bytes (max: ${MAX_FILE_SIZE} bytes)`);
+      return new Response(
+        JSON.stringify({ 
+          error: "Fichier trop volumineux pour cette méthode. Limite: 5MB. Utilisez OpenAI Whisper pour les fichiers plus grands.",
+          code: "FILE_TOO_LARGE",
+          maxSize: MAX_FILE_SIZE,
+          actualSize: audioFile.size
+        }),
+        { status: 413, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     // Convert audio file to base64
     const audioBytes = await audioFile.arrayBuffer();
     const base64Audio = btoa(
