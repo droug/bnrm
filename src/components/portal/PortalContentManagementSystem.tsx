@@ -58,6 +58,16 @@ const tabs = [
     description: "Section Hero de la page d'accueil"
   },
   { 
+    id: "seo", 
+    label: "SEO & Référencement", 
+    icon: TrendingUp, 
+    color: "text-green-600",
+    bgColor: "bg-green-500/10",
+    borderColor: "border-green-500/30",
+    gradient: "from-green-500/20 to-green-600/5",
+    description: "Optimisation moteurs de recherche"
+  },
+  { 
     id: "wysiwyg", 
     label: "Éditeur WYSIWYG", 
     icon: PenSquare, 
@@ -216,16 +226,6 @@ const tabs = [
     borderColor: "border-gray-500/30",
     gradient: "from-gray-500/20 to-gray-600/5",
     description: "Intégrations et notifications"
-  },
-  { 
-    id: "seo", 
-    label: "SEO & Référencement", 
-    icon: TrendingUp, 
-    color: "text-emerald-500",
-    bgColor: "bg-emerald-500/10",
-    borderColor: "border-emerald-500/30",
-    gradient: "from-emerald-500/20 to-emerald-600/5",
-    description: "Optimisation moteurs de recherche"
   },
 ];
 
