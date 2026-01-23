@@ -37,13 +37,17 @@ serve(async (req) => {
 
     console.log(`Processing transcription for file: ${audioFile.name}, size: ${audioFile.size}, type: ${audioFile.type}, language: ${language}`);
 
-    // Check file size limit (10MB max to avoid memory issues with base64 encoding)
-    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    // Check file size limit.
+    // NOTE: This function base64-encodes the entire file and JSON-stringifies it for the
+    // Lovable AI Gateway. That multiplies memory usage (binary + base64 string + JSON),
+    // and can easily exceed the Supabase Edge worker memory budget.
+    // Keep this conservative so we return a controlled 413 + UI fallback instead of 546.
+    const MAX_FILE_SIZE = 4 * 1024 * 1024; // 4MB
     if (audioFile.size > MAX_FILE_SIZE) {
       console.error(`File too large: ${audioFile.size} bytes (max: ${MAX_FILE_SIZE} bytes)`);
       return new Response(
         JSON.stringify({ 
-          error: "Fichier trop volumineux pour cette méthode. Limite: 10MB. Utilisez la méthode locale ou OpenAI Whisper pour les fichiers plus grands.",
+          error: "Fichier trop volumineux pour cette méthode (encodage base64). Utilisez la méthode locale ou OpenAI Whisper pour les fichiers plus grands.",
           code: "FILE_TOO_LARGE",
           maxSize: MAX_FILE_SIZE,
           actualSize: audioFile.size,
@@ -53,9 +57,11 @@ serve(async (req) => {
       );
     }
 
-    // Convert audio file to base64 (efficient, avoids O(n^2) string concatenation)
-    const bytes = new Uint8Array(await audioFile.arrayBuffer());
+    // Convert audio file to base64 (this is the primary memory hotspot)
+    let bytes = new Uint8Array(await audioFile.arrayBuffer());
     const base64Audio = encodeBase64(bytes);
+    // Hint GC to release the binary buffer ASAP (helps reduce peak memory)
+    bytes = new Uint8Array(0);
 
     // Determine MIME type
     let mimeType = audioFile.type || "audio/mpeg";
