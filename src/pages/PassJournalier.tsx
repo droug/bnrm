@@ -166,7 +166,7 @@ export default function PassJournalier() {
             <CardContent>
               <Button
                 variant="outline"
-                onClick={() => navigate("/abonnements")}
+                onClick={() => navigate("/abonnements?platform=portal")}
                 className="w-full"
               >
                 Voir les formules d'abonnement

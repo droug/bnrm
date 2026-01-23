@@ -499,7 +499,7 @@ export default function Auth() {
                       type="button"
                       variant="outline"
                       className="w-full h-12 border-2 hover:border-amber-500 hover:bg-amber-500/5 transition-all group"
-                      onClick={() => navigate("/abonnements")}
+                      onClick={() => navigate("/abonnements?platform=portal")}
                     >
                       <Library className="h-5 w-5 mr-2 text-amber-600" />
                       <span>Adhésion bibliothèque numérique</span>
