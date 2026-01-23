@@ -533,7 +533,7 @@ export default function DocumentDetails() {
                         <Button 
                           size="sm" 
                           className="mt-3 bg-amber-600 hover:bg-amber-700 text-white"
-                          onClick={() => navigate('/abonnements')}
+                          onClick={() => navigate('/abonnements?platform=bn')}
                         >
                           Souscrire à une adhésion
                         </Button>

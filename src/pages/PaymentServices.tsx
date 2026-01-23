@@ -60,7 +60,7 @@ export default function PaymentServices() {
         "Paiement flexible",
         "Support client"
       ],
-      action: () => navigate("/abonnements?type=abonnements"),
+      action: () => navigate("/abonnements?platform=portal&type=abonnements"),
       available: true
     },
     {

@@ -221,7 +221,7 @@ const Index = () => {
 
                   <Card 
                     className="group cursor-pointer hover:shadow-2xl hover:scale-105 transition-all duration-300 border-2 hover:border-primary/50 bg-gradient-to-br from-blue-50 to-blue-100 relative overflow-hidden"
-                    onClick={() => navigate('/abonnements')}
+                    onClick={() => navigate('/abonnements?platform=portal')}
                   >
                     <div 
                       className="absolute inset-0 opacity-10 bg-cover bg-center"
