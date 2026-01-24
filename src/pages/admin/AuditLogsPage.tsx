@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -24,13 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { AuditFilterAutocomplete } from "@/components/admin/audit/AuditFilterAutocomplete";
 import {
   Table,
   TableBody,
@@ -354,8 +348,22 @@ export default function AuditLogsPage() {
   const [activeTab, setActiveTab] = useState('logs');
 
   const { data: logsData, isLoading, refetch, isFetching } = useAuditLogs(filters, page);
-  const { data: filterOptions } = useAuditLogFilterOptions();
   const { data: stats } = useAuditStats(30);
+
+  // Build autocomplete options from labels
+  const actionOptions = useMemo(() => 
+    Object.entries(ACTION_LABELS)
+      .map(([value, label]) => ({ value, label }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
+    []
+  );
+
+  const resourceOptions = useMemo(() => 
+    Object.entries(RESOURCE_LABELS)
+      .map(([value, label]) => ({ value, label }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
+    []
+  );
 
   const handleFilterChange = (key: keyof AuditLogFilters, value: string | undefined) => {
     setFilters(prev => ({ ...prev, [key]: value === 'all' ? undefined : value }));
@@ -437,43 +445,21 @@ export default function AuditLogsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <Select
-                      value={filters.action || 'all'}
-                      onValueChange={(v) => handleFilterChange('action', v)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Action" />
-                      </SelectTrigger>
-                      <SelectContent className="max-h-[300px]">
-                        <SelectItem value="all">Toutes les actions</SelectItem>
-                        {Object.entries(ACTION_LABELS)
-                          .sort((a, b) => a[1].localeCompare(b[1]))
-                          .map(([key, label]) => (
-                            <SelectItem key={key} value={key}>
-                              {label}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
+                    <AuditFilterAutocomplete
+                      options={actionOptions}
+                      value={filters.action}
+                      onChange={(v) => handleFilterChange('action', v)}
+                      placeholder="Action"
+                      allLabel="Toutes les actions"
+                    />
 
-                    <Select
-                      value={filters.resource_type || 'all'}
-                      onValueChange={(v) => handleFilterChange('resource_type', v)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Type de ressource" />
-                      </SelectTrigger>
-                      <SelectContent className="max-h-[300px]">
-                        <SelectItem value="all">Tous les types</SelectItem>
-                        {Object.entries(RESOURCE_LABELS)
-                          .sort((a, b) => a[1].localeCompare(b[1]))
-                          .map(([key, label]) => (
-                            <SelectItem key={key} value={key}>
-                              {label}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
+                    <AuditFilterAutocomplete
+                      options={resourceOptions}
+                      value={filters.resource_type}
+                      onChange={(v) => handleFilterChange('resource_type', v)}
+                      placeholder="Type de ressource"
+                      allLabel="Tous les types"
+                    />
 
                     <Input
                       type="date"
