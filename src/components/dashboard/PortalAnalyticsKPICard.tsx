@@ -12,7 +12,8 @@ import {
   Globe2, TrendingUp, MessageSquare, Share2, Zap, BarChart3,
   RefreshCw, Video, Bot, Cpu, Map, ArrowUpRight, ArrowDownRight,
   Calendar, Activity, Target, Gauge, Wallet, Smartphone, CreditCard,
-  Download, ShoppingCart, Building2, DollarSign
+  Download, ShoppingCart, Building2, DollarSign, BookOpen, Library,
+  BookMarked, Timer, Play, Image, Headphones
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend, AreaChart, Area } from "recharts";
 import { cn } from "@/lib/utils";
@@ -108,6 +109,37 @@ interface KPIData {
       totalTopUps: number;
       totalSpent: number;
       currency: string;
+    };
+  };
+  digitalLibrary: {
+    consultations: {
+      total: number;
+      bySupport: { type: string; count: number }[];
+      byAuthor: { author: string; count: number }[];
+      byPublisher: { publisher: string; count: number }[];
+    };
+    topWorks: {
+      mostConsulted: { title: string; author: string; views: number }[];
+      mostSearched: { title: string; searches: number }[];
+      mostDownloaded: { title: string; author: string; downloads: number }[];
+    };
+    topAuthors: { name: string; consultations: number; reads: number }[];
+    reading: {
+      totalReadingTime: number; // in minutes
+      avgReadingTimePerUser: number; // in minutes
+      totalSessions: number;
+      avgSessionDuration: number; // in minutes
+    };
+    downloads: {
+      total: number;
+      trend: number;
+      byFormat: { format: string; count: number }[];
+    };
+    readerModules: {
+      pdfViewer: { sessions: number; avgDuration: number };
+      flipbook: { sessions: number; avgDuration: number };
+      imageViewer: { sessions: number; avgDuration: number };
+      audioPlayer: { sessions: number; avgDuration: number };
     };
   };
 }
@@ -310,6 +342,83 @@ export function PortalAnalyticsKPICard({ platform = "portail", dateRange }: Port
             currency: 'MAD',
           },
         },
+        digitalLibrary: {
+          consultations: {
+            total: 45678,
+            bySupport: [
+              { type: 'Livres', count: 18500 },
+              { type: 'Périodiques', count: 12340 },
+              { type: 'Manuscrits', count: 8900 },
+              { type: 'Cartes', count: 3200 },
+              { type: 'Photos', count: 2738 },
+            ],
+            byAuthor: [
+              { author: 'Ibn Khaldoun', count: 2340 },
+              { author: 'Al-Idrisi', count: 1890 },
+              { author: 'Ibn Battouta', count: 1650 },
+              { author: 'Al-Khawarizmi', count: 1420 },
+              { author: 'Ibn Rushd', count: 1180 },
+            ],
+            byPublisher: [
+              { publisher: 'BNRM', count: 8900 },
+              { publisher: 'Dar Al-Maarif', count: 5600 },
+              { publisher: 'Éditions Universitaires', count: 4200 },
+              { publisher: 'Imprimerie Royale', count: 3800 },
+            ],
+          },
+          topWorks: {
+            mostConsulted: [
+              { title: 'المقدمة', author: 'ابن خلدون', views: 2340 },
+              { title: 'رحلة ابن بطوطة', author: 'ابن بطوطة', views: 1890 },
+              { title: 'نزهة المشتاق', author: 'الإدريسي', views: 1650 },
+              { title: 'الجبر والمقابلة', author: 'الخوارزمي', views: 1420 },
+              { title: 'تهافت التهافت', author: 'ابن رشد', views: 1180 },
+            ],
+            mostSearched: [
+              { title: 'مخطوطات قرآنية', searches: 3450 },
+              { title: 'تاريخ المغرب', searches: 2890 },
+              { title: 'الأدب العربي', searches: 2340 },
+              { title: 'الفلسفة الإسلامية', searches: 1980 },
+              { title: 'العلوم الطبيعية', searches: 1650 },
+            ],
+            mostDownloaded: [
+              { title: 'المقدمة', author: 'ابن خلدون', downloads: 890 },
+              { title: 'رحلة ابن بطوطة', author: 'ابن بطوطة', downloads: 756 },
+              { title: 'نزهة المشتاق', author: 'الإدريسي', downloads: 623 },
+              { title: 'الجبر والمقابلة', author: 'الخوارزمي', downloads: 534 },
+              { title: 'تهافت التهافت', author: 'ابن رشد', downloads: 445 },
+            ],
+          },
+          topAuthors: [
+            { name: 'ابن خلدون', consultations: 4560, reads: 2340 },
+            { name: 'ابن بطوطة', consultations: 3890, reads: 1890 },
+            { name: 'الإدريسي', consultations: 3200, reads: 1650 },
+            { name: 'الخوارزمي', consultations: 2800, reads: 1420 },
+            { name: 'ابن رشد', consultations: 2450, reads: 1180 },
+          ],
+          reading: {
+            totalReadingTime: 125600, // minutes
+            avgReadingTimePerUser: 23.5, // minutes
+            totalSessions: 34500,
+            avgSessionDuration: 12.8, // minutes
+          },
+          downloads: {
+            total: 8934,
+            trend: 18.5,
+            byFormat: [
+              { format: 'PDF', count: 5600 },
+              { format: 'EPUB', count: 1890 },
+              { format: 'Image HD', count: 1200 },
+              { format: 'Audio', count: 244 },
+            ],
+          },
+          readerModules: {
+            pdfViewer: { sessions: 18500, avgDuration: 15.2 },
+            flipbook: { sessions: 8900, avgDuration: 22.5 },
+            imageViewer: { sessions: 4200, avgDuration: 8.3 },
+            audioPlayer: { sessions: 2400, avgDuration: 35.6 },
+          },
+        },
       };
 
       setKpiData(kpi);
@@ -400,7 +509,7 @@ export function PortalAnalyticsKPICard({ platform = "portail", dateRange }: Port
 
       <CardContent className="p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-flex">
+          <TabsList className="grid w-full grid-cols-7 lg:w-auto lg:inline-flex">
             <TabsTrigger value="overview" className="gap-2">
               <Activity className="h-4 w-4" />
               Vue d'ensemble
@@ -408,6 +517,10 @@ export function PortalAnalyticsKPICard({ platform = "portail", dateRange }: Port
             <TabsTrigger value="engagement" className="gap-2">
               <Target className="h-4 w-4" />
               Engagement
+            </TabsTrigger>
+            <TabsTrigger value="digital-library" className="gap-2">
+              <Library className="h-4 w-4" />
+              Bibliothèque
             </TabsTrigger>
             <TabsTrigger value="search" className="gap-2">
               <Search className="h-4 w-4" />
@@ -738,6 +851,336 @@ export function PortalAnalyticsKPICard({ platform = "portail", dateRange }: Port
                       </div>
                     </div>
                   </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Digital Library Tab */}
+          <TabsContent value="digital-library" className="space-y-6">
+            {/* Main KPIs */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Card className="bg-gradient-to-br from-amber-50 to-amber-100/50 border-amber-200">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-amber-700">Documents Consultés</CardTitle>
+                  <BookOpen className="h-4 w-4 text-amber-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-amber-900">{formatNumber(kpiData.digitalLibrary.consultations.total)}</div>
+                  <p className="text-xs text-muted-foreground">documents numérisés</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 border-emerald-200">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-emerald-700">Temps de Lecture Cumulé</CardTitle>
+                  <Timer className="h-4 w-4 text-emerald-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-emerald-900">
+                    {formatNumber(Math.floor(kpiData.digitalLibrary.reading.totalReadingTime / 60))}h
+                  </div>
+                  <p className="text-xs text-muted-foreground">heures de lecture</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-sky-50 to-sky-100/50 border-sky-200">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-sky-700">Temps Moyen / Utilisateur</CardTitle>
+                  <Clock className="h-4 w-4 text-sky-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-sky-900">{kpiData.digitalLibrary.reading.avgReadingTimePerUser.toFixed(1)} min</div>
+                  <p className="text-xs text-muted-foreground">par session</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-violet-50 to-violet-100/50 border-violet-200">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-violet-700">Téléchargements</CardTitle>
+                  <Download className="h-4 w-4 text-violet-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-violet-900">{formatNumber(kpiData.digitalLibrary.downloads.total)}</div>
+                  <div className="flex items-center gap-1 mt-1">
+                    <ArrowUpRight className="h-3 w-3 text-emerald-600" />
+                    <span className="text-xs text-emerald-600">+{kpiData.digitalLibrary.downloads.trend}%</span>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Consultations by Support Type */}
+            <div className="grid gap-6 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <FileText className="h-5 w-5" />
+                    Consultations par Type de Support
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <BarChart data={kpiData.digitalLibrary.consultations.bySupport} layout="vertical">
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis type="number" />
+                      <YAxis dataKey="type" type="category" width={100} />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <BookMarked className="h-5 w-5" />
+                    Œuvres les Plus Consultées
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ScrollArea className="h-[250px]">
+                    <div className="space-y-3">
+                      {kpiData.digitalLibrary.topWorks.mostConsulted.map((work, i) => (
+                        <div key={i} className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                          <div className="flex items-center gap-3">
+                            <Badge variant="outline">{i + 1}</Badge>
+                            <div>
+                              <div className="font-medium text-right" dir="rtl">{work.title}</div>
+                              <div className="text-xs text-muted-foreground text-right" dir="rtl">{work.author}</div>
+                            </div>
+                          </div>
+                          <Badge variant="secondary">{formatNumber(work.views)} vues</Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Most Searched & Top Authors */}
+            <div className="grid gap-6 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Search className="h-5 w-5" />
+                    Œuvres les Plus Recherchées
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ScrollArea className="h-[250px]">
+                    <div className="space-y-3">
+                      {kpiData.digitalLibrary.topWorks.mostSearched.map((work, i) => (
+                        <div key={i} className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <Badge variant="outline">{i + 1}</Badge>
+                            <span className="font-medium" dir="rtl">{work.title}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm text-muted-foreground">{formatNumber(work.searches)}</span>
+                            <Progress value={(work.searches / kpiData.digitalLibrary.topWorks.mostSearched[0].searches) * 100} className="w-20" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Users className="h-5 w-5" />
+                    Auteurs les Plus Consultés / Lus
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ScrollArea className="h-[250px]">
+                    <div className="space-y-3">
+                      {kpiData.digitalLibrary.topAuthors.map((author, i) => (
+                        <div key={i} className="p-3 rounded-lg bg-muted/50">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline">{i + 1}</Badge>
+                              <span className="font-medium" dir="rtl">{author.name}</span>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-sm">
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Consultations:</span>
+                              <span className="font-medium">{formatNumber(author.consultations)}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span className="text-muted-foreground">Lectures:</span>
+                              <span className="font-medium">{formatNumber(author.reads)}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Downloads & Reading Modules */}
+            <div className="grid gap-6 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Download className="h-5 w-5" />
+                    Téléchargements par Format
+                  </CardTitle>
+                  <CardDescription>Œuvres les plus téléchargées</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <ResponsiveContainer width="100%" height={150}>
+                      <PieChart>
+                        <Pie
+                          data={kpiData.digitalLibrary.downloads.byFormat}
+                          dataKey="count"
+                          nameKey="format"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={60}
+                          label={({ format, percent }) => `${format}: ${(percent * 100).toFixed(0)}%`}
+                        >
+                          {kpiData.digitalLibrary.downloads.byFormat.map((_, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                    
+                    <div className="border-t pt-4">
+                      <h4 className="text-sm font-medium mb-2">Top Téléchargements</h4>
+                      <div className="space-y-2">
+                        {kpiData.digitalLibrary.topWorks.mostDownloaded.slice(0, 3).map((work, i) => (
+                          <div key={i} className="flex items-center justify-between text-sm">
+                            <span className="truncate" dir="rtl">{work.title}</span>
+                            <Badge variant="outline">{work.downloads}</Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Play className="h-5 w-5" />
+                    Utilisation des Modules de Lecture
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-rose-500/10">
+                          <FileText className="h-4 w-4 text-rose-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium">Lecteur PDF</div>
+                          <div className="text-xs text-muted-foreground">{formatNumber(kpiData.digitalLibrary.readerModules.pdfViewer.sessions)} sessions</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold">{kpiData.digitalLibrary.readerModules.pdfViewer.avgDuration} min</div>
+                        <div className="text-xs text-muted-foreground">durée moy.</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-amber-500/10">
+                          <BookOpen className="h-4 w-4 text-amber-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium">Flipbook</div>
+                          <div className="text-xs text-muted-foreground">{formatNumber(kpiData.digitalLibrary.readerModules.flipbook.sessions)} sessions</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold">{kpiData.digitalLibrary.readerModules.flipbook.avgDuration} min</div>
+                        <div className="text-xs text-muted-foreground">durée moy.</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-sky-500/10">
+                          <Image className="h-4 w-4 text-sky-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium">Visionneuse Images</div>
+                          <div className="text-xs text-muted-foreground">{formatNumber(kpiData.digitalLibrary.readerModules.imageViewer.sessions)} sessions</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold">{kpiData.digitalLibrary.readerModules.imageViewer.avgDuration} min</div>
+                        <div className="text-xs text-muted-foreground">durée moy.</div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-violet-500/10">
+                          <Headphones className="h-4 w-4 text-violet-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium">Lecteur Audio</div>
+                          <div className="text-xs text-muted-foreground">{formatNumber(kpiData.digitalLibrary.readerModules.audioPlayer.sessions)} sessions</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="font-bold">{kpiData.digitalLibrary.readerModules.audioPlayer.avgDuration} min</div>
+                        <div className="text-xs text-muted-foreground">durée moy.</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Consultations by Author & Publisher */}
+            <div className="grid gap-6 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Consultations par Auteur</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <BarChart data={kpiData.digitalLibrary.consultations.byAuthor}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="author" tick={{ fontSize: 10 }} />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="#8884D8" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Consultations par Éditeur</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <BarChart data={kpiData.digitalLibrary.consultations.byPublisher}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="publisher" tick={{ fontSize: 10 }} />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="#82CA9D" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </CardContent>
               </Card>
             </div>
