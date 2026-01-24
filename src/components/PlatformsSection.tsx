@@ -106,16 +106,16 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                 ];
                 
                 // Slightly varied heights for natural look
-                const heights = ['h-[545px]', 'h-[552px]', 'h-[548px]', 'h-[555px]'];
+                const heights = ['h-[545px]', 'h-[552px]', 'h-[550px]', 'h-[555px]'];
                 
                 // Natural tilt angles - books lean against each other realistically
-                const tiltAngles = ['3.5deg', '1.2deg', '-2.8deg', '2deg'];
+                const tiltAngles = ['3.5deg', '1.2deg', '-1.5deg', '2deg'];
                 
-                // Subtle vertical offsets for depth
-                const translateY = ['-3px', '2px', '-6px', '0px'];
+                // Subtle vertical offsets for depth (index 2 fixed to sit on shelf)
+                const translateY = ['-3px', '2px', '0px', '0px'];
                 
                 // Books slightly pulled forward/back from shelf
-                const translateX = ['2px', '-1px', '3px', '-2px'];
+                const translateX = ['2px', '-1px', '1px', '-2px'];
                 
                 // Shadow depths for 3D effect
                 const shadowDepths = [
@@ -173,10 +173,10 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                       </div>
                       
                       {/* Book title - vertical at bottom */}
-                      <div className="absolute bottom-32 left-1/2 -translate-x-1/2 flex items-center justify-center w-full px-2">
-                        <div className="transform -rotate-90 origin-center whitespace-nowrap">
-                          <span className="text-white font-bold text-base tracking-[0.25em] uppercase drop-shadow-md">
-                            {platform.title}
+                      <div className="absolute bottom-28 left-1/2 -translate-x-1/2 flex items-center justify-center w-full px-2 overflow-hidden">
+                        <div className="transform -rotate-90 origin-center whitespace-nowrap max-w-[400px]">
+                          <span className="text-white font-bold text-sm tracking-[0.2em] uppercase drop-shadow-md">
+                            {platform.title.length > 15 ? platform.title.substring(0, 15) + '...' : platform.title}
                           </span>
                         </div>
                       </div>
