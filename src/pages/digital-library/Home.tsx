@@ -32,6 +32,11 @@ import manuscritsAndalous from "@/assets/digital-library/manuscrits-andalous.jpg
 import documentsAdministratifs from "@/assets/digital-library/documents-administratifs.jpg";
 import libraryBanner from "@/assets/digital-library/library-banner.jpg";
 import virtualExhibitionBg from "@/assets/virtual-exhibition-bg.png";
+// Logos ressources électroniques
+import logoBrill from "@/assets/logos/logo-brill.png";
+import logoCairn from "@/assets/logos/logo-cairn.svg";
+import logoRfn from "@/assets/logos/logo-rfn.png";
+import logoEuropeana from "@/assets/logos/logo-europeana.svg";
 
 export default function DigitalLibraryHome() {
   const navigate = useNavigate();
@@ -805,20 +810,15 @@ export default function DigitalLibraryHome() {
                 {/* BRILL */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
                   <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
-                      <div className="flex items-center justify-center gap-4">
-                        <div className="w-14 h-14 bg-bn-blue-primary rounded-md flex items-center justify-center">
-                          <svg viewBox="0 0 24 24" className="w-9 h-9" fill="none" aria-hidden="true">
-                            <path d="M9 18V7h5.2c2.2 0 3.8 1.4 3.8 3.2 0 1.6-1 2.8-2.6 3.1l2.4 4.5h-2.4L13.3 14H11v4H9z" fill="white" />
-                          </svg>
-                        </div>
-                        <span className="font-heading text-[30px] tracking-[0.14em] text-bn-blue-primary">BRILL</span>
+                    <CardHeader className="text-center pt-8 pb-4 h-[140px] flex flex-col justify-center">
+                      <div className="flex items-center justify-center h-12 mb-2">
+                        <img src={logoBrill} alt="BRILL" className="max-h-10 max-w-[180px] object-contain" />
                       </div>
                       <a
                         href="https://brill.com/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold"
+                        className="mt-2 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold text-sm"
                       >
                         brill.com
                       </a>
@@ -826,7 +826,7 @@ export default function DigitalLibraryHome() {
                     <CardContent className="px-8 pb-8 flex flex-col">
                       <div className="h-[120px] overflow-hidden">
                         <p className="text-muted-foreground text-sm leading-relaxed text-justify line-clamp-5">
-                          Brill est une maison d'édition académique néerlandaise fondée en 1683 à Leiden. Elle publie des livres, des revues scientifiques et des ouvrages de référence dans les domaines des sciences humaines, du droit international, des études islamiques et orientales, de la linguistique et de l'histoire.
+                          Brill est une maison d'édition académique néerlandaise fondée en 1683 à Leiden. Elle publie des livres, des revues scientifiques et des ouvrages de référence dans les domaines des sciences humaines, du droit international, des études islamiques et orientales.
                         </p>
                       </div>
                       <div className="flex justify-end mt-6">
@@ -880,28 +880,17 @@ export default function DigitalLibraryHome() {
                 {/* CAIRN */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
                   <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
-                      <div className="flex items-center justify-center gap-3">
-                        <svg viewBox="0 0 32 32" className="w-10 h-10 text-bn-blue-primary" fill="currentColor" aria-hidden="true">
-                          <path d="M8 6l6 6-6 6-6-6 6-6zm12 0l6 6-6 6-6-6 6-6zm-6 12l6 6-6 6-6-6 6-6z" />
-                        </svg>
-                        <div className="text-left">
-                          <div className="leading-none">
-                            <span className="font-heading text-[26px] tracking-[0.18em] text-bn-blue-primary">CAIRN</span>
-                            <span className="font-heading text-[26px] tracking-[0.18em] text-muted-foreground/60">.INF</span>
-                          </div>
-                          <div className="mt-1 text-xs tracking-[0.14em] text-bn-blue-primary font-semibold">
-                            SCIENCES HUMAINES &amp; SOCIALES
-                          </div>
-                        </div>
+                    <CardHeader className="text-center pt-8 pb-4 h-[140px] flex flex-col justify-center">
+                      <div className="flex items-center justify-center h-12 mb-2">
+                        <img src={logoCairn} alt="CAIRN.INFO" className="max-h-10 max-w-[180px] object-contain" />
                       </div>
                       <a
                         href="https://shs.cairn.info/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold"
+                        className="mt-2 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold text-sm"
                       >
-                        Cairn.info
+                        cairn.info
                       </a>
                     </CardHeader>
                     <CardContent className="px-8 pb-8 flex flex-col">
@@ -927,9 +916,11 @@ export default function DigitalLibraryHome() {
                 {/* RFN */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
                   <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
-                      <div className="font-heading text-[42px] font-semibold text-bn-blue-primary">RFN</div>
-                      <a href="https://rfnum.org" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold">
+                    <CardHeader className="text-center pt-8 pb-4 h-[140px] flex flex-col justify-center">
+                      <div className="flex items-center justify-center h-12 mb-2">
+                        <img src={logoRfn} alt="RFN" className="max-h-10 max-w-[180px] object-contain" />
+                      </div>
+                      <a href="https://rfnum.org" target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold text-sm">
                         rfnum.org
                       </a>
                     </CardHeader>
@@ -951,9 +942,11 @@ export default function DigitalLibraryHome() {
                 {/* Europeana */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
                   <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
-                      <div className="font-heading text-[42px] font-semibold text-bn-blue-primary">Europeana</div>
-                      <a href="https://www.europeana.eu" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold">
+                    <CardHeader className="text-center pt-8 pb-4 h-[140px] flex flex-col justify-center">
+                      <div className="flex items-center justify-center h-12 mb-2">
+                        <img src={logoEuropeana} alt="Europeana" className="max-h-10 max-w-[180px] object-contain" />
+                      </div>
+                      <a href="https://www.europeana.eu" target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold text-sm">
                         europeana.eu
                       </a>
                     </CardHeader>
@@ -975,9 +968,11 @@ export default function DigitalLibraryHome() {
                 {/* IFLA */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
                   <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
-                      <div className="font-heading text-[42px] font-semibold text-bn-blue-primary">IFLA</div>
-                      <a href="https://www.ifla.org" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold">
+                    <CardHeader className="text-center pt-8 pb-4 h-[140px] flex flex-col justify-center">
+                      <div className="flex items-center justify-center h-12 mb-2">
+                        <span className="font-heading text-[36px] font-bold text-bn-blue-primary">IFLA</span>
+                      </div>
+                      <a href="https://www.ifla.org" target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold text-sm">
                         ifla.org
                       </a>
                     </CardHeader>
