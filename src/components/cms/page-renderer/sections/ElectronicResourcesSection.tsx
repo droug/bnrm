@@ -110,21 +110,21 @@ export function ElectronicResourcesSection({ section, language }: SectionProps) 
               <ChevronLeft className="h-8 w-8" />
             </button>
 
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6">
               {visibleResources.map((resource) => (
-                <Card key={resource.id} className="bg-white hover:shadow-lg transition-shadow group flex flex-col">
-                  <CardContent className="p-6 text-center flex flex-col flex-1">
+                <Card key={resource.id} className="bg-white hover:shadow-lg transition-shadow group">
+                  <CardContent className="p-6 text-center h-[280px] flex flex-col">
                     {/* Logo/Name - Fixed height container */}
-                    <div className="h-16 flex items-center justify-center mb-4">
+                    <div className="h-14 flex items-center justify-center mb-3 shrink-0">
                       {resource.logo ? (
                         <img 
                           src={resource.logo} 
                           alt={resource.name}
-                          className="max-h-12 max-w-full object-contain"
+                          className="max-h-10 max-w-[180px] object-contain"
                           onError={(e) => {
-                            // Fallback to text if logo fails to load
                             e.currentTarget.style.display = 'none';
-                            e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                            const sibling = e.currentTarget.nextElementSibling as HTMLElement;
+                            if (sibling) sibling.classList.remove('hidden');
                           }}
                         />
                       ) : null}
@@ -133,15 +133,17 @@ export function ElectronicResourcesSection({ section, language }: SectionProps) 
                       </span>
                     </div>
                     
-                    {/* Description - Fixed height with line clamp */}
-                    <p className="text-sm text-slate-text mb-4 flex-1 line-clamp-3 min-h-[3.75rem]">
-                      {language === 'ar' && resource.descriptionAr 
-                        ? resource.descriptionAr 
-                        : resource.description}
-                    </p>
+                    {/* Description - Fixed height */}
+                    <div className="h-[120px] overflow-hidden mb-3 shrink-0">
+                      <p className="text-sm text-slate-text line-clamp-5">
+                        {language === 'ar' && resource.descriptionAr 
+                          ? resource.descriptionAr 
+                          : resource.description}
+                      </p>
+                    </div>
                     
-                    {/* Button - Always at bottom, aligned */}
-                    <div className="mt-auto pt-2">
+                    {/* Button - Always at the same position */}
+                    <div className="mt-auto shrink-0">
                       <a 
                         href={resource.url}
                         target="_blank"
