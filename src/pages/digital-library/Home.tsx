@@ -4,7 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookOpen, FileText, Image, Music, Calendar, Sparkles, Globe, ExternalLink, Layers, Eye, ChevronLeft, ChevronRight } from "lucide-react";
+import { BookOpen, FileText, Image, Music, Calendar, Sparkles, Globe, ExternalLink, Layers, Eye } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { Link, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import SEOHead from "@/components/seo/SEOHead";
@@ -772,14 +773,7 @@ export default function DigitalLibraryHome() {
           <div className="text-center mb-14">
             {/* Icône dorée (grille + plus) */}
             <div className="inline-flex items-center justify-center w-12 h-12 border border-gold-bn-primary rounded-lg mb-6">
-              {/* table-box-multiple-outline (MDI) */}
-              <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-gold-bn-primary" aria-hidden="true">
-                <path d="M3 6V18H13V20H1V4H21V13H19V6H3Z" fill="currentColor"/>
-                <path d="M3 11H19V13H3V11Z" fill="currentColor"/>
-                <path d="M8 6V18H10V6H8Z" fill="currentColor"/>
-                <path d="M14 6V13H16V6H14Z" fill="currentColor"/>
-                <path d="M23 15V17H21V19H23V21H21V19H19V21H17V19H19V17H17V15H19V17H21V15H23ZM21 17H19V19H21V17Z" fill="currentColor"/>
-              </svg>
+              <Icon name="mdi:table-box-multiple-outline" className="w-6 h-6 text-gold-bn-primary" />
             </div>
 
             <h2 className="heading-3 text-bn-blue-primary font-heading">
@@ -799,7 +793,7 @@ export default function DigitalLibraryHome() {
               className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
               aria-label="Précédent"
             >
-              <ChevronLeft className="h-6 w-6" strokeWidth={1.5} />
+              <Icon name="mdi:chevron-left" className="h-6 w-6" />
             </button>
 
             {/* Slides */}
@@ -837,7 +831,7 @@ export default function DigitalLibraryHome() {
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors"
                         >
-                          Explorer <ChevronRight className="h-4 w-4" strokeWidth={2} />
+                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
                         </a>
                       </div>
                     </CardContent>
@@ -871,7 +865,7 @@ export default function DigitalLibraryHome() {
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors"
                         >
-                          Explorer <ChevronRight className="h-4 w-4" strokeWidth={2} />
+                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
                         </a>
                       </div>
                     </CardContent>
@@ -907,7 +901,7 @@ export default function DigitalLibraryHome() {
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors"
                         >
-                          Explorer <ChevronRight className="h-4 w-4" strokeWidth={2} />
+                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
                         </a>
                       </div>
                     </CardContent>
@@ -933,7 +927,7 @@ export default function DigitalLibraryHome() {
                       </div>
                       <div className="flex justify-end mt-6">
                         <a href="https://rfnum.org" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors">
-                          Explorer <ChevronRight className="h-4 w-4" strokeWidth={2} />
+                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
                         </a>
                       </div>
                     </CardContent>
@@ -959,7 +953,7 @@ export default function DigitalLibraryHome() {
                       </div>
                       <div className="flex justify-end mt-6">
                         <a href="https://www.europeana.eu" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors">
-                          Explorer <ChevronRight className="h-4 w-4" strokeWidth={2} />
+                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
                         </a>
                       </div>
                     </CardContent>
@@ -985,7 +979,7 @@ export default function DigitalLibraryHome() {
                       </div>
                       <div className="flex justify-end mt-6">
                         <a href="https://www.ifla.org" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors">
-                          Explorer <ChevronRight className="h-4 w-4" strokeWidth={2} />
+                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
                         </a>
                       </div>
                     </CardContent>
@@ -1001,7 +995,7 @@ export default function DigitalLibraryHome() {
               className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
               aria-label="Suivant"
             >
-              <ChevronRight className="h-6 w-6" strokeWidth={1.5} />
+              <Icon name="mdi:chevron-right" className="h-6 w-6" />
             </button>
           </div>
 

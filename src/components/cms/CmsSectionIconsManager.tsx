@@ -9,211 +9,209 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { 
-  Save, Loader2, Search, Check, Grid3X3, 
-  // Section icons
-  Home, Newspaper, Globe, Link2, Video, Footprints, BookOpen, FileText, Image, Music, 
-  Calendar, Sparkles, Layers, Eye, Users, Settings, Database, BarChart3, 
-  LibraryBig, GraduationCap, Building2, Map, Landmark, ScrollText, Archive,
-  FolderOpen, BookMarked, FileStack, Table2, Grid2X2, LayoutGrid, Boxes,
-  Package, Palette, Type, PenTool, Brush, Camera, Film, Mic, Headphones,
-  Bell, Mail, MessageSquare, Phone, Share2, Send, Download, Upload, 
-  ExternalLink, Link, Bookmark, Star, Heart, Award, Trophy, Medal, 
-  Flag, Target, Zap, Lightbulb, Compass, Navigation, MapPin, Clock,
-  Timer, CalendarDays, CalendarRange, History, Undo, Redo, RefreshCw,
-  Filter, SortAsc, List, ListOrdered, AlignLeft, AlignCenter, AlignRight,
-  Bold, Italic, Underline, Strikethrough, Quote, Code, Terminal,
-  Monitor, Smartphone, Tablet, Laptop, Printer, Wifi, Bluetooth,
-  Cloud, Server, HardDrive, Cpu, MemoryStick, CircuitBoard,
-  Lock, Unlock, Key, Shield, ShieldCheck, UserCheck, UserPlus,
-  LogIn, LogOut, ChevronRight, ChevronLeft, ChevronUp, ChevronDown,
-  ArrowRight, ArrowLeft, ArrowUp, ArrowDown, ArrowUpRight, Maximize,
-  Minimize, Plus, Minus, X, Check as CheckIcon, Info, AlertTriangle, AlertCircle,
-  HelpCircle, CircleDot, Circle, Square, Triangle, Hexagon, Pentagon, Octagon
-} from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-// Icon library with categories
-const iconLibrary = {
-  "Navigation": [
-    { name: "Home", icon: Home },
-    { name: "ChevronRight", icon: ChevronRight },
-    { name: "ChevronLeft", icon: ChevronLeft },
-    { name: "ChevronUp", icon: ChevronUp },
-    { name: "ChevronDown", icon: ChevronDown },
-    { name: "ArrowRight", icon: ArrowRight },
-    { name: "ArrowLeft", icon: ArrowLeft },
-    { name: "ArrowUp", icon: ArrowUp },
-    { name: "ArrowDown", icon: ArrowDown },
-    { name: "ArrowUpRight", icon: ArrowUpRight },
-    { name: "ExternalLink", icon: ExternalLink },
-    { name: "Link", icon: Link },
-    { name: "Link2", icon: Link2 },
-    { name: "Compass", icon: Compass },
-    { name: "Navigation", icon: Navigation },
-    { name: "MapPin", icon: MapPin },
-    { name: "Map", icon: Map },
+// Complete MDI icon library organized by category
+const mdiIconLibrary: Record<string, string[]> = {
+  "Bibliothèque & Documents": [
+    "mdi:library",
+    "mdi:book-open-page-variant-outline",
+    "mdi:book-multiple",
+    "mdi:book-outline",
+    "mdi:bookshelf",
+    "mdi:file-document-outline",
+    "mdi:file-multiple-outline",
+    "mdi:folder-outline",
+    "mdi:folder-open-outline",
+    "mdi:archive-outline",
+    "mdi:script-text-outline",
+    "mdi:scroll-text-outline",
+    "mdi:text-box-outline",
+    "mdi:newspaper-variant-outline",
+    "mdi:note-text-outline",
   ],
-  "Contenu": [
-    { name: "FileText", icon: FileText },
-    { name: "FileStack", icon: FileStack },
-    { name: "BookOpen", icon: BookOpen },
-    { name: "BookMarked", icon: BookMarked },
-    { name: "Newspaper", icon: Newspaper },
-    { name: "ScrollText", icon: ScrollText },
-    { name: "Archive", icon: Archive },
-    { name: "FolderOpen", icon: FolderOpen },
-    { name: "Database", icon: Database },
-    { name: "LibraryBig", icon: LibraryBig },
+  "Grilles & Tableaux": [
+    "mdi:table-box-multiple-outline",
+    "mdi:view-grid-outline",
+    "mdi:grid",
+    "mdi:table-large",
+    "mdi:view-module-outline",
+    "mdi:view-dashboard-outline",
+    "mdi:view-list-outline",
+    "mdi:view-grid-plus-outline",
+    "mdi:table-of-contents",
+    "mdi:format-list-bulleted",
+    "mdi:format-list-numbered",
+    "mdi:apps",
   ],
-  "Bibliothèque": [
-    { name: "GraduationCap", icon: GraduationCap },
-    { name: "Building2", icon: Building2 },
-    { name: "Landmark", icon: Landmark },
-    { name: "Globe", icon: Globe },
-    { name: "Users", icon: Users },
-    { name: "Calendar", icon: Calendar },
-    { name: "CalendarDays", icon: CalendarDays },
-    { name: "CalendarRange", icon: CalendarRange },
-    { name: "Clock", icon: Clock },
-    { name: "History", icon: History },
+  "Statistiques & Graphiques": [
+    "mdi:chart-box-outline",
+    "mdi:chart-bar",
+    "mdi:chart-line",
+    "mdi:chart-pie",
+    "mdi:chart-areaspline",
+    "mdi:finance",
+    "mdi:poll",
+    "mdi:trending-up",
+    "mdi:trending-down",
+    "mdi:percent-outline",
+    "mdi:counter",
   ],
   "Médias": [
-    { name: "Image", icon: Image },
-    { name: "Camera", icon: Camera },
-    { name: "Film", icon: Film },
-    { name: "Video", icon: Video },
-    { name: "Music", icon: Music },
-    { name: "Mic", icon: Mic },
-    { name: "Headphones", icon: Headphones },
+    "mdi:video-box",
+    "mdi:video-outline",
+    "mdi:image-outline",
+    "mdi:image-multiple-outline",
+    "mdi:camera-outline",
+    "mdi:movie-outline",
+    "mdi:music-note-outline",
+    "mdi:microphone-outline",
+    "mdi:headphones",
+    "mdi:play-circle-outline",
+    "mdi:youtube",
+    "mdi:multimedia",
   ],
-  "Grilles & Layouts": [
-    { name: "Grid3X3", icon: Grid3X3 },
-    { name: "Grid2X2", icon: Grid2X2 },
-    { name: "LayoutGrid", icon: LayoutGrid },
-    { name: "Table2", icon: Table2 },
-    { name: "Layers", icon: Layers },
-    { name: "Boxes", icon: Boxes },
-    { name: "Package", icon: Package },
-    { name: "List", icon: List },
-    { name: "ListOrdered", icon: ListOrdered },
-  ],
-  "Design": [
-    { name: "Palette", icon: Palette },
-    { name: "Type", icon: Type },
-    { name: "PenTool", icon: PenTool },
-    { name: "Brush", icon: Brush },
-    { name: "Sparkles", icon: Sparkles },
-    { name: "Eye", icon: Eye },
+  "Navigation": [
+    "mdi:home-outline",
+    "mdi:arrow-left",
+    "mdi:arrow-right",
+    "mdi:arrow-up",
+    "mdi:arrow-down",
+    "mdi:chevron-left",
+    "mdi:chevron-right",
+    "mdi:chevron-up",
+    "mdi:chevron-down",
+    "mdi:menu",
+    "mdi:dots-horizontal",
+    "mdi:dots-vertical",
+    "mdi:open-in-new",
+    "mdi:link-variant",
+    "mdi:compass-outline",
+    "mdi:map-marker-outline",
   ],
   "Actions": [
-    { name: "Plus", icon: Plus },
-    { name: "Minus", icon: Minus },
-    { name: "X", icon: X },
-    { name: "Check", icon: CheckIcon },
-    { name: "Save", icon: Save },
-    { name: "Download", icon: Download },
-    { name: "Upload", icon: Upload },
-    { name: "Share2", icon: Share2 },
-    { name: "Send", icon: Send },
-    { name: "RefreshCw", icon: RefreshCw },
-    { name: "Maximize", icon: Maximize },
-    { name: "Minimize", icon: Minimize },
+    "mdi:plus",
+    "mdi:minus",
+    "mdi:close",
+    "mdi:check",
+    "mdi:pencil-outline",
+    "mdi:delete-outline",
+    "mdi:content-save-outline",
+    "mdi:download",
+    "mdi:upload",
+    "mdi:refresh",
+    "mdi:magnify",
+    "mdi:filter-outline",
+    "mdi:sort",
+    "mdi:share-variant-outline",
+    "mdi:content-copy",
+    "mdi:eye-outline",
+    "mdi:eye-off-outline",
   ],
-  "Indicateurs": [
-    { name: "Star", icon: Star },
-    { name: "Heart", icon: Heart },
-    { name: "Award", icon: Award },
-    { name: "Trophy", icon: Trophy },
-    { name: "Medal", icon: Medal },
-    { name: "Flag", icon: Flag },
-    { name: "Target", icon: Target },
-    { name: "Zap", icon: Zap },
-    { name: "Lightbulb", icon: Lightbulb },
-    { name: "Bookmark", icon: Bookmark },
-    { name: "Bell", icon: Bell },
+  "Utilisateurs & Sécurité": [
+    "mdi:account-outline",
+    "mdi:account-group-outline",
+    "mdi:account-circle-outline",
+    "mdi:account-plus-outline",
+    "mdi:account-check-outline",
+    "mdi:login",
+    "mdi:logout",
+    "mdi:lock-outline",
+    "mdi:lock-open-outline",
+    "mdi:shield-outline",
+    "mdi:shield-check-outline",
+    "mdi:key-outline",
   ],
   "Communication": [
-    { name: "Mail", icon: Mail },
-    { name: "MessageSquare", icon: MessageSquare },
-    { name: "Phone", icon: Phone },
-    { name: "Info", icon: Info },
-    { name: "HelpCircle", icon: HelpCircle },
-    { name: "AlertTriangle", icon: AlertTriangle },
-    { name: "AlertCircle", icon: AlertCircle },
+    "mdi:email-outline",
+    "mdi:message-outline",
+    "mdi:phone-outline",
+    "mdi:bell-outline",
+    "mdi:comment-outline",
+    "mdi:chat-outline",
+    "mdi:send-outline",
+    "mdi:bullhorn-outline",
   ],
-  "Sécurité": [
-    { name: "Lock", icon: Lock },
-    { name: "Unlock", icon: Unlock },
-    { name: "Key", icon: Key },
-    { name: "Shield", icon: Shield },
-    { name: "ShieldCheck", icon: ShieldCheck },
-    { name: "UserCheck", icon: UserCheck },
-    { name: "UserPlus", icon: UserPlus },
-    { name: "LogIn", icon: LogIn },
-    { name: "LogOut", icon: LogOut },
+  "Événements & Calendrier": [
+    "mdi:calendar-outline",
+    "mdi:calendar-month-outline",
+    "mdi:calendar-today-outline",
+    "mdi:calendar-range-outline",
+    "mdi:calendar-clock-outline",
+    "mdi:clock-outline",
+    "mdi:timer-outline",
+    "mdi:history",
   ],
-  "Formes": [
-    { name: "Circle", icon: Circle },
-    { name: "CircleDot", icon: CircleDot },
-    { name: "Square", icon: Square },
-    { name: "Triangle", icon: Triangle },
-    { name: "Hexagon", icon: Hexagon },
-    { name: "Pentagon", icon: Pentagon },
-    { name: "Octagon", icon: Octagon },
+  "Design & Style": [
+    "mdi:palette-outline",
+    "mdi:format-text",
+    "mdi:format-bold",
+    "mdi:format-italic",
+    "mdi:brush-outline",
+    "mdi:pencil-ruler",
+    "mdi:shape-outline",
+    "mdi:circle-outline",
+    "mdi:square-outline",
+    "mdi:star-outline",
+    "mdi:heart-outline",
+    "mdi:bookmark-outline",
   ],
-  "Analyse": [
-    { name: "BarChart3", icon: BarChart3 },
-    { name: "Settings", icon: Settings },
-    { name: "Filter", icon: Filter },
-    { name: "SortAsc", icon: SortAsc },
+  "État & Feedback": [
+    "mdi:information-outline",
+    "mdi:alert-outline",
+    "mdi:alert-circle-outline",
+    "mdi:check-circle-outline",
+    "mdi:help-circle-outline",
+    "mdi:lightbulb-outline",
+    "mdi:flash-outline",
+    "mdi:flag-outline",
+    "mdi:trophy-outline",
+    "mdi:medal-outline",
+  ],
+  "Technologies": [
+    "mdi:earth",
+    "mdi:web",
+    "mdi:database-outline",
+    "mdi:server-outline",
+    "mdi:cloud-outline",
+    "mdi:cog-outline",
+    "mdi:wrench-outline",
+    "mdi:code-tags",
+    "mdi:cellphone",
+    "mdi:laptop",
+    "mdi:printer-outline",
+    "mdi:qrcode",
+  ],
+  "Institutions": [
+    "mdi:domain",
+    "mdi:office-building-outline",
+    "mdi:school-outline",
+    "mdi:bank-outline",
+    "mdi:castle",
+    "mdi:mosque",
+    "mdi:town-hall",
+    "mdi:account-tie-outline",
   ],
 };
 
-// Custom SVG icons (MDI style)
-const customSvgIcons = {
-  "table-box-multiple-outline": (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-      <path d="M3 6V18H13V20H1V4H21V13H19V6H3Z"/>
-      <path d="M3 11H19V13H3V11Z"/>
-      <path d="M8 6V18H10V6H8Z"/>
-      <path d="M14 6V13H16V6H14Z"/>
-      <path d="M23 15V17H21V19H23V21H21V19H19V21H17V19H19V17H17V15H19V17H21V15H23ZM21 17H19V19H21V17Z"/>
-    </svg>
-  ),
-  "book-open-page-variant-outline": (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-      <path d="M19 1L14 6V17L19 12.5V1M21 5V18.5C19.9 18.15 18.7 18 17.5 18C15.8 18 13.35 18.65 12 19.5V6C10.55 4.9 8.45 4.5 6.5 4.5C4.55 4.5 2.45 4.9 1 6V20.65C1 20.9 1.25 21.15 1.5 21.15C1.6 21.15 1.65 21.1 1.75 21.1C3.1 20.45 5.05 20 6.5 20C8.45 20 10.55 20.4 12 21.5C13.35 20.65 15.8 20 17.5 20C19.15 20 20.85 20.3 22.25 21.05C22.35 21.1 22.4 21.1 22.5 21.1C22.75 21.1 23 20.85 23 20.6V6C22.4 5.55 21.75 5.25 21 5M10 18.41C8.75 18.09 7.5 18 6.5 18C5.44 18 4.18 18.19 3 18.5V7.13C3.91 6.73 5.14 6.5 6.5 6.5C7.86 6.5 9.09 6.73 10 7.13V18.41Z"/>
-    </svg>
-  ),
-  "chart-box-outline": (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-      <path d="M9 17H7V10H9V17M13 17H11V7H13V17M17 17H15V13H17V17M19 19H5V5H19V19.1M19 3H5C3.9 3 3 3.9 3 5V19C3 20.1 3.9 21 5 21H19C20.1 21 21 20.1 21 19V5C21 3.9 20.1 3 19 3Z"/>
-    </svg>
-  ),
-  "video-box": (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-      <path d="M18 16L14 12.8V16H6V8H14V11.2L18 8M20 4H4A2 2 0 0 0 2 6V18A2 2 0 0 0 4 20H20A2 2 0 0 0 22 18V6A2 2 0 0 0 20 4Z"/>
-    </svg>
-  ),
-};
-
-// Sections that can have icons configured
+// Sections that can have icons configured for BN platform
 const sectionIconConfigs = [
-  { id: "ressources_electroniques", label: "Ressources électroniques", defaultIcon: "table-box-multiple-outline", isCustom: true },
-  { id: "ibn_battouta_stats", label: "Ibn Battouta en chiffres", defaultIcon: "chart-box-outline", isCustom: true },
-  { id: "derniers_ajouts", label: "Derniers ajouts", defaultIcon: "book-open-page-variant-outline", isCustom: true },
-  { id: "mediatheque", label: "Médiathèque", defaultIcon: "video-box", isCustom: true },
-  { id: "hero", label: "Section Hero", defaultIcon: "Home", isCustom: false },
-  { id: "actualites", label: "Actualités", defaultIcon: "Newspaper", isCustom: false },
-  { id: "evenements", label: "Événements", defaultIcon: "Calendar", isCustom: false },
-  { id: "collections", label: "Collections", defaultIcon: "LibraryBig", isCustom: false },
+  { id: "ressources_electroniques", label: "Ressources électroniques", defaultIcon: "mdi:table-box-multiple-outline" },
+  { id: "ibn_battouta_stats", label: "Ibn Battouta en chiffres", defaultIcon: "mdi:chart-box-outline" },
+  { id: "derniers_ajouts", label: "Derniers ajouts", defaultIcon: "mdi:book-open-page-variant-outline" },
+  { id: "mediatheque", label: "Médiathèque", defaultIcon: "mdi:video-box" },
+  { id: "hero", label: "Section Hero", defaultIcon: "mdi:home-outline" },
+  { id: "actualites", label: "Actualités", defaultIcon: "mdi:newspaper-variant-outline" },
+  { id: "evenements", label: "Événements", defaultIcon: "mdi:calendar-month-outline" },
+  { id: "collections", label: "Collections", defaultIcon: "mdi:library" },
+  { id: "vexpo", label: "Expositions virtuelles", defaultIcon: "mdi:panorama-outline" },
+  { id: "recherche", label: "Recherche", defaultIcon: "mdi:magnify" },
 ];
 
 interface SectionIcons {
   [sectionId: string]: {
     icon: string;
-    isCustom: boolean;
     color?: string;
   };
 }
@@ -252,7 +250,6 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
         sectionIconConfigs.forEach(config => {
           defaults[config.id] = {
             icon: config.defaultIcon,
-            isCustom: config.isCustom,
             color: platform === 'bn' ? '#C9A227' : '#3b82f6'
           };
         });
@@ -285,13 +282,12 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
     }
   });
 
-  const selectIconForSection = (sectionId: string, iconName: string, isCustom: boolean) => {
+  const selectIconForSection = (sectionId: string, iconName: string) => {
     setSectionIcons(prev => ({
       ...prev,
       [sectionId]: {
         ...prev[sectionId],
-        icon: iconName,
-        isCustom
+        icon: iconName
       }
     }));
   };
@@ -307,41 +303,23 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
   };
 
   // Filter icons by search
-  const filteredLibrary = Object.entries(iconLibrary).reduce((acc, [category, icons]) => {
+  const filteredLibrary = Object.entries(mdiIconLibrary).reduce((acc, [category, icons]) => {
     const filtered = icons.filter(icon => 
-      icon.name.toLowerCase().includes(searchQuery.toLowerCase())
+      icon.toLowerCase().includes(searchQuery.toLowerCase())
     );
     if (filtered.length > 0) {
       acc[category] = filtered;
     }
     return acc;
-  }, {} as typeof iconLibrary);
+  }, {} as typeof mdiIconLibrary);
 
-  const filteredCustomIcons = Object.entries(customSvgIcons).filter(([name]) =>
-    name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const renderIcon = (iconName: string, isCustom: boolean, className?: string) => {
-    if (isCustom && customSvgIcons[iconName as keyof typeof customSvgIcons]) {
-      return customSvgIcons[iconName as keyof typeof customSvgIcons];
-    }
-    
-    // Find in library
-    for (const icons of Object.values(iconLibrary)) {
-      const found = icons.find(i => i.name === iconName);
-      if (found) {
-        const IconComponent = found.icon;
-        return <IconComponent className={className || "w-5 h-5"} />;
-      }
-    }
-    
-    return <Grid3X3 className={className || "w-5 h-5"} />;
-  };
+  // Count total icons
+  const totalIcons = Object.values(mdiIconLibrary).flat().length;
 
   if (isLoading) {
     return (
       <div className="flex justify-center py-8">
-        <Loader2 className="h-8 w-8 animate-spin" />
+        <Icon name="mdi:loading" className="h-8 w-8 animate-spin" />
       </div>
     );
   }
@@ -352,9 +330,9 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
       <div className="flex justify-end">
         <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
           {saveMutation.isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            <Icon name="mdi:loading" className="h-4 w-4 animate-spin mr-2" />
           ) : (
-            <Save className="h-4 w-4 mr-2" />
+            <Icon name="mdi:content-save-outline" className="h-4 w-4 mr-2" />
           )}
           Sauvegarder les icônes
         </Button>
@@ -363,12 +341,12 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
       <Tabs defaultValue="sections" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="sections" className="flex items-center gap-2">
-            <Layers className="h-4 w-4" />
+            <Icon name="mdi:layers-outline" className="h-4 w-4" />
             Icônes des sections
           </TabsTrigger>
           <TabsTrigger value="library" className="flex items-center gap-2">
-            <Grid3X3 className="h-4 w-4" />
-            Bibliothèque d'icônes
+            <Icon name="mdi:view-grid-outline" className="h-4 w-4" />
+            Bibliothèque MDI
           </TabsTrigger>
         </TabsList>
 
@@ -376,7 +354,7 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
         <TabsContent value="sections" className="mt-4">
           <div className="grid gap-4">
             {sectionIconConfigs.map(config => {
-              const currentIcon = sectionIcons[config.id] || { icon: config.defaultIcon, isCustom: config.isCustom, color: '#C9A227' };
+              const currentIcon = sectionIcons[config.id] || { icon: config.defaultIcon, color: '#C9A227' };
               return (
                 <Card key={config.id} className={selectedSection === config.id ? "ring-2 ring-primary" : ""}>
                   <CardContent className="p-4">
@@ -387,12 +365,12 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
                           className="w-12 h-12 rounded-lg border flex items-center justify-center"
                           style={{ color: currentIcon.color }}
                         >
-                          {renderIcon(currentIcon.icon, currentIcon.isCustom)}
+                          <Icon name={currentIcon.icon} className="w-6 h-6" />
                         </div>
                         <div>
                           <p className="font-medium">{config.label}</p>
                           <p className="text-sm text-muted-foreground">
-                            Icône: <code className="bg-muted px-1 rounded">{currentIcon.icon}</code>
+                            <code className="bg-muted px-1 rounded text-xs">{currentIcon.icon}</code>
                           </p>
                         </div>
                       </div>
@@ -422,9 +400,9 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
                       <div className="mt-4 pt-4 border-t">
                         <div className="mb-4">
                           <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <Icon name="mdi:magnify" className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input
-                              placeholder="Rechercher une icône..."
+                              placeholder="Rechercher une icône MDI..."
                               value={searchQuery}
                               onChange={(e) => setSearchQuery(e.target.value)}
                               className="pl-10"
@@ -433,34 +411,7 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
                         </div>
 
                         <ScrollArea className="h-[300px]">
-                          {/* Custom SVG Icons */}
-                          {filteredCustomIcons.length > 0 && (
-                            <div className="mb-4">
-                              <p className="text-sm font-medium mb-2 flex items-center gap-2">
-                                <Badge variant="secondary">Personnalisées (MDI)</Badge>
-                              </p>
-                              <div className="grid grid-cols-6 gap-2">
-                                {filteredCustomIcons.map(([name, svg]) => (
-                                  <button
-                                    key={name}
-                                    onClick={() => selectIconForSection(config.id, name, true)}
-                                    className={`p-3 rounded-lg border hover:bg-accent transition-colors flex flex-col items-center gap-1 ${
-                                      currentIcon.icon === name && currentIcon.isCustom ? "bg-primary/10 border-primary" : ""
-                                    }`}
-                                    title={name}
-                                  >
-                                    <div style={{ color: currentIcon.color }}>{svg}</div>
-                                    {currentIcon.icon === name && currentIcon.isCustom && (
-                                      <Check className="h-3 w-3 text-primary" />
-                                    )}
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-
-                          {/* Lucide Icons by Category */}
-                          <Accordion type="multiple" className="space-y-2">
+                          <Accordion type="multiple" defaultValue={Object.keys(filteredLibrary).slice(0, 2)} className="space-y-2">
                             {Object.entries(filteredLibrary).map(([category, icons]) => (
                               <AccordionItem key={category} value={category} className="border rounded-lg px-3">
                                 <AccordionTrigger className="hover:no-underline py-2">
@@ -469,18 +420,18 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
                                 </AccordionTrigger>
                                 <AccordionContent>
                                   <div className="grid grid-cols-6 gap-2 py-2">
-                                    {icons.map(({ name, icon: Icon }) => (
+                                    {icons.map((iconName) => (
                                       <button
-                                        key={name}
-                                        onClick={() => selectIconForSection(config.id, name, false)}
+                                        key={iconName}
+                                        onClick={() => selectIconForSection(config.id, iconName)}
                                         className={`p-3 rounded-lg border hover:bg-accent transition-colors flex flex-col items-center gap-1 ${
-                                          currentIcon.icon === name && !currentIcon.isCustom ? "bg-primary/10 border-primary" : ""
+                                          currentIcon.icon === iconName ? "bg-primary/10 border-primary" : ""
                                         }`}
-                                        title={name}
+                                        title={iconName}
                                       >
-                                        <Icon className="h-5 w-5" style={{ color: currentIcon.color }} />
-                                        {currentIcon.icon === name && !currentIcon.isCustom && (
-                                          <Check className="h-3 w-3 text-primary" />
+                                        <Icon name={iconName} className="h-5 w-5" style={{ color: currentIcon.color }} />
+                                        {currentIcon.icon === iconName && (
+                                          <Icon name="mdi:check" className="h-3 w-3 text-primary" />
                                         )}
                                       </button>
                                     ))}
@@ -503,12 +454,15 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
         <TabsContent value="library" className="mt-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Bibliothèque d'icônes système</CardTitle>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Icon name="mdi:material-design" className="h-5 w-5" />
+                Bibliothèque Material Design Icons
+              </CardTitle>
               <CardDescription>
-                Parcourez toutes les icônes disponibles dans le système
+                {totalIcons} icônes MDI disponibles dans le système
               </CardDescription>
               <div className="relative mt-4">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Icon name="mdi:magnify" className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Rechercher une icône..."
                   value={searchQuery}
@@ -519,27 +473,6 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[500px]">
-                {/* Custom SVG Icons */}
-                <div className="mb-6">
-                  <p className="text-sm font-semibold mb-3 flex items-center gap-2">
-                    Icônes personnalisées (MDI)
-                    <Badge variant="secondary">{Object.keys(customSvgIcons).length}</Badge>
-                  </p>
-                  <div className="grid grid-cols-8 gap-3">
-                    {Object.entries(customSvgIcons).map(([name, svg]) => (
-                      <div
-                        key={name}
-                        className="p-3 rounded-lg border bg-card hover:bg-accent transition-colors flex flex-col items-center gap-2 cursor-pointer"
-                        title={name}
-                      >
-                        <div className="text-primary">{svg}</div>
-                        <span className="text-xs text-muted-foreground truncate w-full text-center">{name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Lucide Icons */}
                 <Accordion type="multiple" defaultValue={Object.keys(filteredLibrary)} className="space-y-2">
                   {Object.entries(filteredLibrary).map(([category, icons]) => (
                     <AccordionItem key={category} value={category} className="border rounded-lg px-4">
@@ -550,15 +483,21 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
                         </div>
                       </AccordionTrigger>
                       <AccordionContent>
-                        <div className="grid grid-cols-8 gap-3 py-4">
-                          {icons.map(({ name, icon: Icon }) => (
+                        <div className="grid grid-cols-6 md:grid-cols-8 gap-3 py-4">
+                          {icons.map((iconName) => (
                             <div
-                              key={name}
-                              className="p-3 rounded-lg border bg-card hover:bg-accent transition-colors flex flex-col items-center gap-2 cursor-pointer"
-                              title={name}
+                              key={iconName}
+                              className="p-3 rounded-lg border bg-card hover:bg-accent transition-colors flex flex-col items-center gap-2 cursor-pointer group"
+                              title={iconName}
+                              onClick={() => {
+                                navigator.clipboard.writeText(iconName);
+                                toast({ title: "Copié!", description: iconName });
+                              }}
                             >
-                              <Icon className="h-5 w-5 text-primary" />
-                              <span className="text-xs text-muted-foreground truncate w-full text-center">{name}</span>
+                              <Icon name={iconName} className="h-6 w-6 text-foreground group-hover:text-primary transition-colors" />
+                              <span className="text-[10px] text-muted-foreground truncate w-full text-center">
+                                {iconName.replace("mdi:", "")}
+                              </span>
                             </div>
                           ))}
                         </div>
