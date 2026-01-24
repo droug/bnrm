@@ -105,29 +105,41 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                   'from-[#CD853F] to-[#8B5E3C]', // Bois doré
                 ];
                 
-                const heights = ['h-[550px]', 'h-[550px]', 'h-[550px]', 'h-[550px]'];
+                // Slightly varied heights for natural look
+                const heights = ['h-[545px]', 'h-[552px]', 'h-[548px]', 'h-[555px]'];
                 
-                // Slightly different tilt angles for a natural, disorganized look
-                const tiltAngles = ['4deg', '-1deg', '3deg', '-2deg'];
+                // Natural tilt angles - books lean against each other realistically
+                const tiltAngles = ['3.5deg', '1.2deg', '-2.8deg', '2deg'];
                 
-                // Different vertical offsets - some books pulled forward/back
-                const translateY = ['-8px', '0px', '-12px', '-4px'];
-                const translateZ = ['15px', '0px', '20px', '8px'];
+                // Subtle vertical offsets for depth
+                const translateY = ['-3px', '2px', '-6px', '0px'];
                 
-                // Negative margins to make books touch
-                const margins = index > 0 ? '-ml-1' : '';
+                // Books slightly pulled forward/back from shelf
+                const translateX = ['2px', '-1px', '3px', '-2px'];
+                
+                // Shadow depths for 3D effect
+                const shadowDepths = [
+                  '0 8px 25px -5px rgba(0,0,0,0.3), 0 4px 10px -5px rgba(0,0,0,0.2)',
+                  '0 4px 15px -3px rgba(0,0,0,0.25)',
+                  '0 12px 30px -8px rgba(0,0,0,0.35), 0 6px 12px -4px rgba(0,0,0,0.2)',
+                  '0 6px 20px -4px rgba(0,0,0,0.28)'
+                ];
+                
+                // Negative margins to make books touch/overlap slightly
+                const margins = index > 0 ? '-ml-0.5' : '';
                 
                 return (
                   <div
                     key={platform.number}
-                    className={`relative ${heights[index]} w-28 cursor-pointer group transition-all duration-300 hover:-translate-y-4 hover:shadow-2xl ${margins}`}
+                    className={`relative ${heights[index]} w-28 cursor-pointer group transition-all duration-300 hover:-translate-y-3 ${margins}`}
                     onClick={() => navigate(platform.path)}
                     style={{ 
                       transformStyle: 'preserve-3d',
                       perspective: '1000px',
-                      transform: `rotate(${tiltAngles[index]}) translateY(${translateY[index]}) translateZ(${translateZ[index]})`,
+                      transform: `rotate(${tiltAngles[index]}) translateY(${translateY[index]}) translateX(${translateX[index]})`,
                       transformOrigin: 'bottom center',
-                      zIndex: index === 2 ? 10 : index === 0 ? 8 : index === 3 ? 6 : 4
+                      zIndex: 10 - index,
+                      boxShadow: shadowDepths[index]
                     }}
                   >
                     {/* Book spine */}
