@@ -19,8 +19,9 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { cn } from "@/lib/utils";
 
 interface PortalAnalyticsKPICardProps {
-  platform?: "portail" | "bn" | "cbm" | "manuscrits";
+  platform?: "portail" | "bn" | "cbm" | "manuscrits" | "bibliotheque";
   dateRange?: { start: Date; end: Date };
+  defaultTab?: string;
 }
 
 interface KPIData {
@@ -146,11 +147,11 @@ interface KPIData {
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658', '#FF7300'];
 
-export function PortalAnalyticsKPICard({ platform = "portail", dateRange }: PortalAnalyticsKPICardProps) {
+export function PortalAnalyticsKPICard({ platform = "portail", dateRange, defaultTab = "overview" }: PortalAnalyticsKPICardProps) {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [kpiData, setKpiData] = useState<KPIData | null>(null);
-  const [activeTab, setActiveTab] = useState("overview");
+  const [activeTab, setActiveTab] = useState(defaultTab);
 
   const startDate = dateRange?.start || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   const endDate = dateRange?.end || new Date();

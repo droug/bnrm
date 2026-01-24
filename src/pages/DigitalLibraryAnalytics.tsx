@@ -2,7 +2,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { Navigate, useNavigate } from "react-router-dom";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
-import AnalyticsManager from "@/components/digital-library/AnalyticsManager";
+import { PortalAnalyticsKPICard } from "@/components/dashboard/PortalAnalyticsKPICard";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 
@@ -34,7 +34,13 @@ export default function DigitalLibraryAnalytics() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Retour
         </Button>
-        <AnalyticsManager />
+        
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold">Statistiques - Bibliothèque Numérique</h1>
+          <p className="text-muted-foreground">Analyse détaillée de l'utilisation de la Bibliothèque Numérique</p>
+        </div>
+        
+        <PortalAnalyticsKPICard platform="bn" defaultTab="digital-library" />
       </div>
     </DigitalLibraryLayout>
   );
