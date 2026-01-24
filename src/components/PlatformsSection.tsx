@@ -82,15 +82,43 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
         </div>
 
         <div className="grid lg:grid-cols-[1fr,auto] gap-8 items-start">
-          {/* Main Platform - 3D Book */}
-          <div className="relative">
-            <Book3D
-              coverImage={mainPlatform.image}
-              title={mainPlatform.title}
-              description={mainPlatform.description}
-              number={mainPlatform.number}
-              onClick={() => navigate(mainPlatform.path)}
-            />
+          {/* Main Platform - Simple Card */}
+          <div 
+            className="relative cursor-pointer group overflow-hidden rounded-lg shadow-2xl transition-transform duration-300 hover:scale-[1.02]"
+            onClick={() => navigate(mainPlatform.path)}
+          >
+            {/* Background Image */}
+            <div className="relative h-[500px] w-full max-w-[600px]">
+              <img 
+                src={mainPlatform.image} 
+                alt={mainPlatform.title}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              {/* Gradient overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+              
+              {/* Number badge */}
+              <div className="absolute top-6 left-6">
+                <div className="relative w-16 h-16">
+                  <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-lg">
+                    <polygon points="50,5 82,18 95,50 82,82 50,95 18,82 5,50 18,18" className="fill-white/95" />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center text-gray-900 font-bold text-2xl">
+                    {mainPlatform.number}
+                  </div>
+                </div>
+              </div>
+              
+              {/* Content */}
+              <div className="absolute bottom-0 left-0 right-0 p-8">
+                <h3 className="text-3xl font-bold text-white mb-3 drop-shadow-lg">
+                  {mainPlatform.title}
+                </h3>
+                <p className="text-white/90 text-base leading-relaxed drop-shadow-md">
+                  {mainPlatform.description}
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Bookshelf - Secondary Platforms as Books */}
