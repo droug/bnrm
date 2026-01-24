@@ -53,9 +53,17 @@ export default function VExpo360PanoramaEditor() {
   const [isAddHotspotOpen, setIsAddHotspotOpen] = useState(false);
   const [editingHotspot, setEditingHotspot] = useState<Hotspot | null>(null);
   const [deleteId, setDeleteId] = useState<{ type: 'panorama' | 'hotspot'; id: string } | null>(null);
+  const [isEditPanoramaOpen, setIsEditPanoramaOpen] = useState(false);
+  const [isUploadingPanorama, setIsUploadingPanorama] = useState(false);
 
   // Form states
   const [panoramaForm, setPanoramaForm] = useState({
+    name_fr: "",
+    name_ar: "",
+    panorama_image_url: ""
+  });
+
+  const [editPanoramaForm, setEditPanoramaForm] = useState({
     name_fr: "",
     name_ar: "",
     panorama_image_url: ""
@@ -208,6 +216,39 @@ export default function VExpo360PanoramaEditor() {
     }
   });
 
+  // Update panorama mutation
+  const updatePanorama = useMutation({
+    mutationFn: async () => {
+      if (!selectedPanorama) return;
+      const { error } = await supabase
+        .from('vexpo_panoramas')
+        .update({
+          name_fr: editPanoramaForm.name_fr,
+          name_ar: editPanoramaForm.name_ar || null,
+          panorama_image_url: editPanoramaForm.panorama_image_url
+        })
+        .eq('id', selectedPanorama.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['vexpo360-panoramas', exhibitionId] });
+      // Update local selected panorama
+      if (selectedPanorama) {
+        setSelectedPanorama({
+          ...selectedPanorama,
+          name_fr: editPanoramaForm.name_fr,
+          name_ar: editPanoramaForm.name_ar || null,
+          panorama_image_url: editPanoramaForm.panorama_image_url
+        });
+      }
+      toast({ title: "Panorama modifié" });
+      setIsEditPanoramaOpen(false);
+    },
+    onError: () => {
+      toast({ title: "Erreur", description: "Impossible de modifier le panorama", variant: "destructive" });
+    }
+  });
+
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async ({ type, id }: { type: 'panorama' | 'hotspot'; id: string }) => {
@@ -234,6 +275,17 @@ export default function VExpo360PanoramaEditor() {
       toast({ title: "Erreur", description: "Impossible de supprimer", variant: "destructive" });
     }
   });
+
+  const openEditPanorama = () => {
+    if (selectedPanorama) {
+      setEditPanoramaForm({
+        name_fr: selectedPanorama.name_fr,
+        name_ar: selectedPanorama.name_ar || "",
+        panorama_image_url: selectedPanorama.panorama_image_url
+      });
+      setIsEditPanoramaOpen(true);
+    }
+  };
 
   const resetHotspotForm = () => {
     setHotspotForm({
@@ -657,27 +709,108 @@ export default function VExpo360PanoramaEditor() {
               </CardContent>
             </Card>
 
-            {/* Preview hint */}
+            {/* Preview and Edit Panorama */}
             {selectedPanorama && (
               <Card className="mt-4">
                 <CardContent className="py-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium">Aperçu du panorama</p>
-                      <p className="text-xs text-muted-foreground">
-                        Visualisez le panorama avec les hotspots positionnés
-                      </p>
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium">Aperçu du panorama</p>
+                        <p className="text-xs text-muted-foreground">
+                          Visualisez et modifiez l'image panoramique
+                        </p>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button variant="outline" size="sm" onClick={() => {
+                          window.open(selectedPanorama.panorama_image_url, '_blank');
+                        }}>
+                          <Image className="h-4 w-4 mr-2" />
+                          Voir
+                        </Button>
+                        <Button variant="default" size="sm" onClick={openEditPanorama}>
+                          <Edit className="h-4 w-4 mr-2" />
+                          Modifier
+                        </Button>
+                      </div>
                     </div>
-                    <Button variant="outline" size="sm" onClick={() => {
-                      window.open(selectedPanorama.panorama_image_url, '_blank');
-                    }}>
-                      <Image className="h-4 w-4 mr-2" />
-                      Voir l'image
-                    </Button>
+                    {/* Image preview */}
+                    <div className="relative rounded-lg overflow-hidden border bg-muted/30">
+                      <img
+                        src={selectedPanorama.panorama_image_url}
+                        alt={selectedPanorama.name_fr}
+                        className="w-full h-48 object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/placeholder.svg';
+                        }}
+                      />
+                      <div className="absolute bottom-2 left-2 bg-black/60 text-white px-2 py-1 rounded text-xs">
+                        {selectedPanorama.name_fr}
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             )}
+
+            {/* Edit Panorama Dialog */}
+            <Dialog open={isEditPanoramaOpen} onOpenChange={(open) => {
+              if (!isUploadingPanorama) {
+                setIsEditPanoramaOpen(open);
+              }
+            }}>
+              <DialogContent className="max-w-lg">
+                <DialogHeader>
+                  <DialogTitle>Modifier le Panorama</DialogTitle>
+                  <DialogDescription>Modifiez les informations et l'image du panorama</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div>
+                    <Label>Titre (FR) *</Label>
+                    <Input
+                      value={editPanoramaForm.name_fr}
+                      onChange={(e) => setEditPanoramaForm(p => ({ ...p, name_fr: e.target.value }))}
+                      placeholder="Salle principale"
+                    />
+                  </div>
+                  <div>
+                    <Label>Titre (AR)</Label>
+                    <Input
+                      value={editPanoramaForm.name_ar}
+                      onChange={(e) => setEditPanoramaForm(p => ({ ...p, name_ar: e.target.value }))}
+                      placeholder="القاعة الرئيسية"
+                      dir="rtl"
+                    />
+                  </div>
+                  <div>
+                    <VExpoImageUpload
+                      value={editPanoramaForm.panorama_image_url}
+                      onChange={(url) => setEditPanoramaForm(p => ({ ...p, panorama_image_url: url }))}
+                      onUploadingChange={setIsUploadingPanorama}
+                      label="Image panoramique *"
+                      description="Format recommandé: 8192×4096 équirectangulaire"
+                      folder="panoramas"
+                      maxSizeMB={50}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setIsEditPanoramaOpen(false)}
+                    disabled={isUploadingPanorama || updatePanorama.isPending}
+                  >
+                    Annuler
+                  </Button>
+                  <Button 
+                    onClick={() => updatePanorama.mutate()} 
+                    disabled={!editPanoramaForm.name_fr || !editPanoramaForm.panorama_image_url || isUploadingPanorama || updatePanorama.isPending}
+                  >
+                    {updatePanorama.isPending ? "Enregistrement..." : "Enregistrer"}
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
       </div>
