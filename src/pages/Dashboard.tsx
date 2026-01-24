@@ -513,61 +513,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Accès Rapide - Admin */}
-        <PermissionGuard permission="requests.manage">
-          <div className="mt-6 pt-6 border-t">
-            <h3 className="text-lg font-semibold mb-3">Accès Rapide - Gestion</h3>
-            <div className="grid gap-4 md:grid-cols-3">
-              <Card className="border-blue-200 bg-blue-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/admin/legal-deposit')}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <FileText className="h-4 w-4 text-blue-600" />
-                    Backoffice Dépôt Légal
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">En attente</span>
-                    <Badge variant="outline" className="bg-yellow-100 text-yellow-700">
-                      {cpsStats.pendingValidation}
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-green-200 bg-green-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/admin/committee')}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Users className="h-4 w-4 text-green-600" />
-                    Comité de Validation
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">En cours</span>
-                    <Badge variant="outline" className="bg-blue-100 text-blue-700">
-                      {cpsStats.inProgress}
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-purple-200 bg-purple-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/admin/settings')}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Settings className="h-4 w-4 text-purple-600" />
-                    Paramètres Système
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Button variant="outline" size="sm" className="w-full">
-                    Accéder aux paramètres
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </PermissionGuard>
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -785,70 +730,6 @@ export default function Dashboard() {
           </AccordionItem>
         </Accordion>
 
-        {/* Global Admin Access - Outside Accordion */}
-        <PermissionGuard permission="requests.manage">
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold mb-4">Accès Rapide - Gestion</h2>
-            <div className="grid gap-6 md:grid-cols-3">
-              <Card className="border-blue-200 bg-blue-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/admin/legal-deposit')}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-blue-600" />
-                    Backoffice Dépôt Légal
-                  </CardTitle>
-                  <CardDescription>
-                    Gérer les demandes et workflows de validation
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">En attente</span>
-                    <Badge variant="outline" className="bg-yellow-100 text-yellow-700">
-                      {cpsStats.pendingValidation}
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-green-200 bg-green-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/admin/committee')}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-green-600" />
-                    Comité de Validation
-                  </CardTitle>
-                  <CardDescription>
-                    Gestion du comité et validations
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">En cours</span>
-                    <Badge variant="outline" className="bg-blue-100 text-blue-700">
-                      {cpsStats.inProgress}
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="border-purple-200 bg-purple-50/50 hover:shadow-lg transition-shadow cursor-pointer" onClick={() => navigate('/admin/settings')}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Settings className="h-5 w-5 text-purple-600" />
-                    Paramètres Système
-                  </CardTitle>
-                  <CardDescription>
-                    Configuration et administration
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button variant="outline" className="w-full">
-                    Accéder aux paramètres
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </PermissionGuard>
       </main>
       </div>
     </WatermarkContainer>
