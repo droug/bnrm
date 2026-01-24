@@ -773,7 +773,7 @@ export default function DigitalLibraryHome() {
           <div className="text-center mb-14">
             {/* Icône dorée (grille + plus) */}
             <div className="inline-flex items-center justify-center w-12 h-12 border border-gold-bn-primary rounded-lg mb-6">
-              <Icon name="mdi:table-box-multiple-outline" className="w-6 h-6 text-gold-bn-primary" />
+              <Icon name="mdi:view-grid-plus-outline" className="w-6 h-6 text-gold-bn-primary" />
             </div>
 
             <h2 className="heading-3 text-bn-blue-primary font-heading">
