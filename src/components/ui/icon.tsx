@@ -101,8 +101,8 @@ export function Icon({
 // Common icon presets for the library system
 export const IconNames = {
   // Section icons
-  electronicResources: "mdi:table-box-multiple-outline",
-  ibnBattoutaStats: "mdi:chart-box-outline",
+  electronicResources: "mdi:view-grid-plus-outline",
+  ibnBattoutaStats: "mdi:format-list-numbered",
   latestAdditions: "mdi:book-open-page-variant-outline",
   mediatheque: "mdi:video-box",
   library: "mdi:library",
