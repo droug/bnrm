@@ -1,7 +1,7 @@
 import { ReactNode, useState, useEffect } from "react";
 import { useLanguage, Language } from "@/hooks/useLanguage";
 import { Link } from "react-router-dom";
-import { Book, BookOpen, Search, Globe, Calendar, HelpCircle, User, Settings, ChevronDown, Home, FileText, Image, Music, Video, Sparkles, BookmarkCheck, FileDigit, Shield, Library, UserPlus, LogIn, LogOut, Scroll, Newspaper, Map, LayoutGrid } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { Button } from "@/components/ui/button";
 import { SimpleTooltip } from "@/components/ui/simple-tooltip";
 import { useAccessControl } from "@/hooks/useAccessControl";
@@ -33,14 +33,12 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   const { isAuthenticated, isLibrarian } = useAccessControl();
   const { session, profile } = useAuth();
   
-  // Vérifier si l'utilisateur est admin ou bibliothécaire (compatible avec Header.tsx)
   const canManageLibrary = isLibrarian || profile?.role === 'admin' || profile?.role === 'librarian';
   const [showReservationDialog, setShowReservationDialog] = useState(false);
   const [showDigitizationDialog, setShowDigitizationDialog] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
   const { activeBundles } = useElectronicBundles();
 
-  // Charger le profil utilisateur
   useEffect(() => {
     const loadUserProfile = async () => {
       if (!session?.user?.id) return;
@@ -51,7 +49,6 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
         .eq("id", session.user.id)
         .maybeSingle();
 
-      // Utiliser les données du profil ou les métadonnées de l'utilisateur comme fallback
       if (data && !error) {
         setUserProfile({
           firstName: data.first_name || "",
@@ -59,7 +56,6 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
           email: session.user.email || "",
         });
       } else {
-        // Fallback sur les métadonnées de l'utilisateur
         const metadata = session.user.user_metadata;
         setUserProfile({
           firstName: metadata?.first_name || "",
@@ -75,12 +71,12 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   }, [session, isAuthenticated]);
 
   const collectionsSubmenu = [
-    { labelKey: "dl.collections.manuscripts", descKey: "dl.collections.manuscripts.desc", tooltipKey: "dl.collections.manuscripts.tooltip", href: "/digital-library/collections/manuscripts", icon: Scroll, count: "12,450" },
-    { labelKey: "dl.collections.books", descKey: "dl.collections.books.desc", tooltipKey: "dl.collections.books.tooltip", href: "/digital-library/collections/books", icon: Book, count: "35,000" },
-    { labelKey: "dl.collections.lithography", descKey: "dl.collections.lithography.desc", tooltipKey: "dl.collections.lithography.tooltip", href: "/digital-library/collections/lithography", icon: FileText, count: "10,670" },
-    { labelKey: "dl.collections.periodicals", descKey: "dl.collections.periodicals.desc", tooltipKey: "dl.collections.periodicals.tooltip", href: "/digital-library/collections/periodicals", icon: Newspaper, count: "8,320" },
-    { labelKey: "dl.collections.specialized", descKey: "dl.collections.specialized.desc", tooltipKey: "dl.collections.specialized.tooltip", href: "/digital-library/collections/photos", icon: Map, count: "15,890" },
-    { labelKey: "dl.collections.audiovisual", descKey: "dl.collections.audiovisual.desc", tooltipKey: "dl.collections.audiovisual.tooltip", href: "/digital-library/collections/audiovisual", icon: Music, count: "2,890" },
+    { labelKey: "dl.collections.manuscripts", descKey: "dl.collections.manuscripts.desc", tooltipKey: "dl.collections.manuscripts.tooltip", href: "/digital-library/collections/manuscripts", iconName: "mdi:scroll-text-outline", count: "12,450" },
+    { labelKey: "dl.collections.books", descKey: "dl.collections.books.desc", tooltipKey: "dl.collections.books.tooltip", href: "/digital-library/collections/books", iconName: "mdi:book-outline", count: "35,000" },
+    { labelKey: "dl.collections.lithography", descKey: "dl.collections.lithography.desc", tooltipKey: "dl.collections.lithography.tooltip", href: "/digital-library/collections/lithography", iconName: "mdi:file-document-outline", count: "10,670" },
+    { labelKey: "dl.collections.periodicals", descKey: "dl.collections.periodicals.desc", tooltipKey: "dl.collections.periodicals.tooltip", href: "/digital-library/collections/periodicals", iconName: "mdi:newspaper-variant-outline", count: "8,320" },
+    { labelKey: "dl.collections.specialized", descKey: "dl.collections.specialized.desc", tooltipKey: "dl.collections.specialized.tooltip", href: "/digital-library/collections/photos", iconName: "mdi:map-outline", count: "15,890" },
+    { labelKey: "dl.collections.audiovisual", descKey: "dl.collections.audiovisual.desc", tooltipKey: "dl.collections.audiovisual.tooltip", href: "/digital-library/collections/audiovisual", iconName: "mdi:music-note-outline", count: "2,890" },
   ];
 
   const themesSubmenu = [
@@ -116,7 +112,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
       <nav className="bg-card border-b sticky top-0 z-50 shadow-sm" role="navigation" aria-label="Navigation principale">
         <div className="container mx-auto px-4 py-3">
           <div className="flex items-center justify-between">
-            {/* Logo + Titre de la bibliothèque numérique */}
+            {/* Logo + Titre */}
             <div className="flex items-center gap-6">
               <Link 
                 to="/digital-library" 
@@ -135,11 +131,11 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               </Link>
             </div>
 
-            {/* Bouton Gestion Bibliothèque Numérique pour admin/bibliothécaire */}
+            {/* Bouton Gestion */}
             {canManageLibrary && (
               <Link to="/admin/digital-library">
                 <Button variant="outline" size="sm" className="gap-2 border-gold-bn-primary/40 hover:border-gold-bn-primary hover:bg-gold-bn-primary/10">
-                  <Shield className="h-4 w-4" />
+                  <Icon name="mdi:shield-outline" className="h-4 w-4" />
                   <span className="hidden sm:inline">{t('dl.manageLibrary')}</span>
                   <span className="sm:hidden">{t('dl.administration')}</span>
                 </Button>
@@ -149,58 +145,48 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
             {/* Menu Portails */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-gold-bn-primary focus-visible:ring-offset-2"
-                  aria-label="Portails"
-                >
-                  <LayoutGrid className="h-4 w-4" aria-hidden="true" />
+                <Button variant="outline" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-gold-bn-primary focus-visible:ring-offset-2" aria-label="Portails">
+                  <Icon name="mdi:view-grid-outline" className="h-4 w-4" />
                   <span className="hidden sm:inline">Portails</span>
-                  <ChevronDown className="h-3 w-3" aria-hidden="true" />
+                  <Icon name="mdi:chevron-down" className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="bg-card z-50" role="menu" aria-label="Portails">
                 <Link to="/">
                   <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
-                    <Home className="h-4 w-4" aria-hidden="true" />
+                    <Icon name="mdi:home-outline" className="h-4 w-4" />
                     Portail Principal
                   </DropdownMenuItem>
                 </Link>
                 <Link to="/digital-library">
                   <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
-                    <Library className="h-4 w-4" aria-hidden="true" />
+                    <Icon name="mdi:library" className="h-4 w-4" />
                     Bibliothèque Numérique
                   </DropdownMenuItem>
                 </Link>
                 <Link to="/manuscripts">
                   <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
-                    <Scroll className="h-4 w-4" aria-hidden="true" />
+                    <Icon name="mdi:scroll-text-outline" className="h-4 w-4" />
                     Manuscrits Numérisés
                   </DropdownMenuItem>
                 </Link>
                 <Link to="/portail-cbm">
                   <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
-                    <Globe className="h-4 w-4" aria-hidden="true" />
+                    <Icon name="mdi:earth" className="h-4 w-4" />
                     Portail CBM
                   </DropdownMenuItem>
                 </Link>
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Language Selector, Theme Switcher & User Menu */}
+            {/* Language & User Menu */}
             <div className="flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-gold-bn-primary focus-visible:ring-offset-2" 
-                    aria-label="Sélectionner la langue"
-                  >
-                    <Globe className="h-4 w-4" aria-hidden="true" />
+                  <Button variant="outline" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-gold-bn-primary focus-visible:ring-offset-2" aria-label="Sélectionner la langue">
+                    <Icon name="mdi:earth" className="h-4 w-4" />
                     <span className="hidden sm:inline">{languages.find(lang => lang.code === language)?.label}</span>
-                    <ChevronDown className="h-3 w-3" aria-hidden="true" />
+                    <Icon name="mdi:chevron-down" className="h-3 w-3" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="bg-card z-50" role="menu" aria-label={t('dl.chooseLanguage')}>
@@ -215,34 +201,25 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                       aria-current={language === lang.code ? 'true' : 'false'}
                     >
                       {lang.label}
-                      {language === lang.code && <span className="ml-auto text-gold-bn-primary" aria-hidden="true">✓</span>}
+                      {language === lang.code && <span className="ml-auto text-gold-bn-primary">✓</span>}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>
               <ThemeSwitcher />
               
-              {/* Boutons Connexion/Adhésion pour utilisateurs non connectés */}
+              {/* Boutons Connexion/Adhésion */}
               {!isAuthenticated && (
                 <div className="flex items-center gap-2">
                   <Link to="/auth?redirect=/digital-library">
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-gold-bn-primary focus-visible:ring-offset-2"
-                      aria-label={t('dl.login')}
-                    >
-                      <LogIn className="h-4 w-4" aria-hidden="true" />
+                    <Button variant="outline" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-gold-bn-primary focus-visible:ring-offset-2" aria-label={t('dl.login')}>
+                      <Icon name="mdi:login" className="h-4 w-4" />
                       <span className="hidden sm:inline">{t('dl.login')}</span>
                     </Button>
                   </Link>
                   <Link to="/abonnements?platform=bn">
-                    <Button 
-                      size="sm" 
-                      className="gap-2 text-sm bg-gold-bn-primary hover:bg-gold-bn-primary-dark text-white focus-visible:ring-2 focus-visible:ring-gold-bn-primary focus-visible:ring-offset-2"
-                      aria-label={t('dl.membership')}
-                    >
-                      <UserPlus className="h-4 w-4" aria-hidden="true" />
+                    <Button size="sm" className="gap-2 text-sm bg-gold-bn-primary hover:bg-gold-bn-primary-dark text-white focus-visible:ring-2 focus-visible:ring-gold-bn-primary focus-visible:ring-offset-2" aria-label={t('dl.membership')}>
+                      <Icon name="mdi:account-plus-outline" className="h-4 w-4" />
                       <span className="hidden sm:inline">{t('dl.membership')}</span>
                     </Button>
                   </Link>
@@ -253,17 +230,12 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               {isAuthenticated && (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      size="sm" 
-                      className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" 
-                      aria-label="Menu utilisateur"
-                    >
-                      <User className="h-4 w-4" aria-hidden="true" />
+                    <Button variant="outline" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label="Menu utilisateur">
+                      <Icon name="mdi:account-outline" className="h-4 w-4" />
                       <span className="hidden sm:inline">
                         {userProfile?.firstName || session?.user?.email?.split('@')[0] || t('dl.myAccount')}
                       </span>
-                      <ChevronDown className="h-3 w-3" aria-hidden="true" />
+                      <Icon name="mdi:chevron-down" className="h-3 w-3" />
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="bg-card z-50 w-56" role="menu" aria-label={t('dl.myAccount')}>
@@ -283,7 +255,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                         {adminMenu.map((item) => (
                           <Link key={item.href} to={item.href}>
                             <DropdownMenuItem className="cursor-pointer focus:bg-accent focus:text-accent-foreground">
-                              <Settings className="h-4 w-4 mr-2" aria-hidden="true" />
+                              <Icon name="mdi:cog-outline" className="h-4 w-4 mr-2" />
                               {t(item.labelKey)}
                             </DropdownMenuItem>
                           </Link>
@@ -298,7 +270,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                         window.location.href = '/digital-library';
                       }}
                     >
-                      <LogOut className="h-4 w-4" aria-hidden="true" />
+                      <Icon name="mdi:logout" className="h-4 w-4" />
                       {t('dl.logout')}
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -310,14 +282,8 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
           {/* Main Menu */}
           <div className="flex items-center gap-1 mt-3 overflow-x-auto" role="menubar" aria-label="Menu principal">
             <Link to="/digital-library">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" 
-                role="menuitem"
-                aria-label={t('dl.home')}
-              >
-                <Home className="h-4 w-4" aria-hidden="true" />
+              <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" role="menuitem" aria-label={t('dl.home')}>
+                <Icon name="mdi:home-outline" className="h-4 w-4" />
                 {t('dl.home')}
               </Button>
             </Link>
@@ -325,22 +291,14 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
             {/* Collections Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" 
-                  role="menuitem" 
-                  aria-haspopup="true"
-                  aria-label={t('dl.collections')}
-                >
-                  <BookOpen className="h-4 w-4" aria-hidden="true" />
+                <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" role="menuitem" aria-haspopup="true" aria-label={t('dl.collections')}>
+                  <Icon name="mdi:book-open-page-variant-outline" className="h-4 w-4" />
                   {t('dl.collections')}
-                  <ChevronDown className="h-3 w-3" aria-hidden="true" />
+                  <Icon name="mdi:chevron-down" className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="bg-card z-50 min-w-[320px] p-2" role="menu" aria-label={t('dl.collections')}>
                 {collectionsSubmenu.map((item, index) => {
-                  // Styles variés pour chaque badge - design non-linéaire
                   const badgeStyles = [
                     "bg-gradient-to-r from-gold-bn-primary to-amber-500 text-white shadow-lg shadow-gold-bn-primary/30 rotate-2",
                     "bg-white border-2 border-bn-blue text-gray-900 shadow-lg shadow-bn-blue/20 -rotate-1",
@@ -355,7 +313,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                       <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group">
                         <div className="flex items-center gap-3 flex-1">
                           <div className="p-2 rounded-xl bg-gradient-to-br from-gold-bn-primary/20 to-gold-bn-primary/5 group-hover:from-gold-bn-primary/30 group-hover:to-gold-bn-primary/10 transition-all duration-200 group-hover:scale-110">
-                            <item.icon className="h-5 w-5 text-gold-bn-primary" aria-hidden="true" />
+                            <Icon name={item.iconName} className="h-5 w-5 text-gold-bn-primary" />
                           </div>
                           <div className="flex flex-col">
                             <span className="font-semibold text-foreground group-hover:text-gold-bn-primary transition-colors">{t(item.labelKey)}</span>
@@ -372,19 +330,13 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Bouquets électroniques Dropdown - après Collections */}
+            {/* Bouquets électroniques */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                  aria-label={t('dl.electronicBundles')}
-                  aria-haspopup="true"
-                >
-                  <Library className="h-4 w-4" aria-hidden="true" />
+                <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.electronicBundles')} aria-haspopup="true">
+                  <Icon name="mdi:library" className="h-4 w-4" />
                   {t('dl.electronicBundles')}
-                  <ChevronDown className="h-3 w-3" aria-hidden="true" />
+                  <Icon name="mdi:chevron-down" className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="bg-card z-50 min-w-[200px]">
@@ -403,13 +355,9 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                     >
                       <div className="flex items-center gap-2">
                         {bundle.provider_logo_url ? (
-                          <img 
-                            src={bundle.provider_logo_url} 
-                            alt={bundle.provider}
-                            className="h-4 w-4 object-contain"
-                          />
+                          <img src={bundle.provider_logo_url} alt={bundle.provider} className="h-4 w-4 object-contain" />
                         ) : (
-                          <Globe className="h-4 w-4" aria-hidden="true" />
+                          <Icon name="mdi:earth" className="h-4 w-4" />
                         )}
                         <div className="flex flex-col">
                           <span>{language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name}</span>
@@ -427,71 +375,48 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
             </DropdownMenu>
 
             <Link to="/digital-library/search">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                aria-label={t('dl.advancedSearch')}
-              >
-                <Search className="h-4 w-4" aria-hidden="true" />
+              <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.advancedSearch')}>
+                <Icon name="mdi:magnify" className="h-4 w-4" />
                 {t('dl.advancedSearch')}
               </Button>
             </Link>
 
-            {/* Services aux lecteurs Dropdown */}
+            {/* Services aux lecteurs */}
             {isAuthenticated && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                    aria-label={t('dl.readerServices')}
-                    aria-haspopup="true"
-                  >
-                    <BookmarkCheck className="h-4 w-4" aria-hidden="true" />
+                  <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.readerServices')} aria-haspopup="true">
+                    <Icon name="mdi:bookmark-check-outline" className="h-4 w-4" />
                     {t('dl.readerServices')}
-                    <ChevronDown className="h-3 w-3" aria-hidden="true" />
+                    <Icon name="mdi:chevron-down" className="h-3 w-3" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="bg-card z-50" role="menu" aria-label={t('dl.readerServices')}>
                   <Link to="/abonnements?platform=bn">
                     <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
-                      <UserPlus className="h-4 w-4" aria-hidden="true" />
+                      <Icon name="mdi:account-plus-outline" className="h-4 w-4" />
                       {t('dl.membership')}
                     </DropdownMenuItem>
                   </Link>
-                  <DropdownMenuItem 
-                    className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground"
-                    onClick={() => setShowReservationDialog(true)}
-                  >
-                    <BookmarkCheck className="h-4 w-4" aria-hidden="true" />
+                  <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground" onClick={() => setShowReservationDialog(true)}>
+                    <Icon name="mdi:bookmark-check-outline" className="h-4 w-4" />
                     {t('dl.reservationRequest')}
                   </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground"
-                    onClick={() => setShowDigitizationDialog(true)}
-                  >
-                    <FileDigit className="h-4 w-4" aria-hidden="true" />
+                  <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground" onClick={() => setShowDigitizationDialog(true)}>
+                    <Icon name="mdi:file-document-edit-outline" className="h-4 w-4" />
                     {t('dl.digitizationRequest')}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
 
-            {/* Themes Dropdown */}
+            {/* Themes */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                  aria-label={t('dl.exploreByTheme')}
-                  aria-haspopup="true"
-                >
-                  <Globe className="h-4 w-4" aria-hidden="true" />
+                <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.exploreByTheme')} aria-haspopup="true">
+                  <Icon name="mdi:earth" className="h-4 w-4" />
                   {t('dl.exploreByTheme')}
-                  <ChevronDown className="h-3 w-3" aria-hidden="true" />
+                  <Icon name="mdi:chevron-down" className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="bg-card z-50">
@@ -504,26 +429,17 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
+
             <Link to="/digital-library/news">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                aria-label={t('dl.newsEvents')}
-              >
-                <Calendar className="h-4 w-4" aria-hidden="true" />
+              <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.newsEvents')}>
+                <Icon name="mdi:calendar-month-outline" className="h-4 w-4" />
                 {t('dl.newsEvents')}
               </Button>
             </Link>
 
             <Link to="/digital-library/help">
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                aria-label={t('dl.helpFaq')}
-              >
-                <HelpCircle className="h-4 w-4" aria-hidden="true" />
+              <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.helpFaq')}>
+                <Icon name="mdi:help-circle-outline" className="h-4 w-4" />
                 {t('dl.helpFaq')}
               </Button>
             </Link>

@@ -66,8 +66,8 @@ interface IconProps {
   onClick?: () => void;
   /** Accessibility label */
   "aria-label"?: string;
-  /** Hide from screen readers */
-  "aria-hidden"?: boolean;
+  /** Hide from screen readers (accepts boolean or "true"/"false" string) */
+  "aria-hidden"?: boolean | "true" | "false";
 }
 
 export function Icon({
