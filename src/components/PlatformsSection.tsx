@@ -87,7 +87,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
             className="relative cursor-pointer group transition-transform duration-300 hover:scale-[1.02]"
             onClick={() => navigate(mainPlatform.path)}
           >
-            <div className="relative h-[520px] w-[380px] flex">
+            <div className="relative h-[550px] w-[380px] flex">
               {/* Book Spine (left edge) */}
               <div className="w-6 h-full bg-gradient-to-r from-[#1a3a5c] via-[#2a5a8c] to-[#1a3a5c] rounded-l-sm shadow-inner flex-shrink-0">
                 <div className="absolute left-0 top-0 w-6 h-full bg-gradient-to-r from-black/30 to-transparent" />
