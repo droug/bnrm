@@ -11,7 +11,8 @@ import {
   Users, Eye, Clock, Search, MousePointerClick, FileText, 
   Globe2, TrendingUp, MessageSquare, Share2, Zap, BarChart3,
   RefreshCw, Video, Bot, Cpu, Map, ArrowUpRight, ArrowDownRight,
-  Calendar, Activity, Target, Gauge
+  Calendar, Activity, Target, Gauge, Wallet, Smartphone, CreditCard,
+  Download, ShoppingCart, Building2, DollarSign
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend, AreaChart, Area } from "recharts";
 import { cn } from "@/lib/utils";
@@ -80,6 +81,34 @@ interface KPIData {
   realtime: {
     activeUsers: number;
     currentPages: { path: string; users: number }[];
+  };
+  eWallet: {
+    mobileDownloads: {
+      total: number;
+      ios: number;
+      android: number;
+      trend: number;
+    };
+    mobileUsage: {
+      dailyActiveUsers: number;
+      monthlyActiveUsers: number;
+      sessionsPerUser: number;
+      avgSessionDuration: number;
+    };
+    walletUsage: {
+      totalTransactions: number;
+      libraryAccess: number;
+      eServicePayments: number;
+      subscriptions: number;
+      documentPurchases: number;
+    };
+    financials: {
+      avgWalletBalance: number;
+      totalCumulated: number;
+      totalTopUps: number;
+      totalSpent: number;
+      currency: string;
+    };
   };
 }
 
@@ -253,6 +282,34 @@ export function PortalAnalyticsKPICard({ platform = "portail", dateRange }: Port
             users: p.count
           })),
         },
+        eWallet: {
+          mobileDownloads: {
+            total: 12450,
+            ios: 5230,
+            android: 7220,
+            trend: 15.8,
+          },
+          mobileUsage: {
+            dailyActiveUsers: 856,
+            monthlyActiveUsers: 4250,
+            sessionsPerUser: 3.2,
+            avgSessionDuration: 185, // seconds
+          },
+          walletUsage: {
+            totalTransactions: 8934,
+            libraryAccess: 3456,
+            eServicePayments: 2890,
+            subscriptions: 1678,
+            documentPurchases: 910,
+          },
+          financials: {
+            avgWalletBalance: 125.50,
+            totalCumulated: 523450.00,
+            totalTopUps: 678900.00,
+            totalSpent: 155450.00,
+            currency: 'MAD',
+          },
+        },
       };
 
       setKpiData(kpi);
@@ -343,7 +400,7 @@ export function PortalAnalyticsKPICard({ platform = "portail", dateRange }: Port
 
       <CardContent className="p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 lg:w-auto lg:inline-flex">
+          <TabsList className="grid w-full grid-cols-6 lg:w-auto lg:inline-flex">
             <TabsTrigger value="overview" className="gap-2">
               <Activity className="h-4 w-4" />
               Vue d'ensemble
@@ -359,6 +416,10 @@ export function PortalAnalyticsKPICard({ platform = "portail", dateRange }: Port
             <TabsTrigger value="chatbot" className="gap-2">
               <Bot className="h-4 w-4" />
               Chatbot
+            </TabsTrigger>
+            <TabsTrigger value="ewallet" className="gap-2">
+              <Wallet className="h-4 w-4" />
+              eWallet
             </TabsTrigger>
             <TabsTrigger value="performance" className="gap-2">
               <Gauge className="h-4 w-4" />
@@ -950,6 +1011,240 @@ export function PortalAnalyticsKPICard({ platform = "portail", dateRange }: Port
                 </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* eWallet Tab */}
+          <TabsContent value="ewallet" className="space-y-6">
+            {/* Mobile App Downloads */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100/50 border-emerald-200">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-emerald-700">Téléchargements App</CardTitle>
+                  <Download className="h-4 w-4 text-emerald-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-emerald-900">{formatNumber(kpiData.eWallet.mobileDownloads.total)}</div>
+                  <div className="flex items-center gap-1 mt-1">
+                    <ArrowUpRight className="h-3 w-3 text-emerald-600" />
+                    <span className="text-xs text-emerald-600">+{kpiData.eWallet.mobileDownloads.trend}%</span>
+                    <span className="text-xs text-muted-foreground">ce mois</span>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-sky-50 to-sky-100/50 border-sky-200">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-sky-700">Utilisateurs Actifs/Jour</CardTitle>
+                  <Smartphone className="h-4 w-4 text-sky-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-sky-900">{formatNumber(kpiData.eWallet.mobileUsage.dailyActiveUsers)}</div>
+                  <p className="text-xs text-muted-foreground">
+                    {formatNumber(kpiData.eWallet.mobileUsage.monthlyActiveUsers)} MAU
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-amber-50 to-amber-100/50 border-amber-200">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-amber-700">Solde Moyen eWallet</CardTitle>
+                  <Wallet className="h-4 w-4 text-amber-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-amber-900">
+                    {kpiData.eWallet.financials.avgWalletBalance.toFixed(2)} <span className="text-lg">{kpiData.eWallet.financials.currency}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">par utilisateur</p>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-gradient-to-br from-violet-50 to-violet-100/50 border-violet-200">
+                <CardHeader className="flex flex-row items-center justify-between pb-2">
+                  <CardTitle className="text-sm font-medium text-violet-700">Montant Cumulé</CardTitle>
+                  <DollarSign className="h-4 w-4 text-violet-500" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-violet-900">
+                    {formatNumber(kpiData.eWallet.financials.totalCumulated)} <span className="text-lg">{kpiData.eWallet.financials.currency}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground">total en circulation</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Store Downloads Distribution */}
+            <div className="grid gap-6 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Smartphone className="h-5 w-5" />
+                    Téléchargements par Store
+                  </CardTitle>
+                  <CardDescription>Distribution iOS vs Android</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <PieChart>
+                      <Pie
+                        data={[
+                          { name: 'iOS (App Store)', value: kpiData.eWallet.mobileDownloads.ios },
+                          { name: 'Android (Play Store)', value: kpiData.eWallet.mobileDownloads.android },
+                        ]}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={80}
+                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                      >
+                        <Cell fill="#007AFF" />
+                        <Cell fill="#3DDC84" />
+                      </Pie>
+                      <Tooltip formatter={(value: number) => formatNumber(value)} />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <CreditCard className="h-5 w-5" />
+                    Utilisation eWallet par Usage
+                  </CardTitle>
+                  <CardDescription>Répartition des transactions</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={250}>
+                    <BarChart
+                      data={[
+                        { usage: 'Accès Bibliothèque', count: kpiData.eWallet.walletUsage.libraryAccess },
+                        { usage: 'eServices', count: kpiData.eWallet.walletUsage.eServicePayments },
+                        { usage: 'Abonnements', count: kpiData.eWallet.walletUsage.subscriptions },
+                        { usage: 'Documents', count: kpiData.eWallet.walletUsage.documentPurchases },
+                      ]}
+                      layout="vertical"
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis type="number" />
+                      <YAxis dataKey="usage" type="category" width={120} />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Financial Summary & Mobile Usage Stats */}
+            <div className="grid gap-6 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <DollarSign className="h-5 w-5" />
+                    Statistiques Financières ePayment
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-emerald-500/10">
+                          <ArrowUpRight className="h-4 w-4 text-emerald-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium">Total Rechargements</div>
+                          <div className="text-sm text-muted-foreground">Crédits ajoutés</div>
+                        </div>
+                      </div>
+                      <div className="text-xl font-bold text-emerald-600">
+                        {formatNumber(kpiData.eWallet.financials.totalTopUps)} {kpiData.eWallet.financials.currency}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-rose-500/10">
+                          <ArrowDownRight className="h-4 w-4 text-rose-600" />
+                        </div>
+                        <div>
+                          <div className="font-medium">Total Dépensé</div>
+                          <div className="text-sm text-muted-foreground">Paiements effectués</div>
+                        </div>
+                      </div>
+                      <div className="text-xl font-bold text-rose-600">
+                        {formatNumber(kpiData.eWallet.financials.totalSpent)} {kpiData.eWallet.financials.currency}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between p-4 rounded-lg bg-muted/50">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-full bg-primary/10">
+                          <ShoppingCart className="h-4 w-4 text-primary" />
+                        </div>
+                        <div>
+                          <div className="font-medium">Total Transactions</div>
+                          <div className="text-sm text-muted-foreground">Tous types confondus</div>
+                        </div>
+                      </div>
+                      <div className="text-xl font-bold">
+                        {formatNumber(kpiData.eWallet.walletUsage.totalTransactions)}
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Smartphone className="h-5 w-5" />
+                    Statistiques Application Mobile
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-center p-4 rounded-lg bg-muted/50">
+                        <div className="text-2xl font-bold">{kpiData.eWallet.mobileUsage.sessionsPerUser}</div>
+                        <div className="text-sm text-muted-foreground">Sessions/Utilisateur</div>
+                      </div>
+                      <div className="text-center p-4 rounded-lg bg-muted/50">
+                        <div className="text-2xl font-bold">{formatDuration(kpiData.eWallet.mobileUsage.avgSessionDuration)}</div>
+                        <div className="text-sm text-muted-foreground">Durée Moyenne</div>
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-lg border">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="font-medium">DAU / MAU Ratio</span>
+                        <span className="font-bold">
+                          {((kpiData.eWallet.mobileUsage.dailyActiveUsers / kpiData.eWallet.mobileUsage.monthlyActiveUsers) * 100).toFixed(1)}%
+                        </span>
+                      </div>
+                      <Progress 
+                        value={(kpiData.eWallet.mobileUsage.dailyActiveUsers / kpiData.eWallet.mobileUsage.monthlyActiveUsers) * 100} 
+                      />
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Indicateur de rétention et engagement utilisateur
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 text-center">
+                      <div>
+                        <Badge variant="outline" className="mb-2">iOS</Badge>
+                        <div className="text-lg font-bold">{formatNumber(kpiData.eWallet.mobileDownloads.ios)}</div>
+                      </div>
+                      <div>
+                        <Badge variant="outline" className="mb-2">Android</Badge>
+                        <div className="text-lg font-bold">{formatNumber(kpiData.eWallet.mobileDownloads.android)}</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </TabsContent>
         </Tabs>
       </CardContent>
