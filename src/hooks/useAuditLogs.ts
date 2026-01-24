@@ -83,10 +83,12 @@ export const RESOURCE_TYPES = {
   EXHIBITION: 'exhibition',
 } as const;
 
-// Hook to fetch audit logs with filters
-export function useAuditLogs(filters: AuditLogFilters = {}, page = 1, pageSize = 50) {
+// Hook to fetch audit logs with filters (with real-time refresh)
+export function useAuditLogs(filters: AuditLogFilters = {}, page = 1, pageSize = 50, enableRealtime = true) {
   return useQuery({
     queryKey: ['audit-logs', filters, page, pageSize],
+    refetchInterval: enableRealtime ? 10000 : false, // Rafraîchissement toutes les 10 secondes
+    refetchIntervalInBackground: false,
     queryFn: async () => {
       let query = supabase
         .from('activity_logs')
@@ -237,10 +239,12 @@ export async function logAuditAction(
   }
 }
 
-// Hook for audit statistics
-export function useAuditStats(days = 30) {
+// Hook for audit statistics (with real-time refresh)
+export function useAuditStats(days = 30, enableRealtime = true) {
   return useQuery({
     queryKey: ['audit-stats', days],
+    refetchInterval: enableRealtime ? 15000 : false, // Rafraîchissement toutes les 15 secondes
+    refetchIntervalInBackground: false,
     queryFn: async () => {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - days);
