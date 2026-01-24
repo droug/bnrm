@@ -107,7 +107,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Main Analytics - Using PortalAnalyticsKPICard with Bibliothèque tab active */}
-        <PortalAnalyticsKPICard platform="bn" defaultTab="digital-library" />
+        <PortalAnalyticsKPICard platform="bn" showOnlyTab="digital-library" />
       </div>
     </DigitalLibraryLayout>
   );
