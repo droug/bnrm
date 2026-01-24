@@ -15,6 +15,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Plus, Trash2, Edit, Image, MapPin, FileText, Video, Navigation } from "lucide-react";
 import { VExpoImageUpload } from "@/components/vexpo360/VExpoImageUpload";
+import { PanoramaPositionPicker } from "@/components/vexpo360/PanoramaPositionPicker";
 
 interface Panorama {
   id: string;
@@ -519,6 +520,19 @@ export default function VExpo360PanoramaEditor() {
                           </div>
                         </div>
 
+                        {/* Visual Position Picker */}
+                        {selectedPanorama && (
+                          <PanoramaPositionPicker
+                            panoramaUrl={selectedPanorama.panorama_image_url}
+                            yaw={hotspotForm.yaw}
+                            pitch={hotspotForm.pitch}
+                            onPositionChange={(newYaw, newPitch) => {
+                              setHotspotForm(h => ({ ...h, yaw: newYaw, pitch: newPitch }));
+                            }}
+                          />
+                        )}
+
+                        {/* Manual position inputs */}
                         <div className="grid grid-cols-2 gap-4">
                           <div>
                             <Label>Yaw (horizontal) *</Label>
