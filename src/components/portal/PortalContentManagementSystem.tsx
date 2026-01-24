@@ -15,6 +15,7 @@ import CmsMediathequeManager from "@/components/cms/CmsMediathequeManager";
 import CmsDigitalServicesManager from "@/components/cms/CmsDigitalServicesManager";
 import CmsWysiwygModule from "@/components/cms/CmsWysiwygModule";
 import CmsSeoManager from "@/components/cms/CmsSeoManager";
+import CmsVisualResourcesManager from "@/components/cms/CmsVisualResourcesManager";
 import {
   FileText, 
   Webhook, 
@@ -37,7 +38,8 @@ import {
   BookOpen,
   Palette,
   Settings2,
-  PenSquare
+  PenSquare,
+  Shapes
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -186,6 +188,16 @@ const tabs = [
     borderColor: "border-indigo-500/30",
     gradient: "from-indigo-500/20 to-indigo-600/5",
     description: "Blocs de contenu des pages"
+  },
+  { 
+    id: "visual-resources", 
+    label: "Ressources Visuelles", 
+    icon: Shapes, 
+    color: "text-violet-500",
+    bgColor: "bg-violet-500/10",
+    borderColor: "border-violet-500/30",
+    gradient: "from-violet-500/20 to-violet-600/5",
+    description: "Icônes, logos et pictogrammes"
   },
   { 
     id: "media", 
@@ -374,6 +386,8 @@ export default function PortalContentManagementSystem() {
         return <CmsSectionsManager />;
       case "mediatheque":
         return <CmsMediathequeManager />;
+      case "visual-resources":
+        return <CmsVisualResourcesManager />;
       case "media":
         return <CmsMediaManager />;
       case "menus":

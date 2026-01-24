@@ -2652,6 +2652,60 @@ export type Database = {
           },
         ]
       }
+      cms_visual_resources: {
+        Row: {
+          category: string
+          created_at: string
+          created_by: string | null
+          description_ar: string | null
+          description_fr: string | null
+          file_size: number | null
+          file_type: string
+          file_url: string
+          id: string
+          is_active: boolean | null
+          name: string
+          name_ar: string | null
+          tags: string[] | null
+          updated_at: string
+          usage_count: number | null
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description_ar?: string | null
+          description_fr?: string | null
+          file_size?: number | null
+          file_type?: string
+          file_url: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          name_ar?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          usage_count?: number | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description_ar?: string | null
+          description_fr?: string | null
+          file_size?: number | null
+          file_type?: string
+          file_url?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          name_ar?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          usage_count?: number | null
+        }
+        Relationships: []
+      }
       cms_webhook_logs: {
         Row: {
           completed_at: string | null
