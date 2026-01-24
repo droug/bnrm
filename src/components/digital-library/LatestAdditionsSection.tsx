@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BookOpen, ChevronLeft, ChevronRight, Grid3X3 } from "lucide-react";
+import { FilePlus2, ChevronLeft, ChevronRight } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -65,7 +65,7 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
           {/* Gold Grid Icon */}
           <div className="flex justify-center mb-4">
             <div className="w-14 h-14 rounded-lg border-2 border-gold-bn-primary flex items-center justify-center">
-              <Grid3X3 className="h-7 w-7 text-gold-bn-primary" strokeWidth={1.5} />
+              <FilePlus2 className="h-7 w-7 text-gold-bn-primary" strokeWidth={1.5} />
             </div>
           </div>
           

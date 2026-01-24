@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ExternalLink, ChevronLeft, ChevronRight, Grid3X3 } from "lucide-react";
+import { ExternalLink, ChevronLeft, ChevronRight, LayoutGrid } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -61,7 +61,7 @@ export function ElectronicResourcesSection({ section, language }: SectionProps) 
         <div className="text-center mb-10">
           <div className="flex justify-center mb-4">
             <div className="w-12 h-12 rounded-lg border-2 border-gold-bn-primary flex items-center justify-center">
-              <Grid3X3 className="h-6 w-6 text-gold-bn-primary" strokeWidth={1.5} />
+              <LayoutGrid className="h-6 w-6 text-gold-bn-primary" strokeWidth={1.5} />
             </div>
           </div>
           <h2 className="text-3xl md:text-4xl font-heading font-semibold text-slate-dark">
