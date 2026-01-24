@@ -32,7 +32,8 @@ const mdiIconLibrary: Record<string, string[]> = {
     "mdi:note-text-outline",
   ],
   "Grilles & Tableaux": [
-    "mdi:table-box-multiple-outline",
+    "mdi:select-multiple",
+    "mdi:table-large-plus",
     "mdi:view-grid-outline",
     "mdi:grid",
     "mdi:table-large",
@@ -197,8 +198,8 @@ const mdiIconLibrary: Record<string, string[]> = {
 
 // Sections that can have icons configured for BN platform
 const sectionIconConfigs = [
-  { id: "ressources_electroniques", label: "Ressources électroniques", defaultIcon: "mdi:table-box-multiple-outline" },
-  { id: "ibn_battouta_stats", label: "Ibn Battouta en chiffres", defaultIcon: "mdi:chart-box-outline" },
+  { id: "ressources_electroniques", label: "Ressources électroniques", defaultIcon: "mdi:select-multiple" },
+  { id: "ibn_battouta_stats", label: "Ibn Battouta en chiffres", defaultIcon: "mdi:format-list-numbered" },
   { id: "derniers_ajouts", label: "Derniers ajouts", defaultIcon: "mdi:book-open-page-variant-outline" },
   { id: "mediatheque", label: "Médiathèque", defaultIcon: "mdi:video-box" },
   { id: "hero", label: "Section Hero", defaultIcon: "mdi:home-outline" },

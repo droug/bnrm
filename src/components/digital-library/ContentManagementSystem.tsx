@@ -13,7 +13,9 @@ import CmsSectionsManager from "@/components/cms/CmsSectionsManager";
 import CmsHeroManagerBN from "@/components/cms/CmsHeroManagerBN";
 import CmsStyleManager from "@/components/cms/CmsStyleManager";
 import CmsVExpo360Manager from "@/components/cms/CmsVExpo360Manager";
+import CmsSectionIconsManager from "@/components/cms/CmsSectionIconsManager";
 import FeaturedWorksManager from "@/components/admin/FeaturedWorksManager";
+import { Icon } from "@/components/ui/icon";
 import { 
   Sparkles, 
   FileText, 
@@ -63,6 +65,17 @@ const tabs = [
     borderColor: "border-fuchsia-500/30",
     gradient: "from-fuchsia-500/20 to-fuchsia-600/5",
     description: "Couleurs, polices et boutons"
+  },
+  { 
+    id: "icons", 
+    label: "Icônes des sections", 
+    icon: null, // Using custom MDI icon
+    iconMdi: "mdi:shape-outline",
+    color: "text-teal-500",
+    bgColor: "bg-teal-500/10",
+    borderColor: "border-teal-500/30",
+    gradient: "from-teal-500/20 to-teal-600/5",
+    description: "Personnaliser les icônes MDI"
   },
   { 
     id: "carrousel-bn", 
@@ -286,6 +299,8 @@ export default function ContentManagementSystem() {
         return <CmsHeroManagerBN />;
       case "styles":
         return <CmsStyleManager platform="bn" />;
+      case "icons":
+        return <CmsSectionIconsManager platform="bn" />;
       case "carrousel-bn":
         return <FeaturedWorksManager />;
       case "vexpo360":
@@ -418,7 +433,7 @@ export default function ContentManagementSystem() {
               <ScrollArea className="h-auto max-h-[calc(100vh-300px)]">
                 <nav className="space-y-1">
                   {tabs.map((tab, index) => {
-                    const Icon = tab.icon;
+                    const LucideIcon = tab.icon;
                     const isActive = activeTab === tab.id;
                     
                     return (
@@ -439,7 +454,11 @@ export default function ContentManagementSystem() {
                           "p-2 rounded-lg transition-colors",
                           isActive ? tab.bgColor : "bg-muted group-hover:bg-muted"
                         )}>
-                          <Icon className={cn("h-4 w-4", tab.color)} />
+                          {tab.iconMdi ? (
+                            <Icon name={tab.iconMdi} className={cn("h-4 w-4", tab.color)} />
+                          ) : LucideIcon ? (
+                            <LucideIcon className={cn("h-4 w-4", tab.color)} />
+                          ) : null}
                         </div>
                         <div className="flex-1 min-w-0">
                           <span className={cn(
@@ -476,7 +495,11 @@ export default function ContentManagementSystem() {
           {activeTabData && (
             <div className="flex items-center gap-3 mb-4">
               <div className={cn("p-2 rounded-lg", activeTabData.bgColor)}>
-                <activeTabData.icon className={cn("h-5 w-5", activeTabData.color)} />
+                {activeTabData.iconMdi ? (
+                  <Icon name={activeTabData.iconMdi} className={cn("h-5 w-5", activeTabData.color)} />
+                ) : activeTabData.icon ? (
+                  <activeTabData.icon className={cn("h-5 w-5", activeTabData.color)} />
+                ) : null}
               </div>
               <div>
                 <h2 className="text-xl font-semibold">{activeTabData.label}</h2>
