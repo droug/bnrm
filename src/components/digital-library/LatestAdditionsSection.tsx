@@ -1,17 +1,10 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { Link, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/hooks/useLanguage";
-
-// MDI: text-box-plus-outline
-const TextBoxPlusIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" className={className} fill="currentColor">
-    <path d="M17,14H19V17H22V19H19V22H17V19H14V17H17V14M5,3H19C20.11,3 21,3.89 21,5V12.8C20.39,12.45 19.72,12.2 19,12.08V5H5V19H12.08C12.2,19.72 12.45,20.39 12.8,21H5C3.89,21 3,20.11 3,19V5C3,3.89 3.89,3 5,3M7,7H17V9H7V7M7,11H17V12.08C16.15,12.22 15.37,12.54 14.68,13H7V11M7,15H12V17H7V15Z" />
-  </svg>
-);
 
 interface DocumentItem {
   id: string;
@@ -46,7 +39,6 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
     }
   };
 
-  // Badge color mapping based on document type
   const getBadgeColor = (type: string) => {
     const lowerType = type.toLowerCase();
     if (lowerType.includes('manuscrit') || lowerType.includes('manuscript')) {
@@ -67,21 +59,18 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
   return (
     <section className="bg-white py-16">
       <div className="container mx-auto px-4">
-        {/* Section Header - Matching reference design */}
+        {/* Section Header */}
         <div className="text-center mb-10">
-          {/* Gold Icon */}
           <div className="flex justify-center mb-4">
             <div className="w-14 h-14 rounded-lg border-2 border-gold-bn-primary flex items-center justify-center">
-              <TextBoxPlusIcon className="h-7 w-7 text-gold-bn-primary" />
+              <Icon name="mdi:text-box-plus-outline" className="h-7 w-7 text-gold-bn-primary" />
             </div>
           </div>
           
-          {/* Title - Unified with "Ressources électroniques" style */}
           <h2 className="heading-3 text-bn-blue-primary font-heading">
             {t('dl.home.latestAdditions')}
           </h2>
           
-          {/* Subtitle */}
           <p className="font-body text-regular text-muted-foreground max-w-2xl mx-auto mt-4">
             {t('dl.home.recentlyAdded')}
           </p>
@@ -90,7 +79,7 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
         {/* Cards Grid */}
         {!loading && displayedItems.length > 0 && (
           <div className="relative">
-            {/* Navigation Arrows - Outside cards */}
+            {/* Navigation Arrows */}
             <div className="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 flex-col gap-2 z-10">
               <Button
                 variant="ghost"
@@ -99,7 +88,7 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
                 onClick={() => goToPage(currentPage - 1)}
                 disabled={currentPage === 0}
               >
-                <ChevronLeft className="h-5 w-5 text-slate-text-dark" />
+                <Icon name="mdi:chevron-left" className="h-5 w-5 text-slate-text-dark" />
               </Button>
               <Button
                 variant="ghost"
@@ -108,7 +97,7 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
                 onClick={() => goToPage(currentPage + 1)}
                 disabled={currentPage >= totalPages - 1}
               >
-                <ChevronRight className="h-5 w-5 text-slate-text-dark" />
+                <Icon name="mdi:chevron-right" className="h-5 w-5 text-slate-text-dark" />
               </Button>
             </div>
 
@@ -119,14 +108,12 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
                   key={item.id} 
                   className="group bg-white border border-slate-border hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
                 >
-                  {/* Image Container */}
                   <div className="relative aspect-[4/3] overflow-hidden bg-slate-light">
                     <img 
                       src={item.thumbnail} 
                       alt={item.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    {/* Category Badge - Positioned on image */}
                     <Badge 
                       className={`absolute bottom-3 left-3 ${getBadgeColor(item.type)} px-3 py-1 text-xs font-medium shadow-md`}
                     >
@@ -134,7 +121,6 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
                     </Badge>
                   </div>
                   
-                  {/* Content */}
                   <CardHeader className="flex-1 p-4 pb-2">
                     <CardTitle className="text-base font-semibold text-slate-base-dark line-clamp-2 leading-snug mb-1">
                       {item.title}
@@ -144,14 +130,13 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
                     </CardDescription>
                   </CardHeader>
                   
-                  {/* Action Link */}
                   <CardContent className="p-4 pt-2">
                     <button
                       onClick={() => onConsultDocument(item)}
                       className="group/link inline-flex items-center gap-1 text-gold-bn-primary-dark hover:text-gold-bn-primary font-medium text-sm transition-colors"
                     >
                       {t('dl.home.readMore') || 'En savoir plus'}
-                      <ChevronRight className="h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
+                      <Icon name="mdi:chevron-right" className="h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
                     </button>
                   </CardContent>
                 </Card>
@@ -182,7 +167,7 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
         {loading && (
           <div className="text-center py-12">
             <div className="inline-flex items-center gap-2 text-slate-text">
-              <div className="w-5 h-5 border-2 border-gold-bn-primary border-t-transparent rounded-full animate-spin" />
+              <Icon name="mdi:loading" className="w-5 h-5 animate-spin text-gold-bn-primary" />
               {t('dl.home.loadingDocuments')}
             </div>
           </div>

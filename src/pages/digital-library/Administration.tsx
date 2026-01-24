@@ -1,10 +1,7 @@
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { 
-  LayoutDashboard, Database, Users, Upload, BarChart3, FileImage,
-  Shield, Copyright, Settings, Image, FolderOpen, Lock, Globe, View
-} from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
@@ -36,7 +33,10 @@ export default function Administration() {
     return (
       <DigitalLibraryLayout>
         <div className="container mx-auto px-4 py-8">
-          <p className="text-center">Chargement...</p>
+          <div className="flex items-center justify-center gap-2">
+            <Icon name="mdi:loading" className="h-5 w-5 animate-spin" />
+            <p>Chargement...</p>
+          </div>
         </div>
       </DigitalLibraryLayout>
     );
@@ -50,96 +50,95 @@ export default function Administration() {
     {
       title: "Système de Gestion de Contenu",
       description: "CMS complet pour créer et gérer tout le contenu de la plateforme",
-      icon: FileImage,
+      iconName: "mdi:file-image-outline",
       path: "/admin/content-management-BN",
       color: "bg-violet-100 text-violet-600",
     },
     {
       title: "CMS Expositions 360°",
       description: "Créer et gérer des expositions virtuelles immersives",
-      icon: View,
+      iconName: "mdi:rotate-3d-variant",
       path: "/admin/vexpo360",
       color: "bg-teal-100 text-teal-600",
     },
     {
       title: "Tableau de bord",
       description: "Vue d'ensemble, KPIs et statistiques",
-      icon: LayoutDashboard,
+      iconName: "mdi:view-dashboard-outline",
       path: "/admin/digital-library/dashboard",
       color: "bg-blue-100 text-blue-600",
     },
     {
       title: "Gestion des documents",
       description: "CRUD, métadonnées Dublin Core/MARC",
-      icon: Database,
+      iconName: "mdi:database-outline",
       path: "/admin/digital-library/documents",
       color: "bg-green-100 text-green-600",
     },
     {
       title: "Gestion des utilisateurs",
       description: "Utilisateurs et droits d'accès",
-      icon: Users,
+      iconName: "mdi:account-group-outline",
       path: "/admin/digital-library/users",
       color: "bg-purple-100 text-purple-600",
     },
     {
       title: "Import & Catalogage",
       description: "Import Excel/XML/OAI-PMH",
-      icon: Upload,
+      iconName: "mdi:upload-outline",
       path: "/admin/digital-library/bulk-import",
       color: "bg-amber-100 text-amber-600",
     },
     {
       title: "Statistiques & Rapports",
       description: "Analytics et export XLS/PDF",
-      icon: BarChart3,
+      iconName: "mdi:chart-bar",
       path: "/admin/digital-library/analytics",
       color: "bg-indigo-100 text-indigo-600",
     },
     {
       title: "Demandes de reproduction",
       description: "Traitement des demandes",
-      icon: Image,
+      iconName: "mdi:image-outline",
       path: "/admin/digital-library/reproduction",
       color: "bg-cyan-100 text-cyan-600",
     },
     {
       title: "Restriction d'accès aux pages",
       description: "Gestion des restrictions par page",
-      icon: Lock,
+      iconName: "mdi:lock-outline",
       path: "/admin/digital-library/page-restrictions",
       color: "bg-rose-100 text-rose-600",
     },
     {
       title: "Droits d'auteur",
       description: "Gestion des droits",
-      icon: Copyright,
+      iconName: "mdi:copyright",
       path: "/admin/digital-library/copyright",
       color: "bg-orange-100 text-orange-600",
     },
     {
       title: "Gestion des Demandes",
       description: "Réservations et numérisations",
-      icon: FolderOpen,
+      iconName: "mdi:folder-open-outline",
       path: "/admin/digital-library/requests-management",
       color: "bg-emerald-100 text-emerald-600",
     },
     {
       title: "Bouquets électroniques",
       description: "Configurer les abonnements aux ressources électroniques externes",
-      icon: Globe,
+      iconName: "mdi:earth",
       path: "/admin/digital-library/electronic-bundles",
       color: "bg-sky-100 text-sky-600",
     },
     {
       title: "Paramètres techniques",
       description: "Connecteurs, OAI-PMH, notifications",
-      icon: Settings,
+      iconName: "mdi:cog-outline",
       path: "/admin/digital-library/settings",
       color: "bg-gray-100 text-gray-600",
     },
   ];
-
 
   return (
     <DigitalLibraryLayout>
@@ -166,7 +165,7 @@ export default function Administration() {
                 <CardHeader>
                   <div className="flex items-center gap-4">
                     <div className={`p-3 rounded-lg ${module.color}`}>
-                      <module.icon className="h-6 w-6" />
+                      <Icon name={module.iconName} className="h-6 w-6" />
                     </div>
                     <div className="flex-1">
                       <CardTitle className="text-lg">{module.title}</CardTitle>

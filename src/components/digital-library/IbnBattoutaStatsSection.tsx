@@ -1,19 +1,11 @@
 import { useState } from "react";
-import type { ElementType } from "react";
-import { BookOpen, Newspaper, Image } from "lucide-react";
+import { Icon } from "@/components/ui/icon";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Link } from "react-router-dom";
 
-// MDI: format-list-numbered
-const FormatListNumberedIcon = ({ className }: { className?: string }) => (
-  <svg viewBox="0 0 24 24" className={className} fill="currentColor">
-    <path d="M7,13V11H21V13H7M7,19V17H21V19H7M7,7V5H21V7H7M3,8V5H2V4H4V8H3M2,17V16H5V20H2V19H4V18.5H3V17.5H4V17H2M4.25,10A0.75,0.75 0 0,1 5,10.75C5,10.95 4.92,11.14 4.79,11.27L3.12,13H5V14H2V13.08L4,11H2V10H4.25Z" />
-  </svg>
-);
-
 interface StatItem {
-  icon: ElementType;
+  iconName: string;
   value: string;
   label: string;
   labelAr?: string;
@@ -22,21 +14,21 @@ interface StatItem {
 
 const defaultStats: StatItem[] = [
   {
-    icon: BookOpen,
+    iconName: "mdi:book-open-page-variant-outline",
     value: "+45K",
     label: "Livres numériques",
     labelAr: "كتب رقمية",
     href: "/digital-library/collections/books"
   },
   {
-    icon: Newspaper,
+    iconName: "mdi:newspaper-variant-outline",
     value: "+8K",
     label: "Revues et journaux",
     labelAr: "المجلات والجرائد",
     href: "/digital-library/collections/periodicals"
   },
   {
-    icon: Image,
+    iconName: "mdi:image-outline",
     value: "+15K",
     label: "Photographies",
     labelAr: "صور فوتوغرافية",
@@ -61,19 +53,16 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-14">
-          {/* Gold Icon */}
           <div className="flex justify-center mb-6">
             <div className="w-14 h-14 rounded-lg border-2 border-gold-bn-primary flex items-center justify-center">
-              <FormatListNumberedIcon className="h-7 w-7 text-gold-bn-primary" />
+              <Icon name="mdi:chart-box-outline" className="h-7 w-7 text-gold-bn-primary" />
             </div>
           </div>
           
-          {/* Title - Dark Playfair Display */}
           <h2 className="text-4xl md:text-5xl font-heading font-semibold text-slate-dark mb-6">
             Ibn Battouta en chiffres
           </h2>
           
-          {/* Subtitle */}
           <p className="font-body text-lg text-slate-text max-w-2xl mx-auto">
             Découvrez les documents récemment ajoutés à nos collections,
             soigneusement sélectionnés pour enrichir votre expérience.
@@ -82,16 +71,14 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
 
         {/* Stats Cards with Navigation */}
         <div className="relative max-w-5xl mx-auto flex items-center justify-center gap-4">
-          {/* Left Arrow - Simple filled triangle */}
+          {/* Left Arrow */}
           <button
             onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))}
             disabled={!canGoPrev}
             className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-slate-text hover:text-gold-bn-primary transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
             aria-label="Précédent"
           >
-            <svg width="16" height="28" viewBox="0 0 16 28" fill="currentColor">
-              <path d="M14 2L2 14L14 26" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <Icon name="mdi:chevron-left" className="h-7 w-7" />
           </button>
 
           {/* Stats Cards */}
@@ -102,26 +89,20 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
                 to={stat.href || "#"}
                 className="group"
               >
-                {/* Card - White with gold top border */}
                 <div className="relative bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-slate-border">
-                  {/* Gold top border */}
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gold-bn-primary" />
                   
-                  {/* Content */}
                   <div className="p-8 text-center">
-                    {/* Icon Container - Gold outlined box */}
                     <div className="flex justify-center mb-5">
                       <div className="w-16 h-16 rounded-lg border-2 border-gold-bn-primary flex items-center justify-center">
-                        <stat.icon className="h-8 w-8 text-gold-bn-primary" strokeWidth={1.5} />
+                        <Icon name={stat.iconName} className="h-8 w-8 text-gold-bn-primary" />
                       </div>
                     </div>
                     
-                    {/* Value - Gold text */}
                     <div className="text-4xl md:text-5xl font-bold text-gold-bn-primary mb-3 font-heading">
                       {stat.value}
                     </div>
                     
-                    {/* Label - Dark text */}
                     <div className="text-slate-dark text-lg font-medium">
                       {language === 'ar' && stat.labelAr ? stat.labelAr : stat.label}
                     </div>
@@ -131,20 +112,18 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
             ))}
           </div>
 
-          {/* Right Arrow - Simple filled triangle */}
+          {/* Right Arrow */}
           <button
             onClick={() => setCurrentIndex(Math.min(stats.length - 3, currentIndex + 1))}
             disabled={!canGoNext}
             className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-slate-text hover:text-gold-bn-primary transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
             aria-label="Suivant"
           >
-            <svg width="16" height="28" viewBox="0 0 16 28" fill="currentColor">
-              <path d="M2 2L14 14L2 26" stroke="currentColor" strokeWidth="3" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <Icon name="mdi:chevron-right" className="h-7 w-7" />
           </button>
         </div>
 
-        {/* CTA Button - Gold */}
+        {/* CTA Button */}
         <div className="flex justify-center mt-12">
           <Link to="/digital-library/collections">
             <Button 
