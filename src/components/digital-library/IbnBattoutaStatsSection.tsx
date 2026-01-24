@@ -55,7 +55,7 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
         <div className="text-center mb-14">
           <div className="flex justify-center mb-6">
             <div className="w-14 h-14 rounded-lg border-2 border-gold-bn-primary flex items-center justify-center">
-              <Icon name="mdi:chart-box-outline" className="h-7 w-7 text-gold-bn-primary" />
+              <Icon name="mdi:format-list-numbered" className="h-7 w-7 text-gold-bn-primary" />
             </div>
           </div>
           
