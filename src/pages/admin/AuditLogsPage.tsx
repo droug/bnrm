@@ -24,7 +24,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { AuditFilterAutocomplete } from "@/components/admin/audit/AuditFilterAutocomplete";
+import { SimpleInlineSelect } from "@/components/admin/audit/SimpleInlineSelect";
 import {
   Table,
   TableBody,
@@ -445,7 +445,7 @@ export default function AuditLogsPage() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <AuditFilterAutocomplete
+                    <SimpleInlineSelect
                       options={actionOptions}
                       value={filters.action}
                       onChange={(v) => handleFilterChange('action', v)}
@@ -453,7 +453,7 @@ export default function AuditLogsPage() {
                       allLabel="Toutes les actions"
                     />
 
-                    <AuditFilterAutocomplete
+                    <SimpleInlineSelect
                       options={resourceOptions}
                       value={filters.resource_type}
                       onChange={(v) => handleFilterChange('resource_type', v)}
