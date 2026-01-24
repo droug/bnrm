@@ -245,9 +245,9 @@ export default function Dashboard() {
       </header>
 
       {/* Main Content */}
-      <main className="container py-8">
+      <main className="container py-8 space-y-8">
         {/* Welcome Section */}
-        <div className="mb-8">
+        <div>
           <h1 className="text-3xl font-bold tracking-tight">
             Tableau de bord
           </h1>
@@ -270,12 +270,31 @@ export default function Dashboard() {
           )}
         </div>
 
-        {/* Carte Tableau de Bord KPI Portail */}
-        <div className="mb-6">
+        {/* Section 1: Tableau de Bord KPI Portail - Audience, eWallet, Bibliothèque Numérique */}
+        <section>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <BarChart3 className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold">Tableau de Bord - Indicateurs Globaux</h2>
+              <p className="text-sm text-muted-foreground">Audience, eWallet & Bibliothèque Numérique</p>
+            </div>
+          </div>
           <PortalAnalyticsKPICard platform="portail" />
-        </div>
+        </section>
 
-        {/* Statistiques Accordéon */}
+        {/* Section 2: Statistiques par Service (Accordéon) */}
+        <section>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="p-2 rounded-lg bg-secondary/50">
+              <TrendingUp className="h-5 w-5 text-secondary-foreground" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold">Statistiques par Service</h2>
+              <p className="text-sm text-muted-foreground">Dépôt légal, Manuscrits, Réservations et Abonnements</p>
+            </div>
+          </div>
         <Accordion type="multiple" defaultValue={["depot-legal"]} className="space-y-4">
           {/* Dépôt Légal */}
           <AccordionItem value="depot-legal" className="border rounded-lg bg-card">
@@ -729,6 +748,7 @@ export default function Dashboard() {
             </AccordionContent>
           </AccordionItem>
         </Accordion>
+        </section>
 
       </main>
       </div>
