@@ -82,41 +82,62 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
         </div>
 
         <div className="grid lg:grid-cols-[1fr,auto] gap-8 items-start">
-          {/* Main Platform - Simple Card */}
+          {/* Main Platform - Book Front Cover View */}
           <div 
-            className="relative cursor-pointer group overflow-hidden rounded-lg shadow-2xl transition-transform duration-300 hover:scale-[1.02]"
+            className="relative cursor-pointer group transition-transform duration-300 hover:scale-[1.02]"
             onClick={() => navigate(mainPlatform.path)}
           >
-            {/* Background Image */}
-            <div className="relative h-[500px] w-full max-w-[600px]">
-              <img 
-                src={mainPlatform.image} 
-                alt={mainPlatform.title}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-              {/* Gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-              
-              {/* Number badge */}
-              <div className="absolute top-6 left-6">
-                <div className="relative w-16 h-16">
-                  <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-lg">
-                    <polygon points="50,5 82,18 95,50 82,82 50,95 18,82 5,50 18,18" className="fill-white/95" />
-                  </svg>
-                  <div className="absolute inset-0 flex items-center justify-center text-gray-900 font-bold text-2xl">
-                    {mainPlatform.number}
-                  </div>
-                </div>
+            <div className="relative h-[520px] w-[380px] flex">
+              {/* Book Spine (left edge) */}
+              <div className="w-6 h-full bg-gradient-to-r from-[#1a3a5c] via-[#2a5a8c] to-[#1a3a5c] rounded-l-sm shadow-inner flex-shrink-0">
+                <div className="absolute left-0 top-0 w-6 h-full bg-gradient-to-r from-black/30 to-transparent" />
               </div>
               
-              {/* Content */}
-              <div className="absolute bottom-0 left-0 right-0 p-8">
-                <h3 className="text-3xl font-bold text-white mb-3 drop-shadow-lg">
-                  {mainPlatform.title}
-                </h3>
-                <p className="text-white/90 text-base leading-relaxed drop-shadow-md">
-                  {mainPlatform.description}
-                </p>
+              {/* Book Cover */}
+              <div 
+                className="relative flex-1 rounded-r-sm overflow-hidden"
+                style={{
+                  boxShadow: '8px 8px 20px rgba(0,0,0,0.4), 2px 2px 8px rgba(0,0,0,0.3), inset -2px 0 4px rgba(0,0,0,0.1)'
+                }}
+              >
+                {/* Cover Image */}
+                <img 
+                  src={mainPlatform.image} 
+                  alt={mainPlatform.title}
+                  className="absolute inset-0 w-full h-full object-cover"
+                />
+                
+                {/* Gradient overlay for readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-black/20" />
+                
+                {/* Cover edge highlight (right side) */}
+                <div className="absolute top-0 right-0 w-1 h-full bg-gradient-to-l from-white/20 to-transparent" />
+                
+                {/* Page edge effect (right side) */}
+                <div className="absolute top-2 bottom-2 right-0 w-1.5 bg-gradient-to-l from-gray-200/30 to-gray-100/10 rounded-r-sm" />
+                
+                {/* Number badge */}
+                <div className="absolute top-8 left-1/2 -translate-x-1/2">
+                  <div className="relative w-20 h-20">
+                    <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-lg">
+                      <polygon points="50,5 82,18 95,50 82,82 50,95 18,82 5,50 18,18" className="fill-white/95" />
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center text-gray-900 font-bold text-3xl">
+                      {mainPlatform.number}
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Title and Description */}
+                <div className="absolute inset-x-0 bottom-0 p-8 text-center">
+                  <h3 className="text-3xl font-bold text-white mb-4 drop-shadow-lg tracking-wide">
+                    {mainPlatform.title}
+                  </h3>
+                  <div className="w-16 h-0.5 bg-white/60 mx-auto mb-4" />
+                  <p className="text-white/85 text-sm leading-relaxed drop-shadow-md px-4">
+                    {mainPlatform.description}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
