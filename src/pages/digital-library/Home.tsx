@@ -772,13 +772,13 @@ export default function DigitalLibraryHome() {
           <div className="text-center mb-14">
             {/* Icône dorée (grille + plus) */}
             <div className="inline-flex items-center justify-center w-12 h-12 border border-gold-bn-primary rounded-lg mb-6">
+              {/* table-box-multiple-outline (MDI) */}
               <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6 text-gold-bn-primary" aria-hidden="true">
-                <rect x="5" y="5" width="5" height="5" stroke="currentColor" strokeWidth="1.5" />
-                <rect x="14" y="5" width="5" height="5" stroke="currentColor" strokeWidth="1.5" />
-                <rect x="5" y="14" width="5" height="5" stroke="currentColor" strokeWidth="1.5" />
-                {/* petit + en bas à droite */}
-                <path d="M16.5 14.5v5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                <path d="M14 17h5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                <path d="M3 6V18H13V20H1V4H21V13H19V6H3Z" fill="currentColor"/>
+                <path d="M3 11H19V13H3V11Z" fill="currentColor"/>
+                <path d="M8 6V18H10V6H8Z" fill="currentColor"/>
+                <path d="M14 6V13H16V6H14Z" fill="currentColor"/>
+                <path d="M23 15V17H21V19H23V21H21V19H19V21H17V19H19V17H17V15H19V17H21V15H23ZM21 17H19V19H21V17Z" fill="currentColor"/>
               </svg>
             </div>
 
