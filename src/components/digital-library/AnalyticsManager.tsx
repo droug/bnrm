@@ -8,10 +8,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Eye, Download, TrendingUp, Users, Clock, Search, AlertCircle, User, Building, FileDown } from "lucide-react";
+import { Eye, Download, TrendingUp, Users, Clock, Search, AlertCircle, User, Building, FileDown, Headphones, BookOpen, FileText, Volume2, Play, XCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
 
 export default function AnalyticsManager() {
   const { toast } = useToast();
@@ -559,6 +561,74 @@ export default function AnalyticsManager() {
   const totalReadingTime: number = (Object.values(userActivityStats || {}).reduce((sum: number, u: any) => sum + u.readingTime, 0) as number) || 0;
   const avgReadingTime: number = uniqueUsers > 0 ? Math.round(totalReadingTime / uniqueUsers) : 0;
 
+  // Mock data for most searched works
+  const mostSearchedWorks = [
+    { titre: "الفقه المالكي في المغرب", recherches: 1847, resultats: true },
+    { titre: "تاريخ الحضارة المغربية", recherches: 1523, resultats: true },
+    { titre: "ديوان الشعر الأندلسي", recherches: 1289, resultats: true },
+    { titre: "العلوم في الحضارة الإسلامية", recherches: 1156, resultats: true },
+    { titre: "الأدب المغربي المعاصر", recherches: 987, resultats: true },
+    { titre: "المخطوطات الأندلسية", recherches: 876, resultats: true },
+    { titre: "الموسيقى الأندلسية", recherches: 745, resultats: true },
+    { titre: "فنون الخط العربي", recherches: 689, resultats: true },
+    { titre: "التصوف المغربي", recherches: 623, resultats: true },
+    { titre: "الفن المعماري الإسلامي", recherches: 578, resultats: true }
+  ];
+
+  // Mock data for audio module usage
+  const audioModuleStats = {
+    totalListens: 15847,
+    totalDuration: 4256,
+    avgSessionDuration: 28,
+    uniqueListeners: 892,
+    completionRate: 67.5,
+    topAudioContent: [
+      { titre: "القرآن الكريم - سورة البقرة", ecoutes: 2847, duree: 145 },
+      { titre: "شعر أندلسي - ابن زيدون", ecoutes: 1523, duree: 35 },
+      { titre: "موسيقى الملحون", ecoutes: 1289, duree: 42 },
+      { titre: "محاضرات في الفقه المالكي", ecoutes: 987, duree: 89 },
+      { titre: "الطرب الأندلسي", ecoutes: 876, duree: 52 }
+    ],
+    byCategory: [
+      { name: "Musique", value: 42 },
+      { name: "Conférences", value: 28 },
+      { name: "Récitations", value: 18 },
+      { name: "Poésie", value: 12 }
+    ]
+  };
+
+  // Mock data for failed/unsuccessful searches
+  const failedSearchesDetailed = [
+    { query: "مخطوطات القرن 15", count: 89, date: "2024-01-20" },
+    { query: "كتب الطب القديم", count: 67, date: "2024-01-19" },
+    { query: "خرائط المغرب التاريخية", count: 54, date: "2024-01-18" },
+    { query: "وثائق الحماية الفرنسية", count: 48, date: "2024-01-17" },
+    { query: "مجلات أدبية قديمة", count: 42, date: "2024-01-16" },
+    { query: "صور فاس القديمة", count: 38, date: "2024-01-15" },
+    { query: "مراسلات السلاطين", count: 35, date: "2024-01-14" },
+    { query: "وثائق المقاومة", count: 31, date: "2024-01-13" }
+  ];
+
+  const searchStatsOverview = {
+    totalSearches: 24567,
+    successfulSearches: 21234,
+    failedSearches: 3333,
+    successRate: 86.4,
+    avgResultsPerSearch: 12.5,
+    zeroResultsRate: 13.6
+  };
+
+  // Colors for charts
+  const COLORS = ['#3b5587', '#457166', '#ac916b', '#8b4513', '#2d4a3e'];
+
+  // Downloads by format
+  const downloadsByFormat = [
+    { format: "PDF", count: 8923, percentage: 70.5 },
+    { format: "Images", count: 2847, percentage: 22.5 },
+    { format: "Audio", count: 684, percentage: 5.4 },
+    { format: "Vidéo", count: 200, percentage: 1.6 }
+  ];
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -612,7 +682,7 @@ export default function AnalyticsManager() {
       </div>
 
       <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-9">
           <TabsTrigger value="overview">Vue générale</TabsTrigger>
           <TabsTrigger value="type">Par type</TabsTrigger>
           <TabsTrigger value="authors">Auteurs</TabsTrigger>
@@ -620,6 +690,8 @@ export default function AnalyticsManager() {
           <TabsTrigger value="downloads">Téléchargements</TabsTrigger>
           <TabsTrigger value="users">Utilisateurs</TabsTrigger>
           <TabsTrigger value="searches">Recherches</TabsTrigger>
+          <TabsTrigger value="audio">Audio</TabsTrigger>
+          <TabsTrigger value="failed-searches">Non abouties</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-4">
@@ -856,31 +928,354 @@ export default function AnalyticsManager() {
         </TabsContent>
 
         <TabsContent value="searches" className="space-y-4">
+          {/* Search Stats Overview */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card className="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border-blue-200/50">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Total recherches</p>
+                    <p className="text-2xl font-bold">{searchStatsOverview.totalSearches.toLocaleString()}</p>
+                  </div>
+                  <Search className="h-8 w-8 text-blue-500" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-green-500/10 to-green-600/5 border-green-200/50">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Taux de succès</p>
+                    <p className="text-2xl font-bold">{searchStatsOverview.successRate}%</p>
+                  </div>
+                  <TrendingUp className="h-8 w-8 text-green-500" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-orange-500/10 to-orange-600/5 border-orange-200/50">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Résultats moyens</p>
+                    <p className="text-2xl font-bold">{searchStatsOverview.avgResultsPerSearch}</p>
+                  </div>
+                  <FileText className="h-8 w-8 text-orange-500" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-red-500/10 to-red-600/5 border-red-200/50">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Sans résultats</p>
+                    <p className="text-2xl font-bold">{searchStatsOverview.zeroResultsRate}%</p>
+                  </div>
+                  <XCircle className="h-8 w-8 text-red-500" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
           <Card>
             <CardHeader>
-              <CardTitle>Recherches non abouties</CardTitle>
-              <CardDescription>Liste des recherches qui n'ont pas donné de résultats satisfaisants.</CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <Search className="h-5 w-5" />
+                Œuvres les plus recherchées
+              </CardTitle>
+              <CardDescription>Top 10 des titres les plus recherchés par les utilisateurs.</CardDescription>
             </CardHeader>
             <CardContent className="p-0">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Recherche</TableHead>
-                    <TableHead>Satisfaction</TableHead>
-                    <TableHead>Date</TableHead>
+                    <TableHead className="w-[50px]">Rang</TableHead>
+                    <TableHead>Titre</TableHead>
+                    <TableHead>Recherches</TableHead>
+                    <TableHead>Statut</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {searchStats ? 
-                    failedSearches?.map((search: any) => (
-                      <TableRow key={search.id}>
-                        <TableCell>{search.query_text}</TableCell>
-                        <TableCell>{search.satisfaction_rating || 'N/A'}</TableCell>
-                        <TableCell>{new Date(search.created_at).toLocaleDateString()}</TableCell>
-                      </TableRow>
-                    )) : <TableRow><TableCell colSpan={3} className="text-center">Chargement...</TableCell></TableRow>}
+                  {mostSearchedWorks.map((work, index) => (
+                    <TableRow key={index}>
+                      <TableCell className="font-medium">{index + 1}</TableCell>
+                      <TableCell dir="rtl">{work.titre}</TableCell>
+                      <TableCell>{work.recherches.toLocaleString()}</TableCell>
+                      <TableCell>
+                        <Badge variant={work.resultats ? "default" : "destructive"}>
+                          {work.resultats ? "Trouvé" : "Non trouvé"}
+                        </Badge>
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Audio Module Stats */}
+        <TabsContent value="audio" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+            <Card className="bg-gradient-to-br from-purple-500/10 to-purple-600/5 border-purple-200/50">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Écoutes totales</p>
+                    <p className="text-2xl font-bold">{audioModuleStats.totalListens.toLocaleString()}</p>
+                  </div>
+                  <Headphones className="h-8 w-8 text-purple-500" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-indigo-500/10 to-indigo-600/5 border-indigo-200/50">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Durée totale (h)</p>
+                    <p className="text-2xl font-bold">{audioModuleStats.totalDuration.toLocaleString()}</p>
+                  </div>
+                  <Clock className="h-8 w-8 text-indigo-500" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-pink-500/10 to-pink-600/5 border-pink-200/50">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Session moy. (min)</p>
+                    <p className="text-2xl font-bold">{audioModuleStats.avgSessionDuration}</p>
+                  </div>
+                  <Play className="h-8 w-8 text-pink-500" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-cyan-500/10 to-cyan-600/5 border-cyan-200/50">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Auditeurs uniques</p>
+                    <p className="text-2xl font-bold">{audioModuleStats.uniqueListeners}</p>
+                  </div>
+                  <Users className="h-8 w-8 text-cyan-500" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 border-emerald-200/50">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Taux complétion</p>
+                    <p className="text-2xl font-bold">{audioModuleStats.completionRate}%</p>
+                  </div>
+                  <TrendingUp className="h-8 w-8 text-emerald-500" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Volume2 className="h-5 w-5" />
+                  Contenus audio les plus écoutés
+                </CardTitle>
+                <CardDescription>Top 5 des contenus audio avec le plus d'écoutes.</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[50px]">Rang</TableHead>
+                      <TableHead>Titre</TableHead>
+                      <TableHead>Écoutes</TableHead>
+                      <TableHead>Durée (min)</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {audioModuleStats.topAudioContent.map((item, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="font-medium">{index + 1}</TableCell>
+                        <TableCell dir="rtl">{item.titre}</TableCell>
+                        <TableCell>{item.ecoutes.toLocaleString()}</TableCell>
+                        <TableCell>{item.duree}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Headphones className="h-5 w-5" />
+                  Répartition par catégorie
+                </CardTitle>
+                <CardDescription>Distribution des écoutes par type de contenu audio.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[250px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={audioModuleStats.byCategory}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                        label={({ name, value }) => `${name}: ${value}%`}
+                      >
+                        {audioModuleStats.byCategory.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Failed Searches Tab */}
+        <TabsContent value="failed-searches" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card className="bg-gradient-to-br from-red-500/10 to-red-600/5 border-red-200/50">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Recherches non abouties</p>
+                    <p className="text-2xl font-bold text-red-600">{searchStatsOverview.failedSearches.toLocaleString()}</p>
+                  </div>
+                  <XCircle className="h-8 w-8 text-red-500" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-orange-500/10 to-orange-600/5 border-orange-200/50">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Taux d'échec</p>
+                    <p className="text-2xl font-bold text-orange-600">{searchStatsOverview.zeroResultsRate}%</p>
+                  </div>
+                  <AlertCircle className="h-8 w-8 text-orange-500" />
+                </div>
+              </CardContent>
+            </Card>
+            <Card className="bg-gradient-to-br from-amber-500/10 to-amber-600/5 border-amber-200/50">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-muted-foreground">Titres manquants identifiés</p>
+                    <p className="text-2xl font-bold text-amber-600">{failedSearchesDetailed.length}</p>
+                  </div>
+                  <BookOpen className="h-8 w-8 text-amber-500" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <XCircle className="h-5 w-5 text-red-500" />
+                  Recherches sans résultats - Top demandes
+                </CardTitle>
+                <CardDescription>Titres les plus recherchés qui n'existent pas dans la bibliothèque.</CardDescription>
+              </CardHeader>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-[50px]">Rang</TableHead>
+                      <TableHead>Terme recherché</TableHead>
+                      <TableHead>Occurrences</TableHead>
+                      <TableHead>Dernière recherche</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {failedSearchesDetailed.map((search, index) => (
+                      <TableRow key={index}>
+                        <TableCell className="font-medium">{index + 1}</TableCell>
+                        <TableCell dir="rtl" className="font-medium">{search.query}</TableCell>
+                        <TableCell>
+                          <Badge variant="destructive">{search.count}</Badge>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">{search.date}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Évolution des recherches non abouties
+                </CardTitle>
+                <CardDescription>Nombre de recherches sans résultats par jour.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={[
+                      { jour: 'Lun', echecs: 478 },
+                      { jour: 'Mar', echecs: 512 },
+                      { jour: 'Mer', echecs: 389 },
+                      { jour: 'Jeu', echecs: 445 },
+                      { jour: 'Ven', echecs: 523 },
+                      { jour: 'Sam', echecs: 612 },
+                      { jour: 'Dim', echecs: 374 }
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="jour" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="echecs" fill="#ef4444" name="Échecs" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Suggestions d'amélioration</CardTitle>
+              <CardDescription>Basées sur l'analyse des recherches non abouties.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                  <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-amber-800 dark:text-amber-200">Manucrits du XVe siècle</p>
+                    <p className="text-sm text-amber-600 dark:text-amber-300">89 recherches - Envisagez d'ajouter cette collection à la bibliothèque numérique.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-950/20 rounded-lg border border-amber-200 dark:border-amber-800">
+                  <AlertCircle className="h-5 w-5 text-amber-500 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-amber-800 dark:text-amber-200">Livres de médecine ancienne</p>
+                    <p className="text-sm text-amber-600 dark:text-amber-300">67 recherches - Forte demande pour ce type de contenu.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <Search className="h-5 w-5 text-blue-500 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-blue-800 dark:text-blue-200">Amélioration des synonymes</p>
+                    <p className="text-sm text-blue-600 dark:text-blue-300">Certaines recherches échouent à cause de variantes orthographiques. Enrichissez le thésaurus.</p>
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
