@@ -444,13 +444,15 @@ export default function AuditLogsPage() {
                       <SelectTrigger>
                         <SelectValue placeholder="Action" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="max-h-[300px]">
                         <SelectItem value="all">Toutes les actions</SelectItem>
-                        {filterOptions?.actions.map(action => (
-                          <SelectItem key={action} value={action}>
-                            {ACTION_LABELS[action] || action}
-                          </SelectItem>
-                        ))}
+                        {Object.entries(ACTION_LABELS)
+                          .sort((a, b) => a[1].localeCompare(b[1]))
+                          .map(([key, label]) => (
+                            <SelectItem key={key} value={key}>
+                              {label}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
 
@@ -461,13 +463,15 @@ export default function AuditLogsPage() {
                       <SelectTrigger>
                         <SelectValue placeholder="Type de ressource" />
                       </SelectTrigger>
-                      <SelectContent>
+                      <SelectContent className="max-h-[300px]">
                         <SelectItem value="all">Tous les types</SelectItem>
-                        {filterOptions?.resourceTypes.map(type => (
-                          <SelectItem key={type} value={type}>
-                            {RESOURCE_LABELS[type] || type}
-                          </SelectItem>
-                        ))}
+                        {Object.entries(RESOURCE_LABELS)
+                          .sort((a, b) => a[1].localeCompare(b[1]))
+                          .map(([key, label]) => (
+                            <SelectItem key={key} value={key}>
+                              {label}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
 
