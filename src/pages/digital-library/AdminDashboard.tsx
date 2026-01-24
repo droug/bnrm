@@ -1,9 +1,7 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Button } from "@/components/ui/button";
-import { 
-  Users, Settings, Database, Upload, ArrowLeft
-} from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
@@ -70,43 +68,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Button
-            variant="outline"
-            className="h-auto py-4 flex-col gap-2"
-            onClick={() => navigate("/admin/digital-library/documents")}
-          >
-            <Database className="h-6 w-6" />
-            <span className="text-sm">Gérer les documents</span>
-          </Button>
-          <Button
-            variant="outline"
-            className="h-auto py-4 flex-col gap-2"
-            onClick={() => navigate("/admin/digital-library/users")}
-          >
-            <Users className="h-6 w-6" />
-            <span className="text-sm">Utilisateurs</span>
-          </Button>
-          <Button
-            variant="outline"
-            className="h-auto py-4 flex-col gap-2"
-            onClick={() => navigate("/admin/digital-library/bulk-import")}
-          >
-            <Upload className="h-6 w-6" />
-            <span className="text-sm">Importer</span>
-          </Button>
-          <Button
-            variant="outline"
-            className="h-auto py-4 flex-col gap-2"
-            onClick={() => navigate("/admin/digital-library/settings")}
-          >
-            <Settings className="h-6 w-6" />
-            <span className="text-sm">Paramètres</span>
-          </Button>
-        </div>
-
-        {/* Main Analytics - Using PortalAnalyticsKPICard with Bibliothèque tab active */}
+        {/* Main Analytics - Bibliothèque tab only */}
         <PortalAnalyticsKPICard platform="bn" showOnlyTab="digital-library" />
       </div>
     </DigitalLibraryLayout>
