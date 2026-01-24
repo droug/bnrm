@@ -66,6 +66,7 @@ const EmailManagement = lazy(() => import("./pages/EmailManagement"));
 const SystemListsPage = lazy(() => import("./pages/SystemListsPage"));
 const WorkflowBPM = lazy(() => import("./pages/WorkflowBPM"));
 const NotificationsSettings = lazy(() => import("./pages/admin/NotificationsSettings"));
+const MonitoringPage = lazy(() => import("./pages/admin/MonitoringPage"));
 const CoteManagementPage = lazy(() => import("./pages/CoteManagementPage"));
 const CmsBackoffice = lazy(() => import("./pages/cms/CmsBackoffice"));
 const CmsDynamicPage = lazy(() => import("./pages/cms/CmsDynamicPage"));
@@ -306,6 +307,7 @@ const App = () => {
         <Route path="/admin/archiving" element={<ArchivingPage />} />
         <Route path="/admin/settings" element={<AdminSettings />} />
         <Route path="/admin/notifications" element={<NotificationsSettings />} />
+        <Route path="/admin/monitoring" element={<MonitoringPage />} />
         <Route path="/admin/roles" element={<RolesManagement />} />
             <Route path="/admin/cookie-settings" element={<CookieSettingsPage />} />
             <Route path="/admin/integrations" element={<IntegrationsPage />} />
