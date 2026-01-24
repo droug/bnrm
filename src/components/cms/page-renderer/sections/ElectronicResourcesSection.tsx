@@ -89,8 +89,9 @@ export function ElectronicResourcesSection({ section, language }: SectionProps) 
 
             <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6">
               {visibleResources.map((resource) => (
-                <Card key={resource.id} className="bg-white hover:shadow-lg transition-shadow group">
-                  <CardContent className="p-6 text-center">
+                <Card key={resource.id} className="bg-white hover:shadow-lg transition-shadow group h-full">
+                  <CardContent className="p-6 text-center h-full flex flex-col">
+                    {/* Logo/Name - Fixed height */}
                     {resource.logo ? (
                       <img 
                         src={resource.logo} 
@@ -105,21 +106,25 @@ export function ElectronicResourcesSection({ section, language }: SectionProps) 
                       </div>
                     )}
                     
-                    <p className="text-sm text-slate-text mb-4">
+                    {/* Description - Flex grow to push button down */}
+                    <p className="text-sm text-slate-text mb-4 flex-1">
                       {language === 'ar' && resource.descriptionAr 
                         ? resource.descriptionAr 
                         : resource.description}
                     </p>
                     
-                    <a 
-                      href={resource.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-bn-blue-primary hover:text-bn-blue-deep transition-colors text-sm font-medium underline"
-                    >
-                      {language === 'ar' ? 'استكشف' : 'Explorer'}
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
+                    {/* Button - Always at bottom */}
+                    <div className="mt-auto">
+                      <a 
+                        href={resource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-bn-blue-primary hover:text-bn-blue-deep transition-colors text-sm font-medium underline"
+                      >
+                        {language === 'ar' ? 'استكشف' : 'Explorer'}
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    </div>
                   </CardContent>
                 </Card>
               ))}
