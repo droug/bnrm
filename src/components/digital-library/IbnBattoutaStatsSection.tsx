@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ElementType } from "react";
-import { BookOpen, Newspaper, Image, Grid3X3 } from "lucide-react";
+import { BookOpen, Newspaper, Image, ListOrdered } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/hooks/useLanguage";
 import { Link } from "react-router-dom";
@@ -57,7 +57,7 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
           {/* Gold Grid Icon - outlined box */}
           <div className="flex justify-center mb-6">
             <div className="w-14 h-14 rounded-lg border-2 border-gold-bn-primary flex items-center justify-center">
-              <Grid3X3 className="h-7 w-7 text-gold-bn-primary" strokeWidth={1.5} />
+              <ListOrdered className="h-7 w-7 text-gold-bn-primary" strokeWidth={1.5} />
             </div>
           </div>
           
