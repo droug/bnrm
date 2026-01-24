@@ -89,62 +89,83 @@ async function getStatistics(params: {
   endDate: string;
   platform?: string;
 }) {
-  const { startDate, endDate, platform } = params;
+  try {
+    const { startDate, endDate, platform } = params;
 
-  let query = supabase
-    .from('analytics_events')
-    .select('*')
-    .gte('created_at', startDate)
-    .lte('created_at', endDate)
-    .eq('event_type', 'page_view');
+    let query = supabase
+      .from('analytics_events')
+      .select('*')
+      .gte('created_at', startDate)
+      .lte('created_at', endDate)
+      .eq('event_type', 'page_view')
+      .limit(1000);
 
-  if (platform) {
-    query = query.eq('platform', platform);
+    if (platform && platform !== 'undefined' && platform !== 'null') {
+      query = query.eq('platform', platform);
+    }
+
+    const { data: events, error } = await query;
+
+    if (error) {
+      console.error('[ANALYTICS-SERVICE] Statistics query error:', error);
+      // Return empty data instead of throwing
+      return {
+        summary: { totalPageViews: 0, uniqueVisitors: 0, avgPagesPerVisitor: 0 },
+        platforms: {},
+        topPages: [],
+        dailyPageViews: [],
+      };
+    }
+
+    // Aggregate data
+    const safeEvents = events || [];
+    const pageViews = safeEvents.length;
+    const uniqueUsers = new Set(safeEvents.map(e => e.user_id || e.session_id)).size;
+    
+    const platforms = safeEvents.reduce((acc: Record<string, number>, e) => {
+      acc[e.platform] = (acc[e.platform] || 0) + 1;
+      return acc;
+    }, {});
+
+    // Top pages
+    const topPages = safeEvents.reduce((acc: Record<string, number>, e) => {
+      acc[e.page_path] = (acc[e.page_path] || 0) + 1;
+      return acc;
+    }, {});
+
+    const sortedPages = Object.entries(topPages)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 10)
+      .map(([path, views]) => ({ path, views }));
+
+    // Daily breakdown
+    const dailyData = safeEvents.reduce((acc: Record<string, number>, e) => {
+      const date = e.created_at?.split('T')[0] || 'unknown';
+      acc[date] = (acc[date] || 0) + 1;
+      return acc;
+    }, {});
+
+    return {
+      summary: {
+        totalPageViews: pageViews,
+        uniqueVisitors: uniqueUsers,
+        avgPagesPerVisitor: uniqueUsers > 0 ? parseFloat((pageViews / uniqueUsers).toFixed(2)) : 0,
+      },
+      platforms,
+      topPages: sortedPages,
+      dailyPageViews: Object.entries(dailyData)
+        .map(([date, views]) => ({ date, views }))
+        .sort((a, b) => a.date.localeCompare(b.date)),
+    };
+  } catch (err) {
+    console.error('[ANALYTICS-SERVICE] Statistics error:', err);
+    return {
+      summary: { totalPageViews: 0, uniqueVisitors: 0, avgPagesPerVisitor: 0 },
+      platforms: {},
+      topPages: [],
+      dailyPageViews: [],
+    };
   }
-
-  const { data: events, error } = await query;
-
-  if (error) throw error;
-
-  // Aggregate data
-  const pageViews = events?.length || 0;
-  const uniqueUsers = new Set(events?.map(e => e.user_id || e.session_id)).size;
-  
-  const platforms = events?.reduce((acc: Record<string, number>, e) => {
-    acc[e.platform] = (acc[e.platform] || 0) + 1;
-    return acc;
-  }, {}) || {};
-
-  // Top pages
-  const topPages = events?.reduce((acc: Record<string, number>, e) => {
-    acc[e.page_path] = (acc[e.page_path] || 0) + 1;
-    return acc;
-  }, {}) || {};
-
-  const sortedPages = Object.entries(topPages)
-    .sort(([, a], [, b]) => b - a)
-    .slice(0, 10)
-    .map(([path, views]) => ({ path, views }));
-
-  // Daily breakdown
-  const dailyData = events?.reduce((acc: Record<string, number>, e) => {
-    const date = e.created_at.split('T')[0];
-    acc[date] = (acc[date] || 0) + 1;
-    return acc;
-  }, {}) || {};
-
-  return {
-    summary: {
-      totalPageViews: pageViews,
-      uniqueVisitors: uniqueUsers,
-      avgPagesPerVisitor: uniqueUsers > 0 ? parseFloat((pageViews / uniqueUsers).toFixed(2)) : 0,
-    },
-    platforms,
-    topPages: sortedPages,
-    dailyPageViews: Object.entries(dailyData)
-      .map(([date, views]) => ({ date, views }))
-      .sort((a, b) => a.date.localeCompare(b.date)),
-  };
 }
 
 /**
@@ -155,47 +176,57 @@ async function getContentMetrics(params: {
   endDate: string;
   contentType?: string;
 }) {
-  const { startDate, endDate, contentType } = params;
+  try {
+    const { startDate, endDate, contentType } = params;
 
-  let query = supabase
-    .from('analytics_events')
-    .select('*')
-    .gte('created_at', startDate)
-    .lte('created_at', endDate)
-    .eq('event_category', 'Content');
+    const { data: events, error } = await supabase
+      .from('analytics_events')
+      .select('*')
+      .gte('created_at', startDate)
+      .lte('created_at', endDate)
+      .eq('event_category', 'Content')
+      .limit(1000);
 
-  const { data: events, error } = await query;
-
-  if (error) throw error;
-
-  // Aggregate by content
-  const contentViews = events?.reduce((acc: Record<string, any>, e) => {
-    const contentId = e.custom_dimensions?.content_id || 'unknown';
-    const contentTitle = e.custom_dimensions?.content_title || 'Unknown';
-    const type = e.custom_dimensions?.content_type || 'unknown';
-    
-    if (contentType && type !== contentType) return acc;
-    
-    if (!acc[contentId]) {
-      acc[contentId] = { id: contentId, title: contentTitle, type, views: 0 };
+    if (error) {
+      console.error('[ANALYTICS-SERVICE] Content metrics error:', error);
+      return { topContent: [], totalContentViews: 0, byType: {} };
     }
-    acc[contentId].views++;
-    return acc;
-  }, {}) || {};
 
-  const sortedContent = Object.values(contentViews)
-    .sort((a: any, b: any) => b.views - a.views)
-    .slice(0, 20);
+    const safeEvents = events || [];
 
-  return {
-    topContent: sortedContent,
-    totalContentViews: events?.length || 0,
-    byType: events?.reduce((acc: Record<string, number>, e) => {
-      const type = e.custom_dimensions?.content_type || 'unknown';
-      acc[type] = (acc[type] || 0) + 1;
+    // Aggregate by content
+    const contentViews = safeEvents.reduce((acc: Record<string, any>, e) => {
+      const dims = e.custom_dimensions || {};
+      const contentId = dims.content_id || 'unknown';
+      const contentTitle = dims.content_title || 'Unknown';
+      const type = dims.content_type || 'unknown';
+      
+      if (contentType && type !== contentType) return acc;
+      
+      if (!acc[contentId]) {
+        acc[contentId] = { id: contentId, title: contentTitle, type, views: 0 };
+      }
+      acc[contentId].views++;
       return acc;
-    }, {}) || {},
-  };
+    }, {});
+
+    const sortedContent = Object.values(contentViews)
+      .sort((a: any, b: any) => b.views - a.views)
+      .slice(0, 20);
+
+    return {
+      topContent: sortedContent,
+      totalContentViews: safeEvents.length,
+      byType: safeEvents.reduce((acc: Record<string, number>, e) => {
+        const type = (e.custom_dimensions || {}).content_type || 'unknown';
+        acc[type] = (acc[type] || 0) + 1;
+        return acc;
+      }, {}),
+    };
+  } catch (err) {
+    console.error('[ANALYTICS-SERVICE] Content metrics error:', err);
+    return { topContent: [], totalContentViews: 0, byType: {} };
+  }
 }
 
 /**
@@ -206,87 +237,108 @@ async function getSearchMetrics(params: {
   endDate: string;
   platform?: string;
 }) {
-  const { startDate, endDate, platform } = params;
+  try {
+    const { startDate, endDate, platform } = params;
 
-  let query = supabase
-    .from('analytics_events')
-    .select('*')
-    .gte('created_at', startDate)
-    .lte('created_at', endDate)
-    .eq('event_action', 'search');
+    let query = supabase
+      .from('analytics_events')
+      .select('*')
+      .gte('created_at', startDate)
+      .lte('created_at', endDate)
+      .eq('event_action', 'search')
+      .limit(1000);
 
-  if (platform) {
-    query = query.eq('platform', platform);
-  }
-
-  const { data: events, error } = await query;
-
-  if (error) throw error;
-
-  // Top search queries
-  const searchQueries = events?.reduce((acc: Record<string, any>, e) => {
-    const queryText = e.event_label || 'unknown';
-    if (!acc[queryText]) {
-      acc[queryText] = { query: queryText, count: 0, avgResults: 0, totalResults: 0 };
+    if (platform && platform !== 'undefined' && platform !== 'null') {
+      query = query.eq('platform', platform);
     }
-    acc[queryText].count++;
-    acc[queryText].totalResults += e.event_value || 0;
-    acc[queryText].avgResults = acc[queryText].totalResults / acc[queryText].count;
-    return acc;
-  }, {}) || {};
 
-  const sortedQueries = Object.values(searchQueries)
-    .sort((a: any, b: any) => b.count - a.count)
-    .slice(0, 20);
+    const { data: events, error } = await query;
 
-  const zeroResultSearches = events?.filter(e => e.event_value === 0).length || 0;
+    if (error) {
+      console.error('[ANALYTICS-SERVICE] Search metrics error:', error);
+      return { totalSearches: 0, topQueries: [], zeroResultSearches: 0, zeroResultRate: 0 };
+    }
 
-  return {
-    totalSearches: events?.length || 0,
-    topQueries: sortedQueries,
-    zeroResultSearches,
-    zeroResultRate: events?.length 
-      ? parseFloat(((zeroResultSearches / events.length) * 100).toFixed(2)) 
-      : 0,
-  };
+    const safeEvents = events || [];
+
+    // Top search queries
+    const searchQueries = safeEvents.reduce((acc: Record<string, any>, e) => {
+      const queryText = e.event_label || 'unknown';
+      if (!acc[queryText]) {
+        acc[queryText] = { query: queryText, count: 0, avgResults: 0, totalResults: 0 };
+      }
+      acc[queryText].count++;
+      acc[queryText].totalResults += e.event_value || 0;
+      acc[queryText].avgResults = acc[queryText].totalResults / acc[queryText].count;
+      return acc;
+    }, {});
+
+    const sortedQueries = Object.values(searchQueries)
+      .sort((a: any, b: any) => b.count - a.count)
+      .slice(0, 20);
+
+    const zeroResultSearches = safeEvents.filter(e => e.event_value === 0).length;
+
+    return {
+      totalSearches: safeEvents.length,
+      topQueries: sortedQueries,
+      zeroResultSearches,
+      zeroResultRate: safeEvents.length > 0
+        ? parseFloat(((zeroResultSearches / safeEvents.length) * 100).toFixed(2)) 
+        : 0,
+    };
+  } catch (err) {
+    console.error('[ANALYTICS-SERVICE] Search metrics error:', err);
+    return { totalSearches: 0, topQueries: [], zeroResultSearches: 0, zeroResultRate: 0 };
+  }
 }
 
 /**
  * Real-time active users (last 5 minutes)
  */
 async function getRealtimeUsers() {
-  const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+  try {
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
 
-  const { data: events, error } = await supabase
-    .from('analytics_events')
-    .select('session_id, platform, page_path')
-    .gte('created_at', fiveMinutesAgo);
+    const { data: events, error } = await supabase
+      .from('analytics_events')
+      .select('session_id, platform, page_path')
+      .gte('created_at', fiveMinutesAgo)
+      .limit(500);
 
-  if (error) throw error;
+    if (error) {
+      console.error('[ANALYTICS-SERVICE] Realtime error:', error);
+      return { activeUsers: 0, byPlatform: [], topPages: [] };
+    }
 
-  const uniqueSessions = new Set(events?.map(e => e.session_id));
-  const byPlatform = events?.reduce((acc: Record<string, Set<string>>, e) => {
-    if (!acc[e.platform]) acc[e.platform] = new Set();
-    acc[e.platform].add(e.session_id);
-    return acc;
-  }, {}) || {};
+    const safeEvents = events || [];
+    const uniqueSessions = new Set(safeEvents.map(e => e.session_id));
+    const byPlatform = safeEvents.reduce((acc: Record<string, Set<string>>, e) => {
+      if (!acc[e.platform]) acc[e.platform] = new Set();
+      acc[e.platform].add(e.session_id);
+      return acc;
+    }, {});
 
-  const topPages = events?.reduce((acc: Record<string, number>, e) => {
-    acc[e.page_path] = (acc[e.page_path] || 0) + 1;
-    return acc;
-  }, {}) || {};
+    const topPages = safeEvents.reduce((acc: Record<string, number>, e) => {
+      acc[e.page_path] = (acc[e.page_path] || 0) + 1;
+      return acc;
+    }, {});
 
-  return {
-    activeUsers: uniqueSessions.size,
-    byPlatform: Object.entries(byPlatform).map(([platform, sessions]) => ({
-      platform,
-      users: sessions.size,
-    })),
-    topPages: Object.entries(topPages)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 5)
-      .map(([path, count]) => ({ path, count })),
-  };
+    return {
+      activeUsers: uniqueSessions.size,
+      byPlatform: Object.entries(byPlatform).map(([platform, sessions]) => ({
+        platform,
+        users: sessions.size,
+      })),
+      topPages: Object.entries(topPages)
+        .sort(([, a], [, b]) => b - a)
+        .slice(0, 5)
+        .map(([path, count]) => ({ path, count })),
+    };
+  } catch (err) {
+    console.error('[ANALYTICS-SERVICE] Realtime error:', err);
+    return { activeUsers: 0, byPlatform: [], topPages: [] };
+  }
 }
 
 /**
