@@ -107,8 +107,12 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                 
                 const heights = ['h-[550px]', 'h-[550px]', 'h-[550px]', 'h-[550px]'];
                 
-                // All books tilted to the right
-                const tiltAngles = ['2deg', '2deg', '2deg', '2deg'];
+                // Slightly different tilt angles for a natural, disorganized look
+                const tiltAngles = ['4deg', '-1deg', '3deg', '-2deg'];
+                
+                // Different vertical offsets - some books pulled forward/back
+                const translateY = ['-8px', '0px', '-12px', '-4px'];
+                const translateZ = ['15px', '0px', '20px', '8px'];
                 
                 // Negative margins to make books touch
                 const margins = index > 0 ? '-ml-1' : '';
@@ -116,13 +120,14 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                 return (
                   <div
                     key={platform.number}
-                    className={`relative ${heights[index]} w-28 cursor-pointer group transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl ${margins}`}
+                    className={`relative ${heights[index]} w-28 cursor-pointer group transition-all duration-300 hover:-translate-y-4 hover:shadow-2xl ${margins}`}
                     onClick={() => navigate(platform.path)}
                     style={{ 
                       transformStyle: 'preserve-3d',
                       perspective: '1000px',
-                      transform: `rotate(${tiltAngles[index]})`,
-                      transformOrigin: 'bottom left'
+                      transform: `rotate(${tiltAngles[index]}) translateY(${translateY[index]}) translateZ(${translateZ[index]})`,
+                      transformOrigin: 'bottom center',
+                      zIndex: index === 2 ? 10 : index === 0 ? 8 : index === 3 ? 6 : 4
                     }}
                   >
                     {/* Book spine */}
