@@ -811,15 +811,15 @@ export default function DigitalLibraryHome() {
                 {/* BRILL */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
                   <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-8 pb-4 h-[140px] flex flex-col justify-center">
-                      <div className="flex items-center justify-center h-12 mb-2">
-                        <img src={logoBrill} alt="BRILL" className="max-h-10 max-w-[180px] object-contain" />
+                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
+                      <div className="flex items-center justify-center">
+                        <img src={logoBrill} alt="BRILL" className="h-[42px] max-w-[200px] object-contain" />
                       </div>
                       <a
                         href="https://brill.com/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-2 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold text-sm"
+                        className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold"
                       >
                         brill.com
                       </a>
@@ -881,15 +881,15 @@ export default function DigitalLibraryHome() {
                 {/* CAIRN */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
                   <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-8 pb-4 h-[140px] flex flex-col justify-center">
-                      <div className="flex items-center justify-center h-12 mb-2">
-                        <img src={logoCairn} alt="CAIRN.INFO" className="max-h-10 max-w-[180px] object-contain" />
+                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
+                      <div className="flex items-center justify-center">
+                        <img src={logoCairn} alt="CAIRN.INFO" className="h-[42px] max-w-[200px] object-contain" />
                       </div>
                       <a
                         href="https://shs.cairn.info/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-2 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold text-sm"
+                        className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold"
                       >
                         cairn.info
                       </a>
@@ -917,11 +917,11 @@ export default function DigitalLibraryHome() {
                 {/* RFN */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
                   <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-8 pb-4 h-[140px] flex flex-col justify-center">
-                      <div className="flex items-center justify-center h-12 mb-2">
-                        <img src={logoRfn} alt="RFN" className="max-h-10 max-w-[180px] object-contain" />
+                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
+                      <div className="flex items-center justify-center">
+                        <img src={logoRfn} alt="RFN" className="h-[42px] max-w-[200px] object-contain" />
                       </div>
-                      <a href="https://rfnum.org" target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold text-sm">
+                      <a href="https://rfnum.org" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold">
                         rfnum.org
                       </a>
                     </CardHeader>
@@ -943,11 +943,11 @@ export default function DigitalLibraryHome() {
                 {/* Europeana */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
                   <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-8 pb-4 h-[140px] flex flex-col justify-center">
-                      <div className="flex items-center justify-center h-12 mb-2">
-                        <img src={logoEuropeana} alt="Europeana" className="max-h-10 max-w-[180px] object-contain" />
+                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
+                      <div className="flex items-center justify-center">
+                        <img src={logoEuropeana} alt="Europeana" className="h-[42px] max-w-[200px] object-contain" />
                       </div>
-                      <a href="https://www.europeana.eu" target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold text-sm">
+                      <a href="https://www.europeana.eu" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold">
                         europeana.eu
                       </a>
                     </CardHeader>
@@ -969,11 +969,11 @@ export default function DigitalLibraryHome() {
                 {/* IFLA */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
                   <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-8 pb-4 h-[140px] flex flex-col justify-center">
-                      <div className="flex items-center justify-center h-12 mb-2">
-                        <img src={logoIfla} alt="IFLA" className="max-h-10 max-w-[180px] object-contain" />
+                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
+                      <div className="flex items-center justify-center">
+                        <img src={logoIfla} alt="IFLA" className="h-[42px] max-w-[200px] object-contain" />
                       </div>
-                      <a href="https://www.ifla.org" target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold text-sm">
+                      <a href="https://www.ifla.org" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold">
                         ifla.org
                       </a>
                     </CardHeader>
