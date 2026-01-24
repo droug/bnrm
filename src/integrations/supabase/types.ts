@@ -7636,6 +7636,45 @@ export type Database = {
         }
         Relationships: []
       }
+      monitored_services: {
+        Row: {
+          check_interval_seconds: number | null
+          created_at: string
+          description: string | null
+          endpoint_url: string | null
+          icon: string | null
+          id: string
+          is_active: boolean | null
+          service_name: string
+          service_type: string
+          updated_at: string
+        }
+        Insert: {
+          check_interval_seconds?: number | null
+          created_at?: string
+          description?: string | null
+          endpoint_url?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          service_name: string
+          service_type?: string
+          updated_at?: string
+        }
+        Update: {
+          check_interval_seconds?: number | null
+          created_at?: string
+          description?: string | null
+          endpoint_url?: string | null
+          icon?: string | null
+          id?: string
+          is_active?: boolean | null
+          service_name?: string
+          service_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       nationalities: {
         Row: {
           code: string
@@ -10459,6 +10498,45 @@ export type Database = {
           results_per_page?: number
           snippet_length?: number | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      service_health_logs: {
+        Row: {
+          checked_at: string
+          created_at: string
+          error_message: string | null
+          id: string
+          metadata: Json | null
+          response_time_ms: number | null
+          service_name: string
+          service_type: string
+          status: string
+          status_code: number | null
+        }
+        Insert: {
+          checked_at?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          response_time_ms?: number | null
+          service_name: string
+          service_type?: string
+          status?: string
+          status_code?: number | null
+        }
+        Update: {
+          checked_at?: string
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          metadata?: Json | null
+          response_time_ms?: number | null
+          service_name?: string
+          service_type?: string
+          status?: string
+          status_code?: number | null
         }
         Relationships: []
       }
@@ -13840,6 +13918,17 @@ export type Database = {
         }
         Relationships: []
       }
+      service_health_summary: {
+        Row: {
+          checked_at: string | null
+          response_time_ms: number | null
+          rn: number | null
+          service_name: string | null
+          service_type: string | null
+          status: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       advance_booking_workflow: {
@@ -13910,6 +13999,7 @@ export type Database = {
         Returns: boolean
       }
       cleanup_old_activity_logs: { Args: never; Returns: number }
+      cleanup_old_health_logs: { Args: never; Returns: undefined }
       create_restoration_notification: {
         Args: {
           p_message: string
