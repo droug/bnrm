@@ -37,6 +37,7 @@ import logoBrill from "@/assets/logos/logo-brill.png";
 import logoCairn from "@/assets/logos/logo-cairn.svg";
 import logoRfn from "@/assets/logos/logo-rfn.png";
 import logoEuropeana from "@/assets/logos/logo-europeana.svg";
+import logoIfla from "@/assets/logos/logo-ifla.svg";
 
 export default function DigitalLibraryHome() {
   const navigate = useNavigate();
@@ -970,7 +971,7 @@ export default function DigitalLibraryHome() {
                   <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
                     <CardHeader className="text-center pt-8 pb-4 h-[140px] flex flex-col justify-center">
                       <div className="flex items-center justify-center h-12 mb-2">
-                        <span className="font-heading text-[36px] font-bold text-bn-blue-primary">IFLA</span>
+                        <img src={logoIfla} alt="IFLA" className="max-h-10 max-w-[180px] object-contain" />
                       </div>
                       <a href="https://www.ifla.org" target="_blank" rel="noopener noreferrer" className="mt-2 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold text-sm">
                         ifla.org
