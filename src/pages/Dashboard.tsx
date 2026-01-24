@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { BookOpen, Users, FileText, Clock, Library, LogOut, Settings, Cog, ArrowLeft, CheckCircle, XCircle, AlertCircle, TrendingUp, Award, BarChart3, Eye, Download, Archive, Calendar } from "lucide-react";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ManuscriptsDashboard } from "@/components/manuscripts/ManuscriptsDashboard";
+import { PortalAnalyticsKPICard } from "@/components/dashboard/PortalAnalyticsKPICard";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
@@ -267,6 +268,11 @@ export default function Dashboard() {
               </p>
             </div>
           )}
+        </div>
+
+        {/* Carte Tableau de Bord KPI Portail */}
+        <div className="mb-6">
+          <PortalAnalyticsKPICard platform="portail" />
         </div>
 
         {/* Statistiques Accordéon */}
