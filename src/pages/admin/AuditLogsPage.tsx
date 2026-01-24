@@ -75,6 +75,7 @@ import {
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16'];
 
 const ACTION_LABELS: Record<string, string> = {
+  // Gestion de contenu
   create: 'Création',
   update: 'Modification',
   delete: 'Suppression',
@@ -82,41 +83,260 @@ const ACTION_LABELS: Record<string, string> = {
   unpublish: 'Dépublication',
   archive: 'Archivage',
   restore: 'Restauration',
+  duplicate: 'Duplication',
+  move: 'Déplacement',
+  reorder: 'Réorganisation',
+  
+  // Authentification & Sécurité
   login: 'Connexion',
   logout: 'Déconnexion',
+  login_failed: 'Échec de connexion',
+  password_change: 'Changement mot de passe',
+  password_reset: 'Réinitialisation mot de passe',
+  email_change: 'Changement d\'email',
+  two_factor_enable: 'Activation 2FA',
+  two_factor_disable: 'Désactivation 2FA',
+  session_revoke: 'Révocation de session',
+  account_lock: 'Verrouillage compte',
+  account_unlock: 'Déverrouillage compte',
+  account_suspend: 'Suspension compte',
+  account_activate: 'Activation compte',
+  
+  // Gestion des utilisateurs
+  role_change: 'Changement de rôle',
+  role_assign: 'Attribution de rôle',
+  role_revoke: 'Révocation de rôle',
+  permission_grant: 'Attribution de permission',
+  permission_revoke: 'Révocation de permission',
+  user_invite: 'Invitation utilisateur',
+  user_register: 'Inscription utilisateur',
+  profile_update: 'Mise à jour profil',
+  
+  // Workflow & Validation
   approve: 'Approbation',
   reject: 'Rejet',
   submit: 'Soumission',
+  cancel: 'Annulation',
+  assign: 'Assignation',
+  reassign: 'Réassignation',
+  escalate: 'Escalade',
+  return: 'Retour',
+  complete: 'Complétion',
+  validate: 'Validation',
+  invalidate: 'Invalidation',
+  review: 'Révision',
+  sign: 'Signature',
+  countersign: 'Contre-signature',
+  
+  // Documents & Fichiers
+  upload: 'Téléversement',
+  download: 'Téléchargement',
+  view: 'Consultation',
+  print: 'Impression',
+  share: 'Partage',
+  unshare: 'Retrait partage',
+  convert: 'Conversion',
+  ocr_process: 'Traitement OCR',
+  transcribe: 'Transcription',
+  digitize: 'Numérisation',
+  
+  // Import/Export
   export: 'Export',
   import: 'Import',
-  config_change: 'Configuration',
-  cleanup_old_logs: 'Nettoyage',
-  password_change: 'Changement mot de passe',
-  role_change: 'Changement de rôle',
+  bulk_import: 'Import en masse',
+  bulk_export: 'Export en masse',
+  sync: 'Synchronisation',
+  backup: 'Sauvegarde',
+  restore_backup: 'Restauration sauvegarde',
+  
+  // Configuration système
+  config_change: 'Modification configuration',
+  settings_update: 'Mise à jour paramètres',
+  cleanup_old_logs: 'Nettoyage logs',
+  maintenance_start: 'Début maintenance',
+  maintenance_end: 'Fin maintenance',
+  cache_clear: 'Vidage cache',
+  index_rebuild: 'Reconstruction index',
+  
+  // Paiements & Transactions
+  payment_create: 'Création paiement',
+  payment_complete: 'Paiement effectué',
+  payment_cancel: 'Annulation paiement',
+  payment_refund: 'Remboursement',
+  subscription_start: 'Début abonnement',
+  subscription_renew: 'Renouvellement abonnement',
+  subscription_cancel: 'Annulation abonnement',
+  invoice_generate: 'Génération facture',
+  wallet_topup: 'Rechargement portefeuille',
+  wallet_debit: 'Débit portefeuille',
+  
+  // Communications
+  email_send: 'Envoi email',
+  sms_send: 'Envoi SMS',
+  notification_send: 'Envoi notification',
+  newsletter_send: 'Envoi newsletter',
+  
+  // Réservations & Services
+  book: 'Réservation',
+  check_in: 'Enregistrement',
+  check_out: 'Restitution',
+  extend: 'Prolongation',
+  reserve: 'Réserver',
+  
+  // Recherche & Analytics
+  search: 'Recherche',
+  search_advanced: 'Recherche avancée',
+  report_generate: 'Génération rapport',
+  analytics_view: 'Consultation analytics',
+  
+  // Traduction
+  translate: 'Traduction',
+  translate_auto: 'Traduction automatique',
+  translate_validate: 'Validation traduction',
+  
+  // Autres
+  comment: 'Commentaire',
+  note_add: 'Ajout note',
+  tag_add: 'Ajout tag',
+  tag_remove: 'Retrait tag',
+  link: 'Liaison',
+  unlink: 'Déliaison',
+  merge: 'Fusion',
+  split: 'Séparation',
 };
 
 const RESOURCE_LABELS: Record<string, string> = {
+  // Utilisateurs & Accès
   user: 'Utilisateur',
+  profile: 'Profil',
+  role: 'Rôle',
+  permission: 'Permission',
+  session: 'Session',
+  access_request: 'Demande d\'accès',
+  professional: 'Professionnel',
+  subscription: 'Abonnement',
+  
+  // Contenu éditorial
   content: 'Contenu',
   news: 'Actualité',
   event: 'Événement',
-  manuscript: 'Manuscrit',
-  document: 'Document',
-  deposit: 'Dépôt légal',
-  booking: 'Réservation',
-  access_request: 'Demande d\'accès',
-  restoration: 'Restauration',
-  reproduction: 'Reproduction',
-  professional: 'Professionnel',
-  translation: 'Traduction',
-  workflow: 'Workflow',
-  role: 'Rôle',
-  permission: 'Permission',
-  tariff: 'Tarif',
-  system: 'Système',
+  exhibition: 'Exposition',
+  virtual_exhibition: 'Exposition virtuelle',
   banner: 'Bannière',
   footer: 'Pied de page',
-  exhibition: 'Exposition',
+  page: 'Page',
+  menu: 'Menu',
+  slider: 'Slider',
+  gallery: 'Galerie',
+  
+  // Documents & Catalogue
+  document: 'Document',
+  manuscript: 'Manuscrit',
+  book: 'Livre',
+  periodical: 'Périodique',
+  map: 'Carte',
+  photo: 'Photo',
+  audio: 'Audio',
+  video: 'Vidéo',
+  catalog_record: 'Notice catalogue',
+  metadata: 'Métadonnées',
+  
+  // Dépôt légal
+  deposit: 'Dépôt légal',
+  deposit_book: 'Dépôt livre',
+  deposit_periodical: 'Dépôt périodique',
+  deposit_multimedia: 'Dépôt multimédia',
+  deposit_electronic: 'Dépôt électronique',
+  depositor: 'Déposant',
+  
+  // Services
+  booking: 'Réservation espace',
+  reservation: 'Réservation ouvrage',
+  reproduction: 'Reproduction',
+  restoration: 'Restauration',
+  loan: 'Prêt',
+  consultation: 'Consultation',
+  
+  // CBM - Catalogue collectif
+  cbm_record: 'Notice CBM',
+  cbm_library: 'Bibliothèque CBM',
+  cbm_adhesion: 'Adhésion CBM',
+  cbm_formation: 'Formation CBM',
+  
+  // Workflows
+  workflow: 'Workflow',
+  workflow_step: 'Étape workflow',
+  workflow_instance: 'Instance workflow',
+  task: 'Tâche',
+  
+  // Traductions
+  translation: 'Traduction',
+  translation_batch: 'Lot de traductions',
+  
+  // Paiements
+  payment: 'Paiement',
+  invoice: 'Facture',
+  wallet: 'Portefeuille',
+  tariff: 'Tarif',
+  service_tariff: 'Tarif service',
+  
+  // Communications
+  email: 'Email',
+  email_template: 'Modèle email',
+  notification: 'Notification',
+  newsletter: 'Newsletter',
+  sms: 'SMS',
+  
+  // Système
+  system: 'Système',
+  config: 'Configuration',
+  settings: 'Paramètres',
+  backup: 'Sauvegarde',
+  log: 'Journal',
+  cache: 'Cache',
+  index: 'Index',
+  
+  // Activités culturelles
+  cultural_activity: 'Activité culturelle',
+  program: 'Programme',
+  activity_type: 'Type d\'activité',
+  
+  // Espaces
+  cultural_space: 'Espace culturel',
+  equipment: 'Équipement',
+  space_service: 'Service espace',
+  
+  // Listes & Références
+  autocomplete_list: 'Liste autocomplete',
+  list_value: 'Valeur liste',
+  category: 'Catégorie',
+  tag: 'Tag',
+  
+  // Chatbot & IA
+  chatbot: 'Chatbot',
+  chatbot_interaction: 'Interaction chatbot',
+  knowledge_base: 'Base de connaissances',
+  
+  // Analytics
+  analytics: 'Analytics',
+  report: 'Rapport',
+  dashboard: 'Tableau de bord',
+  
+  // Interconnexions
+  external_system: 'Système externe',
+  api_key: 'Clé API',
+  webhook: 'Webhook',
+  sync_job: 'Job de synchronisation',
+  
+  // Formulaires
+  form: 'Formulaire',
+  form_field: 'Champ formulaire',
+  form_submission: 'Soumission formulaire',
+  
+  // Cotes & Classifications
+  cote: 'Cote',
+  collection: 'Collection',
+  classification: 'Classification',
 };
 
 function getActionBadgeVariant(action: string): "default" | "secondary" | "destructive" | "outline" {
