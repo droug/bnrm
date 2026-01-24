@@ -30,22 +30,45 @@ const defaultResources: ResourceItem[] = [
     id: "1",
     name: "BRILL",
     nameAr: "بريل",
+    logo: "https://brill.com/fileasset/brill-logo.svg",
     url: "https://brill.com",
-    description: "Ressources académiques"
+    description: "Maison d'édition académique néerlandaise fondée en 1683, spécialisée en sciences humaines"
   },
   {
     id: "2",
     name: "CAIRN.INFO",
     nameAr: "كارن",
+    logo: "https://www.cairn.info/static/images/logo-cairn-info.svg",
     url: "https://cairn.info",
-    description: "Revues francophones"
+    description: "Plateforme de référence pour les publications scientifiques francophones"
   },
   {
     id: "3",
-    name: "JSTOR",
-    nameAr: "جستور",
-    url: "https://jstor.org",
-    description: "Archives académiques"
+    name: "EBSCO",
+    nameAr: "إبسكو",
+    url: "https://www.ebsco.com",
+    description: "Fournisseur américain de bases de données, revues et livres numériques"
+  },
+  {
+    id: "4",
+    name: "Europeana",
+    nameAr: "يوروبيانا",
+    url: "https://www.europeana.eu",
+    description: "Bibliothèque numérique européenne donnant accès à des millions d'œuvres culturelles"
+  },
+  {
+    id: "5",
+    name: "IFLA",
+    nameAr: "الإفلا",
+    url: "https://www.ifla.org",
+    description: "Fédération internationale des associations de bibliothécaires"
+  },
+  {
+    id: "6",
+    name: "RFN",
+    nameAr: "الشبكة الفرنكوفونية الرقمية",
+    url: "https://www.rfnum.org",
+    description: "Réseau Francophone Numérique pour le patrimoine documentaire francophone"
   }
 ];
 
@@ -87,42 +110,46 @@ export function ElectronicResourcesSection({ section, language }: SectionProps) 
               <ChevronLeft className="h-8 w-8" />
             </button>
 
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
               {visibleResources.map((resource) => (
-                <Card key={resource.id} className="bg-white hover:shadow-lg transition-shadow group h-full">
-                  <CardContent className="p-6 text-center h-full flex flex-col">
-                    {/* Logo/Name - Fixed height */}
-                    {resource.logo ? (
-                      <img 
-                        src={resource.logo} 
-                        alt={resource.name}
-                        className="h-12 mx-auto mb-4 object-contain"
-                      />
-                    ) : (
-                      <div className="h-12 flex items-center justify-center mb-4">
-                        <span className="text-2xl font-bold text-bn-blue-primary">
-                          {resource.name}
-                        </span>
-                      </div>
-                    )}
+                <Card key={resource.id} className="bg-white hover:shadow-lg transition-shadow group flex flex-col">
+                  <CardContent className="p-6 text-center flex flex-col flex-1">
+                    {/* Logo/Name - Fixed height container */}
+                    <div className="h-16 flex items-center justify-center mb-4">
+                      {resource.logo ? (
+                        <img 
+                          src={resource.logo} 
+                          alt={resource.name}
+                          className="max-h-12 max-w-full object-contain"
+                          onError={(e) => {
+                            // Fallback to text if logo fails to load
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                          }}
+                        />
+                      ) : null}
+                      <span className={`text-xl font-bold text-bn-blue-primary ${resource.logo ? 'hidden' : ''}`}>
+                        {resource.name}
+                      </span>
+                    </div>
                     
-                    {/* Description - Flex grow to push button down */}
-                    <p className="text-sm text-slate-text mb-4 flex-1">
+                    {/* Description - Fixed height with line clamp */}
+                    <p className="text-sm text-slate-text mb-4 flex-1 line-clamp-3 min-h-[3.75rem]">
                       {language === 'ar' && resource.descriptionAr 
                         ? resource.descriptionAr 
                         : resource.description}
                     </p>
                     
-                    {/* Button - Always at bottom */}
-                    <div className="mt-auto">
+                    {/* Button - Always at bottom, aligned */}
+                    <div className="mt-auto pt-2">
                       <a 
                         href={resource.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-bn-blue-primary hover:text-bn-blue-deep transition-colors text-sm font-medium underline"
+                        className="inline-flex items-center gap-2 text-bn-blue-primary hover:text-bn-blue-deep transition-colors text-sm font-medium"
                       >
                         {language === 'ar' ? 'استكشف' : 'Explorer'}
-                        <ExternalLink className="h-4 w-4" />
+                        <ChevronRight className="h-4 w-4" />
                       </a>
                     </div>
                   </CardContent>
