@@ -8,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Palette, Save, Loader2, Type, Paintbrush, RotateCcw, Home, Newspaper, Globe, Link2, Video, Footprints } from "lucide-react";
+import { Palette, Save, Loader2, Type, Paintbrush, RotateCcw, Home, Newspaper, Globe, Link2, Video, Footprints, Grid3X3 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import CmsSectionIconsManager from "./CmsSectionIconsManager";
 
 interface SectionStyles {
   hero: {
@@ -375,7 +376,7 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
 
       <CardContent>
         <Tabs defaultValue="sections" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="sections" className="flex items-center gap-2">
               <Paintbrush className="h-4 w-4" />
               Sections
@@ -387,6 +388,10 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
             <TabsTrigger value="buttons" className="flex items-center gap-2">
               <Palette className="h-4 w-4" />
               Boutons
+            </TabsTrigger>
+            <TabsTrigger value="icons" className="flex items-center gap-2">
+              <Grid3X3 className="h-4 w-4" />
+              Icônes
             </TabsTrigger>
           </TabsList>
 
@@ -1083,6 +1088,11 @@ export default function CmsStyleManager({ platform = 'portal' }: CmsStyleManager
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
+
+          {/* Icons Tab */}
+          <TabsContent value="icons" className="mt-4">
+            <CmsSectionIconsManager platform={platform} />
           </TabsContent>
         </Tabs>
       </CardContent>
