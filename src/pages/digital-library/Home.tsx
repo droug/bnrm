@@ -804,10 +804,9 @@ export default function DigitalLibraryHome() {
               >
                 {/* BRILL */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <Card className="bg-card border-0 rounded-xl h-full shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-10 pb-4">
+                  <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
+                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
                       <div className="flex items-center justify-center gap-4">
-                        {/* Icône Brill (bloc bleu + pictogramme blanc) */}
                         <div className="w-14 h-14 bg-bn-blue-primary rounded-md flex items-center justify-center">
                           <svg viewBox="0 0 24 24" className="w-9 h-9" fill="none" aria-hidden="true">
                             <path d="M9 18V7h5.2c2.2 0 3.8 1.4 3.8 3.2 0 1.6-1 2.8-2.6 3.1l2.4 4.5h-2.4L13.3 14H11v4H9z" fill="white" />
@@ -825,9 +824,11 @@ export default function DigitalLibraryHome() {
                       </a>
                     </CardHeader>
                     <CardContent className="px-8 pb-8 flex flex-col">
-                      <p className="text-muted-foreground text-sm leading-relaxed text-justify">
-                        Brill est une maison d'édition académique néerlandaise fondée en 1683 à Leiden. Elle publie des livres, des revues scientifiques et des ouvrages de référence dans les domaines des sciences humaines, du droit international, des études islamiques et orientales, de la linguistique et de l'histoire.
-                      </p>
+                      <div className="h-[120px] overflow-hidden">
+                        <p className="text-muted-foreground text-sm leading-relaxed text-justify line-clamp-5">
+                          Brill est une maison d'édition académique néerlandaise fondée en 1683 à Leiden. Elle publie des livres, des revues scientifiques et des ouvrages de référence dans les domaines des sciences humaines, du droit international, des études islamiques et orientales, de la linguistique et de l'histoire.
+                        </p>
+                      </div>
                       <div className="flex justify-end mt-6">
                         <a
                           href="https://brill.com/"
@@ -844,8 +845,8 @@ export default function DigitalLibraryHome() {
 
                 {/* EBSCO */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <Card className="bg-card border-0 rounded-xl h-full shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-10 pb-4">
+                  <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
+                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
                       <div className="font-heading text-[42px] font-semibold text-bn-blue-primary tracking-wide">EBSCO</div>
                       <a
                         href="https://www.ebsco.com/"
@@ -857,9 +858,11 @@ export default function DigitalLibraryHome() {
                       </a>
                     </CardHeader>
                     <CardContent className="px-8 pb-8 flex flex-col">
-                      <p className="text-muted-foreground text-sm leading-relaxed text-justify">
-                        ebsco.com est le site officiel de EBSCO Information Services, un fournisseur américain de bases de données, revues et livres numériques, ainsi que d'outils de recherche utilisés par les bibliothèques, universités, écoles et institutions à travers le monde.
-                      </p>
+                      <div className="h-[120px] overflow-hidden">
+                        <p className="text-muted-foreground text-sm leading-relaxed text-justify line-clamp-5">
+                          ebsco.com est le site officiel de EBSCO Information Services, un fournisseur américain de bases de données, revues et livres numériques, ainsi que d'outils de recherche utilisés par les bibliothèques, universités, écoles et institutions à travers le monde.
+                        </p>
+                      </div>
                       <div className="flex justify-end mt-6">
                         <a
                           href="https://www.ebsco.com/"
@@ -876,10 +879,9 @@ export default function DigitalLibraryHome() {
 
                 {/* CAIRN */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <Card className="bg-card border-0 rounded-xl h-full shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-10 pb-4">
+                  <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
+                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
                       <div className="flex items-center justify-center gap-3">
-                        {/* Icône losanges */}
                         <svg viewBox="0 0 32 32" className="w-10 h-10 text-bn-blue-primary" fill="currentColor" aria-hidden="true">
                           <path d="M8 6l6 6-6 6-6-6 6-6zm12 0l6 6-6 6-6-6 6-6zm-6 12l6 6-6 6-6-6 6-6z" />
                         </svg>
@@ -903,9 +905,11 @@ export default function DigitalLibraryHome() {
                       </a>
                     </CardHeader>
                     <CardContent className="px-8 pb-8 flex flex-col">
-                      <p className="text-muted-foreground text-sm leading-relaxed text-justify">
-                        Cairn.info, plateforme de référence pour les publications scientifiques francophones, vise à favoriser la découverte d'une recherche de qualité tout en cultivant l'indépendance et la diversité des acteurs de l'écosystème du savoir.
-                      </p>
+                      <div className="h-[120px] overflow-hidden">
+                        <p className="text-muted-foreground text-sm leading-relaxed text-justify line-clamp-5">
+                          Cairn.info, plateforme de référence pour les publications scientifiques francophones, vise à favoriser la découverte d'une recherche de qualité tout en cultivant l'indépendance et la diversité des acteurs de l'écosystème du savoir.
+                        </p>
+                      </div>
                       <div className="flex justify-end mt-6">
                         <a
                           href="https://shs.cairn.info/"
@@ -922,17 +926,19 @@ export default function DigitalLibraryHome() {
 
                 {/* RFN */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <Card className="bg-card border-0 rounded-xl h-full shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-10 pb-4">
+                  <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
+                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
                       <div className="font-heading text-[42px] font-semibold text-bn-blue-primary">RFN</div>
                       <a href="https://rfnum.org" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold">
                         rfnum.org
                       </a>
                     </CardHeader>
                     <CardContent className="px-8 pb-8 flex flex-col">
-                      <p className="text-muted-foreground text-sm leading-relaxed text-justify">
-                        Réseau Francophone Numérique regroupant les collections patrimoniales de bibliothèques nationales francophones pour préserver le patrimoine documentaire commun.
-                      </p>
+                      <div className="h-[120px] overflow-hidden">
+                        <p className="text-muted-foreground text-sm leading-relaxed text-justify line-clamp-5">
+                          Réseau Francophone Numérique regroupant les collections patrimoniales de bibliothèques nationales francophones pour préserver le patrimoine documentaire commun.
+                        </p>
+                      </div>
                       <div className="flex justify-end mt-6">
                         <a href="https://rfnum.org" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors">
                           Explorer <ChevronRight className="h-4 w-4" strokeWidth={2} />
@@ -944,17 +950,19 @@ export default function DigitalLibraryHome() {
 
                 {/* Europeana */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <Card className="bg-card border-0 rounded-xl h-full shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-10 pb-4">
+                  <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
+                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
                       <div className="font-heading text-[42px] font-semibold text-bn-blue-primary">Europeana</div>
                       <a href="https://www.europeana.eu" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold">
                         europeana.eu
                       </a>
                     </CardHeader>
                     <CardContent className="px-8 pb-8 flex flex-col">
-                      <p className="text-muted-foreground text-sm leading-relaxed text-justify">
-                        Agrégateur central du patrimoine culturel européen. Initiative de l'UE visant à moderniser la numérisation et la réutilisation des données culturelles.
-                      </p>
+                      <div className="h-[120px] overflow-hidden">
+                        <p className="text-muted-foreground text-sm leading-relaxed text-justify line-clamp-5">
+                          Agrégateur central du patrimoine culturel européen. Initiative de l'UE visant à moderniser la numérisation et la réutilisation des données culturelles.
+                        </p>
+                      </div>
                       <div className="flex justify-end mt-6">
                         <a href="https://www.europeana.eu" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors">
                           Explorer <ChevronRight className="h-4 w-4" strokeWidth={2} />
@@ -966,17 +974,19 @@ export default function DigitalLibraryHome() {
 
                 {/* IFLA */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <Card className="bg-card border-0 rounded-xl h-full shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-10 pb-4">
+                  <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
+                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
                       <div className="font-heading text-[42px] font-semibold text-bn-blue-primary">IFLA</div>
                       <a href="https://www.ifla.org" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold">
                         ifla.org
                       </a>
                     </CardHeader>
                     <CardContent className="px-8 pb-8 flex flex-col">
-                      <p className="text-muted-foreground text-sm leading-relaxed text-justify">
-                        Fédération Internationale des Associations de Bibliothécaires. Définit les normes internationales pour l'interopérabilité entre les grands réservoirs mondiaux.
-                      </p>
+                      <div className="h-[120px] overflow-hidden">
+                        <p className="text-muted-foreground text-sm leading-relaxed text-justify line-clamp-5">
+                          Fédération Internationale des Associations de Bibliothécaires. Définit les normes internationales pour l'interopérabilité entre les grands réservoirs mondiaux.
+                        </p>
+                      </div>
                       <div className="flex justify-end mt-6">
                         <a href="https://www.ifla.org" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors">
                           Explorer <ChevronRight className="h-4 w-4" strokeWidth={2} />
