@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { Book3D } from "@/components/Book3D";
+import { useState } from "react";
 import bibliothequeNumerique from "@/assets/bibliotheque-numerique.jpg";
 import kitabBackground from "@/assets/kitab-book.jpg";
 import manuscritsBackground from "@/assets/manuscrits-background.jpg";
@@ -14,12 +15,16 @@ interface PlatformsSectionProps {
 
 export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
   const navigate = useNavigate();
+  const [hoveredPlatform, setHoveredPlatform] = useState<string | null>(null);
 
   const mainPlatform = {
     title: language === 'ar' ? 'المكتبة الرقمية' : 'Bibliothèque Numérique',
     description: language === 'ar' 
       ? 'استكشف مجموعاتنا الرقمية الغنية من الكتب والمخطوطات والوثائق التاريخية المتاحة للاستشارة عبر الإنترنت'
       : 'Explorez nos riches collections numériques de livres, manuscrits et documents historiques disponibles en consultation en ligne',
+    tooltip: language === 'ar'
+      ? 'أكثر من 50,000 وثيقة رقمية • وصول مجاني على مدار الساعة • بحث متقدم'
+      : 'Plus de 50 000 documents numérisés • Accès gratuit 24h/24 • Recherche avancée',
     path: '/digital-library',
     image: bibliothequeNumerique,
     number: '01'
@@ -28,24 +33,36 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
   const secondaryPlatforms = [
     {
       title: language === 'ar' ? 'مخطوطات' : 'Manuscrits',
+      description: language === 'ar' 
+        ? 'اكتشف كنوز المخطوطات العربية والأمازيغية النادرة'
+        : 'Découvrez les trésors des manuscrits arabes et amazighs rares',
       path: '/plateforme-manuscrits',
       image: manuscritsBackground,
       number: '02'
     },
     {
       title: 'Kitab',
+      description: language === 'ar'
+        ? 'الفهرس الوطني الموحد للمكتبات المغربية'
+        : 'Le catalogue national unifié des bibliothèques marocaines',
       path: '/kitab',
       image: kitabBackground,
       number: '03'
     },
     {
       title: language === 'ar' ? 'الأنشطة الثقافية' : 'Activités Culturelles',
+      description: language === 'ar'
+        ? 'معارض، محاضرات، ورشات عمل وفعاليات ثقافية متنوعة'
+        : 'Expositions, conférences, ateliers et événements culturels variés',
       path: '/cultural-activities',
       image: culturalActivitiesBackground,
       number: '04'
     },
     {
       title: 'CBM',
+      description: language === 'ar'
+        ? 'الفهرس الببليوغرافي المغربي الشامل'
+        : 'Le Catalogue Bibliographique Marocain complet',
       path: '/cbm',
       image: cbmBackground,
       number: '05'
@@ -86,7 +103,40 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
           <div 
             className="relative cursor-pointer group transition-transform duration-300 hover:scale-[1.02]"
             onClick={() => navigate(mainPlatform.path)}
+            onMouseEnter={() => setHoveredPlatform('main')}
+            onMouseLeave={() => setHoveredPlatform(null)}
           >
+            {/* Tooltip Bubble */}
+            <div className={`absolute -top-4 left-1/2 -translate-x-1/2 -translate-y-full z-50 transition-all duration-300 ${
+              hoveredPlatform === 'main' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
+            }`}>
+              <div className="relative bg-white rounded-2xl shadow-2xl p-5 max-w-[320px] border border-orange-100">
+                {/* Arrow */}
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rotate-45 border-r border-b border-orange-100" />
+                
+                <div className="flex items-start gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center flex-shrink-0 shadow-lg">
+                    <span className="text-white font-bold text-lg">01</span>
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-gray-900 text-base mb-1">{mainPlatform.title}</h4>
+                    <p className="text-gray-600 text-sm leading-relaxed">{mainPlatform.tooltip}</p>
+                  </div>
+                </div>
+                
+                <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
+                  <span className="text-xs text-orange-600 font-medium">
+                    {language === 'ar' ? 'انقر للاستكشاف' : 'Cliquez pour explorer'}
+                  </span>
+                  <div className="flex gap-1">
+                    <span className="w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
+                    <span className="w-2 h-2 rounded-full bg-orange-300 animate-pulse delay-75" />
+                    <span className="w-2 h-2 rounded-full bg-orange-200 animate-pulse delay-150" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="relative h-[550px] w-[380px] flex">
               {/* Book Spine (left edge) */}
               <div className="w-6 h-full bg-gradient-to-r from-[#1a3a5c] via-[#2a5a8c] to-[#1a3a5c] rounded-l-sm shadow-inner flex-shrink-0">
@@ -182,15 +232,44 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                     key={platform.number}
                     className={`relative ${heights[index]} w-28 cursor-pointer group transition-all duration-300 hover:-translate-y-3 ${margins}`}
                     onClick={() => navigate(platform.path)}
+                    onMouseEnter={() => setHoveredPlatform(platform.number)}
+                    onMouseLeave={() => setHoveredPlatform(null)}
                     style={{ 
                       transformStyle: 'preserve-3d',
                       perspective: '1000px',
                       transform: `rotate(${tiltAngles[index]}) translateY(${translateY[index]}) translateX(${translateX[index]})`,
                       transformOrigin: 'bottom center',
-                      zIndex: 10 - index,
+                      zIndex: hoveredPlatform === platform.number ? 50 : 10 - index,
                       boxShadow: shadowDepths[index]
                     }}
                   >
+                    {/* Tooltip Bubble */}
+                    <div className={`absolute -top-4 left-1/2 -translate-x-1/2 -translate-y-full z-[100] transition-all duration-300 ${
+                      hoveredPlatform === platform.number ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
+                    }`} style={{ transform: `rotate(-${tiltAngles[index]}) translateX(-50%) translateY(-100%)` }}>
+                      <div className="relative bg-white rounded-xl shadow-2xl p-4 w-[220px] border border-gray-100">
+                        {/* Arrow */}
+                        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rotate-45 border-r border-b border-gray-100" />
+                        
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${bookColors[index]} flex items-center justify-center flex-shrink-0 shadow-md`}>
+                            <span className="text-white font-bold text-xs">{platform.number}</span>
+                          </div>
+                          <h4 className="font-bold text-gray-900 text-sm">{platform.title}</h4>
+                        </div>
+                        
+                        <p className="text-gray-600 text-xs leading-relaxed mb-2">
+                          {platform.description}
+                        </p>
+                        
+                        <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                          <span className="text-xs text-primary font-medium">
+                            {language === 'ar' ? 'اكتشف المزيد →' : 'Découvrir →'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Book spine */}
                     <div className={`absolute inset-0 bg-gradient-to-b ${bookColors[index]} rounded-sm shadow-lg`}>
                       {/* Book texture overlay */}
