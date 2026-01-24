@@ -101,7 +101,7 @@ export function Icon({
 // Common icon presets for the library system
 export const IconNames = {
   // Section icons
-  electronicResources: "mdi:table-large-plus",
+  electronicResources: "mdi:select-multiple",
   ibnBattoutaStats: "mdi:format-list-numbered",
   latestAdditions: "mdi:book-open-page-variant-outline",
   mediatheque: "mdi:video-box",
