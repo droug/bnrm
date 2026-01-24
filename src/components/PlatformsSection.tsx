@@ -172,12 +172,16 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                         </div>
                       </div>
                       
-                      {/* Book title - vertical at bottom */}
-                      <div className="absolute bottom-28 left-1/2 -translate-x-1/2 flex items-center justify-center w-full px-2 overflow-hidden">
-                        <div className="transform -rotate-90 origin-center whitespace-nowrap max-w-[400px]">
-                          <span className="text-white font-bold text-sm tracking-[0.2em] uppercase drop-shadow-md">
-                            {platform.title.length > 15 ? platform.title.substring(0, 15) + '...' : platform.title}
-                          </span>
+                      {/* Book title - vertical on spine (kept inside book bounds) */}
+                      <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex items-center justify-center w-full px-2">
+                        <div
+                          className={`max-h-[280px] overflow-hidden text-white font-bold text-sm leading-tight tracking-[0.14em] drop-shadow-xl ${
+                            language === 'ar' ? '' : 'uppercase'
+                          }`}
+                          style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
+                          title={platform.title}
+                        >
+                          {platform.title}
                         </div>
                       </div>
                       
