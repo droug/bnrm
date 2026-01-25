@@ -25,6 +25,15 @@ interface NavigationItem {
   bgColor: string;
 }
 
+interface UserProfiles {
+  isProfessional?: boolean;  // Dépôt légal
+  isDonor?: boolean;         // Mécénat
+  hasRestorations?: boolean;
+  hasReproductions?: boolean;
+  hasBookReservations?: boolean;
+  hasSpaceReservations?: boolean;
+}
+
 interface MySpaceNavigationProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
@@ -40,11 +49,16 @@ interface MySpaceNavigationProps {
     reviews: number;
     mecenat?: number;
   };
+  userProfiles?: UserProfiles;
 }
 
-export function MySpaceNavigation({ activeTab, onTabChange, counts }: MySpaceNavigationProps) {
-  const requestsItems: NavigationItem[] = [
-    {
+export function MySpaceNavigation({ activeTab, onTabChange, counts, userProfiles }: MySpaceNavigationProps) {
+  // Build request items based on user profile
+  const requestsItems: NavigationItem[] = [];
+
+  // Always show restoration if user has requests or count > 0
+  if (userProfiles?.hasRestorations || counts.restoration > 0) {
+    requestsItems.push({
       id: "restoration",
       label: "Restauration",
       description: "Demandes de restauration de documents",
@@ -52,8 +66,12 @@ export function MySpaceNavigation({ activeTab, onTabChange, counts }: MySpaceNav
       count: counts.restoration,
       color: "text-amber-600",
       bgColor: "bg-amber-50 hover:bg-amber-100",
-    },
-    {
+    });
+  }
+
+  // Show reproduction if user has requests
+  if (userProfiles?.hasReproductions || counts.reproduction > 0) {
+    requestsItems.push({
       id: "reproduction",
       label: "Reproduction",
       description: "Demandes de reproduction",
@@ -61,8 +79,12 @@ export function MySpaceNavigation({ activeTab, onTabChange, counts }: MySpaceNav
       count: counts.reproduction,
       color: "text-orange-600",
       bgColor: "bg-orange-50 hover:bg-orange-100",
-    },
-    {
+    });
+  }
+
+  // Show legal deposit only for professionals
+  if (userProfiles?.isProfessional) {
+    requestsItems.push({
       id: "legal-deposit",
       label: "Dépôt légal",
       description: "Suivi des dépôts légaux",
@@ -70,8 +92,12 @@ export function MySpaceNavigation({ activeTab, onTabChange, counts }: MySpaceNav
       count: counts.legalDeposit,
       color: "text-blue-600",
       bgColor: "bg-blue-50 hover:bg-blue-100",
-    },
-    {
+    });
+  }
+
+  // Show book reservation if user has reservations
+  if (userProfiles?.hasBookReservations || counts.bookReservation > 0) {
+    requestsItems.push({
       id: "book-reservation",
       label: "Réservation ouvrage",
       description: "Réservations de livres et documents",
@@ -79,8 +105,12 @@ export function MySpaceNavigation({ activeTab, onTabChange, counts }: MySpaceNav
       count: counts.bookReservation,
       color: "text-emerald-600",
       bgColor: "bg-emerald-50 hover:bg-emerald-100",
-    },
-    {
+    });
+  }
+
+  // Show space reservation if user has reservations
+  if (userProfiles?.hasSpaceReservations || counts.spaceReservation > 0) {
+    requestsItems.push({
       id: "space-reservation",
       label: "Réservation espace",
       description: "Réservations d'espaces culturels",
@@ -88,8 +118,12 @@ export function MySpaceNavigation({ activeTab, onTabChange, counts }: MySpaceNav
       count: counts.spaceReservation,
       color: "text-purple-600",
       bgColor: "bg-purple-50 hover:bg-purple-100",
-    },
-    {
+    });
+  }
+
+  // Show mecenat only for donors
+  if (userProfiles?.isDonor) {
+    requestsItems.push({
       id: "mecenat",
       label: "Mécénat",
       description: "Donations et propositions de dons",
@@ -97,8 +131,8 @@ export function MySpaceNavigation({ activeTab, onTabChange, counts }: MySpaceNav
       count: counts.mecenat,
       color: "text-rose-600",
       bgColor: "bg-rose-50 hover:bg-rose-100",
-    },
-  ];
+    });
+  }
 
   const actionsItems: NavigationItem[] = [
     {
@@ -192,23 +226,25 @@ export function MySpaceNavigation({ activeTab, onTabChange, counts }: MySpaceNav
 
   return (
     <div className="space-y-6">
-      {/* Demandes */}
-      <Card className="border-0 shadow-sm">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base font-semibold flex items-center gap-2">
-            <FileText className="h-4 w-4 text-primary" />
-            Suivi des demandes
-          </CardTitle>
-          <CardDescription className="text-xs">
-            Consultez l'état de vos demandes
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="space-y-2">
-            {requestsItems.map(renderNavItem)}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Demandes - only show if there are items */}
+      {requestsItems.length > 0 && (
+        <Card className="border-0 shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-semibold flex items-center gap-2">
+              <FileText className="h-4 w-4 text-primary" />
+              Suivi des demandes
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Consultez l'état de vos demandes
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="space-y-2">
+              {requestsItems.map(renderNavItem)}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Actions */}
       <Card className="border-0 shadow-sm">

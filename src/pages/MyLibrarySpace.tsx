@@ -110,6 +110,16 @@ export default function MyLibrarySpace() {
     completed: 0,
   });
 
+  // User profiles for conditional navigation
+  const [userProfiles, setUserProfiles] = useState({
+    isProfessional: false,
+    isDonor: false,
+    hasRestorations: false,
+    hasReproductions: false,
+    hasBookReservations: false,
+    hasSpaceReservations: false,
+  });
+
   useEffect(() => {
     if (user) {
       fetchData();
@@ -141,11 +151,13 @@ export default function MyLibrarySpace() {
         reservationsRes,
         reproductionsRes,
         restorationsRes,
+        donorRes,
       ] = await Promise.all([
         supabase.from('bookings').select('id, status', { count: 'exact' }).eq('user_id', user.id),
         supabase.from('reservations_ouvrages').select('id, statut', { count: 'exact' }).eq('user_id', user.id),
         supabase.from('reproduction_requests').select('id, status', { count: 'exact' }).eq('user_id', user.id),
         supabase.from('restoration_requests').select('id, status', { count: 'exact' }).eq('user_id', user.id),
+        supabase.from('donors').select('id').eq('user_id', user.id).maybeSingle(),
       ]);
 
       // Get professional registry for legal deposits
@@ -189,6 +201,16 @@ export default function MyLibrarySpace() {
         restorations: restorationsRes.data?.length || 0,
         pending: bookingsPending + reservationsPending + reproPending + restoPending + ldPending,
         completed: bookingsCompleted + reservationsCompleted + reproCompleted + restoCompleted + ldCompleted,
+      });
+
+      // Set user profiles based on data
+      setUserProfiles({
+        isProfessional: !!profData,
+        isDonor: !!donorRes.data,
+        hasRestorations: (restorationsRes.data?.length || 0) > 0,
+        hasReproductions: (reproductionsRes.data?.length || 0) > 0,
+        hasBookReservations: (reservationsRes.data?.length || 0) > 0,
+        hasSpaceReservations: (bookingsRes.data?.length || 0) > 0,
       });
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -669,6 +691,7 @@ export default function MyLibrarySpace() {
                 reviews: reviews.length,
                 mecenat: 0,
               }}
+              userProfiles={userProfiles}
             />
           </div>
 
