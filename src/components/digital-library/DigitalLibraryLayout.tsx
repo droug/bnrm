@@ -184,24 +184,28 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="outline" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-gold-bn-primary focus-visible:ring-offset-2" aria-label="Sélectionner la langue">
-                    <Icon name="mdi:earth" className="h-4 w-4" />
-                    <span className="hidden sm:inline">{languages.find(lang => lang.code === language)?.label}</span>
+                    <Icon name="mdi:translate" className="h-4 w-4" />
+                    <span className="hidden sm:inline uppercase font-medium">{language}</span>
                     <Icon name="mdi:chevron-down" className="h-3 w-3" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-card z-50" role="menu" aria-label={t('dl.chooseLanguage')}>
-                  <DropdownMenuLabel>{t('dl.chooseLanguage')}</DropdownMenuLabel>
+                <DropdownMenuContent align="end" className="bg-card z-50 min-w-[160px]" role="menu" aria-label={t('dl.chooseLanguage')}>
+                  <DropdownMenuLabel className="flex items-center gap-2">
+                    <Icon name="mdi:web" className="h-4 w-4 text-gold-bn-primary" />
+                    {t('dl.chooseLanguage')}
+                  </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   {languages.map((lang) => (
                     <DropdownMenuItem
                       key={lang.code}
                       onClick={() => setLanguage(lang.code as Language)}
-                      className="cursor-pointer focus:bg-accent focus:text-accent-foreground"
+                      className={`cursor-pointer focus:bg-accent focus:text-accent-foreground gap-3 ${language === lang.code ? 'bg-gold-bn-primary/10' : ''}`}
                       aria-label={`Changer la langue en ${lang.label}`}
                       aria-current={language === lang.code ? 'true' : 'false'}
                     >
-                      {lang.label}
-                      {language === lang.code && <span className="ml-auto text-gold-bn-primary">✓</span>}
+                      <span className="uppercase font-mono text-xs bg-muted px-1.5 py-0.5 rounded">{lang.code}</span>
+                      <span className="flex-1">{lang.label}</span>
+                      {language === lang.code && <Icon name="mdi:check" className="h-4 w-4 text-gold-bn-primary" />}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
