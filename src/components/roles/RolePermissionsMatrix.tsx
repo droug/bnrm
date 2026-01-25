@@ -410,6 +410,100 @@ export function RolePermissionsMatrix({ searchQuery, selectedPlatform }: RolePer
           ]
         }
       ]
+    },
+    {
+      id: "vexpo360",
+      name: "VExpo360 - Expositions Virtuelles",
+      icon: Database,
+      color: "bg-violet-500",
+      modules: [
+        {
+          id: "vexpo_exhibitions",
+          name: "Expositions",
+          description: "Gestion des expositions virtuelles 360°",
+          icon: Database,
+          permissions: [
+            { id: "vexpo.view", name: "Consulter", description: "Voir les expositions", icon: Eye },
+            { id: "vexpo.create", name: "Créer", description: "Créer des expositions", icon: Edit },
+            { id: "vexpo.edit", name: "Modifier", description: "Modifier les expositions", icon: Edit },
+            { id: "vexpo.publish", name: "Publier", description: "Publier les expositions", icon: Upload },
+            { id: "vexpo.delete", name: "Supprimer", description: "Supprimer des expositions", icon: Trash },
+          ]
+        },
+        {
+          id: "vexpo_galleries",
+          name: "Galeries",
+          description: "Gestion des galeries d'exposition",
+          icon: Database,
+          permissions: [
+            { id: "vexpo_galleries.view", name: "Consulter", description: "Voir les galeries", icon: Eye },
+            { id: "vexpo_galleries.manage", name: "Gérer", description: "Gérer les galeries", icon: Settings },
+          ]
+        },
+        {
+          id: "vexpo_media",
+          name: "Médias",
+          description: "Gestion des médias d'exposition",
+          icon: Upload,
+          permissions: [
+            { id: "vexpo_media.upload", name: "Téléverser", description: "Ajouter des médias", icon: Upload },
+            { id: "vexpo_media.manage", name: "Gérer", description: "Gérer les médias", icon: Settings },
+          ]
+        },
+        {
+          id: "vexpo_roles",
+          name: "Rôles VExpo",
+          description: "Gestion des rôles super_admin, editor, reviewer",
+          icon: Shield,
+          permissions: [
+            { id: "vexpo_roles.view", name: "Consulter", description: "Voir les rôles VExpo", icon: Eye },
+            { id: "vexpo_roles.assign", name: "Attribuer", description: "Attribuer des rôles", icon: UserCheck },
+            { id: "vexpo_roles.manage", name: "Gérer", description: "Gérer les rôles", icon: Settings },
+          ]
+        }
+      ]
+    },
+    {
+      id: "cbn",
+      name: "Catalogue Bibliothèque Nationale",
+      icon: Database,
+      color: "bg-teal-500",
+      modules: [
+        {
+          id: "cbn_catalog",
+          name: "Catalogue CBN",
+          description: "Catalogue général",
+          icon: Database,
+          permissions: [
+            { id: "cbn.view", name: "Consulter", description: "Voir le catalogue", icon: Eye },
+            { id: "cbn.create", name: "Créer", description: "Créer des notices", icon: Edit },
+            { id: "cbn.edit", name: "Modifier", description: "Modifier des notices", icon: Edit },
+            { id: "cbn.validate", name: "Valider", description: "Valider des notices", icon: FileCheck },
+            { id: "cbn.delete", name: "Supprimer", description: "Supprimer des notices", icon: Trash },
+          ]
+        },
+        {
+          id: "cbn_acquisitions",
+          name: "Acquisitions",
+          description: "Gestion des acquisitions",
+          icon: Database,
+          permissions: [
+            { id: "cbn_acquisitions.propose", name: "Proposer", description: "Proposer des acquisitions", icon: Edit },
+            { id: "cbn_acquisitions.approve", name: "Approuver", description: "Approuver des acquisitions", icon: Check },
+            { id: "cbn_acquisitions.manage", name: "Gérer", description: "Gérer les acquisitions", icon: Settings },
+          ]
+        },
+        {
+          id: "cbn_periodicals",
+          name: "Périodiques",
+          description: "Gestion des périodiques et abonnements",
+          icon: FileText,
+          permissions: [
+            { id: "cbn_periodicals.view", name: "Consulter", description: "Voir les périodiques", icon: Eye },
+            { id: "cbn_periodicals.manage", name: "Gérer", description: "Gérer les abonnements", icon: Settings },
+          ]
+        }
+      ]
     }
   ];
 
