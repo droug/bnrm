@@ -20,7 +20,8 @@ import {
   Check,
   ChevronDown,
   ChevronUp,
-  Subtitles
+  Subtitles,
+  Bookmark
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,6 +38,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { MediaBookmarksPanel } from "./MediaBookmarksPanel";
+import { useMediaBookmarks } from "@/hooks/useMediaBookmarks";
 
 interface TranscriptSegment {
   id: string;
@@ -480,6 +483,13 @@ export default function AudioVideoReader({ documentData, onBack }: AudioVideoRea
             </div>
           </CardContent>
         </Card>
+
+        {/* Media Bookmarks Panel */}
+        <MediaBookmarksPanel 
+          documentId={documentData.id}
+          currentTime={currentTime}
+          onSeek={handleSeek}
+        />
 
         {/* Transcription Panel - Toggle to show/hide existing transcription */}
         {(transcript || transcriptionLoaded) && (
