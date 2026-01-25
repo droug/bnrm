@@ -7868,6 +7868,36 @@ export type Database = {
           },
         ]
       }
+      media_bookmarks: {
+        Row: {
+          created_at: string
+          document_id: string
+          id: string
+          label: string | null
+          timestamp_seconds: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          document_id: string
+          id?: string
+          label?: string | null
+          timestamp_seconds: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          document_id?: string
+          id?: string
+          label?: string | null
+          timestamp_seconds?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           attachments: Json | null
