@@ -4496,6 +4496,372 @@ export type Database = {
         }
         Relationships: []
       }
+      donation_items: {
+        Row: {
+          author: string | null
+          catalog_number: string | null
+          created_at: string | null
+          description: string | null
+          digital_library_id: string | null
+          donation_id: string
+          id: string
+          image_url: string | null
+          is_digitized: boolean | null
+          publication_year: string | null
+          support_type: string | null
+          title: string
+          title_ar: string | null
+        }
+        Insert: {
+          author?: string | null
+          catalog_number?: string | null
+          created_at?: string | null
+          description?: string | null
+          digital_library_id?: string | null
+          donation_id: string
+          id?: string
+          image_url?: string | null
+          is_digitized?: boolean | null
+          publication_year?: string | null
+          support_type?: string | null
+          title: string
+          title_ar?: string | null
+        }
+        Update: {
+          author?: string | null
+          catalog_number?: string | null
+          created_at?: string | null
+          description?: string | null
+          digital_library_id?: string | null
+          donation_id?: string
+          id?: string
+          image_url?: string | null
+          is_digitized?: boolean | null
+          publication_year?: string | null
+          support_type?: string | null
+          title?: string
+          title_ar?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donation_items_donation_id_fkey"
+            columns: ["donation_id"]
+            isOneToOne: false
+            referencedRelation: "donations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      donation_proposals: {
+        Row: {
+          address: string | null
+          city: string
+          collection_description: string
+          condition: string | null
+          converted_donation_id: string | null
+          country: string | null
+          created_at: string | null
+          documents: Json | null
+          donor_type: string
+          email: string
+          estimated_books_count: number | null
+          estimated_pages_count: number | null
+          first_name: string
+          historical_value: string | null
+          id: string
+          last_name: string
+          oldest_item_date: string | null
+          organization_name: string | null
+          phone: string
+          proposal_number: string | null
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string | null
+          support_type: string
+          thematics: string[] | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          address?: string | null
+          city: string
+          collection_description: string
+          condition?: string | null
+          converted_donation_id?: string | null
+          country?: string | null
+          created_at?: string | null
+          documents?: Json | null
+          donor_type: string
+          email: string
+          estimated_books_count?: number | null
+          estimated_pages_count?: number | null
+          first_name: string
+          historical_value?: string | null
+          id?: string
+          last_name: string
+          oldest_item_date?: string | null
+          organization_name?: string | null
+          phone: string
+          proposal_number?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          support_type: string
+          thematics?: string[] | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          address?: string | null
+          city?: string
+          collection_description?: string
+          condition?: string | null
+          converted_donation_id?: string | null
+          country?: string | null
+          created_at?: string | null
+          documents?: Json | null
+          donor_type?: string
+          email?: string
+          estimated_books_count?: number | null
+          estimated_pages_count?: number | null
+          first_name?: string
+          historical_value?: string | null
+          id?: string
+          last_name?: string
+          oldest_item_date?: string | null
+          organization_name?: string | null
+          phone?: string
+          proposal_number?: string | null
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string | null
+          support_type?: string
+          thematics?: string[] | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donation_proposals_converted_donation_id_fkey"
+            columns: ["converted_donation_id"]
+            isOneToOne: false
+            referencedRelation: "donations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      donations: {
+        Row: {
+          cataloged_items_count: number | null
+          condition: string | null
+          created_at: string | null
+          description: string | null
+          description_ar: string | null
+          documents: Json | null
+          donation_date: string | null
+          donation_number: string | null
+          donor_id: string
+          estimated_quantity: number | null
+          historical_value: string | null
+          id: string
+          images: Json | null
+          oldest_item_date: string | null
+          reception_date: string | null
+          status: string | null
+          support_type: string
+          thematic: string[] | null
+          title: string
+          title_ar: string | null
+          updated_at: string | null
+          validated_at: string | null
+          validated_by: string | null
+          validation_notes: string | null
+        }
+        Insert: {
+          cataloged_items_count?: number | null
+          condition?: string | null
+          created_at?: string | null
+          description?: string | null
+          description_ar?: string | null
+          documents?: Json | null
+          donation_date?: string | null
+          donation_number?: string | null
+          donor_id: string
+          estimated_quantity?: number | null
+          historical_value?: string | null
+          id?: string
+          images?: Json | null
+          oldest_item_date?: string | null
+          reception_date?: string | null
+          status?: string | null
+          support_type: string
+          thematic?: string[] | null
+          title: string
+          title_ar?: string | null
+          updated_at?: string | null
+          validated_at?: string | null
+          validated_by?: string | null
+          validation_notes?: string | null
+        }
+        Update: {
+          cataloged_items_count?: number | null
+          condition?: string | null
+          created_at?: string | null
+          description?: string | null
+          description_ar?: string | null
+          documents?: Json | null
+          donation_date?: string | null
+          donation_number?: string | null
+          donor_id?: string
+          estimated_quantity?: number | null
+          historical_value?: string | null
+          id?: string
+          images?: Json | null
+          oldest_item_date?: string | null
+          reception_date?: string | null
+          status?: string | null
+          support_type?: string
+          thematic?: string[] | null
+          title?: string
+          title_ar?: string | null
+          updated_at?: string | null
+          validated_at?: string | null
+          validated_by?: string | null
+          validation_notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donations_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "donors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      donor_communications: {
+        Row: {
+          communication_type: string
+          content: string | null
+          created_at: string | null
+          created_by: string | null
+          direction: string | null
+          donor_id: string | null
+          id: string
+          proposal_id: string | null
+          subject: string | null
+        }
+        Insert: {
+          communication_type: string
+          content?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          direction?: string | null
+          donor_id?: string | null
+          id?: string
+          proposal_id?: string | null
+          subject?: string | null
+        }
+        Update: {
+          communication_type?: string
+          content?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          direction?: string | null
+          donor_id?: string | null
+          id?: string
+          proposal_id?: string | null
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "donor_communications_donor_id_fkey"
+            columns: ["donor_id"]
+            isOneToOne: false
+            referencedRelation: "donors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "donor_communications_proposal_id_fkey"
+            columns: ["proposal_id"]
+            isOneToOne: false
+            referencedRelation: "donation_proposals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      donors: {
+        Row: {
+          address: string | null
+          biography: string | null
+          biography_ar: string | null
+          city: string | null
+          country: string | null
+          created_at: string | null
+          donor_type: string
+          email: string
+          first_name: string | null
+          id: string
+          is_anonymous: boolean | null
+          is_featured: boolean | null
+          last_name: string | null
+          organization_name: string | null
+          phone: string | null
+          photo_url: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string | null
+          website: string | null
+        }
+        Insert: {
+          address?: string | null
+          biography?: string | null
+          biography_ar?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          donor_type: string
+          email: string
+          first_name?: string | null
+          id?: string
+          is_anonymous?: boolean | null
+          is_featured?: boolean | null
+          last_name?: string | null
+          organization_name?: string | null
+          phone?: string | null
+          photo_url?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          website?: string | null
+        }
+        Update: {
+          address?: string | null
+          biography?: string | null
+          biography_ar?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string | null
+          donor_type?: string
+          email?: string
+          first_name?: string | null
+          id?: string
+          is_anonymous?: boolean | null
+          is_featured?: boolean | null
+          last_name?: string | null
+          organization_name?: string | null
+          phone?: string | null
+          photo_url?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       download_logs: {
         Row: {
           content_id: string
@@ -14013,6 +14379,7 @@ export type Database = {
       generate_content_slug: { Args: { title: string }; Returns: string }
       generate_deposit_number: { Args: never; Returns: string }
       generate_document_number: { Args: { doc_type: string }; Returns: string }
+      generate_donation_number: { Args: never; Returns: string }
       generate_ged_document_number: {
         Args: { p_document_type: string }
         Returns: string

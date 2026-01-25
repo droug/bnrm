@@ -27,6 +27,9 @@ const News = lazy(() => import("./pages/News"));
 const PracticalInfo = lazy(() => import("./pages/PracticalInfo"));
 const Donation = lazy(() => import("./pages/Donation"));
 const OffrirCollections = lazy(() => import("./pages/OffrirCollections"));
+const DonateursPublic = lazy(() => import("./pages/mecenat/DonateursPublic"));
+const MonEspaceDonateur = lazy(() => import("./pages/mecenat/MonEspaceDonateur"));
+const MecenatBackoffice = lazy(() => import("./pages/mecenat/MecenatBackoffice"));
 
 // Manuscripts Platform (lazy)
 const Manuscripts = lazy(() => import("./pages/Manuscripts"));
@@ -289,6 +292,9 @@ const App = () => {
           <Route path="/practical-info" element={<PracticalInfo />} />
           <Route path="/donation" element={<Donation />} />
           <Route path="/offrir-collections" element={<OffrirCollections />} />
+          <Route path="/donateurs" element={<DonateursPublic />} />
+          <Route path="/mon-espace-donateur" element={<MonEspaceDonateur />} />
+          <Route path="/admin/mecenat" element={<MecenatBackoffice />} />
         <Route path="/settings" element={<Navigate to="/admin/roles" replace />} />
         <Route path="/wysiwyg" element={<WysiwygPage />} />
             <Route path="/admin/bnrm-tariffs" element={<BNRMTariffsPage />} />
