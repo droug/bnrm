@@ -1,19 +1,18 @@
 import { useState, useEffect } from "react";
-import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
+import { AdminPageWrapper } from "@/components/digital-library/admin/AdminPageWrapper";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Settings, Database, Bell, Link as LinkIcon, List, Save } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Icon } from "@iconify/react";
+import { useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import SEOHead from "@/components/seo/SEOHead";
 
 export default function AdminSettings() {
   const navigate = useNavigate();
@@ -47,25 +46,8 @@ export default function AdminSettings() {
     searchHistory: true,
   });
 
-  useEffect(() => {
-    if (!user) {
-      navigate("/auth");
-      return;
-    }
-    if (!rolesLoading && !isAdmin) {
-      toast({
-        title: "Accès refusé",
-        description: "Seuls les administrateurs peuvent accéder à cette page",
-        variant: "destructive",
-      });
-      navigate("/digital-library");
-      return;
-    }
-  }, [user, isAdmin, rolesLoading, navigate]);
-
   const handleSave = async (section: string) => {
     try {
-      // In a real implementation, save to database or config table
       toast({
         title: "Paramètres enregistrés",
         description: `Configuration ${section} mise à jour avec succès`,
@@ -79,62 +61,69 @@ export default function AdminSettings() {
     }
   };
 
-  if (!user || rolesLoading) {
+  if (rolesLoading) {
     return (
-      <DigitalLibraryLayout>
-        <div className="container mx-auto px-4 py-8">
-          <p className="text-center">Chargement...</p>
-        </div>
-      </DigitalLibraryLayout>
+      <AdminPageWrapper
+        title="Paramètres techniques"
+        description="Configuration des connecteurs, notifications et listes dynamiques"
+        icon="mdi:cog-outline"
+        iconColor="text-gray-600"
+        iconBgColor="bg-gray-500/10"
+        loading={true}
+      >
+        <div />
+      </AdminPageWrapper>
     );
   }
 
-  if (!isAdmin) {
-    return null;
+  if (!user || !isAdmin) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return (
-    <DigitalLibraryLayout>
-      <div className="container mx-auto px-4 py-8 max-w-5xl">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">
-            Paramètres techniques
-          </h1>
-          <p className="text-lg text-muted-foreground">
-            Configuration des connecteurs, notifications et listes dynamiques
-          </p>
-        </div>
-
+    <>
+      <SEOHead
+        title="Paramètres techniques - Administration BN"
+        description="Configuration des connecteurs, notifications et listes dynamiques"
+        noindex={true}
+      />
+      <AdminPageWrapper
+        title="Paramètres techniques"
+        description="Configuration des connecteurs, notifications et listes dynamiques de la bibliothèque numérique"
+        icon="mdi:cog-outline"
+        iconColor="text-gray-600"
+        iconBgColor="bg-gray-500/10"
+      >
         <Tabs defaultValue="connectors" className="space-y-4">
-          <TabsList>
+          <TabsList className="bg-muted/50">
             <TabsTrigger value="connectors" className="gap-2">
-              <LinkIcon className="h-4 w-4" />
+              <Icon icon="mdi:link-variant" className="h-4 w-4" />
               Connecteurs
             </TabsTrigger>
             <TabsTrigger value="oai" className="gap-2">
-              <Database className="h-4 w-4" />
+              <Icon icon="mdi:database-outline" className="h-4 w-4" />
               OAI-PMH
             </TabsTrigger>
             <TabsTrigger value="notifications" className="gap-2">
-              <Bell className="h-4 w-4" />
+              <Icon icon="mdi:bell-outline" className="h-4 w-4" />
               Notifications
             </TabsTrigger>
             <TabsTrigger value="lists" className="gap-2">
-              <List className="h-4 w-4" />
+              <Icon icon="mdi:format-list-bulleted" className="h-4 w-4" />
               Listes dynamiques
             </TabsTrigger>
           </TabsList>
 
           {/* Connecteurs Tab */}
           <TabsContent value="connectors">
-            <Card>
-              <CardHeader>
+            <Card className="border-border/50 shadow-sm">
+              <CardHeader className="bg-gradient-to-r from-muted/50 to-transparent border-b border-border/50">
                 <CardTitle>Connecteurs externes</CardTitle>
                 <CardDescription>
                   Configuration des connexions avec CBM, Manuscrits et Kitab
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-6 pt-6">
                 {/* CBM Connector */}
                 <div className="space-y-4 p-4 border rounded-lg">
                   <div className="flex items-center justify-between">
@@ -222,8 +211,8 @@ export default function AdminSettings() {
                   )}
                 </div>
 
-                <Button onClick={() => handleSave("connecteurs")}>
-                  <Save className="h-4 w-4 mr-2" />
+                <Button onClick={() => handleSave("connecteurs")} className="bg-bn-blue-primary hover:bg-bn-blue-dark">
+                  <Icon icon="mdi:content-save-outline" className="h-4 w-4 mr-2" />
                   Enregistrer les connecteurs
                 </Button>
               </CardContent>
@@ -232,14 +221,14 @@ export default function AdminSettings() {
 
           {/* OAI-PMH Tab */}
           <TabsContent value="oai">
-            <Card>
-              <CardHeader>
+            <Card className="border-border/50 shadow-sm">
+              <CardHeader className="bg-gradient-to-r from-muted/50 to-transparent border-b border-border/50">
                 <CardTitle>Configuration OAI-PMH</CardTitle>
                 <CardDescription>
                   Paramètres pour la moisson et l'exposition des métadonnées
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 pt-6">
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
                     <h3 className="font-semibold">Activer OAI-PMH</h3>
@@ -304,8 +293,8 @@ export default function AdminSettings() {
                   </>
                 )}
 
-                <Button onClick={() => handleSave("OAI-PMH")}>
-                  <Save className="h-4 w-4 mr-2" />
+                <Button onClick={() => handleSave("OAI-PMH")} className="bg-bn-blue-primary hover:bg-bn-blue-dark">
+                  <Icon icon="mdi:content-save-outline" className="h-4 w-4 mr-2" />
                   Enregistrer la configuration OAI
                 </Button>
               </CardContent>
@@ -314,14 +303,14 @@ export default function AdminSettings() {
 
           {/* Notifications Tab */}
           <TabsContent value="notifications">
-            <Card>
-              <CardHeader>
+            <Card className="border-border/50 shadow-sm">
+              <CardHeader className="bg-gradient-to-r from-muted/50 to-transparent border-b border-border/50">
                 <CardTitle>Paramètres de notification</CardTitle>
                 <CardDescription>
                   Configurer les alertes et notifications système
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-6 pt-6">
                 <div className="flex items-center justify-between p-4 border rounded-lg">
                   <div>
                     <h3 className="font-semibold">Notifications par email</h3>
@@ -365,8 +354,8 @@ export default function AdminSettings() {
                   />
                 </div>
 
-                <Button onClick={() => handleSave("notifications")}>
-                  <Save className="h-4 w-4 mr-2" />
+                <Button onClick={() => handleSave("notifications")} className="bg-bn-blue-primary hover:bg-bn-blue-dark">
+                  <Icon icon="mdi:content-save-outline" className="h-4 w-4 mr-2" />
                   Enregistrer les notifications
                 </Button>
               </CardContent>
@@ -375,14 +364,14 @@ export default function AdminSettings() {
 
           {/* Dynamic Lists Tab */}
           <TabsContent value="lists">
-            <Card>
-              <CardHeader>
+            <Card className="border-border/50 shadow-sm">
+              <CardHeader className="bg-gradient-to-r from-muted/50 to-transparent border-b border-border/50">
                 <CardTitle>Listes dynamiques</CardTitle>
                 <CardDescription>
                   Configuration des listes et suggestions automatiques
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
+              <CardContent className="space-y-6 pt-6">
                 <div className="space-y-2">
                   <Label>Documents par page</Label>
                   <Select
@@ -446,15 +435,15 @@ export default function AdminSettings() {
                   </Button>
                 </div>
 
-                <Button onClick={() => handleSave("listes dynamiques")}>
-                  <Save className="h-4 w-4 mr-2" />
+                <Button onClick={() => handleSave("listes dynamiques")} className="bg-bn-blue-primary hover:bg-bn-blue-dark">
+                  <Icon icon="mdi:content-save-outline" className="h-4 w-4 mr-2" />
                   Enregistrer les paramètres
                 </Button>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
-    </DigitalLibraryLayout>
+      </AdminPageWrapper>
+    </>
   );
 }
