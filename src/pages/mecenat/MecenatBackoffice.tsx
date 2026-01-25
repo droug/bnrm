@@ -134,23 +134,23 @@ function DonorsTab() {
               className="pl-10"
             />
           </div>
-          <Select value={filterType} onValueChange={setFilterType}>
+          <Select value={filterType || "all"} onValueChange={(v) => setFilterType(v === "all" ? "" : v)}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Tous les types</SelectItem>
+              <SelectItem value="all">Tous les types</SelectItem>
               <SelectItem value="individual">Particulier</SelectItem>
               <SelectItem value="institution">Institution</SelectItem>
               <SelectItem value="association">Association</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={filterStatus} onValueChange={setFilterStatus}>
+          <Select value={filterStatus || "all"} onValueChange={(v) => setFilterStatus(v === "all" ? "" : v)}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Statut" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Tous les statuts</SelectItem>
+              <SelectItem value="all">Tous les statuts</SelectItem>
               <SelectItem value="active">Actif</SelectItem>
               <SelectItem value="inactive">Inactif</SelectItem>
               <SelectItem value="pending">En attente</SelectItem>
@@ -284,23 +284,23 @@ function DonationsTab() {
               className="pl-10"
             />
           </div>
-          <Select value={filterType} onValueChange={setFilterType}>
+          <Select value={filterType || "all"} onValueChange={(v) => setFilterType(v === "all" ? "" : v)}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Type de support" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Tous les types</SelectItem>
+              <SelectItem value="all">Tous les types</SelectItem>
               {Object.entries(supportTypeLabels).map(([value, label]) => (
                 <SelectItem key={value} value={value}>{label}</SelectItem>
               ))}
             </SelectContent>
           </Select>
-          <Select value={filterStatus} onValueChange={setFilterStatus}>
+          <Select value={filterStatus || "all"} onValueChange={(v) => setFilterStatus(v === "all" ? "" : v)}>
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Statut" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Tous les statuts</SelectItem>
+              <SelectItem value="all">Tous les statuts</SelectItem>
               <SelectItem value="pending">En attente</SelectItem>
               <SelectItem value="accepted">Acceptée</SelectItem>
               <SelectItem value="cataloged">Cataloguée</SelectItem>
@@ -430,12 +430,12 @@ function ProposalsTab() {
                 className="pl-10"
               />
             </div>
-            <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <Select value={filterStatus || "all"} onValueChange={(v) => setFilterStatus(v === "all" ? "" : v)}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Statut" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Tous les statuts</SelectItem>
+                <SelectItem value="all">Tous les statuts</SelectItem>
                 <SelectItem value="submitted">Soumise</SelectItem>
                 <SelectItem value="under_review">En examen</SelectItem>
                 <SelectItem value="accepted">Acceptée</SelectItem>
