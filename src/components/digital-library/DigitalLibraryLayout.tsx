@@ -89,9 +89,6 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
 
   const userMenu = isAuthenticated ? [
     { labelKey: "dl.myPersonalSpace", href: "/digital-library/my-space" },
-    { labelKey: "dl.myRequests", href: "/digital-library/mes-demandes" },
-    { labelKey: "dl.myDigitalLoans", href: "/digital-library/my-loans" },
-    { labelKey: "dl.myAnnotations", href: "/digital-library/my-notes" },
     { labelKey: "dl.accountSettings", href: "/digital-library/account-settings" },
   ] : [];
 

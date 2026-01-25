@@ -14,6 +14,8 @@ import { MySpaceHeaderBN } from "@/components/digital-library/my-space/MySpaceHe
 import { MySpaceMediaBookmarks } from "@/components/digital-library/my-space/MySpaceMediaBookmarks";
 import { MySpacePrivateFeedback } from "@/components/digital-library/my-space/MySpacePrivateFeedback";
 import { MySpaceRecentReadings } from "@/components/digital-library/my-space/MySpaceRecentReadings";
+import { MySpaceLoans } from "@/components/digital-library/my-space/MySpaceLoans";
+import { MySpaceAnnotations } from "@/components/digital-library/my-space/MySpaceAnnotations";
 import { MyRestorationRequests } from "@/components/restoration/MyRestorationRequests";
 import { cn } from "@/lib/utils";
 
@@ -89,9 +91,11 @@ export default function MySpace() {
 
   const tabs = [
     { id: "overview", label: "Vue d'ensemble", icon: "mdi:view-dashboard" },
+    { id: "loans", label: "Mes emprunts", icon: "mdi:book-open-page-variant" },
+    { id: "requests", label: "Mes demandes", icon: "mdi:file-document-edit" },
+    { id: "annotations", label: "Mes annotations", icon: "mdi:note-text" },
     { id: "favorites", label: "Favoris", icon: "mdi:heart" },
     { id: "downloads", label: "Téléchargements", icon: "mdi:download" },
-    { id: "requests", label: "Mes demandes", icon: "mdi:file-document-edit" },
   ];
 
   return (
@@ -103,18 +107,18 @@ export default function MySpace() {
         {/* Navigation Tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <div className="bg-card rounded-xl border shadow-sm p-1.5">
-            <TabsList className="w-full grid grid-cols-2 md:grid-cols-4 bg-transparent h-auto gap-1">
+            <TabsList className="w-full grid grid-cols-3 md:grid-cols-6 bg-transparent h-auto gap-1">
               {tabs.map((tab) => (
                 <TabsTrigger
                   key={tab.id}
                   value={tab.id}
                   className={cn(
-                    "flex items-center gap-2 py-3 px-4 rounded-lg transition-all data-[state=active]:bg-bn-blue-primary data-[state=active]:text-white data-[state=active]:shadow-md",
-                    "hover:bg-muted/50"
+                    "flex items-center gap-2 py-3 px-3 rounded-lg transition-all data-[state=active]:bg-bn-blue-primary data-[state=active]:text-white data-[state=active]:shadow-md",
+                    "hover:bg-muted/50 text-xs sm:text-sm"
                   )}
                 >
                   <Icon icon={tab.icon} className="h-4 w-4" />
-                  <span className="hidden sm:inline">{tab.label}</span>
+                  <span className="hidden md:inline">{tab.label}</span>
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -132,6 +136,45 @@ export default function MySpace() {
 
             {/* Private Feedback */}
             <MySpacePrivateFeedback />
+          </TabsContent>
+
+          {/* Loans Tab */}
+          <TabsContent value="loans" className="mt-0">
+            <MySpaceLoans />
+          </TabsContent>
+
+          {/* Requests Tab */}
+          <TabsContent value="requests" className="mt-0">
+            <Card className="border-bn-blue-primary/10">
+              <CardHeader className="bg-gradient-to-r from-bn-blue-primary/5 to-gold-bn-primary/5">
+                <CardTitle className="flex items-center gap-3 text-bn-blue-primary">
+                  <div className="p-2 rounded-lg bg-purple-100">
+                    <Icon icon="mdi:file-document-edit" className="h-5 w-5 text-purple-600" />
+                  </div>
+                  Suivi de mes demandes
+                </CardTitle>
+                <CardDescription>Gérez vos demandes de restauration et autres services</CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6">
+                <Tabs defaultValue="restoration" className="space-y-4">
+                  <TabsList className="bg-muted/50">
+                    <TabsTrigger value="restoration" className="gap-2">
+                      <Icon icon="mdi:auto-fix" className="h-4 w-4" />
+                      Restauration
+                    </TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="restoration">
+                    <MyRestorationRequests />
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Annotations Tab */}
+          <TabsContent value="annotations" className="mt-0">
+            <MySpaceAnnotations />
           </TabsContent>
 
           {/* Favorites Tab */}
@@ -253,35 +296,6 @@ export default function MySpace() {
                     ))}
                   </div>
                 )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Requests Tab */}
-          <TabsContent value="requests" className="mt-0">
-            <Card className="border-bn-blue-primary/10">
-              <CardHeader className="bg-gradient-to-r from-bn-blue-primary/5 to-gold-bn-primary/5">
-                <CardTitle className="flex items-center gap-3 text-bn-blue-primary">
-                  <div className="p-2 rounded-lg bg-purple-100">
-                    <Icon icon="mdi:file-document-edit" className="h-5 w-5 text-purple-600" />
-                  </div>
-                  Suivi de mes demandes
-                </CardTitle>
-                <CardDescription>Gérez vos demandes de restauration et autres services</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-6">
-                <Tabs defaultValue="restoration" className="space-y-4">
-                  <TabsList className="bg-muted/50">
-                    <TabsTrigger value="restoration" className="gap-2">
-                      <Icon icon="mdi:auto-fix" className="h-4 w-4" />
-                      Restauration
-                    </TabsTrigger>
-                  </TabsList>
-                  
-                  <TabsContent value="restoration">
-                    <MyRestorationRequests />
-                  </TabsContent>
-                </Tabs>
               </CardContent>
             </Card>
           </TabsContent>
