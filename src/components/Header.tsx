@@ -192,7 +192,7 @@ const Header = () => {
         {
           title: { fr: "Mon espace donateur", ar: "فضائي كمتبرع" },
           desc: { fr: "Accédez à votre historique et propositions", ar: "الوصول إلى تاريخك ومقترحاتك" },
-          href: "/mon-espace-donateur"
+          href: "/my-space?tab=mecenat"
         },
         {
           title: { fr: "Dons financiers", ar: "التبرعات المالية" },

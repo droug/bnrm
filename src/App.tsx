@@ -293,7 +293,7 @@ const App = () => {
           <Route path="/donation" element={<Donation />} />
           <Route path="/offrir-collections" element={<OffrirCollections />} />
           <Route path="/donateurs" element={<DonateursPublic />} />
-          <Route path="/mon-espace-donateur" element={<MonEspaceDonateur />} />
+          <Route path="/mon-espace-donateur" element={<Navigate to="/my-space?tab=mecenat" replace />} />
           <Route path="/admin/mecenat" element={<MecenatBackoffice />} />
         <Route path="/settings" element={<Navigate to="/admin/roles" replace />} />
         <Route path="/wysiwyg" element={<WysiwygPage />} />
