@@ -15,6 +15,7 @@ export default function DigitalLibraryAnalytics() {
         description="Analytics et export XLS/PDF"
         icon="mdi:chart-bar"
         iconColor="text-indigo-600"
+        iconBgColor="bg-indigo-500/10"
         loading={true}
       >
         <div />
@@ -32,6 +33,7 @@ export default function DigitalLibraryAnalytics() {
       description="Analyse détaillée de l'utilisation de la Bibliothèque Numérique avec exports"
       icon="mdi:chart-bar"
       iconColor="text-indigo-600"
+      iconBgColor="bg-indigo-500/10"
     >
       <PortalAnalyticsKPICard platform="bn" defaultTab="digital-library" />
     </AdminPageWrapper>

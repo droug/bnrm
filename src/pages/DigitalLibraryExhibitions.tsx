@@ -15,6 +15,7 @@ export default function DigitalLibraryExhibitions() {
         description="Gestion des expositions"
         icon="mdi:rotate-3d-variant"
         iconColor="text-teal-600"
+        iconBgColor="bg-teal-500/10"
         loading={true}
       >
         <div />
@@ -32,6 +33,7 @@ export default function DigitalLibraryExhibitions() {
       description="Création et gestion des expositions virtuelles immersives"
       icon="mdi:rotate-3d-variant"
       iconColor="text-teal-600"
+      iconBgColor="bg-teal-500/10"
     >
       <ExhibitionsManager />
     </AdminPageWrapper>

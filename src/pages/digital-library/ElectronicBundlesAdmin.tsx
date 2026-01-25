@@ -15,6 +15,7 @@ export default function ElectronicBundlesAdmin() {
         description="Configurer les abonnements aux ressources électroniques"
         icon="mdi:earth"
         iconColor="text-sky-600"
+        iconBgColor="bg-sky-500/10"
         loading={true}
       >
         <div />
@@ -32,6 +33,7 @@ export default function ElectronicBundlesAdmin() {
       description="Configurer les abonnements aux ressources électroniques externes (CAIRN, BRILL, Europeana, etc.)"
       icon="mdi:earth"
       iconColor="text-sky-600"
+      iconBgColor="bg-sky-500/10"
     >
       <ElectronicBundlesManagement />
     </AdminPageWrapper>

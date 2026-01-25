@@ -15,6 +15,7 @@ export default function DigitalLibraryReproduction() {
         description="Traitement des demandes"
         icon="mdi:image-outline"
         iconColor="text-cyan-600"
+        iconBgColor="bg-cyan-500/10"
         loading={true}
       >
         <div />
@@ -32,6 +33,7 @@ export default function DigitalLibraryReproduction() {
       description="Gestion et traitement des demandes de reproduction de documents"
       icon="mdi:image-outline"
       iconColor="text-cyan-600"
+      iconBgColor="bg-cyan-500/10"
     >
       <ReproductionManager />
     </AdminPageWrapper>

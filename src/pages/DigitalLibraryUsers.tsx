@@ -15,6 +15,7 @@ export default function DigitalLibraryUsers() {
         description="Utilisateurs et droits d'accès"
         icon="mdi:account-group-outline"
         iconColor="text-purple-600"
+        iconBgColor="bg-purple-500/10"
         loading={true}
       >
         <div />
@@ -32,6 +33,7 @@ export default function DigitalLibraryUsers() {
       description="Gestion des comptes utilisateurs, rôles et permissions d'accès"
       icon="mdi:account-group-outline"
       iconColor="text-purple-600"
+      iconBgColor="bg-purple-500/10"
     >
       <UsersManager />
     </AdminPageWrapper>
