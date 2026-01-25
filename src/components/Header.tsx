@@ -190,11 +190,6 @@ const Header = () => {
           href: "/offrir-collections"
         },
         {
-          title: { fr: "Mon espace donateur", ar: "فضائي كمتبرع" },
-          desc: { fr: "Accédez à votre historique et propositions", ar: "الوصول إلى تاريخك ومقترحاتك" },
-          href: "/my-space?tab=mecenat"
-        },
-        {
           title: { fr: "Dons financiers", ar: "التبرعات المالية" },
           desc: { fr: "Soutenez la bibliothèque par vos dons", ar: "ادعم المكتبة بتبرعاتك" },
           href: "/donation"
