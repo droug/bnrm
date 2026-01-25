@@ -22,7 +22,7 @@ import {
   LogIn
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { MyRestorationRequests } from "@/components/restoration/MyRestorationRequests";
 import { MyReproductionRequests } from "@/components/my-space/MyReproductionRequests";
 import { MyLegalDeposits } from "@/components/my-space/MyLegalDeposits";
@@ -31,6 +31,7 @@ import { MySpaceReservations } from "@/components/my-space/MySpaceReservations";
 import { MySpaceHeader } from "@/components/my-space/MySpaceHeader";
 import { MySpaceStats } from "@/components/my-space/MySpaceStats";
 import { MySpaceNavigation } from "@/components/my-space/MySpaceNavigation";
+import { MyDonorSpace } from "@/components/my-space/MyDonorSpace";
 
 interface ReadingHistoryItem {
   id: string;
@@ -88,6 +89,7 @@ export default function MyLibrarySpace() {
   const { user } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [profile, setProfile] = useState<Profile | null>(null);
   const [readingHistory, setReadingHistory] = useState<ReadingHistoryItem[]>([]);
@@ -95,7 +97,7 @@ export default function MyLibrarySpace() {
   const [bookmarks, setBookmarks] = useState<UserBookmark[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("restoration");
+  const [activeTab, setActiveTab] = useState(() => searchParams.get('tab') || "restoration");
 
   // Stats data
   const [stats, setStats] = useState({
@@ -333,6 +335,8 @@ export default function MyLibrarySpace() {
         return <MyBookReservations />;
       case 'space-reservation':
         return <MySpaceReservations />;
+      case 'mecenat':
+        return <MyDonorSpace />;
       case 'history':
         return renderHistory();
       case 'favorites':
@@ -663,6 +667,7 @@ export default function MyLibrarySpace() {
                 favorites: favorites.length,
                 bookmarks: bookmarks.length,
                 reviews: reviews.length,
+                mecenat: 0,
               }}
             />
           </div>

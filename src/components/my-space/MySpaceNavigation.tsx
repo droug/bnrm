@@ -10,7 +10,8 @@ import {
   Heart,
   Bookmark,
   MessageSquare,
-  ChevronRight
+  ChevronRight,
+  Gift
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -37,6 +38,7 @@ interface MySpaceNavigationProps {
     favorites: number;
     bookmarks: number;
     reviews: number;
+    mecenat?: number;
   };
 }
 
@@ -86,6 +88,15 @@ export function MySpaceNavigation({ activeTab, onTabChange, counts }: MySpaceNav
       count: counts.spaceReservation,
       color: "text-purple-600",
       bgColor: "bg-purple-50 hover:bg-purple-100",
+    },
+    {
+      id: "mecenat",
+      label: "Mécénat",
+      description: "Donations et propositions de dons",
+      icon: Gift,
+      count: counts.mecenat,
+      color: "text-rose-600",
+      bgColor: "bg-rose-50 hover:bg-rose-100",
     },
   ];
 
