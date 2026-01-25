@@ -12,7 +12,7 @@ import CmsFooterManager from "@/components/cms/CmsFooterManager";
 import CmsSectionsManager from "@/components/cms/CmsSectionsManager";
 import CmsHeroManagerBN from "@/components/cms/CmsHeroManagerBN";
 import CmsStyleManager from "@/components/cms/CmsStyleManager";
-import CmsVExpo360Manager from "@/components/cms/CmsVExpo360Manager";
+import CmsVExpo360HeroManager from "@/components/cms/CmsVExpo360HeroManager";
 import CmsSectionIconsManager from "@/components/cms/CmsSectionIconsManager";
 import FeaturedWorksManager from "@/components/admin/FeaturedWorksManager";
 import { Icon } from "@/components/ui/icon";
@@ -25,8 +25,6 @@ import {
   CalendarDays, 
   Menu,
   Megaphone,
-  LayoutDashboard,
-  ChevronRight,
   TrendingUp,
   Footprints,
   LayoutTemplate,
@@ -35,7 +33,9 @@ import {
   Library,
   Scroll,
   Palette,
-  Globe
+  Globe,
+  ExternalLink,
+  ChevronRight
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -43,6 +43,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useNavigate } from "react-router-dom";
 
 // Modules spécifiques à la Bibliothèque Numérique (BN)
 const tabs = [
@@ -88,34 +89,14 @@ const tabs = [
     description: "Carrousel des œuvres mises en avant"
   },
   { 
-    id: "vexpo360", 
-    label: "Expositions Virtuelles 360°", 
+    id: "vexpo360-hero", 
+    label: "Section VExpo 360° (Hero)", 
     icon: Globe, 
     color: "text-purple-500",
     bgColor: "bg-purple-500/10",
     borderColor: "border-purple-500/30",
     gradient: "from-purple-500/20 to-purple-600/5",
-    description: "Expositions virtuelles immersives"
-  },
-  { 
-    id: "collections", 
-    label: "Collections", 
-    icon: Library, 
-    color: "text-indigo-500",
-    bgColor: "bg-indigo-500/10",
-    borderColor: "border-indigo-500/30",
-    gradient: "from-indigo-500/20 to-indigo-600/5",
-    description: "Gestion des collections numériques"
-  },
-  { 
-    id: "manuscripts", 
-    label: "Manuscrits", 
-    icon: Scroll, 
-    color: "text-amber-600",
-    bgColor: "bg-amber-600/10",
-    borderColor: "border-amber-600/30",
-    gradient: "from-amber-600/20 to-amber-700/5",
-    description: "Manuscrits et documents anciens"
+    description: "Paramètres Hero de la section VExpo"
   },
   { 
     id: "bannieres", 
@@ -268,8 +249,53 @@ function StatCard({
   );
 }
 
+// Liens vers les interfaces dédiées
+const dedicatedInterfaces = [
+  {
+    id: "vexpo360",
+    label: "CMS Expositions Virtuelles 360°",
+    icon: Globe,
+    color: "text-purple-500",
+    bgColor: "bg-purple-500/10",
+    borderColor: "border-purple-500/30",
+    route: "/admin/vexpo360",
+    description: "Gérer les panoramas, hotspots et expositions"
+  },
+  {
+    id: "documents",
+    label: "Gestion des Documents",
+    icon: FileText,
+    color: "text-blue-500",
+    bgColor: "bg-blue-500/10",
+    borderColor: "border-blue-500/30",
+    route: "/admin/digital-library/documents",
+    description: "Documents numériques de la bibliothèque"
+  },
+  {
+    id: "manuscripts",
+    label: "Gestion des Manuscrits",
+    icon: Scroll,
+    color: "text-amber-600",
+    bgColor: "bg-amber-600/10",
+    borderColor: "border-amber-600/30",
+    route: "/admin/manuscripts",
+    description: "Manuscrits et documents anciens"
+  },
+  {
+    id: "collections",
+    label: "Gestion des Collections",
+    icon: Library,
+    color: "text-indigo-500",
+    bgColor: "bg-indigo-500/10",
+    borderColor: "border-indigo-500/30",
+    route: "/admin/digital-library/collections",
+    description: "Collections numériques"
+  },
+];
+
 export default function ContentManagementSystem() {
   const [activeTab, setActiveTab] = useState("hero");
+  const navigate = useNavigate();
 
   // Fetch stats pour la Bibliothèque Numérique
   const { data: stats } = useQuery({
@@ -303,32 +329,8 @@ export default function ContentManagementSystem() {
         return <CmsSectionIconsManager platform="bn" />;
       case "carrousel-bn":
         return <FeaturedWorksManager />;
-      case "vexpo360":
-        return <CmsVExpo360Manager />;
-      case "collections":
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Collections Numériques</CardTitle>
-              <CardDescription>Gestion des collections de la Bibliothèque Numérique</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Module en développement - Accédez à la gestion des collections depuis le menu Administration.</p>
-            </CardContent>
-          </Card>
-        );
-      case "manuscripts":
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Manuscrits</CardTitle>
-              <CardDescription>Gestion des manuscrits et documents anciens</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Module en développement - Accédez à la gestion des manuscrits depuis le menu Administration.</p>
-            </CardContent>
-          </Card>
-        );
+      case "vexpo360-hero":
+        return <CmsVExpo360HeroManager />;
       case "bannieres":
         return <CmsBannersManager />;
       case "actualites":
@@ -412,6 +414,49 @@ export default function ContentManagementSystem() {
               />
             </div>
           </CardHeader>
+        </Card>
+      </motion.div>
+
+      {/* Liens vers les interfaces dédiées */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, delay: 0.15 }}
+      >
+        <Card className="border shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-2">
+              <ExternalLink className="h-4 w-4" />
+              Interfaces de gestion dédiées
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {dedicatedInterfaces.map((item) => {
+                const ItemIcon = item.icon;
+                return (
+                  <Button
+                    key={item.id}
+                    variant="outline"
+                    className={cn(
+                      "h-auto p-4 flex flex-col items-start gap-2 hover:shadow-md transition-all",
+                      `hover:${item.borderColor}`
+                    )}
+                    onClick={() => navigate(item.route)}
+                  >
+                    <div className={cn("p-2 rounded-lg", item.bgColor)}>
+                      <ItemIcon className={cn("h-5 w-5", item.color)} />
+                    </div>
+                    <div className="text-left">
+                      <span className="font-medium text-sm block">{item.label}</span>
+                      <span className="text-xs text-muted-foreground">{item.description}</span>
+                    </div>
+                    <ExternalLink className="h-3 w-3 text-muted-foreground absolute top-3 right-3" />
+                  </Button>
+                );
+              })}
+            </div>
+          </CardContent>
         </Card>
       </motion.div>
 
