@@ -611,8 +611,8 @@ export default function MecenatBackoffice() {
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full" />
+      <div className="min-h-screen bg-slate-surface flex items-center justify-center">
+        <div className="animate-spin h-8 w-8 border-4 border-blue-primary border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -625,14 +625,14 @@ export default function MecenatBackoffice() {
   const pendingProposals = proposals.filter(p => p.status === 'submitted' || p.status === 'under_review');
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-slate-surface">
       <Header />
 
       <main className="container mx-auto px-4 py-8">
         <Button
           variant="ghost"
           onClick={() => navigate('/admin/settings')}
-          className="mb-6"
+          className="mb-6 text-slate-text-dark hover:text-blue-primary-dark hover:bg-blue-surface"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Retour à l'administration
@@ -640,80 +640,80 @@ export default function MecenatBackoffice() {
 
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <Heart className="h-8 w-8 text-primary" />
+          <h1 className="text-3xl font-bold flex items-center gap-3 text-blue-primary-dark">
+            <Heart className="h-8 w-8 text-gold-primary" />
             Gestion du Mécénat
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-slate-text mt-1">
             Référentiel des donateurs, donations et propositions de dons
           </p>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <Card className="p-4 bg-gradient-to-br from-primary/5 to-primary/10">
+          <Card className="p-4 bg-white border-slate-border">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/20">
-                <Users className="h-5 w-5 text-primary" />
+              <div className="p-2 rounded-lg bg-blue-surface">
+                <Users className="h-5 w-5 text-blue-primary-dark" />
               </div>
               <div>
-                <div className="text-2xl font-bold">{donors.length}</div>
-                <div className="text-sm text-muted-foreground">Donateurs</div>
+                <div className="text-2xl font-bold text-blue-primary-dark">{donors.length}</div>
+                <div className="text-sm text-slate-text">Donateurs</div>
               </div>
             </div>
           </Card>
-          <Card className="p-4 bg-gradient-to-br from-amber-500/5 to-amber-500/10">
+          <Card className="p-4 bg-white border-slate-border">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-amber-500/20">
-                <Award className="h-5 w-5 text-amber-600" />
+              <div className="p-2 rounded-lg bg-gold-surface">
+                <Award className="h-5 w-5 text-gold-primary-dark" />
               </div>
               <div>
-                <div className="text-2xl font-bold">
+                <div className="text-2xl font-bold text-gold-primary-dark">
                   {donors.filter(d => d.is_featured).length}
                 </div>
-                <div className="text-sm text-muted-foreground">Mécènes d'honneur</div>
+                <div className="text-sm text-slate-text">Mécènes d'honneur</div>
               </div>
             </div>
           </Card>
-          <Card className="p-4 bg-gradient-to-br from-green-500/5 to-green-500/10">
+          <Card className="p-4 bg-white border-slate-border">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-green-500/20">
+              <div className="p-2 rounded-lg bg-green-100">
                 <Heart className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <div className="text-2xl font-bold">{donations.length}</div>
-                <div className="text-sm text-muted-foreground">Donations</div>
+                <div className="text-2xl font-bold text-green-600">{donations.length}</div>
+                <div className="text-sm text-slate-text">Donations</div>
               </div>
             </div>
           </Card>
-          <Card className="p-4 bg-gradient-to-br from-blue-500/5 to-blue-500/10">
+          <Card className="p-4 bg-white border-slate-border">
             <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-blue-500/20">
-                <FileText className="h-5 w-5 text-blue-600" />
+              <div className="p-2 rounded-lg bg-blue-surface">
+                <FileText className="h-5 w-5 text-blue-primary-dark" />
               </div>
               <div>
-                <div className="text-2xl font-bold">{pendingProposals.length}</div>
-                <div className="text-sm text-muted-foreground">Propositions en attente</div>
+                <div className="text-2xl font-bold text-blue-primary-dark">{pendingProposals.length}</div>
+                <div className="text-sm text-slate-text">Propositions en attente</div>
               </div>
             </div>
           </Card>
         </div>
 
         <Tabs defaultValue="donors" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="donors" className="flex items-center gap-2">
+          <TabsList className="grid w-full grid-cols-3 bg-slate-light">
+            <TabsTrigger value="donors" className="flex items-center gap-2 data-[state=active]:bg-blue-primary data-[state=active]:text-white">
               <Users className="h-4 w-4" />
               Donateurs
             </TabsTrigger>
-            <TabsTrigger value="donations" className="flex items-center gap-2">
+            <TabsTrigger value="donations" className="flex items-center gap-2 data-[state=active]:bg-blue-primary data-[state=active]:text-white">
               <Heart className="h-4 w-4" />
               Donations
             </TabsTrigger>
-            <TabsTrigger value="proposals" className="flex items-center gap-2">
+            <TabsTrigger value="proposals" className="flex items-center gap-2 data-[state=active]:bg-blue-primary data-[state=active]:text-white">
               <FileText className="h-4 w-4" />
               Propositions
               {pendingProposals.length > 0 && (
-                <Badge variant="destructive" className="ml-1">
+                <Badge className="ml-1 bg-gold-primary text-white">
                   {pendingProposals.length}
                 </Badge>
               )}
