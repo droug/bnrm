@@ -27,7 +27,9 @@ import {
   BookOpen,
   Calendar,
   Archive,
-  FileText
+  FileText,
+  Database,
+  Box
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -48,7 +50,9 @@ export default function RolesManagement() {
     { id: "manuscripts", name: "Plateforme Manuscrits", icon: FileText, color: "bg-amber-500" },
     { id: "cbm", name: "Plateforme CBM", icon: Archive, color: "bg-purple-500" },
     { id: "kitab", name: "Plateforme Kitab", icon: BookOpen, color: "bg-rose-500" },
-    { id: "cultural", name: "Activités Culturelles", icon: Calendar, color: "bg-cyan-500" }
+    { id: "cultural", name: "Activités Culturelles", icon: Calendar, color: "bg-cyan-500" },
+    { id: "vexpo360", name: "VExpo360", icon: Box, color: "bg-violet-500" },
+    { id: "cbn", name: "Catalogue CBN", icon: Database, color: "bg-teal-500" }
   ];
 
   return (

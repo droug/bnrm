@@ -195,6 +195,102 @@ export const SYSTEM_MODULES: SystemModule[] = [
     is_active: true,
   },
   
+  // Plateforme Kitab
+  {
+    code: 'KITAB_DEPOSIT',
+    name: 'Dépôt Kitab',
+    platform: 'KITAB',
+    description: 'Gestion des dépôts de publications Kitab',
+    icon: 'BookPlus',
+    color: '#E11D48',
+    is_active: true,
+  },
+  {
+    code: 'KITAB_ISBN',
+    name: 'ISBN Kitab',
+    platform: 'KITAB',
+    description: 'Attribution et gestion des ISBN via Kitab',
+    icon: 'Hash',
+    color: '#BE185D',
+    is_active: true,
+  },
+  {
+    code: 'KITAB_PUBLISHERS',
+    name: 'Éditeurs Kitab',
+    platform: 'KITAB',
+    description: 'Gestion des éditeurs enregistrés sur Kitab',
+    icon: 'Users',
+    color: '#DB2777',
+    is_active: true,
+  },
+  {
+    code: 'KITAB_STATISTICS',
+    name: 'Statistiques Kitab',
+    platform: 'KITAB',
+    description: 'Statistiques et rapports du secteur de l\'édition',
+    icon: 'BarChart',
+    color: '#EC4899',
+    is_active: true,
+  },
+  
+  // Plateforme VExpo360
+  {
+    code: 'VEXPO_EXHIBITIONS',
+    name: 'Expositions Virtuelles',
+    platform: 'VEXPO360',
+    description: 'Création et gestion des expositions virtuelles 360°',
+    icon: 'Box',
+    color: '#7C3AED',
+    is_active: true,
+  },
+  {
+    code: 'VEXPO_GALLERIES',
+    name: 'Galeries VExpo',
+    platform: 'VEXPO360',
+    description: 'Gestion des galeries et espaces d\'exposition',
+    icon: 'Images',
+    color: '#8B5CF6',
+    is_active: true,
+  },
+  {
+    code: 'VEXPO_MEDIA',
+    name: 'Médias VExpo',
+    platform: 'VEXPO360',
+    description: 'Gestion des médias (images, vidéos, audio) des expositions',
+    icon: 'Video',
+    color: '#A855F7',
+    is_active: true,
+  },
+  
+  // Plateforme CBN (Catalogue Bibliothèque Nationale)
+  {
+    code: 'CBN_CATALOG',
+    name: 'Catalogue CBN',
+    platform: 'CBN',
+    description: 'Catalogue général de la Bibliothèque Nationale',
+    icon: 'Database',
+    color: '#0891B2',
+    is_active: true,
+  },
+  {
+    code: 'CBN_ACQUISITIONS',
+    name: 'Acquisitions CBN',
+    platform: 'CBN',
+    description: 'Gestion des acquisitions et enrichissement du fonds',
+    icon: 'ShoppingCart',
+    color: '#06B6D4',
+    is_active: true,
+  },
+  {
+    code: 'CBN_PERIODICALS',
+    name: 'Périodiques CBN',
+    platform: 'CBN',
+    description: 'Gestion des périodiques et abonnements',
+    icon: 'Newspaper',
+    color: '#14B8A6',
+    is_active: true,
+  },
+  
   // Modules transverses
   {
     code: 'PORTAL',
@@ -212,6 +308,33 @@ export const SYSTEM_MODULES: SystemModule[] = [
     description: 'Tableaux de bord et statistiques',
     icon: 'BarChart3',
     color: '#F97316',
+    is_active: true,
+  },
+  {
+    code: 'NOTIFICATIONS',
+    name: 'Notifications',
+    platform: 'SYSTEM',
+    description: 'Système de notifications et alertes',
+    icon: 'Bell',
+    color: '#EAB308',
+    is_active: true,
+  },
+  {
+    code: 'AUDIT',
+    name: 'Audit & Traçabilité',
+    platform: 'SYSTEM',
+    description: 'Journalisation et traçabilité des actions',
+    icon: 'ClipboardList',
+    color: '#64748B',
+    is_active: true,
+  },
+  {
+    code: 'SECURITY',
+    name: 'Sécurité',
+    platform: 'SYSTEM',
+    description: 'Gestion de la sécurité et des accès',
+    icon: 'ShieldCheck',
+    color: '#DC2626',
     is_active: true,
   },
 ];
@@ -489,6 +612,100 @@ export const SYSTEM_SERVICES: SystemService[] = [
     is_active: true,
     requires_approval: false,
   },
+  
+  // Services Kitab
+  {
+    code: 'KITAB_ISBN_REQUEST',
+    name: 'Demande ISBN Kitab',
+    module_code: 'KITAB_ISBN',
+    description: 'Demande d\'attribution ISBN via plateforme Kitab',
+    is_active: true,
+    requires_approval: true,
+  },
+  {
+    code: 'KITAB_PUBLISHER_REG',
+    name: 'Inscription Éditeur Kitab',
+    module_code: 'KITAB_PUBLISHERS',
+    description: 'Inscription d\'un éditeur sur la plateforme Kitab',
+    is_active: true,
+    requires_approval: true,
+  },
+  {
+    code: 'KITAB_DEPOSIT_BOOK',
+    name: 'Dépôt Livre Kitab',
+    module_code: 'KITAB_DEPOSIT',
+    description: 'Dépôt d\'un livre via plateforme Kitab',
+    is_active: true,
+    requires_approval: true,
+  },
+  {
+    code: 'KITAB_STATS_REPORT',
+    name: 'Rapport Statistiques Kitab',
+    module_code: 'KITAB_STATISTICS',
+    description: 'Génération de rapports statistiques secteur édition',
+    is_active: true,
+    requires_approval: false,
+  },
+  
+  // Services VExpo360
+  {
+    code: 'VEXPO_CREATE',
+    name: 'Création Exposition',
+    module_code: 'VEXPO_EXHIBITIONS',
+    description: 'Création d\'une nouvelle exposition virtuelle',
+    is_active: true,
+    requires_approval: true,
+  },
+  {
+    code: 'VEXPO_PUBLISH',
+    name: 'Publication Exposition',
+    module_code: 'VEXPO_EXHIBITIONS',
+    description: 'Publication d\'une exposition virtuelle',
+    is_active: true,
+    requires_approval: true,
+  },
+  {
+    code: 'VEXPO_GALLERY_CREATE',
+    name: 'Création Galerie',
+    module_code: 'VEXPO_GALLERIES',
+    description: 'Création d\'une galerie d\'exposition',
+    is_active: true,
+    requires_approval: false,
+  },
+  {
+    code: 'VEXPO_MEDIA_UPLOAD',
+    name: 'Téléversement Média',
+    module_code: 'VEXPO_MEDIA',
+    description: 'Téléversement de médias pour expositions',
+    is_active: true,
+    requires_approval: false,
+  },
+  
+  // Services CBN
+  {
+    code: 'CBN_NOTICE_CREATE',
+    name: 'Création Notice CBN',
+    module_code: 'CBN_CATALOG',
+    description: 'Création d\'une notice bibliographique CBN',
+    is_active: true,
+    requires_approval: false,
+  },
+  {
+    code: 'CBN_ACQUISITION',
+    name: 'Proposition Acquisition',
+    module_code: 'CBN_ACQUISITIONS',
+    description: 'Proposition d\'acquisition de document',
+    is_active: true,
+    requires_approval: true,
+  },
+  {
+    code: 'CBN_PERIODICAL_SUB',
+    name: 'Abonnement Périodique',
+    module_code: 'CBN_PERIODICALS',
+    description: 'Gestion d\'abonnement à un périodique',
+    is_active: true,
+    requires_approval: true,
+  },
 ];
 
 /**
@@ -621,6 +838,304 @@ export const WORKFLOW_PERMISSIONS: WorkflowPermission[] = [
     permission_name: 'cbm.catalog.manage',
     category: 'CBM',
     description: 'Gérer le catalogue CBM',
+  },
+  
+  // Permissions Kitab
+  {
+    permission_name: 'kitab.deposit.create',
+    category: 'Kitab',
+    description: 'Créer un dépôt sur Kitab',
+  },
+  {
+    permission_name: 'kitab.deposit.validate',
+    category: 'Kitab',
+    description: 'Valider un dépôt Kitab',
+  },
+  {
+    permission_name: 'kitab.isbn.request',
+    category: 'Kitab',
+    description: 'Demander un ISBN via Kitab',
+  },
+  {
+    permission_name: 'kitab.isbn.assign',
+    category: 'Kitab',
+    description: 'Attribuer un ISBN',
+  },
+  {
+    permission_name: 'kitab.publisher.register',
+    category: 'Kitab',
+    description: 'Enregistrer un éditeur sur Kitab',
+  },
+  {
+    permission_name: 'kitab.publisher.manage',
+    category: 'Kitab',
+    description: 'Gérer les éditeurs Kitab',
+  },
+  {
+    permission_name: 'kitab.statistics.view',
+    category: 'Kitab',
+    description: 'Consulter les statistiques Kitab',
+  },
+  {
+    permission_name: 'kitab.statistics.export',
+    category: 'Kitab',
+    description: 'Exporter les statistiques Kitab',
+  },
+  
+  // Permissions VExpo360
+  {
+    permission_name: 'vexpo.exhibition.create',
+    category: 'VExpo360',
+    description: 'Créer une exposition virtuelle',
+  },
+  {
+    permission_name: 'vexpo.exhibition.edit',
+    category: 'VExpo360',
+    description: 'Modifier une exposition virtuelle',
+  },
+  {
+    permission_name: 'vexpo.exhibition.publish',
+    category: 'VExpo360',
+    description: 'Publier une exposition virtuelle',
+  },
+  {
+    permission_name: 'vexpo.exhibition.delete',
+    category: 'VExpo360',
+    description: 'Supprimer une exposition virtuelle',
+  },
+  {
+    permission_name: 'vexpo.gallery.manage',
+    category: 'VExpo360',
+    description: 'Gérer les galeries VExpo',
+  },
+  {
+    permission_name: 'vexpo.media.upload',
+    category: 'VExpo360',
+    description: 'Téléverser des médias VExpo',
+  },
+  {
+    permission_name: 'vexpo.roles.manage',
+    category: 'VExpo360',
+    description: 'Gérer les rôles VExpo (super_admin, editor, reviewer)',
+  },
+  
+  // Permissions CBN
+  {
+    permission_name: 'cbn.catalog.view',
+    category: 'CBN',
+    description: 'Consulter le catalogue CBN',
+  },
+  {
+    permission_name: 'cbn.catalog.create',
+    category: 'CBN',
+    description: 'Créer une notice CBN',
+  },
+  {
+    permission_name: 'cbn.catalog.edit',
+    category: 'CBN',
+    description: 'Modifier une notice CBN',
+  },
+  {
+    permission_name: 'cbn.catalog.validate',
+    category: 'CBN',
+    description: 'Valider une notice CBN',
+  },
+  {
+    permission_name: 'cbn.acquisition.propose',
+    category: 'CBN',
+    description: 'Proposer une acquisition',
+  },
+  {
+    permission_name: 'cbn.acquisition.approve',
+    category: 'CBN',
+    description: 'Approuver une acquisition',
+  },
+  {
+    permission_name: 'cbn.periodical.manage',
+    category: 'CBN',
+    description: 'Gérer les périodiques et abonnements',
+  },
+  
+  // Permissions Manuscrits étendues
+  {
+    permission_name: 'manuscripts.view',
+    category: 'Manuscrits',
+    description: 'Consulter les manuscrits',
+  },
+  {
+    permission_name: 'manuscripts.create',
+    category: 'Manuscrits',
+    description: 'Créer une fiche manuscrit',
+  },
+  {
+    permission_name: 'manuscripts.edit',
+    category: 'Manuscrits',
+    description: 'Modifier une fiche manuscrit',
+  },
+  {
+    permission_name: 'manuscripts.digitize',
+    category: 'Manuscrits',
+    description: 'Gérer la numérisation des manuscrits',
+  },
+  {
+    permission_name: 'manuscripts.access.request',
+    category: 'Manuscrits',
+    description: 'Demander l\'accès à un manuscrit',
+  },
+  {
+    permission_name: 'manuscripts.access.approve',
+    category: 'Manuscrits',
+    description: 'Approuver une demande d\'accès',
+  },
+  {
+    permission_name: 'manuscripts.conservation.view',
+    category: 'Manuscrits',
+    description: 'Consulter l\'état de conservation',
+  },
+  {
+    permission_name: 'manuscripts.conservation.update',
+    category: 'Manuscrits',
+    description: 'Mettre à jour l\'état de conservation',
+  },
+  
+  // Permissions Dépôt Légal étendues
+  {
+    permission_name: 'legal_deposit.create',
+    category: 'Dépôt Légal',
+    description: 'Créer un dépôt légal',
+  },
+  {
+    permission_name: 'legal_deposit.validate',
+    category: 'Dépôt Légal',
+    description: 'Valider un dépôt légal',
+  },
+  {
+    permission_name: 'legal_deposit.reject',
+    category: 'Dépôt Légal',
+    description: 'Rejeter un dépôt légal',
+  },
+  {
+    permission_name: 'legal_deposit.assign_number',
+    category: 'Dépôt Légal',
+    description: 'Attribuer un numéro de dépôt',
+  },
+  {
+    permission_name: 'legal_deposit.archive',
+    category: 'Dépôt Légal',
+    description: 'Archiver un dépôt légal',
+  },
+  
+  // Permissions Bibliothèque Numérique
+  {
+    permission_name: 'digital_library.view',
+    category: 'Bibliothèque Numérique',
+    description: 'Consulter la bibliothèque numérique',
+  },
+  {
+    permission_name: 'digital_library.upload',
+    category: 'Bibliothèque Numérique',
+    description: 'Téléverser des documents',
+  },
+  {
+    permission_name: 'digital_library.catalog',
+    category: 'Bibliothèque Numérique',
+    description: 'Cataloguer des documents',
+  },
+  {
+    permission_name: 'digital_library.publish',
+    category: 'Bibliothèque Numérique',
+    description: 'Publier des documents',
+  },
+  {
+    permission_name: 'digital_library.manage_access',
+    category: 'Bibliothèque Numérique',
+    description: 'Gérer les droits d\'accès',
+  },
+  
+  // Permissions Espaces & Réservations
+  {
+    permission_name: 'spaces.view',
+    category: 'Espaces Culturels',
+    description: 'Consulter les espaces disponibles',
+  },
+  {
+    permission_name: 'spaces.book',
+    category: 'Espaces Culturels',
+    description: 'Réserver un espace',
+  },
+  {
+    permission_name: 'spaces.manage',
+    category: 'Espaces Culturels',
+    description: 'Gérer les espaces culturels',
+  },
+  {
+    permission_name: 'booking.view',
+    category: 'Espaces Culturels',
+    description: 'Consulter les réservations',
+  },
+  {
+    permission_name: 'booking.approve',
+    category: 'Espaces Culturels',
+    description: 'Approuver les réservations',
+  },
+  {
+    permission_name: 'booking.reject',
+    category: 'Espaces Culturels',
+    description: 'Rejeter les réservations',
+  },
+  
+  // Permissions Activités Culturelles
+  {
+    permission_name: 'cultural.event.create',
+    category: 'Activités Culturelles',
+    description: 'Créer un événement culturel',
+  },
+  {
+    permission_name: 'cultural.event.edit',
+    category: 'Activités Culturelles',
+    description: 'Modifier un événement culturel',
+  },
+  {
+    permission_name: 'cultural.event.publish',
+    category: 'Activités Culturelles',
+    description: 'Publier un événement culturel',
+  },
+  {
+    permission_name: 'cultural.event.cancel',
+    category: 'Activités Culturelles',
+    description: 'Annuler un événement culturel',
+  },
+  
+  // Permissions Système
+  {
+    permission_name: 'system.audit.view',
+    category: 'Système',
+    description: 'Consulter les logs d\'audit',
+  },
+  {
+    permission_name: 'system.audit.export',
+    category: 'Système',
+    description: 'Exporter les logs d\'audit',
+  },
+  {
+    permission_name: 'system.notifications.manage',
+    category: 'Système',
+    description: 'Gérer les notifications système',
+  },
+  {
+    permission_name: 'system.security.manage',
+    category: 'Système',
+    description: 'Gérer les paramètres de sécurité',
+  },
+  {
+    permission_name: 'system.users.manage',
+    category: 'Système',
+    description: 'Gérer les utilisateurs',
+  },
+  {
+    permission_name: 'system.roles.manage',
+    category: 'Système',
+    description: 'Gérer les rôles et permissions',
   },
   
   // Permissions générales
