@@ -1,21 +1,24 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
-import { Navigate, useNavigate } from "react-router-dom";
-import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
+import { Navigate } from "react-router-dom";
+import { AdminPageWrapper } from "@/components/digital-library/admin/AdminPageWrapper";
 import ExhibitionsManager from "@/components/digital-library/ExhibitionsManager";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
 
 export default function DigitalLibraryExhibitions() {
   const { user } = useAuth();
   const { isLibrarian, loading } = useSecureRoles();
-  const navigate = useNavigate();
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-      </div>
+      <AdminPageWrapper
+        title="Expositions virtuelles"
+        description="Gestion des expositions"
+        icon="mdi:rotate-3d-variant"
+        iconColor="text-teal-600"
+        loading={true}
+      >
+        <div />
+      </AdminPageWrapper>
     );
   }
 
@@ -24,18 +27,13 @@ export default function DigitalLibraryExhibitions() {
   }
 
   return (
-    <DigitalLibraryLayout>
-      <div className="container mx-auto p-6">
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/admin/digital-library")}
-          className="mb-4"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Retour
-        </Button>
-        <ExhibitionsManager />
-      </div>
-    </DigitalLibraryLayout>
+    <AdminPageWrapper
+      title="Expositions virtuelles"
+      description="Création et gestion des expositions virtuelles immersives"
+      icon="mdi:rotate-3d-variant"
+      iconColor="text-teal-600"
+    >
+      <ExhibitionsManager />
+    </AdminPageWrapper>
   );
 }
