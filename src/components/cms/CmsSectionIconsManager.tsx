@@ -275,28 +275,275 @@ const iconLibraries = {
   }
 };
 
-// Target types where icons can be applied
-const targetTypes = [
-  { id: "section", label: "Sections de page", icon: "mdi:layers-outline" },
-  { id: "page", label: "Pages CMS", icon: "mdi:file-document-outline" },
-  { id: "form", label: "Formulaires", icon: "mdi:form-select" },
-  { id: "menu", label: "Menus de navigation", icon: "mdi:menu" },
-  { id: "button", label: "Boutons d'action", icon: "mdi:gesture-tap-button" },
+// Platform/Portal definitions
+const platforms = [
+  { id: "portal", label: "Portail BNRM", icon: "mdi:domain", color: "#1e40af" },
+  { id: "bn", label: "Bibliothèque Numérique", icon: "mdi:library", color: "#C9A227" },
+  { id: "cbn", label: "Catalogue Collectif (CBN)", icon: "mdi:book-multiple", color: "#059669" },
+  { id: "cbm", label: "Catalogue Collectif (CBM)", icon: "mdi:bookshelf", color: "#7c3aed" },
+  { id: "manuscripts", label: "Manuscrits Numérisés", icon: "mdi:scroll-text-outline", color: "#b45309" },
+  { id: "kitab", label: "Kitab", icon: "mdi:book-open-page-variant-outline", color: "#dc2626" },
+  { id: "cultural", label: "Activités Culturelles", icon: "mdi:calendar-month-outline", color: "#0891b2" },
 ];
 
-// Predefined section configs for BN platform
-const sectionIconConfigs = [
-  { id: "ressources_electroniques", label: "Ressources électroniques", defaultIcon: "mdi:select-multiple", type: "section" },
-  { id: "ibn_battouta_stats", label: "Ibn Battouta en chiffres", defaultIcon: "mdi:format-list-numbered", type: "section" },
-  { id: "derniers_ajouts", label: "Derniers ajouts", defaultIcon: "mdi:book-open-page-variant-outline", type: "section" },
-  { id: "mediatheque", label: "Médiathèque", defaultIcon: "mdi:video-box", type: "section" },
-  { id: "hero", label: "Section Hero", defaultIcon: "mdi:home-outline", type: "section" },
-  { id: "actualites", label: "Actualités", defaultIcon: "mdi:newspaper-variant-outline", type: "section" },
-  { id: "evenements", label: "Événements", defaultIcon: "mdi:calendar-month-outline", type: "section" },
-  { id: "collections", label: "Collections", defaultIcon: "mdi:library", type: "section" },
-  { id: "vexpo", label: "Expositions virtuelles", defaultIcon: "mdi:panorama-outline", type: "section" },
-  { id: "recherche", label: "Recherche", defaultIcon: "mdi:magnify", type: "section" },
+// Office types
+const officeTypes = [
+  { id: "front", label: "Front Office", icon: "mdi:monitor", description: "Interface publique" },
+  { id: "back", label: "Back Office", icon: "mdi:cog-outline", description: "Administration" },
 ];
+
+// Target types where icons can be applied
+const targetTypes = [
+  { id: "section", label: "Sections", icon: "mdi:layers-outline" },
+  { id: "card", label: "Cartes", icon: "mdi:card-outline" },
+  { id: "menu", label: "Menus", icon: "mdi:menu" },
+  { id: "button", label: "Boutons", icon: "mdi:gesture-tap-button" },
+  { id: "tab", label: "Onglets", icon: "mdi:tab" },
+  { id: "sidebar", label: "Sidebar", icon: "mdi:page-layout-sidebar-left" },
+];
+
+// Comprehensive element configs by platform, office, and type
+const elementConfigs: Record<string, Record<string, Record<string, Array<{ id: string; label: string; defaultIcon: string }>>>> = {
+  portal: {
+    front: {
+      section: [
+        { id: "portal_hero", label: "Section Hero", defaultIcon: "mdi:home-outline" },
+        { id: "portal_actualites", label: "Actualités", defaultIcon: "mdi:newspaper-variant-outline" },
+        { id: "portal_evenements", label: "Événements", defaultIcon: "mdi:calendar-month-outline" },
+        { id: "portal_services", label: "Services numériques", defaultIcon: "mdi:web" },
+        { id: "portal_plateformes", label: "Nos Plateformes", defaultIcon: "mdi:apps" },
+        { id: "portal_liens_rapides", label: "Liens rapides", defaultIcon: "mdi:link-variant" },
+      ],
+      card: [
+        { id: "portal_card_service", label: "Carte Service", defaultIcon: "mdi:card-outline" },
+        { id: "portal_card_actu", label: "Carte Actualité", defaultIcon: "mdi:newspaper-variant-outline" },
+        { id: "portal_card_event", label: "Carte Événement", defaultIcon: "mdi:calendar-outline" },
+      ],
+      menu: [
+        { id: "portal_nav_main", label: "Navigation principale", defaultIcon: "mdi:menu" },
+        { id: "portal_nav_footer", label: "Footer", defaultIcon: "mdi:page-layout-footer" },
+      ],
+      button: [],
+      tab: [],
+      sidebar: [],
+    },
+    back: {
+      section: [
+        { id: "portal_admin_dashboard", label: "Dashboard Admin", defaultIcon: "mdi:view-dashboard-outline" },
+        { id: "portal_admin_cms", label: "Gestion CMS", defaultIcon: "mdi:file-document-edit-outline" },
+      ],
+      card: [
+        { id: "portal_admin_stat_card", label: "Carte Statistique", defaultIcon: "mdi:chart-box-outline" },
+      ],
+      menu: [
+        { id: "portal_admin_sidebar", label: "Menu latéral admin", defaultIcon: "mdi:menu" },
+      ],
+      button: [],
+      tab: [],
+      sidebar: [
+        { id: "portal_admin_sidebar_nav", label: "Navigation Sidebar", defaultIcon: "mdi:page-layout-sidebar-left" },
+      ],
+    },
+  },
+  bn: {
+    front: {
+      section: [
+        { id: "bn_hero", label: "Section Hero BN", defaultIcon: "mdi:home-outline" },
+        { id: "bn_ressources_electroniques", label: "Ressources électroniques", defaultIcon: "mdi:select-multiple" },
+        { id: "bn_ibn_battouta_stats", label: "Ibn Battouta en chiffres", defaultIcon: "mdi:format-list-numbered" },
+        { id: "bn_derniers_ajouts", label: "Derniers ajouts", defaultIcon: "mdi:book-open-page-variant-outline" },
+        { id: "bn_mediatheque", label: "Médiathèque", defaultIcon: "mdi:video-box" },
+        { id: "bn_collections", label: "Collections", defaultIcon: "mdi:library" },
+        { id: "bn_vexpo", label: "Expositions virtuelles", defaultIcon: "mdi:panorama-outline" },
+        { id: "bn_recherche", label: "Recherche", defaultIcon: "mdi:magnify" },
+      ],
+      card: [
+        { id: "bn_card_document", label: "Carte Document", defaultIcon: "mdi:file-document-outline" },
+        { id: "bn_card_collection", label: "Carte Collection", defaultIcon: "mdi:folder-multiple-outline" },
+        { id: "bn_card_ressource", label: "Carte Ressource électronique", defaultIcon: "mdi:web" },
+      ],
+      menu: [
+        { id: "bn_nav_main", label: "Navigation principale BN", defaultIcon: "mdi:menu" },
+        { id: "bn_nav_portails", label: "Menu Portails", defaultIcon: "mdi:apps" },
+      ],
+      button: [
+        { id: "bn_btn_consulter", label: "Bouton Consulter", defaultIcon: "mdi:eye-outline" },
+        { id: "bn_btn_telecharger", label: "Bouton Télécharger", defaultIcon: "mdi:download" },
+      ],
+      tab: [
+        { id: "bn_tab_collections", label: "Onglets Collections", defaultIcon: "mdi:tab" },
+      ],
+      sidebar: [],
+    },
+    back: {
+      section: [
+        { id: "bn_admin_dashboard", label: "Dashboard BN", defaultIcon: "mdi:view-dashboard-outline" },
+        { id: "bn_admin_documents", label: "Gestion Documents", defaultIcon: "mdi:file-document-multiple-outline" },
+        { id: "bn_admin_vexpo", label: "Gestion VExpo", defaultIcon: "mdi:panorama-outline" },
+      ],
+      card: [
+        { id: "bn_admin_stat_card", label: "Carte Statistique BN", defaultIcon: "mdi:chart-box-outline" },
+      ],
+      menu: [
+        { id: "bn_admin_sidebar", label: "Sidebar Admin BN", defaultIcon: "mdi:menu" },
+      ],
+      button: [],
+      tab: [
+        { id: "bn_admin_tabs", label: "Onglets Admin", defaultIcon: "mdi:tab" },
+      ],
+      sidebar: [
+        { id: "bn_admin_sidebar_nav", label: "Navigation Sidebar BN", defaultIcon: "mdi:page-layout-sidebar-left" },
+      ],
+    },
+  },
+  cbn: {
+    front: {
+      section: [
+        { id: "cbn_hero", label: "Section Hero CBN", defaultIcon: "mdi:home-outline" },
+        { id: "cbn_recherche", label: "Recherche Catalogue", defaultIcon: "mdi:magnify" },
+        { id: "cbn_resultats", label: "Résultats", defaultIcon: "mdi:format-list-bulleted" },
+      ],
+      card: [
+        { id: "cbn_card_notice", label: "Carte Notice", defaultIcon: "mdi:file-document-outline" },
+        { id: "cbn_card_bibliotheque", label: "Carte Bibliothèque", defaultIcon: "mdi:library" },
+      ],
+      menu: [
+        { id: "cbn_nav_main", label: "Navigation CBN", defaultIcon: "mdi:menu" },
+      ],
+      button: [],
+      tab: [],
+      sidebar: [],
+    },
+    back: {
+      section: [
+        { id: "cbn_admin_dashboard", label: "Dashboard CBN", defaultIcon: "mdi:view-dashboard-outline" },
+      ],
+      card: [],
+      menu: [],
+      button: [],
+      tab: [],
+      sidebar: [],
+    },
+  },
+  cbm: {
+    front: {
+      section: [
+        { id: "cbm_hero", label: "Section Hero CBM", defaultIcon: "mdi:home-outline" },
+        { id: "cbm_adhesion", label: "Adhésion", defaultIcon: "mdi:account-plus-outline" },
+        { id: "cbm_formation", label: "Formations", defaultIcon: "mdi:school-outline" },
+        { id: "cbm_bibliotheques", label: "Bibliothèques membres", defaultIcon: "mdi:library" },
+      ],
+      card: [
+        { id: "cbm_card_bibliotheque", label: "Carte Bibliothèque", defaultIcon: "mdi:library" },
+        { id: "cbm_card_formation", label: "Carte Formation", defaultIcon: "mdi:school-outline" },
+      ],
+      menu: [
+        { id: "cbm_nav_main", label: "Navigation CBM", defaultIcon: "mdi:menu" },
+      ],
+      button: [],
+      tab: [],
+      sidebar: [],
+    },
+    back: {
+      section: [
+        { id: "cbm_admin_dashboard", label: "Dashboard CBM", defaultIcon: "mdi:view-dashboard-outline" },
+        { id: "cbm_admin_adhesions", label: "Gestion Adhésions", defaultIcon: "mdi:account-group-outline" },
+      ],
+      card: [],
+      menu: [],
+      button: [],
+      tab: [],
+      sidebar: [],
+    },
+  },
+  manuscripts: {
+    front: {
+      section: [
+        { id: "ms_hero", label: "Section Hero Manuscrits", defaultIcon: "mdi:home-outline" },
+        { id: "ms_collections", label: "Collections Manuscrits", defaultIcon: "mdi:scroll-text-outline" },
+        { id: "ms_recherche", label: "Recherche Manuscrits", defaultIcon: "mdi:magnify" },
+      ],
+      card: [
+        { id: "ms_card_manuscrit", label: "Carte Manuscrit", defaultIcon: "mdi:scroll-text-outline" },
+      ],
+      menu: [
+        { id: "ms_nav_main", label: "Navigation Manuscrits", defaultIcon: "mdi:menu" },
+      ],
+      button: [],
+      tab: [],
+      sidebar: [],
+    },
+    back: {
+      section: [
+        { id: "ms_admin_dashboard", label: "Dashboard Manuscrits", defaultIcon: "mdi:view-dashboard-outline" },
+        { id: "ms_admin_catalogage", label: "Catalogage", defaultIcon: "mdi:file-document-edit-outline" },
+      ],
+      card: [],
+      menu: [],
+      button: [],
+      tab: [],
+      sidebar: [],
+    },
+  },
+  kitab: {
+    front: {
+      section: [
+        { id: "kitab_hero", label: "Section Hero Kitab", defaultIcon: "mdi:home-outline" },
+        { id: "kitab_catalogue", label: "Catalogue Kitab", defaultIcon: "mdi:book-open-page-variant-outline" },
+      ],
+      card: [
+        { id: "kitab_card_livre", label: "Carte Livre", defaultIcon: "mdi:book-outline" },
+      ],
+      menu: [
+        { id: "kitab_nav_main", label: "Navigation Kitab", defaultIcon: "mdi:menu" },
+      ],
+      button: [],
+      tab: [],
+      sidebar: [],
+    },
+    back: {
+      section: [
+        { id: "kitab_admin_dashboard", label: "Dashboard Kitab", defaultIcon: "mdi:view-dashboard-outline" },
+      ],
+      card: [],
+      menu: [],
+      button: [],
+      tab: [],
+      sidebar: [],
+    },
+  },
+  cultural: {
+    front: {
+      section: [
+        { id: "cultural_hero", label: "Section Hero Culturelle", defaultIcon: "mdi:home-outline" },
+        { id: "cultural_agenda", label: "Agenda Culturel", defaultIcon: "mdi:calendar-month-outline" },
+        { id: "cultural_espaces", label: "Espaces Culturels", defaultIcon: "mdi:domain" },
+        { id: "cultural_visites", label: "Visites Guidées", defaultIcon: "mdi:walk" },
+      ],
+      card: [
+        { id: "cultural_card_event", label: "Carte Événement Culturel", defaultIcon: "mdi:calendar-outline" },
+        { id: "cultural_card_espace", label: "Carte Espace", defaultIcon: "mdi:office-building-outline" },
+      ],
+      menu: [
+        { id: "cultural_nav_main", label: "Navigation Culturelle", defaultIcon: "mdi:menu" },
+      ],
+      button: [],
+      tab: [],
+      sidebar: [],
+    },
+    back: {
+      section: [
+        { id: "cultural_admin_dashboard", label: "Dashboard Culturel", defaultIcon: "mdi:view-dashboard-outline" },
+        { id: "cultural_admin_reservations", label: "Gestion Réservations", defaultIcon: "mdi:calendar-check-outline" },
+      ],
+      card: [],
+      menu: [],
+      button: [],
+      tab: [],
+      sidebar: [],
+    },
+  },
+};
 
 interface IconConfig {
   icon: string;
@@ -324,6 +571,8 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
   
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
+  const [selectedPlatform, setSelectedPlatform] = useState<string>(platform === 'bn' ? 'bn' : 'portal');
+  const [selectedOffice, setSelectedOffice] = useState<string>("front");
   const [selectedTargetType, setSelectedTargetType] = useState("section");
   const [activeLibrary, setActiveLibrary] = useState<string>("mdi");
   const [sectionIcons, setSectionIcons] = useState<SectionIcons>({});
@@ -332,6 +581,15 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
   const keyPrefix = platform === 'bn' ? 'bn_' : '';
   const sectionIconsKey = `${keyPrefix}section_icons`;
   const libraryConfigKey = `${keyPrefix}icon_library_config`;
+
+  // Get current elements based on selections
+  const getCurrentElements = () => {
+    const platformConfig = elementConfigs[selectedPlatform];
+    if (!platformConfig) return [];
+    const officeConfig = platformConfig[selectedOffice];
+    if (!officeConfig) return [];
+    return officeConfig[selectedTargetType] || [];
+  };
 
   // Load saved icons and library config
   const { isLoading } = useQuery({
@@ -357,13 +615,20 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
       if (iconsRes.data?.setting_value) {
         setSectionIcons(iconsRes.data.setting_value as unknown as SectionIcons);
       } else {
+        // Initialize with defaults from all platforms
         const defaults: SectionIcons = {};
-        sectionIconConfigs.forEach(config => {
-          defaults[config.id] = {
-            icon: config.defaultIcon,
-            color: platform === 'bn' ? '#C9A227' : '#3b82f6',
-            library: 'mdi'
-          };
+        Object.entries(elementConfigs).forEach(([, officeConfigs]) => {
+          Object.entries(officeConfigs).forEach(([, typeConfigs]) => {
+            Object.entries(typeConfigs).forEach(([, elements]) => {
+              (elements as Array<{ id: string; defaultIcon: string }>).forEach(el => {
+                defaults[el.id] = {
+                  icon: el.defaultIcon,
+                  color: platform === 'bn' ? '#C9A227' : '#3b82f6',
+                  library: 'mdi'
+                };
+              });
+            });
+          });
         });
         setSectionIcons(defaults);
       }
@@ -510,8 +775,8 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
   // Count total icons
   const totalIcons = Object.values(libraryCategories).flat().length + customIcons.length;
 
-  // Filter sections by target type
-  const filteredSections = sectionIconConfigs.filter(s => s.type === selectedTargetType);
+  // Get filtered elements based on current selections
+  const currentElements = getCurrentElements();
 
   if (isLoading) {
     return (
@@ -675,140 +940,246 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
                 Appliquer les icônes
               </CardTitle>
               <CardDescription>
-                Choisissez où appliquer les icônes dans votre interface
+                Sélectionnez le portail, le type d'interface, puis l'élément à configurer
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              {/* Target Type Selector */}
-              <div className="mb-6">
-                <Label className="mb-3 block">Type d'élément</Label>
-                <div className="flex flex-wrap gap-2">
-                  {targetTypes.map(type => (
-                    <Button
-                      key={type.id}
-                      variant={selectedTargetType === type.id ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setSelectedTargetType(type.id)}
-                      className="flex items-center gap-2"
+            <CardContent className="space-y-6">
+              {/* Step 1: Platform Selection */}
+              <div>
+                <Label className="mb-3 block text-sm font-medium">
+                  <span className="inline-flex items-center gap-2">
+                    <Badge variant="outline" className="rounded-full h-5 w-5 p-0 justify-center">1</Badge>
+                    Portail / Plateforme
+                  </span>
+                </Label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {platforms.map(p => (
+                    <button
+                      key={p.id}
+                      onClick={() => {
+                        setSelectedPlatform(p.id);
+                        setSelectedSection(null);
+                      }}
+                      className={`p-3 rounded-lg border text-left transition-all ${
+                        selectedPlatform === p.id 
+                          ? 'ring-2 ring-primary bg-primary/5 border-primary' 
+                          : 'hover:bg-accent'
+                      }`}
                     >
-                      <Icon name={type.icon} className="h-4 w-4" />
-                      {type.label}
-                    </Button>
+                      <div className="flex items-center gap-2">
+                        <Icon name={p.icon} className="h-5 w-5" style={{ color: p.color }} />
+                        <span className="text-sm font-medium truncate">{p.label}</span>
+                      </div>
+                    </button>
                   ))}
                 </div>
               </div>
 
-              {/* Section List */}
-              <div className="grid gap-4">
-                {filteredSections.map(config => {
-                  const currentIcon = sectionIcons[config.id] || { 
-                    icon: config.defaultIcon, 
-                    color: platform === 'bn' ? '#C9A227' : '#3b82f6',
-                    library: 'mdi'
-                  };
-                  return (
-                    <Card key={config.id} className={selectedSection === config.id ? "ring-2 ring-primary" : ""}>
-                      <CardContent className="p-4">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-4">
-                            <div 
-                              className="w-12 h-12 rounded-lg border flex items-center justify-center"
-                              style={{ color: currentIcon.color }}
-                            >
-                              <Icon name={currentIcon.icon} className="w-6 h-6" />
-                            </div>
-                            <div>
-                              <p className="font-medium">{config.label}</p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <code className="bg-muted px-1.5 py-0.5 rounded text-xs">{currentIcon.icon}</code>
-                                {currentIcon.library && (
-                                  <Badge variant="secondary" className="text-xs">
-                                    {iconLibraries[currentIcon.library as keyof typeof iconLibraries]?.name || currentIcon.library}
-                                  </Badge>
-                                )}
+              {/* Step 2: Office Type Selection */}
+              <div>
+                <Label className="mb-3 block text-sm font-medium">
+                  <span className="inline-flex items-center gap-2">
+                    <Badge variant="outline" className="rounded-full h-5 w-5 p-0 justify-center">2</Badge>
+                    Type d'interface
+                  </span>
+                </Label>
+                <div className="grid grid-cols-2 gap-3">
+                  {officeTypes.map(office => (
+                    <button
+                      key={office.id}
+                      onClick={() => {
+                        setSelectedOffice(office.id);
+                        setSelectedSection(null);
+                      }}
+                      className={`p-4 rounded-lg border text-left transition-all ${
+                        selectedOffice === office.id 
+                          ? 'ring-2 ring-primary bg-primary/5 border-primary' 
+                          : 'hover:bg-accent'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                          selectedOffice === office.id ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                        }`}>
+                          <Icon name={office.icon} className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <p className="font-medium">{office.label}</p>
+                          <p className="text-xs text-muted-foreground">{office.description}</p>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Step 3: Target Type Selector */}
+              <div>
+                <Label className="mb-3 block text-sm font-medium">
+                  <span className="inline-flex items-center gap-2">
+                    <Badge variant="outline" className="rounded-full h-5 w-5 p-0 justify-center">3</Badge>
+                    Type d'élément
+                  </span>
+                </Label>
+                <div className="flex flex-wrap gap-2">
+                  {targetTypes.map(type => {
+                    const hasElements = (elementConfigs[selectedPlatform]?.[selectedOffice]?.[type.id]?.length || 0) > 0;
+                    return (
+                      <Button
+                        key={type.id}
+                        variant={selectedTargetType === type.id ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => {
+                          setSelectedTargetType(type.id);
+                          setSelectedSection(null);
+                        }}
+                        disabled={!hasElements}
+                        className="flex items-center gap-2"
+                      >
+                        <Icon name={type.icon} className="h-4 w-4" />
+                        {type.label}
+                        {hasElements && (
+                          <Badge variant="secondary" className="ml-1 text-xs">
+                            {elementConfigs[selectedPlatform]?.[selectedOffice]?.[type.id]?.length || 0}
+                          </Badge>
+                        )}
+                      </Button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Current Selection Summary */}
+              <div className="p-3 bg-muted/50 rounded-lg">
+                <div className="flex items-center gap-2 text-sm">
+                  <Icon name={platforms.find(p => p.id === selectedPlatform)?.icon || "mdi:domain"} className="h-4 w-4" />
+                  <span className="font-medium">{platforms.find(p => p.id === selectedPlatform)?.label}</span>
+                  <Icon name="mdi:chevron-right" className="h-4 w-4 text-muted-foreground" />
+                  <span>{officeTypes.find(o => o.id === selectedOffice)?.label}</span>
+                  <Icon name="mdi:chevron-right" className="h-4 w-4 text-muted-foreground" />
+                  <span>{targetTypes.find(t => t.id === selectedTargetType)?.label}</span>
+                </div>
+              </div>
+
+              {/* Step 4: Elements List */}
+              <div>
+                <Label className="mb-3 block text-sm font-medium">
+                  <span className="inline-flex items-center gap-2">
+                    <Badge variant="outline" className="rounded-full h-5 w-5 p-0 justify-center">4</Badge>
+                    Éléments à configurer ({currentElements.length})
+                  </span>
+                </Label>
+                <div className="grid gap-3">
+                  {currentElements.map(config => {
+                    const currentIcon = sectionIcons[config.id] || { 
+                      icon: config.defaultIcon, 
+                      color: platforms.find(p => p.id === selectedPlatform)?.color || '#3b82f6',
+                      library: 'mdi'
+                    };
+                    return (
+                      <Card key={config.id} className={selectedSection === config.id ? "ring-2 ring-primary" : ""}>
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4">
+                              <div 
+                                className="w-12 h-12 rounded-lg border flex items-center justify-center"
+                                style={{ color: currentIcon.color }}
+                              >
+                                <Icon name={currentIcon.icon} className="w-6 h-6" />
+                              </div>
+                              <div>
+                                <p className="font-medium">{config.label}</p>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <code className="bg-muted px-1.5 py-0.5 rounded text-xs">{currentIcon.icon}</code>
+                                  {currentIcon.library && (
+                                    <Badge variant="secondary" className="text-xs">
+                                      {iconLibraries[currentIcon.library as keyof typeof iconLibraries]?.name || currentIcon.library}
+                                    </Badge>
+                                  )}
+                                </div>
                               </div>
                             </div>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <div className="flex items-center gap-2">
-                              <Label className="text-sm">Couleur</Label>
-                              <Input
-                                type="color"
-                                value={currentIcon.color || '#C9A227'}
-                                onChange={(e) => updateSectionIconColor(config.id, e.target.value)}
-                                className="w-10 h-10 p-1 cursor-pointer"
-                              />
-                            </div>
-                            <Button 
-                              variant={selectedSection === config.id ? "default" : "outline"}
-                              size="sm"
-                              onClick={() => setSelectedSection(selectedSection === config.id ? null : config.id)}
-                            >
-                              {selectedSection === config.id ? "Fermer" : "Changer"}
-                            </Button>
-                          </div>
-                        </div>
-
-                        {/* Icon Selector */}
-                        {selectedSection === config.id && (
-                          <div className="mt-4 pt-4 border-t">
-                            <div className="mb-4">
-                              <div className="relative">
-                                <Icon name="mdi:magnify" className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-2">
+                                <Label className="text-sm">Couleur</Label>
                                 <Input
-                                  placeholder={`Rechercher dans ${currentLibrary?.name || 'la bibliothèque'}...`}
-                                  value={searchQuery}
-                                  onChange={(e) => setSearchQuery(e.target.value)}
-                                  className="pl-10"
+                                  type="color"
+                                  value={currentIcon.color || '#C9A227'}
+                                  onChange={(e) => updateSectionIconColor(config.id, e.target.value)}
+                                  className="w-10 h-10 p-1 cursor-pointer"
                                 />
                               </div>
+                              <Button 
+                                variant={selectedSection === config.id ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => setSelectedSection(selectedSection === config.id ? null : config.id)}
+                              >
+                                {selectedSection === config.id ? "Fermer" : "Changer"}
+                              </Button>
                             </div>
-
-                            <ScrollArea className="h-[300px]">
-                              <Accordion type="multiple" defaultValue={Object.keys(filteredLibrary).slice(0, 2)} className="space-y-2">
-                                {Object.entries(filteredLibrary).map(([category, icons]) => (
-                                  <AccordionItem key={category} value={category} className="border rounded-lg px-3">
-                                    <AccordionTrigger className="hover:no-underline py-2">
-                                      <span className="text-sm font-medium">{category}</span>
-                                      <Badge variant="outline" className="ml-2">{(icons as string[]).length}</Badge>
-                                    </AccordionTrigger>
-                                    <AccordionContent>
-                                      <div className="grid grid-cols-6 gap-2 py-2">
-                                        {(icons as string[]).map((iconName) => (
-                                          <button
-                                            key={iconName}
-                                            onClick={() => selectIconForSection(config.id, iconName)}
-                                            className={`p-3 rounded-lg border hover:bg-accent transition-colors flex flex-col items-center gap-1 ${
-                                              currentIcon.icon === iconName ? "bg-primary/10 border-primary" : ""
-                                            }`}
-                                            title={iconName}
-                                          >
-                                            <Icon name={iconName} className="h-5 w-5" style={{ color: currentIcon.color }} />
-                                            {currentIcon.icon === iconName && (
-                                              <Icon name="mdi:check" className="h-3 w-3 text-primary" />
-                                            )}
-                                          </button>
-                                        ))}
-                                      </div>
-                                    </AccordionContent>
-                                  </AccordionItem>
-                                ))}
-                              </Accordion>
-                            </ScrollArea>
                           </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  );
-                })}
 
-                {filteredSections.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground">
-                    <Icon name="mdi:information-outline" className="h-8 w-8 mx-auto mb-2" />
-                    <p>Aucun élément configuré pour ce type.</p>
-                    <p className="text-sm">Les icônes de sections sont actuellement disponibles.</p>
-                  </div>
-                )}
+                          {/* Icon Selector */}
+                          {selectedSection === config.id && (
+                            <div className="mt-4 pt-4 border-t">
+                              <div className="mb-4">
+                                <div className="relative">
+                                  <Icon name="mdi:magnify" className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                                  <Input
+                                    placeholder={`Rechercher dans ${currentLibrary?.name || 'la bibliothèque'}...`}
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    className="pl-10"
+                                  />
+                                </div>
+                              </div>
+
+                              <ScrollArea className="h-[300px]">
+                                <Accordion type="multiple" defaultValue={Object.keys(filteredLibrary).slice(0, 2)} className="space-y-2">
+                                  {Object.entries(filteredLibrary).map(([category, icons]) => (
+                                    <AccordionItem key={category} value={category} className="border rounded-lg px-3">
+                                      <AccordionTrigger className="hover:no-underline py-2">
+                                        <span className="text-sm font-medium">{category}</span>
+                                        <Badge variant="outline" className="ml-2">{(icons as string[]).length}</Badge>
+                                      </AccordionTrigger>
+                                      <AccordionContent>
+                                        <div className="grid grid-cols-6 gap-2 py-2">
+                                          {(icons as string[]).map((iconName) => (
+                                            <button
+                                              key={iconName}
+                                              onClick={() => selectIconForSection(config.id, iconName)}
+                                              className={`p-3 rounded-lg border hover:bg-accent transition-colors flex flex-col items-center gap-1 ${
+                                                currentIcon.icon === iconName ? "bg-primary/10 border-primary" : ""
+                                              }`}
+                                              title={iconName}
+                                            >
+                                              <Icon name={iconName} className="h-5 w-5" style={{ color: currentIcon.color }} />
+                                              {currentIcon.icon === iconName && (
+                                                <Icon name="mdi:check" className="h-3 w-3 text-primary" />
+                                              )}
+                                            </button>
+                                          ))}
+                                        </div>
+                                      </AccordionContent>
+                                    </AccordionItem>
+                                  ))}
+                                </Accordion>
+                              </ScrollArea>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+
+                  {currentElements.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
+                      <Icon name="mdi:information-outline" className="h-8 w-8 mx-auto mb-2" />
+                      <p>Aucun élément configuré pour cette sélection.</p>
+                      <p className="text-sm mt-1">Essayez de changer le type d'élément ou la plateforme.</p>
+                    </div>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
