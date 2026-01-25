@@ -11,15 +11,32 @@ import { Badge } from "@/components/ui/badge";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Icon } from "@/components/ui/icon";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Download, Upload, Check, Library, Layers, Settings2, FileJson } from "lucide-react";
+import { Download, Upload, Check, Library, Layers, Settings2, FileJson, ExternalLink, Package, CheckCircle, AlertCircle } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 
-// Available icon libraries
-const iconLibraries = {
+// Icon library registry with installation status tracking
+interface IconLibraryDefinition {
+  id: string;
+  name: string;
+  prefix: string;
+  description: string;
+  iconCount: number;
+  website: string;
+  cdnUrl?: string;
+  isBuiltIn: boolean;
+  categories: Record<string, string[]>;
+}
+
+// Built-in icon libraries (always available)
+const builtInLibraries: Record<string, IconLibraryDefinition> = {
   mdi: {
     id: "mdi",
     name: "Material Design Icons",
     prefix: "mdi:",
-    description: "7000+ icônes Material Design",
+    description: "7000+ icônes Material Design - Préinstallée",
+    iconCount: 7000,
+    website: "https://pictogrammers.com/library/mdi/",
+    isBuiltIn: true,
     categories: {
       "Bibliothèque & Documents": [
         "mdi:library",
@@ -203,11 +220,19 @@ const iconLibraries = {
       ],
     }
   },
+};
+
+// Downloadable icon libraries
+const downloadableLibraries: Record<string, Omit<IconLibraryDefinition, 'categories'> & { categories?: Record<string, string[]> }> = {
   lucide: {
     id: "lucide",
     name: "Lucide Icons",
     prefix: "lucide:",
-    description: "1000+ icônes minimalistes",
+    description: "1000+ icônes open source élégantes et cohérentes",
+    iconCount: 1000,
+    website: "https://lucide.dev/",
+    cdnUrl: "https://api.iconify.design/lucide.json",
+    isBuiltIn: false,
     categories: {
       "Documents": [
         "lucide:file",
@@ -218,6 +243,10 @@ const iconLibraries = {
         "lucide:library",
         "lucide:newspaper",
         "lucide:scroll",
+        "lucide:file-plus",
+        "lucide:folder-open",
+        "lucide:archive",
+        "lucide:clipboard",
       ],
       "Interface": [
         "lucide:home",
@@ -228,6 +257,12 @@ const iconLibraries = {
         "lucide:minus",
         "lucide:x",
         "lucide:check",
+        "lucide:chevron-left",
+        "lucide:chevron-right",
+        "lucide:arrow-left",
+        "lucide:arrow-right",
+        "lucide:layout-grid",
+        "lucide:layout-list",
       ],
       "Médias": [
         "lucide:image",
@@ -236,6 +271,9 @@ const iconLibraries = {
         "lucide:music",
         "lucide:play",
         "lucide:pause",
+        "lucide:volume-2",
+        "lucide:mic",
+        "lucide:headphones",
       ],
       "Utilisateurs": [
         "lucide:user",
@@ -244,35 +282,245 @@ const iconLibraries = {
         "lucide:shield",
         "lucide:lock",
         "lucide:key",
+        "lucide:log-in",
+        "lucide:log-out",
+      ],
+      "Communication": [
+        "lucide:mail",
+        "lucide:message-circle",
+        "lucide:phone",
+        "lucide:bell",
+        "lucide:send",
+        "lucide:at-sign",
+      ],
+      "Graphiques": [
+        "lucide:bar-chart",
+        "lucide:line-chart",
+        "lucide:pie-chart",
+        "lucide:trending-up",
+        "lucide:trending-down",
+        "lucide:activity",
       ],
     }
   },
   fontawesome: {
     id: "fontawesome",
     name: "Font Awesome",
-    prefix: "fa:",
-    description: "2000+ icônes populaires",
+    prefix: "fa6-solid:",
+    description: "2000+ icônes populaires - Standard du web",
+    iconCount: 2000,
+    website: "https://fontawesome.com/",
+    cdnUrl: "https://api.iconify.design/fa6-solid.json",
+    isBuiltIn: false,
     categories: {
       "Solides": [
-        "fa:house",
-        "fa:book",
-        "fa:file",
-        "fa:folder",
-        "fa:user",
-        "fa:gear",
-        "fa:magnifying-glass",
-        "fa:bell",
+        "fa6-solid:house",
+        "fa6-solid:book",
+        "fa6-solid:file",
+        "fa6-solid:folder",
+        "fa6-solid:user",
+        "fa6-solid:gear",
+        "fa6-solid:magnifying-glass",
+        "fa6-solid:bell",
+        "fa6-solid:envelope",
+        "fa6-solid:heart",
+        "fa6-solid:star",
+        "fa6-solid:download",
+        "fa6-solid:upload",
+        "fa6-solid:check",
+        "fa6-solid:xmark",
+        "fa6-solid:plus",
+        "fa6-solid:minus",
       ],
-      "Marques": [
-        "fa:facebook",
-        "fa:twitter",
-        "fa:instagram",
-        "fa:youtube",
-        "fa:linkedin",
-        "fa:github",
+      "Flèches": [
+        "fa6-solid:arrow-left",
+        "fa6-solid:arrow-right",
+        "fa6-solid:arrow-up",
+        "fa6-solid:arrow-down",
+        "fa6-solid:chevron-left",
+        "fa6-solid:chevron-right",
+        "fa6-solid:angles-left",
+        "fa6-solid:angles-right",
+      ],
+      "Business": [
+        "fa6-solid:chart-line",
+        "fa6-solid:chart-bar",
+        "fa6-solid:chart-pie",
+        "fa6-solid:building",
+        "fa6-solid:briefcase",
+        "fa6-solid:dollar-sign",
+        "fa6-solid:credit-card",
+      ],
+      "Médias": [
+        "fa6-solid:image",
+        "fa6-solid:video",
+        "fa6-solid:camera",
+        "fa6-solid:music",
+        "fa6-solid:play",
+        "fa6-solid:pause",
+        "fa6-solid:volume-high",
       ],
     }
-  }
+  },
+  tabler: {
+    id: "tabler",
+    name: "Tabler Icons",
+    prefix: "tabler:",
+    description: "4000+ icônes SVG gratuites pour vos projets web",
+    iconCount: 4000,
+    website: "https://tabler-icons.io/",
+    cdnUrl: "https://api.iconify.design/tabler.json",
+    isBuiltIn: false,
+    categories: {
+      "Interface": [
+        "tabler:home",
+        "tabler:menu-2",
+        "tabler:search",
+        "tabler:settings",
+        "tabler:plus",
+        "tabler:minus",
+        "tabler:x",
+        "tabler:check",
+        "tabler:dots",
+        "tabler:layout-dashboard",
+      ],
+      "Documents": [
+        "tabler:file",
+        "tabler:file-text",
+        "tabler:folder",
+        "tabler:book",
+        "tabler:book-2",
+        "tabler:notebook",
+        "tabler:clipboard",
+      ],
+      "Utilisateurs": [
+        "tabler:user",
+        "tabler:users",
+        "tabler:user-plus",
+        "tabler:shield",
+        "tabler:lock",
+        "tabler:key",
+      ],
+    }
+  },
+  heroicons: {
+    id: "heroicons",
+    name: "Heroicons",
+    prefix: "heroicons:",
+    description: "Icônes SVG par les créateurs de Tailwind CSS",
+    iconCount: 450,
+    website: "https://heroicons.com/",
+    cdnUrl: "https://api.iconify.design/heroicons.json",
+    isBuiltIn: false,
+    categories: {
+      "Interface": [
+        "heroicons:home",
+        "heroicons:bars-3",
+        "heroicons:magnifying-glass",
+        "heroicons:cog-6-tooth",
+        "heroicons:plus",
+        "heroicons:minus",
+        "heroicons:x-mark",
+        "heroicons:check",
+      ],
+      "Actions": [
+        "heroicons:arrow-down-tray",
+        "heroicons:arrow-up-tray",
+        "heroicons:pencil",
+        "heroicons:trash",
+        "heroicons:eye",
+        "heroicons:eye-slash",
+      ],
+    }
+  },
+  phosphor: {
+    id: "phosphor",
+    name: "Phosphor Icons",
+    prefix: "ph:",
+    description: "Icônes flexibles pour interfaces, diagrammes et présentations",
+    iconCount: 1200,
+    website: "https://phosphoricons.com/",
+    cdnUrl: "https://api.iconify.design/ph.json",
+    isBuiltIn: false,
+    categories: {
+      "Interface": [
+        "ph:house",
+        "ph:list",
+        "ph:magnifying-glass",
+        "ph:gear",
+        "ph:plus",
+        "ph:minus",
+        "ph:x",
+        "ph:check",
+      ],
+      "Documents": [
+        "ph:file",
+        "ph:file-text",
+        "ph:folder",
+        "ph:book",
+        "ph:book-open",
+        "ph:notebook",
+      ],
+    }
+  },
+  remix: {
+    id: "remix",
+    name: "Remix Icons",
+    prefix: "ri:",
+    description: "2000+ icônes open source système et stylisées",
+    iconCount: 2000,
+    website: "https://remixicon.com/",
+    cdnUrl: "https://api.iconify.design/ri.json",
+    isBuiltIn: false,
+    categories: {
+      "Interface": [
+        "ri:home-line",
+        "ri:menu-line",
+        "ri:search-line",
+        "ri:settings-line",
+        "ri:add-line",
+        "ri:subtract-line",
+        "ri:close-line",
+        "ri:check-line",
+      ],
+      "Documents": [
+        "ri:file-line",
+        "ri:file-text-line",
+        "ri:folder-line",
+        "ri:book-line",
+        "ri:book-open-line",
+      ],
+    }
+  },
+  bootstrap: {
+    id: "bootstrap",
+    name: "Bootstrap Icons",
+    prefix: "bi:",
+    description: "1800+ icônes officielle de Bootstrap",
+    iconCount: 1800,
+    website: "https://icons.getbootstrap.com/",
+    cdnUrl: "https://api.iconify.design/bi.json",
+    isBuiltIn: false,
+    categories: {
+      "Interface": [
+        "bi:house",
+        "bi:list",
+        "bi:search",
+        "bi:gear",
+        "bi:plus",
+        "bi:dash",
+        "bi:x",
+        "bi:check",
+      ],
+      "Documents": [
+        "bi:file-earmark",
+        "bi:file-earmark-text",
+        "bi:folder",
+        "bi:book",
+        "bi:journal",
+      ],
+    }
+  },
 };
 
 // Platform/Portal definitions
@@ -558,7 +806,23 @@ interface SectionIcons {
 interface IconLibraryConfig {
   activeLibrary: string;
   customIcons: Array<{ name: string; icon: string; category: string }>;
+  installedLibraries: string[]; // IDs of installed downloadable libraries
 }
+
+// Combine built-in and downloadable libraries for active use
+const getAllAvailableLibraries = (installedLibraries: string[]): Record<string, IconLibraryDefinition> => {
+  const libs: Record<string, IconLibraryDefinition> = { ...builtInLibraries };
+  installedLibraries.forEach(libId => {
+    const downloadable = downloadableLibraries[libId];
+    if (downloadable) {
+      libs[libId] = {
+        ...downloadable,
+        categories: downloadable.categories || {}
+      } as IconLibraryDefinition;
+    }
+  });
+  return libs;
+};
 
 interface CmsSectionIconsManagerProps {
   platform: 'portal' | 'bn';
@@ -577,10 +841,16 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
   const [activeLibrary, setActiveLibrary] = useState<string>("mdi");
   const [sectionIcons, setSectionIcons] = useState<SectionIcons>({});
   const [customIcons, setCustomIcons] = useState<Array<{ name: string; icon: string; category: string }>>([]);
+  const [installedLibraries, setInstalledLibraries] = useState<string[]>([]);
+  const [downloadingLibrary, setDownloadingLibrary] = useState<string | null>(null);
+  const [downloadProgress, setDownloadProgress] = useState(0);
 
   const keyPrefix = platform === 'bn' ? 'bn_' : '';
   const sectionIconsKey = `${keyPrefix}section_icons`;
   const libraryConfigKey = `${keyPrefix}icon_library_config`;
+
+  // Get all available libraries (built-in + installed)
+  const iconLibraries = getAllAvailableLibraries(installedLibraries);
 
   // Get current elements based on selections
   const getCurrentElements = () => {
@@ -638,18 +908,67 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
         const config = configRes.data.setting_value as unknown as IconLibraryConfig;
         setActiveLibrary(config.activeLibrary || 'mdi');
         setCustomIcons(config.customIcons || []);
+        setInstalledLibraries(config.installedLibraries || []);
       }
       
       return { icons: iconsRes.data, config: configRes.data };
     }
   });
 
+  // Install/download a library
+  const handleInstallLibrary = async (libraryId: string) => {
+    if (installedLibraries.includes(libraryId)) {
+      toast({ title: "Bibliothèque déjà installée" });
+      return;
+    }
+
+    setDownloadingLibrary(libraryId);
+    setDownloadProgress(0);
+
+    // Simulate download progress (in reality, icons are loaded via Iconify CDN on-demand)
+    const progressInterval = setInterval(() => {
+      setDownloadProgress(prev => {
+        if (prev >= 90) {
+          clearInterval(progressInterval);
+          return 90;
+        }
+        return prev + 10;
+      });
+    }, 150);
+
+    // Add library to installed list
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    clearInterval(progressInterval);
+    setDownloadProgress(100);
+
+    setInstalledLibraries(prev => [...prev, libraryId]);
+    
+    setTimeout(() => {
+      setDownloadingLibrary(null);
+      setDownloadProgress(0);
+      toast({ 
+        title: "Bibliothèque installée", 
+        description: `${downloadableLibraries[libraryId]?.name} est maintenant disponible` 
+      });
+    }, 300);
+  };
+
+  // Uninstall a library
+  const handleUninstallLibrary = (libraryId: string) => {
+    setInstalledLibraries(prev => prev.filter(id => id !== libraryId));
+    if (activeLibrary === libraryId) {
+      setActiveLibrary('mdi');
+    }
+    toast({ title: "Bibliothèque désinstallée" });
+  };
+
   // Save mutation
   const saveMutation = useMutation({
     mutationFn: async () => {
       const libraryConfig: IconLibraryConfig = {
         activeLibrary,
-        customIcons
+        customIcons,
+        installedLibraries
       };
       
       await Promise.all([
@@ -838,54 +1157,175 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
         </TabsList>
 
         {/* Library Selection Tab */}
-        <TabsContent value="library" className="mt-4 space-y-4">
+        <TabsContent value="library" className="mt-4 space-y-6">
+          {/* Built-in Library */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Choisir une bibliothèque d'icônes</CardTitle>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Package className="h-5 w-5 text-green-600" />
+                Bibliothèque préinstallée
+              </CardTitle>
               <CardDescription>
-                Sélectionnez la bibliothèque d'icônes à utiliser pour le {platform === 'bn' ? 'portail BN' : 'portail BNRM'}
+                Bibliothèque disponible par défaut
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-3">
-                {Object.values(iconLibraries).map((lib) => (
-                  <Card 
-                    key={lib.id}
-                    className={`cursor-pointer transition-all hover:shadow-md ${
-                      activeLibrary === lib.id ? 'ring-2 ring-primary bg-primary/5' : ''
-                    }`}
-                    onClick={() => setActiveLibrary(lib.id)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 rounded-lg bg-muted flex items-center justify-center">
-                            <Icon name={`${lib.prefix}star-outline`} className="h-6 w-6" />
-                          </div>
-                          <div>
-                            <p className="font-medium">{lib.name}</p>
-                            <p className="text-sm text-muted-foreground">{lib.description}</p>
+              <Card 
+                className={`cursor-pointer transition-all hover:shadow-md ${
+                  activeLibrary === 'mdi' ? 'ring-2 ring-primary bg-primary/5' : ''
+                }`}
+                onClick={() => setActiveLibrary('mdi')}
+              >
+                <CardContent className="p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center">
+                        <Icon name="mdi:material-design" className="h-6 w-6 text-green-700" />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium">{builtInLibraries.mdi.name}</p>
+                          <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Installée
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{builtInLibraries.mdi.description}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{builtInLibraries.mdi.iconCount.toLocaleString()}+ icônes</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {activeLibrary === 'mdi' && (
+                        <Badge className="bg-primary">Active</Badge>
+                      )}
+                      <Button 
+                        variant="ghost" 
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.open(builtInLibraries.mdi.website, '_blank');
+                        }}
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </CardContent>
+          </Card>
+
+          {/* Downloadable Libraries */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Download className="h-5 w-5 text-blue-600" />
+                Bibliothèques disponibles au téléchargement
+              </CardTitle>
+              <CardDescription>
+                Téléchargez des bibliothèques d'icônes supplémentaires (via Iconify CDN)
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 md:grid-cols-2">
+                {Object.values(downloadableLibraries).map((lib) => {
+                  const isInstalled = installedLibraries.includes(lib.id);
+                  const isDownloading = downloadingLibrary === lib.id;
+                  const isActive = activeLibrary === lib.id;
+                  
+                  return (
+                    <Card 
+                      key={lib.id}
+                      className={`transition-all ${
+                        isActive ? 'ring-2 ring-primary bg-primary/5' : ''
+                      } ${isInstalled ? 'cursor-pointer hover:shadow-md' : ''}`}
+                      onClick={() => isInstalled && setActiveLibrary(lib.id)}
+                    >
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+                              isInstalled ? 'bg-blue-100' : 'bg-muted'
+                            }`}>
+                              <Icon name={`${lib.prefix}home`} className={`h-6 w-6 ${
+                                isInstalled ? 'text-blue-700' : 'text-muted-foreground'
+                              }`} />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <p className="font-medium">{lib.name}</p>
+                                {isInstalled && (
+                                  <Badge variant="secondary" className="text-xs bg-green-100 text-green-700">
+                                    <CheckCircle className="h-3 w-3 mr-1" />
+                                    Installée
+                                  </Badge>
+                                )}
+                                {isActive && (
+                                  <Badge className="bg-primary text-xs">Active</Badge>
+                                )}
+                              </div>
+                              <p className="text-sm text-muted-foreground">{lib.description}</p>
+                              <p className="text-xs text-muted-foreground mt-1">{lib.iconCount.toLocaleString()}+ icônes</p>
+                            </div>
                           </div>
                         </div>
-                        {activeLibrary === lib.id && (
-                          <Check className="h-5 w-5 text-primary" />
+
+                        {isDownloading && (
+                          <div className="mt-3">
+                            <Progress value={downloadProgress} className="h-2" />
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Téléchargement en cours... {downloadProgress}%
+                            </p>
+                          </div>
                         )}
-                      </div>
-                      <div className="mt-3 flex flex-wrap gap-1">
-                        {Object.keys(lib.categories).slice(0, 3).map(cat => (
-                          <Badge key={cat} variant="secondary" className="text-xs">
-                            {cat}
-                          </Badge>
-                        ))}
-                        {Object.keys(lib.categories).length > 3 && (
-                          <Badge variant="outline" className="text-xs">
-                            +{Object.keys(lib.categories).length - 3}
-                          </Badge>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+
+                        <div className="mt-3 flex items-center gap-2">
+                          {!isInstalled ? (
+                            <Button 
+                              size="sm" 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleInstallLibrary(lib.id);
+                              }}
+                              disabled={isDownloading}
+                              className="flex-1"
+                            >
+                              {isDownloading ? (
+                                <Icon name="mdi:loading" className="h-4 w-4 animate-spin mr-2" />
+                              ) : (
+                                <Download className="h-4 w-4 mr-2" />
+                              )}
+                              Télécharger
+                            </Button>
+                          ) : (
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleUninstallLibrary(lib.id);
+                              }}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Icon name="mdi:delete-outline" className="h-4 w-4 mr-2" />
+                              Désinstaller
+                            </Button>
+                          )}
+                          <Button 
+                            variant="ghost" 
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              window.open(lib.website, '_blank');
+                            }}
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             </CardContent>
           </Card>
@@ -898,7 +1338,7 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
                 Icônes personnalisées
               </CardTitle>
               <CardDescription>
-                Importez vos propres icônes ou configurez des icônes additionnelles
+                Importez vos propres icônes via un fichier JSON
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -911,6 +1351,9 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
                   <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
                     Parcourir les fichiers
                   </Button>
+                  <p className="text-xs text-muted-foreground mt-3">
+                    Format: {"{"}"icons": [{"{"}"name": "...", "icon": "prefix:name", "category": "..."{"}"}]{"}"} 
+                  </p>
                 </div>
                 
                 {customIcons.length > 0 && (
@@ -926,6 +1369,32 @@ export default function CmsSectionIconsManager({ platform }: CmsSectionIconsMana
                     </div>
                   </div>
                 )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Summary */}
+          <Card className="bg-muted/30">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-green-600" />
+                    <span className="text-sm">
+                      <strong>{1 + installedLibraries.length}</strong> bibliothèque(s) installée(s)
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Package className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">
+                      {Object.keys(downloadableLibraries).length - installedLibraries.length} disponible(s) au téléchargement
+                    </span>
+                  </div>
+                </div>
+                <Badge variant="outline" className="flex items-center gap-1">
+                  <Icon name={iconLibraries[activeLibrary]?.prefix + 'star-outline' || 'mdi:star-outline'} className="h-3 w-3" />
+                  Active: {iconLibraries[activeLibrary]?.name || 'Material Design Icons'}
+                </Badge>
               </div>
             </CardContent>
           </Card>
