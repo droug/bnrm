@@ -180,12 +180,22 @@ const Header = () => {
       title: { fr: "Mécénat", ar: "الرعاية" },
       items: [
         {
+          title: { fr: "Nos donateurs", ar: "متبرعونا" },
+          desc: { fr: "Découvrez nos mécènes et leurs œuvres", ar: "اكتشف المتبرعين وأعمالهم" },
+          href: "/donateurs"
+        },
+        {
           title: { fr: "Offrir des collections", ar: "تقديم مجموعات" },
           desc: { fr: "Enrichir le fonds documentaire de la bibliothéque", ar: "إغناء الرصيد الوثائقي للمكتبة" },
           href: "/offrir-collections"
         },
         {
-          title: { fr: "Dons", ar: "التبرعات" },
+          title: { fr: "Mon espace donateur", ar: "فضائي كمتبرع" },
+          desc: { fr: "Accédez à votre historique et propositions", ar: "الوصول إلى تاريخك ومقترحاتك" },
+          href: "/mon-espace-donateur"
+        },
+        {
+          title: { fr: "Dons financiers", ar: "التبرعات المالية" },
           desc: { fr: "Soutenez la bibliothèque par vos dons", ar: "ادعم المكتبة بتبرعاتك" },
           href: "/donation"
         }
