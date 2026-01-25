@@ -1,11 +1,9 @@
 import { useEffect } from "react";
-import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { useToast } from "@/hooks/use-toast";
+import { AdminPageWrapper } from "@/components/digital-library/admin/AdminPageWrapper";
 import { PortalAnalyticsKPICard } from "@/components/dashboard/PortalAnalyticsKPICard";
 
 export default function AdminDashboard() {
@@ -32,13 +30,15 @@ export default function AdminDashboard() {
 
   if (!user || rolesLoading) {
     return (
-      <DigitalLibraryLayout>
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center min-h-[400px]">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        </div>
-      </DigitalLibraryLayout>
+      <AdminPageWrapper
+        title="Tableau de bord"
+        description="Vue d'ensemble et KPIs"
+        icon="mdi:view-dashboard-outline"
+        iconColor="text-blue-600"
+        loading={true}
+      >
+        <div />
+      </AdminPageWrapper>
     );
   }
 
@@ -47,30 +47,13 @@ export default function AdminDashboard() {
   }
 
   return (
-    <DigitalLibraryLayout>
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              onClick={() => navigate("/admin/digital-library")}
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Retour
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold">Statistiques - Bibliothèque Numérique</h1>
-              <p className="text-muted-foreground">
-                Analyse détaillée de l'utilisation de la Bibliothèque Numérique
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Analytics - Bibliothèque tab only */}
-        <PortalAnalyticsKPICard platform="bn" showOnlyTab="digital-library" />
-      </div>
-    </DigitalLibraryLayout>
+    <AdminPageWrapper
+      title="Tableau de bord"
+      description="Vue d'ensemble des statistiques et indicateurs clés de la Bibliothèque Numérique"
+      icon="mdi:view-dashboard-outline"
+      iconColor="text-blue-600"
+    >
+      <PortalAnalyticsKPICard platform="bn" showOnlyTab="digital-library" />
+    </AdminPageWrapper>
   );
 }

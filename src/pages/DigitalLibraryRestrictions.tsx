@@ -1,10 +1,9 @@
 import { useAuth } from "@/hooks/useAuth";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
-import { Navigate, useNavigate } from "react-router-dom";
-import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
+import { Navigate } from "react-router-dom";
+import { AdminPageWrapper, AdminSectionCard } from "@/components/digital-library/admin/AdminPageWrapper";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Ban, Plus, Trash2 } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Icon } from "@iconify/react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -20,7 +19,6 @@ import { useState } from "react";
 export default function DigitalLibraryRestrictions() {
   const { user, profile } = useAuth();
   const { isAdmin, isLibrarian, loading: rolesLoading } = useSecureRoles();
-  const navigate = useNavigate();
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -104,7 +102,6 @@ export default function DigitalLibraryRestrictions() {
     }
   });
 
-  // Delete restriction mutation
   const deleteRestrictionMutation = useMutation({
     mutationFn: async (id: string) => {
       const { error } = await supabase
@@ -129,179 +126,180 @@ export default function DigitalLibraryRestrictions() {
 
   // Conditional returns AFTER all hooks
   if (rolesLoading) {
-    return <div className="min-h-screen flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div></div>;
+    return (
+      <AdminPageWrapper
+        title="Restrictions de téléchargement"
+        description="Gérer les restrictions d'accès"
+        icon="mdi:download-off"
+        iconColor="text-red-600"
+        loading={true}
+      >
+        <div />
+      </AdminPageWrapper>
+    );
   }
 
   if (!user || (!isAdmin && !isLibrarian)) {
     return <Navigate to="/" replace />;
   }
 
-  return (
-    <DigitalLibraryLayout>
-      <div className="container mx-auto p-6">
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/admin/digital-library")}
-          className="mb-4"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Retour
+  const AddButton = (
+    <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+      <DialogTrigger asChild>
+        <Button className="bg-bn-blue-primary hover:bg-bn-blue-dark gap-2">
+          <Icon icon="mdi:plus" className="h-4 w-4" />
+          Ajouter une restriction
         </Button>
-
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-3 rounded-lg bg-gradient-to-br from-red-500 to-red-600">
-                  <Ban className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <CardTitle className="text-2xl">Restrictions de téléchargement</CardTitle>
-                  <CardDescription>
-                    Gérer les restrictions d'accès pour les utilisateurs en cas d'abus
-                  </CardDescription>
-                </div>
-              </div>
-              <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-                <DialogTrigger asChild>
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Ajouter une restriction
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Ajouter une restriction</DialogTitle>
-                    <DialogDescription>
-                      Restreindre l'accès au téléchargement pour un utilisateur
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="user">Utilisateur</Label>
-                      <Select value={selectedUserId} onValueChange={setSelectedUserId}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Sélectionner un utilisateur" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {users?.map((user) => (
-                            <SelectItem key={user.id} value={user.id}>
-                              {user.first_name} {user.last_name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="type">Type de restriction</Label>
-                      <Select value={restrictionType} onValueChange={setRestrictionType}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="temporary">Temporaire</SelectItem>
-                          <SelectItem value="permanent">Permanente</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    {restrictionType === 'temporary' && (
-                      <div>
-                        <Label htmlFor="expires">Date d'expiration</Label>
-                        <Input
-                          id="expires"
-                          type="datetime-local"
-                          value={expiresAt}
-                          onChange={(e) => setExpiresAt(e.target.value)}
-                        />
-                      </div>
-                    )}
-                    <div>
-                      <Label htmlFor="reason">Raison</Label>
-                      <Textarea
-                        id="reason"
-                        value={reason}
-                        onChange={(e) => setReason(e.target.value)}
-                        placeholder="Décrire la raison de la restriction..."
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-                      Annuler
-                    </Button>
-                    <Button 
-                      onClick={() => addRestrictionMutation.mutate()}
-                      disabled={!selectedUserId || !reason}
-                    >
-                      Ajouter
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+      </DialogTrigger>
+      <DialogContent className="z-[10001]">
+        <DialogHeader>
+          <DialogTitle>Ajouter une restriction</DialogTitle>
+          <DialogDescription>
+            Restreindre l'accès au téléchargement pour un utilisateur
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="user">Utilisateur</Label>
+            <Select value={selectedUserId} onValueChange={setSelectedUserId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionner un utilisateur" />
+              </SelectTrigger>
+              <SelectContent className="z-[10100]">
+                {users?.map((u) => (
+                  <SelectItem key={u.id} value={u.id}>
+                    {u.first_name} {u.last_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor="type">Type de restriction</Label>
+            <Select value={restrictionType} onValueChange={setRestrictionType}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="z-[10100]">
+                <SelectItem value="temporary">Temporaire</SelectItem>
+                <SelectItem value="permanent">Permanente</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {restrictionType === 'temporary' && (
+            <div>
+              <Label htmlFor="expires">Date d'expiration</Label>
+              <Input
+                id="expires"
+                type="datetime-local"
+                value={expiresAt}
+                onChange={(e) => setExpiresAt(e.target.value)}
+              />
             </div>
-          </CardHeader>
-          <CardContent>
-            {isLoading ? (
-              <p>Chargement...</p>
-            ) : restrictions && restrictions.length > 0 ? (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Utilisateur</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Raison</TableHead>
-                    <TableHead>Date de création</TableHead>
-                    <TableHead>Expire le</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {restrictions.map((restriction) => (
-                    <TableRow key={restriction.id}>
-                      <TableCell>
-                        <div>
-                          <p className="font-medium">
-                            {restriction.user_profile?.first_name} {restriction.user_profile?.last_name}
-                          </p>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant={restriction.restriction_type === 'permanent' ? 'destructive' : 'secondary'}>
-                          {restriction.restriction_type === 'permanent' ? 'Permanente' : 'Temporaire'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="max-w-xs truncate">{restriction.reason}</TableCell>
-                      <TableCell>
-                        {new Date(restriction.created_at).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        {restriction.expires_at 
-                          ? new Date(restriction.expires_at).toLocaleDateString()
-                          : '-'
-                        }
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => deleteRestrictionMutation.mutate(restriction.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <Ban className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Aucune restriction de téléchargement</p>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </DigitalLibraryLayout>
+          )}
+          <div>
+            <Label htmlFor="reason">Raison</Label>
+            <Textarea
+              id="reason"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              placeholder="Décrire la raison de la restriction..."
+            />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setShowAddDialog(false)}>
+            Annuler
+          </Button>
+          <Button 
+            onClick={() => addRestrictionMutation.mutate()}
+            disabled={!selectedUserId || !reason}
+            className="bg-bn-blue-primary hover:bg-bn-blue-dark"
+          >
+            Ajouter
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+
+  return (
+    <AdminPageWrapper
+      title="Restrictions de téléchargement"
+      description="Gérer les restrictions d'accès pour les utilisateurs en cas d'abus"
+      icon="mdi:download-off"
+      iconColor="text-red-600"
+      actions={AddButton}
+    >
+      <AdminSectionCard
+        title="Utilisateurs restreints"
+        description="Liste des restrictions actives"
+        icon="mdi:account-off"
+        iconBgColor="bg-red-100 text-red-600"
+      >
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-bn-blue-primary"></div>
+          </div>
+        ) : restrictions && restrictions.length > 0 ? (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Utilisateur</TableHead>
+                <TableHead>Type</TableHead>
+                <TableHead>Raison</TableHead>
+                <TableHead>Date de création</TableHead>
+                <TableHead>Expire le</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {restrictions.map((restriction) => (
+                <TableRow key={restriction.id}>
+                  <TableCell>
+                    <div>
+                      <p className="font-medium">
+                        {restriction.user_profile?.first_name} {restriction.user_profile?.last_name}
+                      </p>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={restriction.restriction_type === 'permanent' ? 'destructive' : 'secondary'}>
+                      {restriction.restriction_type === 'permanent' ? 'Permanente' : 'Temporaire'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="max-w-xs truncate">{restriction.reason}</TableCell>
+                  <TableCell>
+                    {new Date(restriction.created_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    {restriction.expires_at 
+                      ? new Date(restriction.expires_at).toLocaleDateString()
+                      : '-'
+                    }
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => deleteRestrictionMutation.mutate(restriction.id)}
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                    >
+                      <Icon icon="mdi:trash-can" className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        ) : (
+          <div className="text-center py-12 text-muted-foreground">
+            <Icon icon="mdi:check-circle" className="h-12 w-12 mx-auto mb-4 opacity-40 text-green-500" />
+            <p>Aucune restriction de téléchargement</p>
+            <p className="text-sm mt-1">Tous les utilisateurs ont un accès normal</p>
+          </div>
+        )}
+      </AdminSectionCard>
+    </AdminPageWrapper>
   );
 }
