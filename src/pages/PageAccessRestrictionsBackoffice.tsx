@@ -20,6 +20,7 @@ export default function PageAccessRestrictionsBackoffice() {
         description="Gestion des restrictions par page"
         icon="mdi:lock-outline"
         iconColor="text-rose-600"
+        iconBgColor="bg-rose-500/10"
         loading={true}
       >
         <div />
@@ -37,6 +38,7 @@ export default function PageAccessRestrictionsBackoffice() {
       description="Gérez les restrictions d'accès par œuvre ou par lot pour protéger les contenus sensibles"
       icon="mdi:lock-outline"
       iconColor="text-rose-600"
+      iconBgColor="bg-rose-500/10"
     >
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
         <TabsList className="grid w-full max-w-md grid-cols-2 bg-muted/50">

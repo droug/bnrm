@@ -56,6 +56,7 @@ export default function DigitalLibraryCopyright() {
         description="Gestion des droits"
         icon="mdi:copyright"
         iconColor="text-orange-600"
+        iconBgColor="bg-orange-500/10"
         loading={true}
       >
         <div />
@@ -73,6 +74,7 @@ export default function DigitalLibraryCopyright() {
       description="Documents avec protection des droits d'auteur et dates d'expiration"
       icon="mdi:copyright"
       iconColor="text-orange-600"
+      iconBgColor="bg-orange-500/10"
     >
       {/* Alert for expiring documents */}
       {expiringDocs && expiringDocs.length > 0 && (

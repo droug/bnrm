@@ -39,6 +39,7 @@ export default function RequestsManagement() {
         description="Réservations et numérisations"
         icon="mdi:folder-open-outline"
         iconColor="text-emerald-600"
+        iconBgColor="bg-emerald-500/10"
         loading={true}
       >
         <div />
@@ -56,6 +57,7 @@ export default function RequestsManagement() {
       description="Gestion centralisée des demandes de réservation et de numérisation"
       icon="mdi:folder-open-outline"
       iconColor="text-emerald-600"
+      iconBgColor="bg-emerald-500/10"
     >
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-3 mb-6 bg-muted/50">

@@ -15,6 +15,7 @@ export default function DigitalLibraryBulkImport() {
         description="Import Excel/XML/OAI-PMH"
         icon="mdi:upload-outline"
         iconColor="text-amber-600"
+        iconBgColor="bg-amber-500/10"
         backPath="/admin/digital-library/documents"
         loading={true}
       >
@@ -33,6 +34,7 @@ export default function DigitalLibraryBulkImport() {
       description="Import en masse de documents via Excel, XML ou protocole OAI-PMH"
       icon="mdi:upload-outline"
       iconColor="text-amber-600"
+      iconBgColor="bg-amber-500/10"
       backPath="/admin/digital-library/documents"
     >
       <DigitalLibraryDocumentImporter 

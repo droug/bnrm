@@ -35,6 +35,7 @@ export default function AdminDashboard() {
         description="Vue d'ensemble et KPIs"
         icon="mdi:view-dashboard-outline"
         iconColor="text-blue-600"
+        iconBgColor="bg-blue-500/10"
         loading={true}
       >
         <div />
@@ -52,6 +53,7 @@ export default function AdminDashboard() {
       description="Vue d'ensemble des statistiques et indicateurs clés de la Bibliothèque Numérique"
       icon="mdi:view-dashboard-outline"
       iconColor="text-blue-600"
+      iconBgColor="bg-blue-500/10"
     >
       <PortalAnalyticsKPICard platform="bn" showOnlyTab="digital-library" />
     </AdminPageWrapper>
