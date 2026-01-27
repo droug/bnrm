@@ -291,9 +291,9 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
             </SimpleTooltip>
 
             <Link to="/digital-library/about">
-              <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" role="menuitem" aria-label={t('dl.about')}>
+              <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" role="menuitem" aria-label="À propos">
                 <Icon name="mdi:information-outline" className="h-4 w-4" />
-                {t('dl.about')}
+                À propos
               </Button>
             </Link>
 
