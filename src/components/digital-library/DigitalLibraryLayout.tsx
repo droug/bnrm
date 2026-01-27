@@ -99,11 +99,16 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   ];
 
   const themesSubmenu = [
-    { labelKey: "dl.themes.history", descKey: "Découvrez les documents historiques du Maroc", href: "/digital-library/themes/history", iconName: "mdi:history", count: "4,230" },
-    { labelKey: "dl.themes.arts", descKey: "Arts visuels, musique et patrimoine artistique", href: "/digital-library/themes/arts", iconName: "mdi:palette-outline", count: "2,890" },
-    { labelKey: "dl.themes.sciences", descKey: "Sciences exactes, naturelles et appliquées", href: "/digital-library/themes/sciences", iconName: "mdi:flask-outline", count: "1,560" },
-    { labelKey: "dl.themes.religion", descKey: "Textes religieux et études théologiques", href: "/digital-library/themes/religion", iconName: "mdi:mosque", count: "3,120" },
-    { labelKey: "dl.themes.literature", descKey: "Littérature marocaine et arabe classique", href: "/digital-library/themes/literature", iconName: "mdi:feather", count: "5,670" },
+    { label: "Informatique, information et ouvrages généraux", href: "/digital-library/themes/informatique", iconName: "mdi:laptop" },
+    { label: "Philosophie et psychologie", href: "/digital-library/themes/philosophie", iconName: "mdi:head-cog-outline" },
+    { label: "Religion", href: "/digital-library/themes/religion", iconName: "mdi:mosque" },
+    { label: "Sciences sociales", href: "/digital-library/themes/sciences-sociales", iconName: "mdi:account-group-outline" },
+    { label: "Langues et linguistique", href: "/digital-library/themes/langues", iconName: "mdi:translate" },
+    { label: "Sciences pures", href: "/digital-library/themes/sciences-pures", iconName: "mdi:flask-outline" },
+    { label: "Techniques et sciences appliquées", href: "/digital-library/themes/techniques", iconName: "mdi:cog-outline" },
+    { label: "Arts, loisirs et sports", href: "/digital-library/themes/arts", iconName: "mdi:palette-outline" },
+    { label: "Littérature", href: "/digital-library/themes/litterature", iconName: "mdi:feather" },
+    { label: "Géographie et histoire", href: "/digital-library/themes/geographie-histoire", iconName: "mdi:earth" },
   ];
 
   const userMenu = isAuthenticated ? [
@@ -476,28 +481,16 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   ];
                   
                   return (
-                    <FancyTooltip 
-                      key={item.href}
-                      content={t(item.labelKey)} 
-                      description={item.descKey}
-                      icon={item.iconName}
-                      side="right"
-                      variant="gold"
-                    >
-                      <Link to={item.href} className="block">
-                        <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group">
-                          <div className="flex items-center gap-3 flex-1">
-                            <div className="p-2 rounded-xl bg-gradient-to-br from-bn-blue/20 to-bn-blue/5 group-hover:from-bn-blue/30 group-hover:to-bn-blue/10 transition-all duration-200 group-hover:scale-110">
-                              <Icon name={item.iconName} className="h-5 w-5 text-bn-blue" />
-                            </div>
-                            <span className="font-semibold text-foreground group-hover:text-bn-blue transition-colors">{t(item.labelKey)}</span>
+                    <Link key={item.href} to={item.href} className="block">
+                      <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group">
+                        <div className="flex items-center gap-3 flex-1">
+                          <div className="p-2 rounded-xl bg-gradient-to-br from-bn-blue/20 to-bn-blue/5 group-hover:from-bn-blue/30 group-hover:to-bn-blue/10 transition-all duration-200 group-hover:scale-110">
+                            <Icon name={item.iconName} className="h-5 w-5 text-bn-blue" />
                           </div>
-                          <span className={`px-3 py-1 text-xs font-bold rounded-none transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-0 ${themeBadgeStyles[index % themeBadgeStyles.length]}`}>
-                            {item.count}
-                          </span>
-                        </DropdownMenuItem>
-                      </Link>
-                    </FancyTooltip>
+                          <span className="font-medium text-foreground group-hover:text-bn-blue transition-colors">{item.label}</span>
+                        </div>
+                      </DropdownMenuItem>
+                    </Link>
                   );
                 })}
               </DropdownMenuContent>
