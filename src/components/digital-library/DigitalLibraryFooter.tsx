@@ -67,10 +67,8 @@ const DigitalLibraryFooter = () => {
   ];
 
   const supportLinks = [
-    { title_fr: "FAQ", title_ar: "الأسئلة الشائعة", href: "/help" },
-    { title_fr: "Guide d'utilisation", title_ar: "دليل الاستخدام", href: "/help" },
-    { title_fr: "Demande de numérisation", title_ar: "طلب الرقمنة", href: "/digital-library" },
-    { title_fr: "Contact", title_ar: "اتصل بنا", href: "#contact" }
+    { title_fr: "Aide et FAQ", title_ar: "المساعدة والأسئلة الشائعة", href: "/digital-library/help" },
+    { title_fr: "Guide d'utilisation", title_ar: "دليل الاستخدام", href: "/digital-library/help#guide" }
   ];
 
   const servicesLinks = [
