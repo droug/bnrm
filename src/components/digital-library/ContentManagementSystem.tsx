@@ -14,6 +14,7 @@ import CmsHeroManagerBN from "@/components/cms/CmsHeroManagerBN";
 import CmsStyleManager from "@/components/cms/CmsStyleManager";
 import CmsVExpo360HeroManager from "@/components/cms/CmsVExpo360HeroManager";
 import CmsSectionIconsManager from "@/components/cms/CmsSectionIconsManager";
+import CmsAboutManagerBN from "@/components/cms/CmsAboutManagerBN";
 import FeaturedWorksManager from "@/components/admin/FeaturedWorksManager";
 import { Icon } from "@/components/ui/icon";
 import { 
@@ -188,6 +189,17 @@ const tabs = [
     gradient: "from-gray-500/20 to-gray-600/5",
     description: "Intégrations externes"
   },
+  { 
+    id: "about", 
+    label: "Page À propos", 
+    icon: null,
+    iconMdi: "mdi:information-outline",
+    color: "text-sky-500",
+    bgColor: "bg-sky-500/10",
+    borderColor: "border-sky-500/30",
+    gradient: "from-sky-500/20 to-sky-600/5",
+    description: "Mission, vision et valeurs de la BN"
+  },
 ];
 
 function StatCard({ 
@@ -349,6 +361,8 @@ export default function ContentManagementSystem() {
         return <CmsFooterManager />;
       case "webhooks":
         return <CmsWebhooksManager />;
+      case "about":
+        return <CmsAboutManagerBN />;
       default:
         return null;
     }
