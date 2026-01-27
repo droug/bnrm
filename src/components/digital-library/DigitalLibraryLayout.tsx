@@ -36,8 +36,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { ReservationRequestDialog } from "@/components/digital-library/ReservationRequestDialog";
-import { DigitizationRequestDialog } from "@/components/digital-library/DigitizationRequestDialog";
+import { ReproductionRequestDialog } from "@/components/digital-library/ReproductionRequestDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useElectronicBundles } from "@/hooks/useElectronicBundles";
 
@@ -51,8 +50,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   const { session, profile } = useAuth();
   
   const canManageLibrary = isLibrarian || profile?.role === 'admin' || profile?.role === 'librarian';
-  const [showReservationDialog, setShowReservationDialog] = useState(false);
-  const [showDigitizationDialog, setShowDigitizationDialog] = useState(false);
+  const [showReproductionDialog, setShowReproductionDialog] = useState(false);
   const [userProfile, setUserProfile] = useState<any>(null);
   const { activeBundles } = useElectronicBundles();
 
@@ -435,34 +433,18 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                     </Link>
                   </FancyTooltip>
                   <FancyTooltip 
-                    content={t('dl.reservationRequest')} 
-                    description="Réservez un document pour consultation sur place"
-                    icon="mdi:bookmark-check-outline"
+                    content="Demande de Reproduction" 
+                    description="Demandez une copie numérique ou papier d'un document patrimonial"
+                    icon="mdi:content-copy"
                     side="right"
                     variant="gold"
                   >
                     <div className="block">
-                      <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group" onClick={() => setShowReservationDialog(true)}>
-                        <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 group-hover:from-emerald-500/30 group-hover:to-emerald-500/10 transition-all duration-200 group-hover:scale-110">
-                          <Icon name="mdi:bookmark-check-outline" className="h-5 w-5 text-emerald-600" />
-                        </div>
-                        <span className="font-semibold text-foreground group-hover:text-emerald-600 transition-colors">{t('dl.reservationRequest')}</span>
-                      </DropdownMenuItem>
-                    </div>
-                  </FancyTooltip>
-                  <FancyTooltip 
-                    content={t('dl.digitizationRequest')} 
-                    description="Demandez la numérisation d'un document non disponible en ligne"
-                    icon="mdi:file-document-edit-outline"
-                    side="right"
-                    variant="gold"
-                  >
-                    <div className="block">
-                      <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group" onClick={() => setShowDigitizationDialog(true)}>
+                      <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group" onClick={() => setShowReproductionDialog(true)}>
                         <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-500/5 group-hover:from-purple-500/30 group-hover:to-purple-500/10 transition-all duration-200 group-hover:scale-110">
-                          <Icon name="mdi:file-document-edit-outline" className="h-5 w-5 text-purple-600" />
+                          <Icon name="mdi:content-copy" className="h-5 w-5 text-purple-600" />
                         </div>
-                        <span className="font-semibold text-foreground group-hover:text-purple-600 transition-colors">{t('dl.digitizationRequest')}</span>
+                        <span className="font-semibold text-foreground group-hover:text-purple-600 transition-colors">Demande de Reproduction</span>
                       </DropdownMenuItem>
                     </div>
                   </FancyTooltip>
@@ -517,18 +499,11 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
       {/* Outils globaux d'accessibilité et chatbot */}
       <GlobalAccessibilityTools />
 
-      {/* Dialogs de demandes */}
-      {showReservationDialog && userProfile && (
-        <ReservationRequestDialog
-          isOpen={showReservationDialog}
-          onClose={() => setShowReservationDialog(false)}
-          userProfile={userProfile}
-        />
-      )}
-      {showDigitizationDialog && userProfile && (
-        <DigitizationRequestDialog
-          isOpen={showDigitizationDialog}
-          onClose={() => setShowDigitizationDialog(false)}
+      {/* Dialog de demande de reproduction */}
+      {showReproductionDialog && userProfile && (
+        <ReproductionRequestDialog
+          isOpen={showReproductionDialog}
+          onClose={() => setShowReproductionDialog(false)}
           userProfile={userProfile}
         />
       )}
