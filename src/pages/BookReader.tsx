@@ -631,7 +631,7 @@ const BookReader = () => {
     size: "45.3 MB",
     hasAudio: true,
     audioDuration: "5h 23min",
-    permalink: window.location.href
+    permalink: `https://bnrm-dev.digiup.ma/digital-library/book-reader/${id}`
   };
 
   const chapters = [
