@@ -227,7 +227,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               
               {/* Bouton Connexion */}
               {!isAuthenticated && (
-                <Link to="/auth?redirect=/digital-library">
+                <Link to="/auth-BN">
                   <Button variant="outline" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-gold-bn-primary focus-visible:ring-offset-2" aria-label={t('dl.login')}>
                     <Icon name="mdi:login" className="h-4 w-4" />
                     <span className="hidden sm:inline">{t('dl.login')}</span>
