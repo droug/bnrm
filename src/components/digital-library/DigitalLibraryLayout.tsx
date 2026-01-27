@@ -29,6 +29,8 @@ const providerLogoMap: Record<string, string> = {
   'ifla': logoIfla,
   'eni-elearning': 'https://www.eni-elearning.com/wp-content/uploads/2021/12/belearn-formations-informatique_fr.svg',
   'eni': 'https://www.eni-elearning.com/wp-content/uploads/2021/12/belearn-formations-informatique_fr.svg',
+  'almanhal': 'https://assets.almanhal.com/website/ui/img/logo-default-white.png',
+  'al-manhal': 'https://assets.almanhal.com/website/ui/img/logo-default-white.png',
 };
 import {
   DropdownMenu,
