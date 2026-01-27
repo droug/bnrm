@@ -90,7 +90,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   const collectionsSubmenu = [
     { labelKey: "dl.collections.manuscripts", descKey: "dl.collections.manuscripts.desc", tooltipKey: "dl.collections.manuscripts.tooltip", href: "/digital-library/collections/manuscripts", iconName: "mdi:scroll-text-outline", count: "12,450" },
     { labelKey: "dl.collections.lithography", descKey: "dl.collections.lithography.desc", tooltipKey: "dl.collections.lithography.tooltip", href: "/digital-library/collections/lithography", iconName: "mdi:file-document-outline", count: "10,670" },
-    { labelKey: "dl.collections.books", descKey: "dl.collections.books.desc", tooltipKey: "dl.collections.books.tooltip", href: "/digital-library/collections/books", iconName: "mdi:book-outline", count: "35,000" },
+    { labelKey: "dl.collections.books", descKey: "Livres rares, Imprimés et E-Books", tooltipKey: "dl.collections.books.tooltip", href: "/digital-library/collections/books", iconName: "mdi:book-outline", count: "35,000", customDesc: true },
     { labelKey: "dl.collections.periodicals", descKey: "dl.collections.periodicals.desc", tooltipKey: "dl.collections.periodicals.tooltip", href: "/digital-library/collections/periodicals", iconName: "mdi:newspaper-variant-outline", count: "8,320" },
     { labelKey: "dl.collections.specialized", descKey: "dl.collections.specialized.desc", tooltipKey: "dl.collections.specialized.tooltip", href: "/digital-library/collections/photos", iconName: "mdi:map-outline", count: "15,890" },
     { labelKey: "dl.collections.audiovisual", descKey: "dl.collections.audiovisual.desc", tooltipKey: "dl.collections.audiovisual.tooltip", href: "/digital-library/collections/audiovisual", iconName: "mdi:music-note-outline", count: "2,890" },
@@ -330,7 +330,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                     <FancyTooltip 
                       key={item.href}
                       content={t(item.labelKey)} 
-                      description={t(item.descKey)}
+                      description={(item as any).customDesc ? item.descKey : t(item.descKey)}
                       icon={item.iconName}
                       side="right"
                       variant="gold"
