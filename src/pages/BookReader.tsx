@@ -1514,15 +1514,17 @@ const BookReader = () => {
                           </Badge>
                         </div>
                         
-                        <Card className="shadow-xl">
+                        <Card 
+                          className="shadow-xl"
+                          style={{
+                            transform: `scale(${zoom / 100}) rotate(${rotation + (pageRotations[pageNum] ?? 0)}deg)`,
+                            transformOrigin: 'center',
+                            transition: 'transform 0.3s ease'
+                          }}
+                        >
                           <CardContent className="p-0">
                             <div 
                               className="w-full max-w-[600px] bg-gradient-to-br from-background to-muted flex items-center justify-center relative overflow-hidden"
-                              style={{
-                                transform: `scale(${zoom / 100}) rotate(${rotation + (pageRotations[pageNum] ?? 0)}deg)`,
-                                transformOrigin: 'center',
-                                transition: 'transform 0.3s ease'
-                              }}
                             >
                               {isAccessible ? (
                                 pdfUrl && documentPages.length === 0 ? (
