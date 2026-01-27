@@ -29,12 +29,9 @@ const providerLogoMap: Record<string, string> = {
   'ifla': logoIfla,
   'eni-elearning': 'https://www.eni-elearning.com/wp-content/uploads/2021/12/belearn-formations-informatique_fr.svg',
   'eni': 'https://www.eni-elearning.com/wp-content/uploads/2021/12/belearn-formations-informatique_fr.svg',
-  'almanhal': 'https://assets.almanhal.com/website/ui/img/logo-blue.png',
-  'al-manhal': 'https://assets.almanhal.com/website/ui/img/logo-blue.png',
+  'almanhal': 'https://assets.almanhal.com/website/ui/img/logo-default-white.png',
+  'al-manhal': 'https://assets.almanhal.com/website/ui/img/logo-default-white.png',
 };
-
-// Providers qui ont besoin d'un fond sombre pour leur logo
-const providersWithDarkBg: string[] = ['almanhal', 'al-manhal'];
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -391,15 +388,13 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                           }
                         }}
                       >
-                        <div className="flex items-center gap-3 w-full">
+                        <div className="flex items-center gap-3">
                           {logoSrc ? (
-                            <div className={`flex items-center justify-center h-7 px-1 rounded ${providersWithDarkBg.includes(providerKey || '') ? 'bg-slate-800' : ''}`}>
-                              <img src={logoSrc} alt={bundle.provider} className="h-5 w-auto max-w-[90px] object-contain" />
-                            </div>
+                            <img src={logoSrc} alt={bundle.provider} className="h-6 w-auto max-w-[100px] object-contain" />
                           ) : (
                             <Icon name="mdi:earth" className="h-5 w-5 text-gold-bn-primary" />
                           )}
-                          <span className="font-medium text-foreground">{language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name}</span>
+                          <span className="font-medium">{language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name}</span>
                         </div>
                       </DropdownMenuItem>
                     );
