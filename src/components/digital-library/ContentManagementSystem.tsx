@@ -43,7 +43,7 @@ import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
-import { ScrollArea } from "@/components/ui/scroll-area";
+
 import { useNavigate } from "react-router-dom";
 
 // Modules spécifiques à la Bibliothèque Numérique (BN)
@@ -489,7 +489,7 @@ export default function ContentManagementSystem() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-2">
-              <ScrollArea className="h-auto max-h-[calc(100vh-300px)]">
+              <div className="overflow-y-auto max-h-[calc(100vh-300px)] pr-1">
                 <nav className="space-y-1">
                   {tabs.map((tab, index) => {
                     const LucideIcon = tab.icon;
@@ -538,7 +538,7 @@ export default function ContentManagementSystem() {
                     );
                   })}
                 </nav>
-              </ScrollArea>
+              </div>
             </CardContent>
           </Card>
         </motion.div>
