@@ -801,6 +801,9 @@ const BookReader = () => {
       case "linkedin":
         window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, "_blank");
         break;
+      case "email":
+        window.open(`mailto:?subject=${encodeURIComponent(text)}&body=${encodeURIComponent(`Découvrez ce document: ${url}`)}`, "_blank");
+        break;
       case "copy":
         navigator.clipboard.writeText(url);
         toast.success("Lien copié dans le presse-papier");
@@ -1116,7 +1119,7 @@ const BookReader = () => {
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
-                          <DialogTitle>Partager sur les réseaux sociaux</DialogTitle>
+                          <DialogTitle>Partager</DialogTitle>
                         </DialogHeader>
                         <div className="grid grid-cols-2 gap-3 mt-4">
                           <Button onClick={() => handleShare("facebook")} variant="outline">
@@ -1131,7 +1134,11 @@ const BookReader = () => {
                             <Linkedin className="h-4 w-4 mr-2" />
                             LinkedIn
                           </Button>
-                          <Button onClick={() => handleShare("copy")} variant="outline">
+                          <Button onClick={() => handleShare("email")} variant="outline">
+                            <Mail className="h-4 w-4 mr-2" />
+                            E-mail
+                          </Button>
+                          <Button onClick={() => handleShare("copy")} variant="outline" className="col-span-2">
                             <Copy className="h-4 w-4 mr-2" />
                             Copier lien
                           </Button>
