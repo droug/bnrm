@@ -11,6 +11,22 @@ import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import DigitalLibraryFooter from "@/components/digital-library/DigitalLibraryFooter";
 import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
 import logoDigitalLibrary from "@/assets/digital-library-logo.png";
+// Logos ressources électroniques
+import logoBrill from "@/assets/logos/logo-brill.png";
+import logoCairn from "@/assets/logos/logo-cairn.svg";
+import logoRfn from "@/assets/logos/logo-rfn.png";
+import logoEuropeana from "@/assets/logos/logo-europeana.svg";
+import logoIfla from "@/assets/logos/logo-ifla.svg";
+
+// Mapping des logos par nom de provider (insensible à la casse)
+const providerLogoMap: Record<string, string> = {
+  'cairn': logoCairn,
+  'cairn.info': logoCairn,
+  'brill': logoBrill,
+  'rfn': logoRfn,
+  'europeana': logoEuropeana,
+  'ifla': logoIfla,
+};
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -350,26 +366,33 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" className="bg-card z-50 min-w-[240px] p-2">
                 {activeBundles && activeBundles.length > 0 ? (
-                  activeBundles.map((bundle) => (
-                    <DropdownMenuItem 
-                      key={bundle.id} 
-                      className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-2 px-3 rounded-md"
-                      onClick={() => {
-                        if (bundle.website_url) {
-                          window.open(bundle.website_url, '_blank');
-                        }
-                      }}
-                    >
-                      <div className="flex items-center gap-3">
-                        {bundle.provider_logo_url ? (
-                          <img src={bundle.provider_logo_url} alt={bundle.provider} className="h-6 w-auto max-w-[80px] object-contain" />
-                        ) : (
-                          <Icon name="mdi:earth" className="h-5 w-5 text-gold-bn-primary" />
-                        )}
-                        <span className="font-medium">{language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name}</span>
-                      </div>
-                    </DropdownMenuItem>
-                  ))
+                  activeBundles.map((bundle) => {
+                    // Chercher le logo local en priorité basé sur le nom du provider
+                    const providerKey = bundle.provider?.toLowerCase().trim();
+                    const localLogo = providerKey ? providerLogoMap[providerKey] : null;
+                    const logoSrc = localLogo || bundle.provider_logo_url;
+                    
+                    return (
+                      <DropdownMenuItem 
+                        key={bundle.id} 
+                        className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-2 px-3 rounded-md"
+                        onClick={() => {
+                          if (bundle.website_url) {
+                            window.open(bundle.website_url, '_blank');
+                          }
+                        }}
+                      >
+                        <div className="flex items-center gap-3">
+                          {logoSrc ? (
+                            <img src={logoSrc} alt={bundle.provider} className="h-6 w-auto max-w-[100px] object-contain" />
+                          ) : (
+                            <Icon name="mdi:earth" className="h-5 w-5 text-gold-bn-primary" />
+                          )}
+                          <span className="font-medium">{language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name}</span>
+                        </div>
+                      </DropdownMenuItem>
+                    );
+                  })
                 ) : (
                   <DropdownMenuItem disabled className="text-muted-foreground text-sm">
                     Aucune ressource disponible
