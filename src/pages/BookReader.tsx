@@ -1618,16 +1618,16 @@ const BookReader = () => {
                 </div>
               ) : (
                 <div className="w-full h-full flex items-center justify-center overflow-auto p-4">
-                  <Card className="shadow-2xl max-h-[85vh]">
+                  <Card 
+                    className="shadow-2xl"
+                    style={{
+                      transform: `scale(${zoom / 100}) rotate(${rotation + (pageRotations[currentPage] ?? 0)}deg)`,
+                      transformOrigin: 'center',
+                      transition: 'transform 0.3s ease'
+                    }}
+                  >
                     <CardContent className="p-0 flex items-center justify-center">
-                      <div 
-                        className="relative max-h-[80vh] flex items-center justify-center"
-                        style={{
-                          transform: `scale(${zoom / 100}) rotate(${rotation + (pageRotations[currentPage] ?? 0)}deg)`,
-                          transformOrigin: 'center',
-                          transition: 'transform 0.3s ease'
-                        }}
-                      >
+                      <div className="relative max-h-[80vh] flex items-center justify-center">
                         {pdfUrl && documentPages.length === 0 ? (
                           <PdfPageRenderer
                             pdfUrl={pdfUrl}
