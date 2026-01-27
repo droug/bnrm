@@ -52,12 +52,11 @@ const DigitalLibraryFooter = () => {
   };
 
   const quickLinks = [
-    { title_fr: "Accueil", title_ar: "الرئيسية", href: "/digital-library" },
-    { title_fr: "Collections", title_ar: "المجموعات", href: "/digital-library/collections" },
-    { title_fr: "Manuscrits", title_ar: "المخطوطات", href: "/digital-library/collections/manuscripts" },
-    { title_fr: "Périodiques", title_ar: "الدوريات", href: "/digital-library/collections/periodicals" },
-    { title_fr: "Recherche", title_ar: "البحث", href: "/search" },
-    { title_fr: "Aide", title_ar: "المساعدة", href: "/help" }
+    { title_fr: "Portail BNRM", title_ar: "بوابة المكتبة الوطنية", href: "/" },
+    { title_fr: "Plateforme Manuscrits", title_ar: "منصة المخطوطات", href: "/manuscripts" },
+    { title_fr: "Plateforme Kitab", title_ar: "منصة كتاب", href: "/kitab" },
+    { title_fr: "Plateforme Activités culturelles", title_ar: "منصة الأنشطة الثقافية", href: "/activites-culturelles" },
+    { title_fr: "Plateforme CBM", title_ar: "منصة الفهرس البيبليوغرافي", href: "/portail-cbm" }
   ];
 
   const legalLinks = [
