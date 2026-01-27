@@ -477,8 +477,8 @@ export default function DigitalLibraryHome() {
                   }
                 }}
               />
-              <Button 
-                className="m-1.5 px-6 py-2 bg-gold-bn-primary hover:bg-gold-bn-primary-dark text-white rounded-full text-sm font-medium"
+              <button 
+                className="m-1.5 px-6 py-2 border border-gold-bn-primary text-gold-bn-primary hover:bg-gold-bn-primary hover:text-white rounded-full text-sm font-medium transition-colors"
                 onClick={() => {
                   const input = document.querySelector('input[type="text"]') as HTMLInputElement;
                   if (input?.value.trim()) {
@@ -487,7 +487,7 @@ export default function DigitalLibraryHome() {
                 }}
               >
                 Rechercher
-              </Button>
+              </button>
             </div>
           </div>
 
@@ -495,7 +495,7 @@ export default function DigitalLibraryHome() {
           <div className="flex-1 flex items-center justify-center py-8">
             {!loadingFeatured && featuredWorks.length > 0 && (
               <div className="relative w-full max-w-7xl mx-auto px-16">
-                {/* Left Arrow - Outside carousel */}
+                {/* Left Arrow - Simple chevron like reference */}
                 <button 
                   className="absolute left-0 top-1/2 -translate-y-1/2 z-10 text-gold-bn-primary hover:text-gold-bn-primary-dark transition-colors"
                   onClick={() => {
@@ -503,10 +503,12 @@ export default function DigitalLibraryHome() {
                     prevBtn?.click();
                   }}
                 >
-                  <Icon name="mdi:chevron-left" className="w-14 h-14 md:w-16 md:h-16" />
+                  <svg className="w-10 h-10 md:w-12 md:h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
                 </button>
                 
-                {/* Right Arrow - Outside carousel */}
+                {/* Right Arrow - Simple chevron like reference */}
                 <button 
                   className="absolute right-0 top-1/2 -translate-y-1/2 z-10 text-gold-bn-primary hover:text-gold-bn-primary-dark transition-colors"
                   onClick={() => {
@@ -514,7 +516,9 @@ export default function DigitalLibraryHome() {
                     nextBtn?.click();
                   }}
                 >
-                  <Icon name="mdi:chevron-right" className="w-14 h-14 md:w-16 md:h-16" />
+                  <svg className="w-10 h-10 md:w-12 md:h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
                 </button>
 
                 <Carousel
@@ -593,7 +597,7 @@ export default function DigitalLibraryHome() {
             {/* Fallback to recent documents if no featured works */}
             {!loadingFeatured && featuredWorks.length === 0 && !loading && newItems.length > 0 && (
               <div className="relative w-full max-w-7xl mx-auto px-16">
-                {/* Left Arrow */}
+                {/* Left Arrow - Simple chevron */}
                 <button 
                   className="absolute left-0 top-1/2 -translate-y-1/2 z-10 text-gold-bn-primary hover:text-gold-bn-primary-dark transition-colors"
                   onClick={() => {
@@ -601,10 +605,12 @@ export default function DigitalLibraryHome() {
                     prevBtn?.click();
                   }}
                 >
-                  <Icon name="mdi:chevron-left" className="w-14 h-14 md:w-16 md:h-16" />
+                  <svg className="w-10 h-10 md:w-12 md:h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
                 </button>
                 
-                {/* Right Arrow */}
+                {/* Right Arrow - Simple chevron */}
                 <button 
                   className="absolute right-0 top-1/2 -translate-y-1/2 z-10 text-gold-bn-primary hover:text-gold-bn-primary-dark transition-colors"
                   onClick={() => {
@@ -612,7 +618,9 @@ export default function DigitalLibraryHome() {
                     nextBtn?.click();
                   }}
                 >
-                  <Icon name="mdi:chevron-right" className="w-14 h-14 md:w-16 md:h-16" />
+                  <svg className="w-10 h-10 md:w-12 md:h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
                 </button>
 
                 <Carousel
