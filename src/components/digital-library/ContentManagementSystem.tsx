@@ -15,6 +15,7 @@ import CmsStyleManager from "@/components/cms/CmsStyleManager";
 import CmsVExpo360HeroManager from "@/components/cms/CmsVExpo360HeroManager";
 import CmsSectionIconsManager from "@/components/cms/CmsSectionIconsManager";
 import CmsAboutManagerBN from "@/components/cms/CmsAboutManagerBN";
+import CmsHelpManagerBN from "@/components/cms/CmsHelpManagerBN";
 import FeaturedWorksManager from "@/components/admin/FeaturedWorksManager";
 import { Icon } from "@/components/ui/icon";
 import { 
@@ -148,6 +149,18 @@ const tabs = [
     borderColor: "border-violet-500/30",
     gradient: "from-violet-500/20 to-violet-600/5",
     description: "Blocs de contenu des pages",
+    category: "content"
+  },
+  { 
+    id: "help", 
+    label: "Aide & FAQ", 
+    icon: null,
+    iconMdi: "mdi:help-circle-outline",
+    color: "text-teal-500",
+    bgColor: "bg-teal-500/10",
+    borderColor: "border-teal-500/30",
+    gradient: "from-teal-500/20 to-teal-600/5",
+    description: "Page d'aide et questions fréquentes",
     category: "content"
   },
   // === DESIGN & STRUCTURE ===
@@ -382,6 +395,8 @@ export default function ContentManagementSystem() {
         return <CmsWebhooksManager />;
       case "about":
         return <CmsAboutManagerBN />;
+      case "help":
+        return <CmsHelpManagerBN />;
       default:
         return null;
     }
