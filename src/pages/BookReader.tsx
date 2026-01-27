@@ -10,7 +10,7 @@ import manuscriptPage1 from "@/assets/manuscript-page-1.jpg";
 import manuscriptPage2 from "@/assets/manuscript-page-2.jpg";
 import manuscriptPage3 from "@/assets/manuscript-page-3.jpg";
 import manuscriptPage4 from "@/assets/manuscript-page-4.jpg";
-import { PageFlipBook } from "@/components/book-reader/PageFlipBook";
+import { PageFlipBook, type PageFlipBookHandle } from "@/components/book-reader/PageFlipBook";
 import { DocumentSearchInBook } from "@/components/digital-library/DocumentSearchInBook";
 import { SidebarSearchInBook } from "@/components/digital-library/SidebarSearchInBook";
 import { PdfPageRenderer } from "@/components/digital-library/PdfPageRenderer";
@@ -102,6 +102,7 @@ const BookReader = () => {
   const [readingMode, setReadingMode] = useState<"book" | "audio">("book");
 
   const mainContentRef = useRef<HTMLElement | null>(null);
+  const pageFlipRef = useRef<PageFlipBookHandle>(null);
   const [floatingToolbarStyle, setFloatingToolbarStyle] = useState<CSSProperties | null>(null);
 
   useLayoutEffect(() => {
@@ -697,8 +698,12 @@ const BookReader = () => {
 
   const handlePreviousPage = () => {
     if (currentPage > 1) {
-      const newPage = viewMode === "double" ? Math.max(1, currentPage - 2) : currentPage - 1;
-      setCurrentPage(newPage);
+      if (viewMode === "double" && pageFlipRef.current) {
+        pageFlipRef.current.flipPrev();
+      } else {
+        const newPage = viewMode === "double" ? Math.max(1, currentPage - 2) : currentPage - 1;
+        setCurrentPage(newPage);
+      }
     }
   };
 
@@ -711,7 +716,11 @@ const BookReader = () => {
     }
     
     if (currentPage < totalPages) {
-      setCurrentPage(nextPage);
+      if (viewMode === "double" && pageFlipRef.current) {
+        pageFlipRef.current.flipNext();
+      } else {
+        setCurrentPage(nextPage);
+      }
     }
   };
 
@@ -1474,6 +1483,7 @@ const BookReader = () => {
                 </div>
               ) : viewMode === "double" ? (
                 <PageFlipBook 
+                  ref={pageFlipRef}
                   images={generatePageImages()}
                   currentPage={currentPage}
                   onPageChange={setCurrentPage}

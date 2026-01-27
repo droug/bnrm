@@ -1,4 +1,4 @@
-import { useRef, forwardRef, useState, useEffect, useCallback } from "react";
+import { useRef, forwardRef, useState, useEffect, useCallback, useImperativeHandle } from "react";
 import HTMLFlipBook from "react-pageflip";
 
 interface PageFlipBookProps {
@@ -11,6 +11,12 @@ interface PageFlipBookProps {
    * Rotation additionnelle par page (en degrés). Exemple: { 8: 180, 12: 180 }
    */
   pageRotations?: Record<number, number>;
+}
+
+export interface PageFlipBookHandle {
+  flipNext: () => void;
+  flipPrev: () => void;
+  turnToPage: (page: number) => void;
 }
 
 const Page = forwardRef<
@@ -49,17 +55,36 @@ const Page = forwardRef<
 
 Page.displayName = "Page";
 
-export const PageFlipBook = ({
+export const PageFlipBook = forwardRef<PageFlipBookHandle, PageFlipBookProps>(({
   images,
   currentPage,
   onPageChange,
   zoom,
   rotation,
   pageRotations,
-}: PageFlipBookProps) => {
+}, ref) => {
   const bookRef = useRef<any>();
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 550, height: 733 });
+
+  // Expose navigation methods
+  useImperativeHandle(ref, () => ({
+    flipNext: () => {
+      if (bookRef.current?.pageFlip()) {
+        bookRef.current.pageFlip().flipNext();
+      }
+    },
+    flipPrev: () => {
+      if (bookRef.current?.pageFlip()) {
+        bookRef.current.pageFlip().flipPrev();
+      }
+    },
+    turnToPage: (page: number) => {
+      if (bookRef.current?.pageFlip()) {
+        bookRef.current.pageFlip().turnToPage(page - 1);
+      }
+    },
+  }), []);
 
   // Calculate optimal dimensions based on container size
   const calculateDimensions = useCallback(() => {
@@ -160,5 +185,7 @@ export const PageFlipBook = ({
       </HTMLFlipBook>
     </div>
   );
-};
+});
+
+PageFlipBook.displayName = "PageFlipBook";
 
