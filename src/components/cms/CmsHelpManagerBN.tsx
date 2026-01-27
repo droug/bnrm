@@ -10,7 +10,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Trash2, GripVertical, Save, Eye } from "lucide-react";
+import { Plus, Trash2, GripVertical, Save, Eye, Upload, Video, Link2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface FAQCategory {
@@ -238,6 +238,8 @@ export default function CmsHelpManagerBN() {
   const [settings, setSettings] = useState<HelpSettings>(defaultSettings);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
+
+  const [uploadingVideoId, setUploadingVideoId] = useState<string | null>(null);
 
   const { data: savedSettings, isLoading } = useQuery({
     queryKey: ['bn-help-settings'],
@@ -883,20 +885,157 @@ export default function CmsHelpManagerBN() {
                         />
                       </div>
                     </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label className="text-xs">URL de la vidéo (YouTube embed)</Label>
-                        <Input
-                          value={tutorial.video_url}
-                          onChange={(e) => {
+                    {/* Video Source Selection */}
+                    <div className="space-y-3 border-t pt-3">
+                      <Label className="text-sm font-medium">Source de la vidéo</Label>
+                      <div className="flex gap-2 mb-3">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant={!tutorial.video_url?.includes('supabase') ? "default" : "outline"}
+                          onClick={() => {
                             const newItems = [...(settings.tutorials?.items || [])];
-                            newItems[index].video_url = e.target.value;
+                            newItems[index].video_url = '';
                             setSettings(prev => ({ ...prev, tutorials: { ...prev.tutorials, items: newItems } }));
                             setIsDirty(true);
                           }}
-                          placeholder="https://www.youtube.com/embed/..."
-                        />
+                        >
+                          <Link2 className="h-4 w-4 mr-2" />
+                          URL externe
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant={tutorial.video_url?.includes('supabase') ? "default" : "outline"}
+                          onClick={() => {}}
+                        >
+                          <Upload className="h-4 w-4 mr-2" />
+                          Télécharger
+                        </Button>
                       </div>
+
+                      {/* External URL Input */}
+                      {!tutorial.video_url?.includes('supabase') && (
+                        <div className="space-y-2">
+                          <Label className="text-xs text-muted-foreground">URL de la vidéo (YouTube embed, Vimeo...)</Label>
+                          <Input
+                            value={tutorial.video_url?.includes('supabase') ? '' : tutorial.video_url}
+                            onChange={(e) => {
+                              const newItems = [...(settings.tutorials?.items || [])];
+                              newItems[index].video_url = e.target.value;
+                              setSettings(prev => ({ ...prev, tutorials: { ...prev.tutorials, items: newItems } }));
+                              setIsDirty(true);
+                            }}
+                            placeholder="https://www.youtube.com/embed/..."
+                          />
+                        </div>
+                      )}
+
+                      {/* File Upload */}
+                      <div className="space-y-2">
+                        <Label className="text-xs text-muted-foreground">Ou télécharger une vidéo (MP4, WebM, max 100MB)</Label>
+                        <div className="flex gap-2">
+                          <Input
+                            type="file"
+                            accept="video/mp4,video/webm,video/ogg,video/quicktime"
+                            disabled={uploadingVideoId === tutorial.id}
+                            onChange={async (e) => {
+                              const file = e.target.files?.[0];
+                              if (!file) return;
+                              
+                              if (file.size > 100 * 1024 * 1024) {
+                                toast.error("Le fichier est trop volumineux (max 100MB)");
+                                return;
+                              }
+
+                              setUploadingVideoId(tutorial.id);
+                              try {
+                                const fileExt = file.name.split('.').pop();
+                                const fileName = `tutorial-${tutorial.id}-${Date.now()}.${fileExt}`;
+                                
+                                const { error: uploadError } = await supabase.storage
+                                  .from('tutorial-videos')
+                                  .upload(fileName, file, { upsert: true });
+
+                                if (uploadError) throw uploadError;
+
+                                const { data: { publicUrl } } = supabase.storage
+                                  .from('tutorial-videos')
+                                  .getPublicUrl(fileName);
+
+                                const newItems = [...(settings.tutorials?.items || [])];
+                                newItems[index].video_url = publicUrl;
+                                setSettings(prev => ({ ...prev, tutorials: { ...prev.tutorials, items: newItems } }));
+                                setIsDirty(true);
+                                toast.success("Vidéo téléchargée avec succès");
+                              } catch (error: any) {
+                                console.error('Upload error:', error);
+                                toast.error(error.message || "Erreur lors du téléchargement");
+                              } finally {
+                                setUploadingVideoId(null);
+                              }
+                            }}
+                            className="flex-1"
+                          />
+                          {uploadingVideoId === tutorial.id && (
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-primary border-t-transparent" />
+                              Téléchargement...
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Video Preview */}
+                        {tutorial.video_url && (
+                          <div className="mt-3 p-3 bg-background rounded-lg border">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Video className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-xs text-muted-foreground truncate flex-1">
+                                {tutorial.video_url.includes('supabase') ? 'Vidéo téléchargée' : 'Vidéo externe'}
+                              </span>
+                              {tutorial.video_url.includes('supabase') && (
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 text-destructive hover:text-destructive"
+                                  onClick={async () => {
+                                    try {
+                                      const fileName = tutorial.video_url.split('/').pop();
+                                      if (fileName) {
+                                        await supabase.storage.from('tutorial-videos').remove([fileName]);
+                                      }
+                                      const newItems = [...(settings.tutorials?.items || [])];
+                                      newItems[index].video_url = '';
+                                      setSettings(prev => ({ ...prev, tutorials: { ...prev.tutorials, items: newItems } }));
+                                      setIsDirty(true);
+                                      toast.success("Vidéo supprimée");
+                                    } catch (error) {
+                                      toast.error("Erreur lors de la suppression");
+                                    }
+                                  }}
+                                >
+                                  <Trash2 className="h-3 w-3" />
+                                </Button>
+                              )}
+                            </div>
+                            {tutorial.video_url.includes('supabase') ? (
+                              <video 
+                                src={tutorial.video_url} 
+                                controls 
+                                className="w-full rounded max-h-32 object-cover"
+                              />
+                            ) : tutorial.video_url.includes('youtube') || tutorial.video_url.includes('vimeo') ? (
+                              <div className="aspect-video bg-muted rounded flex items-center justify-center text-xs text-muted-foreground">
+                                Aperçu disponible sur la page publique
+                              </div>
+                            ) : null}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-4 pt-2 border-t">
                       <div className="space-y-2">
                         <Label className="text-xs">Durée</Label>
                         <Input
