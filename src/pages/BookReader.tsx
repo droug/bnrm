@@ -1539,10 +1539,10 @@ const BookReader = () => {
                 </div>
               ) : (
                 <div className="w-full h-full flex items-center justify-center overflow-auto p-4">
-                  <Card className="shadow-2xl">
-                    <CardContent className="p-0">
+                  <Card className="shadow-2xl max-h-[85vh]">
+                    <CardContent className="p-0 flex items-center justify-center">
                       <div 
-                        className="relative"
+                        className="relative max-h-[80vh] flex items-center justify-center"
                         style={{
                           transform: `scale(${zoom / 100}) rotate(${rotation + (pageRotations[currentPage] ?? 0)}deg)`,
                           transformOrigin: 'center',
@@ -1553,8 +1553,9 @@ const BookReader = () => {
                           <PdfPageRenderer
                             pdfUrl={pdfUrl}
                             pageNumber={currentPage}
-                            scale={1.2}
+                            scale={0.9}
                             rotation={rotation + (pageRotations[currentPage] ?? 0)}
+                            className="max-h-[75vh] w-auto"
                             onPageLoad={(totalPages) => {
                               if (actualTotalPages !== totalPages) {
                                 setActualTotalPages(totalPages);
@@ -1565,7 +1566,7 @@ const BookReader = () => {
                           <img 
                             src={getCurrentPageImage(currentPage)}
                             alt={`Page ${currentPage}`}
-                            className="block max-w-full h-auto object-contain"
+                            className="block max-h-[75vh] w-auto object-contain"
                           />
                         )}
                         {bookmarks.includes(currentPage) && (
