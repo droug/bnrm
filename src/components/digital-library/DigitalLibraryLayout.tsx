@@ -11,7 +11,7 @@ import GlobalSearchBar from "@/components/GlobalSearchBar";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
 import DigitalLibraryFooter from "@/components/digital-library/DigitalLibraryFooter";
 import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
-import logoDigitalLibrary from "@/assets/digital-library-logo.png";
+import logoDigitalLibrary from "@/assets/Logo_BN.png";
 // Logos ressources électroniques
 import logoBrill from "@/assets/logos/logo-brill.png";
 import logoCairn from "@/assets/logos/logo-cairn.svg";
