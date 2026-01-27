@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import logoDigitalLibrary from "@/assets/digital-library-logo.png";
+import logoDigitalLibrary from "@/assets/Logo_BN.png";
 
 // Helper to parse hash fragment error params
 function parseHashParams(hash: string): Record<string, string> {

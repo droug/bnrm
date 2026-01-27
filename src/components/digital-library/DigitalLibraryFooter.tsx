@@ -16,7 +16,7 @@ import {
 import { useLanguage } from "@/hooks/useLanguage";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import logoDigitalLibrary from "@/assets/digital-library-logo.png";
+import logoDigitalLibrary from "@/assets/Logo_BN.png";
 
 const DigitalLibraryFooter = () => {
   const currentYear = new Date().getFullYear();
