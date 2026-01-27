@@ -1,6 +1,6 @@
 import { ReactNode, useState, useEffect } from "react";
 import { useLanguage, Language } from "@/hooks/useLanguage";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Icon } from "@/components/ui/icon";
 import { Button } from "@/components/ui/button";
 import { SimpleTooltip } from "@/components/ui/simple-tooltip";
@@ -51,6 +51,8 @@ interface DigitalLibraryLayoutProps {
 export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   const { t, language, setLanguage } = useLanguage();
   const { isAuthenticated, isLibrarian } = useAccessControl();
+  const location = useLocation();
+  const isHomePage = location.pathname === '/digital-library' || location.pathname === '/digital-library/';
   const { session, profile } = useAuth();
   
   const canManageLibrary = isLibrarian || profile?.role === 'admin' || profile?.role === 'librarian';
@@ -509,10 +511,12 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
             </Link>
           </div>
 
-          {/* Barre de recherche globale */}
-          <div className="mt-4">
-            <GlobalSearchBar />
-          </div>
+          {/* Barre de recherche globale - Hidden on homepage since it has integrated search */}
+          {!isHomePage && (
+            <div className="mt-4">
+              <GlobalSearchBar />
+            </div>
+          )}
         </div>
       </nav>
 
