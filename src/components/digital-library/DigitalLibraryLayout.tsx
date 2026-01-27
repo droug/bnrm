@@ -88,8 +88,8 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
 
   const collectionsSubmenu = [
     { labelKey: "dl.collections.manuscripts", descKey: "dl.collections.manuscripts.desc", tooltipKey: "dl.collections.manuscripts.tooltip", href: "/digital-library/collections/manuscripts", iconName: "mdi:scroll-text-outline", count: "12,450" },
-    { labelKey: "dl.collections.books", descKey: "dl.collections.books.desc", tooltipKey: "dl.collections.books.tooltip", href: "/digital-library/collections/books", iconName: "mdi:book-outline", count: "35,000" },
     { labelKey: "dl.collections.lithography", descKey: "dl.collections.lithography.desc", tooltipKey: "dl.collections.lithography.tooltip", href: "/digital-library/collections/lithography", iconName: "mdi:file-document-outline", count: "10,670" },
+    { labelKey: "dl.collections.books", descKey: "dl.collections.books.desc", tooltipKey: "dl.collections.books.tooltip", href: "/digital-library/collections/books", iconName: "mdi:book-outline", count: "35,000" },
     { labelKey: "dl.collections.periodicals", descKey: "dl.collections.periodicals.desc", tooltipKey: "dl.collections.periodicals.tooltip", href: "/digital-library/collections/periodicals", iconName: "mdi:newspaper-variant-outline", count: "8,320" },
     { labelKey: "dl.collections.specialized", descKey: "dl.collections.specialized.desc", tooltipKey: "dl.collections.specialized.tooltip", href: "/digital-library/collections/photos", iconName: "mdi:map-outline", count: "15,890" },
     { labelKey: "dl.collections.audiovisual", descKey: "dl.collections.audiovisual.desc", tooltipKey: "dl.collections.audiovisual.tooltip", href: "/digital-library/collections/audiovisual", iconName: "mdi:music-note-outline", count: "2,890" },
@@ -331,10 +331,6 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                         <div className="flex items-center gap-3 flex-1">
                           <div className="p-2 rounded-xl bg-gradient-to-br from-gold-bn-primary/20 to-gold-bn-primary/5 group-hover:from-gold-bn-primary/30 group-hover:to-gold-bn-primary/10 transition-all duration-200 group-hover:scale-110">
                             <Icon name={item.iconName} className="h-5 w-5 text-gold-bn-primary" />
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="font-semibold text-foreground group-hover:text-gold-bn-primary transition-colors">{t(item.labelKey)}</span>
-                            <span className="text-xs text-muted-foreground">{t(item.descKey)}</span>
                           </div>
                         </div>
                         <span className={`px-3 py-1 text-xs font-bold rounded-none transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-0 ${badgeStyles[index % badgeStyles.length]}`}>
