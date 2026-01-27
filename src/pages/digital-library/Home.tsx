@@ -805,35 +805,18 @@ export default function DigitalLibraryHome() {
                 {/* BRILL */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
                   <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
-                      <div className="flex items-center justify-center">
-                        <img src={logoBrill} alt="BRILL" className="h-[42px] max-w-[200px] object-contain" />
+                    <CardContent className="p-8 flex flex-col items-center justify-center">
+                      <div className="flex items-center justify-center h-[80px]">
+                        <img src={logoBrill} alt="BRILL" className="h-[50px] max-w-[200px] object-contain" />
                       </div>
                       <a
                         href="https://brill.com/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold"
+                        className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
                       >
-                        brill.com
+                        Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
                       </a>
-                    </CardHeader>
-                    <CardContent className="px-8 pb-8 flex flex-col">
-                      <div className="h-[120px] overflow-hidden">
-                        <p className="text-muted-foreground text-sm leading-relaxed text-justify line-clamp-5">
-                          Brill est une maison d'édition académique néerlandaise fondée en 1683 à Leiden. Elle publie des livres, des revues scientifiques et des ouvrages de référence dans les domaines des sciences humaines, du droit international, des études islamiques et orientales.
-                        </p>
-                      </div>
-                      <div className="flex justify-end mt-6">
-                        <a
-                          href="https://brill.com/"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors"
-                        >
-                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                        </a>
-                      </div>
                     </CardContent>
                   </Card>
                 </div>
@@ -841,33 +824,18 @@ export default function DigitalLibraryHome() {
                 {/* EBSCO */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
                   <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
-                      <div className="font-heading text-[42px] font-semibold text-bn-blue-primary tracking-wide">EBSCO</div>
+                    <CardContent className="p-8 flex flex-col items-center justify-center">
+                      <div className="flex items-center justify-center h-[80px]">
+                        <div className="font-heading text-[42px] font-semibold text-bn-blue-primary tracking-wide">EBSCO</div>
+                      </div>
                       <a
                         href="https://www.ebsco.com/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold"
+                        className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
                       >
-                        ebsco.com
+                        Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
                       </a>
-                    </CardHeader>
-                    <CardContent className="px-8 pb-8 flex flex-col">
-                      <div className="h-[120px] overflow-hidden">
-                        <p className="text-muted-foreground text-sm leading-relaxed text-justify line-clamp-5">
-                          ebsco.com est le site officiel de EBSCO Information Services, un fournisseur américain de bases de données, revues et livres numériques, ainsi que d'outils de recherche utilisés par les bibliothèques, universités, écoles et institutions à travers le monde.
-                        </p>
-                      </div>
-                      <div className="flex justify-end mt-6">
-                        <a
-                          href="https://www.ebsco.com/"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors"
-                        >
-                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                        </a>
-                      </div>
                     </CardContent>
                   </Card>
                 </div>
@@ -875,35 +843,18 @@ export default function DigitalLibraryHome() {
                 {/* CAIRN */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
                   <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
-                      <div className="flex items-center justify-center">
-                        <img src={logoCairn} alt="CAIRN.INFO" className="h-[42px] max-w-[200px] object-contain" />
+                    <CardContent className="p-8 flex flex-col items-center justify-center">
+                      <div className="flex items-center justify-center h-[80px]">
+                        <img src={logoCairn} alt="CAIRN.INFO" className="h-[50px] max-w-[200px] object-contain" />
                       </div>
                       <a
                         href="https://shs.cairn.info/"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold"
+                        className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
                       >
-                        cairn.info
+                        Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
                       </a>
-                    </CardHeader>
-                    <CardContent className="px-8 pb-8 flex flex-col">
-                      <div className="h-[120px] overflow-hidden">
-                        <p className="text-muted-foreground text-sm leading-relaxed text-justify line-clamp-5">
-                          Cairn.info, plateforme de référence pour les publications scientifiques francophones, vise à favoriser la découverte d'une recherche de qualité tout en cultivant l'indépendance et la diversité des acteurs de l'écosystème du savoir.
-                        </p>
-                      </div>
-                      <div className="flex justify-end mt-6">
-                        <a
-                          href="https://shs.cairn.info/"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors"
-                        >
-                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                        </a>
-                      </div>
                     </CardContent>
                   </Card>
                 </div>
@@ -911,25 +862,18 @@ export default function DigitalLibraryHome() {
                 {/* RFN */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
                   <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
-                      <div className="flex items-center justify-center">
-                        <img src={logoRfn} alt="RFN" className="h-[42px] max-w-[200px] object-contain" />
+                    <CardContent className="p-8 flex flex-col items-center justify-center">
+                      <div className="flex items-center justify-center h-[80px]">
+                        <img src={logoRfn} alt="RFN" className="h-[50px] max-w-[200px] object-contain" />
                       </div>
-                      <a href="https://rfnum.org" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold">
-                        rfnum.org
+                      <a
+                        href="https://rfnum.org"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
+                      >
+                        Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
                       </a>
-                    </CardHeader>
-                    <CardContent className="px-8 pb-8 flex flex-col">
-                      <div className="h-[120px] overflow-hidden">
-                        <p className="text-muted-foreground text-sm leading-relaxed text-justify line-clamp-5">
-                          Réseau Francophone Numérique regroupant les collections patrimoniales de bibliothèques nationales francophones pour préserver le patrimoine documentaire commun.
-                        </p>
-                      </div>
-                      <div className="flex justify-end mt-6">
-                        <a href="https://rfnum.org" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors">
-                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                        </a>
-                      </div>
                     </CardContent>
                   </Card>
                 </div>
@@ -937,25 +881,18 @@ export default function DigitalLibraryHome() {
                 {/* Europeana */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
                   <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
-                      <div className="flex items-center justify-center">
-                        <img src={logoEuropeana} alt="Europeana" className="h-[42px] max-w-[200px] object-contain" />
+                    <CardContent className="p-8 flex flex-col items-center justify-center">
+                      <div className="flex items-center justify-center h-[80px]">
+                        <img src={logoEuropeana} alt="Europeana" className="h-[50px] max-w-[200px] object-contain" />
                       </div>
-                      <a href="https://www.europeana.eu" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold">
-                        europeana.eu
+                      <a
+                        href="https://www.europeana.eu"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
+                      >
+                        Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
                       </a>
-                    </CardHeader>
-                    <CardContent className="px-8 pb-8 flex flex-col">
-                      <div className="h-[120px] overflow-hidden">
-                        <p className="text-muted-foreground text-sm leading-relaxed text-justify line-clamp-5">
-                          Agrégateur central du patrimoine culturel européen. Initiative de l'UE visant à moderniser la numérisation et la réutilisation des données culturelles.
-                        </p>
-                      </div>
-                      <div className="flex justify-end mt-6">
-                        <a href="https://www.europeana.eu" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors">
-                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                        </a>
-                      </div>
                     </CardContent>
                   </Card>
                 </div>
@@ -963,25 +900,18 @@ export default function DigitalLibraryHome() {
                 {/* IFLA */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
                   <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardHeader className="text-center pt-10 pb-4 h-[140px] flex flex-col justify-center">
-                      <div className="flex items-center justify-center">
-                        <img src={logoIfla} alt="IFLA" className="h-[42px] max-w-[200px] object-contain" />
+                    <CardContent className="p-8 flex flex-col items-center justify-center">
+                      <div className="flex items-center justify-center h-[80px]">
+                        <img src={logoIfla} alt="IFLA" className="h-[50px] max-w-[200px] object-contain" />
                       </div>
-                      <a href="https://www.ifla.org" target="_blank" rel="noopener noreferrer" className="mt-4 inline-block text-bn-blue-primary underline underline-offset-4 font-semibold">
-                        ifla.org
+                      <a
+                        href="https://www.ifla.org"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
+                      >
+                        Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
                       </a>
-                    </CardHeader>
-                    <CardContent className="px-8 pb-8 flex flex-col">
-                      <div className="h-[120px] overflow-hidden">
-                        <p className="text-muted-foreground text-sm leading-relaxed text-justify line-clamp-5">
-                          Fédération Internationale des Associations de Bibliothécaires. Définit les normes internationales pour l'interopérabilité entre les grands réservoirs mondiaux.
-                        </p>
-                      </div>
-                      <div className="flex justify-end mt-6">
-                        <a href="https://www.ifla.org" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium underline underline-offset-4 hover:bg-gold-bn-primary/20 transition-colors">
-                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                        </a>
-                      </div>
                     </CardContent>
                   </Card>
                 </div>
