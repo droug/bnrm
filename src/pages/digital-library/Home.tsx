@@ -494,35 +494,35 @@ export default function DigitalLibraryHome() {
           {/* Œuvres et vedettes - Featured Works Carousel */}
           <div className="flex-1 flex items-center justify-center py-6">
             {!loadingFeatured && featuredWorks.length > 0 && (
-              <div className="relative w-full max-w-7xl mx-auto px-4">
-                {/* Left Arrow - Large gold triangle at far edge */}
+              <div className="relative w-full max-w-5xl mx-auto px-4">
+                {/* Left Arrow - Large gold triangle outside container */}
                 <button 
-                  className="absolute left-0 md:-left-2 top-1/2 -translate-y-1/2 z-20 text-gold-bn-primary hover:text-gold-bn-primary-dark transition-colors p-2"
+                  className="absolute -left-4 md:-left-8 top-1/2 -translate-y-1/2 z-20 text-gold-bn-primary hover:text-gold-bn-primary-dark transition-colors p-2"
                   onClick={() => {
                     const prevBtn = document.querySelector('[data-carousel-prev]') as HTMLButtonElement;
                     prevBtn?.click();
                   }}
                 >
-                  <svg className="w-6 h-12 md:w-8 md:h-16" viewBox="0 0 24 48" fill="currentColor">
+                  <svg className="w-5 h-10 md:w-6 md:h-12" viewBox="0 0 24 48" fill="currentColor">
                     <polygon points="20,4 4,24 20,44" />
                   </svg>
                 </button>
                 
-                {/* Right Arrow - Large gold triangle at far edge */}
+                {/* Right Arrow - Large gold triangle outside container */}
                 <button 
-                  className="absolute right-0 md:-right-2 top-1/2 -translate-y-1/2 z-20 text-gold-bn-primary hover:text-gold-bn-primary-dark transition-colors p-2"
+                  className="absolute -right-4 md:-right-8 top-1/2 -translate-y-1/2 z-20 text-gold-bn-primary hover:text-gold-bn-primary-dark transition-colors p-2"
                   onClick={() => {
                     const nextBtn = document.querySelector('[data-carousel-next]') as HTMLButtonElement;
                     nextBtn?.click();
                   }}
                 >
-                  <svg className="w-6 h-12 md:w-8 md:h-16" viewBox="0 0 24 48" fill="currentColor">
+                  <svg className="w-5 h-10 md:w-6 md:h-12" viewBox="0 0 24 48" fill="currentColor">
                     <polygon points="4,4 20,24 4,44" />
                   </svg>
                 </button>
 
-                {/* Carousel content - NO background container, content flows on hero */}
-                <div className="mx-10 md:mx-16">
+                {/* Blurred container that doesn't take full width */}
+                <div className="bg-black/15 backdrop-blur-md rounded-2xl p-6 md:p-8 lg:p-10">
                   <Carousel
                     opts={{
                       align: "center",
@@ -534,19 +534,19 @@ export default function DigitalLibraryHome() {
                     <CarouselContent>
                       {featuredWorks.map((item) => (
                         <CarouselItem key={item.workId || item.id} className="animate-fade-in">
-                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-                            {/* Left: Text Content */}
-                            <div className="text-white space-y-4 order-2 lg:order-1">
-                              <Badge className="bg-gold-bn-primary text-white hover:bg-gold-bn-primary-dark text-xs px-4 py-1.5 rounded font-medium">
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center min-h-[20rem] md:min-h-[24rem]">
+                            {/* Left: Text Content - vertically centered */}
+                            <div className="text-white space-y-4 order-2 lg:order-1 flex flex-col justify-center">
+                              <Badge className="bg-gold-bn-primary text-white hover:bg-gold-bn-primary-dark text-xs px-4 py-1.5 rounded font-medium w-fit">
                                 {item.type}
                               </Badge>
-                              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold uppercase tracking-wide leading-tight">
+                              <h2 className="text-xl md:text-2xl lg:text-3xl font-bold uppercase tracking-wide leading-tight">
                                 {language === 'ar' && item.title_ar ? item.title_ar : item.title}
                               </h2>
-                              <p className="text-white/85 text-sm md:text-base leading-relaxed line-clamp-5 text-justify max-w-xl">
+                              <p className="text-white/85 text-sm md:text-base leading-relaxed line-clamp-5 text-justify">
                                 {item.description || `${item.author}${item.date ? ` - ${item.date}` : ''}`}
                               </p>
-                              <div className="pt-4">
+                              <div className="pt-2">
                                 {(item.hasDocument || item.link) && (
                                   <button 
                                     className="inline-flex items-center gap-3 px-5 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 rounded-full text-white text-sm font-medium transition-all group"
@@ -559,13 +559,13 @@ export default function DigitalLibraryHome() {
                               </div>
                             </div>
                             
-                            {/* Right: Image with subtle glow effect */}
+                            {/* Right: Image - vertically centered */}
                             {item.thumbnail && (
-                              <div className="relative flex justify-center lg:justify-end order-1 lg:order-2">
+                              <div className="relative flex justify-center lg:justify-end order-1 lg:order-2 items-center">
                                 <div className="relative">
                                   {/* Subtle warm glow effect */}
-                                  <div className="absolute -inset-6 bg-gradient-to-br from-amber-400/15 via-orange-300/10 to-transparent blur-2xl rounded-2xl" />
-                                  <div className="relative w-64 h-72 md:w-80 md:h-[22rem] lg:w-[28rem] lg:h-[24rem] rounded-xl overflow-hidden shadow-2xl border border-white/10 transform hover:scale-[1.01] transition-transform duration-500">
+                                  <div className="absolute -inset-4 bg-gradient-to-br from-amber-400/10 via-orange-300/5 to-transparent blur-xl rounded-xl" />
+                                  <div className="relative w-56 h-64 md:w-72 md:h-80 lg:w-80 lg:h-[22rem] rounded-lg overflow-hidden shadow-2xl border border-white/10">
                                     <img 
                                       src={item.thumbnail} 
                                       alt={item.title}
