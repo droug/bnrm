@@ -547,17 +547,23 @@ export default function DigitalLibraryHome() {
                                 {item.description || `${item.author}${item.date ? ` - ${item.date}` : ''}`}
                               </p>
                               <div className="pt-2">
-                                {(item.hasDocument || item.link) && (
-                                  <button 
-                                    className="inline-flex items-center gap-3 px-6 py-3 bg-black/30 hover:bg-black/40 backdrop-blur-sm rounded-full text-white text-sm font-medium transition-all group"
-                                    onClick={() => item.hasDocument ? handleConsultDocument(item) : window.open(item.link, '_blank')}
-                                  >
-                                    En savoir plus
-                                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                      <path d="M5 12h14M12 5l7 7-7 7" />
-                                    </svg>
-                                  </button>
-                                )}
+                                <button 
+                                  className="inline-flex items-center gap-3 px-6 py-3 bg-black/30 hover:bg-black/40 backdrop-blur-sm rounded-full text-white text-sm font-medium transition-all group"
+                                  onClick={() => {
+                                    if (item.hasDocument) {
+                                      handleConsultDocument(item);
+                                    } else if (item.link) {
+                                      window.open(item.link, '_blank');
+                                    } else {
+                                      navigate(`/digital-library/document/${item.id}`);
+                                    }
+                                  }}
+                                >
+                                  En savoir plus
+                                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path d="M5 12h14M12 5l7 7-7 7" />
+                                  </svg>
+                                </button>
                               </div>
                             </div>
                             
