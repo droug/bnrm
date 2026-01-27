@@ -342,9 +342,9 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
             {/* Bouquets électroniques */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.electronicBundles')} aria-haspopup="true">
+                <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label="Ressources électroniques" aria-haspopup="true">
                   <Icon name="mdi:library" className="h-4 w-4" />
-                  {t('dl.electronicBundles')}
+                  Ressources électroniques
                   <Icon name="mdi:chevron-down" className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
