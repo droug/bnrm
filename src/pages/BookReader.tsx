@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, type CSSProperties } from "react";
+import { createPortal } from "react-dom";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useParams, useNavigate } from "react-router-dom";
@@ -99,6 +100,48 @@ const BookReader = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [viewMode, setViewMode] = useState<"single" | "double" | "scroll">("single");
   const [readingMode, setReadingMode] = useState<"book" | "audio">("book");
+
+  const mainContentRef = useRef<HTMLElement | null>(null);
+  const [floatingToolbarStyle, setFloatingToolbarStyle] = useState<CSSProperties | null>(null);
+
+  useLayoutEffect(() => {
+    if (viewMode !== "scroll" || readingMode !== "book") {
+      setFloatingToolbarStyle(null);
+      return;
+    }
+
+    const update = () => {
+      const mainEl = mainContentRef.current;
+      if (!mainEl) return;
+
+      const nav = document.querySelector(
+        'nav[aria-label="Navigation principale"]'
+      ) as HTMLElement | null;
+
+      const mainRect = mainEl.getBoundingClientRect();
+      const top = isFullscreen
+        ? 0
+        : nav
+        ? Math.max(0, nav.getBoundingClientRect().bottom)
+        : 0;
+
+      setFloatingToolbarStyle({
+        position: "fixed",
+        top,
+        left: Math.max(0, mainRect.left),
+        width: mainRect.width,
+        zIndex: 60,
+      });
+    };
+
+    update();
+    const raf = requestAnimationFrame(update);
+    window.addEventListener("resize", update);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", update);
+    };
+  }, [viewMode, readingMode, isFullscreen]);
   
   // User interaction states
   const [isFavorite, setIsFavorite] = useState(false);
@@ -1219,10 +1262,11 @@ const BookReader = () => {
         </aside>
 
         {/* Main Content - Book Viewer */}
-        <main className="flex-1 min-w-0 flex flex-col min-h-0 overflow-hidden relative">
-          {/* Toolbar - Hidden in scroll mode (has its own floating toolbar) */}
-          <div className={`bg-muted/30 backdrop-blur-sm border-b p-3 z-30 shrink-0 ${viewMode === "scroll" ? "hidden" : ""}`}>
-            <div className="flex items-center justify-between gap-4">
+        <main ref={mainContentRef} className="flex-1 min-w-0 flex flex-col min-h-0 overflow-hidden relative">
+          {/* Toolbar */}
+          {(() => {
+            const content = (
+              <div className="flex items-center justify-between gap-4">
               {/* Navigation Controls */}
               <div className="flex items-center gap-2">
                 <Button 
@@ -1400,7 +1444,26 @@ const BookReader = () => {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-          </div>
+            );
+
+            if (viewMode === "scroll" && floatingToolbarStyle) {
+              return createPortal(
+                <div
+                  style={floatingToolbarStyle}
+                  className="bg-background/95 backdrop-blur-sm border-b shadow-sm p-3"
+                >
+                  {content}
+                </div>,
+                document.body
+              );
+            }
+
+            return (
+              <div className="bg-muted/30 backdrop-blur-sm border-b p-3 z-30 shrink-0">
+                {content}
+              </div>
+            );
+          })()}
 
           {/* Book Display Area */}
           {readingMode === "book" ? (
@@ -1421,95 +1484,10 @@ const BookReader = () => {
               ) : viewMode === "scroll" ? (
                 /* Mode défilement vertical */
                 <div className="flex flex-col items-center gap-6 pb-8">
-                  {/* Floating toolbar - sticky at top */}
-                  <div className="sticky top-0 z-50 w-full max-w-4xl -mt-4 md:-mt-8 mb-2 bg-background border rounded-b-lg shadow-lg p-3">
-                    <div className="flex items-center justify-center gap-4 flex-wrap">
-                      {/* Navigation Controls */}
-                      <div className="flex items-center gap-2">
-                        <Button 
-                          variant="outline" 
-                          size="sm"
-                          onClick={() => {
-                            const scrollContainer = document.getElementById("scroll-container");
-                            if (scrollContainer) {
-                              scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
-                            }
-                            setCurrentPage(1);
-                          }}
-                          title="Retour au début"
-                        >
-                          <ChevronsUp className="h-4 w-4" />
-                        </Button>
-                        
-                        <div className="flex items-center gap-2">
-                          <Input 
-                            type="number" 
-                            value={currentPage}
-                            onChange={(e) => {
-                              const val = parseInt(e.target.value) || 1;
-                              const targetPage = Math.min(totalPages, Math.max(1, val));
-                              setCurrentPage(targetPage);
-                              const pageElement = document.getElementById(`page-${targetPage}`);
-                              if (pageElement) {
-                                pageElement.scrollIntoView({ behavior: "smooth", block: "start" });
-                              }
-                            }}
-                            className="w-16 text-center h-9 text-sm"
-                          />
-                          <span className="text-sm text-muted-foreground">/ {totalPages}</span>
-                        </div>
-                      </div>
-
-                      {/* Zoom Controls */}
-                      <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm" onClick={handleZoomOut}>
-                          <ZoomOut className="h-4 w-4" />
-                        </Button>
-                        <span className="text-sm font-medium w-16 text-center">{zoom}%</span>
-                        <Button variant="outline" size="sm" onClick={handleZoomIn}>
-                          <ZoomIn className="h-4 w-4" />
-                        </Button>
-                      </div>
-
-                      {/* View Mode Switcher */}
-                      <div className="flex items-center gap-1">
-                        <Button 
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setViewMode("single")}
-                        >
-                          <FileText className="h-4 w-4 mr-1" />
-                          Simple
-                        </Button>
-                        <Button 
-                          variant="outline"
-                          size="sm"
-                          onClick={() => allowDoublePageViewRestriction && setViewMode("double")}
-                          disabled={!allowDoublePageViewRestriction}
-                        >
-                          <BookOpen className="h-4 w-4 mr-1" />
-                          Double
-                        </Button>
-                        <Button 
-                          variant="default"
-                          size="sm"
-                        >
-                          <ChevronDown className="h-4 w-4 mr-1" />
-                          Scroll
-                        </Button>
-                      </div>
-
-                      {/* Fullscreen & Rotate */}
-                      <div className="flex items-center gap-2">
-                        <Button variant="outline" size="sm" onClick={handleRotate} title="Rotation">
-                          <RotateCw className="h-4 w-4" />
-                        </Button>
-                        <Button variant="outline" size="sm" onClick={toggleFullscreen}>
-                          {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
+                  {/* Spacer to avoid content being hidden under the floating toolbar */}
+                  {floatingToolbarStyle && (
+                    <div className="h-24 md:h-20" aria-hidden="true" />
+                  )}
                   {(pdfUrl && documentPages.length === 0 
                     ? Array.from({ length: actualTotalPages }, (_, i) => i) 
                     : generatePageImages()
