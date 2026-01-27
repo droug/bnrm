@@ -430,15 +430,31 @@ export default function HelpFAQ() {
                     transition={{ delay: index * 0.1 }}
                   >
                     <Card className="h-full overflow-hidden hover:shadow-xl transition-all group">
-                      <div className="aspect-video bg-muted relative">
+                      <div className="aspect-video bg-muted relative overflow-hidden">
                         {tutorial.video_url ? (
-                          <iframe
-                            src={tutorial.video_url}
-                            title={getText(tutorial.title_fr, tutorial.title_ar)}
-                            className="w-full h-full"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                          />
+                          tutorial.video_url.includes('supabase') || 
+                          tutorial.video_url.endsWith('.mp4') || 
+                          tutorial.video_url.endsWith('.webm') || 
+                          tutorial.video_url.endsWith('.ogg') ? (
+                            // Direct video file (uploaded)
+                            <video
+                              src={tutorial.video_url}
+                              controls
+                              className="w-full h-full object-cover"
+                              poster={tutorial.thumbnail_url}
+                            >
+                              {isArabic ? 'متصفحك لا يدعم تشغيل الفيديو' : 'Votre navigateur ne supporte pas la lecture vidéo'}
+                            </video>
+                          ) : (
+                            // Embedded video (YouTube, Vimeo, etc.)
+                            <iframe
+                              src={tutorial.video_url}
+                              title={getText(tutorial.title_fr, tutorial.title_ar)}
+                              className="w-full h-full"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                            />
+                          )
                         ) : (
                           <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-bn-blue-primary/20 to-bn-blue-primary/5">
                             <div className="w-16 h-16 rounded-full bg-white/90 shadow-lg flex items-center justify-center group-hover:scale-110 transition-transform">
