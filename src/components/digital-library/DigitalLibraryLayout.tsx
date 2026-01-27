@@ -282,10 +282,18 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
 
           {/* Main Menu */}
           <div className="flex items-center gap-1 mt-3 overflow-x-auto" role="menubar" aria-label="Menu principal">
-            <Link to="/digital-library">
-              <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" role="menuitem" aria-label={t('dl.home')}>
-                <Icon name="mdi:home-outline" className="h-4 w-4" />
-                {t('dl.home')}
+            <SimpleTooltip content={t('dl.home')}>
+              <Link to="/digital-library">
+                <Button variant="ghost" size="icon" className="h-8 w-8 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" role="menuitem" aria-label={t('dl.home')}>
+                  <Icon name="mdi:home-outline" className="h-5 w-5" />
+                </Button>
+              </Link>
+            </SimpleTooltip>
+
+            <Link to="/digital-library/about">
+              <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" role="menuitem" aria-label={t('dl.about')}>
+                <Icon name="mdi:information-outline" className="h-4 w-4" />
+                {t('dl.about')}
               </Button>
             </Link>
 
@@ -431,12 +439,6 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            <Link to="/digital-library/news">
-              <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.newsEvents')}>
-                <Icon name="mdi:calendar-month-outline" className="h-4 w-4" />
-                {t('dl.newsEvents')}
-              </Button>
-            </Link>
 
             <Link to="/digital-library/help">
               <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.helpFaq')}>
