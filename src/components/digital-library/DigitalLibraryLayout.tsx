@@ -417,21 +417,55 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                     <Icon name="mdi:chevron-down" className="h-3 w-3" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="bg-card z-50" role="menu" aria-label={t('dl.readerServices')}>
-                  <Link to="/abonnements?platform=bn">
-                    <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
-                      <Icon name="mdi:account-plus-outline" className="h-4 w-4" />
-                      {t('dl.membership')}
-                    </DropdownMenuItem>
-                  </Link>
-                  <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground" onClick={() => setShowReservationDialog(true)}>
-                    <Icon name="mdi:bookmark-check-outline" className="h-4 w-4" />
-                    {t('dl.reservationRequest')}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground" onClick={() => setShowDigitizationDialog(true)}>
-                    <Icon name="mdi:file-document-edit-outline" className="h-4 w-4" />
-                    {t('dl.digitizationRequest')}
-                  </DropdownMenuItem>
+                <DropdownMenuContent align="start" className="bg-card z-50 min-w-[280px] p-2" role="menu" aria-label={t('dl.readerServices')}>
+                  <FancyTooltip 
+                    content={t('dl.membership')} 
+                    description="Abonnez-vous pour accéder à l'ensemble des ressources numériques"
+                    icon="mdi:account-plus-outline"
+                    side="right"
+                    variant="gold"
+                  >
+                    <Link to="/abonnements?platform=bn" className="block">
+                      <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group">
+                        <div className="p-2 rounded-xl bg-gradient-to-br from-gold-bn-primary/20 to-gold-bn-primary/5 group-hover:from-gold-bn-primary/30 group-hover:to-gold-bn-primary/10 transition-all duration-200 group-hover:scale-110">
+                          <Icon name="mdi:account-plus-outline" className="h-5 w-5 text-gold-bn-primary" />
+                        </div>
+                        <span className="font-semibold text-foreground group-hover:text-gold-bn-primary transition-colors">{t('dl.membership')}</span>
+                      </DropdownMenuItem>
+                    </Link>
+                  </FancyTooltip>
+                  <FancyTooltip 
+                    content={t('dl.reservationRequest')} 
+                    description="Réservez un document pour consultation sur place"
+                    icon="mdi:bookmark-check-outline"
+                    side="right"
+                    variant="gold"
+                  >
+                    <div className="block">
+                      <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group" onClick={() => setShowReservationDialog(true)}>
+                        <div className="p-2 rounded-xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 group-hover:from-emerald-500/30 group-hover:to-emerald-500/10 transition-all duration-200 group-hover:scale-110">
+                          <Icon name="mdi:bookmark-check-outline" className="h-5 w-5 text-emerald-600" />
+                        </div>
+                        <span className="font-semibold text-foreground group-hover:text-emerald-600 transition-colors">{t('dl.reservationRequest')}</span>
+                      </DropdownMenuItem>
+                    </div>
+                  </FancyTooltip>
+                  <FancyTooltip 
+                    content={t('dl.digitizationRequest')} 
+                    description="Demandez la numérisation d'un document non disponible en ligne"
+                    icon="mdi:file-document-edit-outline"
+                    side="right"
+                    variant="gold"
+                  >
+                    <div className="block">
+                      <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group" onClick={() => setShowDigitizationDialog(true)}>
+                        <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-500/5 group-hover:from-purple-500/30 group-hover:to-purple-500/10 transition-all duration-200 group-hover:scale-110">
+                          <Icon name="mdi:file-document-edit-outline" className="h-5 w-5 text-purple-600" />
+                        </div>
+                        <span className="font-semibold text-foreground group-hover:text-purple-600 transition-colors">{t('dl.digitizationRequest')}</span>
+                      </DropdownMenuItem>
+                    </div>
+                  </FancyTooltip>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
