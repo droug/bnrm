@@ -548,7 +548,7 @@ export default function DigitalLibraryHome() {
                               </p>
                               <div className="pt-2">
                                 <button 
-                                  className="inline-flex items-center gap-3 px-6 py-3 bg-black/30 hover:bg-black/40 backdrop-blur-sm rounded-full text-white text-sm font-medium transition-all group"
+                                  className="inline-flex items-center gap-3 px-6 py-3 bg-gold-bn-primary/20 hover:bg-gold-bn-primary/30 backdrop-blur-sm rounded-full text-white text-sm font-medium transition-all group"
                                   onClick={() => {
                                     if (item.hasDocument) {
                                       handleConsultDocument(item);
