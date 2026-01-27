@@ -225,22 +225,14 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               </DropdownMenu>
               <ThemeSwitcher />
               
-              {/* Boutons Connexion/Adhésion */}
+              {/* Bouton Connexion */}
               {!isAuthenticated && (
-                <div className="flex items-center gap-2">
-                  <Link to="/auth?redirect=/digital-library">
-                    <Button variant="outline" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-gold-bn-primary focus-visible:ring-offset-2" aria-label={t('dl.login')}>
-                      <Icon name="mdi:login" className="h-4 w-4" />
-                      <span className="hidden sm:inline">{t('dl.login')}</span>
-                    </Button>
-                  </Link>
-                  <Link to="/abonnements?platform=bn">
-                    <Button size="sm" className="gap-2 text-sm bg-gold-bn-primary hover:bg-gold-bn-primary-dark text-white focus-visible:ring-2 focus-visible:ring-gold-bn-primary focus-visible:ring-offset-2" aria-label={t('dl.membership')}>
-                      <Icon name="mdi:account-plus-outline" className="h-4 w-4" />
-                      <span className="hidden sm:inline">{t('dl.membership')}</span>
-                    </Button>
-                  </Link>
-                </div>
+                <Link to="/auth?redirect=/digital-library">
+                  <Button variant="outline" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-gold-bn-primary focus-visible:ring-offset-2" aria-label={t('dl.login')}>
+                    <Icon name="mdi:login" className="h-4 w-4" />
+                    <span className="hidden sm:inline">{t('dl.login')}</span>
+                  </Button>
+                </Link>
               )}
               
               {/* Menu Utilisateur */}
