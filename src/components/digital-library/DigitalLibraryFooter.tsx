@@ -142,27 +142,7 @@ const DigitalLibraryFooter = () => {
             </ul>
           </div>
 
-          {/* Col 3: Aide et support */}
-          <div>
-            <h4 className="text-lg font-semibold mb-6 flex items-center text-bn-blue-primary">
-              <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
-              {language === 'ar' ? 'المساعدة والدعم' : 'Aide et support'}
-            </h4>
-            <ul className="space-y-3">
-              {supportLinks.map((link, index) => (
-                <li key={index}>
-                  <a 
-                    href={link.href} 
-                    className="text-sm opacity-80 hover:opacity-100 hover:text-gold-bn-primary hover:translate-x-1 transition-all inline-block"
-                  >
-                    {language === 'ar' ? link.title_ar : link.title_fr}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Col 4: Réservoirs mondiaux */}
+          {/* Col 3: Réservoirs mondiaux */}
           <div>
             <h4 className="text-lg font-semibold mb-6 flex items-center text-bn-blue-primary">
               <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
@@ -175,6 +155,26 @@ const DigitalLibraryFooter = () => {
                     href={link.href}
                     target="_blank"
                     rel="noopener noreferrer"
+                    className="text-sm opacity-80 hover:opacity-100 hover:text-gold-bn-primary hover:translate-x-1 transition-all inline-block"
+                  >
+                    {language === 'ar' ? link.title_ar : link.title_fr}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Col 4: Aide et support */}
+          <div>
+            <h4 className="text-lg font-semibold mb-6 flex items-center text-bn-blue-primary">
+              <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
+              {language === 'ar' ? 'المساعدة والدعم' : 'Aide et support'}
+            </h4>
+            <ul className="space-y-3">
+              {supportLinks.map((link, index) => (
+                <li key={index}>
+                  <a 
+                    href={link.href} 
                     className="text-sm opacity-80 hover:opacity-100 hover:text-gold-bn-primary hover:translate-x-1 transition-all inline-block"
                   >
                     {language === 'ar' ? link.title_ar : link.title_fr}
