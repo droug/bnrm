@@ -27,6 +27,8 @@ const providerLogoMap: Record<string, string> = {
   'rfn': logoRfn,
   'europeana': logoEuropeana,
   'ifla': logoIfla,
+  'eni-elearning': 'https://www.eni-elearning.com/wp-content/uploads/2021/12/belearn-formations-informatique_fr.svg',
+  'eni': 'https://www.eni-elearning.com/wp-content/uploads/2021/12/belearn-formations-informatique_fr.svg',
 };
 import {
   DropdownMenu,
