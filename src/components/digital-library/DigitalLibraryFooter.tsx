@@ -71,11 +71,10 @@ const DigitalLibraryFooter = () => {
     { title_fr: "Guide d'utilisation", title_ar: "دليل الاستخدام", href: "/digital-library/help#guide" }
   ];
 
-  const servicesLinks = [
-    { title_fr: "Espace personnel", title_ar: "المساحة الشخصية", href: "/digital-library/my-space" },
-    { title_fr: "Réservations", title_ar: "الحجوزات", href: "/digital-library/mes-demandes" },
-    { title_fr: "Prêts numériques", title_ar: "الإعارة الرقمية", href: "/digital-library/my-loans" },
-    { title_fr: "Annotations", title_ar: "التعليقات", href: "/digital-library/my-notes" }
+  const worldReservoirsLinks = [
+    { title_fr: "Réseau Francophone Numérique", title_ar: "الشبكة الفرنكوفونية الرقمية", href: "https://rfnum.org", external: true },
+    { title_fr: "Patrimoine culturel numérique européen", title_ar: "التراث الثقافي الرقمي الأوروبي", href: "https://www.europeana.eu", external: true },
+    { title_fr: "World Digital Library", title_ar: "المكتبة الرقمية العالمية", href: "https://www.loc.gov/collections/world-digital-library", external: true }
   ];
 
   const socialLinks = [
@@ -163,17 +162,19 @@ const DigitalLibraryFooter = () => {
             </ul>
           </div>
 
-          {/* Col 4: Services */}
+          {/* Col 4: Réservoirs mondiaux */}
           <div>
             <h4 className="text-lg font-semibold mb-6 flex items-center text-bn-blue-primary">
               <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
-              {language === 'ar' ? 'الخدمات' : 'Services'}
+              {language === 'ar' ? 'الخزانات العالمية' : 'Réservoirs mondiaux'}
             </h4>
             <ul className="space-y-3">
-              {servicesLinks.map((link, index) => (
+              {worldReservoirsLinks.map((link, index) => (
                 <li key={index}>
                   <a 
-                    href={link.href} 
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="text-sm opacity-80 hover:opacity-100 hover:text-gold-bn-primary hover:translate-x-1 transition-all inline-block"
                   >
                     {language === 'ar' ? link.title_ar : link.title_fr}
