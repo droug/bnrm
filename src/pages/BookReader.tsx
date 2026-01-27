@@ -631,7 +631,7 @@ const BookReader = () => {
     size: "45.3 MB",
     hasAudio: true,
     audioDuration: "5h 23min",
-    permalink: `https://bnrm.ma/reader/${id}`
+    permalink: window.location.href
   };
 
   const chapters = [
