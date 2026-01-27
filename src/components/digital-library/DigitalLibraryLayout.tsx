@@ -99,11 +99,11 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   ];
 
   const themesSubmenu = [
-    { labelKey: "dl.themes.history", href: "/digital-library/themes/history" },
-    { labelKey: "dl.themes.arts", href: "/digital-library/themes/arts" },
-    { labelKey: "dl.themes.sciences", href: "/digital-library/themes/sciences" },
-    { labelKey: "dl.themes.religion", href: "/digital-library/themes/religion" },
-    { labelKey: "dl.themes.literature", href: "/digital-library/themes/literature" },
+    { labelKey: "dl.themes.history", descKey: "Découvrez les documents historiques du Maroc", href: "/digital-library/themes/history", iconName: "mdi:history", count: "4,230" },
+    { labelKey: "dl.themes.arts", descKey: "Arts visuels, musique et patrimoine artistique", href: "/digital-library/themes/arts", iconName: "mdi:palette-outline", count: "2,890" },
+    { labelKey: "dl.themes.sciences", descKey: "Sciences exactes, naturelles et appliquées", href: "/digital-library/themes/sciences", iconName: "mdi:flask-outline", count: "1,560" },
+    { labelKey: "dl.themes.religion", descKey: "Textes religieux et études théologiques", href: "/digital-library/themes/religion", iconName: "mdi:mosque", count: "3,120" },
+    { labelKey: "dl.themes.literature", descKey: "Littérature marocaine et arabe classique", href: "/digital-library/themes/literature", iconName: "mdi:feather", count: "5,670" },
   ];
 
   const userMenu = isAuthenticated ? [
@@ -465,14 +465,41 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   <Icon name="mdi:chevron-down" className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="bg-card z-50">
-                {themesSubmenu.map((item) => (
-                  <Link key={item.href} to={item.href}>
-                    <DropdownMenuItem className="cursor-pointer focus:bg-accent focus:text-accent-foreground">
-                      {t(item.labelKey)}
-                    </DropdownMenuItem>
-                  </Link>
-                ))}
+              <DropdownMenuContent align="start" className="bg-card z-50 min-w-[320px] p-2" role="menu" aria-label={t('dl.exploreByTheme')}>
+                {themesSubmenu.map((item, index) => {
+                  const themeBadgeStyles = [
+                    "bg-gradient-to-r from-amber-600 to-orange-500 text-white shadow-lg shadow-amber-600/30 rotate-1",
+                    "bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg shadow-pink-500/30 -rotate-1",
+                    "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-500/30 rotate-2",
+                    "bg-gradient-to-br from-emerald-600 to-green-500 text-white shadow-lg shadow-emerald-600/30 -rotate-2",
+                    "bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/30 rotate-1",
+                  ];
+                  
+                  return (
+                    <FancyTooltip 
+                      key={item.href}
+                      content={t(item.labelKey)} 
+                      description={item.descKey}
+                      icon={item.iconName}
+                      side="right"
+                      variant="gold"
+                    >
+                      <Link to={item.href} className="block">
+                        <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group">
+                          <div className="flex items-center gap-3 flex-1">
+                            <div className="p-2 rounded-xl bg-gradient-to-br from-bn-blue/20 to-bn-blue/5 group-hover:from-bn-blue/30 group-hover:to-bn-blue/10 transition-all duration-200 group-hover:scale-110">
+                              <Icon name={item.iconName} className="h-5 w-5 text-bn-blue" />
+                            </div>
+                            <span className="font-semibold text-foreground group-hover:text-bn-blue transition-colors">{t(item.labelKey)}</span>
+                          </div>
+                          <span className={`px-3 py-1 text-xs font-bold rounded-none transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-0 ${themeBadgeStyles[index % themeBadgeStyles.length]}`}>
+                            {item.count}
+                          </span>
+                        </DropdownMenuItem>
+                      </Link>
+                    </FancyTooltip>
+                  );
+                })}
               </DropdownMenuContent>
             </DropdownMenu>
 
