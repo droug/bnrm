@@ -437,158 +437,219 @@ export default function DigitalLibraryHome() {
         keywords={["bibliothèque numérique", "documents numérisés", "patrimoine marocain", "livres électroniques", "archives numériques", "collections BNRM"]}
       />
       
-      {/* Hero Section with Background Image */}
+      {/* Hero Section with Background Image & Integrated Search */}
       <section 
-        className="relative py-16 overflow-hidden"
+        className="relative min-h-[85vh] overflow-hidden"
         style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url(${heroImageUrl})`,
+          backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url(${heroImageUrl})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 relative z-10 flex flex-col h-full pt-12">
+          {/* Hero Title & Subtitle */}
           <div className="text-center mb-8">
-            <h1 className="text-5xl font-bold text-white mb-4 animate-fade-in drop-shadow-lg">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 animate-fade-in drop-shadow-lg tracking-wide uppercase">
               {t('dl.home.welcome')}
             </h1>
-            <p className="text-xl text-white/90 max-w-3xl mx-auto animate-fade-in drop-shadow-md">
+            <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto animate-fade-in drop-shadow-md">
               {t('dl.home.accessDocuments')}
             </p>
           </div>
 
-          {/* Hero Carousel - Uses Featured Works from CMS */}
-          {!loadingFeatured && featuredWorks.length > 0 && (
-            <div className="max-w-5xl mx-auto">
-              <Carousel
-                opts={{
-                  align: "start",
-                  loop: true,
+          {/* Integrated Search Bar */}
+          <div className="max-w-3xl mx-auto w-full mb-12">
+            <div className="relative flex items-center bg-white/95 backdrop-blur-sm rounded-full shadow-2xl overflow-hidden border-2 border-white/20">
+              <div className="flex items-center pl-6 text-muted-foreground">
+                <Icon name="mdi:magnify" className="w-6 h-6" />
+              </div>
+              <input
+                type="text"
+                placeholder={t('dl.home.searchPlaceholder') || "Rechercher parmi 50,000+ documents..."}
+                className="flex-1 px-4 py-4 text-lg bg-transparent outline-none text-foreground placeholder:text-muted-foreground"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    const value = (e.target as HTMLInputElement).value;
+                    if (value.trim()) {
+                      navigate(`/digital-library/search?q=${encodeURIComponent(value.trim())}`);
+                    }
+                  }
                 }}
-                plugins={[autoplayPlugin.current]}
-                className="w-full"
+              />
+              <Button 
+                className="m-2 px-6 py-2 bg-gold-bn-primary hover:bg-gold-bn-primary-dark text-white rounded-full font-medium"
+                onClick={() => {
+                  const input = document.querySelector('input[type="text"]') as HTMLInputElement;
+                  if (input?.value.trim()) {
+                    navigate(`/digital-library/search?q=${encodeURIComponent(input.value.trim())}`);
+                  }
+                }}
               >
-                <CarouselContent>
-                  {featuredWorks.map((item) => (
-                     <CarouselItem key={item.workId || item.id} className="animate-fade-in">
-                       <div className="p-1">
-                         <Card className="border-2 hover:shadow-2xl transition-all duration-700 bg-background/10 backdrop-blur-sm border-primary-foreground/30 hover:bg-background/20 hover:scale-[1.02]">
-                           <CardContent className="flex flex-col md:flex-row items-center gap-6 p-8 text-white">
-                             <div className="flex-1">
-                               <Badge className="mb-3">{item.type}</Badge>
-                               <h3 className="text-2xl font-bold mb-2 text-white">
-                                 {language === 'ar' && item.title_ar ? item.title_ar : item.title}
-                               </h3>
-                               <p className="text-white/80 mb-2">{item.author}</p>
-                               {item.description && (
-                                 <p className="text-sm text-white/70 mb-3 line-clamp-2">{item.description}</p>
-                               )}
-                               {item.date && (
-                                 <p className="text-sm text-white/60 mb-4">{item.date}</p>
-                               )}
-                               <div className="flex gap-2 mt-6">
-                                  {item.hasDocument ? (
-                                    <Button 
-                                      size="lg" 
-                                      className="bg-gradient-to-r from-gold-bn-primary to-gold-bn-primary-dark hover:from-gold-bn-primary-dark hover:to-gold-bn-deep text-white shadow-lg hover:shadow-xl transition-all duration-300 min-w-[160px]" 
-                                      onClick={() => handleConsultDocument(item)}
-                                    >
-                                      <BookOpen className="h-5 w-5 mr-2" />
-                                      {t('dl.home.consult')}
-                                   </Button>
-                                  ) : item.link ? (
-                                    <Button 
-                                      size="lg" 
-                                      className="bg-gradient-to-r from-gold-bn-primary to-gold-bn-primary-dark hover:from-gold-bn-primary-dark hover:to-gold-bn-deep text-white shadow-lg hover:shadow-xl transition-all duration-300 min-w-[160px]" 
-                                      onClick={() => window.open(item.link, '_blank')}
-                                    >
-                                      <ExternalLink className="h-5 w-5 mr-2" />
-                                      {t('dl.home.discover')}
-                                   </Button>
-                                 ) : null}
-                               </div>
+                {t('dl.home.search') || "Rechercher"}
+              </Button>
+            </div>
+          </div>
+
+          {/* Œuvres et vedettes - Featured Works Carousel */}
+          <div className="flex-1 flex flex-col justify-end pb-12">
+            {!loadingFeatured && featuredWorks.length > 0 && (
+              <div className="relative">
+                <Carousel
+                  opts={{
+                    align: "start",
+                    loop: true,
+                  }}
+                  plugins={[autoplayPlugin.current]}
+                  className="w-full max-w-6xl mx-auto"
+                >
+                  <CarouselContent>
+                    {featuredWorks.map((item) => (
+                      <CarouselItem key={item.workId || item.id} className="animate-fade-in">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center px-4">
+                          {/* Left: Text Content */}
+                          <div className="text-white space-y-4">
+                            <Badge className="bg-gold-bn-primary text-white hover:bg-gold-bn-primary-dark text-sm px-4 py-1">
+                              {item.type}
+                            </Badge>
+                            <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wide leading-tight">
+                              {language === 'ar' && item.title_ar ? item.title_ar : item.title}
+                            </h2>
+                            <p className="text-white/80 text-base leading-relaxed line-clamp-4">
+                              {item.description || `${item.author}${item.date ? ` - ${item.date}` : ''}`}
+                            </p>
+                            <div className="pt-4">
+                              {item.hasDocument ? (
+                                <Button 
+                                  variant="link" 
+                                  className="text-gold-bn-primary hover:text-gold-bn-primary-dark p-0 text-base font-semibold group"
+                                  onClick={() => handleConsultDocument(item)}
+                                >
+                                  {t('dl.home.learnMore') || "En savoir plus"}
+                                  <Icon name="mdi:arrow-right" className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                </Button>
+                              ) : item.link ? (
+                                <Button 
+                                  variant="link" 
+                                  className="text-gold-bn-primary hover:text-gold-bn-primary-dark p-0 text-base font-semibold group"
+                                  onClick={() => window.open(item.link, '_blank')}
+                                >
+                                  {t('dl.home.learnMore') || "En savoir plus"}
+                                  <Icon name="mdi:arrow-right" className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                </Button>
+                              ) : null}
                             </div>
-                            {item.thumbnail && (
-                              <div className="w-full md:w-48 h-64 rounded-lg overflow-hidden hover-scale shadow-xl">
+                          </div>
+                          
+                          {/* Right: Image with glow effect */}
+                          {item.thumbnail && (
+                            <div className="relative flex justify-center md:justify-end">
+                              <div className="relative">
+                                {/* Glow effect */}
+                                <div className="absolute inset-0 bg-gradient-to-r from-gold-bn-primary/30 to-transparent blur-3xl scale-150 opacity-50" />
+                                <div className="relative w-72 h-80 md:w-80 md:h-96 rounded-xl overflow-hidden shadow-2xl border-2 border-white/20 transform hover:scale-105 transition-transform duration-500">
+                                  <img 
+                                    src={item.thumbnail} 
+                                    alt={item.title}
+                                    className="w-full h-full object-cover"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  
+                  {/* Custom Navigation Arrows */}
+                  <CarouselPrevious className="absolute left-0 md:-left-4 top-1/2 -translate-y-1/2 bg-transparent border-0 text-gold-bn-primary hover:text-gold-bn-primary-dark hover:bg-transparent h-16 w-16">
+                    <Icon name="mdi:chevron-left" className="w-12 h-12" />
+                  </CarouselPrevious>
+                  <CarouselNext className="absolute right-0 md:-right-4 top-1/2 -translate-y-1/2 bg-transparent border-0 text-gold-bn-primary hover:text-gold-bn-primary-dark hover:bg-transparent h-16 w-16">
+                    <Icon name="mdi:chevron-right" className="w-12 h-12" />
+                  </CarouselNext>
+                </Carousel>
+              </div>
+            )}
+            
+            {/* Fallback to recent documents if no featured works */}
+            {!loadingFeatured && featuredWorks.length === 0 && !loading && newItems.length > 0 && (
+              <div className="relative">
+                <Carousel
+                  opts={{
+                    align: "start",
+                    loop: true,
+                  }}
+                  plugins={[autoplayPlugin.current]}
+                  className="w-full max-w-6xl mx-auto"
+                >
+                  <CarouselContent>
+                    {newItems.map((item) => (
+                      <CarouselItem key={item.id} className="animate-fade-in">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center px-4">
+                          {/* Left: Text Content */}
+                          <div className="text-white space-y-4">
+                            <Badge className="bg-gold-bn-primary text-white hover:bg-gold-bn-primary-dark text-sm px-4 py-1">
+                              {item.type}
+                            </Badge>
+                            <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wide leading-tight">
+                              {item.title}
+                            </h2>
+                            <p className="text-white/80 text-base leading-relaxed">
+                              {item.author} - {t('dl.home.addedOn')} {new Date(item.date).toLocaleDateString(language === 'ar' ? 'ar-MA' : language === 'en' ? 'en-US' : 'fr-FR')}
+                            </p>
+                            <div className="pt-4">
+                              <Button 
+                                variant="link" 
+                                className="text-gold-bn-primary hover:text-gold-bn-primary-dark p-0 text-base font-semibold group"
+                                onClick={() => handleConsultDocument(item)}
+                              >
+                                {t('dl.home.learnMore') || "En savoir plus"}
+                                <Icon name="mdi:arrow-right" className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                              </Button>
+                            </div>
+                          </div>
+                          
+                          {/* Right: Image with glow effect */}
+                          <div className="relative flex justify-center md:justify-end">
+                            <div className="relative">
+                              <div className="absolute inset-0 bg-gradient-to-r from-gold-bn-primary/30 to-transparent blur-3xl scale-150 opacity-50" />
+                              <div className="relative w-72 h-80 md:w-80 md:h-96 rounded-xl overflow-hidden shadow-2xl border-2 border-white/20 transform hover:scale-105 transition-transform duration-500">
                                 <img 
                                   src={item.thumbnail} 
                                   alt={item.title}
                                   className="w-full h-full object-cover"
                                 />
                               </div>
-                            )}
-                          </CardContent>
-                        </Card>
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious className="hidden md:flex" />
-                <CarouselNext className="hidden md:flex" />
-              </Carousel>
-            </div>
-          )}
-          {/* Fallback to recent documents if no featured works */}
-          {!loadingFeatured && featuredWorks.length === 0 && !loading && newItems.length > 0 && (
-            <div className="max-w-5xl mx-auto">
-              <Carousel
-                opts={{
-                  align: "start",
-                  loop: true,
-                }}
-                plugins={[autoplayPlugin.current]}
-                className="w-full"
-              >
-                <CarouselContent>
-                  {newItems.map((item) => (
-                     <CarouselItem key={item.id} className="animate-fade-in">
-                       <div className="p-1">
-                         <Card className="border-2 hover:shadow-2xl transition-all duration-700 bg-background/10 backdrop-blur-sm border-primary-foreground/30 hover:bg-background/20 hover:scale-[1.02]">
-                           <CardContent className="flex flex-col md:flex-row items-center gap-6 p-8 text-white">
-                             <div className="flex-1">
-                               <Badge className="mb-3">{item.type}</Badge>
-                               <h3 className="text-2xl font-bold mb-2 text-white">{item.title}</h3>
-                               <p className="text-white/80 mb-4">{item.author}</p>
-                                <p className="text-sm text-white/70 mb-4">{t('dl.home.addedOn')} {new Date(item.date).toLocaleDateString(language === 'ar' ? 'ar-MA' : language === 'en' ? 'en-US' : 'fr-FR')}</p>
-                                    <div className="flex gap-2 mt-6">
-                                     <Button 
-                                       size="lg" 
-                                       className="bg-gradient-to-r from-gold-bn-primary to-gold-bn-primary-dark hover:from-gold-bn-primary-dark hover:to-gold-bn-deep text-white shadow-lg hover:shadow-xl transition-all duration-300 min-w-[160px]" 
-                                       onClick={() => handleConsultDocument(item)}
-                                     >
-                                       <BookOpen className="h-5 w-5 mr-2" />
-                                       {t('dl.home.consult')}
-                                    </Button>
-                                 </div>
                             </div>
-                            <div className="w-full md:w-48 h-64 rounded-lg overflow-hidden hover-scale shadow-xl">
-                              <img 
-                                src={item.thumbnail} 
-                                alt={item.title}
-                                className="w-full h-full object-cover"
-                              />
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-                <CarouselPrevious className="hidden md:flex" />
-                <CarouselNext className="hidden md:flex" />
-              </Carousel>
-            </div>
-          )}
-          {(loadingFeatured || loading) && (
-            <div className="max-w-5xl mx-auto text-center py-12">
-              <p className="text-white/90 drop-shadow-md">{t('dl.home.loadingDocuments')}</p>
-            </div>
-          )}
-          {!loadingFeatured && featuredWorks.length === 0 && !loading && newItems.length === 0 && (
-            <div className="max-w-5xl mx-auto text-center py-12">
-              <p className="text-white/90 drop-shadow-md">{t('dl.home.noDocumentsAvailable')}</p>
-            </div>
-          )}
+                          </div>
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  
+                  <CarouselPrevious className="absolute left-0 md:-left-4 top-1/2 -translate-y-1/2 bg-transparent border-0 text-gold-bn-primary hover:text-gold-bn-primary-dark hover:bg-transparent h-16 w-16">
+                    <Icon name="mdi:chevron-left" className="w-12 h-12" />
+                  </CarouselPrevious>
+                  <CarouselNext className="absolute right-0 md:-right-4 top-1/2 -translate-y-1/2 bg-transparent border-0 text-gold-bn-primary hover:text-gold-bn-primary-dark hover:bg-transparent h-16 w-16">
+                    <Icon name="mdi:chevron-right" className="w-12 h-12" />
+                  </CarouselNext>
+                </Carousel>
+              </div>
+            )}
+            
+            {(loadingFeatured || loading) && (
+              <div className="text-center py-12">
+                <p className="text-white/90 drop-shadow-md">{t('dl.home.loadingDocuments')}</p>
+              </div>
+            )}
+            {!loadingFeatured && featuredWorks.length === 0 && !loading && newItems.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-white/90 drop-shadow-md">{t('dl.home.noDocumentsAvailable')}</p>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
