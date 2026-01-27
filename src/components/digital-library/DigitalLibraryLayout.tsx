@@ -470,25 +470,29 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   <Icon name="mdi:chevron-down" className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="bg-card z-50 min-w-[320px] p-2" role="menu" aria-label={t('dl.exploreByTheme')}>
+              <DropdownMenuContent align="start" className="bg-card z-50 w-[340px] p-1.5 grid grid-cols-1 gap-0.5" role="menu" aria-label={t('dl.exploreByTheme')}>
                 {themesSubmenu.map((item, index) => {
-                  const themeBadgeStyles = [
-                    "bg-gradient-to-r from-amber-600 to-orange-500 text-white shadow-lg shadow-amber-600/30 rotate-1",
-                    "bg-gradient-to-r from-pink-500 to-rose-500 text-white shadow-lg shadow-pink-500/30 -rotate-1",
-                    "bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-500/30 rotate-2",
-                    "bg-gradient-to-br from-emerald-600 to-green-500 text-white shadow-lg shadow-emerald-600/30 -rotate-2",
-                    "bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/30 rotate-1",
+                  const iconColors = [
+                    "from-blue-500 to-indigo-600",
+                    "from-purple-500 to-violet-600", 
+                    "from-emerald-500 to-teal-600",
+                    "from-amber-500 to-orange-600",
+                    "from-cyan-500 to-blue-500",
+                    "from-rose-500 to-pink-600",
+                    "from-green-500 to-emerald-600",
+                    "from-fuchsia-500 to-purple-600",
+                    "from-indigo-500 to-blue-600",
+                    "from-teal-500 to-cyan-600",
                   ];
                   
                   return (
                     <Link key={item.href} to={item.href} className="block">
-                      <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group">
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className="p-2 rounded-xl bg-gradient-to-br from-bn-blue/20 to-bn-blue/5 group-hover:from-bn-blue/30 group-hover:to-bn-blue/10 transition-all duration-200 group-hover:scale-110">
-                            <Icon name={item.iconName} className="h-5 w-5 text-bn-blue" />
-                          </div>
-                          <span className="font-medium text-foreground group-hover:text-bn-blue transition-colors">{item.label}</span>
+                      <DropdownMenuItem className="gap-2.5 cursor-pointer focus:bg-accent py-2 px-2.5 rounded-md hover:bg-bn-blue/5 transition-all duration-200 group">
+                        <div className={`p-1.5 rounded-lg bg-gradient-to-br ${iconColors[index % iconColors.length]} shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200`}>
+                          <Icon name={item.iconName} className="h-4 w-4 text-white" />
                         </div>
+                        <span className="text-sm font-medium text-foreground/80 group-hover:text-bn-blue transition-colors flex-1 truncate">{item.label}</span>
+                        <Icon name="mdi:chevron-right" className="h-3.5 w-3.5 text-muted-foreground/50 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
                       </DropdownMenuItem>
                     </Link>
                   );
