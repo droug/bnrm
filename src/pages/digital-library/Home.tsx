@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { BookOpen, FileText, Image, Music, Calendar, Sparkles, Globe, ExternalLink, Layers, Eye } from "lucide-react";
 import { Icon } from "@/components/ui/icon";
+import { FancyTooltip } from "@/components/ui/fancy-tooltip";
 import { Link, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import SEOHead from "@/components/seo/SEOHead";
@@ -804,116 +805,164 @@ export default function DigitalLibraryHome() {
               >
                 {/* BRILL */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardContent className="p-8 flex flex-col items-center justify-center">
-                      <div className="flex items-center justify-center h-[80px]">
-                        <img src={logoBrill} alt="BRILL" className="h-[50px] max-w-[200px] object-contain" />
-                      </div>
-                      <a
-                        href="https://brill.com/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
-                      >
-                        Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                      </a>
-                    </CardContent>
-                  </Card>
+                  <FancyTooltip
+                    content="BRILL"
+                    description="Maison d'édition académique néerlandaise spécialisée dans les sciences humaines et les études orientales."
+                    icon="mdi:book-open-variant"
+                    side="top"
+                    variant="gold"
+                  >
+                    <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+                      <CardContent className="p-8 flex flex-col items-center justify-center">
+                        <div className="flex items-center justify-center h-[80px]">
+                          <img src={logoBrill} alt="BRILL" className="h-[50px] max-w-[200px] object-contain" />
+                        </div>
+                        <a
+                          href="https://brill.com/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
+                        >
+                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
+                        </a>
+                      </CardContent>
+                    </Card>
+                  </FancyTooltip>
                 </div>
 
                 {/* EBSCO */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardContent className="p-8 flex flex-col items-center justify-center">
-                      <div className="flex items-center justify-center h-[80px]">
-                        <div className="font-heading text-[42px] font-semibold text-bn-blue-primary tracking-wide">EBSCO</div>
-                      </div>
-                      <a
-                        href="https://www.ebsco.com/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
-                      >
-                        Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                      </a>
-                    </CardContent>
-                  </Card>
+                  <FancyTooltip
+                    content="EBSCO"
+                    description="Fournisseur américain de bases de données, revues et livres numériques pour bibliothèques et universités."
+                    icon="mdi:database-search"
+                    side="top"
+                    variant="gold"
+                  >
+                    <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+                      <CardContent className="p-8 flex flex-col items-center justify-center">
+                        <div className="flex items-center justify-center h-[80px]">
+                          <div className="font-heading text-[42px] font-semibold text-bn-blue-primary tracking-wide">EBSCO</div>
+                        </div>
+                        <a
+                          href="https://www.ebsco.com/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
+                        >
+                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
+                        </a>
+                      </CardContent>
+                    </Card>
+                  </FancyTooltip>
                 </div>
 
                 {/* CAIRN */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardContent className="p-8 flex flex-col items-center justify-center">
-                      <div className="flex items-center justify-center h-[80px]">
-                        <img src={logoCairn} alt="CAIRN.INFO" className="h-[50px] max-w-[200px] object-contain" />
-                      </div>
-                      <a
-                        href="https://shs.cairn.info/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
-                      >
-                        Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                      </a>
-                    </CardContent>
-                  </Card>
+                  <FancyTooltip
+                    content="CAIRN.INFO"
+                    description="Plateforme de référence pour les publications scientifiques francophones en sciences humaines et sociales."
+                    icon="mdi:school"
+                    side="top"
+                    variant="gold"
+                  >
+                    <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+                      <CardContent className="p-8 flex flex-col items-center justify-center">
+                        <div className="flex items-center justify-center h-[80px]">
+                          <img src={logoCairn} alt="CAIRN.INFO" className="h-[50px] max-w-[200px] object-contain" />
+                        </div>
+                        <a
+                          href="https://shs.cairn.info/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
+                        >
+                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
+                        </a>
+                      </CardContent>
+                    </Card>
+                  </FancyTooltip>
                 </div>
 
                 {/* RFN */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardContent className="p-8 flex flex-col items-center justify-center">
-                      <div className="flex items-center justify-center h-[80px]">
-                        <img src={logoRfn} alt="RFN" className="h-[50px] max-w-[200px] object-contain" />
-                      </div>
-                      <a
-                        href="https://rfnum.org"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
-                      >
-                        Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                      </a>
-                    </CardContent>
-                  </Card>
+                  <FancyTooltip
+                    content="Réseau Francophone Numérique"
+                    description="Collections patrimoniales des bibliothèques nationales francophones pour préserver le patrimoine documentaire commun."
+                    icon="mdi:earth"
+                    side="top"
+                    variant="gold"
+                  >
+                    <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+                      <CardContent className="p-8 flex flex-col items-center justify-center">
+                        <div className="flex items-center justify-center h-[80px]">
+                          <img src={logoRfn} alt="RFN" className="h-[50px] max-w-[200px] object-contain" />
+                        </div>
+                        <a
+                          href="https://rfnum.org"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
+                        >
+                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
+                        </a>
+                      </CardContent>
+                    </Card>
+                  </FancyTooltip>
                 </div>
 
                 {/* Europeana */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardContent className="p-8 flex flex-col items-center justify-center">
-                      <div className="flex items-center justify-center h-[80px]">
-                        <img src={logoEuropeana} alt="Europeana" className="h-[50px] max-w-[200px] object-contain" />
-                      </div>
-                      <a
-                        href="https://www.europeana.eu"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
-                      >
-                        Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                      </a>
-                    </CardContent>
-                  </Card>
+                  <FancyTooltip
+                    content="Europeana"
+                    description="Agrégateur central du patrimoine culturel européen — initiative de l'UE pour la numérisation culturelle."
+                    icon="mdi:castle"
+                    side="top"
+                    variant="gold"
+                  >
+                    <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+                      <CardContent className="p-8 flex flex-col items-center justify-center">
+                        <div className="flex items-center justify-center h-[80px]">
+                          <img src={logoEuropeana} alt="Europeana" className="h-[50px] max-w-[200px] object-contain" />
+                        </div>
+                        <a
+                          href="https://www.europeana.eu"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
+                        >
+                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
+                        </a>
+                      </CardContent>
+                    </Card>
+                  </FancyTooltip>
                 </div>
 
                 {/* IFLA */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)]">
-                    <CardContent className="p-8 flex flex-col items-center justify-center">
-                      <div className="flex items-center justify-center h-[80px]">
-                        <img src={logoIfla} alt="IFLA" className="h-[50px] max-w-[200px] object-contain" />
-                      </div>
-                      <a
-                        href="https://www.ifla.org"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
-                      >
-                        Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                      </a>
-                    </CardContent>
-                  </Card>
+                  <FancyTooltip
+                    content="IFLA"
+                    description="Fédération Internationale des Associations de Bibliothécaires — normes pour l'interopérabilité mondiale."
+                    icon="mdi:library"
+                    side="top"
+                    variant="gold"
+                  >
+                    <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+                      <CardContent className="p-8 flex flex-col items-center justify-center">
+                        <div className="flex items-center justify-center h-[80px]">
+                          <img src={logoIfla} alt="IFLA" className="h-[50px] max-w-[200px] object-contain" />
+                        </div>
+                        <a
+                          href="https://www.ifla.org"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
+                        >
+                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
+                        </a>
+                      </CardContent>
+                    </Card>
+                  </FancyTooltip>
                 </div>
               </div>
             </div>
