@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 import { Icon } from '@/components/ui/icon';
 
@@ -20,20 +21,39 @@ export const FancyTooltip: React.FC<FancyTooltipProps> = ({
   variant = 'gold'
 }) => {
   const [isVisible, setIsVisible] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const triggerRef = useRef<HTMLDivElement>(null);
 
-  const positionClasses = {
-    top: 'bottom-full left-1/2 -translate-x-1/2 mb-3',
-    bottom: 'top-full left-1/2 -translate-x-1/2 mt-3',
-    left: 'right-full top-1/2 -translate-y-1/2 mr-3',
-    right: 'left-full top-1/2 -translate-y-1/2 ml-3',
-  };
+  useEffect(() => {
+    if (isVisible && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      const offset = 12;
+      
+      let top = 0;
+      let left = 0;
 
-  const arrowPositionClasses = {
-    top: "bottom-[-6px] left-1/2 -translate-x-1/2",
-    bottom: "top-[-6px] left-1/2 -translate-x-1/2",
-    left: "right-[-6px] top-1/2 -translate-y-1/2",
-    right: "left-[-6px] top-1/2 -translate-y-1/2"
-  };
+      switch (side) {
+        case 'right':
+          top = rect.top + rect.height / 2;
+          left = rect.right + offset;
+          break;
+        case 'left':
+          top = rect.top + rect.height / 2;
+          left = rect.left - offset;
+          break;
+        case 'top':
+          top = rect.top - offset;
+          left = rect.left + rect.width / 2;
+          break;
+        case 'bottom':
+          top = rect.bottom + offset;
+          left = rect.left + rect.width / 2;
+          break;
+      }
+
+      setPosition({ top, left });
+    }
+  }, [isVisible, side]);
 
   const variantClasses = {
     default: "bg-slate-900 text-white border border-slate-700",
@@ -47,78 +67,117 @@ export const FancyTooltip: React.FC<FancyTooltipProps> = ({
     gradient: "bg-bn-blue border-l border-b border-bn-blue-light/30"
   };
 
+  const getTransformStyle = () => {
+    switch (side) {
+      case 'right':
+        return 'translateY(-50%)';
+      case 'left':
+        return 'translateX(-100%) translateY(-50%)';
+      case 'top':
+        return 'translateX(-50%) translateY(-100%)';
+      case 'bottom':
+        return 'translateX(-50%)';
+      default:
+        return '';
+    }
+  };
+
+  const getArrowStyle = () => {
+    switch (side) {
+      case 'right':
+        return { left: '-6px', top: '50%', transform: 'translateY(-50%) rotate(45deg)' };
+      case 'left':
+        return { right: '-6px', top: '50%', transform: 'translateY(-50%) rotate(-135deg)' };
+      case 'top':
+        return { bottom: '-6px', left: '50%', transform: 'translateX(-50%) rotate(-45deg)' };
+      case 'bottom':
+        return { top: '-6px', left: '50%', transform: 'translateX(-50%) rotate(135deg)' };
+      default:
+        return {};
+    }
+  };
+
+  const tooltipContent = isVisible && (
+    <div
+      style={{
+        position: 'fixed',
+        top: position.top,
+        left: position.left,
+        transform: getTransformStyle(),
+        zIndex: 99999,
+      }}
+      className={cn(
+        "min-w-[220px] max-w-[280px] p-4 rounded-xl shadow-2xl pointer-events-none",
+        "animate-in fade-in-0 zoom-in-95 duration-300",
+        variantClasses[variant]
+      )}
+    >
+      <div className="flex items-start gap-3">
+        {icon && (
+          <div className={cn(
+            "p-2 rounded-lg shrink-0",
+            variant === 'gold' && "bg-gradient-to-br from-gold-bn-primary/20 to-amber-200/30",
+            variant === 'gradient' && "bg-white/10",
+            variant === 'default' && "bg-slate-700"
+          )}>
+            <Icon name={icon} className={cn(
+              "h-5 w-5",
+              variant === 'gold' && "text-gold-bn-primary",
+              variant === 'gradient' && "text-white",
+              variant === 'default' && "text-white"
+            )} />
+          </div>
+        )}
+        <div className="flex flex-col gap-1">
+          <span className={cn(
+            "font-bold text-sm leading-tight",
+            variant === 'gold' && "text-slate-800",
+            variant === 'gradient' && "text-white",
+            variant === 'default' && "text-white"
+          )}>
+            {content}
+          </span>
+          {description && (
+            <span className={cn(
+              "text-xs leading-relaxed",
+              variant === 'gold' && "text-slate-600",
+              variant === 'gradient' && "text-white/80",
+              variant === 'default' && "text-slate-300"
+            )}>
+              {description}
+            </span>
+          )}
+        </div>
+      </div>
+      
+      {/* Decorative sparkle */}
+      {variant === 'gold' && (
+        <div className="absolute -top-1 -right-1 w-3 h-3">
+          <div className="absolute inset-0 bg-gold-bn-primary rounded-full animate-ping opacity-40" />
+          <div className="absolute inset-0.5 bg-gold-bn-primary rounded-full" />
+        </div>
+      )}
+      
+      {/* Arrow */}
+      <div
+        style={getArrowStyle()}
+        className={cn(
+          "absolute w-3 h-3",
+          arrowVariantClasses[variant]
+        )}
+      />
+    </div>
+  );
+
   return (
     <div 
+      ref={triggerRef}
       className="relative"
       onMouseEnter={() => setIsVisible(true)}
       onMouseLeave={() => setIsVisible(false)}
     >
       {children}
-      {isVisible && (
-        <div
-          className={cn(
-            "absolute z-[9999] min-w-[220px] max-w-[280px] p-4 rounded-xl shadow-2xl pointer-events-none",
-            "animate-in fade-in-0 zoom-in-95 slide-in-from-left-2 duration-300",
-            positionClasses[side],
-            variantClasses[variant]
-          )}
-        >
-          <div className="flex items-start gap-3">
-            {icon && (
-              <div className={cn(
-                "p-2 rounded-lg shrink-0",
-                variant === 'gold' && "bg-gradient-to-br from-gold-bn-primary/20 to-amber-200/30",
-                variant === 'gradient' && "bg-white/10",
-                variant === 'default' && "bg-slate-700"
-              )}>
-                <Icon name={icon} className={cn(
-                  "h-5 w-5",
-                  variant === 'gold' && "text-gold-bn-primary",
-                  variant === 'gradient' && "text-white",
-                  variant === 'default' && "text-white"
-                )} />
-              </div>
-            )}
-            <div className="flex flex-col gap-1">
-              <span className={cn(
-                "font-bold text-sm leading-tight",
-                variant === 'gold' && "text-slate-800",
-                variant === 'gradient' && "text-white",
-                variant === 'default' && "text-white"
-              )}>
-                {content}
-              </span>
-              {description && (
-                <span className={cn(
-                  "text-xs leading-relaxed",
-                  variant === 'gold' && "text-slate-600",
-                  variant === 'gradient' && "text-white/80",
-                  variant === 'default' && "text-slate-300"
-                )}>
-                  {description}
-                </span>
-              )}
-            </div>
-          </div>
-          
-          {/* Decorative sparkle */}
-          {variant === 'gold' && (
-            <div className="absolute -top-1 -right-1 w-3 h-3">
-              <div className="absolute inset-0 bg-gold-bn-primary rounded-full animate-ping opacity-40" />
-              <div className="absolute inset-0.5 bg-gold-bn-primary rounded-full" />
-            </div>
-          )}
-          
-          {/* Arrow */}
-          <div
-            className={cn(
-              "absolute w-3 h-3 transform rotate-45",
-              arrowPositionClasses[side],
-              arrowVariantClasses[variant]
-            )}
-          />
-        </div>
-      )}
+      {typeof document !== 'undefined' && createPortal(tooltipContent, document.body)}
     </div>
   );
 };
