@@ -46,8 +46,9 @@ import { motion, AnimatePresence } from "framer-motion";
 
 import { useNavigate } from "react-router-dom";
 
-// Modules spécifiques à la Bibliothèque Numérique (BN)
+// Modules spécifiques à la Bibliothèque Numérique (BN) - Organisés par catégorie
 const tabs = [
+  // === SECTIONS HOMEPAGE ===
   { 
     id: "hero", 
     label: "Hero BN", 
@@ -56,28 +57,8 @@ const tabs = [
     bgColor: "bg-rose-500/10",
     borderColor: "border-rose-500/30",
     gradient: "from-rose-500/20 to-rose-600/5",
-    description: "Section Hero de la Bibliothèque Numérique"
-  },
-  { 
-    id: "styles", 
-    label: "Styles & Design", 
-    icon: Palette, 
-    color: "text-fuchsia-500",
-    bgColor: "bg-fuchsia-500/10",
-    borderColor: "border-fuchsia-500/30",
-    gradient: "from-fuchsia-500/20 to-fuchsia-600/5",
-    description: "Couleurs, polices et boutons"
-  },
-  { 
-    id: "icons", 
-    label: "Icônes des sections", 
-    icon: null, // Using custom MDI icon
-    iconMdi: "mdi:shape-outline",
-    color: "text-teal-500",
-    bgColor: "bg-teal-500/10",
-    borderColor: "border-teal-500/30",
-    gradient: "from-teal-500/20 to-teal-600/5",
-    description: "Personnaliser les icônes MDI"
+    description: "Section Hero de la Bibliothèque Numérique",
+    category: "homepage"
   },
   { 
     id: "carrousel-bn", 
@@ -87,17 +68,19 @@ const tabs = [
     bgColor: "bg-amber-500/10",
     borderColor: "border-amber-500/30",
     gradient: "from-amber-500/20 to-amber-600/5",
-    description: "Carrousel des œuvres mises en avant"
+    description: "Carrousel des œuvres mises en avant",
+    category: "homepage"
   },
   { 
     id: "vexpo360-hero", 
-    label: "Section VExpo 360° (Hero)", 
+    label: "Section VExpo 360°", 
     icon: Globe, 
     color: "text-purple-500",
     bgColor: "bg-purple-500/10",
     borderColor: "border-purple-500/30",
     gradient: "from-purple-500/20 to-purple-600/5",
-    description: "Paramètres Hero de la section VExpo"
+    description: "Paramètres Hero de la section VExpo",
+    category: "homepage"
   },
   { 
     id: "bannieres", 
@@ -107,88 +90,10 @@ const tabs = [
     bgColor: "bg-pink-500/10",
     borderColor: "border-pink-500/30",
     gradient: "from-pink-500/20 to-pink-600/5",
-    description: "Bannières de la Bibliothèque Numérique"
+    description: "Bannières de la Bibliothèque Numérique",
+    category: "homepage"
   },
-  { 
-    id: "actualites", 
-    label: "Actualités BN", 
-    icon: Newspaper, 
-    color: "text-blue-500",
-    bgColor: "bg-blue-500/10",
-    borderColor: "border-blue-500/30",
-    gradient: "from-blue-500/20 to-blue-600/5",
-    description: "Actualités de la Bibliothèque Numérique"
-  },
-  { 
-    id: "evenements", 
-    label: "Événements BN", 
-    icon: CalendarDays, 
-    color: "text-green-500",
-    bgColor: "bg-green-500/10",
-    borderColor: "border-green-500/30",
-    gradient: "from-green-500/20 to-green-600/5",
-    description: "Événements de la Bibliothèque Numérique"
-  },
-  { 
-    id: "pages", 
-    label: "Pages BN", 
-    icon: FileText, 
-    color: "text-purple-500",
-    bgColor: "bg-purple-500/10",
-    borderColor: "border-purple-500/30",
-    gradient: "from-purple-500/20 to-purple-600/5",
-    description: "Pages statiques de la BN"
-  },
-  { 
-    id: "sections", 
-    label: "Sections", 
-    icon: LayoutTemplate, 
-    color: "text-violet-500",
-    bgColor: "bg-violet-500/10",
-    borderColor: "border-violet-500/30",
-    gradient: "from-violet-500/20 to-violet-600/5",
-    description: "Blocs de contenu des pages"
-  },
-  { 
-    id: "media", 
-    label: "Médias BN", 
-    icon: ImageIcon, 
-    color: "text-orange-500",
-    bgColor: "bg-orange-500/10",
-    borderColor: "border-orange-500/30",
-    gradient: "from-orange-500/20 to-orange-600/5",
-    description: "Bibliothèque de médias BN"
-  },
-  { 
-    id: "menus", 
-    label: "Menus BN", 
-    icon: Menu, 
-    color: "text-cyan-500",
-    bgColor: "bg-cyan-500/10",
-    borderColor: "border-cyan-500/30",
-    gradient: "from-cyan-500/20 to-cyan-600/5",
-    description: "Navigation de la BN"
-  },
-  { 
-    id: "footer", 
-    label: "Footer BN", 
-    icon: Footprints, 
-    color: "text-slate-500",
-    bgColor: "bg-slate-500/10",
-    borderColor: "border-slate-500/30",
-    gradient: "from-slate-500/20 to-slate-600/5",
-    description: "Pied de page de la BN"
-  },
-  { 
-    id: "webhooks", 
-    label: "Webhooks", 
-    icon: Webhook, 
-    color: "text-gray-500",
-    bgColor: "bg-gray-500/10",
-    borderColor: "border-gray-500/30",
-    gradient: "from-gray-500/20 to-gray-600/5",
-    description: "Intégrations externes"
-  },
+  // === CONTENU ===
   { 
     id: "about", 
     label: "Page À propos", 
@@ -198,7 +103,121 @@ const tabs = [
     bgColor: "bg-sky-500/10",
     borderColor: "border-sky-500/30",
     gradient: "from-sky-500/20 to-sky-600/5",
-    description: "Mission, vision et valeurs de la BN"
+    description: "Mission, vision et valeurs de la BN",
+    category: "content"
+  },
+  { 
+    id: "actualites", 
+    label: "Actualités BN", 
+    icon: Newspaper, 
+    color: "text-blue-500",
+    bgColor: "bg-blue-500/10",
+    borderColor: "border-blue-500/30",
+    gradient: "from-blue-500/20 to-blue-600/5",
+    description: "Actualités de la Bibliothèque Numérique",
+    category: "content"
+  },
+  { 
+    id: "evenements", 
+    label: "Événements BN", 
+    icon: CalendarDays, 
+    color: "text-green-500",
+    bgColor: "bg-green-500/10",
+    borderColor: "border-green-500/30",
+    gradient: "from-green-500/20 to-green-600/5",
+    description: "Événements de la Bibliothèque Numérique",
+    category: "content"
+  },
+  { 
+    id: "pages", 
+    label: "Pages BN", 
+    icon: FileText, 
+    color: "text-purple-500",
+    bgColor: "bg-purple-500/10",
+    borderColor: "border-purple-500/30",
+    gradient: "from-purple-500/20 to-purple-600/5",
+    description: "Pages statiques de la BN",
+    category: "content"
+  },
+  { 
+    id: "sections", 
+    label: "Sections", 
+    icon: LayoutTemplate, 
+    color: "text-violet-500",
+    bgColor: "bg-violet-500/10",
+    borderColor: "border-violet-500/30",
+    gradient: "from-violet-500/20 to-violet-600/5",
+    description: "Blocs de contenu des pages",
+    category: "content"
+  },
+  // === DESIGN & STRUCTURE ===
+  { 
+    id: "styles", 
+    label: "Styles & Design", 
+    icon: Palette, 
+    color: "text-fuchsia-500",
+    bgColor: "bg-fuchsia-500/10",
+    borderColor: "border-fuchsia-500/30",
+    gradient: "from-fuchsia-500/20 to-fuchsia-600/5",
+    description: "Couleurs, polices et boutons",
+    category: "design"
+  },
+  { 
+    id: "icons", 
+    label: "Icônes des sections", 
+    icon: null,
+    iconMdi: "mdi:shape-outline",
+    color: "text-teal-500",
+    bgColor: "bg-teal-500/10",
+    borderColor: "border-teal-500/30",
+    gradient: "from-teal-500/20 to-teal-600/5",
+    description: "Personnaliser les icônes MDI",
+    category: "design"
+  },
+  { 
+    id: "menus", 
+    label: "Menus BN", 
+    icon: Menu, 
+    color: "text-cyan-500",
+    bgColor: "bg-cyan-500/10",
+    borderColor: "border-cyan-500/30",
+    gradient: "from-cyan-500/20 to-cyan-600/5",
+    description: "Navigation de la BN",
+    category: "design"
+  },
+  { 
+    id: "footer", 
+    label: "Footer BN", 
+    icon: Footprints, 
+    color: "text-slate-500",
+    bgColor: "bg-slate-500/10",
+    borderColor: "border-slate-500/30",
+    gradient: "from-slate-500/20 to-slate-600/5",
+    description: "Pied de page de la BN",
+    category: "design"
+  },
+  // === MÉDIAS & TECHNIQUE ===
+  { 
+    id: "media", 
+    label: "Médias BN", 
+    icon: ImageIcon, 
+    color: "text-orange-500",
+    bgColor: "bg-orange-500/10",
+    borderColor: "border-orange-500/30",
+    gradient: "from-orange-500/20 to-orange-600/5",
+    description: "Bibliothèque de médias BN",
+    category: "technical"
+  },
+  { 
+    id: "webhooks", 
+    label: "Webhooks", 
+    icon: Webhook, 
+    color: "text-gray-500",
+    bgColor: "bg-gray-500/10",
+    borderColor: "border-gray-500/30",
+    gradient: "from-gray-500/20 to-gray-600/5",
+    description: "Intégrations externes",
+    category: "technical"
   },
 ];
 
