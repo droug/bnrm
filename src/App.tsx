@@ -15,6 +15,7 @@ import { AuthRecoveryRedirect } from "@/components/auth/AuthRecoveryRedirect";
 // Always loaded (critical routes)
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import AuthBN from "./pages/AuthBN";
 import NotFound from "./pages/NotFound";
 
 // Lazy-loaded routes for better performance
@@ -261,6 +262,7 @@ const App = () => {
         <Route path="/" element={<Index />} />
         <Route path="/search" element={<SearchResults />} />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/auth-BN" element={<AuthBN />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/manuscripts" element={<Manuscripts />} />

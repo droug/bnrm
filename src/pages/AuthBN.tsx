@@ -1,0 +1,587 @@
+import { useEffect, useRef, useState } from "react";
+import { Navigate, useNavigate, useSearchParams, useLocation } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { 
+  BookOpen, 
+  Shield, 
+  AlertTriangle, 
+  RefreshCw, 
+  Library, 
+  ArrowRight,
+  Lock,
+  Mail,
+  Eye,
+  EyeOff,
+  ScrollText,
+  Search
+} from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import logoDigitalLibrary from "@/assets/digital-library-logo.png";
+
+// Helper to parse hash fragment error params
+function parseHashParams(hash: string): Record<string, string> {
+  if (!hash || hash.length <= 1) return {};
+  const params = new URLSearchParams(hash.substring(1));
+  const result: Record<string, string> = {};
+  params.forEach((value, key) => {
+    result[key] = value;
+  });
+  return result;
+}
+
+export default function AuthBN() {
+  const { user, signIn, loading } = useAuth();
+  const [searchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const hasTriedRecoverySession = useRef(false);
+  const [showResetPassword, setShowResetPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const hashParams = parseHashParams(location.hash);
+  const authError = hashParams.error;
+  const authErrorCode = hashParams.error_code;
+  const authErrorDescription = hashParams.error_description?.replace(/\+/g, " ");
+
+  const isResetFlow = searchParams.get("reset") === "true";
+  const redirectTo = searchParams.get("redirect") || "/digital-library";
+  const isExpiredLink = authErrorCode === "otp_expired" || authError === "access_denied";
+
+  useEffect(() => {
+    if (isResetFlow) {
+      setShowResetPassword(false);
+    }
+  }, [isResetFlow]);
+
+  useEffect(() => {
+    if (!isResetFlow) return;
+    if (hasTriedRecoverySession.current) return;
+
+    const hp = parseHashParams(location.hash);
+    const access_token = hp.access_token;
+    const refresh_token = hp.refresh_token;
+
+    if (!access_token || !refresh_token) return;
+
+    hasTriedRecoverySession.current = true;
+
+    setIsLoading(true);
+    supabase.auth
+      .setSession({ access_token, refresh_token })
+      .then(({ error }) => {
+        if (error) {
+          toast.error("Lien invalide ou expiré", { description: error.message });
+        }
+      })
+      .finally(() => setIsLoading(false));
+  }, [isResetFlow, location.hash]);
+
+  if (user && !loading && !isResetFlow) {
+    return <Navigate to={redirectTo} replace />;
+  }
+
+  const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+    
+    await signIn(email, password);
+    setIsLoading(false);
+  };
+
+  const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      redirectTo: `${window.location.origin}/auth-BN?reset=true`,
+    });
+
+    if (error) {
+      toast.error("Erreur", { description: error.message });
+    } else {
+      toast.success("Email envoyé", {
+        description: "Vérifiez votre boîte email pour réinitialiser votre mot de passe.",
+      });
+      setShowResetPassword(false);
+      setResetEmail("");
+    }
+
+    setIsLoading(false);
+  };
+
+  const handleUpdatePassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (newPassword.length < 8) {
+      toast.error("Mot de passe trop court", {
+        description: "Utilisez au moins 8 caractères.",
+      });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error("Les mots de passe ne correspondent pas");
+      return;
+    }
+
+    setIsLoading(true);
+
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+    if (error) {
+      toast.error("Impossible de modifier le mot de passe", {
+        description: error.message,
+      });
+      setIsLoading(false);
+      return;
+    }
+
+    toast.success("Mot de passe créé", {
+      description: "Votre mot de passe a été enregistré.",
+    });
+
+    setNewPassword("");
+    setConfirmPassword("");
+    setIsLoading(false);
+
+    navigate(redirectTo, { replace: true });
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-bn-blue-primary/5 to-gold-bn-primary/5">
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-bn-blue-primary border-t-transparent"></div>
+      </div>
+    );
+  }
+
+  // Branding panel component - BN Style
+  const BrandingPanel = ({ icon: Icon, title, subtitle }: { icon: React.ElementType; title: string; subtitle: string }) => (
+    <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-bn-blue-primary via-bn-blue-primary/90 to-bn-blue-primary-dark relative overflow-hidden">
+      {/* Decorative elements */}
+      <div className="absolute -top-20 -left-20 w-64 h-64 bg-gold-bn-primary/10 rounded-full blur-3xl"></div>
+      <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-gold-bn-primary/20 rounded-full blur-3xl"></div>
+      <div className="absolute inset-0 opacity-10" style={{
+        backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+      }}></div>
+      
+      <div className="relative z-10 flex flex-col justify-center items-center w-full p-12 text-white">
+        <div className="mb-10">
+          <div className="w-24 h-24 bg-white/10 backdrop-blur-sm rounded-3xl flex items-center justify-center mb-8 mx-auto shadow-2xl border border-gold-bn-primary/30">
+            <Icon className="h-12 w-12 text-gold-bn-primary" />
+          </div>
+          <h1 className="text-4xl font-bold text-center mb-3">{title}</h1>
+          <p className="text-white/80 text-center text-lg max-w-md">{subtitle}</p>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Reset password flow
+  if (isResetFlow) {
+    return (
+      <div className="min-h-screen flex">
+        <BrandingPanel 
+          icon={Shield} 
+          title="Sécurisez votre compte" 
+          subtitle="Créez un mot de passe sécurisé pour protéger l'accès à votre espace personnel"
+        />
+
+        {/* Right Panel - Form */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-gradient-to-br from-bn-blue-primary/5 to-gold-bn-primary/5">
+          <Card className="w-full max-w-md border-0 shadow-2xl shadow-bn-blue-primary/10 bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-8">
+              <div className="text-center mb-8">
+                <div className="w-16 h-16 bg-bn-blue-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <Lock className="h-8 w-8 text-bn-blue-primary" />
+                </div>
+                <h2 className="text-2xl font-bold text-foreground">Créer votre mot de passe</h2>
+                <p className="text-muted-foreground mt-2">
+                  {user?.email
+                    ? `Compte : ${user.email}`
+                    : isLoading
+                      ? "Chargement du compte..."
+                      : "Lien invalide ou expiré."}
+                </p>
+              </div>
+
+              {!user ? (
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground text-center">
+                    Pour des raisons de sécurité, les liens de récupération expirent. Veuillez demander un nouveau lien.
+                  </p>
+                  <Button
+                    className="w-full h-12 bg-bn-blue-primary hover:bg-bn-blue-primary-dark"
+                    onClick={() => navigate("/auth-BN", { replace: true })}
+                  >
+                    Retour à la connexion
+                  </Button>
+                </div>
+              ) : (
+                <form onSubmit={handleUpdatePassword} className="space-y-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="new-password" className="text-sm font-medium">Nouveau mot de passe</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="new-password"
+                        type={showPassword ? "text" : "password"}
+                        autoComplete="new-password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        required
+                        minLength={8}
+                        className="pl-10 pr-10 h-12 border-slate-200 focus:border-bn-blue-primary"
+                        placeholder="••••••••"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm-password" className="text-sm font-medium">Confirmer le mot de passe</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="confirm-password"
+                        type={showPassword ? "text" : "password"}
+                        autoComplete="new-password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                        minLength={8}
+                        className="pl-10 h-12 border-slate-200 focus:border-bn-blue-primary"
+                        placeholder="••••••••"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 pt-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="flex-1 h-12"
+                      onClick={() => navigate("/auth-BN", { replace: true })}
+                      disabled={isLoading}
+                    >
+                      Annuler
+                    </Button>
+                    <Button type="submit" className="flex-1 h-12 bg-bn-blue-primary hover:bg-bn-blue-primary-dark" disabled={isLoading}>
+                      {isLoading ? "Enregistrement..." : "Enregistrer"}
+                    </Button>
+                  </div>
+                </form>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // Main login view - BN Style
+  return (
+    <div className="min-h-screen flex">
+      {/* Left Panel - BN Branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-bn-blue-primary via-bn-blue-primary/90 to-bn-blue-primary-dark relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute -top-20 -left-20 w-64 h-64 bg-gold-bn-primary/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-gold-bn-primary/20 rounded-full blur-3xl"></div>
+        <div className="absolute inset-0 opacity-10" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23D4AF37' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+        }}></div>
+        
+        <div className="relative z-10 flex flex-col justify-center items-center w-full p-12 text-white">
+          {/* Logo */}
+          <div className="mb-10">
+            <img 
+              src={logoDigitalLibrary} 
+              alt="Bibliothèque Numérique Marocaine" 
+              className="h-24 w-auto mx-auto mb-6"
+            />
+            <h1 className="text-3xl font-bold text-center mb-3">Bibliothèque Numérique Marocaine</h1>
+            <p className="text-white/80 text-center text-lg max-w-md">
+              Patrimoine Numérique du Maroc
+            </p>
+          </div>
+
+          {/* Features - BN specific */}
+          <div className="space-y-4 w-full max-w-sm">
+            <div className="flex items-center gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-gold-bn-primary/20">
+              <div className="w-12 h-12 bg-gold-bn-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                <ScrollText className="h-6 w-6 text-gold-bn-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Manuscrits & Documents rares</h3>
+                <p className="text-sm text-white/70">Accédez au patrimoine numérisé</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-gold-bn-primary/20">
+              <div className="w-12 h-12 bg-gold-bn-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Search className="h-6 w-6 text-gold-bn-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Recherche avancée</h3>
+                <p className="text-sm text-white/70">Explorez les collections numérisées</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-4 bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-gold-bn-primary/20">
+              <div className="w-12 h-12 bg-gold-bn-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Library className="h-6 w-6 text-gold-bn-primary" />
+              </div>
+              <div>
+                <h3 className="font-semibold">Espace personnel</h3>
+                <p className="text-sm text-white/70">Gérez vos favoris et annotations</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right Panel - Login Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-gradient-to-br from-bn-blue-primary/5 to-gold-bn-primary/5">
+        <div className="w-full max-w-md">
+          {/* Mobile Logo */}
+          <div className="lg:hidden text-center mb-8">
+            <img 
+              src={logoDigitalLibrary} 
+              alt="Bibliothèque Numérique Marocaine" 
+              className="h-16 w-auto mx-auto mb-4"
+            />
+            <h1 className="text-2xl font-bold text-foreground">Bibliothèque Numérique</h1>
+            <p className="text-muted-foreground text-sm">Patrimoine Numérique du Maroc</p>
+          </div>
+
+          <Card className="border-0 shadow-2xl shadow-bn-blue-primary/10 bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-8">
+              {/* Header */}
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold text-foreground">Connexion</h2>
+                <p className="text-muted-foreground mt-2">Accédez à votre espace lecteur</p>
+              </div>
+
+              {/* Expired Link Alert */}
+              {isExpiredLink && (
+                <Alert variant="destructive" className="mb-6 border-destructive/50 bg-destructive/10">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>Lien expiré ou invalide</AlertTitle>
+                  <AlertDescription className="mt-2 space-y-3">
+                    <p className="text-sm">
+                      {authErrorDescription || "Le lien d'activation ou de réinitialisation a expiré."}
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setShowResetPassword(true);
+                        navigate("/auth-BN", { replace: true });
+                      }}
+                    >
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Demander un nouveau lien
+                    </Button>
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {/* Login Form */}
+              {!showResetPassword ? (
+                <form onSubmit={handleSignIn} className="space-y-5">
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="votre@email.com"
+                        required
+                        className="pl-10 h-12 border-slate-200 focus:border-bn-blue-primary transition-colors"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="password" className="text-sm font-medium">Mot de passe</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="password"
+                        name="password"
+                        type={showPassword ? "text" : "password"}
+                        required
+                        className="pl-10 pr-10 h-12 border-slate-200 focus:border-bn-blue-primary transition-colors"
+                        placeholder="••••••••"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div className="flex justify-end">
+                    <Button
+                      type="button"
+                      variant="link"
+                      className="text-sm px-0 h-auto text-bn-blue-primary hover:text-bn-blue-primary/80"
+                      onClick={() => setShowResetPassword(true)}
+                    >
+                      Mot de passe oublié ?
+                    </Button>
+                  </div>
+                  
+                  <Button
+                    type="submit"
+                    className="w-full h-12 text-base font-medium bg-bn-blue-primary hover:bg-bn-blue-primary-dark transition-all"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? (
+                      <span className="flex items-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                        Connexion...
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        Se connecter
+                        <ArrowRight className="h-4 w-4" />
+                      </span>
+                    )}
+                  </Button>
+
+                  {/* Divider */}
+                  <div className="relative my-6">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t border-slate-200" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-white px-4 text-muted-foreground font-medium">
+                        Pas encore de compte ?
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Single signup button - No professional registration for BN */}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full h-12 border-2 hover:border-gold-bn-primary hover:bg-gold-bn-primary/5 transition-all group"
+                    onClick={() => navigate("/abonnements?platform=bn")}
+                  >
+                    <BookOpen className="h-5 w-5 mr-2 text-gold-bn-primary" />
+                    <span>Souscrire à une adhésion</span>
+                    <ArrowRight className="h-4 w-4 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </Button>
+                </form>
+              ) : (
+                /* Reset Password Form */
+                <div className="space-y-6">
+                  <div className="text-center space-y-2">
+                    <div className="w-14 h-14 bg-bn-blue-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                      <Mail className="h-7 w-7 text-bn-blue-primary" />
+                    </div>
+                    <h3 className="text-xl font-semibold">Réinitialiser le mot de passe</h3>
+                    <p className="text-sm text-muted-foreground">
+                      Entrez votre email pour recevoir un lien de réinitialisation
+                    </p>
+                  </div>
+                  
+                  <form onSubmit={handleResetPassword} className="space-y-5">
+                    <div className="space-y-2">
+                      <Label htmlFor="reset-email" className="text-sm font-medium">Email</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="reset-email"
+                          type="email"
+                          placeholder="votre@email.com"
+                          value={resetEmail}
+                          onChange={(e) => setResetEmail(e.target.value)}
+                          required
+                          className="pl-10 h-12 border-slate-200 focus:border-bn-blue-primary"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="flex gap-3">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="flex-1 h-12"
+                        onClick={() => {
+                          setShowResetPassword(false);
+                          setResetEmail("");
+                        }}
+                      >
+                        Annuler
+                      </Button>
+                      <Button
+                        type="submit"
+                        className="flex-1 h-12 bg-bn-blue-primary hover:bg-bn-blue-primary-dark"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? "Envoi..." : "Envoyer"}
+                      </Button>
+                    </div>
+                  </form>
+                </div>
+              )}
+              
+              {/* Trust badges */}
+              <div className="mt-8 pt-6 border-t border-slate-100">
+                <div className="flex items-center justify-center gap-6 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1.5">
+                    <Shield className="h-4 w-4 text-green-600" />
+                    <span>Connexion sécurisée</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <Lock className="h-4 w-4 text-green-600" />
+                    <span>Données protégées</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Back to digital library */}
+          <div className="text-center mt-6">
+            <Button
+              variant="ghost"
+              className="text-muted-foreground hover:text-foreground"
+              onClick={() => navigate("/digital-library")}
+            >
+              ← Retour à la Bibliothèque Numérique
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
