@@ -348,36 +348,31 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   <Icon name="mdi:chevron-down" className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="bg-card z-50 min-w-[200px]">
-                <DropdownMenuLabel>{t('dl.electronicResources')}</DropdownMenuLabel>
-                <DropdownMenuSeparator />
+              <DropdownMenuContent align="start" className="bg-card z-50 min-w-[240px] p-2">
                 {activeBundles && activeBundles.length > 0 ? (
                   activeBundles.map((bundle) => (
                     <DropdownMenuItem 
                       key={bundle.id} 
-                      className="cursor-pointer focus:bg-accent focus:text-accent-foreground"
+                      className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-2 px-3 rounded-md"
                       onClick={() => {
                         if (bundle.website_url) {
                           window.open(bundle.website_url, '_blank');
                         }
                       }}
                     >
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         {bundle.provider_logo_url ? (
-                          <img src={bundle.provider_logo_url} alt={bundle.provider} className="h-4 w-4 object-contain" />
+                          <img src={bundle.provider_logo_url} alt={bundle.provider} className="h-6 w-auto max-w-[80px] object-contain" />
                         ) : (
-                          <Icon name="mdi:earth" className="h-4 w-4" />
+                          <Icon name="mdi:earth" className="h-5 w-5 text-gold-bn-primary" />
                         )}
-                        <div className="flex flex-col">
-                          <span>{language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name}</span>
-                          <span className="text-xs text-muted-foreground">{bundle.provider}</span>
-                        </div>
+                        <span className="font-medium">{language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name}</span>
                       </div>
                     </DropdownMenuItem>
                   ))
                 ) : (
                   <DropdownMenuItem disabled className="text-muted-foreground text-sm">
-                    {t('dl.noBundlesAvailable')}
+                    Aucune ressource disponible
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>
