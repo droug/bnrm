@@ -1404,7 +1404,98 @@ const BookReader = () => {
 
           {/* Book Display Area */}
           {readingMode === "book" ? (
-            <div id="scroll-container" className={`flex-1 min-h-0 ${viewMode === "scroll" ? "overflow-y-auto overscroll-contain scroll-smooth" : "overflow-hidden"} bg-muted/10 ${viewMode === "scroll" ? "" : "flex items-center justify-center"} p-4 md:p-8`}>
+            <div id="scroll-container" className={`flex-1 min-h-0 ${viewMode === "scroll" ? "overflow-y-auto overscroll-contain scroll-smooth" : "overflow-hidden"} bg-muted/10 ${viewMode === "scroll" ? "" : "flex items-center justify-center"} p-4 md:p-8 relative`}>
+              {/* Floating toolbar for scroll mode */}
+              {viewMode === "scroll" && (
+                <div className="sticky top-0 left-0 right-0 z-40 -mx-4 md:-mx-8 -mt-4 md:-mt-8 mb-4 bg-background/95 backdrop-blur-md border-b shadow-sm p-3">
+                  <div className="flex items-center justify-center gap-4 flex-wrap">
+                    {/* Navigation Controls */}
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => {
+                          const scrollContainer = document.getElementById("scroll-container");
+                          if (scrollContainer) {
+                            scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
+                          }
+                          setCurrentPage(1);
+                        }}
+                        title="Retour au début"
+                      >
+                        <ChevronsUp className="h-4 w-4" />
+                      </Button>
+                      
+                      <div className="flex items-center gap-2">
+                        <Input 
+                          type="number" 
+                          value={currentPage}
+                          onChange={(e) => {
+                            const val = parseInt(e.target.value) || 1;
+                            const targetPage = Math.min(totalPages, Math.max(1, val));
+                            setCurrentPage(targetPage);
+                            const pageElement = document.getElementById(`page-${targetPage}`);
+                            if (pageElement) {
+                              pageElement.scrollIntoView({ behavior: "smooth", block: "start" });
+                            }
+                          }}
+                          className="w-16 text-center h-9 text-sm"
+                        />
+                        <span className="text-sm text-muted-foreground">/ {totalPages}</span>
+                      </div>
+                    </div>
+
+                    {/* Zoom Controls */}
+                    <div className="flex items-center gap-2">
+                      <Button variant="outline" size="sm" onClick={handleZoomOut}>
+                        <ZoomOut className="h-4 w-4" />
+                      </Button>
+                      <span className="text-sm font-medium w-16 text-center">{zoom}%</span>
+                      <Button variant="outline" size="sm" onClick={handleZoomIn}>
+                        <ZoomIn className="h-4 w-4" />
+                      </Button>
+                    </div>
+
+                    {/* View Mode Switcher */}
+                    <div className="flex items-center gap-1">
+                      <Button 
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setViewMode("single")}
+                      >
+                        <FileText className="h-4 w-4 mr-1" />
+                        Simple
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        size="sm"
+                        onClick={() => allowDoublePageViewRestriction && setViewMode("double")}
+                        disabled={!allowDoublePageViewRestriction}
+                      >
+                        <BookOpen className="h-4 w-4 mr-1" />
+                        Double
+                      </Button>
+                      <Button 
+                        variant="default"
+                        size="sm"
+                      >
+                        <ChevronDown className="h-4 w-4 mr-1" />
+                        Scroll
+                      </Button>
+                    </div>
+
+                    {/* Fullscreen & Rotate */}
+                    <div className="flex items-center gap-2">
+                      <Button variant="outline" size="sm" onClick={handleRotate} title="Rotation">
+                        <RotateCw className="h-4 w-4" />
+                      </Button>
+                      <Button variant="outline" size="sm" onClick={toggleFullscreen}>
+                        {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
               {loading ? (
                 <div className="text-center">
                   <p className="text-muted-foreground">Chargement du document...</p>
