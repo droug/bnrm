@@ -28,6 +28,43 @@ interface FAQCategory {
   }>;
 }
 
+interface GuideStep {
+  id: string;
+  title_fr: string;
+  title_ar?: string;
+  description_fr: string;
+  description_ar?: string;
+  icon: string;
+}
+
+interface Tutorial {
+  id: string;
+  title_fr: string;
+  title_ar?: string;
+  description_fr: string;
+  description_ar?: string;
+  video_url: string;
+  thumbnail_url?: string;
+  duration?: string;
+}
+
+interface ReproductionInfo {
+  title_fr: string;
+  title_ar?: string;
+  description_fr: string;
+  description_ar?: string;
+  steps: Array<{
+    id: string;
+    title_fr: string;
+    title_ar?: string;
+    description_fr: string;
+    description_ar?: string;
+  }>;
+  cta_label_fr: string;
+  cta_label_ar?: string;
+  cta_url: string;
+}
+
 interface HelpSettings {
   hero_title_fr: string;
   hero_title_ar?: string;
@@ -52,6 +89,21 @@ interface HelpSettings {
     url: string;
     icon: string;
   }>;
+  guide: {
+    title_fr: string;
+    title_ar?: string;
+    subtitle_fr: string;
+    subtitle_ar?: string;
+    steps: GuideStep[];
+  };
+  tutorials: {
+    title_fr: string;
+    title_ar?: string;
+    subtitle_fr: string;
+    subtitle_ar?: string;
+    items: Tutorial[];
+  };
+  reproduction: ReproductionInfo;
 }
 
 const defaultSettings: HelpSettings = {
@@ -145,10 +197,45 @@ const defaultSettings: HelpSettings = {
     cta_label_ar: "اتصل بنا"
   },
   quick_links: [
-    { label_fr: "Guide d'utilisation", label_ar: "دليل الاستخدام", url: "/digital-library/guide", icon: "mdi:book-open-page-variant" },
-    { label_fr: "Tutoriels vidéo", label_ar: "دروس فيديو", url: "/digital-library/tutorials", icon: "mdi:video-outline" },
-    { label_fr: "Demande de reproduction", label_ar: "طلب استنساخ", url: "/digital-library/reproduction", icon: "mdi:content-copy" }
-  ]
+    { label_fr: "Guide d'utilisation", label_ar: "دليل الاستخدام", url: "#guide", icon: "mdi:book-open-page-variant" },
+    { label_fr: "Tutoriels vidéo", label_ar: "دروس فيديو", url: "#tutorials", icon: "mdi:video-outline" },
+    { label_fr: "Demande de reproduction", label_ar: "طلب استنساخ", url: "#reproduction", icon: "mdi:content-copy" }
+  ],
+  guide: {
+    title_fr: "Guide d'utilisation",
+    title_ar: "دليل الاستخدام",
+    subtitle_fr: "Découvrez comment utiliser la Bibliothèque Numérique",
+    subtitle_ar: "اكتشف كيفية استخدام المكتبة الرقمية",
+    steps: [
+      { id: "1", title_fr: "Créer un compte", title_ar: "إنشاء حساب", description_fr: "Inscrivez-vous gratuitement pour accéder à plus de fonctionnalités", description_ar: "سجل مجانًا للوصول إلى المزيد من الميزات", icon: "mdi:account-plus" },
+      { id: "2", title_fr: "Rechercher un document", title_ar: "البحث عن وثيقة", description_fr: "Utilisez la barre de recherche ou naviguez par catégorie", description_ar: "استخدم شريط البحث أو تصفح حسب الفئة", icon: "mdi:magnify" },
+      { id: "3", title_fr: "Consulter et télécharger", title_ar: "الاطلاع والتحميل", description_fr: "Lisez en ligne ou téléchargez les documents disponibles", description_ar: "اقرأ عبر الإنترنت أو قم بتحميل الوثائق المتاحة", icon: "mdi:download" }
+    ]
+  },
+  tutorials: {
+    title_fr: "Tutoriels vidéo",
+    title_ar: "دروس فيديو",
+    subtitle_fr: "Apprenez à utiliser nos services avec nos tutoriels",
+    subtitle_ar: "تعلم استخدام خدماتنا من خلال دروسنا",
+    items: [
+      { id: "1", title_fr: "Premiers pas sur la plateforme", title_ar: "الخطوات الأولى على المنصة", description_fr: "Découvrez l'interface et les fonctionnalités de base", description_ar: "اكتشف الواجهة والميزات الأساسية", video_url: "https://www.youtube.com/embed/example1", duration: "3:45" },
+      { id: "2", title_fr: "Recherche avancée", title_ar: "البحث المتقدم", description_fr: "Maîtrisez les filtres et options de recherche", description_ar: "أتقن المرشحات وخيارات البحث", video_url: "https://www.youtube.com/embed/example2", duration: "5:20" }
+    ]
+  },
+  reproduction: {
+    title_fr: "Demande de reproduction",
+    title_ar: "طلب استنساخ",
+    description_fr: "Vous pouvez demander la reproduction de documents pour vos recherches ou projets. Notre service vous accompagne dans vos démarches.",
+    description_ar: "يمكنك طلب استنساخ الوثائق لأبحاثك أو مشاريعك. خدمتنا ترافقك في إجراءاتك.",
+    steps: [
+      { id: "1", title_fr: "Identifier le document", title_ar: "تحديد الوثيقة", description_fr: "Notez la cote et le titre du document souhaité", description_ar: "سجل رمز وعنوان الوثيقة المطلوبة" },
+      { id: "2", title_fr: "Remplir le formulaire", title_ar: "ملء الاستمارة", description_fr: "Complétez le formulaire de demande en ligne", description_ar: "أكمل استمارة الطلب عبر الإنترنت" },
+      { id: "3", title_fr: "Valider et payer", title_ar: "التأكيد والدفع", description_fr: "Réglez les frais de reproduction en ligne ou sur place", description_ar: "ادفع رسوم الاستنساخ عبر الإنترنت أو في الموقع" }
+    ],
+    cta_label_fr: "Faire une demande",
+    cta_label_ar: "تقديم طلب",
+    cta_url: "/digital-library/services/reproduction"
+  }
 };
 
 const categoryColors = [
@@ -241,17 +328,202 @@ export default function HelpFAQ() {
             <div className="container mx-auto px-4">
               <div className="flex flex-wrap justify-center gap-3">
                 {content.quick_links.map((link, index) => (
-                  <Link
+                  <a
                     key={index}
-                    to={link.url}
+                    href={link.url}
                     className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border shadow-sm hover:shadow-md hover:border-bn-blue-primary/30 transition-all group"
                   >
                     <Icon name={link.icon} className="h-4 w-4 text-bn-blue-primary" />
                     <span className="text-sm font-medium">{getText(link.label_fr, link.label_ar)}</span>
-                    <ExternalLink className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </Link>
+                    <ArrowRight className="h-3 w-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </a>
                 ))}
               </div>
+            </div>
+          </section>
+        )}
+
+        {/* Guide d'utilisation */}
+        {content.guide?.steps?.length > 0 && (
+          <section id="guide" className="py-12 lg:py-16 bg-gradient-to-b from-background to-muted/20">
+            <div className="container mx-auto px-4 max-w-5xl">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="text-center mb-10"
+              >
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-bn-blue-primary/10 text-bn-blue-primary text-sm mb-4">
+                  <Icon name="mdi:book-open-page-variant" className="h-4 w-4" />
+                  <span>{isArabic ? 'دليل' : 'Guide'}</span>
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold mb-2">
+                  {getText(content.guide.title_fr, content.guide.title_ar)}
+                </h2>
+                <p className="text-muted-foreground">
+                  {getText(content.guide.subtitle_fr, content.guide.subtitle_ar)}
+                </p>
+              </motion.div>
+
+              <div className="grid md:grid-cols-3 gap-6">
+                {content.guide.steps.map((step, index) => (
+                  <motion.div
+                    key={step.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <Card className="h-full border-0 shadow-lg hover:shadow-xl transition-all group relative overflow-hidden">
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-bn-blue-primary to-gold-bn-primary" />
+                      <CardContent className="pt-8 pb-6 px-6 text-center">
+                        <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-bn-blue-primary to-bn-blue-primary/80 flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
+                          <Icon name={step.icon} className="h-8 w-8" />
+                        </div>
+                        <div className="w-8 h-8 mx-auto mb-3 rounded-full bg-gold-bn-primary/20 flex items-center justify-center text-gold-bn-primary font-bold text-sm">
+                          {index + 1}
+                        </div>
+                        <h3 className="font-semibold text-lg mb-2">
+                          {getText(step.title_fr, step.title_ar)}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {getText(step.description_fr, step.description_ar)}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Tutoriels vidéo */}
+        {content.tutorials?.items?.length > 0 && (
+          <section id="tutorials" className="py-12 lg:py-16 bg-muted/30">
+            <div className="container mx-auto px-4 max-w-5xl">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="text-center mb-10"
+              >
+                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rose-500/10 text-rose-600 text-sm mb-4">
+                  <Icon name="mdi:video-outline" className="h-4 w-4" />
+                  <span>{isArabic ? 'فيديو' : 'Vidéo'}</span>
+                </div>
+                <h2 className="text-2xl md:text-3xl font-bold mb-2">
+                  {getText(content.tutorials.title_fr, content.tutorials.title_ar)}
+                </h2>
+                <p className="text-muted-foreground">
+                  {getText(content.tutorials.subtitle_fr, content.tutorials.subtitle_ar)}
+                </p>
+              </motion.div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                {content.tutorials.items.map((tutorial, index) => (
+                  <motion.div
+                    key={tutorial.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                  >
+                    <Card className="h-full overflow-hidden hover:shadow-xl transition-all group">
+                      <div className="aspect-video bg-muted relative">
+                        {tutorial.video_url ? (
+                          <iframe
+                            src={tutorial.video_url}
+                            title={getText(tutorial.title_fr, tutorial.title_ar)}
+                            className="w-full h-full"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-bn-blue-primary/20 to-bn-blue-primary/5">
+                            <div className="w-16 h-16 rounded-full bg-white/90 shadow-lg flex items-center justify-center group-hover:scale-110 transition-transform">
+                              <Icon name="mdi:play" className="h-8 w-8 text-bn-blue-primary ml-1" />
+                            </div>
+                          </div>
+                        )}
+                        {tutorial.duration && (
+                          <span className="absolute bottom-2 right-2 px-2 py-1 rounded bg-black/70 text-white text-xs font-medium">
+                            {tutorial.duration}
+                          </span>
+                        )}
+                      </div>
+                      <CardContent className="p-5">
+                        <h3 className="font-semibold text-lg mb-2">
+                          {getText(tutorial.title_fr, tutorial.title_ar)}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">
+                          {getText(tutorial.description_fr, tutorial.description_ar)}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Demande de reproduction */}
+        {content.reproduction && (
+          <section id="reproduction" className="py-12 lg:py-16">
+            <div className="container mx-auto px-4 max-w-5xl">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+              >
+                <Card className="border-0 shadow-xl overflow-hidden">
+                  <div className="h-2 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500" />
+                  <CardContent className="p-8 lg:p-10">
+                    <div className="grid lg:grid-cols-2 gap-8 items-center">
+                      <div>
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 text-emerald-600 text-sm mb-4">
+                          <Icon name="mdi:content-copy" className="h-4 w-4" />
+                          <span>{isArabic ? 'خدمة' : 'Service'}</span>
+                        </div>
+                        <h2 className="text-2xl md:text-3xl font-bold mb-4">
+                          {getText(content.reproduction.title_fr, content.reproduction.title_ar)}
+                        </h2>
+                        <p className="text-muted-foreground mb-6">
+                          {getText(content.reproduction.description_fr, content.reproduction.description_ar)}
+                        </p>
+                        <Link to={content.reproduction.cta_url}>
+                          <Button size="lg" className="bg-emerald-600 hover:bg-emerald-700">
+                            {getText(content.reproduction.cta_label_fr, content.reproduction.cta_label_ar)}
+                            <ArrowRight className="h-4 w-4 ml-2" />
+                          </Button>
+                        </Link>
+                      </div>
+
+                      <div className="space-y-4">
+                        {content.reproduction.steps?.map((step, index) => (
+                          <div
+                            key={step.id}
+                            className="flex gap-4 p-4 rounded-xl bg-muted/50 hover:bg-muted transition-colors"
+                          >
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold">
+                              {index + 1}
+                            </div>
+                            <div>
+                              <h4 className="font-semibold mb-1">
+                                {getText(step.title_fr, step.title_ar)}
+                              </h4>
+                              <p className="text-sm text-muted-foreground">
+                                {getText(step.description_fr, step.description_ar)}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
             </div>
           </section>
         )}

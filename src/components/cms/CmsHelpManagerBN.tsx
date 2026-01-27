@@ -30,6 +30,43 @@ interface FAQQuestion {
   answer_ar?: string;
 }
 
+interface GuideStep {
+  id: string;
+  title_fr: string;
+  title_ar?: string;
+  description_fr: string;
+  description_ar?: string;
+  icon: string;
+}
+
+interface Tutorial {
+  id: string;
+  title_fr: string;
+  title_ar?: string;
+  description_fr: string;
+  description_ar?: string;
+  video_url: string;
+  thumbnail_url?: string;
+  duration?: string;
+}
+
+interface ReproductionInfo {
+  title_fr: string;
+  title_ar?: string;
+  description_fr: string;
+  description_ar?: string;
+  steps: Array<{
+    id: string;
+    title_fr: string;
+    title_ar?: string;
+    description_fr: string;
+    description_ar?: string;
+  }>;
+  cta_label_fr: string;
+  cta_label_ar?: string;
+  cta_url: string;
+}
+
 interface HelpSettings {
   hero_title_fr: string;
   hero_title_ar?: string;
@@ -54,6 +91,21 @@ interface HelpSettings {
     url: string;
     icon: string;
   }>;
+  guide: {
+    title_fr: string;
+    title_ar?: string;
+    subtitle_fr: string;
+    subtitle_ar?: string;
+    steps: GuideStep[];
+  };
+  tutorials: {
+    title_fr: string;
+    title_ar?: string;
+    subtitle_fr: string;
+    subtitle_ar?: string;
+    items: Tutorial[];
+  };
+  reproduction: ReproductionInfo;
 }
 
 const defaultSettings: HelpSettings = {
@@ -140,10 +192,45 @@ const defaultSettings: HelpSettings = {
     cta_label_ar: "اتصل بنا"
   },
   quick_links: [
-    { label_fr: "Guide d'utilisation", label_ar: "دليل الاستخدام", url: "/digital-library/guide", icon: "mdi:book-open-page-variant" },
-    { label_fr: "Tutoriels vidéo", label_ar: "دروس فيديو", url: "/digital-library/tutorials", icon: "mdi:video-outline" },
-    { label_fr: "Demande de reproduction", label_ar: "طلب استنساخ", url: "/digital-library/reproduction", icon: "mdi:content-copy" }
-  ]
+    { label_fr: "Guide d'utilisation", label_ar: "دليل الاستخدام", url: "#guide", icon: "mdi:book-open-page-variant" },
+    { label_fr: "Tutoriels vidéo", label_ar: "دروس فيديو", url: "#tutorials", icon: "mdi:video-outline" },
+    { label_fr: "Demande de reproduction", label_ar: "طلب استنساخ", url: "#reproduction", icon: "mdi:content-copy" }
+  ],
+  guide: {
+    title_fr: "Guide d'utilisation",
+    title_ar: "دليل الاستخدام",
+    subtitle_fr: "Découvrez comment utiliser la Bibliothèque Numérique",
+    subtitle_ar: "اكتشف كيفية استخدام المكتبة الرقمية",
+    steps: [
+      { id: "1", title_fr: "Créer un compte", title_ar: "إنشاء حساب", description_fr: "Inscrivez-vous gratuitement pour accéder à plus de fonctionnalités", description_ar: "سجل مجانًا للوصول إلى المزيد من الميزات", icon: "mdi:account-plus" },
+      { id: "2", title_fr: "Rechercher un document", title_ar: "البحث عن وثيقة", description_fr: "Utilisez la barre de recherche ou naviguez par catégorie", description_ar: "استخدم شريط البحث أو تصفح حسب الفئة", icon: "mdi:magnify" },
+      { id: "3", title_fr: "Consulter et télécharger", title_ar: "الاطلاع والتحميل", description_fr: "Lisez en ligne ou téléchargez les documents disponibles", description_ar: "اقرأ عبر الإنترنت أو قم بتحميل الوثائق المتاحة", icon: "mdi:download" }
+    ]
+  },
+  tutorials: {
+    title_fr: "Tutoriels vidéo",
+    title_ar: "دروس فيديو",
+    subtitle_fr: "Apprenez à utiliser nos services avec nos tutoriels",
+    subtitle_ar: "تعلم استخدام خدماتنا من خلال دروسنا",
+    items: [
+      { id: "1", title_fr: "Premiers pas sur la plateforme", title_ar: "الخطوات الأولى على المنصة", description_fr: "Découvrez l'interface et les fonctionnalités de base", description_ar: "اكتشف الواجهة والميزات الأساسية", video_url: "https://www.youtube.com/embed/example1", duration: "3:45" },
+      { id: "2", title_fr: "Recherche avancée", title_ar: "البحث المتقدم", description_fr: "Maîtrisez les filtres et options de recherche", description_ar: "أتقن المرشحات وخيارات البحث", video_url: "https://www.youtube.com/embed/example2", duration: "5:20" }
+    ]
+  },
+  reproduction: {
+    title_fr: "Demande de reproduction",
+    title_ar: "طلب استنساخ",
+    description_fr: "Vous pouvez demander la reproduction de documents pour vos recherches ou projets. Notre service vous accompagne dans vos démarches.",
+    description_ar: "يمكنك طلب استنساخ الوثائق لأبحاثك أو مشاريعك. خدمتنا ترافقك في إجراءاتك.",
+    steps: [
+      { id: "1", title_fr: "Identifier le document", title_ar: "تحديد الوثيقة", description_fr: "Notez la cote et le titre du document souhaité", description_ar: "سجل رمز وعنوان الوثيقة المطلوبة" },
+      { id: "2", title_fr: "Remplir le formulaire", title_ar: "ملء الاستمارة", description_fr: "Complétez le formulaire de demande en ligne", description_ar: "أكمل استمارة الطلب عبر الإنترنت" },
+      { id: "3", title_fr: "Valider et payer", title_ar: "التأكيد والدفع", description_fr: "Réglez les frais de reproduction en ligne ou sur place", description_ar: "ادفع رسوم الاستنساخ عبر الإنترنت أو في الموقع" }
+    ],
+    cta_label_fr: "Faire une demande",
+    cta_label_ar: "تقديم طلب",
+    cta_url: "/digital-library/services/reproduction"
+  }
 };
 
 export default function CmsHelpManagerBN() {
@@ -324,9 +411,12 @@ export default function CmsHelpManagerBN() {
       </div>
 
       <Tabs defaultValue="general" className="space-y-6">
-        <TabsList className="grid grid-cols-4 w-full max-w-xl">
+        <TabsList className="flex flex-wrap gap-1 h-auto p-1">
           <TabsTrigger value="general">Général</TabsTrigger>
           <TabsTrigger value="faq">FAQ</TabsTrigger>
+          <TabsTrigger value="guide">Guide</TabsTrigger>
+          <TabsTrigger value="tutorials">Tutoriels</TabsTrigger>
+          <TabsTrigger value="reproduction">Reproduction</TabsTrigger>
           <TabsTrigger value="contact">Contact</TabsTrigger>
           <TabsTrigger value="links">Liens rapides</TabsTrigger>
         </TabsList>
@@ -513,6 +603,501 @@ export default function CmsHelpManagerBN() {
               </Card>
             ))}
           </div>
+        </TabsContent>
+
+        {/* Guide d'utilisation */}
+        <TabsContent value="guide" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Icon name="mdi:book-open-page-variant" className="h-5 w-5" />
+                Guide d'utilisation
+              </CardTitle>
+              <CardDescription>Configurez les étapes du guide d'utilisation</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Titre (Français)</Label>
+                  <Input
+                    value={settings.guide?.title_fr || ''}
+                    onChange={(e) => setSettings(prev => ({
+                      ...prev,
+                      guide: { ...prev.guide, title_fr: e.target.value }
+                    }))}
+                  />
+                </div>
+                <div className="space-y-2" dir="rtl">
+                  <Label>Titre (Arabe)</Label>
+                  <Input
+                    value={settings.guide?.title_ar || ''}
+                    onChange={(e) => setSettings(prev => ({
+                      ...prev,
+                      guide: { ...prev.guide, title_ar: e.target.value }
+                    }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Sous-titre (Français)</Label>
+                  <Input
+                    value={settings.guide?.subtitle_fr || ''}
+                    onChange={(e) => setSettings(prev => ({
+                      ...prev,
+                      guide: { ...prev.guide, subtitle_fr: e.target.value }
+                    }))}
+                  />
+                </div>
+                <div className="space-y-2" dir="rtl">
+                  <Label>Sous-titre (Arabe)</Label>
+                  <Input
+                    value={settings.guide?.subtitle_ar || ''}
+                    onChange={(e) => setSettings(prev => ({
+                      ...prev,
+                      guide: { ...prev.guide, subtitle_ar: e.target.value }
+                    }))}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <h4 className="font-medium">Étapes du guide</h4>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      const newStep = { id: Date.now().toString(), title_fr: "Nouvelle étape", title_ar: "", description_fr: "", description_ar: "", icon: "mdi:numeric" };
+                      setSettings(prev => ({
+                        ...prev,
+                        guide: { ...prev.guide, steps: [...(prev.guide?.steps || []), newStep] }
+                      }));
+                      setIsDirty(true);
+                    }}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Ajouter une étape
+                  </Button>
+                </div>
+                {settings.guide?.steps?.map((step, index) => (
+                  <div key={step.id} className="p-4 bg-muted/50 rounded-lg space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-muted-foreground">Étape {index + 1}</span>
+                      <div className="flex gap-2">
+                        <Input
+                          value={step.icon}
+                          onChange={(e) => {
+                            const newSteps = [...(settings.guide?.steps || [])];
+                            newSteps[index].icon = e.target.value;
+                            setSettings(prev => ({ ...prev, guide: { ...prev.guide, steps: newSteps } }));
+                            setIsDirty(true);
+                          }}
+                          placeholder="mdi:icon"
+                          className="w-36 text-xs"
+                        />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-destructive"
+                          onClick={() => {
+                            setSettings(prev => ({
+                              ...prev,
+                              guide: { ...prev.guide, steps: prev.guide.steps.filter(s => s.id !== step.id) }
+                            }));
+                            setIsDirty(true);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Input
+                          value={step.title_fr}
+                          onChange={(e) => {
+                            const newSteps = [...(settings.guide?.steps || [])];
+                            newSteps[index].title_fr = e.target.value;
+                            setSettings(prev => ({ ...prev, guide: { ...prev.guide, steps: newSteps } }));
+                            setIsDirty(true);
+                          }}
+                          placeholder="Titre (FR)"
+                        />
+                        <Textarea
+                          value={step.description_fr}
+                          onChange={(e) => {
+                            const newSteps = [...(settings.guide?.steps || [])];
+                            newSteps[index].description_fr = e.target.value;
+                            setSettings(prev => ({ ...prev, guide: { ...prev.guide, steps: newSteps } }));
+                            setIsDirty(true);
+                          }}
+                          placeholder="Description (FR)"
+                          rows={2}
+                        />
+                      </div>
+                      <div className="space-y-2" dir="rtl">
+                        <Input
+                          value={step.title_ar || ''}
+                          onChange={(e) => {
+                            const newSteps = [...(settings.guide?.steps || [])];
+                            newSteps[index].title_ar = e.target.value;
+                            setSettings(prev => ({ ...prev, guide: { ...prev.guide, steps: newSteps } }));
+                            setIsDirty(true);
+                          }}
+                          placeholder="Titre (AR)"
+                        />
+                        <Textarea
+                          value={step.description_ar || ''}
+                          onChange={(e) => {
+                            const newSteps = [...(settings.guide?.steps || [])];
+                            newSteps[index].description_ar = e.target.value;
+                            setSettings(prev => ({ ...prev, guide: { ...prev.guide, steps: newSteps } }));
+                            setIsDirty(true);
+                          }}
+                          placeholder="Description (AR)"
+                          rows={2}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Tutoriels vidéo */}
+        <TabsContent value="tutorials" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Icon name="mdi:video-outline" className="h-5 w-5" />
+                Tutoriels vidéo
+              </CardTitle>
+              <CardDescription>Gérez les tutoriels vidéo de la plateforme</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Titre section (Français)</Label>
+                  <Input
+                    value={settings.tutorials?.title_fr || ''}
+                    onChange={(e) => setSettings(prev => ({
+                      ...prev,
+                      tutorials: { ...prev.tutorials, title_fr: e.target.value }
+                    }))}
+                  />
+                </div>
+                <div className="space-y-2" dir="rtl">
+                  <Label>Titre section (Arabe)</Label>
+                  <Input
+                    value={settings.tutorials?.title_ar || ''}
+                    onChange={(e) => setSettings(prev => ({
+                      ...prev,
+                      tutorials: { ...prev.tutorials, title_ar: e.target.value }
+                    }))}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <h4 className="font-medium">Liste des tutoriels</h4>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      const newTutorial = { id: Date.now().toString(), title_fr: "Nouveau tutoriel", title_ar: "", description_fr: "", description_ar: "", video_url: "", duration: "" };
+                      setSettings(prev => ({
+                        ...prev,
+                        tutorials: { ...prev.tutorials, items: [...(prev.tutorials?.items || []), newTutorial] }
+                      }));
+                      setIsDirty(true);
+                    }}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Ajouter un tutoriel
+                  </Button>
+                </div>
+                {settings.tutorials?.items?.map((tutorial, index) => (
+                  <div key={tutorial.id} className="p-4 bg-muted/50 rounded-lg space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-muted-foreground">Tutoriel {index + 1}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive"
+                        onClick={() => {
+                          setSettings(prev => ({
+                            ...prev,
+                            tutorials: { ...prev.tutorials, items: prev.tutorials.items.filter(t => t.id !== tutorial.id) }
+                          }));
+                          setIsDirty(true);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Input
+                          value={tutorial.title_fr}
+                          onChange={(e) => {
+                            const newItems = [...(settings.tutorials?.items || [])];
+                            newItems[index].title_fr = e.target.value;
+                            setSettings(prev => ({ ...prev, tutorials: { ...prev.tutorials, items: newItems } }));
+                            setIsDirty(true);
+                          }}
+                          placeholder="Titre (FR)"
+                        />
+                        <Textarea
+                          value={tutorial.description_fr}
+                          onChange={(e) => {
+                            const newItems = [...(settings.tutorials?.items || [])];
+                            newItems[index].description_fr = e.target.value;
+                            setSettings(prev => ({ ...prev, tutorials: { ...prev.tutorials, items: newItems } }));
+                            setIsDirty(true);
+                          }}
+                          placeholder="Description (FR)"
+                          rows={2}
+                        />
+                      </div>
+                      <div className="space-y-2" dir="rtl">
+                        <Input
+                          value={tutorial.title_ar || ''}
+                          onChange={(e) => {
+                            const newItems = [...(settings.tutorials?.items || [])];
+                            newItems[index].title_ar = e.target.value;
+                            setSettings(prev => ({ ...prev, tutorials: { ...prev.tutorials, items: newItems } }));
+                            setIsDirty(true);
+                          }}
+                          placeholder="Titre (AR)"
+                        />
+                        <Textarea
+                          value={tutorial.description_ar || ''}
+                          onChange={(e) => {
+                            const newItems = [...(settings.tutorials?.items || [])];
+                            newItems[index].description_ar = e.target.value;
+                            setSettings(prev => ({ ...prev, tutorials: { ...prev.tutorials, items: newItems } }));
+                            setIsDirty(true);
+                          }}
+                          placeholder="Description (AR)"
+                          rows={2}
+                        />
+                      </div>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label className="text-xs">URL de la vidéo (YouTube embed)</Label>
+                        <Input
+                          value={tutorial.video_url}
+                          onChange={(e) => {
+                            const newItems = [...(settings.tutorials?.items || [])];
+                            newItems[index].video_url = e.target.value;
+                            setSettings(prev => ({ ...prev, tutorials: { ...prev.tutorials, items: newItems } }));
+                            setIsDirty(true);
+                          }}
+                          placeholder="https://www.youtube.com/embed/..."
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label className="text-xs">Durée</Label>
+                        <Input
+                          value={tutorial.duration || ''}
+                          onChange={(e) => {
+                            const newItems = [...(settings.tutorials?.items || [])];
+                            newItems[index].duration = e.target.value;
+                            setSettings(prev => ({ ...prev, tutorials: { ...prev.tutorials, items: newItems } }));
+                            setIsDirty(true);
+                          }}
+                          placeholder="3:45"
+                          className="w-24"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Demande de reproduction */}
+        <TabsContent value="reproduction" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Icon name="mdi:content-copy" className="h-5 w-5" />
+                Demande de reproduction
+              </CardTitle>
+              <CardDescription>Configurez les informations sur le service de reproduction</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Titre (Français)</Label>
+                  <Input
+                    value={settings.reproduction?.title_fr || ''}
+                    onChange={(e) => setSettings(prev => ({
+                      ...prev,
+                      reproduction: { ...prev.reproduction, title_fr: e.target.value }
+                    }))}
+                  />
+                </div>
+                <div className="space-y-2" dir="rtl">
+                  <Label>Titre (Arabe)</Label>
+                  <Input
+                    value={settings.reproduction?.title_ar || ''}
+                    onChange={(e) => setSettings(prev => ({
+                      ...prev,
+                      reproduction: { ...prev.reproduction, title_ar: e.target.value }
+                    }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Description (Français)</Label>
+                  <Textarea
+                    value={settings.reproduction?.description_fr || ''}
+                    onChange={(e) => setSettings(prev => ({
+                      ...prev,
+                      reproduction: { ...prev.reproduction, description_fr: e.target.value }
+                    }))}
+                    rows={3}
+                  />
+                </div>
+                <div className="space-y-2" dir="rtl">
+                  <Label>Description (Arabe)</Label>
+                  <Textarea
+                    value={settings.reproduction?.description_ar || ''}
+                    onChange={(e) => setSettings(prev => ({
+                      ...prev,
+                      reproduction: { ...prev.reproduction, description_ar: e.target.value }
+                    }))}
+                    rows={3}
+                  />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label>Libellé CTA (Français)</Label>
+                  <Input
+                    value={settings.reproduction?.cta_label_fr || ''}
+                    onChange={(e) => setSettings(prev => ({
+                      ...prev,
+                      reproduction: { ...prev.reproduction, cta_label_fr: e.target.value }
+                    }))}
+                  />
+                </div>
+                <div className="space-y-2" dir="rtl">
+                  <Label>Libellé CTA (Arabe)</Label>
+                  <Input
+                    value={settings.reproduction?.cta_label_ar || ''}
+                    onChange={(e) => setSettings(prev => ({
+                      ...prev,
+                      reproduction: { ...prev.reproduction, cta_label_ar: e.target.value }
+                    }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>URL du CTA</Label>
+                  <Input
+                    value={settings.reproduction?.cta_url || ''}
+                    onChange={(e) => setSettings(prev => ({
+                      ...prev,
+                      reproduction: { ...prev.reproduction, cta_url: e.target.value }
+                    }))}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex justify-between items-center">
+                  <h4 className="font-medium">Étapes du processus</h4>
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      const newStep = { id: Date.now().toString(), title_fr: "Nouvelle étape", title_ar: "", description_fr: "", description_ar: "" };
+                      setSettings(prev => ({
+                        ...prev,
+                        reproduction: { ...prev.reproduction, steps: [...(prev.reproduction?.steps || []), newStep] }
+                      }));
+                      setIsDirty(true);
+                    }}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Ajouter une étape
+                  </Button>
+                </div>
+                {settings.reproduction?.steps?.map((step, index) => (
+                  <div key={step.id} className="p-4 bg-muted/50 rounded-lg space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-medium text-muted-foreground">Étape {index + 1}</span>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive"
+                        onClick={() => {
+                          setSettings(prev => ({
+                            ...prev,
+                            reproduction: { ...prev.reproduction, steps: prev.reproduction.steps.filter(s => s.id !== step.id) }
+                          }));
+                          setIsDirty(true);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Input
+                          value={step.title_fr}
+                          onChange={(e) => {
+                            const newSteps = [...(settings.reproduction?.steps || [])];
+                            newSteps[index].title_fr = e.target.value;
+                            setSettings(prev => ({ ...prev, reproduction: { ...prev.reproduction, steps: newSteps } }));
+                            setIsDirty(true);
+                          }}
+                          placeholder="Titre (FR)"
+                        />
+                        <Textarea
+                          value={step.description_fr}
+                          onChange={(e) => {
+                            const newSteps = [...(settings.reproduction?.steps || [])];
+                            newSteps[index].description_fr = e.target.value;
+                            setSettings(prev => ({ ...prev, reproduction: { ...prev.reproduction, steps: newSteps } }));
+                            setIsDirty(true);
+                          }}
+                          placeholder="Description (FR)"
+                          rows={2}
+                        />
+                      </div>
+                      <div className="space-y-2" dir="rtl">
+                        <Input
+                          value={step.title_ar || ''}
+                          onChange={(e) => {
+                            const newSteps = [...(settings.reproduction?.steps || [])];
+                            newSteps[index].title_ar = e.target.value;
+                            setSettings(prev => ({ ...prev, reproduction: { ...prev.reproduction, steps: newSteps } }));
+                            setIsDirty(true);
+                          }}
+                          placeholder="Titre (AR)"
+                        />
+                        <Textarea
+                          value={step.description_ar || ''}
+                          onChange={(e) => {
+                            const newSteps = [...(settings.reproduction?.steps || [])];
+                            newSteps[index].description_ar = e.target.value;
+                            setSettings(prev => ({ ...prev, reproduction: { ...prev.reproduction, steps: newSteps } }));
+                            setIsDirty(true);
+                          }}
+                          placeholder="Description (AR)"
+                          rows={2}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
         {/* Contact */}
