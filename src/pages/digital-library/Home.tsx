@@ -534,16 +534,16 @@ export default function DigitalLibraryHome() {
                     <CarouselContent>
                       {featuredWorks.map((item) => (
                         <CarouselItem key={item.workId || item.id} className="animate-fade-in">
-                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center min-h-[20rem] md:min-h-[24rem]">
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
                             {/* Left: Text Content - vertically centered */}
-                            <div className="text-white space-y-4 order-2 lg:order-1 flex flex-col justify-center">
+                            <div className="text-white space-y-3 order-2 lg:order-1 flex flex-col justify-center py-4">
                               <Badge className="bg-gold-bn-primary text-white hover:bg-gold-bn-primary-dark text-xs px-4 py-1.5 rounded font-medium w-fit">
                                 {item.type}
                               </Badge>
                               <h2 className="text-xl md:text-2xl lg:text-3xl font-bold uppercase tracking-wide leading-tight">
                                 {language === 'ar' && item.title_ar ? item.title_ar : item.title}
                               </h2>
-                              <p className="text-white/85 text-sm md:text-base leading-relaxed line-clamp-5 text-justify">
+                              <p className="text-white/85 text-sm md:text-base leading-relaxed line-clamp-4 text-justify">
                                 {item.description || `${item.author}${item.date ? ` - ${item.date}` : ''}`}
                               </p>
                               <div className="pt-2">
@@ -559,19 +559,15 @@ export default function DigitalLibraryHome() {
                               </div>
                             </div>
                             
-                            {/* Right: Image - vertically centered */}
+                            {/* Right: Image - fully visible */}
                             {item.thumbnail && (
-                              <div className="relative flex justify-center lg:justify-end order-1 lg:order-2 items-center">
-                                <div className="relative">
-                                  {/* Subtle warm glow effect */}
-                                  <div className="absolute -inset-4 bg-gradient-to-br from-amber-400/10 via-orange-300/5 to-transparent blur-xl rounded-xl" />
-                                  <div className="relative w-56 h-64 md:w-72 md:h-80 lg:w-80 lg:h-[22rem] rounded-lg overflow-hidden shadow-2xl border border-white/10">
-                                    <img 
-                                      src={item.thumbnail} 
-                                      alt={item.title}
-                                      className="w-full h-full object-cover"
-                                    />
-                                  </div>
+                              <div className="relative flex justify-center lg:justify-end order-1 lg:order-2">
+                                <div className="relative w-full max-w-sm lg:max-w-md aspect-[3/4] rounded-lg overflow-hidden shadow-2xl border border-white/10">
+                                  <img 
+                                    src={item.thumbnail} 
+                                    alt={item.title}
+                                    className="w-full h-full object-cover object-center"
+                                  />
                                 </div>
                               </div>
                             )}
