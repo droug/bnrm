@@ -1219,9 +1219,9 @@ const BookReader = () => {
         </aside>
 
         {/* Main Content - Book Viewer */}
-        <main className="flex-1 min-w-0 flex flex-col min-h-0 overflow-hidden">
-          {/* Toolbar - Sticky */}
-          <div className="bg-muted/30 border-b p-3 sticky top-0 z-20">
+        <main className="flex-1 min-w-0 flex flex-col min-h-0 overflow-hidden relative">
+          {/* Toolbar - Fixed at top of main content */}
+          <div className="bg-muted/30 backdrop-blur-sm border-b p-3 sticky top-0 z-30 shrink-0">
             <div className="flex items-center justify-between gap-4">
               {/* Navigation Controls */}
               <div className="flex items-center gap-2">
@@ -1404,7 +1404,7 @@ const BookReader = () => {
 
           {/* Book Display Area */}
           {readingMode === "book" ? (
-            <div id="scroll-container" className={`flex-1 min-h-0 ${viewMode === "scroll" ? "overflow-y-auto overscroll-contain" : "overflow-hidden"} bg-muted/10 ${viewMode === "scroll" ? "" : "flex items-center justify-center"} p-4 md:p-8`}>
+            <div id="scroll-container" className={`flex-1 min-h-0 ${viewMode === "scroll" ? "overflow-y-auto overscroll-contain scroll-smooth" : "overflow-hidden"} bg-muted/10 ${viewMode === "scroll" ? "" : "flex items-center justify-center"} p-4 md:p-8`}>
               {loading ? (
                 <div className="text-center">
                   <p className="text-muted-foreground">Chargement du document...</p>
