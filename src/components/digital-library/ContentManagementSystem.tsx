@@ -9,6 +9,7 @@ import CmsEvenementsManager from "@/components/cms/CmsEvenementsManager";
 import CmsMenusManager from "@/components/cms/CmsMenusManager";
 import CmsBannersManager from "@/components/cms/CmsBannersManager";
 import CmsFooterManager from "@/components/cms/CmsFooterManager";
+import CmsFooterManagerBN from "@/components/cms/CmsFooterManagerBN";
 import CmsSectionsManager from "@/components/cms/CmsSectionsManager";
 import CmsHeroManagerBN from "@/components/cms/CmsHeroManagerBN";
 import CmsStyleManager from "@/components/cms/CmsStyleManager";
@@ -390,7 +391,7 @@ export default function ContentManagementSystem() {
       case "menus":
         return <CmsMenusManager />;
       case "footer":
-        return <CmsFooterManager />;
+        return <CmsFooterManagerBN />;
       case "webhooks":
         return <CmsWebhooksManager />;
       case "about":
