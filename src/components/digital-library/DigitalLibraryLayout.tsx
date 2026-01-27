@@ -332,6 +332,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                           <div className="p-2 rounded-xl bg-gradient-to-br from-gold-bn-primary/20 to-gold-bn-primary/5 group-hover:from-gold-bn-primary/30 group-hover:to-gold-bn-primary/10 transition-all duration-200 group-hover:scale-110">
                             <Icon name={item.iconName} className="h-5 w-5 text-gold-bn-primary" />
                           </div>
+                          <span className="font-semibold text-foreground group-hover:text-gold-bn-primary transition-colors">{t(item.labelKey)}</span>
                         </div>
                         <span className={`px-3 py-1 text-xs font-bold rounded-none transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-0 ${badgeStyles[index % badgeStyles.length]}`}>
                           {item.count}
