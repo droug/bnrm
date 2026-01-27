@@ -1220,8 +1220,8 @@ const BookReader = () => {
 
         {/* Main Content - Book Viewer */}
         <main className="flex-1 min-w-0 flex flex-col min-h-0 overflow-hidden relative">
-          {/* Toolbar - Fixed at top of main content */}
-          <div className="bg-muted/30 backdrop-blur-sm border-b p-3 sticky top-0 z-30 shrink-0">
+          {/* Toolbar - Hidden in scroll mode (has its own floating toolbar) */}
+          <div className={`bg-muted/30 backdrop-blur-sm border-b p-3 z-30 shrink-0 ${viewMode === "scroll" ? "hidden" : ""}`}>
             <div className="flex items-center justify-between gap-4">
               {/* Navigation Controls */}
               <div className="flex items-center gap-2">
