@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Icon } from "@/components/ui/icon";
 import { Button } from "@/components/ui/button";
 import { SimpleTooltip } from "@/components/ui/simple-tooltip";
+import { FancyTooltip } from "@/components/ui/fancy-tooltip";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useAuth } from "@/hooks/useAuth";
 import GlobalSearchBar from "@/components/GlobalSearchBar";
@@ -326,19 +327,28 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   ];
                   
                   return (
-                    <Link key={item.href} to={item.href} className="block" title={t(item.tooltipKey)}>
-                      <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group">
-                        <div className="flex items-center gap-3 flex-1">
-                          <div className="p-2 rounded-xl bg-gradient-to-br from-gold-bn-primary/20 to-gold-bn-primary/5 group-hover:from-gold-bn-primary/30 group-hover:to-gold-bn-primary/10 transition-all duration-200 group-hover:scale-110">
-                            <Icon name={item.iconName} className="h-5 w-5 text-gold-bn-primary" />
+                    <FancyTooltip 
+                      key={item.href}
+                      content={t(item.labelKey)} 
+                      description={t(item.descKey)}
+                      icon={item.iconName}
+                      side="right"
+                      variant="gold"
+                    >
+                      <Link to={item.href} className="block">
+                        <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group">
+                          <div className="flex items-center gap-3 flex-1">
+                            <div className="p-2 rounded-xl bg-gradient-to-br from-gold-bn-primary/20 to-gold-bn-primary/5 group-hover:from-gold-bn-primary/30 group-hover:to-gold-bn-primary/10 transition-all duration-200 group-hover:scale-110">
+                              <Icon name={item.iconName} className="h-5 w-5 text-gold-bn-primary" />
+                            </div>
+                            <span className="font-semibold text-foreground group-hover:text-gold-bn-primary transition-colors">{t(item.labelKey)}</span>
                           </div>
-                          <span className="font-semibold text-foreground group-hover:text-gold-bn-primary transition-colors">{t(item.labelKey)}</span>
-                        </div>
-                        <span className={`px-3 py-1 text-xs font-bold rounded-none transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-0 ${badgeStyles[index % badgeStyles.length]}`}>
-                          {item.count}
-                        </span>
-                      </DropdownMenuItem>
-                    </Link>
+                          <span className={`px-3 py-1 text-xs font-bold rounded-none transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-0 ${badgeStyles[index % badgeStyles.length]}`}>
+                            {item.count}
+                          </span>
+                        </DropdownMenuItem>
+                      </Link>
+                    </FancyTooltip>
                   );
                 })}
               </DropdownMenuContent>
