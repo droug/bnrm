@@ -521,8 +521,8 @@ export default function DigitalLibraryHome() {
                   </svg>
                 </button>
 
-                {/* Blurred container that doesn't take full width */}
-                <div className="bg-black/15 backdrop-blur-md rounded-2xl p-6 md:p-8 lg:p-10">
+                {/* Very subtle blurred container */}
+                <div className="bg-black/5 backdrop-blur-[2px] rounded-2xl p-6 md:p-8">
                   <Carousel
                     opts={{
                       align: "center",
@@ -534,16 +534,16 @@ export default function DigitalLibraryHome() {
                     <CarouselContent>
                       {featuredWorks.map((item) => (
                         <CarouselItem key={item.workId || item.id} className="animate-fade-in">
-                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8 items-center">
-                            {/* Left: Text Content - vertically centered */}
-                            <div className="text-white space-y-3 order-2 lg:order-1 flex flex-col justify-center py-4">
+                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center">
+                            {/* Left: Text Content */}
+                            <div className="text-white space-y-4 order-2 lg:order-1 flex flex-col justify-center">
                               <Badge className="bg-gold-bn-primary text-white hover:bg-gold-bn-primary-dark text-xs px-4 py-1.5 rounded font-medium w-fit">
                                 {item.type}
                               </Badge>
                               <h2 className="text-xl md:text-2xl lg:text-3xl font-bold uppercase tracking-wide leading-tight">
                                 {language === 'ar' && item.title_ar ? item.title_ar : item.title}
                               </h2>
-                              <p className="text-white/85 text-sm md:text-base leading-relaxed line-clamp-4 text-justify">
+                              <p className="text-white/85 text-sm md:text-base leading-relaxed line-clamp-5 text-justify max-w-lg">
                                 {item.description || `${item.author}${item.date ? ` - ${item.date}` : ''}`}
                               </p>
                               <div className="pt-2">
@@ -559,10 +559,10 @@ export default function DigitalLibraryHome() {
                               </div>
                             </div>
                             
-                            {/* Right: Image - fully visible */}
+                            {/* Right: Image - horizontal book spread format like Figma */}
                             {item.thumbnail && (
                               <div className="relative flex justify-center lg:justify-end order-1 lg:order-2">
-                                <div className="relative w-full max-w-sm lg:max-w-md aspect-[3/4] rounded-lg overflow-hidden shadow-2xl border border-white/10">
+                                <div className="relative w-full max-w-md lg:max-w-lg aspect-[4/3] rounded-xl overflow-hidden shadow-2xl border border-white/10">
                                   <img 
                                     src={item.thumbnail} 
                                     alt={item.title}
