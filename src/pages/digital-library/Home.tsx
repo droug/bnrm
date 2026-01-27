@@ -439,35 +439,35 @@ export default function DigitalLibraryHome() {
       
       {/* Hero Section with Background Image & Integrated Search */}
       <section 
-        className="relative min-h-[85vh] overflow-hidden"
+        className="relative min-h-[90vh] overflow-hidden"
         style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url(${heroImageUrl})`,
+          backgroundImage: `linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.7)), url(${heroImageUrl})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
         }}
       >
-        <div className="container mx-auto px-4 relative z-10 flex flex-col h-full pt-12">
+        <div className="container mx-auto px-4 relative z-10 flex flex-col min-h-[90vh]">
           {/* Hero Title & Subtitle */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 animate-fade-in drop-shadow-lg tracking-wide uppercase">
-              {t('dl.home.welcome')}
+          <div className="text-center pt-16 pb-6">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 animate-fade-in drop-shadow-lg tracking-widest uppercase">
+              BIBLIOTHÈQUE NUMÉRIQUE MAROCAINE
             </h1>
-            <p className="text-lg md:text-xl text-white/90 max-w-3xl mx-auto animate-fade-in drop-shadow-md">
-              {t('dl.home.accessDocuments')}
+            <p className="text-base md:text-lg text-white/90 max-w-3xl mx-auto animate-fade-in drop-shadow-md">
+              Plongez dans nos collections riches et diversifiées de documents historiques
             </p>
           </div>
 
           {/* Integrated Search Bar */}
-          <div className="max-w-3xl mx-auto w-full mb-12">
-            <div className="relative flex items-center bg-white/95 backdrop-blur-sm rounded-full shadow-2xl overflow-hidden border-2 border-white/20">
-              <div className="flex items-center pl-6 text-muted-foreground">
-                <Icon name="mdi:magnify" className="w-6 h-6" />
+          <div className="max-w-2xl mx-auto w-full mb-8">
+            <div className="relative flex items-center bg-white rounded-full shadow-xl overflow-hidden">
+              <div className="flex items-center pl-5 text-gray-400">
+                <Icon name="mdi:magnify" className="w-5 h-5" />
               </div>
               <input
                 type="text"
-                placeholder={t('dl.home.searchPlaceholder') || "Rechercher parmi 50,000+ documents..."}
-                className="flex-1 px-4 py-4 text-lg bg-transparent outline-none text-foreground placeholder:text-muted-foreground"
+                placeholder="Rechercher parmi 50,000+ documents..."
+                className="flex-1 px-4 py-3.5 text-base bg-transparent outline-none text-gray-800 placeholder:text-gray-400"
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') {
                     const value = (e.target as HTMLInputElement).value;
@@ -478,7 +478,7 @@ export default function DigitalLibraryHome() {
                 }}
               />
               <Button 
-                className="m-2 px-6 py-2 bg-gold-bn-primary hover:bg-gold-bn-primary-dark text-white rounded-full font-medium"
+                className="m-1.5 px-6 py-2 bg-gold-bn-primary hover:bg-gold-bn-primary-dark text-white rounded-full text-sm font-medium"
                 onClick={() => {
                   const input = document.querySelector('input[type="text"]') as HTMLInputElement;
                   if (input?.value.trim()) {
@@ -486,68 +486,89 @@ export default function DigitalLibraryHome() {
                   }
                 }}
               >
-                {t('dl.home.search') || "Rechercher"}
+                Rechercher
               </Button>
             </div>
           </div>
 
           {/* Œuvres et vedettes - Featured Works Carousel */}
-          <div className="flex-1 flex flex-col justify-end pb-12">
+          <div className="flex-1 flex items-center justify-center py-8">
             {!loadingFeatured && featuredWorks.length > 0 && (
-              <div className="relative">
+              <div className="relative w-full max-w-7xl mx-auto px-16">
+                {/* Left Arrow - Outside carousel */}
+                <button 
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 text-gold-bn-primary hover:text-gold-bn-primary-dark transition-colors"
+                  onClick={() => {
+                    const prevBtn = document.querySelector('[data-carousel-prev]') as HTMLButtonElement;
+                    prevBtn?.click();
+                  }}
+                >
+                  <Icon name="mdi:chevron-left" className="w-14 h-14 md:w-16 md:h-16" />
+                </button>
+                
+                {/* Right Arrow - Outside carousel */}
+                <button 
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 text-gold-bn-primary hover:text-gold-bn-primary-dark transition-colors"
+                  onClick={() => {
+                    const nextBtn = document.querySelector('[data-carousel-next]') as HTMLButtonElement;
+                    nextBtn?.click();
+                  }}
+                >
+                  <Icon name="mdi:chevron-right" className="w-14 h-14 md:w-16 md:h-16" />
+                </button>
+
                 <Carousel
                   opts={{
                     align: "start",
                     loop: true,
                   }}
                   plugins={[autoplayPlugin.current]}
-                  className="w-full max-w-6xl mx-auto"
+                  className="w-full"
                 >
                   <CarouselContent>
                     {featuredWorks.map((item) => (
                       <CarouselItem key={item.workId || item.id} className="animate-fade-in">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center px-4">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center">
                           {/* Left: Text Content */}
-                          <div className="text-white space-y-4">
-                            <Badge className="bg-gold-bn-primary text-white hover:bg-gold-bn-primary-dark text-sm px-4 py-1">
+                          <div className="text-white space-y-3 order-2 lg:order-1">
+                            <Badge className="bg-gold-bn-primary text-white hover:bg-gold-bn-primary-dark text-xs px-3 py-1 rounded">
                               {item.type}
                             </Badge>
-                            <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wide leading-tight">
+                            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold uppercase tracking-wider leading-tight">
                               {language === 'ar' && item.title_ar ? item.title_ar : item.title}
                             </h2>
-                            <p className="text-white/80 text-base leading-relaxed line-clamp-4">
+                            <p className="text-white/80 text-sm md:text-base leading-relaxed line-clamp-5 text-justify">
                               {item.description || `${item.author}${item.date ? ` - ${item.date}` : ''}`}
                             </p>
-                            <div className="pt-4">
+                            <div className="pt-2">
                               {item.hasDocument ? (
-                                <Button 
-                                  variant="link" 
-                                  className="text-gold-bn-primary hover:text-gold-bn-primary-dark p-0 text-base font-semibold group"
+                                <button 
+                                  className="inline-flex items-center text-gold-bn-primary hover:text-gold-bn-primary-dark text-sm font-medium group border-b border-gold-bn-primary/50 pb-0.5"
                                   onClick={() => handleConsultDocument(item)}
                                 >
-                                  {t('dl.home.learnMore') || "En savoir plus"}
-                                  <Icon name="mdi:arrow-right" className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                </Button>
+                                  En savoir plus
+                                  <Icon name="mdi:arrow-right" className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                </button>
                               ) : item.link ? (
-                                <Button 
-                                  variant="link" 
-                                  className="text-gold-bn-primary hover:text-gold-bn-primary-dark p-0 text-base font-semibold group"
+                                <button 
+                                  className="inline-flex items-center text-gold-bn-primary hover:text-gold-bn-primary-dark text-sm font-medium group border-b border-gold-bn-primary/50 pb-0.5"
                                   onClick={() => window.open(item.link, '_blank')}
                                 >
-                                  {t('dl.home.learnMore') || "En savoir plus"}
-                                  <Icon name="mdi:arrow-right" className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                </Button>
+                                  En savoir plus
+                                  <Icon name="mdi:arrow-right" className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                </button>
                               ) : null}
                             </div>
                           </div>
                           
                           {/* Right: Image with glow effect */}
                           {item.thumbnail && (
-                            <div className="relative flex justify-center md:justify-end">
+                            <div className="relative flex justify-center lg:justify-end order-1 lg:order-2">
                               <div className="relative">
-                                {/* Glow effect */}
-                                <div className="absolute inset-0 bg-gradient-to-r from-gold-bn-primary/30 to-transparent blur-3xl scale-150 opacity-50" />
-                                <div className="relative w-72 h-80 md:w-80 md:h-96 rounded-xl overflow-hidden shadow-2xl border-2 border-white/20 transform hover:scale-105 transition-transform duration-500">
+                                {/* Cyan/Blue glow effect like reference */}
+                                <div className="absolute -inset-4 bg-gradient-to-br from-cyan-400/20 via-blue-500/15 to-transparent blur-2xl rounded-full" />
+                                <div className="absolute -inset-8 bg-gradient-to-r from-cyan-300/10 to-transparent blur-3xl" />
+                                <div className="relative w-64 h-72 md:w-80 md:h-[22rem] lg:w-[22rem] lg:h-[26rem] rounded-lg overflow-hidden shadow-2xl border border-white/10 transform hover:scale-[1.02] transition-transform duration-500">
                                   <img 
                                     src={item.thumbnail} 
                                     alt={item.title}
@@ -562,60 +583,78 @@ export default function DigitalLibraryHome() {
                     ))}
                   </CarouselContent>
                   
-                  {/* Custom Navigation Arrows */}
-                  <CarouselPrevious className="absolute left-0 md:-left-4 top-1/2 -translate-y-1/2 bg-transparent border-0 text-gold-bn-primary hover:text-gold-bn-primary-dark hover:bg-transparent h-16 w-16">
-                    <Icon name="mdi:chevron-left" className="w-12 h-12" />
-                  </CarouselPrevious>
-                  <CarouselNext className="absolute right-0 md:-right-4 top-1/2 -translate-y-1/2 bg-transparent border-0 text-gold-bn-primary hover:text-gold-bn-primary-dark hover:bg-transparent h-16 w-16">
-                    <Icon name="mdi:chevron-right" className="w-12 h-12" />
-                  </CarouselNext>
+                  {/* Hidden native buttons for programmatic control */}
+                  <CarouselPrevious data-carousel-prev className="hidden" />
+                  <CarouselNext data-carousel-next className="hidden" />
                 </Carousel>
               </div>
             )}
             
             {/* Fallback to recent documents if no featured works */}
             {!loadingFeatured && featuredWorks.length === 0 && !loading && newItems.length > 0 && (
-              <div className="relative">
+              <div className="relative w-full max-w-7xl mx-auto px-16">
+                {/* Left Arrow */}
+                <button 
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 text-gold-bn-primary hover:text-gold-bn-primary-dark transition-colors"
+                  onClick={() => {
+                    const prevBtn = document.querySelector('[data-carousel-prev-fallback]') as HTMLButtonElement;
+                    prevBtn?.click();
+                  }}
+                >
+                  <Icon name="mdi:chevron-left" className="w-14 h-14 md:w-16 md:h-16" />
+                </button>
+                
+                {/* Right Arrow */}
+                <button 
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 text-gold-bn-primary hover:text-gold-bn-primary-dark transition-colors"
+                  onClick={() => {
+                    const nextBtn = document.querySelector('[data-carousel-next-fallback]') as HTMLButtonElement;
+                    nextBtn?.click();
+                  }}
+                >
+                  <Icon name="mdi:chevron-right" className="w-14 h-14 md:w-16 md:h-16" />
+                </button>
+
                 <Carousel
                   opts={{
                     align: "start",
                     loop: true,
                   }}
                   plugins={[autoplayPlugin.current]}
-                  className="w-full max-w-6xl mx-auto"
+                  className="w-full"
                 >
                   <CarouselContent>
                     {newItems.map((item) => (
                       <CarouselItem key={item.id} className="animate-fade-in">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center px-4">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center">
                           {/* Left: Text Content */}
-                          <div className="text-white space-y-4">
-                            <Badge className="bg-gold-bn-primary text-white hover:bg-gold-bn-primary-dark text-sm px-4 py-1">
+                          <div className="text-white space-y-3 order-2 lg:order-1">
+                            <Badge className="bg-gold-bn-primary text-white hover:bg-gold-bn-primary-dark text-xs px-3 py-1 rounded">
                               {item.type}
                             </Badge>
-                            <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wide leading-tight">
+                            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold uppercase tracking-wider leading-tight">
                               {item.title}
                             </h2>
-                            <p className="text-white/80 text-base leading-relaxed">
+                            <p className="text-white/80 text-sm md:text-base leading-relaxed text-justify">
                               {item.author} - {t('dl.home.addedOn')} {new Date(item.date).toLocaleDateString(language === 'ar' ? 'ar-MA' : language === 'en' ? 'en-US' : 'fr-FR')}
                             </p>
-                            <div className="pt-4">
-                              <Button 
-                                variant="link" 
-                                className="text-gold-bn-primary hover:text-gold-bn-primary-dark p-0 text-base font-semibold group"
+                            <div className="pt-2">
+                              <button 
+                                className="inline-flex items-center text-gold-bn-primary hover:text-gold-bn-primary-dark text-sm font-medium group border-b border-gold-bn-primary/50 pb-0.5"
                                 onClick={() => handleConsultDocument(item)}
                               >
-                                {t('dl.home.learnMore') || "En savoir plus"}
-                                <Icon name="mdi:arrow-right" className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                              </Button>
+                                En savoir plus
+                                <Icon name="mdi:arrow-right" className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                              </button>
                             </div>
                           </div>
                           
                           {/* Right: Image with glow effect */}
-                          <div className="relative flex justify-center md:justify-end">
+                          <div className="relative flex justify-center lg:justify-end order-1 lg:order-2">
                             <div className="relative">
-                              <div className="absolute inset-0 bg-gradient-to-r from-gold-bn-primary/30 to-transparent blur-3xl scale-150 opacity-50" />
-                              <div className="relative w-72 h-80 md:w-80 md:h-96 rounded-xl overflow-hidden shadow-2xl border-2 border-white/20 transform hover:scale-105 transition-transform duration-500">
+                              <div className="absolute -inset-4 bg-gradient-to-br from-cyan-400/20 via-blue-500/15 to-transparent blur-2xl rounded-full" />
+                              <div className="absolute -inset-8 bg-gradient-to-r from-cyan-300/10 to-transparent blur-3xl" />
+                              <div className="relative w-64 h-72 md:w-80 md:h-[22rem] lg:w-[22rem] lg:h-[26rem] rounded-lg overflow-hidden shadow-2xl border border-white/10 transform hover:scale-[1.02] transition-transform duration-500">
                                 <img 
                                   src={item.thumbnail} 
                                   alt={item.title}
@@ -629,12 +668,8 @@ export default function DigitalLibraryHome() {
                     ))}
                   </CarouselContent>
                   
-                  <CarouselPrevious className="absolute left-0 md:-left-4 top-1/2 -translate-y-1/2 bg-transparent border-0 text-gold-bn-primary hover:text-gold-bn-primary-dark hover:bg-transparent h-16 w-16">
-                    <Icon name="mdi:chevron-left" className="w-12 h-12" />
-                  </CarouselPrevious>
-                  <CarouselNext className="absolute right-0 md:-right-4 top-1/2 -translate-y-1/2 bg-transparent border-0 text-gold-bn-primary hover:text-gold-bn-primary-dark hover:bg-transparent h-16 w-16">
-                    <Icon name="mdi:chevron-right" className="w-12 h-12" />
-                  </CarouselNext>
+                  <CarouselPrevious data-carousel-prev-fallback className="hidden" />
+                  <CarouselNext data-carousel-next-fallback className="hidden" />
                 </Carousel>
               </div>
             )}
