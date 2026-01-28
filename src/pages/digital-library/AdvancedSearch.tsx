@@ -774,6 +774,9 @@ export default function AdvancedSearch() {
                         </div>
                       </div>
                       
+                      {/* IMPORTANT: Utiliser digital_library_document_id pour les liens vers les documents
+                          car cbn_documents.id est l'ID de l'index de recherche, pas l'ID du document source.
+                          Le document réel est dans digital_library_documents avec un ID différent. */}
                       <Link to={`/digital-library/document/${doc.digital_library_document_id || doc.id}`}>
                         <Button variant="default" size="lg">
                           Voir la notice
