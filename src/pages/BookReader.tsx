@@ -11,6 +11,7 @@ import manuscriptPage2 from "@/assets/manuscript-page-2.jpg";
 import manuscriptPage3 from "@/assets/manuscript-page-3.jpg";
 import manuscriptPage4 from "@/assets/manuscript-page-4.jpg";
 import { PageFlipBook, type PageFlipBookHandle } from "@/components/book-reader/PageFlipBook";
+import { PdfPageFlipBook, type PdfPageFlipBookHandle } from "@/components/book-reader/PdfPageFlipBook";
 import { DocumentSearchInBook } from "@/components/digital-library/DocumentSearchInBook";
 import { SidebarSearchInBook } from "@/components/digital-library/SidebarSearchInBook";
 import { OptimizedPdfPageRenderer, preloadPdfPages, clearPdfCache } from "@/components/digital-library/OptimizedPdfPageRenderer";
@@ -1551,15 +1552,15 @@ const BookReader = () => {
                     isRtl={isArabicDocument()}
                   />
                 ) : pdfUrl ? (
-                  /* Mode Double avec PDF - glisser-déposer pour tourner les pages */
-                  <DraggableDoublePage
+                  /* Mode Double avec PDF - effet livre avec glisser-déposer */
+                  <PdfPageFlipBook
                     pdfUrl={pdfUrl}
                     currentPage={currentPage}
-                    totalPages={actualTotalPages}
-                    isRtl={isArabicDocument()}
+                    onPageChange={setCurrentPage}
+                    zoom={zoom}
                     rotation={rotation}
                     pageRotations={pageRotations}
-                    onPageChange={setCurrentPage}
+                    isRtl={isArabicDocument()}
                     onTotalPagesChange={setActualTotalPages}
                   />
                 ) : null
