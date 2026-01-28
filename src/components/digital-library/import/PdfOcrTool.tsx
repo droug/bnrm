@@ -222,10 +222,10 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
 
   // Save OCR results to database
   const saveToDatabase = async () => {
-    if (!effectiveDocumentId || pageResults.length === 0) {
+    if (pageResults.length === 0) {
       toast({
         title: "Erreur",
-        description: "Sélectionnez un document et effectuez l'OCR d'abord",
+        description: "Effectuez l'OCR d'abord",
         variant: "destructive"
       });
       return;
@@ -234,14 +234,64 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
     try {
       const successPages = pageResults.filter(r => r.status === 'success' && r.text);
       
+      // If no document selected, create a new one based on the filename
+      let documentId = effectiveDocumentId;
+      
+      if (!documentId && selectedFile) {
+        // Create new document from filename
+        const fileName = selectedFile.name.replace('.pdf', '').replace(/_/g, ' ');
+        
+        // First create a cbn_documents record (required for digital_library_documents)
+        const { data: cbnDoc, error: cbnError } = await supabase
+          .from('cbn_documents')
+          .insert({
+            title: fileName,
+            cote: `OCR-${Date.now()}`,
+            document_type: 'periodique'
+          })
+          .select('id')
+          .single();
+        
+        if (cbnError) throw cbnError;
+        
+        // Then create the digital_library_documents record
+        const { data: newDoc, error: createError } = await supabase
+          .from('digital_library_documents')
+          .insert({
+            title: fileName,
+            cbn_document_id: cbnDoc.id,
+            document_type: 'periodique',
+            pages_count: pageResults.length
+          })
+          .select('id')
+          .single();
+        
+        if (createError) throw createError;
+        documentId = newDoc.id;
+        
+        toast({
+          title: "Document créé",
+          description: `Nouveau document "${fileName}" créé automatiquement`
+        });
+      }
+      
+      if (!documentId) {
+        toast({
+          title: "Erreur",
+          description: "Sélectionnez un document ou chargez un fichier PDF",
+          variant: "destructive"
+        });
+        return;
+      }
+      
       for (const page of successPages) {
         // Check if page already exists
         const { data: existing } = await supabase
           .from('digital_library_pages')
           .select('id')
-          .eq('document_id', effectiveDocumentId)
+          .eq('document_id', documentId)
           .eq('page_number', page.pageNumber)
-          .single();
+          .maybeSingle();
 
         if (existing) {
           // Update existing page
@@ -254,7 +304,7 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
           await supabase
             .from('digital_library_pages')
             .insert({
-              document_id: effectiveDocumentId,
+              document_id: documentId,
               page_number: page.pageNumber,
               ocr_text: page.text
             });
@@ -265,7 +315,7 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
       await supabase
         .from('digital_library_documents')
         .update({ ocr_processed: true })
-        .eq('id', effectiveDocumentId);
+        .eq('id', documentId);
 
       toast({
         title: "Enregistrement réussi",
@@ -459,9 +509,9 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
               {/* Bouton d'enregistrement en premier, plus visible */}
               <Button 
                 onClick={saveToDatabase} 
-                disabled={!effectiveDocumentId || successCount === 0}
+                disabled={(!effectiveDocumentId && !selectedFile) || successCount === 0}
                 size="lg"
-                className={effectiveDocumentId && successCount > 0 
+                className={(effectiveDocumentId || selectedFile) && successCount > 0 
                   ? "bg-green-600 hover:bg-green-700 text-white" 
                   : ""}
               >
