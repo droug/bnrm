@@ -625,7 +625,11 @@ const BookReader = () => {
   };
   
   // Vérifier si le document a un contenu affichable (PDF ou images de pages)
-  const hasDisplayableContent = pdfUrl || documentPages.length > 0 || 
+  const hasDisplayableContent = Boolean(pdfUrl) || documentPages.length > 0 || 
+    (documentImage && !documentImage.includes('manuscript-page'));
+  
+  // Pour le mode Double, on a besoin soit d'images de pages, soit d'un PDF qu'on peut afficher page par page
+  const canUseDoubleMode = documentPages.length > 0 || 
     (documentImage && !documentImage.includes('manuscript-page'));
 
   // Détecter si le document est en arabe (pour le mode RTL en double page)
@@ -1533,16 +1537,51 @@ const BookReader = () => {
                   </div>
                 </div>
               ) : viewMode === "double" ? (
-                <PageFlipBook 
-                  ref={pageFlipRef}
-                  images={generatePageImages()}
-                  currentPage={currentPage}
-                  onPageChange={setCurrentPage}
-                  zoom={zoom}
-                  rotation={rotation}
-                  pageRotations={pageRotations}
-                  isRtl={isArabicDocument()}
-                />
+                canUseDoubleMode ? (
+                  <PageFlipBook 
+                    ref={pageFlipRef}
+                    images={generatePageImages()}
+                    currentPage={currentPage}
+                    onPageChange={setCurrentPage}
+                    zoom={zoom}
+                    rotation={rotation}
+                    pageRotations={pageRotations}
+                    isRtl={isArabicDocument()}
+                  />
+                ) : pdfUrl ? (
+                  /* Mode Double avec PDF - afficher 2 pages côte à côte via PdfPageRenderer */
+                  <div className="flex items-center justify-center gap-2 w-full h-full p-4">
+                    <Card className="shadow-xl flex-1 max-w-[45%]">
+                      <CardContent className="p-0 flex items-center justify-center">
+                        <PdfPageRenderer
+                          pdfUrl={pdfUrl}
+                          pageNumber={isArabicDocument() ? (currentPage + 1 <= actualTotalPages ? currentPage + 1 : currentPage) : currentPage}
+                          scale={0.8}
+                          rotation={rotation + (pageRotations[currentPage] ?? 0)}
+                          className="max-h-[70vh] w-auto"
+                          onPageLoad={(totalPages) => {
+                            if (actualTotalPages !== totalPages) {
+                              setActualTotalPages(totalPages);
+                            }
+                          }}
+                        />
+                      </CardContent>
+                    </Card>
+                    {currentPage + 1 <= actualTotalPages && (
+                      <Card className="shadow-xl flex-1 max-w-[45%]">
+                        <CardContent className="p-0 flex items-center justify-center">
+                          <PdfPageRenderer
+                            pdfUrl={pdfUrl}
+                            pageNumber={isArabicDocument() ? currentPage : currentPage + 1}
+                            scale={0.8}
+                            rotation={rotation + (pageRotations[currentPage + 1] ?? 0)}
+                            className="max-h-[70vh] w-auto"
+                          />
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
+                ) : null
               ) : viewMode === "scroll" ? (
                 /* Mode défilement vertical */
                 <div className="flex flex-col items-center gap-6 pb-8">
@@ -1673,24 +1712,25 @@ const BookReader = () => {
                   })}
                 </div>
               ) : (
+                /* Mode Simple - affichage d'une seule page avec scroll complet */
                 <div className="w-full h-full flex items-center justify-center overflow-auto p-4">
                   <Card 
-                    className="shadow-2xl"
+                    className="shadow-2xl max-w-full"
                     style={{
                       transform: `scale(${zoom / 100}) rotate(${rotation + (pageRotations[currentPage] ?? 0)}deg)`,
-                      transformOrigin: 'center',
+                      transformOrigin: 'top center',
                       transition: 'transform 0.3s ease'
                     }}
                   >
                     <CardContent className="p-0 flex items-center justify-center">
-                      <div className="relative max-h-[80vh] flex items-center justify-center">
+                      <div className="relative flex items-center justify-center">
                         {pdfUrl && documentPages.length === 0 ? (
                           <PdfPageRenderer
                             pdfUrl={pdfUrl}
                             pageNumber={currentPage}
-                            scale={0.9}
+                            scale={1.2}
                             rotation={rotation + (pageRotations[currentPage] ?? 0)}
-                            className="max-h-[75vh] w-auto"
+                            className="w-auto"
                             onPageLoad={(totalPages) => {
                               if (actualTotalPages !== totalPages) {
                                 setActualTotalPages(totalPages);
@@ -1701,7 +1741,7 @@ const BookReader = () => {
                           <img 
                             src={getCurrentPageImage(currentPage) || ''}
                             alt={`Page ${currentPage}`}
-                            className="block max-h-[75vh] w-auto object-contain"
+                            className="block w-auto object-contain"
                           />
                         ) : (
                           /* Fallback - ne devrait pas arriver grâce à hasDisplayableContent */
