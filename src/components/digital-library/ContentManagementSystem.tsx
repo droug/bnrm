@@ -100,7 +100,8 @@ const tabs = [
     id: "about", 
     label: "Page À propos", 
     icon: null,
-    iconMdi: "mdi:information-outline",
+    iconMdi: null,
+    logoUrl: "/Logo_BN.png",
     color: "text-sky-500",
     bgColor: "bg-sky-500/10",
     borderColor: "border-sky-500/30",
@@ -548,7 +549,9 @@ export default function ContentManagementSystem() {
                           "p-2 rounded-lg transition-colors",
                           isActive ? tab.bgColor : "bg-muted group-hover:bg-muted"
                         )}>
-                          {tab.iconMdi ? (
+                          {(tab as any).logoUrl ? (
+                            <img src={(tab as any).logoUrl} alt="" className="h-4 w-4 object-contain" />
+                          ) : tab.iconMdi ? (
                             <Icon name={tab.iconMdi} className={cn("h-4 w-4", tab.color)} />
                           ) : LucideIcon ? (
                             <LucideIcon className={cn("h-4 w-4", tab.color)} />
@@ -589,7 +592,9 @@ export default function ContentManagementSystem() {
           {activeTabData && (
             <div className="flex items-center gap-3 mb-4">
               <div className={cn("p-2 rounded-lg", activeTabData.bgColor)}>
-                {activeTabData.iconMdi ? (
+                {(activeTabData as any).logoUrl ? (
+                  <img src={(activeTabData as any).logoUrl} alt="" className="h-5 w-5 object-contain" />
+                ) : activeTabData.iconMdi ? (
                   <Icon name={activeTabData.iconMdi} className={cn("h-5 w-5", activeTabData.color)} />
                 ) : activeTabData.icon ? (
                   <activeTabData.icon className={cn("h-5 w-5", activeTabData.color)} />
