@@ -131,9 +131,27 @@ export default function AdvancedSearch() {
         baseQuery = baseQuery.eq('language', params.language);
       }
       
-      // Filtrer par type de document
+      // Filtrer par type de document (insensible à la casse avec support des variantes)
       if (params.documentType) {
-        baseQuery = baseQuery.eq('document_type', params.documentType);
+        // Mapping des types avec leurs variantes possibles dans la base
+        const typeVariantsMap: Record<string, string[]> = {
+          'book': ['book', 'Livre', 'livre'],
+          'periodical': ['periodical', 'Périodique', 'periodique'],
+          'manuscript': ['manuscript', 'Manuscrit', 'manuscrit'],
+          'image': ['image', 'Image', 'Cartes et Plans', 'cartes et plans'],
+          'audio': ['audio', 'Audio'],
+          'video': ['video', 'Vidéo', 'Video'],
+        };
+        
+        const variants = typeVariantsMap[params.documentType];
+        if (variants && variants.length > 0) {
+          // Créer une condition OR pour toutes les variantes
+          const orConditions = variants.map(v => `document_type.eq.${v}`).join(',');
+          baseQuery = baseQuery.or(orConditions);
+        } else {
+          // Fallback: recherche insensible à la casse
+          baseQuery = baseQuery.ilike('document_type', params.documentType);
+        }
       }
       
       // Filtrer par livre rare
