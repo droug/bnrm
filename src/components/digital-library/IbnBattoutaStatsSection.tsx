@@ -87,7 +87,7 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
           </button>
 
           {/* Stats Cards */}
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl">
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl">
             {visibleStats.map((stat, index) => (
               <Link 
                 key={index} 
