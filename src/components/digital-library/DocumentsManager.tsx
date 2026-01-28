@@ -627,12 +627,10 @@ export default function DocumentsManager() {
     setDocumentToDelete(null);
   };
 
-  // Ouvrir le dialogue OCR pour un document
+  // Ouvrir le dialogue OCR pour un document - redirige vers l'onglet OCR avec le document pré-sélectionné
   const openOcrDialog = (doc: any) => {
-    setOcrDocumentTarget(doc);
-    setOcrBaseUrl(doc.base_url || "");
-    setOcrLanguage(doc.language || "ar");
-    setShowOcrDialog(true);
+    setSelectedDocument(doc);
+    setActiveTab("ocr");
   };
 
   // Convert PDF page to image using canvas

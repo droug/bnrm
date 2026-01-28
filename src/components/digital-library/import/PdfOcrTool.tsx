@@ -318,6 +318,24 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
 
   return (
     <div className="space-y-6">
+      {/* Document pré-sélectionné - Toujours visible en haut */}
+      {preSelectedDocumentId && preSelectedDocumentTitle && (
+        <Card className="border-primary/30 bg-primary/5">
+          <CardContent className="py-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <FileText className="h-5 w-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium">Document sélectionné pour l'OCR</p>
+                <p className="text-base font-semibold text-primary">{preSelectedDocumentTitle}</p>
+              </div>
+              <CheckCircle2 className="h-6 w-6 text-green-600" />
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -326,7 +344,10 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
             <Badge variant="secondary" className="ml-2">Tesseract.js - Local</Badge>
           </CardTitle>
           <CardDescription>
-            Uploadez un fichier PDF pour extraire automatiquement le texte de chaque page via OCR local (open-source, sans API)
+            {preSelectedDocumentId 
+              ? `Uploadez le PDF correspondant au document "${preSelectedDocumentTitle}" pour extraire le texte`
+              : "Uploadez un fichier PDF pour extraire automatiquement le texte de chaque page via OCR local"
+            }
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -433,33 +454,26 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Document pré-sélectionné */}
-            {preSelectedDocumentId && preSelectedDocumentTitle && (
-              <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
-                <FileText className="h-4 w-4 text-primary" />
-                <span className="text-sm font-medium">Document lié :</span>
-                <span className="text-sm">{preSelectedDocumentTitle}</span>
-                <CheckCircle2 className="h-4 w-4 text-green-600 ml-auto" />
-              </div>
-            )}
-            
-            {/* Actions */}
-            <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" onClick={exportAsText} disabled={successCount === 0}>
-                <Download className="mr-2 h-4 w-4" />
-                Exporter en TXT
+            {/* Actions - Bouton d'enregistrement toujours visible en premier */}
+            <div className="flex flex-wrap items-center gap-2 p-3 rounded-lg bg-muted/50">
+              {/* Bouton d'enregistrement en premier, plus visible */}
+              <Button 
+                onClick={saveToDatabase} 
+                disabled={!effectiveDocumentId || successCount === 0}
+                size="lg"
+                className={effectiveDocumentId && successCount > 0 
+                  ? "bg-green-600 hover:bg-green-700 text-white" 
+                  : ""}
+              >
+                <CheckCircle2 className="mr-2 h-5 w-5" />
+                Enregistrer dans la BDD
               </Button>
-              <Button variant="outline" size="sm" onClick={copyAllText} disabled={successCount === 0}>
-                <Copy className="mr-2 h-4 w-4" />
-                Copier tout
-              </Button>
-              <div className="flex-1" />
               
               {/* Afficher le dropdown seulement si pas de document pré-sélectionné */}
               {!preSelectedDocumentId && (
                 <Select value={selectedDocumentId} onValueChange={setSelectedDocumentId} onOpenChange={(open) => open && loadDocuments()}>
-                  <SelectTrigger className="w-[300px]">
-                    <SelectValue placeholder="Lier à un document..." />
+                  <SelectTrigger className="w-[280px]">
+                    <SelectValue placeholder="Sélectionner un document..." />
                   </SelectTrigger>
                   <SelectContent>
                     {loadingDocs ? (
@@ -477,13 +491,15 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
                 </Select>
               )}
               
-              <Button 
-                onClick={saveToDatabase} 
-                disabled={!effectiveDocumentId || successCount === 0}
-                className={effectiveDocumentId && successCount > 0 ? "bg-green-600 hover:bg-green-700" : ""}
-              >
-                <CheckCircle2 className="mr-2 h-4 w-4" />
-                Enregistrer dans la BDD
+              <div className="flex-1" />
+              
+              <Button variant="outline" size="sm" onClick={exportAsText} disabled={successCount === 0}>
+                <Download className="mr-2 h-4 w-4" />
+                Exporter en TXT
+              </Button>
+              <Button variant="outline" size="sm" onClick={copyAllText} disabled={successCount === 0}>
+                <Copy className="mr-2 h-4 w-4" />
+                Copier tout
               </Button>
             </div>
 
