@@ -3016,6 +3016,19 @@ export default function DocumentsManager() {
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
+            {/* Warning if document is already OCR'd */}
+            {ocrDocumentTarget?.ocr_processed && (
+              <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400">
+                  <AlertCircle className="h-4 w-4" />
+                  <span className="text-sm font-medium">Document déjà OCRisé</span>
+                </div>
+                <p className="text-xs text-amber-600 dark:text-amber-500 mt-1">
+                  Ce document a déjà été traité par OCR. Relancer l'OCR écrasera les données existantes.
+                </p>
+              </div>
+            )}
+            
             {/* Show PDF info if available */}
             {ocrDocumentTarget?.pdf_url && (
               <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">

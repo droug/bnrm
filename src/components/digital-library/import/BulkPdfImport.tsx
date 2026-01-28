@@ -58,6 +58,7 @@ export default function BulkPdfImport({ onSuccess }: BulkPdfImportProps) {
   // OCR settings
   const [enableOcr, setEnableOcr] = useState(false);
   const [ocrLanguage, setOcrLanguage] = useState<string>('fra+ara');
+  const [skipAlreadyOcr, setSkipAlreadyOcr] = useState(true);
 
   const handleFilesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const pickedFiles = Array.from(e.target.files || []);
@@ -361,6 +362,18 @@ export default function BulkPdfImport({ onSuccess }: BulkPdfImportProps) {
                   L'OCR ralentit considérablement l'import. Vous pouvez l'exécuter séparément via l'onglet "Indexation OCR".
                 </AlertDescription>
               </Alert>
+              
+              {/* Option to skip already OCR'd documents */}
+              <div className="flex items-center space-x-2 pt-2">
+                <Switch
+                  id="skip-ocr"
+                  checked={skipAlreadyOcr}
+                  onCheckedChange={setSkipAlreadyOcr}
+                />
+                <Label htmlFor="skip-ocr" className="text-sm">
+                  Ignorer les documents déjà OCRisés
+                </Label>
+              </div>
             </div>
           )}
         </CardContent>
