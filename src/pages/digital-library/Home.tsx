@@ -415,7 +415,7 @@ export default function DigitalLibraryHome() {
         <div className="container mx-auto px-4 relative z-10 flex flex-col min-h-[90vh]">
           {/* Hero Title & Subtitle */}
           <div className="text-center pt-16 pb-6">
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 animate-fade-in drop-shadow-lg tracking-widest uppercase">
+            <h1 className="font-inter text-[36px] font-bold leading-[160%] tracking-normal text-center uppercase text-white mb-3 animate-fade-in drop-shadow-lg">
               BIBLIOTHÈQUE NUMÉRIQUE MAROCAINE
             </h1>
             <p className="text-base md:text-lg text-white/90 max-w-3xl mx-auto animate-fade-in drop-shadow-md">
