@@ -81,13 +81,13 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
             <svg width="20" height="36" viewBox="0 0 20 36" fill="none">
               <polygon 
                 points="20,0 0,18 20,36" 
-                className="fill-gold-bn-primary"
+                fill="#B68F1C"
               />
             </svg>
           </button>
 
           {/* Stats Cards */}
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-14 max-w-5xl">
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-20 max-w-6xl">
             {visibleStats.map((stat, index) => (
               <Link 
                 key={index} 
@@ -137,7 +137,7 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
             <svg width="20" height="36" viewBox="0 0 20 36" fill="none">
               <polygon 
                 points="0,0 20,18 0,36" 
-                className="fill-gold-bn-primary"
+                fill="#B68F1C"
               />
             </svg>
           </button>
