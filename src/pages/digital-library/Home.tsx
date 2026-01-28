@@ -516,10 +516,10 @@ export default function DigitalLibraryHome() {
                               </div>
                             </div>
                             
-                            {/* Right: Image - half width, full height, extends to edge */}
+                            {/* Right: Image - half width, full height, extends to edge, transparent bg */}
                             {item.thumbnail && (
-                              <div className="w-1/2 h-full absolute right-0 top-0 bottom-0">
-                                <img src={item.thumbnail} alt={item.title} className="w-full h-full object-cover object-center" />
+                              <div className="w-1/2 h-full absolute right-0 top-0 bottom-0 bg-transparent">
+                                <img src={item.thumbnail} alt={item.title} className="w-full h-full object-cover object-center bg-transparent" />
                               </div>
                             )}
                           </div>
