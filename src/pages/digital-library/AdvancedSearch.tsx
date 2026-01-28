@@ -774,7 +774,7 @@ export default function AdvancedSearch() {
                         </div>
                       </div>
                       
-                      <Link to={`/digital-library/document/${doc.id}`}>
+                      <Link to={`/digital-library/document/${doc.digital_library_document_id || doc.id}`}>
                         <Button variant="default" size="lg">
                           Voir la notice
                         </Button>
