@@ -472,7 +472,7 @@ export default function DigitalLibraryHome() {
                 </button>
 
                 {/* Very subtle blurred container */}
-                <div className="bg-white/10 backdrop-blur-[3px] rounded-2xl p-6 md:p-8">
+                <div className="bg-white/5 backdrop-blur-[3px] p-6 md:p-8">
                   <Carousel opts={{
                 align: "center",
                 loop: true
