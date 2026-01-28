@@ -437,7 +437,7 @@ export default function DigitalLibraryHome() {
                 }
               }
             }} />
-              <button className="m-1.5 px-6 py-2 border border-gold-bn-primary text-gold-bn-primary hover:bg-gold-bn-primary hover:text-white rounded-full text-sm font-medium transition-colors bg-[#b58f1c]" onClick={() => {
+              <button className="m-1.5 px-6 py-2 border border-gold-bn-primary bg-gold-bn-primary text-white hover:bg-transparent hover:text-gold-bn-primary rounded-full text-sm font-medium transition-colors" onClick={() => {
               const input = document.querySelector('input[type="text"]') as HTMLInputElement;
               if (input?.value.trim()) {
                 navigate(`/digital-library/search?q=${encodeURIComponent(input.value.trim())}`);
