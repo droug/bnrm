@@ -147,7 +147,7 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
                         onClick={() => onConsultDocument(item)}
                         className="group/link inline-flex items-center gap-1 text-gold-bn-primary-dark hover:text-gold-bn-primary font-medium text-sm transition-colors"
                       >
-                        {t('dl.home.readMore') || 'En savoir plus'}
+                        En savoir plus
                         <Icon name="mdi:chevron-right" className="h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
                       </button>
                     </CardContent>
