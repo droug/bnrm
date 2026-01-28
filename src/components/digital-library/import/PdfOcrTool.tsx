@@ -22,6 +22,13 @@ interface PageOcrResult {
   confidence?: number;
 }
 
+interface PdfOcrToolProps {
+  /** Si fourni, le document sera pré-sélectionné et le dropdown sera masqué */
+  preSelectedDocumentId?: string;
+  /** Titre du document pré-sélectionné (pour affichage) */
+  preSelectedDocumentTitle?: string;
+}
+
 // Map language codes to Tesseract language codes
 const TESSERACT_LANG_MAP: Record<string, string> = {
   'ar': 'ara',
@@ -31,7 +38,7 @@ const TESSERACT_LANG_MAP: Record<string, string> = {
   'mixed': 'ara+fra+eng'
 };
 
-export default function PdfOcrTool() {
+export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentTitle }: PdfOcrToolProps = {}) {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -40,9 +47,12 @@ export default function PdfOcrTool() {
   const [progress, setProgress] = useState(0);
   const [currentPageProgress, setCurrentPageProgress] = useState(0);
   const [pageResults, setPageResults] = useState<PageOcrResult[]>([]);
-  const [selectedDocumentId, setSelectedDocumentId] = useState<string>("");
+  const [selectedDocumentId, setSelectedDocumentId] = useState<string>(preSelectedDocumentId || "");
   const [documents, setDocuments] = useState<any[]>([]);
   const [loadingDocs, setLoadingDocs] = useState(false);
+  
+  // Sync with preSelectedDocumentId prop changes
+  const effectiveDocumentId = preSelectedDocumentId || selectedDocumentId;
 
   // Load documents for selection
   const loadDocuments = async () => {
@@ -212,7 +222,7 @@ export default function PdfOcrTool() {
 
   // Save OCR results to database
   const saveToDatabase = async () => {
-    if (!selectedDocumentId || pageResults.length === 0) {
+    if (!effectiveDocumentId || pageResults.length === 0) {
       toast({
         title: "Erreur",
         description: "Sélectionnez un document et effectuez l'OCR d'abord",
@@ -229,7 +239,7 @@ export default function PdfOcrTool() {
         const { data: existing } = await supabase
           .from('digital_library_pages')
           .select('id')
-          .eq('document_id', selectedDocumentId)
+          .eq('document_id', effectiveDocumentId)
           .eq('page_number', page.pageNumber)
           .single();
 
@@ -244,7 +254,7 @@ export default function PdfOcrTool() {
           await supabase
             .from('digital_library_pages')
             .insert({
-              document_id: selectedDocumentId,
+              document_id: effectiveDocumentId,
               page_number: page.pageNumber,
               ocr_text: page.text
             });
@@ -255,7 +265,7 @@ export default function PdfOcrTool() {
       await supabase
         .from('digital_library_documents')
         .update({ ocr_processed: true })
-        .eq('id', selectedDocumentId);
+        .eq('id', effectiveDocumentId);
 
       toast({
         title: "Enregistrement réussi",
@@ -423,6 +433,16 @@ export default function PdfOcrTool() {
             </div>
           </CardHeader>
           <CardContent className="space-y-4">
+            {/* Document pré-sélectionné */}
+            {preSelectedDocumentId && preSelectedDocumentTitle && (
+              <div className="flex items-center gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                <FileText className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium">Document lié :</span>
+                <span className="text-sm">{preSelectedDocumentTitle}</span>
+                <CheckCircle2 className="h-4 w-4 text-green-600 ml-auto" />
+              </div>
+            )}
+            
             {/* Actions */}
             <div className="flex flex-wrap gap-2">
               <Button variant="outline" size="sm" onClick={exportAsText} disabled={successCount === 0}>
@@ -434,25 +454,35 @@ export default function PdfOcrTool() {
                 Copier tout
               </Button>
               <div className="flex-1" />
-              <Select value={selectedDocumentId} onValueChange={setSelectedDocumentId} onOpenChange={(open) => open && loadDocuments()}>
-                <SelectTrigger className="w-[300px]">
-                  <SelectValue placeholder="Lier à un document..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {loadingDocs ? (
-                    <div className="p-2 text-center text-sm text-muted-foreground">Chargement...</div>
-                  ) : documents.length === 0 ? (
-                    <div className="p-2 text-center text-sm text-muted-foreground">Aucun document</div>
-                  ) : (
-                    documents.map(doc => (
-                      <SelectItem key={doc.id} value={doc.id}>
-                        {doc.title} ({doc.pages_count || '?'} pages)
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </Select>
-              <Button onClick={saveToDatabase} disabled={!selectedDocumentId || successCount === 0}>
+              
+              {/* Afficher le dropdown seulement si pas de document pré-sélectionné */}
+              {!preSelectedDocumentId && (
+                <Select value={selectedDocumentId} onValueChange={setSelectedDocumentId} onOpenChange={(open) => open && loadDocuments()}>
+                  <SelectTrigger className="w-[300px]">
+                    <SelectValue placeholder="Lier à un document..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {loadingDocs ? (
+                      <div className="p-2 text-center text-sm text-muted-foreground">Chargement...</div>
+                    ) : documents.length === 0 ? (
+                      <div className="p-2 text-center text-sm text-muted-foreground">Aucun document</div>
+                    ) : (
+                      documents.map(doc => (
+                        <SelectItem key={doc.id} value={doc.id}>
+                          {doc.title} ({doc.pages_count || '?'} pages)
+                        </SelectItem>
+                      ))
+                    )}
+                  </SelectContent>
+                </Select>
+              )}
+              
+              <Button 
+                onClick={saveToDatabase} 
+                disabled={!effectiveDocumentId || successCount === 0}
+                className={effectiveDocumentId && successCount > 0 ? "bg-green-600 hover:bg-green-700" : ""}
+              >
+                <CheckCircle2 className="mr-2 h-4 w-4" />
                 Enregistrer dans la BDD
               </Button>
             </div>
