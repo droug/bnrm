@@ -17,6 +17,7 @@ interface DocumentItem {
   cote: string;
   thumbnail: string;
   isManuscript?: boolean;
+  description?: string;
 }
 
 interface LatestAdditionsSectionProps {
@@ -129,20 +130,20 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
                     </div>
                     
                     {/* Badge moved under image */}
-                    <div className="px-4 pt-3">
+                    <div className="px-4 pt-4">
                       <Badge 
-                        className={`${getBadgeColor(item.type)} px-3 py-1 text-xs font-medium rounded-none`}
+                        className={`${getBadgeColor(item.type)} px-3 py-1 text-xs font-medium rounded-sm`}
                       >
                         {item.type}
                       </Badge>
                     </div>
                     
-                    <CardHeader className="flex-1 p-4 pb-2 pt-2">
-                      <CardTitle className="text-base font-semibold text-slate-base-dark line-clamp-2 leading-snug mb-1">
+                    <CardHeader className="flex-1 p-4 pb-3 pt-3 space-y-3">
+                      <CardTitle className="text-base font-semibold text-slate-base-dark line-clamp-2 leading-relaxed">
                         {item.title}
                       </CardTitle>
-                      <CardDescription className="text-sm text-slate-text line-clamp-2">
-                        {item.author}
+                      <CardDescription className="text-sm text-slate-text line-clamp-2 leading-relaxed">
+                        {item.description || item.author || 'Document numérisé de la Bibliothèque Nationale...'}
                       </CardDescription>
                     </CardHeader>
                     
