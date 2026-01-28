@@ -325,8 +325,9 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
       }
 
       toast({
-        title: "Enregistrement réussi",
-        description: `${successPages.length} pages enregistrées et indexées`
+        title: "✓ Enregistrement réussi",
+        description: `Fichier PDF enregistré avec ${successPages.length} pages OCR liées. Document indexé pour la recherche.`,
+        duration: 6000
       });
 
     } catch (error: any) {
