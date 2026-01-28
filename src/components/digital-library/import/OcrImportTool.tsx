@@ -466,12 +466,24 @@ export default function OcrImportTool() {
           )}
           
           {selectedDocument && (
-            <Alert>
+            <Alert className={selectedDocument.ocr_processed ? "border-amber-300 bg-amber-50" : ""}>
               <FileText className="h-4 w-4" />
-              <AlertTitle>Document sélectionné</AlertTitle>
+              <AlertTitle className="flex items-center gap-2">
+                Document sélectionné
+                {selectedDocument.ocr_processed && (
+                  <Badge variant="outline" className="bg-amber-100 text-amber-700 border-amber-300">
+                    Déjà OCRisé
+                  </Badge>
+                )}
+              </AlertTitle>
               <AlertDescription>
                 <strong>{selectedDocument.title}</strong> - {selectedDocument.pages_count || 0} pages
-                {existingPages && existingPages.length > 0 && (
+                {selectedDocument.ocr_processed && (
+                  <span className="block text-sm mt-1 text-amber-600">
+                    ⚠️ Ce document a déjà été OCRisé. Relancer l'OCR écrasera les données existantes.
+                  </span>
+                )}
+                {existingPages && existingPages.length > 0 && !selectedDocument.ocr_processed && (
                   <span className="block text-sm mt-1">
                     ⚠️ {existingPages.length} pages OCR existantes (seront remplacées)
                   </span>
