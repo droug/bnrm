@@ -15,6 +15,7 @@ import { DocumentSearchInBook } from "@/components/digital-library/DocumentSearc
 import { SidebarSearchInBook } from "@/components/digital-library/SidebarSearchInBook";
 import { OptimizedPdfPageRenderer, preloadPdfPages, clearPdfCache } from "@/components/digital-library/OptimizedPdfPageRenderer";
 import { VirtualizedScrollReader } from "@/components/digital-library/reader/VirtualizedScrollReader";
+import { DraggableDoublePage } from "@/components/digital-library/reader/DraggableDoublePage";
 import { ReproductionAuthChoiceModal } from "@/components/digital-library/ReproductionAuthChoiceModal";
 import AudioVideoReader from "@/components/digital-library/reader/AudioVideoReader";
 import { Button } from "@/components/ui/button";
@@ -1550,69 +1551,17 @@ const BookReader = () => {
                     isRtl={isArabicDocument()}
                   />
                 ) : pdfUrl ? (
-                  /* Mode Double avec PDF - afficher 2 pages côte à côte via OptimizedPdfPageRenderer */
-                  <div className="relative flex items-center justify-center w-full h-full">
-                    {/* Zone de clic gauche pour page précédente */}
-                    <button
-                      onClick={handlePreviousPage}
-                      disabled={currentPage <= 1}
-                      className="absolute left-0 top-0 h-full w-1/6 z-20 cursor-pointer flex items-center justify-start pl-2 opacity-0 hover:opacity-100 transition-opacity bg-gradient-to-r from-black/10 to-transparent disabled:cursor-not-allowed group"
-                      aria-label="Page précédente"
-                    >
-                      <div className="bg-background/80 backdrop-blur-sm rounded-full p-2 shadow-lg group-hover:bg-background transition-colors">
-                        <ChevronLeft className="h-8 w-8 text-foreground" />
-                      </div>
-                    </button>
-
-                    {/* Conteneur des pages */}
-                    <div className="flex items-center justify-center gap-4 w-full h-full p-4">
-                      <Card className="shadow-xl flex-1 max-w-[45%]">
-                        <CardContent className="p-0 flex items-center justify-center">
-                          <OptimizedPdfPageRenderer
-                            pdfUrl={pdfUrl}
-                            pageNumber={isArabicDocument() ? (currentPage + 1 <= actualTotalPages ? currentPage + 1 : currentPage) : currentPage}
-                            scale={0.8}
-                            rotation={rotation + (pageRotations[currentPage] ?? 0)}
-                            className="max-h-[70vh] w-auto"
-                            onPageLoad={(totalPages) => {
-                              if (actualTotalPages !== totalPages) {
-                                setActualTotalPages(totalPages);
-                              }
-                            }}
-                          />
-                        </CardContent>
-                      </Card>
-                      {currentPage + 1 <= actualTotalPages && (
-                        <Card className="shadow-xl flex-1 max-w-[45%]">
-                          <CardContent className="p-0 flex items-center justify-center">
-                            <OptimizedPdfPageRenderer
-                              pdfUrl={pdfUrl}
-                              pageNumber={isArabicDocument() ? currentPage : currentPage + 1}
-                              scale={0.8}
-                              rotation={rotation + (pageRotations[currentPage + 1] ?? 0)}
-                              className="max-h-[70vh] w-auto"
-                            />
-                          </CardContent>
-                        </Card>
-                      )}
-                    </div>
-
-                    {/* Zone de clic droite pour page suivante */}
-                    <button
-                      onClick={() => {
-                        // En mode double, avancer de 2 pages
-                        const nextPage = Math.min(currentPage + 2, actualTotalPages);
-                        setCurrentPage(nextPage);
-                      }}
-                      disabled={currentPage + 1 >= actualTotalPages}
-                      className="absolute right-0 top-0 h-full w-1/6 z-20 cursor-pointer flex items-center justify-end pr-2 opacity-0 hover:opacity-100 transition-opacity bg-gradient-to-l from-black/10 to-transparent disabled:cursor-not-allowed group"
-                      aria-label="Page suivante"
-                    >
-                      <div className="bg-background/80 backdrop-blur-sm rounded-full p-2 shadow-lg group-hover:bg-background transition-colors">
-                        <ChevronRight className="h-8 w-8 text-foreground" />
-                      </div>
-                    </button>
-                  </div>
+                  /* Mode Double avec PDF - glisser-déposer pour tourner les pages */
+                  <DraggableDoublePage
+                    pdfUrl={pdfUrl}
+                    currentPage={currentPage}
+                    totalPages={actualTotalPages}
+                    isRtl={isArabicDocument()}
+                    rotation={rotation}
+                    pageRotations={pageRotations}
+                    onPageChange={setCurrentPage}
+                    onTotalPagesChange={setActualTotalPages}
+                  />
                 ) : null
               ) : viewMode === "scroll" ? (
                 /* Mode défilement vertical optimisé avec virtualisation */
