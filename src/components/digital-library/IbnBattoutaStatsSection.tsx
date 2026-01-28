@@ -87,7 +87,7 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
           </button>
 
           {/* Stats Cards */}
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl">
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-14 max-w-5xl">
             {visibleStats.map((stat, index) => (
               <Link 
                 key={index} 
@@ -95,7 +95,7 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
                 className="group"
               >
                 <div 
-                  className="relative bg-white shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 w-[352px] h-[228px] border-t-[7px] border-t-gold-bn-primary"
+                  className="relative bg-white shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 w-[320px] h-[228px] border-t-[7px] border-t-gold-bn-primary"
                   style={{
                     borderTopLeftRadius: '20px',
                     borderTopRightRadius: '20px',
