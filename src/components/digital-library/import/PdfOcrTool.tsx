@@ -9,6 +9,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
 import { FileUp, Loader2, FileText, CheckCircle2, AlertCircle, Download, Copy } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import Tesseract from 'tesseract.js';
@@ -40,6 +41,7 @@ const TESSERACT_LANG_MAP: Record<string, string> = {
 
 export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentTitle }: PdfOcrToolProps = {}) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [language, setLanguage] = useState<string>("ar");
@@ -206,6 +208,31 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
 
     try {
       const successPages = pageResults.filter(r => r.status === 'success' && r.text);
+
+      const uploadPdfToStorage = async (targetDocumentId: string, file: File) => {
+        const safeFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+        const ext = safeFileName.split('.').pop()?.toLowerCase() || 'pdf';
+        const fileName = `${targetDocumentId}_${Date.now()}.${ext}`;
+        const filePath = `documents/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('digital-library')
+          .upload(filePath, file, {
+            upsert: true,
+            contentType: 'application/pdf',
+          });
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage
+          .from('digital-library')
+          .getPublicUrl(filePath);
+
+        return {
+          pdfUrl: urlData?.publicUrl || null,
+          fileFormat: 'pdf' as const,
+          fileSizeMb: parseFloat((file.size / 1024 / 1024).toFixed(2)),
+        };
+      };
       
       // If no document selected, create a new one based on the filename
       let documentId = effectiveDocumentId;
@@ -213,7 +240,6 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
       if (!documentId && selectedFile) {
         // Create new document from filename
         const fileName = selectedFile.name.replace('.pdf', '').replace(/_/g, ' ');
-        const safeFileName = selectedFile.name.replace(/[^a-zA-Z0-9._-]/g, '-');
         
         // First create a cbn_documents record (required for digital_library_documents)
         const generatedCote = `OCR-${Date.now()}`;
@@ -229,22 +255,7 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
         
         if (cbnError) throw cbnError;
 
-        // Upload the PDF to storage so the reader can display the correct content
-        const storageFolderName = `CBN-${generatedCote.replace(/[^a-zA-Z0-9]/g, '-')}`;
-        const filePath = `documents/${storageFolderName}/${safeFileName}`;
-        const { error: uploadError } = await supabase.storage
-          .from('digital-library')
-          .upload(filePath, selectedFile, { upsert: true, contentType: 'application/pdf' });
-
-        if (uploadError) throw uploadError;
-
-        const { data: urlData } = supabase.storage
-          .from('digital-library')
-          .getPublicUrl(filePath);
-
-        const pdfUrl = urlData?.publicUrl || null;
-        
-        // Then create the digital_library_documents record
+        // Create the digital_library_documents record first (to get a stable id)
         const { data: newDoc, error: createError } = await supabase
           .from('digital_library_documents')
           .insert({
@@ -252,15 +263,28 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
             cbn_document_id: cbnDoc.id,
             document_type: 'periodique',
             pages_count: pageResults.length,
-            pdf_url: pdfUrl,
             file_format: 'pdf',
             file_size_mb: parseFloat((selectedFile.size / 1024 / 1024).toFixed(2)),
+            language,
           })
           .select('id')
           .single();
         
         if (createError) throw createError;
         documentId = newDoc.id;
+
+        // Upload the PDF and update the document with its URL
+        const upload = await uploadPdfToStorage(documentId, selectedFile);
+        await supabase
+          .from('digital_library_documents')
+          .update({
+            pdf_url: upload.pdfUrl,
+            file_format: upload.fileFormat,
+            file_size_mb: upload.fileSizeMb,
+            pages_count: pageResults.length,
+            language,
+          })
+          .eq('id', documentId);
         
         // Link the cbn_documents record to the digital_library_documents record
         await supabase
@@ -282,32 +306,45 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
         });
         return;
       }
-      
-      for (const page of successPages) {
-        // Check if page already exists
-        const { data: existing } = await supabase
-          .from('digital_library_pages')
-          .select('id')
-          .eq('document_id', documentId)
-          .eq('page_number', page.pageNumber)
-          .maybeSingle();
 
-        if (existing) {
-          // Update existing page
-          await supabase
-            .from('digital_library_pages')
-            .update({ ocr_text: page.text })
-            .eq('id', existing.id);
-        } else {
-          // Insert new page
-          await supabase
-            .from('digital_library_pages')
-            .insert({
+      // Cas "document pré-sélectionné" : on doit aussi stocker le PDF, sinon le Book Reader ne peut pas l'afficher.
+      // (Beaucoup de documents existent dans la liste sans pdf_url tant qu'un PDF n'a pas été téléversé.)
+      if (selectedFile && preSelectedDocumentId) {
+        const upload = await uploadPdfToStorage(documentId, selectedFile);
+        await supabase
+          .from('digital_library_documents')
+          .update({
+            pdf_url: upload.pdfUrl,
+            file_format: upload.fileFormat,
+            file_size_mb: upload.fileSizeMb,
+            pages_count: pageResults.length,
+            language,
+          })
+          .eq('id', documentId);
+      } else {
+        // Même sans upload, s'assurer que la langue/pages_count sont cohérents
+        await supabase
+          .from('digital_library_documents')
+          .update({
+            pages_count: pageResults.length,
+            language,
+          })
+          .eq('id', documentId);
+      }
+      
+      // Upsert batch (UNIQUE(document_id, page_number)) pour réduire drastiquement les allers-retours réseau
+      if (successPages.length > 0) {
+        const { error: upsertError } = await supabase
+          .from('digital_library_pages')
+          .upsert(
+            successPages.map((p) => ({
               document_id: documentId,
-              page_number: page.pageNumber,
-              ocr_text: page.text
-            });
-        }
+              page_number: p.pageNumber,
+              ocr_text: p.text,
+            })),
+            { onConflict: 'document_id,page_number' }
+          );
+        if (upsertError) throw upsertError;
       }
 
       // Update document OCR status
@@ -329,6 +366,9 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
         description: `Fichier PDF enregistré avec ${successPages.length} pages OCR liées. Document indexé pour la recherche.`,
         duration: 6000
       });
+
+      // Rafraîchir l'interface d'administration (liste + badge OCR)
+      queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
 
     } catch (error: any) {
       console.error('Save error:', error);
