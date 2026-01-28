@@ -472,14 +472,14 @@ export default function DigitalLibraryHome() {
                 </button>
 
                 {/* Carousel container - no background, no padding */}
-                <div>
+                <div className="bg-transparent">
                   <Carousel opts={{
                 align: "center",
                 loop: true
-              }} plugins={[autoplayPlugin.current]} className="w-full">
-                    <CarouselContent>
-                      {featuredWorks.map(item => <CarouselItem key={item.workId || item.id} className="animate-fade-in">
-                          <div className="relative flex h-[320px] md:h-[380px]">
+              }} plugins={[autoplayPlugin.current]} className="w-full bg-transparent">
+                    <CarouselContent className="bg-transparent">
+                      {featuredWorks.map(item => <CarouselItem key={item.workId || item.id} className="animate-fade-in bg-transparent">
+                          <div className="relative flex h-[320px] md:h-[380px] bg-transparent">
                             {/* Left: Text Content */}
                             <div className="flex-1 text-white flex flex-col justify-between p-6 md:p-8 pt-4 md:pt-6">
                               {/* Top Left: Badge/Tagline with little padding on top */}
