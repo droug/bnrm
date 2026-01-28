@@ -11,6 +11,11 @@ interface PageFlipBookProps {
    * Rotation additionnelle par page (en degrés). Exemple: { 8: 180, 12: 180 }
    */
   pageRotations?: Record<number, number>;
+  /**
+   * Direction de lecture RTL (Right-to-Left) pour les documents arabes.
+   * En mode RTL, les pages se tournent de gauche à droite.
+   */
+  isRtl?: boolean;
 }
 
 export interface PageFlipBookHandle {
@@ -62,6 +67,7 @@ export const PageFlipBook = forwardRef<PageFlipBookHandle, PageFlipBookProps>(({
   zoom,
   rotation,
   pageRotations,
+  isRtl = false,
 }, ref) => {
   const bookRef = useRef<any>();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -143,8 +149,11 @@ export const PageFlipBook = forwardRef<PageFlipBookHandle, PageFlipBookProps>(({
     };
   }, [calculateDimensions]);
 
+  // Pour RTL, inverser l'ordre des images pour que la lecture soit de droite à gauche
+  const displayImages = isRtl ? [...images].reverse() : images;
+
   return (
-    <div ref={containerRef} className="flex items-center justify-center w-full h-full" style={{ minHeight: "400px" }}>
+    <div ref={containerRef} className="flex items-center justify-center w-full h-full" style={{ minHeight: "400px" }} dir={isRtl ? "rtl" : "ltr"}>
       <HTMLFlipBook
         width={dimensions.width}
         height={dimensions.height}
@@ -156,10 +165,15 @@ export const PageFlipBook = forwardRef<PageFlipBookHandle, PageFlipBookProps>(({
         maxShadowOpacity={0.5}
         showCover={true}
         mobileScrollSupport={true}
-        onFlip={(e: any) => onPageChange(e.data + 1)}
+        onFlip={(e: any) => {
+          // En RTL, recalculer le numéro de page réel
+          const flipPage = e.data + 1;
+          const realPage = isRtl ? images.length - flipPage + 1 : flipPage;
+          onPageChange(realPage);
+        }}
         className="book-container"
         style={{}}
-        startPage={currentPage - 1}
+        startPage={isRtl ? images.length - currentPage : currentPage - 1}
         drawShadow={true}
         flippingTime={800}
         usePortrait={true}
@@ -172,16 +186,20 @@ export const PageFlipBook = forwardRef<PageFlipBookHandle, PageFlipBookProps>(({
         disableFlipByClick={false}
         ref={bookRef}
       >
-        {images.map((image, index) => (
-          <Page
-            key={index}
-            image={image}
-            pageNumber={index + 1}
-            zoom={zoom}
-            rotation={rotation}
-            pageRotation={pageRotations?.[index + 1] ?? 0}
-          />
-        ))}
+        {displayImages.map((image, index) => {
+          // En RTL, le pageNumber réel est inversé
+          const realPageNumber = isRtl ? images.length - index : index + 1;
+          return (
+            <Page
+              key={index}
+              image={image}
+              pageNumber={realPageNumber}
+              zoom={zoom}
+              rotation={rotation}
+              pageRotation={pageRotations?.[realPageNumber] ?? 0}
+            />
+          );
+        })}
       </HTMLFlipBook>
     </div>
   );
