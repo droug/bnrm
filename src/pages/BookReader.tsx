@@ -202,6 +202,7 @@ const BookReader = () => {
   const [showSearch, setShowSearch] = useState(false);
   const [actualTotalPages, setActualTotalPages] = useState(245);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [documentLanguage, setDocumentLanguage] = useState<string | null>(null);
 
   const getDefaultPageRotations = (docId?: string): Record<number, number> => {
     if (!docId) return {};
@@ -414,7 +415,7 @@ const BookReader = () => {
         
         const { data: dlByIdData, error: dlByIdError } = await supabase
           .from('digital_library_documents')
-          .select('id, cbn_document_id, ocr_processed, title, author, publication_year, cover_image_url, pages_count, document_type, pdf_url')
+          .select('id, cbn_document_id, ocr_processed, title, author, publication_year, cover_image_url, pages_count, document_type, pdf_url, language')
           .eq('id', id)
           .maybeSingle();
         
@@ -425,7 +426,7 @@ const BookReader = () => {
           // Si non trouvé par id, essayer par cbn_document_id
           const { data: dlByCbnIdData, error: dlByCbnIdError } = await supabase
             .from('digital_library_documents')
-            .select('id, cbn_document_id, ocr_processed, title, author, publication_year, cover_image_url, pages_count, document_type, pdf_url')
+            .select('id, cbn_document_id, ocr_processed, title, author, publication_year, cover_image_url, pages_count, document_type, pdf_url, language')
             .eq('cbn_document_id', id)
             .maybeSingle();
           
@@ -438,7 +439,7 @@ const BookReader = () => {
           // Utiliser l'ID réel du document (pas cbn_document_id) pour les opérations
           const realDocumentId = dlData.id;
           setIsOcrProcessed(dlData.ocr_processed || false);
-
+          setDocumentLanguage(dlData.language || null);
           // Utiliser les données de digital_library_documents directement
           setDocumentData({
             id: realDocumentId, // Important: utiliser l'ID réel
@@ -615,6 +616,19 @@ const BookReader = () => {
       images.push(documentImage || manuscriptPages[i % manuscriptPages.length]);
     }
     return images;
+  };
+
+  // Détecter si le document est en arabe (pour le mode RTL en double page)
+  const isArabicDocument = (): boolean => {
+    // Vérifier la langue explicite
+    if (documentLanguage) {
+      const lang = documentLanguage.toLowerCase();
+      if (lang === 'ar' || lang === 'arabic' || lang === 'arabe') return true;
+    }
+    // Vérifier si le titre contient des caractères arabes
+    const title = documentData?.title || '';
+    const arabicRegex = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/;
+    return arabicRegex.test(title);
   };
   
   const bookInfo = {
@@ -1497,6 +1511,7 @@ const BookReader = () => {
                   zoom={zoom}
                   rotation={rotation}
                   pageRotations={pageRotations}
+                  isRtl={isArabicDocument()}
                 />
               ) : viewMode === "scroll" ? (
                 /* Mode défilement vertical */
