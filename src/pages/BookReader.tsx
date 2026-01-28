@@ -598,12 +598,12 @@ const BookReader = () => {
     if (documentPages.length > 0 && page <= documentPages.length) {
       return documentPages[page - 1];
     }
-    // If we have a real document image, use it for all pages
-    if (documentImage) {
+    // Si on a une vraie image de document (pas les images manuscrit par défaut), l'utiliser
+    if (documentImage && !documentImage.includes('manuscript-page')) {
       return documentImage;
     }
-    // Otherwise cycle through the manuscript images
-    return manuscriptPages[(page - 1) % manuscriptPages.length];
+    // Retourner null si pas de contenu réel - sera géré par hasDisplayableContent
+    return null;
   };
 
   // Generate page images for flip book
@@ -611,12 +611,22 @@ const BookReader = () => {
     if (documentPages.length > 0) {
       return documentPages;
     }
-    const images = [];
-    for (let i = 0; i < totalPages; i++) {
-      images.push(documentImage || manuscriptPages[i % manuscriptPages.length]);
+    // Si on a une image de couverture du document, l'utiliser
+    // Sinon retourner un tableau vide pour forcer l'affichage de l'erreur "document non disponible"
+    if (documentImage && !documentImage.includes('manuscript-page')) {
+      const images = [];
+      for (let i = 0; i < totalPages; i++) {
+        images.push(documentImage);
+      }
+      return images;
     }
-    return images;
+    // Pas de vraies images disponibles
+    return [];
   };
+  
+  // Vérifier si le document a un contenu affichable (PDF ou images de pages)
+  const hasDisplayableContent = pdfUrl || documentPages.length > 0 || 
+    (documentImage && !documentImage.includes('manuscript-page'));
 
   // Détecter si le document est en arabe (pour le mode RTL en double page)
   const isArabicDocument = (): boolean => {
@@ -1502,6 +1512,26 @@ const BookReader = () => {
                 <div className="text-center">
                   <p className="text-muted-foreground">Chargement du document...</p>
                 </div>
+              ) : !hasDisplayableContent ? (
+                /* Aucun PDF ni pages disponibles - afficher un message d'erreur */
+                <div className="text-center p-8">
+                  <div className="max-w-md mx-auto space-y-4">
+                    <div className="w-24 h-24 mx-auto bg-muted rounded-full flex items-center justify-center">
+                      <FileText className="h-12 w-12 text-muted-foreground" />
+                    </div>
+                    <h3 className="text-xl font-semibold">Document non disponible</h3>
+                    <p className="text-muted-foreground">
+                      Ce document n'a pas encore été numérisé ou le fichier PDF n'est pas disponible.
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Veuillez contacter la bibliothèque pour plus d'informations ou demander la numérisation de ce document.
+                    </p>
+                    <Button variant="outline" onClick={() => navigate(-1)}>
+                      <ChevronLeft className="h-4 w-4 mr-2" />
+                      Retour
+                    </Button>
+                  </div>
+                </div>
               ) : viewMode === "double" ? (
                 <PageFlipBook 
                   ref={pageFlipRef}
@@ -1566,13 +1596,17 @@ const BookReader = () => {
                                     scale={1.2}
                                     rotation={rotation + (pageRotations[pageNum] ?? 0)}
                                   />
-                                ) : (
+                                ) : pageImage ? (
                                   <img 
                                     src={pageImage}
                                     alt={`Page ${pageNum}`}
                                     className="w-full h-auto object-contain"
                                     loading="lazy"
                                   />
+                                ) : (
+                                  <div className="flex items-center justify-center p-16 text-muted-foreground">
+                                    <FileText className="h-8 w-8" />
+                                  </div>
                                 )
                               ) : restrictedPageDisplay === "blur" ? (
                                 /* Mode flou - Afficher l'image avec un effet blur */
@@ -1663,12 +1697,18 @@ const BookReader = () => {
                               }
                             }}
                           />
-                        ) : (
+                        ) : documentPages.length > 0 || (documentImage && !documentImage.includes('manuscript-page')) ? (
                           <img 
-                            src={getCurrentPageImage(currentPage)}
+                            src={getCurrentPageImage(currentPage) || ''}
                             alt={`Page ${currentPage}`}
                             className="block max-h-[75vh] w-auto object-contain"
                           />
+                        ) : (
+                          /* Fallback - ne devrait pas arriver grâce à hasDisplayableContent */
+                          <div className="flex items-center justify-center p-16 text-muted-foreground">
+                            <FileText className="h-12 w-12 mr-4" />
+                            <span>Contenu non disponible</span>
+                          </div>
                         )}
                         {bookmarks.includes(currentPage) && (
                           <Badge className="absolute top-4 right-4 bg-primary/90">
