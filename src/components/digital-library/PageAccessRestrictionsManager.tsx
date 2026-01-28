@@ -12,7 +12,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Lock, Unlock, Edit, Save, X, BookOpen, FileText, Search, Filter, Eye, EyeOff, Plus, Trash2, Shield, Download, Camera, MousePointerClick, Square, Sparkles, ArrowLeft, BookOpenCheck, ScrollText } from "lucide-react";
+import { Lock, Unlock, Edit, Save, X, BookOpen, FileText, Search, Filter, Eye, EyeOff, Plus, Trash2, Shield, Download, Camera, MousePointerClick, Square, Sparkles, ArrowLeft, BookOpenCheck, ScrollText, FileQuestion, AlertTriangle } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 
 export function PageAccessRestrictionsManager() {
@@ -50,6 +51,25 @@ export function PageAccessRestrictionsManager() {
   // Paramètres de vue
   const [allowDoublePageView, setAllowDoublePageView] = useState(true);
   const [allowScrollView, setAllowScrollView] = useState(true);
+  
+  // Pages manquantes
+  const [missingPages, setMissingPages] = useState<number[]>([]);
+  const [missingPagesReason, setMissingPagesReason] = useState<string>("");
+  const [missingPagesCustomReason, setMissingPagesCustomReason] = useState("");
+  const [showMissingPagesSection, setShowMissingPagesSection] = useState(false);
+  const [newMissingPage, setNewMissingPage] = useState("");
+  
+  // Liste des raisons prédéfinies
+  const missingPagesReasons = [
+    { value: "deterioration", label: "Détérioration du document original" },
+    { value: "lacune_origine", label: "Lacune d'origine (pages jamais présentes)" },
+    { value: "restauration", label: "Pages retirées pour restauration" },
+    { value: "censure_historique", label: "Censure historique" },
+    { value: "numerisation_incomplete", label: "Numérisation incomplète" },
+    { value: "perte", label: "Pages perdues ou égarées" },
+    { value: "non_communicable", label: "Pages non communicables" },
+    { value: "autre", label: "Autre (préciser)" },
+  ];
 
   // Fetch documents
   const { data: documents, isLoading } = useQuery({
@@ -139,6 +159,9 @@ export function PageAccessRestrictionsManager() {
         is_rare_book: data.isRareBook,
         allow_double_page_view: data.allowDoublePageView,
         allow_scroll_view: data.allowScrollView,
+        missing_pages: data.missingPages || [],
+        missing_pages_reason: data.missingPagesReason || null,
+        missing_pages_custom_reason: data.missingPagesReason === 'autre' ? data.missingPagesCustomReason : null,
       };
 
       const { error } = await supabase
@@ -205,6 +228,12 @@ export function PageAccessRestrictionsManager() {
       setAllowDoublePageView(restriction.allow_double_page_view !== false);
       setAllowScrollView(restriction.allow_scroll_view !== false);
       
+      // Pages manquantes
+      setMissingPages(restriction.missing_pages || []);
+      setMissingPagesReason(restriction.missing_pages_reason || "");
+      setMissingPagesCustomReason(restriction.missing_pages_custom_reason || "");
+      setShowMissingPagesSection((restriction.missing_pages?.length || 0) > 0);
+      
       if (restriction.restriction_mode === 'range' && restriction.manual_pages?.length > 0) {
         const pages = [...restriction.manual_pages].sort((a, b) => a - b);
         const ranges: Array<{start: number, end: number}> = [];
@@ -253,6 +282,10 @@ export function PageAccessRestrictionsManager() {
       setIsRareBook(false);
       setAllowDoublePageView(true);
       setAllowScrollView(true);
+      setMissingPages([]);
+      setMissingPagesReason("");
+      setMissingPagesCustomReason("");
+      setShowMissingPagesSection(false);
     }
   };
 
@@ -274,7 +307,22 @@ export function PageAccessRestrictionsManager() {
       isRareBook,
       allowDoublePageView,
       allowScrollView,
+      missingPages,
+      missingPagesReason,
+      missingPagesCustomReason,
     });
+  };
+
+  const handleAddMissingPage = () => {
+    const pageNum = parseInt(newMissingPage, 10);
+    if (!isNaN(pageNum) && pageNum > 0 && pageNum <= totalPages && !missingPages.includes(pageNum)) {
+      setMissingPages([...missingPages, pageNum].sort((a, b) => a - b));
+      setNewMissingPage("");
+    }
+  };
+
+  const handleRemoveMissingPage = (page: number) => {
+    setMissingPages(missingPages.filter(p => p !== page));
   };
 
   const calculatePercentagePages = () => {
@@ -852,7 +900,7 @@ export function PageAccessRestrictionsManager() {
                       <CardTitle className="text-base">Affichage des pages non accessibles</CardTitle>
                     </div>
                   </CardHeader>
-                  <CardContent className="space-y-3 pt-4">
+                  <CardContent className="space-y-4 pt-4">
                     <div className="grid grid-cols-3 gap-3">
                       <Button
                         type="button"
@@ -883,6 +931,120 @@ export function PageAccessRestrictionsManager() {
                         <EyeOff className="h-5 w-5" />
                         <span className="text-xs">Masquer</span>
                       </Button>
+                    </div>
+
+                    {/* Section Pages manquantes */}
+                    <div className="border-t pt-4 mt-4">
+                      <Button
+                        type="button"
+                        variant={showMissingPagesSection ? "default" : "outline"}
+                        onClick={() => setShowMissingPagesSection(!showMissingPagesSection)}
+                        className="w-full gap-2"
+                      >
+                        <FileQuestion className="h-4 w-4" />
+                        Pages manquantes
+                        {missingPages.length > 0 && (
+                          <Badge variant="secondary" className="ml-2">
+                            {missingPages.length}
+                          </Badge>
+                        )}
+                      </Button>
+
+                      {showMissingPagesSection && (
+                        <div className="mt-4 space-y-4 p-4 bg-muted/30 rounded-lg border">
+                          <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800">
+                            <AlertTriangle className="h-4 w-4 text-amber-600 dark:text-amber-400 mt-0.5 shrink-0" />
+                            <p className="text-xs text-amber-700 dark:text-amber-300">
+                              Indiquez les pages qui ne sont pas disponibles dans le document numérisé. Ces pages seront signalées aux utilisateurs.
+                            </p>
+                          </div>
+
+                          {/* Ajout de pages manquantes */}
+                          <div className="space-y-2">
+                            <Label className="text-sm font-semibold">Ajouter une page manquante</Label>
+                            <div className="flex gap-2">
+                              <Input
+                                type="number"
+                                min={1}
+                                max={totalPages}
+                                value={newMissingPage}
+                                onChange={(e) => setNewMissingPage(e.target.value)}
+                                placeholder="N° de page"
+                                className="flex-1"
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    handleAddMissingPage();
+                                  }
+                                }}
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                onClick={handleAddMissingPage}
+                                disabled={!newMissingPage}
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+
+                          {/* Liste des pages manquantes */}
+                          {missingPages.length > 0 && (
+                            <div className="space-y-2">
+                              <Label className="text-sm font-semibold">Pages manquantes ({missingPages.length})</Label>
+                              <div className="flex flex-wrap gap-2">
+                                {missingPages.map((page) => (
+                                  <Badge
+                                    key={page}
+                                    variant="secondary"
+                                    className="gap-1 pr-1 cursor-pointer hover:bg-destructive/20"
+                                    onClick={() => handleRemoveMissingPage(page)}
+                                  >
+                                    Page {page}
+                                    <X className="h-3 w-3" />
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Raison de non-disponibilité */}
+                          {missingPages.length > 0 && (
+                            <div className="space-y-3">
+                              <Label className="text-sm font-semibold">Raison de la non-disponibilité</Label>
+                              <Select
+                                value={missingPagesReason}
+                                onValueChange={setMissingPagesReason}
+                              >
+                                <SelectTrigger className="w-full bg-background">
+                                  <SelectValue placeholder="Sélectionner une raison..." />
+                                </SelectTrigger>
+                                <SelectContent className="bg-background z-[10001]">
+                                  {missingPagesReasons.map((reason) => (
+                                    <SelectItem key={reason.value} value={reason.value}>
+                                      {reason.label}
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+
+                              {/* Champ de saisie personnalisé pour "Autre" */}
+                              {missingPagesReason === "autre" && (
+                                <div className="space-y-2">
+                                  <Label className="text-sm">Précisez la raison</Label>
+                                  <Textarea
+                                    value={missingPagesCustomReason}
+                                    onChange={(e) => setMissingPagesCustomReason(e.target.value)}
+                                    placeholder="Décrivez la raison de la non-disponibilité des pages..."
+                                    className="min-h-[80px] resize-none"
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

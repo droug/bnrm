@@ -8292,6 +8292,9 @@ export type Database = {
           is_rare_book: boolean | null
           is_restricted: boolean | null
           manual_pages: number[] | null
+          missing_pages: number[] | null
+          missing_pages_custom_reason: string | null
+          missing_pages_reason: string | null
           restricted_page_display: string | null
           restriction_mode: string | null
           start_page: number | null
@@ -8314,6 +8317,9 @@ export type Database = {
           is_rare_book?: boolean | null
           is_restricted?: boolean | null
           manual_pages?: number[] | null
+          missing_pages?: number[] | null
+          missing_pages_custom_reason?: string | null
+          missing_pages_reason?: string | null
           restricted_page_display?: string | null
           restriction_mode?: string | null
           start_page?: number | null
@@ -8336,6 +8342,9 @@ export type Database = {
           is_rare_book?: boolean | null
           is_restricted?: boolean | null
           manual_pages?: number[] | null
+          missing_pages?: number[] | null
+          missing_pages_custom_reason?: string | null
+          missing_pages_reason?: string | null
           restricted_page_display?: string | null
           restriction_mode?: string | null
           start_page?: number | null
