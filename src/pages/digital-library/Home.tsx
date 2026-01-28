@@ -471,8 +471,8 @@ export default function DigitalLibraryHome() {
                   </svg>
                 </button>
 
-                {/* Carousel container - no background, no padding */}
-                <div className="bg-transparent">
+                {/* Carousel container with semi-transparent background */}
+                <div className="rounded-lg" style={{ background: '#6C666636' }}>
                   <Carousel opts={{
                 align: "center",
                 loop: true
