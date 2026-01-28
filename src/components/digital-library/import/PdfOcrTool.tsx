@@ -307,11 +307,13 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
         return;
       }
 
-      // Cas "document pré-sélectionné" : on doit aussi stocker le PDF, sinon le Book Reader ne peut pas l'afficher.
-      // (Beaucoup de documents existent dans la liste sans pdf_url tant qu'un PDF n'a pas été téléversé.)
-      if (selectedFile && preSelectedDocumentId) {
+      // CORRECTION: Toujours uploader le PDF + màj metadata, sinon Book Reader = écran vide
+      // Car pdf_url est OBLIGATOIRE pour l'affichage (même en mode document pré-sélectionné)
+      if (selectedFile) {
         const upload = await uploadPdfToStorage(documentId, selectedFile);
-        await supabase
+        
+        // Mise à jour digital_library_documents avec pdf_url + metadata
+        const { error: updateDlError } = await supabase
           .from('digital_library_documents')
           .update({
             pdf_url: upload.pdfUrl,
@@ -321,8 +323,28 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
             language,
           })
           .eq('id', documentId);
+        
+        if (updateDlError) throw updateDlError;
+        
+        // IMPORTANT: Retrouver le cbn_document_id et le lier au digital_library_document
+        // (garantit la cohérence des données pour les requêtes ultérieures)
+        const { data: dlDoc } = await supabase
+          .from('digital_library_documents')
+          .select('cbn_document_id')
+          .eq('id', documentId)
+          .single();
+        
+        if (dlDoc?.cbn_document_id) {
+          await supabase
+            .from('cbn_documents')
+            .update({ 
+              digital_library_document_id: documentId,
+              is_digitized: true 
+            })
+            .eq('id', dlDoc.cbn_document_id);
+        }
       } else {
-        // Même sans upload, s'assurer que la langue/pages_count sont cohérents
+        // Pas de fichier uploadé (rare) : on met à jour quand même pages_count + langue
         await supabase
           .from('digital_library_documents')
           .update({
