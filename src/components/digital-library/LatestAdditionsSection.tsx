@@ -40,21 +40,8 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
     }
   };
 
-  const getBadgeColor = (type: string) => {
-    const lowerType = type.toLowerCase();
-    if (lowerType.includes('manuscrit') || lowerType.includes('manuscript')) {
-      return 'bg-gold-bn-primary text-white';
-    }
-    if (lowerType.includes('livre') || lowerType.includes('book')) {
-      return 'bg-blue-primary text-white';
-    }
-    if (lowerType.includes('revue') || lowerType.includes('article') || lowerType.includes('périodique')) {
-      return 'bg-gold-bn-primary-dark text-white';
-    }
-    if (lowerType.includes('image') || lowerType.includes('photo')) {
-      return 'bg-bn-blue-primary text-white';
-    }
-    return 'bg-gold-bn-primary text-white';
+  const getBadgeColor = (_type: string) => {
+    return 'bg-[#B68F1C] text-white';
   };
 
   const getDocumentIcon = (type: string) => {
