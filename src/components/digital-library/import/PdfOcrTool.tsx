@@ -47,35 +47,8 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
   const [progress, setProgress] = useState(0);
   const [currentPageProgress, setCurrentPageProgress] = useState(0);
   const [pageResults, setPageResults] = useState<PageOcrResult[]>([]);
-  const [selectedDocumentId, setSelectedDocumentId] = useState<string>(preSelectedDocumentId || "");
-  const [documents, setDocuments] = useState<any[]>([]);
-  const [loadingDocs, setLoadingDocs] = useState(false);
-  
-  // Sync with preSelectedDocumentId prop changes
-  const effectiveDocumentId = preSelectedDocumentId || selectedDocumentId;
-
-  // Load documents for selection
-  const loadDocuments = async () => {
-    setLoadingDocs(true);
-    try {
-      const { data, error } = await supabase
-        .from('digital_library_documents')
-        .select('id, title, pages_count')
-        .order('title');
-      
-      if (error) throw error;
-      setDocuments(data || []);
-    } catch (error: any) {
-      console.error('Error loading documents:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les documents",
-        variant: "destructive"
-      });
-    } finally {
-      setLoadingDocs(false);
-    }
-  };
+  // Use pre-selected document ID if provided
+  const effectiveDocumentId = preSelectedDocumentId || "";
 
   // Handle file selection
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -518,28 +491,6 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
                 <CheckCircle2 className="mr-2 h-5 w-5" />
                 Enregistrer dans la BDD
               </Button>
-              
-              {/* Afficher le dropdown seulement si pas de document pré-sélectionné */}
-              {!preSelectedDocumentId && (
-                <Select value={selectedDocumentId} onValueChange={setSelectedDocumentId} onOpenChange={(open) => open && loadDocuments()}>
-                  <SelectTrigger className="w-[280px]">
-                    <SelectValue placeholder="Sélectionner un document..." />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {loadingDocs ? (
-                      <div className="p-2 text-center text-sm text-muted-foreground">Chargement...</div>
-                    ) : documents.length === 0 ? (
-                      <div className="p-2 text-center text-sm text-muted-foreground">Aucun document</div>
-                    ) : (
-                      documents.map(doc => (
-                        <SelectItem key={doc.id} value={doc.id}>
-                          {doc.title} ({doc.pages_count || '?'} pages)
-                        </SelectItem>
-                      ))
-                    )}
-                  </SelectContent>
-                </Select>
-              )}
               
               <div className="flex-1" />
               
