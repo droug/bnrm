@@ -480,8 +480,8 @@ export default function DigitalLibraryHome() {
                     <CarouselContent className="bg-transparent">
                       {featuredWorks.map(item => <CarouselItem key={item.workId || item.id} className="animate-fade-in bg-transparent">
                           <div className="relative flex h-[320px] md:h-[380px] bg-transparent">
-                            {/* Left: Text Content */}
-                            <div className="flex-1 text-white flex flex-col justify-between p-6 md:p-8 pt-4 md:pt-6">
+                            {/* Left: Text Content - constrained to 50% to not overlap with image */}
+                            <div className="w-1/2 text-white flex flex-col justify-between p-6 md:p-8 pt-4 md:pt-6 pr-4">
                               {/* Top Left: Badge/Tagline with little padding on top */}
                               <div className="pt-2">
                                 <Badge className="bg-gold-bn-primary text-white hover:bg-gold-bn-primary-dark text-xs px-4 py-1.5 rounded font-medium w-fit">
