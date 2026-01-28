@@ -94,9 +94,15 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
                 to={stat.href || "#"}
                 className="group"
               >
-                <div className="relative bg-white rounded-[20px] shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-100">
-                  {/* Top gold border accent */}
-                  <div className="absolute top-0 left-6 right-6 h-1.5 bg-gold-bn-primary rounded-full" />
+                <div 
+                  className="relative bg-white shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 w-[352px] h-[228px] border-t-[7px] border-t-gold-bn-primary"
+                  style={{
+                    borderTopLeftRadius: '20px',
+                    borderTopRightRadius: '20px',
+                    borderBottomLeftRadius: '10px',
+                    borderBottomRightRadius: '10px',
+                  }}
+                >
                   
                   <div className="p-8 text-center">
                     {/* Icon container */}
