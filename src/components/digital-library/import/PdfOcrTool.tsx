@@ -242,6 +242,12 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
         if (createError) throw createError;
         documentId = newDoc.id;
         
+        // Link the cbn_documents record to the digital_library_documents record
+        await supabase
+          .from('cbn_documents')
+          .update({ digital_library_document_id: newDoc.id, is_digitized: true })
+          .eq('id', cbnDoc.id);
+        
         toast({
           title: "Document créé",
           description: `Nouveau document "${fileName}" créé automatiquement`
