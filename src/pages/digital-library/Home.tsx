@@ -471,8 +471,8 @@ export default function DigitalLibraryHome() {
                   </svg>
                 </button>
 
-                {/* Carousel container - no background */}
-                <div className="p-6 md:p-8">
+                {/* Carousel container - no background, no padding */}
+                <div>
                   <Carousel opts={{
                 align: "center",
                 loop: true
@@ -516,9 +516,9 @@ export default function DigitalLibraryHome() {
                               </div>
                             </div>
                             
-                            {/* Right: Image - half width, full height, no padding, no radius */}
+                            {/* Right: Image - half width, full height, extends to edge */}
                             {item.thumbnail && (
-                              <div className="w-1/2 h-full">
+                              <div className="w-1/2 h-full absolute right-0 top-0 bottom-0">
                                 <img src={item.thumbnail} alt={item.title} className="w-full h-full object-cover object-center" />
                               </div>
                             )}
