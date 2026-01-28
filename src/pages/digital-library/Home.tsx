@@ -481,9 +481,9 @@ export default function DigitalLibraryHome() {
                       {featuredWorks.map(item => <CarouselItem key={item.workId || item.id} className="animate-fade-in">
                           <div className="relative flex h-[320px] md:h-[380px]">
                             {/* Left: Text Content */}
-                            <div className="flex-1 text-white flex flex-col justify-between p-6 md:p-8">
-                              {/* Top Left: Badge/Tagline */}
-                              <div>
+                            <div className="flex-1 text-white flex flex-col justify-between p-6 md:p-8 pt-4 md:pt-6">
+                              {/* Top Left: Badge/Tagline with little padding on top */}
+                              <div className="pt-2">
                                 <Badge className="bg-gold-bn-primary text-white hover:bg-gold-bn-primary-dark text-xs px-4 py-1.5 rounded font-medium w-fit">
                                   {item.type}
                                 </Badge>
@@ -497,7 +497,7 @@ export default function DigitalLibraryHome() {
                               {/* Bottom Right: Button */}
                               <div className="flex justify-end">
                                 <button 
-                                  className="inline-flex items-center gap-3 px-6 py-3 bg-[#B68F1C]/20 hover:bg-[#B68F1C]/30 text-[#B68F1C] text-sm font-medium transition-all group" 
+                                  className="inline-flex items-center gap-3 px-6 py-3 bg-[#B68F1C]/20 hover:bg-[#B68F1C]/30 text-white text-sm font-medium transition-all group" 
                                   onClick={() => {
                                     if (item.hasDocument) {
                                       handleConsultDocument(item);
@@ -516,9 +516,9 @@ export default function DigitalLibraryHome() {
                               </div>
                             </div>
                             
-                            {/* Right: Image - half width, full height, no radius */}
+                            {/* Right: Image - half width, full height, no padding, no radius */}
                             {item.thumbnail && (
-                              <div className="w-1/2 h-full overflow-hidden">
+                              <div className="w-1/2 h-full">
                                 <img src={item.thumbnail} alt={item.title} className="w-full h-full object-cover object-center" />
                               </div>
                             )}
