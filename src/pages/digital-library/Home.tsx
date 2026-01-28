@@ -479,28 +479,35 @@ export default function DigitalLibraryHome() {
               }} plugins={[autoplayPlugin.current]} className="w-full">
                     <CarouselContent>
                       {featuredWorks.map(item => <CarouselItem key={item.workId || item.id} className="animate-fade-in">
-                          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-10 items-center">
+                          <div className="relative flex h-[320px] md:h-[380px]">
                             {/* Left: Text Content */}
-                            <div className="text-white space-y-4 order-2 lg:order-1 flex flex-col justify-center">
-                              <Badge className="bg-gold-bn-primary text-white hover:bg-gold-bn-primary-dark text-xs px-4 py-1.5 rounded font-medium w-fit">
-                                {item.type}
-                              </Badge>
-                              <h2 className="text-xl md:text-2xl lg:text-3xl font-bold uppercase tracking-wide leading-tight">
-                                {language === 'ar' && item.title_ar ? item.title_ar : item.title}
-                              </h2>
-                              <p className="text-white/85 text-sm md:text-base leading-relaxed line-clamp-5 text-justify max-w-lg">
-                                {item.description || `${item.author}${item.date ? ` - ${item.date}` : ''}`}
-                              </p>
-                              <div className="pt-2">
-                                <button className="inline-flex items-center gap-3 px-6 py-3 bg-gold-bn-primary/20 hover:bg-gold-bn-primary/30 backdrop-blur-sm rounded-full text-white text-sm font-medium transition-all group" onClick={() => {
-                            if (item.hasDocument) {
-                              handleConsultDocument(item);
-                            } else if (item.link) {
-                              window.open(item.link, '_blank');
-                            } else {
-                              navigate(`/digital-library/document/${item.id}`);
-                            }
-                          }}>
+                            <div className="flex-1 text-white flex flex-col justify-between p-6 md:p-8">
+                              {/* Top Left: Badge/Tagline */}
+                              <div>
+                                <Badge className="bg-gold-bn-primary text-white hover:bg-gold-bn-primary-dark text-xs px-4 py-1.5 rounded font-medium w-fit">
+                                  {item.type}
+                                </Badge>
+                                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold uppercase tracking-wide leading-tight mt-4">
+                                  {language === 'ar' && item.title_ar ? item.title_ar : item.title}
+                                </h2>
+                                <p className="text-white/85 text-sm md:text-base leading-relaxed line-clamp-4 text-justify max-w-lg mt-3">
+                                  {item.description || `${item.author}${item.date ? ` - ${item.date}` : ''}`}
+                                </p>
+                              </div>
+                              {/* Bottom Right: Button */}
+                              <div className="flex justify-end">
+                                <button 
+                                  className="inline-flex items-center gap-3 px-6 py-3 bg-[#B68F1C]/20 hover:bg-[#B68F1C]/30 text-[#B68F1C] text-sm font-medium transition-all group" 
+                                  onClick={() => {
+                                    if (item.hasDocument) {
+                                      handleConsultDocument(item);
+                                    } else if (item.link) {
+                                      window.open(item.link, '_blank');
+                                    } else {
+                                      navigate(`/digital-library/document/${item.id}`);
+                                    }
+                                  }}
+                                >
                                   En savoir plus
                                   <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                     <path d="M5 12h14M12 5l7 7-7 7" />
@@ -509,12 +516,12 @@ export default function DigitalLibraryHome() {
                               </div>
                             </div>
                             
-                            {/* Right: Image - horizontal book spread format like Figma */}
-                            {item.thumbnail && <div className="relative flex justify-center lg:justify-end order-1 lg:order-2">
-                                <div className="relative w-full max-w-md lg:max-w-lg aspect-[4/3] rounded-xl overflow-hidden shadow-2xl border border-white/10">
-                                  <img src={item.thumbnail} alt={item.title} className="w-full h-full object-cover object-center" />
-                                </div>
-                              </div>}
+                            {/* Right: Image - half width, full height, no radius */}
+                            {item.thumbnail && (
+                              <div className="w-1/2 h-full overflow-hidden">
+                                <img src={item.thumbnail} alt={item.title} className="w-full h-full object-cover object-center" />
+                              </div>
+                            )}
                           </div>
                         </CarouselItem>)}
                     </CarouselContent>
