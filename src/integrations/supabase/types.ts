@@ -8274,6 +8274,442 @@ export type Database = {
           },
         ]
       }
+      ocr_audit_logs: {
+        Row: {
+          action: string
+          cloud_endpoint: string | null
+          created_at: string | null
+          duration_ms: number | null
+          file_hash: string | null
+          file_size_bytes: number | null
+          id: string
+          ip_address: unknown
+          job_id: string | null
+          page_id: string | null
+          provider: Database["public"]["Enums"]["ocr_provider"] | null
+          request_data: Json | null
+          response_summary: Json | null
+          sent_to_cloud: boolean | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          cloud_endpoint?: string | null
+          created_at?: string | null
+          duration_ms?: number | null
+          file_hash?: string | null
+          file_size_bytes?: number | null
+          id?: string
+          ip_address?: unknown
+          job_id?: string | null
+          page_id?: string | null
+          provider?: Database["public"]["Enums"]["ocr_provider"] | null
+          request_data?: Json | null
+          response_summary?: Json | null
+          sent_to_cloud?: boolean | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          cloud_endpoint?: string | null
+          created_at?: string | null
+          duration_ms?: number | null
+          file_hash?: string | null
+          file_size_bytes?: number | null
+          id?: string
+          ip_address?: unknown
+          job_id?: string | null
+          page_id?: string | null
+          provider?: Database["public"]["Enums"]["ocr_provider"] | null
+          request_data?: Json | null
+          response_summary?: Json | null
+          sent_to_cloud?: boolean | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ocr_audit_logs_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "ocr_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ocr_audit_logs_page_id_fkey"
+            columns: ["page_id"]
+            isOneToOne: false
+            referencedRelation: "ocr_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ocr_ground_truth: {
+        Row: {
+          bbox: Json | null
+          corrected_text: string
+          correction_type: string | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          is_validated: boolean | null
+          job_id: string
+          line_id: string | null
+          line_index: number | null
+          page_id: string | null
+          page_number: number
+          recognized_text: string
+          updated_at: string | null
+          validated_by: string | null
+        }
+        Insert: {
+          bbox?: Json | null
+          corrected_text: string
+          correction_type?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_validated?: boolean | null
+          job_id: string
+          line_id?: string | null
+          line_index?: number | null
+          page_id?: string | null
+          page_number: number
+          recognized_text: string
+          updated_at?: string | null
+          validated_by?: string | null
+        }
+        Update: {
+          bbox?: Json | null
+          corrected_text?: string
+          correction_type?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          is_validated?: boolean | null
+          job_id?: string
+          line_id?: string | null
+          line_index?: number | null
+          page_id?: string | null
+          page_number?: number
+          recognized_text?: string
+          updated_at?: string | null
+          validated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ocr_ground_truth_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "ocr_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ocr_ground_truth_page_id_fkey"
+            columns: ["page_id"]
+            isOneToOne: false
+            referencedRelation: "ocr_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ocr_jobs: {
+        Row: {
+          auto_mode: boolean | null
+          cloud_allowed: boolean | null
+          completed_at: string | null
+          created_at: string | null
+          document_id: string | null
+          document_type: Database["public"]["Enums"]["ocr_document_type"]
+          error_message: string | null
+          id: string
+          languages: string[] | null
+          overall_confidence: number | null
+          preprocessing_options: Json | null
+          processed_pages: number | null
+          processing_time_ms: number | null
+          recommended_provider:
+            | Database["public"]["Enums"]["ocr_provider"]
+            | null
+          selected_provider: Database["public"]["Enums"]["ocr_provider"] | null
+          source_file_hash: string | null
+          source_file_name: string | null
+          source_file_url: string | null
+          started_at: string | null
+          status: Database["public"]["Enums"]["ocr_job_status"] | null
+          total_pages: number | null
+          unknown_char_ratio: number | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          auto_mode?: boolean | null
+          cloud_allowed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          document_id?: string | null
+          document_type?: Database["public"]["Enums"]["ocr_document_type"]
+          error_message?: string | null
+          id?: string
+          languages?: string[] | null
+          overall_confidence?: number | null
+          preprocessing_options?: Json | null
+          processed_pages?: number | null
+          processing_time_ms?: number | null
+          recommended_provider?:
+            | Database["public"]["Enums"]["ocr_provider"]
+            | null
+          selected_provider?: Database["public"]["Enums"]["ocr_provider"] | null
+          source_file_hash?: string | null
+          source_file_name?: string | null
+          source_file_url?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["ocr_job_status"] | null
+          total_pages?: number | null
+          unknown_char_ratio?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          auto_mode?: boolean | null
+          cloud_allowed?: boolean | null
+          completed_at?: string | null
+          created_at?: string | null
+          document_id?: string | null
+          document_type?: Database["public"]["Enums"]["ocr_document_type"]
+          error_message?: string | null
+          id?: string
+          languages?: string[] | null
+          overall_confidence?: number | null
+          preprocessing_options?: Json | null
+          processed_pages?: number | null
+          processing_time_ms?: number | null
+          recommended_provider?:
+            | Database["public"]["Enums"]["ocr_provider"]
+            | null
+          selected_provider?: Database["public"]["Enums"]["ocr_provider"] | null
+          source_file_hash?: string | null
+          source_file_name?: string | null
+          source_file_url?: string | null
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["ocr_job_status"] | null
+          total_pages?: number | null
+          unknown_char_ratio?: number | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ocr_jobs_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "digital_library_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ocr_models: {
+        Row: {
+          accuracy: number | null
+          cer: number | null
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          id: string
+          is_active: boolean | null
+          is_default: boolean | null
+          is_pretrained: boolean | null
+          meta_json: Json | null
+          model_name: string
+          model_path: string | null
+          model_version: string | null
+          provider: Database["public"]["Enums"]["ocr_provider"]
+          supported_scripts: string[] | null
+          test_set_size: number | null
+          trained_on_jobs: string[] | null
+          training_samples_count: number | null
+          updated_at: string | null
+          wer: number | null
+        }
+        Insert: {
+          accuracy?: number | null
+          cer?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_default?: boolean | null
+          is_pretrained?: boolean | null
+          meta_json?: Json | null
+          model_name: string
+          model_path?: string | null
+          model_version?: string | null
+          provider: Database["public"]["Enums"]["ocr_provider"]
+          supported_scripts?: string[] | null
+          test_set_size?: number | null
+          trained_on_jobs?: string[] | null
+          training_samples_count?: number | null
+          updated_at?: string | null
+          wer?: number | null
+        }
+        Update: {
+          accuracy?: number | null
+          cer?: number | null
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_default?: boolean | null
+          is_pretrained?: boolean | null
+          meta_json?: Json | null
+          model_name?: string
+          model_path?: string | null
+          model_version?: string | null
+          provider?: Database["public"]["Enums"]["ocr_provider"]
+          supported_scripts?: string[] | null
+          test_set_size?: number | null
+          trained_on_jobs?: string[] | null
+          training_samples_count?: number | null
+          updated_at?: string | null
+          wer?: number | null
+        }
+        Relationships: []
+      }
+      ocr_pages: {
+        Row: {
+          alto_xml: string | null
+          confidence: number | null
+          created_at: string | null
+          error_message: string | null
+          id: string
+          image_height: number | null
+          image_url: string | null
+          image_width: number | null
+          job_id: string
+          line_count: number | null
+          meta_json: Json | null
+          page_number: number
+          page_xml: string | null
+          processing_time_ms: number | null
+          provider_used: Database["public"]["Enums"]["ocr_provider"] | null
+          recognized_text: string | null
+          regions: Json | null
+          status: Database["public"]["Enums"]["ocr_job_status"] | null
+          unknown_char_count: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          alto_xml?: string | null
+          confidence?: number | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          image_height?: number | null
+          image_url?: string | null
+          image_width?: number | null
+          job_id: string
+          line_count?: number | null
+          meta_json?: Json | null
+          page_number: number
+          page_xml?: string | null
+          processing_time_ms?: number | null
+          provider_used?: Database["public"]["Enums"]["ocr_provider"] | null
+          recognized_text?: string | null
+          regions?: Json | null
+          status?: Database["public"]["Enums"]["ocr_job_status"] | null
+          unknown_char_count?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          alto_xml?: string | null
+          confidence?: number | null
+          created_at?: string | null
+          error_message?: string | null
+          id?: string
+          image_height?: number | null
+          image_url?: string | null
+          image_width?: number | null
+          job_id?: string
+          line_count?: number | null
+          meta_json?: Json | null
+          page_number?: number
+          page_xml?: string | null
+          processing_time_ms?: number | null
+          provider_used?: Database["public"]["Enums"]["ocr_provider"] | null
+          recognized_text?: string | null
+          regions?: Json | null
+          status?: Database["public"]["Enums"]["ocr_job_status"] | null
+          unknown_char_count?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ocr_pages_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "ocr_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ocr_provider_configs: {
+        Row: {
+          api_version: string | null
+          base_url: string | null
+          created_at: string | null
+          current_usage_today: number | null
+          default_options: Json | null
+          description: string | null
+          documentation_url: string | null
+          id: string
+          is_cloud: boolean | null
+          is_enabled: boolean | null
+          provider: Database["public"]["Enums"]["ocr_provider"]
+          rate_limit_per_day: number | null
+          rate_limit_per_minute: number | null
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          api_version?: string | null
+          base_url?: string | null
+          created_at?: string | null
+          current_usage_today?: number | null
+          default_options?: Json | null
+          description?: string | null
+          documentation_url?: string | null
+          id?: string
+          is_cloud?: boolean | null
+          is_enabled?: boolean | null
+          provider: Database["public"]["Enums"]["ocr_provider"]
+          rate_limit_per_day?: number | null
+          rate_limit_per_minute?: number | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          api_version?: string | null
+          base_url?: string | null
+          created_at?: string | null
+          current_usage_today?: number | null
+          default_options?: Json | null
+          description?: string | null
+          documentation_url?: string | null
+          id?: string
+          is_cloud?: boolean | null
+          is_enabled?: boolean | null
+          provider?: Database["public"]["Enums"]["ocr_provider"]
+          rate_limit_per_day?: number | null
+          rate_limit_per_minute?: number | null
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
       page_access_restrictions: {
         Row: {
           allow_double_page_view: boolean | null
@@ -14781,6 +15217,15 @@ export type Database = {
         | "ouvrages_scolaires"
         | "periodiques"
         | "musique"
+      ocr_document_type: "printed" | "handwritten" | "mixed"
+      ocr_job_status:
+        | "pending"
+        | "preprocessing"
+        | "processing"
+        | "completed"
+        | "failed"
+        | "partial"
+      ocr_provider: "tesseract" | "sanad" | "escriptorium" | "kraken"
       payment_method: "carte_bancaire" | "virement" | "especes" | "cheque"
       payment_status:
         | "pending"
@@ -15000,6 +15445,16 @@ export const Constants = {
         "periodiques",
         "musique",
       ],
+      ocr_document_type: ["printed", "handwritten", "mixed"],
+      ocr_job_status: [
+        "pending",
+        "preprocessing",
+        "processing",
+        "completed",
+        "failed",
+        "partial",
+      ],
+      ocr_provider: ["tesseract", "sanad", "escriptorium", "kraken"],
       payment_method: ["carte_bancaire", "virement", "especes", "cheque"],
       payment_status: [
         "pending",
