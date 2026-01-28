@@ -24,6 +24,8 @@ export default {
         'arabic': ['Amiri', 'Noto Naskh Arabic', 'Noto Sans Arabic', 'serif'],
         'moroccan': ['Playfair Display', 'Amiri', 'serif'],
         'elegant': ['Playfair Display', 'Georgia', 'serif'],
+        // Section titles - Gilda Display
+        'gilda': ['Gilda Display', 'Georgia', 'serif'],
       },
       fontSize: {
         // BN Typography Scale (exact from reference image)

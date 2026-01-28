@@ -73,7 +73,7 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
             </div>
           </div>
           
-          <h2 className="heading-3 text-bn-blue-primary font-heading">
+          <h2 className="text-[48px] font-normal text-bn-blue-primary font-gilda">
             {t('dl.home.latestAdditions')}
           </h2>
           
