@@ -70,15 +70,20 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
         </div>
 
         {/* Stats Cards with Navigation */}
-        <div className="relative max-w-5xl mx-auto flex items-center justify-center gap-4">
-          {/* Left Arrow */}
+        <div className="relative max-w-5xl mx-auto flex items-center justify-center gap-8">
+          {/* Left Arrow - Triangle */}
           <button
             onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))}
             disabled={!canGoPrev}
-            className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-slate-text hover:text-gold-bn-primary transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+            className="flex-shrink-0 transition-all duration-300 disabled:opacity-20 disabled:cursor-not-allowed hover:scale-110"
             aria-label="Précédent"
           >
-            <Icon name="mdi:chevron-left" className="h-7 w-7" />
+            <svg width="20" height="36" viewBox="0 0 20 36" fill="none">
+              <polygon 
+                points="20,0 0,18 20,36" 
+                className="fill-gold-bn-primary"
+              />
+            </svg>
           </button>
 
           {/* Stats Cards */}
@@ -89,21 +94,25 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
                 to={stat.href || "#"}
                 className="group"
               >
-                <div className="relative bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-slate-border">
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gold-bn-primary" />
+                <div className="relative bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-slate-200">
+                  {/* Left gold border accent */}
+                  <div className="absolute top-4 bottom-4 left-0 w-1 bg-gold-bn-primary rounded-r-full" />
                   
                   <div className="p-8 text-center">
+                    {/* Icon container */}
                     <div className="flex justify-center mb-5">
-                      <div className="w-16 h-16 rounded-lg border-2 border-gold-bn-primary flex items-center justify-center">
-                        <Icon name={stat.iconName} className="h-8 w-8 text-gold-bn-primary" />
+                      <div className="w-14 h-14 rounded-xl bg-gold-bn-primary/10 flex items-center justify-center">
+                        <Icon name={stat.iconName} className="h-7 w-7 text-gold-bn-primary" />
                       </div>
                     </div>
                     
-                    <div className="text-4xl md:text-5xl font-bold text-gold-bn-primary mb-3 font-heading">
+                    {/* Value */}
+                    <div className="text-3xl md:text-4xl font-semibold text-slate-dark mb-2 font-heading">
                       {stat.value}
                     </div>
                     
-                    <div className="text-slate-dark text-lg font-medium">
+                    {/* Label */}
+                    <div className="text-slate-text text-base font-medium">
                       {language === 'ar' && stat.labelAr ? stat.labelAr : stat.label}
                     </div>
                   </div>
@@ -112,14 +121,19 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
             ))}
           </div>
 
-          {/* Right Arrow */}
+          {/* Right Arrow - Triangle */}
           <button
             onClick={() => setCurrentIndex(Math.min(stats.length - 3, currentIndex + 1))}
             disabled={!canGoNext}
-            className="flex-shrink-0 w-10 h-10 flex items-center justify-center text-slate-text hover:text-gold-bn-primary transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+            className="flex-shrink-0 transition-all duration-300 disabled:opacity-20 disabled:cursor-not-allowed hover:scale-110"
             aria-label="Suivant"
           >
-            <Icon name="mdi:chevron-right" className="h-7 w-7" />
+            <svg width="20" height="36" viewBox="0 0 20 36" fill="none">
+              <polygon 
+                points="0,0 20,18 0,36" 
+                className="fill-gold-bn-primary"
+              />
+            </svg>
           </button>
         </div>
 
