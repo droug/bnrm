@@ -376,8 +376,38 @@ export default function OcrImportTool() {
     await insertOcrPages.mutateAsync(validPages);
   };
 
+  const hasOcrResults = ocrPages.some(p => p.ocr_text.trim());
+
   return (
     <div className="space-y-6">
+      {/* Barre d'état du document sélectionné */}
+      {selectedDocument && (
+        <Alert className={`${selectedDocument.ocr_processed ? "border-amber-300 bg-amber-50" : "border-primary/30 bg-primary/5"}`}>
+          <FileText className="h-4 w-4" />
+          <AlertTitle className="flex items-center gap-2">
+            Document en cours : <strong>{selectedDocument.title}</strong>
+            {selectedDocument.ocr_processed && (
+              <Badge variant="outline" className="bg-amber-100 text-amber-700 border-amber-300">
+                Déjà OCRisé
+              </Badge>
+            )}
+          </AlertTitle>
+          <AlertDescription>
+            {selectedDocument.pages_count || 0} pages
+            {selectedDocument.ocr_processed && (
+              <span className="block text-sm mt-1 text-amber-600">
+                ⚠️ Relancer l'OCR écrasera les données existantes.
+              </span>
+            )}
+            {existingPages && existingPages.length > 0 && !selectedDocument.ocr_processed && (
+              <span className="block text-sm mt-1 text-muted-foreground">
+                ⚠️ {existingPages.length} pages OCR existantes (seront remplacées)
+              </span>
+            )}
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Sélection du document */}
       <Card>
         <CardHeader>
@@ -463,33 +493,6 @@ export default function OcrImportTool() {
                 </TableBody>
               </Table>
             </ScrollArea>
-          )}
-          
-          {selectedDocument && (
-            <Alert className={selectedDocument.ocr_processed ? "border-amber-300 bg-amber-50" : ""}>
-              <FileText className="h-4 w-4" />
-              <AlertTitle className="flex items-center gap-2">
-                Document sélectionné
-                {selectedDocument.ocr_processed && (
-                  <Badge variant="outline" className="bg-amber-100 text-amber-700 border-amber-300">
-                    Déjà OCRisé
-                  </Badge>
-                )}
-              </AlertTitle>
-              <AlertDescription>
-                <strong>{selectedDocument.title}</strong> - {selectedDocument.pages_count || 0} pages
-                {selectedDocument.ocr_processed && (
-                  <span className="block text-sm mt-1 text-amber-600">
-                    ⚠️ Ce document a déjà été OCRisé. Relancer l'OCR écrasera les données existantes.
-                  </span>
-                )}
-                {existingPages && existingPages.length > 0 && !selectedDocument.ocr_processed && (
-                  <span className="block text-sm mt-1">
-                    ⚠️ {existingPages.length} pages OCR existantes (seront remplacées)
-                  </span>
-                )}
-              </AlertDescription>
-            </Alert>
           )}
         </CardContent>
       </Card>
@@ -724,27 +727,43 @@ export default function OcrImportTool() {
               </TabsContent>
             </Tabs>
             
-            {/* Résumé et action */}
-            <div className="mt-6 pt-4 border-t flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">
-                {ocrPages.filter(p => p.ocr_text.trim()).length} pages avec texte OCR
+            {/* Résumé et action - Toujours visible */}
+            <div className="mt-6 pt-4 border-t space-y-3">
+              {hasOcrResults && (
+                <Alert className="bg-green-50 border-green-200">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <AlertTitle className="text-green-800">
+                    {ocrPages.filter(p => p.ocr_text.trim()).length} pages prêtes à indexer
+                  </AlertTitle>
+                  <AlertDescription className="text-green-700">
+                    Cliquez sur "Enregistrer dans la BD" pour sauvegarder le texte OCR.
+                  </AlertDescription>
+                </Alert>
+              )}
+              
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-muted-foreground">
+                  {ocrPages.filter(p => p.ocr_text.trim()).length} pages avec texte OCR
+                </div>
+                <Button 
+                  onClick={handleSaveOcr}
+                  disabled={insertOcrPages.isPending || !hasOcrResults}
+                  size="lg"
+                  className={hasOcrResults ? "bg-green-600 hover:bg-green-700" : ""}
+                >
+                  {insertOcrPages.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Enregistrement...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle2 className="h-4 w-4 mr-2" />
+                      Enregistrer dans la BD
+                    </>
+                  )}
+                </Button>
               </div>
-              <Button 
-                onClick={handleSaveOcr}
-                disabled={insertOcrPages.isPending || !ocrPages.some(p => p.ocr_text.trim())}
-              >
-                {insertOcrPages.isPending ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Indexation...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 className="h-4 w-4 mr-2" />
-                    Indexer le texte OCR
-                  </>
-                )}
-              </Button>
             </div>
           </CardContent>
         </Card>
