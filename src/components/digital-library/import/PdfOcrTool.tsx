@@ -213,19 +213,36 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
       if (!documentId && selectedFile) {
         // Create new document from filename
         const fileName = selectedFile.name.replace('.pdf', '').replace(/_/g, ' ');
+        const safeFileName = selectedFile.name.replace(/[^a-zA-Z0-9._-]/g, '-');
         
         // First create a cbn_documents record (required for digital_library_documents)
+        const generatedCote = `OCR-${Date.now()}`;
         const { data: cbnDoc, error: cbnError } = await supabase
           .from('cbn_documents')
           .insert({
             title: fileName,
-            cote: `OCR-${Date.now()}`,
+            cote: generatedCote,
             document_type: 'periodique'
           })
           .select('id')
           .single();
         
         if (cbnError) throw cbnError;
+
+        // Upload the PDF to storage so the reader can display the correct content
+        const storageFolderName = `CBN-${generatedCote.replace(/[^a-zA-Z0-9]/g, '-')}`;
+        const filePath = `documents/${storageFolderName}/${safeFileName}`;
+        const { error: uploadError } = await supabase.storage
+          .from('digital-library')
+          .upload(filePath, selectedFile, { upsert: true, contentType: 'application/pdf' });
+
+        if (uploadError) throw uploadError;
+
+        const { data: urlData } = supabase.storage
+          .from('digital-library')
+          .getPublicUrl(filePath);
+
+        const pdfUrl = urlData?.publicUrl || null;
         
         // Then create the digital_library_documents record
         const { data: newDoc, error: createError } = await supabase
@@ -234,7 +251,10 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
             title: fileName,
             cbn_document_id: cbnDoc.id,
             document_type: 'periodique',
-            pages_count: pageResults.length
+            pages_count: pageResults.length,
+            pdf_url: pdfUrl,
+            file_format: 'pdf',
+            file_size_mb: parseFloat((selectedFile.size / 1024 / 1024).toFixed(2)),
           })
           .select('id')
           .single();
