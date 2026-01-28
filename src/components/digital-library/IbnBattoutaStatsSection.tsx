@@ -70,12 +70,12 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
         </div>
 
         {/* Stats Cards with Navigation */}
-        <div className="relative max-w-5xl mx-auto flex items-center justify-center gap-8">
-          {/* Left Arrow - Triangle */}
+        <div className="relative max-w-6xl mx-auto">
+          {/* Left Arrow - positioned outside cards */}
           <button
             onClick={() => setCurrentIndex(Math.max(0, currentIndex - 1))}
             disabled={!canGoPrev}
-            className="flex-shrink-0 transition-all duration-300 disabled:opacity-20 disabled:cursor-not-allowed hover:scale-110"
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-12 z-10 transition-all duration-300 disabled:opacity-20 disabled:cursor-not-allowed hover:scale-110"
             aria-label="Précédent"
           >
             <svg width="20" height="36" viewBox="0 0 20 36" fill="none">
@@ -87,7 +87,7 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
           </button>
 
           {/* Stats Cards */}
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-20 max-w-6xl">
+          <div className="flex justify-center gap-16">
             {visibleStats.map((stat, index) => (
               <Link 
                 key={index} 
@@ -127,11 +127,11 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
             ))}
           </div>
 
-          {/* Right Arrow - Triangle */}
+          {/* Right Arrow - positioned outside cards */}
           <button
             onClick={() => setCurrentIndex(Math.min(stats.length - 3, currentIndex + 1))}
             disabled={!canGoNext}
-            className="flex-shrink-0 transition-all duration-300 disabled:opacity-20 disabled:cursor-not-allowed hover:scale-110"
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-12 z-10 transition-all duration-300 disabled:opacity-20 disabled:cursor-not-allowed hover:scale-110"
             aria-label="Suivant"
           >
             <svg width="20" height="36" viewBox="0 0 20 36" fill="none">
