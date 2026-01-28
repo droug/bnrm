@@ -316,9 +316,17 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
         .update({ ocr_processed: true })
         .eq('id', documentId);
 
+      // Sync to unified document index for search visibility
+      try {
+        await supabase.rpc('sync_unified_from_digital_library');
+        console.log('Document synced to unified index');
+      } catch (syncError) {
+        console.warn('Could not sync unified index:', syncError);
+      }
+
       toast({
         title: "Enregistrement réussi",
-        description: `${successPages.length} pages enregistrées dans la base de données`
+        description: `${successPages.length} pages enregistrées et indexées`
       });
 
     } catch (error: any) {
