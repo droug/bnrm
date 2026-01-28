@@ -623,7 +623,7 @@ export default function DigitalLibraryHome() {
       {newsArticles.length > 0 && <section className="bg-muted/30 py-12">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="heading-3 text-bn-blue-primary font-heading flex items-center gap-2">
+              <h2 className="text-[48px] font-normal text-bn-blue-primary font-gilda flex items-center gap-2">
                 <Calendar className="h-8 w-8 text-gold-bn-primary" />
                 {t('dl.home.latestNews')}
               </h2>
@@ -686,7 +686,7 @@ export default function DigitalLibraryHome() {
                 <Layers className="h-6 w-6 text-gold-bn-primary" />
               </div>
               
-              <h2 className="heading-3 text-white font-heading">
+              <h2 className="text-[48px] font-normal text-white font-gilda">
                 {language === 'ar' ? vexpoHeroSettings?.title_ar || 'معرض افتراضي' : vexpoHeroSettings?.title_fr || 'Exposition Virtuelle'}
               </h2>
               <p className="font-body text-regular text-white/80 max-w-2xl mx-auto mt-4">
@@ -757,7 +757,7 @@ export default function DigitalLibraryHome() {
               <Icon name="mdi:select-multiple" className="w-6 h-6 text-gold-bn-primary" />
             </div>
 
-            <h2 className="heading-3 text-bn-blue-primary font-heading">
+            <h2 className="text-[48px] font-normal text-bn-blue-primary font-gilda">
               Ressources électroniques
             </h2>
             <p className="font-body text-regular text-muted-foreground max-w-2xl mx-auto mt-4">
