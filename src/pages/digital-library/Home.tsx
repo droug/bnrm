@@ -655,19 +655,6 @@ export default function DigitalLibraryHome() {
           </div>
         </section>}
 
-      {/* Quick Stats */}
-      {statsData.length > 0 && <section className="container mx-auto px-4 py-12">
-          <Card className="bg-gradient-to-br from-bn-blue-primary/10 to-gold-bn-primary/10 border-2 border-gold-bn-primary/30">
-            <CardContent className="py-8">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-8 text-center">
-                {statsData.map((stat, index) => <div key={index}>
-                    <div className="text-4xl font-bold text-gold-bn-primary mb-2">{stat.value}</div>
-                    <div className="text-sm text-muted-foreground">{stat.labelKey ? t(stat.labelKey) : stat.label}</div>
-                  </div>)}
-              </div>
-            </CardContent>
-          </Card>
-        </section>}
 
       {/* Section Exposition Virtuelle */}
       {latestExhibition && <section className="py-16 relative overflow-hidden">
