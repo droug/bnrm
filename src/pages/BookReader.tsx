@@ -1676,54 +1676,71 @@ const BookReader = () => {
                 )
               ) : (
                 /* Mode Simple - affichage d'une seule page avec scroll complet */
-                <div className="w-full h-full flex items-center justify-center overflow-auto p-4">
-                  <Card 
-                    className="shadow-2xl max-w-full"
-                    style={{
-                      transform: `scale(${zoom / 100}) rotate(${rotation + (pageRotations[currentPage] ?? 0)}deg)`,
-                      transformOrigin: 'top center',
-                      transition: 'transform 0.3s ease'
-                    }}
-                  >
-                    <CardContent className="p-0 flex items-center justify-center">
-                      <div className="relative flex items-center justify-center">
-                        {pdfUrl && documentPages.length === 0 ? (
-                          <OptimizedPdfPageRenderer
-                            pdfUrl={pdfUrl}
-                            pageNumber={currentPage}
-                            scale={1.2}
-                            rotation={rotation + (pageRotations[currentPage] ?? 0)}
-                            className="w-auto"
-                            onPageLoad={(totalPages) => {
-                              if (actualTotalPages !== totalPages) {
-                                setActualTotalPages(totalPages);
-                              }
-                            }}
-                            preloadPages={[currentPage - 1, currentPage + 1, currentPage + 2]}
-                          />
-                        ) : documentPages.length > 0 || (documentImage && !documentImage.includes('manuscript-page')) ? (
-                          <img 
-                            src={getCurrentPageImage(currentPage) || ''}
-                            alt={`Page ${currentPage}`}
-                            className="block w-auto object-contain"
-                          />
-                        ) : (
-                          /* Fallback - ne devrait pas arriver grâce à hasDisplayableContent */
-                          <div className="flex items-center justify-center p-16 text-muted-foreground">
-                            <FileText className="h-12 w-12 mr-4" />
-                            <span>Contenu non disponible</span>
-                          </div>
-                        )}
-                        {bookmarks.includes(currentPage) && (
-                          <Badge className="absolute top-4 right-4 bg-primary/90">
-                            <Bookmark className="h-3 w-3 mr-1 fill-current" />
-                            Marqué
-                          </Badge>
-                        )}
+                (() => {
+                  const totalRotation = rotation + (pageRotations[currentPage] ?? 0);
+                  const isRotated90or270 = totalRotation % 180 !== 0;
+                  
+                  return (
+                    <div className="w-full h-full flex items-center justify-center overflow-auto p-4">
+                      <div 
+                        className="flex items-center justify-center"
+                        style={{
+                          /* Ajouter du padding supplémentaire quand roté à 90° ou 270° pour éviter le clipping */
+                          padding: isRotated90or270 ? '20%' : '0',
+                          minWidth: isRotated90or270 ? '100%' : 'auto',
+                          minHeight: isRotated90or270 ? '100%' : 'auto',
+                        }}
+                      >
+                        <Card 
+                          className="shadow-2xl"
+                          style={{
+                            transform: `scale(${zoom / 100}) rotate(${totalRotation}deg)`,
+                            transformOrigin: 'center center',
+                            transition: 'transform 0.3s ease',
+                          }}
+                        >
+                          <CardContent className="p-0 flex items-center justify-center">
+                            <div className="relative flex items-center justify-center">
+                              {pdfUrl && documentPages.length === 0 ? (
+                                <OptimizedPdfPageRenderer
+                                  pdfUrl={pdfUrl}
+                                  pageNumber={currentPage}
+                                  scale={1.2}
+                                  rotation={totalRotation}
+                                  className="w-auto"
+                                  onPageLoad={(totalPages) => {
+                                    if (actualTotalPages !== totalPages) {
+                                      setActualTotalPages(totalPages);
+                                    }
+                                  }}
+                                  preloadPages={[currentPage - 1, currentPage + 1, currentPage + 2]}
+                                />
+                              ) : documentPages.length > 0 || (documentImage && !documentImage.includes('manuscript-page')) ? (
+                                <img 
+                                  src={getCurrentPageImage(currentPage) || ''}
+                                  alt={`Page ${currentPage}`}
+                                  className="block w-auto object-contain"
+                                />
+                              ) : (
+                                /* Fallback - ne devrait pas arriver grâce à hasDisplayableContent */
+                                <div className="flex items-center justify-center p-16 text-muted-foreground">
+                                  <FileText className="h-12 w-12 mr-4" />
+                                  <span>Contenu non disponible</span>
+                                </div>
+                              )}
+                              {bookmarks.includes(currentPage) && (
+                                <Badge className="absolute top-4 right-4 bg-primary/90">
+                                  <Bookmark className="h-3 w-3 mr-1 fill-current" />
+                                  Marqué
+                                </Badge>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
                       </div>
-                    </CardContent>
-                  </Card>
-                </div>
+                    </div>
+                  );
+                })()
               )}
             </div>
           ) : (
