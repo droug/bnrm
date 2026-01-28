@@ -3,7 +3,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { FileText, Upload, FileSearch, UploadCloud, Wand2, Loader2, CheckCircle2, AlertCircle, FileSpreadsheet, Film, Mic } from "lucide-react";
+import { FileText, Upload, FileSearch, UploadCloud, Wand2, Loader2, CheckCircle2, AlertCircle, FileSpreadsheet, Film, Mic, Languages } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import SingleDocumentImport from "./SingleDocumentImport";
@@ -12,6 +12,7 @@ import BulkPdfImport from "./BulkPdfImport";
 import BulkAudiovisualImport from "./BulkAudiovisualImport";
 import OcrImportTool from "./OcrImportTool";
 import AudiovisualTranscriptionTool from "./AudiovisualTranscriptionTool";
+import { MultiEngineOcrTool } from "../ocr-multiengine";
 
 interface DigitalLibraryDocumentImporterProps {
   defaultTab?: string;
@@ -129,7 +130,7 @@ export default function DigitalLibraryDocumentImporter({
       </Card>
 
       <Tabs defaultValue={defaultTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="single" className="flex items-center gap-2">
             <FileText className="h-4 w-4" />
             <span className="hidden sm:inline">Unitaire</span>
@@ -156,6 +157,11 @@ export default function DigitalLibraryDocumentImporter({
             <FileSearch className="h-4 w-4" />
             <span className="hidden sm:inline">OCR</span>
           </TabsTrigger>
+          <TabsTrigger value="ocr-multi" className="flex items-center gap-2">
+            <Languages className="h-4 w-4" />
+            <span className="hidden sm:inline">Multi-OCR</span>
+            <span className="sm:hidden">HTR</span>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="single">
@@ -180,6 +186,10 @@ export default function DigitalLibraryDocumentImporter({
 
         <TabsContent value="ocr">
           <OcrImportTool />
+        </TabsContent>
+
+        <TabsContent value="ocr-multi">
+          <MultiEngineOcrTool onSuccess={onSuccess} />
         </TabsContent>
       </Tabs>
     </div>
