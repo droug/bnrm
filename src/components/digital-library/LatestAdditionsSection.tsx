@@ -143,7 +143,7 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
                         {item.title}
                       </CardTitle>
                       <CardDescription className="text-sm text-slate-text line-clamp-2 leading-relaxed">
-                        {item.description || item.author || 'Document numérisé de la Bibliothèque Nationale...'}
+                        {item.description || (item.author && item.author !== 'Auteur inconnu' ? item.author : 'Document numérisé de la Bibliothèque Nationale...')}
                       </CardDescription>
                     </CardHeader>
                     
