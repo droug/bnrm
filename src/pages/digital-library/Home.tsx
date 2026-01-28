@@ -471,8 +471,8 @@ export default function DigitalLibraryHome() {
                   </svg>
                 </button>
 
-                {/* Very subtle blurred container */}
-                <div className="bg-white/5 backdrop-blur-[3px] p-6 md:p-8">
+                {/* Carousel container - no background */}
+                <div className="p-6 md:p-8">
                   <Carousel opts={{
                 align: "center",
                 loop: true
