@@ -5,6 +5,7 @@ import { Icon } from "@/components/ui/icon";
 import { Link, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/hooks/useLanguage";
+import { FancyTooltip } from "@/components/ui/fancy-tooltip";
 
 interface DocumentItem {
   id: string;
@@ -56,6 +57,23 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
     return 'bg-gold-bn-primary text-white';
   };
 
+  const getDocumentIcon = (type: string) => {
+    const lowerType = type.toLowerCase();
+    if (lowerType.includes('manuscrit') || lowerType.includes('manuscript')) {
+      return 'mdi:script-text-outline';
+    }
+    if (lowerType.includes('livre') || lowerType.includes('book')) {
+      return 'mdi:book-open-page-variant';
+    }
+    if (lowerType.includes('revue') || lowerType.includes('article') || lowerType.includes('périodique')) {
+      return 'mdi:newspaper-variant-outline';
+    }
+    if (lowerType.includes('image') || lowerType.includes('photo')) {
+      return 'mdi:image-outline';
+    }
+    return 'mdi:file-document-outline';
+  };
+
   return (
     <section className="bg-white py-16">
       <div className="container mx-auto px-4">
@@ -104,42 +122,50 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
             {/* Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
               {displayedItems.map((item) => (
-                <Card 
-                  key={item.id} 
-                  className="group bg-white border border-slate-border hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col"
+                <FancyTooltip 
+                  key={item.id}
+                  content={item.title} 
+                  description={`${item.author}${item.date ? ` • ${item.date}` : ''}${item.cote ? ` • Cote: ${item.cote}` : ''}`}
+                  icon={getDocumentIcon(item.type)}
+                  side="top"
+                  variant="gold"
                 >
-                  <div className="relative aspect-[4/3] overflow-hidden bg-slate-light">
-                    <img 
-                      src={item.thumbnail} 
-                      alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <Badge 
-                      className={`absolute bottom-3 left-3 ${getBadgeColor(item.type)} px-3 py-1 text-xs font-medium shadow-md`}
-                    >
-                      {item.type}
-                    </Badge>
-                  </div>
-                  
-                  <CardHeader className="flex-1 p-4 pb-2">
-                    <CardTitle className="text-base font-semibold text-slate-base-dark line-clamp-2 leading-snug mb-1">
-                      {item.title}
-                    </CardTitle>
-                    <CardDescription className="text-sm text-slate-text line-clamp-2">
-                      {item.author}
-                    </CardDescription>
-                  </CardHeader>
-                  
-                  <CardContent className="p-4 pt-2">
-                    <button
-                      onClick={() => onConsultDocument(item)}
-                      className="group/link inline-flex items-center gap-1 text-gold-bn-primary-dark hover:text-gold-bn-primary font-medium text-sm transition-colors"
-                    >
-                      {t('dl.home.readMore') || 'En savoir plus'}
-                      <Icon name="mdi:chevron-right" className="h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
-                    </button>
-                  </CardContent>
-                </Card>
+                  <Card 
+                    className="group bg-white border border-slate-border hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
+                  >
+                    <div className="relative aspect-[4/3] overflow-hidden bg-slate-light">
+                      <img 
+                        src={item.thumbnail} 
+                        alt={item.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <Badge 
+                        className={`absolute bottom-3 left-3 ${getBadgeColor(item.type)} px-3 py-1 text-xs font-medium shadow-md`}
+                      >
+                        {item.type}
+                      </Badge>
+                    </div>
+                    
+                    <CardHeader className="flex-1 p-4 pb-2">
+                      <CardTitle className="text-base font-semibold text-slate-base-dark line-clamp-2 leading-snug mb-1">
+                        {item.title}
+                      </CardTitle>
+                      <CardDescription className="text-sm text-slate-text line-clamp-2">
+                        {item.author}
+                      </CardDescription>
+                    </CardHeader>
+                    
+                    <CardContent className="p-4 pt-2">
+                      <button
+                        onClick={() => onConsultDocument(item)}
+                        className="group/link inline-flex items-center gap-1 text-gold-bn-primary-dark hover:text-gold-bn-primary font-medium text-sm transition-colors"
+                      >
+                        {t('dl.home.readMore') || 'En savoir plus'}
+                        <Icon name="mdi:chevron-right" className="h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
+                      </button>
+                    </CardContent>
+                  </Card>
+                </FancyTooltip>
               ))}
             </div>
           </div>
