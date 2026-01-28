@@ -2639,7 +2639,10 @@ export default function DocumentsManager() {
               <TabsTrigger value="manual">Import manuel</TabsTrigger>
             </TabsList>
             <TabsContent value="pdf" className="mt-4">
-              <PdfOcrTool />
+              <PdfOcrTool 
+                preSelectedDocumentId={selectedDocument?.id}
+                preSelectedDocumentTitle={selectedDocument?.title}
+              />
             </TabsContent>
             <TabsContent value="manual" className="mt-4">
               <OcrImportTool />
