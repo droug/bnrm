@@ -118,7 +118,7 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
                   variant="gold"
                 >
                   <Card 
-                    className="group bg-white border border-slate-border hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer"
+                    className="group bg-white border border-[#B68F1C]/30 hover:border-[#B68F1C]/50 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer min-h-[420px]"
                   >
                     <div className="relative aspect-[4/3] overflow-hidden bg-slate-light">
                       <img 
@@ -126,14 +126,18 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
                         alt={item.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
+                    </div>
+                    
+                    {/* Badge moved under image */}
+                    <div className="px-4 pt-3">
                       <Badge 
-                        className={`absolute bottom-3 left-3 ${getBadgeColor(item.type)} px-3 py-1 text-xs font-medium shadow-md`}
+                        className={`${getBadgeColor(item.type)} px-3 py-1 text-xs font-medium rounded-none`}
                       >
                         {item.type}
                       </Badge>
                     </div>
                     
-                    <CardHeader className="flex-1 p-4 pb-2">
+                    <CardHeader className="flex-1 p-4 pb-2 pt-2">
                       <CardTitle className="text-base font-semibold text-slate-base-dark line-clamp-2 leading-snug mb-1">
                         {item.title}
                       </CardTitle>
