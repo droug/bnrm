@@ -13,7 +13,8 @@ import manuscriptPage4 from "@/assets/manuscript-page-4.jpg";
 import { PageFlipBook, type PageFlipBookHandle } from "@/components/book-reader/PageFlipBook";
 import { DocumentSearchInBook } from "@/components/digital-library/DocumentSearchInBook";
 import { SidebarSearchInBook } from "@/components/digital-library/SidebarSearchInBook";
-import { PdfPageRenderer } from "@/components/digital-library/PdfPageRenderer";
+import { OptimizedPdfPageRenderer, preloadPdfPages, clearPdfCache } from "@/components/digital-library/OptimizedPdfPageRenderer";
+import { VirtualizedScrollReader } from "@/components/digital-library/reader/VirtualizedScrollReader";
 import { ReproductionAuthChoiceModal } from "@/components/digital-library/ReproductionAuthChoiceModal";
 import AudioVideoReader from "@/components/digital-library/reader/AudioVideoReader";
 import { Button } from "@/components/ui/button";
@@ -1549,11 +1550,11 @@ const BookReader = () => {
                     isRtl={isArabicDocument()}
                   />
                 ) : pdfUrl ? (
-                  /* Mode Double avec PDF - afficher 2 pages côte à côte via PdfPageRenderer */
+                  /* Mode Double avec PDF - afficher 2 pages côte à côte via OptimizedPdfPageRenderer */
                   <div className="flex items-center justify-center gap-2 w-full h-full p-4">
                     <Card className="shadow-xl flex-1 max-w-[45%]">
                       <CardContent className="p-0 flex items-center justify-center">
-                        <PdfPageRenderer
+                        <OptimizedPdfPageRenderer
                           pdfUrl={pdfUrl}
                           pageNumber={isArabicDocument() ? (currentPage + 1 <= actualTotalPages ? currentPage + 1 : currentPage) : currentPage}
                           scale={0.8}
@@ -1570,7 +1571,7 @@ const BookReader = () => {
                     {currentPage + 1 <= actualTotalPages && (
                       <Card className="shadow-xl flex-1 max-w-[45%]">
                         <CardContent className="p-0 flex items-center justify-center">
-                          <PdfPageRenderer
+                          <OptimizedPdfPageRenderer
                             pdfUrl={pdfUrl}
                             pageNumber={isArabicDocument() ? currentPage : currentPage + 1}
                             scale={0.8}
@@ -1583,134 +1584,115 @@ const BookReader = () => {
                   </div>
                 ) : null
               ) : viewMode === "scroll" ? (
-                /* Mode défilement vertical */
-                <div className="flex flex-col items-center gap-6 pb-8">
-                  {/* Spacer to avoid content being hidden under the floating toolbar */}
-                  {floatingToolbarStyle && (
-                    <div className="h-24 md:h-20" aria-hidden="true" />
-                  )}
-                  {(pdfUrl && documentPages.length === 0 
-                    ? Array.from({ length: actualTotalPages }, (_, i) => i) 
-                    : generatePageImages()
-                  ).map((item, index) => {
-                    const pageNum = index + 1;
-                    const pageImage = typeof item === 'string' ? item : null;
-                    const isAccessible = isPageAccessible(pageNum);
-                    
-                    // Si le mode est "hidden" et la page n'est pas accessible, ne pas afficher
-                    if (!isAccessible && restrictedPageDisplay === "hidden") {
-                      return null;
-                    }
-                    
-                    return (
-                      <div 
-                        key={pageNum} 
-                        className="relative"
-                        id={`page-${pageNum}`}
-                      >
-                        {/* Numéro de page */}
-                        <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                          <Badge variant="secondary" className="text-xs">
-                            Page {pageNum}
-                          </Badge>
-                        </div>
-                        
-                        <Card 
-                          className="shadow-xl"
-                          style={{
-                            transform: `scale(${zoom / 100}) rotate(${rotation + (pageRotations[pageNum] ?? 0)}deg)`,
-                            transformOrigin: 'center',
-                            transition: 'transform 0.3s ease'
-                          }}
+                /* Mode défilement vertical optimisé avec virtualisation */
+                pdfUrl && documentPages.length === 0 ? (
+                  <VirtualizedScrollReader
+                    pdfUrl={pdfUrl}
+                    totalPages={actualTotalPages}
+                    zoom={zoom}
+                    rotation={rotation}
+                    pageRotations={pageRotations}
+                    bookmarks={bookmarks}
+                    onToggleBookmark={toggleBookmark}
+                    onCurrentPageChange={setCurrentPage}
+                    isPageAccessible={isPageAccessible}
+                    restrictedPageDisplay={restrictedPageDisplay}
+                    getAccessDeniedMessage={getAccessDeniedMessage}
+                  />
+                ) : (
+                  /* Mode scroll avec images pré-extraites */
+                  <div className="flex flex-col items-center gap-6 pb-8">
+                    {floatingToolbarStyle && (
+                      <div className="h-24 md:h-20" aria-hidden="true" />
+                    )}
+                    {generatePageImages().map((pageImage, index) => {
+                      const pageNum = index + 1;
+                      const isAccessible = isPageAccessible(pageNum);
+                      
+                      if (!isAccessible && restrictedPageDisplay === "hidden") {
+                        return null;
+                      }
+                      
+                      return (
+                        <div 
+                          key={pageNum} 
+                          className="relative"
+                          id={`page-${pageNum}`}
                         >
-                          <CardContent className="p-0">
-                            <div 
-                              className="w-full max-w-[600px] bg-gradient-to-br from-background to-muted flex items-center justify-center relative overflow-hidden"
-                            >
-                              {isAccessible ? (
-                                pdfUrl && documentPages.length === 0 ? (
-                                  <PdfPageRenderer
-                                    pdfUrl={pdfUrl}
-                                    pageNumber={pageNum}
-                                    scale={1.2}
-                                    rotation={rotation + (pageRotations[pageNum] ?? 0)}
-                                  />
-                                ) : pageImage ? (
+                          <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                            <Badge variant="secondary" className="text-xs">
+                              Page {pageNum}
+                            </Badge>
+                          </div>
+                          
+                          <Card 
+                            className="shadow-xl"
+                            style={{
+                              transform: `scale(${zoom / 100}) rotate(${rotation + (pageRotations[pageNum] ?? 0)}deg)`,
+                              transformOrigin: 'center',
+                              transition: 'transform 0.3s ease'
+                            }}
+                          >
+                            <CardContent className="p-0">
+                              <div className="w-full max-w-[600px] bg-gradient-to-br from-background to-muted flex items-center justify-center relative overflow-hidden">
+                                {isAccessible ? (
                                   <img 
                                     src={pageImage}
                                     alt={`Page ${pageNum}`}
                                     className="w-full h-auto object-contain"
                                     loading="lazy"
                                   />
-                                ) : (
-                                  <div className="flex items-center justify-center p-16 text-muted-foreground">
-                                    <FileText className="h-8 w-8" />
-                                  </div>
-                                )
-                              ) : restrictedPageDisplay === "blur" ? (
-                                /* Mode flou - Afficher l'image avec un effet blur */
-                                <div className="relative w-full">
-                                  {pdfUrl && !pageImage ? (
-                                    <div className="filter blur-lg">
-                                      <PdfPageRenderer
-                                        pdfUrl={pdfUrl}
-                                        pageNumber={pageNum}
-                                        scale={1.2}
-                                        rotation={rotation + (pageRotations[pageNum] ?? 0)}
-                                      />
-                                    </div>
-                                  ) : (
+                                ) : restrictedPageDisplay === "blur" ? (
+                                  <div className="relative w-full">
                                     <img 
-                                      src={pageImage || ''}
+                                      src={pageImage}
                                       alt={`Page ${pageNum}`}
                                       className="w-full h-auto object-contain filter blur-lg"
                                       loading="lazy"
                                     />
-                                  )}
-                                  <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                                    <div className="text-center p-4 bg-background/90 rounded-lg shadow-lg">
-                                      <AlertCircle className="h-8 w-8 mx-auto mb-2 text-amber-500" />
-                                      <p className="text-sm font-medium">Page restreinte</p>
-                                      <p className="text-xs text-muted-foreground mt-1">
+                                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                                      <div className="text-center p-4 bg-background/90 rounded-lg shadow-lg">
+                                        <AlertCircle className="h-8 w-8 mx-auto mb-2 text-amber-500" />
+                                        <p className="text-sm font-medium">Page restreinte</p>
+                                        <p className="text-xs text-muted-foreground mt-1">
+                                          {getAccessDeniedMessage()}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="w-full aspect-[3/4] flex items-center justify-center bg-muted/50">
+                                    <div className="text-center p-8">
+                                      <AlertCircle className="h-12 w-12 mx-auto mb-4 text-amber-500" />
+                                      <p className="text-muted-foreground text-sm">
                                         {getAccessDeniedMessage()}
                                       </p>
                                     </div>
                                   </div>
-                                </div>
-                              ) : (
-                                /* Mode empty - Page vide */
-                                <div className="w-full aspect-[3/4] flex items-center justify-center bg-muted/50">
-                                  <div className="text-center p-8">
-                                    <AlertCircle className="h-12 w-12 mx-auto mb-4 text-amber-500" />
-                                    <p className="text-muted-foreground text-sm">
-                                      {getAccessDeniedMessage()}
-                                    </p>
-                                  </div>
-                                </div>
-                              )}
-                              {bookmarks.includes(pageNum) && (
-                                <Badge className="absolute top-4 right-4 bg-primary/90">
-                                  <Bookmark className="h-3 w-3 mr-1 fill-current" />
-                                  Marqué
-                                </Badge>
-                              )}
-                            </div>
-                          </CardContent>
-                        </Card>
-                        
-                        {/* Bouton marque-page */}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="absolute top-2 right-2"
-                          onClick={() => toggleBookmark(pageNum)}
-                        >
-                          <Bookmark className={`h-4 w-4 ${bookmarks.includes(pageNum) ? "fill-current text-primary" : ""}`} />
-                        </Button>
-                      </div>
-                    );
-                  })}
-                </div>
+                                )}
+                                {bookmarks.includes(pageNum) && (
+                                  <Badge className="absolute top-4 right-4 bg-primary/90">
+                                    <Bookmark className="h-3 w-3 mr-1 fill-current" />
+                                    Marqué
+                                  </Badge>
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                          
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="absolute top-2 right-2"
+                            onClick={() => toggleBookmark(pageNum)}
+                          >
+                            <Bookmark className={`h-4 w-4 ${bookmarks.includes(pageNum) ? "fill-current text-primary" : ""}`} />
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )
               ) : (
                 /* Mode Simple - affichage d'une seule page avec scroll complet */
                 <div className="w-full h-full flex items-center justify-center overflow-auto p-4">
@@ -1725,7 +1707,7 @@ const BookReader = () => {
                     <CardContent className="p-0 flex items-center justify-center">
                       <div className="relative flex items-center justify-center">
                         {pdfUrl && documentPages.length === 0 ? (
-                          <PdfPageRenderer
+                          <OptimizedPdfPageRenderer
                             pdfUrl={pdfUrl}
                             pageNumber={currentPage}
                             scale={1.2}
@@ -1736,6 +1718,7 @@ const BookReader = () => {
                                 setActualTotalPages(totalPages);
                               }
                             }}
+                            preloadPages={[currentPage - 1, currentPage + 1, currentPage + 2]}
                           />
                         ) : documentPages.length > 0 || (documentImage && !documentImage.includes('manuscript-page')) ? (
                           <img 
