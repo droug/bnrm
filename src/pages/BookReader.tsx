@@ -1536,7 +1536,7 @@ const BookReader = () => {
 
           {/* Book Display Area */}
           {readingMode === "book" ? (
-            <div id="scroll-container" className={`flex-1 min-h-0 ${viewMode === "scroll" ? "overflow-y-auto overscroll-contain" : "overflow-hidden"} bg-muted/10 ${viewMode === "scroll" ? "" : "flex items-center justify-center"} p-4 md:p-8`}>
+            <main ref={mainContentRef} id="scroll-container" className={`flex-1 min-h-0 min-w-0 overflow-hidden bg-muted/10 flex flex-col`}>
               {loading ? (
                 <div className="text-center">
                   <p className="text-muted-foreground">Chargement du document...</p>
@@ -1562,55 +1562,61 @@ const BookReader = () => {
                   </div>
                 </div>
               ) : viewMode === "double" ? (
-                <PanZoomContainer
-                  zoom={zoom}
-                  rotation={0}
-                  className="w-full h-full"
-                >
-                  {canUseDoubleMode ? (
-                    <PageFlipBook 
-                      ref={pageFlipRef}
-                      images={generatePageImages()}
-                      currentPage={currentPage}
-                      onPageChange={setCurrentPage}
-                      zoom={100}
-                      rotation={rotation}
-                      pageRotations={pageRotations}
-                      isRtl={isArabicDocument()}
-                    />
-                  ) : pdfUrl ? (
-                    /* Mode Double avec PDF - effet livre avec glisser-déposer */
-                    <PdfPageFlipBook
-                      pdfUrl={pdfUrl}
-                      currentPage={currentPage}
-                      onPageChange={setCurrentPage}
-                      zoom={100}
-                      rotation={rotation}
-                      pageRotations={pageRotations}
-                      isRtl={isArabicDocument()}
-                      onTotalPagesChange={setActualTotalPages}
-                    />
-                  ) : null}
-                </PanZoomContainer>
-              ) : viewMode === "scroll" ? (
-                /* Mode défilement vertical optimisé avec virtualisation */
-                pdfUrl && documentPages.length === 0 ? (
-                  <VirtualizedScrollReader
-                    pdfUrl={pdfUrl}
-                    totalPages={actualTotalPages}
+                <div className="flex-1 min-h-0 flex items-center justify-center p-4 md:p-8">
+                  <PanZoomContainer
                     zoom={zoom}
-                    rotation={rotation}
-                    pageRotations={pageRotations}
-                    bookmarks={bookmarks}
-                    onToggleBookmark={toggleBookmark}
-                    onCurrentPageChange={setCurrentPage}
-                    isPageAccessible={isPageAccessible}
-                    restrictedPageDisplay={restrictedPageDisplay}
-                    getAccessDeniedMessage={getAccessDeniedMessage}
-                  />
-                ) : (
-                  /* Mode scroll avec images pré-extraites */
-                  <div className="flex flex-col items-center gap-6 pb-8">
+                    rotation={0}
+                    className="w-full h-full"
+                  >
+                    {canUseDoubleMode ? (
+                      <PageFlipBook 
+                        ref={pageFlipRef}
+                        images={generatePageImages()}
+                        currentPage={currentPage}
+                        onPageChange={setCurrentPage}
+                        zoom={100}
+                        rotation={rotation}
+                        pageRotations={pageRotations}
+                        isRtl={isArabicDocument()}
+                      />
+                    ) : pdfUrl ? (
+                      /* Mode Double avec PDF - effet livre avec glisser-déposer */
+                      <PdfPageFlipBook
+                        pdfUrl={pdfUrl}
+                        currentPage={currentPage}
+                        onPageChange={setCurrentPage}
+                        zoom={100}
+                        rotation={rotation}
+                        pageRotations={pageRotations}
+                        isRtl={isArabicDocument()}
+                        onTotalPagesChange={setActualTotalPages}
+                      />
+                    ) : null}
+                  </PanZoomContainer>
+                </div>
+              ) : viewMode === "scroll" ? (
+                /* Mode défilement vertical optimisé avec virtualisation - scroll interne */
+                <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+                  {pdfUrl && documentPages.length === 0 ? (
+                    <VirtualizedScrollReader
+                      pdfUrl={pdfUrl}
+                      totalPages={actualTotalPages}
+                      zoom={zoom}
+                      rotation={rotation}
+                      pageRotations={pageRotations}
+                      bookmarks={bookmarks}
+                      onToggleBookmark={toggleBookmark}
+                      onCurrentPageChange={setCurrentPage}
+                      isPageAccessible={isPageAccessible}
+                      restrictedPageDisplay={restrictedPageDisplay}
+                      getAccessDeniedMessage={getAccessDeniedMessage}
+                    />
+                  ) : (
+                    /* Mode scroll avec images pré-extraites */
+                    <div className="flex flex-col items-center gap-6 pb-8 p-4 md:p-8">
+                      {floatingToolbarStyle && (
+                        <div className="h-24 md:h-20" aria-hidden="true" />
+                      )}
                     {floatingToolbarStyle && (
                       <div className="h-24 md:h-20" aria-hidden="true" />
                     )}
@@ -1700,64 +1706,67 @@ const BookReader = () => {
                         </div>
                       );
                     })}
-                  </div>
-                )
+                    </div>
+                  )}
+                </div>
               ) : (
-                /* Mode Simple - affichage d'une seule page avec scroll complet */
-                (() => {
-                  const totalRotation = rotation + (pageRotations[currentPage] ?? 0);
-                  const isPdfMode = pdfUrl && documentPages.length === 0;
-                  
-                  return (
-                    <PanZoomContainer
-                      zoom={zoom}
-                      rotation={isPdfMode ? 0 : totalRotation}
-                      className="w-full h-full p-4"
-                    >
-                      <Card className="shadow-2xl">
-                        <CardContent className="p-0 flex items-center justify-center">
-                          <div className="relative flex items-center justify-center">
-                            {isPdfMode ? (
-                              <OptimizedPdfPageRenderer
-                                pdfUrl={pdfUrl}
-                                pageNumber={currentPage}
-                                scale={1.2}
-                                rotation={totalRotation}
-                                className="w-auto"
-                                onPageLoad={(totalPages) => {
-                                  if (actualTotalPages !== totalPages) {
-                                    setActualTotalPages(totalPages);
-                                  }
-                                }}
-                                preloadPages={[currentPage - 1, currentPage + 1, currentPage + 2]}
-                              />
-                            ) : documentPages.length > 0 || (documentImage && !documentImage.includes('manuscript-page')) ? (
-                              <img 
-                                src={getCurrentPageImage(currentPage) || ''}
-                                alt={`Page ${currentPage}`}
-                                className="block w-auto object-contain pointer-events-none"
-                              />
-                            ) : (
-                              /* Fallback - ne devrait pas arriver grâce à hasDisplayableContent */
-                              <div className="flex items-center justify-center p-16 text-muted-foreground">
-                                <FileText className="h-12 w-12 mr-4" />
-                                <span>Contenu non disponible</span>
-                              </div>
-                            )}
-                            {bookmarks.includes(currentPage) && (
-                              <Badge className="absolute top-4 right-4 bg-primary/90">
-                                <Bookmark className="h-3 w-3 mr-1 fill-current" />
-                                Marqué
-                              </Badge>
-                            )}
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </PanZoomContainer>
-                  );
-                })()
+                /* Mode Simple - affichage d'une seule page */
+                <div className="flex-1 min-h-0 flex items-center justify-center p-4 md:p-8">
+                  {(() => {
+                    const totalRotation = rotation + (pageRotations[currentPage] ?? 0);
+                    const isPdfMode = pdfUrl && documentPages.length === 0;
+                    
+                    return (
+                      <PanZoomContainer
+                        zoom={zoom}
+                        rotation={isPdfMode ? 0 : totalRotation}
+                        className="w-full h-full"
+                      >
+                        <Card className="shadow-2xl">
+                          <CardContent className="p-0 flex items-center justify-center">
+                            <div className="relative flex items-center justify-center">
+                              {isPdfMode ? (
+                                <OptimizedPdfPageRenderer
+                                  pdfUrl={pdfUrl}
+                                  pageNumber={currentPage}
+                                  scale={1.2}
+                                  rotation={totalRotation}
+                                  className="w-auto"
+                                  onPageLoad={(totalPages) => {
+                                    if (actualTotalPages !== totalPages) {
+                                      setActualTotalPages(totalPages);
+                                    }
+                                  }}
+                                  preloadPages={[currentPage - 1, currentPage + 1, currentPage + 2]}
+                                />
+                              ) : documentPages.length > 0 || (documentImage && !documentImage.includes('manuscript-page')) ? (
+                                <img 
+                                  src={getCurrentPageImage(currentPage) || ''}
+                                  alt={`Page ${currentPage}`}
+                                  className="block w-auto object-contain pointer-events-none"
+                                />
+                              ) : (
+                                /* Fallback - ne devrait pas arriver grâce à hasDisplayableContent */
+                                <div className="flex items-center justify-center p-16 text-muted-foreground">
+                                  <FileText className="h-12 w-12 mr-4" />
+                                  <span>Contenu non disponible</span>
+                                </div>
+                              )}
+                              {bookmarks.includes(currentPage) && (
+                                <Badge className="absolute top-4 right-4 bg-primary/90">
+                                  <Bookmark className="h-3 w-3 mr-1 fill-current" />
+                                  Marqué
+                                </Badge>
+                              )}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </PanZoomContainer>
+                    );
+                  })()}
+                </div>
               )}
-            </div>
+            </main>
           ) : (
             // Audio Mode
             <div className="flex-1 overflow-auto bg-muted/10 p-8">
