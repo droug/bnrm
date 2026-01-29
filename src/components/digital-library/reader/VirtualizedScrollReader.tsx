@@ -116,6 +116,7 @@ export const VirtualizedScrollReader = memo(function VirtualizedScrollReader({
   return (
     <div 
       ref={containerRef}
+      id="virtualized-scroll-container"
       className="h-full overflow-y-auto overscroll-contain scroll-smooth"
     >
       <div className="flex flex-col items-center gap-6 pb-8 pt-4 px-4">
