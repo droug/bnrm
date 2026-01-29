@@ -69,6 +69,15 @@ export const ReproductionAuthChoiceModal = ({
               <div className="text-xs opacity-80">Nouveau compte utilisateur</div>
             </div>
           </Button>
+
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="w-full mt-2 text-muted-foreground"
+            onClick={() => onOpenChange(false)}
+          >
+            Annuler
+          </Button>
         </div>
       </CustomDialogContent>
     </CustomDialog>
