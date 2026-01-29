@@ -188,7 +188,7 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
     },
   }), []);
 
-  // Calculate optimal dimensions based on container size
+  // Calculate optimal dimensions based on container size for double-page spread
   const calculateDimensions = useCallback(() => {
     if (!containerRef.current) return;
 
@@ -199,26 +199,26 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
     // Target aspect ratio (3:4 for document pages)
     const aspectRatio = 3 / 4;
 
-    // Calculate max dimensions with padding
-    const maxWidth = containerWidth * 0.9;
-    const maxHeight = containerHeight * 0.9;
+    // Calculate max dimensions with padding - need space for 2 pages side by side
+    const maxWidth = containerWidth * 0.95;
+    const maxHeight = containerHeight * 0.85;
 
     let pageWidth: number;
     let pageHeight: number;
 
-    // Calculate based on height first
+    // Calculate based on height first (for double page spread)
     pageHeight = maxHeight;
     pageWidth = pageHeight * aspectRatio;
 
-    // If too wide, scale down by width
+    // If two pages are too wide, scale down by width
     if (pageWidth * 2 > maxWidth) {
       pageWidth = maxWidth / 2;
       pageHeight = pageWidth / aspectRatio;
     }
 
-    // Ensure minimum dimensions
-    pageWidth = Math.max(280, Math.min(600, pageWidth));
-    pageHeight = Math.max(373, Math.min(800, pageHeight));
+    // Ensure reasonable dimensions for double-page display
+    pageWidth = Math.max(200, Math.min(500, pageWidth));
+    pageHeight = Math.max(267, Math.min(667, pageHeight));
 
     setDimensions({ width: Math.round(pageWidth), height: Math.round(pageHeight) });
   }, []);
@@ -279,10 +279,10 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
         width={dimensions.width}
         height={dimensions.height}
         size="stretch"
-        minWidth={280}
-        maxWidth={600}
-        minHeight={373}
-        maxHeight={800}
+        minWidth={200}
+        maxWidth={500}
+        minHeight={267}
+        maxHeight={667}
         maxShadowOpacity={0.5}
         showCover={true}
         mobileScrollSupport={true}
@@ -296,7 +296,7 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
         startPage={isRtl ? totalPages - currentPage : currentPage - 1}
         drawShadow={true}
         flippingTime={800}
-        usePortrait={true}
+        usePortrait={false}
         startZIndex={0}
         autoSize={true}
         clickEventForward={true}
