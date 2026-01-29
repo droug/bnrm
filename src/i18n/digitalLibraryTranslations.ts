@@ -5,7 +5,7 @@ export const digitalLibraryTranslations = {
   fr: {
     // ============= Layout & Navigation =============
     'dl.title': 'Bibliothèque Numérique',
-    'dl.subtitle': 'BNRM - Patrimoine Numérique du Maroc',
+    'dl.subtitle': 'IBN BATTOUTA',
     'dl.home': 'Accueil',
     'dl.collections': 'Collections',
     'dl.electronicBundles': 'Bouquets électroniques',
