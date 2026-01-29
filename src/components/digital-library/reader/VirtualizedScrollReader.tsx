@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
 import { OptimizedPdfPageRenderer, preloadPdfPages } from '../OptimizedPdfPageRenderer';
-import { PanZoomContainer } from './PanZoomContainer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -148,65 +147,66 @@ export const VirtualizedScrollReader = memo(function VirtualizedScrollReader({
                 </Badge>
               </div>
 
-              <PanZoomContainer
-                zoom={zoom}
-                rotation={rotation + (pageRotations[pageNum] ?? 0)}
-                className="inline-block"
+              <Card 
+                className="shadow-xl"
+                style={{
+                  transform: `scale(${zoom / 100}) rotate(${rotation + (pageRotations[pageNum] ?? 0)}deg)`,
+                  transformOrigin: 'center',
+                  transition: 'transform 0.3s ease',
+                }}
               >
-                <Card className="shadow-xl">
-                  <CardContent className="p-0">
-                    <div className="w-full max-w-[600px] bg-gradient-to-br from-background to-muted flex items-center justify-center relative overflow-hidden">
-                      {isAccessible ? (
-                        <OptimizedPdfPageRenderer
-                          pdfUrl={pdfUrl}
-                          pageNumber={pageNum}
-                          scale={1.2}
-                          rotation={rotation + (pageRotations[pageNum] ?? 0)}
-                          priority={pageNum === visibleRange.start || pageNum === visibleRange.start + 1 ? 'high' : 'low'}
-                        />
-                      ) : restrictedPageDisplay === 'blur' ? (
-                        <div className="relative w-full">
-                          <div className="filter blur-lg opacity-50">
-                            <OptimizedPdfPageRenderer
-                              pdfUrl={pdfUrl}
-                              pageNumber={pageNum}
-                              scale={1.2}
-                              rotation={rotation + (pageRotations[pageNum] ?? 0)}
-                              priority="low"
-                            />
-                          </div>
-                          <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                            <div className="text-center p-4 bg-background/90 rounded-lg shadow-lg">
-                              <AlertCircle className="h-8 w-8 mx-auto mb-2 text-amber-500" />
-                              <p className="text-sm font-medium">Page restreinte</p>
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {getAccessDeniedMessage()}
-                              </p>
-                            </div>
-                          </div>
+                <CardContent className="p-0">
+                  <div className="w-full max-w-[600px] bg-gradient-to-br from-background to-muted flex items-center justify-center relative overflow-hidden">
+                    {isAccessible ? (
+                      <OptimizedPdfPageRenderer
+                        pdfUrl={pdfUrl}
+                        pageNumber={pageNum}
+                        scale={1.2}
+                        rotation={rotation + (pageRotations[pageNum] ?? 0)}
+                        priority={pageNum === visibleRange.start || pageNum === visibleRange.start + 1 ? 'high' : 'low'}
+                      />
+                    ) : restrictedPageDisplay === 'blur' ? (
+                      <div className="relative w-full">
+                        <div className="filter blur-lg opacity-50">
+                          <OptimizedPdfPageRenderer
+                            pdfUrl={pdfUrl}
+                            pageNumber={pageNum}
+                            scale={1.2}
+                            rotation={rotation + (pageRotations[pageNum] ?? 0)}
+                            priority="low"
+                          />
                         </div>
-                      ) : (
-                        <div className="w-full aspect-[3/4] flex items-center justify-center bg-muted/50 min-h-[400px]">
-                          <div className="text-center p-8">
-                            <AlertCircle className="h-12 w-12 mx-auto mb-4 text-amber-500" />
-                            <p className="text-muted-foreground text-sm">
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                          <div className="text-center p-4 bg-background/90 rounded-lg shadow-lg">
+                            <AlertCircle className="h-8 w-8 mx-auto mb-2 text-amber-500" />
+                            <p className="text-sm font-medium">Page restreinte</p>
+                            <p className="text-xs text-muted-foreground mt-1">
                               {getAccessDeniedMessage()}
                             </p>
                           </div>
                         </div>
-                      )}
+                      </div>
+                    ) : (
+                      <div className="w-full aspect-[3/4] flex items-center justify-center bg-muted/50 min-h-[400px]">
+                        <div className="text-center p-8">
+                          <AlertCircle className="h-12 w-12 mx-auto mb-4 text-amber-500" />
+                          <p className="text-muted-foreground text-sm">
+                            {getAccessDeniedMessage()}
+                          </p>
+                        </div>
+                      </div>
+                    )}
 
-                      {/* Badge marque-page */}
-                      {bookmarks.includes(pageNum) && (
-                        <Badge className="absolute top-4 right-4 bg-primary/90">
-                          <Bookmark className="h-3 w-3 mr-1 fill-current" />
-                          Marqué
-                        </Badge>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              </PanZoomContainer>
+                    {/* Badge marque-page */}
+                    {bookmarks.includes(pageNum) && (
+                      <Badge className="absolute top-4 right-4 bg-primary/90">
+                        <Bookmark className="h-3 w-3 mr-1 fill-current" />
+                        Marqué
+                      </Badge>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
 
               {/* Bouton marque-page */}
               <Button
