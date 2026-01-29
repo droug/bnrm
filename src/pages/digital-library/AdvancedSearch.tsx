@@ -17,11 +17,13 @@ import { CoteAutocomplete } from "@/components/ui/cote-autocomplete";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { SearchPagination } from "@/components/ui/search-pagination";
+import { useSecureRoles } from "@/hooks/useSecureRoles";
 
 export default function AdvancedSearch() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { toast } = useToast();
+  const { isLibrarian, loading: rolesLoading } = useSecureRoles();
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -68,6 +70,9 @@ export default function AdvancedSearch() {
 
   // Fonction de recherche
   const performSearch = useCallback(async () => {
+    // Attendre que le chargement des rôles soit terminé pour savoir si on peut montrer les brouillons
+    if (rolesLoading) return;
+    
     const params = Object.fromEntries(searchParams.entries());
     console.log('🔍 performSearch called with params:', params);
     
@@ -78,13 +83,21 @@ export default function AdvancedSearch() {
     setIsSearching(true);
     try {
       // Utiliser digital_library_documents comme source principale (table utilisée par l'admin)
-      // Exclure les documents supprimés et non publiés
+      // Exclure les documents supprimés
       let baseQuery: any = supabase
         .from('digital_library_documents')
         .select('*', { count: 'exact' })
-        .is('deleted_at', null)
-        .eq('publication_status', 'published');
-      console.log('🗄️ Base query created (digital_library_documents, published only, excluding deleted)');
+        .is('deleted_at', null);
+      
+      // Les bibliothécaires voient aussi les brouillons, le public ne voit que les publiés
+      if (!isLibrarian) {
+        baseQuery = baseQuery.eq('publication_status', 'published');
+        console.log('🗄️ Base query created (digital_library_documents, published only for public user)');
+      } else {
+        // Les bibliothécaires voient published + draft
+        baseQuery = baseQuery.in('publication_status', ['published', 'draft']);
+        console.log('🗄️ Base query created (digital_library_documents, published + draft for librarian)');
+      }
       
       // Recherche générale (adapté aux colonnes de digital_library_documents)
       if (params.keyword) {
@@ -189,22 +202,24 @@ export default function AdvancedSearch() {
     } finally {
       setIsSearching(false);
     }
-  }, [searchParams, currentPage, itemsPerPage, toast]);
+  }, [searchParams, currentPage, itemsPerPage, toast, isLibrarian, rolesLoading]);
 
-  // Effectuer la recherche quand les params changent ou au chargement
+  // Effectuer la recherche quand les params changent ou au chargement (attendre que les rôles soient chargés)
   useEffect(() => {
+    if (rolesLoading) return;
     console.log('🔄 useEffect triggered, searchParams:', searchParams.toString());
     performSearch();
-  }, [performSearch]);
+  }, [performSearch, rolesLoading]);
 
   // Charger tous les documents au premier chargement
   useEffect(() => {
+    if (rolesLoading) return;
     console.log('🎬 Component mounted');
     if (searchParams.toString() === '') {
       console.log('📋 No search params, loading all documents');
       performSearch();
     }
-  }, []);
+  }, [rolesLoading]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

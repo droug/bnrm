@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLocalWhisperTranscription } from "@/hooks/useLocalWhisperTranscription";
+import { registerDocumentInGed, deleteGedDocument, updateGedWorkflowStatus } from "@/hooks/useGedIntegration";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -412,7 +413,7 @@ export default function DocumentsManager() {
         }
 
         // Create the digital_library_document
-        const { error: dlError } = await supabase
+        const { data: newDoc, error: dlError } = await supabase
           .from('digital_library_documents')
           .insert([{
             cbn_document_id: cbnDocumentId,
@@ -427,9 +428,32 @@ export default function DocumentsManager() {
             publication_status: values.is_visible ? 'published' : 'draft',
             digitization_source: values.digitization_source,
             pages_count: 0,
-          }]);
+          }])
+          .select('id')
+          .single();
 
         if (dlError) throw dlError;
+
+        // Enregistrer dans la GED
+        if (newDoc?.id) {
+          const gedResult = await registerDocumentInGed({
+            documentId: newDoc.id,
+            documentTitle: values.title || existingCbn?.title || `Document ${values.cote}`,
+            documentType: values.file_type || existingCbn?.document_type || 'book',
+            description: values.description,
+            fileUrl: uploadedPdfUrl,
+            fileName: uploadFile?.name,
+            fileMimeType: uploadFile?.type || 'application/pdf',
+            fileSizeBytes: uploadFile?.size,
+            workflowStatus: values.is_visible ? 'published' : 'draft',
+          });
+          
+          if (!gedResult.success) {
+            console.warn('GED registration warning:', gedResult.error);
+          } else {
+            console.log('Document enregistré dans la GED:', gedResult.gedDocumentId);
+          }
+        }
       } finally {
         setIsUploading(false);
         setUploadProgress(0);
@@ -514,6 +538,9 @@ export default function DocumentsManager() {
         .select('pdf_url, cover_image_url, cbn_document_id')
         .eq('id', id)
         .single();
+
+      // Supprimer le document GED associé (soft delete)
+      await deleteGedDocument(id);
 
       // Delete associated pages if any
       await supabase
