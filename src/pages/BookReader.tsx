@@ -1566,64 +1566,65 @@ const BookReader = () => {
                   </div>
                 </div>
               ) : viewMode === "double" ? (
-                <div className="flex-1 min-h-0 flex items-center justify-center p-4 md:p-8 relative">
+                <div className="flex-1 min-h-0 flex items-center justify-center p-4 md:p-8">
                   <PanZoomContainer
                     zoom={zoom}
                     rotation={0}
                     className="w-full h-full"
                   >
-                    {canUseDoubleMode ? (
-                      <PageFlipBook 
-                        ref={pageFlipRef}
-                        images={generatePageImages()}
-                        currentPage={currentPage}
-                        onPageChange={setCurrentPage}
-                        zoom={100}
-                        rotation={rotation}
-                        pageRotations={pageRotations}
-                        isRtl={isArabicDocument()}
-                      />
-                    ) : pdfUrl ? (
-                      /* Mode Double avec PDF - effet livre avec glisser-déposer */
-                      <PdfPageFlipBook
-                        pdfUrl={pdfUrl}
-                        currentPage={currentPage}
-                        onPageChange={setCurrentPage}
-                        zoom={100}
-                        rotation={rotation}
-                        pageRotations={pageRotations}
-                        isRtl={isArabicDocument()}
-                        onTotalPagesChange={setActualTotalPages}
-                      />
-                    ) : null}
+                    <div className="relative">
+                      {canUseDoubleMode ? (
+                        <PageFlipBook 
+                          ref={pageFlipRef}
+                          images={generatePageImages()}
+                          currentPage={currentPage}
+                          onPageChange={setCurrentPage}
+                          zoom={100}
+                          rotation={rotation}
+                          pageRotations={pageRotations}
+                          isRtl={isArabicDocument()}
+                        />
+                      ) : pdfUrl ? (
+                        /* Mode Double avec PDF - effet livre avec glisser-déposer */
+                        <PdfPageFlipBook
+                          pdfUrl={pdfUrl}
+                          currentPage={currentPage}
+                          onPageChange={setCurrentPage}
+                          zoom={100}
+                          rotation={rotation}
+                          pageRotations={pageRotations}
+                          isRtl={isArabicDocument()}
+                          onTotalPagesChange={setActualTotalPages}
+                        />
+                      ) : null}
+                      
+                      {/* Boutons marque-page intégrés - comme en mode Scroll */}
+                      <div className="absolute top-2 left-2 z-10 flex gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleBookmark(currentPage)}
+                          title={bookmarks.includes(currentPage) ? `Retirer marque-page p.${currentPage}` : `Ajouter marque-page p.${currentPage}`}
+                        >
+                          <Bookmark className={`h-4 w-4 ${bookmarks.includes(currentPage) ? "fill-current text-primary" : ""}`} />
+                          <span className="ml-1 text-xs">{currentPage}</span>
+                        </Button>
+                      </div>
+                      {currentPage + 1 <= totalPages && (
+                        <div className="absolute top-2 right-2 z-10 flex gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => toggleBookmark(currentPage + 1)}
+                            title={bookmarks.includes(currentPage + 1) ? `Retirer marque-page p.${currentPage + 1}` : `Ajouter marque-page p.${currentPage + 1}`}
+                          >
+                            <span className="mr-1 text-xs">{currentPage + 1}</span>
+                            <Bookmark className={`h-4 w-4 ${bookmarks.includes(currentPage + 1) ? "fill-current text-primary" : ""}`} />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
                   </PanZoomContainer>
-                  
-                  {/* Bouton marque-page flottant - Mode Double */}
-                  <div className="absolute top-6 right-6 z-20 flex flex-col gap-2">
-                    <Button
-                      variant={bookmarks.includes(currentPage) ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => toggleBookmark(currentPage)}
-                      className="shadow-lg"
-                      title={bookmarks.includes(currentPage) ? "Retirer marque-page" : "Ajouter marque-page"}
-                    >
-                      <Bookmark className={`h-4 w-4 ${bookmarks.includes(currentPage) ? "fill-current" : ""}`} />
-                      <span className="ml-2 hidden sm:inline">Page {currentPage}</span>
-                    </Button>
-                    {/* Bouton pour la page droite en mode double */}
-                    {currentPage + 1 <= totalPages && (
-                      <Button
-                        variant={bookmarks.includes(currentPage + 1) ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => toggleBookmark(currentPage + 1)}
-                        className="shadow-lg"
-                        title={bookmarks.includes(currentPage + 1) ? "Retirer marque-page p." + (currentPage + 1) : "Ajouter marque-page p." + (currentPage + 1)}
-                      >
-                        <Bookmark className={`h-4 w-4 ${bookmarks.includes(currentPage + 1) ? "fill-current" : ""}`} />
-                        <span className="ml-2 hidden sm:inline">Page {currentPage + 1}</span>
-                      </Button>
-                    )}
-                  </div>
                 </div>
               ) : viewMode === "scroll" ? (
                 /* Mode défilement vertical - scroll géré par VirtualizedScrollReader ou le conteneur interne */
@@ -1740,7 +1741,7 @@ const BookReader = () => {
               ) : (
                 /* Mode Simple - ajuster à la hauteur du conteneur en conservant le ratio */
                 <div 
-                  className="flex-1 min-h-0 flex items-center justify-center p-2 relative"
+                  className="flex-1 min-h-0 flex items-center justify-center p-2"
                   style={{ height: 'calc(100vh - 10rem)' }}
                 >
                   {(() => {
@@ -1753,66 +1754,65 @@ const BookReader = () => {
                         rotation={isPdfMode ? 0 : totalRotation}
                         className="h-full w-full"
                       >
-                        <Card 
-                          className="shadow-2xl overflow-hidden"
-                          style={{ maxHeight: '100%', height: 'auto' }}
-                        >
-                          <CardContent className="p-0 flex items-center justify-center">
-                            <div className="relative flex items-center justify-center">
-                              {isPdfMode ? (
-                                <OptimizedPdfPageRenderer
-                                  pdfUrl={pdfUrl}
-                                  pageNumber={currentPage}
-                                  scale={1.2}
-                                  rotation={totalRotation}
-                                  className=""
-                                  onPageLoad={(totalPages) => {
-                                    if (actualTotalPages !== totalPages) {
-                                      setActualTotalPages(totalPages);
-                                    }
-                                  }}
-                                  preloadPages={[currentPage - 1, currentPage + 1, currentPage + 2]}
-                                />
-                              ) : documentPages.length > 0 || (documentImage && !documentImage.includes('manuscript-page')) ? (
-                                <img
-                                  src={getCurrentPageImage(currentPage) || ''}
-                                  alt={`Page ${currentPage}`}
-                                  className="block w-auto h-auto object-contain pointer-events-none"
-                                  style={{ maxHeight: 'calc(100vh - 12rem)' }}
-                                />
-                              ) : (
-                                /* Fallback - ne devrait pas arriver grâce à hasDisplayableContent */
-                                <div className="flex items-center justify-center p-16 text-muted-foreground">
-                                  <FileText className="h-12 w-12 mr-4" />
-                                  <span>Contenu non disponible</span>
-                                </div>
-                              )}
-                              {bookmarks.includes(currentPage) && (
-                                <Badge className="absolute top-4 right-4 bg-primary/90">
-                                  <Bookmark className="h-3 w-3 mr-1 fill-current" />
-                                  Marqué
-                                </Badge>
-                              )}
-                            </div>
-                          </CardContent>
-                        </Card>
+                        <div className="relative">
+                          <Card 
+                            className="shadow-2xl overflow-hidden"
+                            style={{ maxHeight: '100%', height: 'auto' }}
+                          >
+                            <CardContent className="p-0 flex items-center justify-center">
+                              <div className="relative flex items-center justify-center">
+                                {isPdfMode ? (
+                                  <OptimizedPdfPageRenderer
+                                    pdfUrl={pdfUrl}
+                                    pageNumber={currentPage}
+                                    scale={1.2}
+                                    rotation={totalRotation}
+                                    className=""
+                                    onPageLoad={(totalPages) => {
+                                      if (actualTotalPages !== totalPages) {
+                                        setActualTotalPages(totalPages);
+                                      }
+                                    }}
+                                    preloadPages={[currentPage - 1, currentPage + 1, currentPage + 2]}
+                                  />
+                                ) : documentPages.length > 0 || (documentImage && !documentImage.includes('manuscript-page')) ? (
+                                  <img
+                                    src={getCurrentPageImage(currentPage) || ''}
+                                    alt={`Page ${currentPage}`}
+                                    className="block w-auto h-auto object-contain pointer-events-none"
+                                    style={{ maxHeight: 'calc(100vh - 12rem)' }}
+                                  />
+                                ) : (
+                                  /* Fallback - ne devrait pas arriver grâce à hasDisplayableContent */
+                                  <div className="flex items-center justify-center p-16 text-muted-foreground">
+                                    <FileText className="h-12 w-12 mr-4" />
+                                    <span>Contenu non disponible</span>
+                                  </div>
+                                )}
+                                {bookmarks.includes(currentPage) && (
+                                  <Badge className="absolute top-4 left-4 bg-primary/90">
+                                    <Bookmark className="h-3 w-3 mr-1 fill-current" />
+                                    Marqué
+                                  </Badge>
+                                )}
+                              </div>
+                            </CardContent>
+                          </Card>
+                          
+                          {/* Bouton marque-page intégré sur la page - comme en mode Scroll */}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="absolute top-2 right-2 z-10"
+                            onClick={() => toggleBookmark(currentPage)}
+                            title={bookmarks.includes(currentPage) ? "Retirer marque-page" : "Ajouter marque-page"}
+                          >
+                            <Bookmark className={`h-4 w-4 ${bookmarks.includes(currentPage) ? "fill-current text-primary" : ""}`} />
+                          </Button>
+                        </div>
                       </PanZoomContainer>
                     );
                   })()}
-                  
-                  {/* Bouton marque-page flottant - Mode Simple */}
-                  <div className="absolute top-6 right-6 z-20">
-                    <Button
-                      variant={bookmarks.includes(currentPage) ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => toggleBookmark(currentPage)}
-                      className="shadow-lg"
-                      title={bookmarks.includes(currentPage) ? "Retirer marque-page" : "Ajouter marque-page"}
-                    >
-                      <Bookmark className={`h-4 w-4 ${bookmarks.includes(currentPage) ? "fill-current" : ""}`} />
-                      <span className="ml-2 hidden sm:inline">{bookmarks.includes(currentPage) ? "Marqué" : "Marquer"}</span>
-                    </Button>
-                  </div>
                 </div>
               )}
             </main>
