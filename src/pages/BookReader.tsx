@@ -21,6 +21,7 @@ import { DraggableDoublePage } from "@/components/digital-library/reader/Draggab
 import { ReproductionAuthChoiceModal } from "@/components/digital-library/ReproductionAuthChoiceModal";
 import AudioVideoReader from "@/components/digital-library/reader/AudioVideoReader";
 import { PanZoomContainer } from "@/components/digital-library/reader/PanZoomContainer";
+import { FullPageOverlay } from "@/components/digital-library/reader/FullPageOverlay";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -105,6 +106,7 @@ const BookReader = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [viewMode, setViewMode] = useState<"single" | "double" | "scroll">("single");
   const [readingMode, setReadingMode] = useState<"book" | "audio">("book");
+  const [isFullPage, setIsFullPage] = useState(false);
 
   const mainContentRef = useRef<HTMLElement | null>(null);
   const pageFlipRef = useRef<PageFlipBookHandle>(null);
@@ -1489,8 +1491,13 @@ const BookReader = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
 
-                <Button variant="outline" size="sm" onClick={toggleFullscreen}>
-                  {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => setIsFullPage(true)}
+                  title="Mode plein écran"
+                >
+                  <Maximize className="h-4 w-4" />
                 </Button>
                 <Button
                   variant={showSearch ? "default" : "outline"}
@@ -1962,6 +1969,46 @@ const BookReader = () => {
         documentId={id}
         documentTitle={documentData?.title}
       />
+
+      {/* Full Page Overlay */}
+      {isFullPage && readingMode === "book" && (
+        <FullPageOverlay
+          onClose={() => setIsFullPage(false)}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          zoom={zoom}
+          onZoomIn={handleZoomIn}
+          onZoomOut={handleZoomOut}
+          onPreviousPage={handlePreviousPage}
+          onNextPage={handleNextPage}
+          onRotate={handleRotate}
+        >
+          {pdfUrl && documentPages.length === 0 ? (
+            <PdfPageWithHighlight
+              pdfUrl={pdfUrl}
+              pageNumber={currentPage}
+              scale={zoom / 60}
+              rotation={rotation + (pageRotations[currentPage] ?? 0)}
+              className="max-h-[calc(100vh-6rem)]"
+              onPageLoad={(totalPages) => {
+                if (actualTotalPages !== totalPages) {
+                  setActualTotalPages(totalPages);
+                }
+              }}
+              searchHighlight={searchHighlight}
+            />
+          ) : documentPages.length > 0 || documentImage ? (
+            <img
+              src={getCurrentPageImage(currentPage) || ''}
+              alt={`Page ${currentPage}`}
+              className="max-h-[calc(100vh-6rem)] w-auto object-contain"
+              style={{
+                transform: `rotate(${rotation + (pageRotations[currentPage] ?? 0)}deg)`,
+              }}
+            />
+          ) : null}
+        </FullPageOverlay>
+      )}
 
       </div>
     </DigitalLibraryLayout>
