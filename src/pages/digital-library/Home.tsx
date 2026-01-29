@@ -38,7 +38,7 @@ import virtualExhibitionBg from "@/assets/virtual-exhibition-bg.png";
 import logoBrill from "@/assets/logos/logo-brill.png";
 import logoCairn from "@/assets/logos/logo-cairn.svg";
 import logoAlmanhal from "@/assets/logos/logo-almanhal.png";
-import logoEni from "@/assets/logos/logo-eni.png";
+import logoEni from "@/assets/logos/logo-eni.svg";
 export default function DigitalLibraryHome() {
   const navigate = useNavigate();
   const {
@@ -816,7 +816,7 @@ export default function DigitalLibraryHome() {
                   <FancyTooltip content="Al Manhal" description="La seule plateforme de bases de données académiques arabes entièrement consultables du Moyen-Orient, Afrique et Asie." icon="mdi:book-open-variant" side="top" variant="gold">
                     <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
                       <CardContent className="p-8 flex flex-col items-center justify-center">
-                        <div className="flex items-center justify-center h-[80px]">
+                        <div className="flex items-center justify-center h-[80px] bg-bn-blue-primary rounded-lg px-4">
                           <img src={logoAlmanhal} alt="Al Manhal" className="h-[50px] max-w-[200px] object-contain" />
                         </div>
                         <a href="https://almanhal.com/" target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors">
@@ -832,7 +832,7 @@ export default function DigitalLibraryHome() {
                   <FancyTooltip content="ENI elearning" description="La plus grande plateforme de contenus IT : formations bureautiques, livres et vidéos conçus par des experts informatiques." icon="mdi:laptop" side="top" variant="gold">
                     <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
                       <CardContent className="p-8 flex flex-col items-center justify-center">
-                        <div className="flex items-center justify-center h-[80px]">
+                        <div className="flex items-center justify-center h-[80px] bg-bn-blue-primary rounded-lg px-4">
                           <img src={logoEni} alt="ENI elearning" className="h-[50px] max-w-[200px] object-contain" />
                         </div>
                         <a href="https://www.eni-elearning.com/" target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors">
