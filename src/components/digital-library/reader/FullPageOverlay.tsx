@@ -49,10 +49,21 @@ export const FullPageOverlay = ({
 
   const content = (
     <div className="fixed inset-0 z-[9999] bg-black flex flex-col">
-      {/* Minimal toolbar */}
-      <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-gradient-to-b from-black/80 to-transparent">
+      {/* Close button - prominent and always visible */}
+      <Button 
+        variant="default"
+        size="icon"
+        onClick={onClose}
+        className="absolute top-4 right-4 z-20 bg-white text-black hover:bg-gray-200 h-12 w-12 rounded-full shadow-lg"
+        title="Fermer le mode plein écran (Échap)"
+      >
+        <X className="h-6 w-6" />
+      </Button>
+
+      {/* Bottom toolbar */}
+      <div className="absolute bottom-0 left-0 right-0 z-10 flex items-center justify-center gap-4 p-4 bg-gradient-to-t from-black/80 to-transparent">
         {/* Navigation controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 bg-black/50 rounded-full px-4 py-2">
           <Button 
             variant="ghost" 
             size="sm"
@@ -63,7 +74,7 @@ export const FullPageOverlay = ({
             <ChevronLeft className="h-5 w-5" />
           </Button>
           
-          <span className="text-white text-sm font-medium px-3">
+          <span className="text-white text-sm font-medium px-3 min-w-[80px] text-center">
             {currentPage} / {totalPages}
           </span>
           
@@ -79,12 +90,13 @@ export const FullPageOverlay = ({
         </div>
 
         {/* Zoom controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 bg-black/50 rounded-full px-4 py-2">
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={onZoomOut}
-            className="text-white hover:bg-white/20"
+            disabled={zoom <= 50}
+            className="text-white hover:bg-white/20 disabled:opacity-50"
           >
             <ZoomOut className="h-5 w-5" />
           </Button>
@@ -93,37 +105,37 @@ export const FullPageOverlay = ({
             variant="ghost" 
             size="sm" 
             onClick={onZoomIn}
-            className="text-white hover:bg-white/20"
+            disabled={zoom >= 300}
+            className="text-white hover:bg-white/20 disabled:opacity-50"
           >
             <ZoomIn className="h-5 w-5" />
           </Button>
+          
+          <div className="w-px h-6 bg-white/30 mx-1" />
           
           <Button 
             variant="ghost" 
             size="sm" 
             onClick={onRotate}
-            className="text-white hover:bg-white/20 ml-2"
+            className="text-white hover:bg-white/20"
             title="Pivoter"
           >
             <RotateCw className="h-5 w-5" />
           </Button>
         </div>
-
-        {/* Close button */}
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={onClose}
-          className="text-white hover:bg-white/20 h-10 w-10"
-          title="Fermer le mode plein écran (Échap)"
-        >
-          <X className="h-6 w-6" />
-        </Button>
       </div>
 
-      {/* Document content */}
-      <div className="flex-1 flex items-center justify-center overflow-auto p-4 pt-20">
-        {children}
+      {/* Document content with zoom applied */}
+      <div className="flex-1 flex items-center justify-center overflow-auto p-4">
+        <div 
+          style={{ 
+            transform: `scale(${zoom / 100})`,
+            transformOrigin: 'center center',
+            transition: 'transform 0.2s ease-out'
+          }}
+        >
+          {children}
+        </div>
       </div>
     </div>
   );
