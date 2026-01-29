@@ -29,7 +29,7 @@ export const ReproductionAuthChoiceModal = ({
 
   const handleSignup = () => {
     onOpenChange(false);
-    navigate(`/signup?redirect=${encodeURIComponent(redirectPath)}`);
+    navigate('/abonnements?platform=bn');
   };
 
   return (
