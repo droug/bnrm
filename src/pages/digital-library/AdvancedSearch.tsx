@@ -101,18 +101,27 @@ export default function AdvancedSearch() {
       
       // Recherche générale (adapté aux colonnes de digital_library_documents)
       if (params.keyword) {
-        const term = params.keyword;
-        baseQuery = baseQuery.or(`title.ilike.%${term}%,title_ar.ilike.%${term}%,author.ilike.%${term}%`);
+        // Échapper les caractères spéciaux pour éviter les erreurs de syntaxe Supabase
+        const term = params.keyword.replace(/['"\\%]/g, '');
+        if (term.length > 0) {
+          baseQuery = baseQuery.or(`title.ilike.%${term}%,title_ar.ilike.%${term}%,author.ilike.%${term}%`);
+        }
       }
       
       // Recherche par auteur
       if (params.author) {
-        baseQuery = baseQuery.ilike('author', `%${params.author}%`);
+        const author = params.author.replace(/['"\\%]/g, '');
+        if (author.length > 0) {
+          baseQuery = baseQuery.ilike('author', `%${author}%`);
+        }
       }
       
       // Recherche par titre (FR ou AR)
       if (params.title) {
-        baseQuery = baseQuery.or(`title.ilike.%${params.title}%,title_ar.ilike.%${params.title}%`);
+        const title = params.title.replace(/['"\\%]/g, '');
+        if (title.length > 0) {
+          baseQuery = baseQuery.or(`title.ilike.%${title}%,title_ar.ilike.%${title}%`);
+        }
       }
       
       // Recherche par éditeur - cette colonne n'existe pas dans digital_library_documents
