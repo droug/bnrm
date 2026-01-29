@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import RichTextEditorCompact from "@/components/cms/RichTextEditorCompact";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Icon } from "@/components/ui/icon";
@@ -444,10 +444,11 @@ export default function CmsHelpManagerBN() {
                 </div>
                 <div>
                   <Label>Sous-titre (Français)</Label>
-                  <Textarea
+                  <RichTextEditorCompact
                     value={settings.hero_subtitle_fr}
-                    onChange={(e) => updateSettings({ hero_subtitle_fr: e.target.value })}
-                    rows={2}
+                    onChange={(value) => updateSettings({ hero_subtitle_fr: value })}
+                    placeholder="Sous-titre..."
+                    minHeight="80px"
                   />
                 </div>
                 <div>
@@ -468,10 +469,12 @@ export default function CmsHelpManagerBN() {
                 </div>
                 <div>
                   <Label>Sous-titre (Arabe)</Label>
-                  <Textarea
+                  <RichTextEditorCompact
                     value={settings.hero_subtitle_ar || ''}
-                    onChange={(e) => updateSettings({ hero_subtitle_ar: e.target.value })}
-                    rows={2}
+                    onChange={(value) => updateSettings({ hero_subtitle_ar: value })}
+                    placeholder="العنوان الفرعي..."
+                    minHeight="80px"
+                    dir="rtl"
                   />
                 </div>
                 <div>
@@ -568,11 +571,11 @@ export default function CmsHelpManagerBN() {
                               onChange={(e) => updateQuestion(category.id, question.id, { question_fr: e.target.value })}
                               placeholder="Question (FR)"
                             />
-                            <Textarea
+                            <RichTextEditorCompact
                               value={question.answer_fr}
-                              onChange={(e) => updateQuestion(category.id, question.id, { answer_fr: e.target.value })}
+                              onChange={(value) => updateQuestion(category.id, question.id, { answer_fr: value })}
                               placeholder="Réponse (FR)"
-                              rows={2}
+                              minHeight="80px"
                             />
                           </div>
                           <div className="space-y-2" dir="rtl">
@@ -581,11 +584,12 @@ export default function CmsHelpManagerBN() {
                               onChange={(e) => updateQuestion(category.id, question.id, { question_ar: e.target.value })}
                               placeholder="Question (AR)"
                             />
-                            <Textarea
+                            <RichTextEditorCompact
                               value={question.answer_ar || ''}
-                              onChange={(e) => updateQuestion(category.id, question.id, { answer_ar: e.target.value })}
-                              placeholder="Réponse (AR)"
-                              rows={2}
+                              onChange={(value) => updateQuestion(category.id, question.id, { answer_ar: value })}
+                              placeholder="الإجابة (AR)"
+                              minHeight="80px"
+                              dir="rtl"
                             />
                           </div>
                         </div>
@@ -723,16 +727,16 @@ export default function CmsHelpManagerBN() {
                           }}
                           placeholder="Titre (FR)"
                         />
-                        <Textarea
+                        <RichTextEditorCompact
                           value={step.description_fr}
-                          onChange={(e) => {
+                          onChange={(value) => {
                             const newSteps = [...(settings.guide?.steps || [])];
-                            newSteps[index].description_fr = e.target.value;
+                            newSteps[index].description_fr = value;
                             setSettings(prev => ({ ...prev, guide: { ...prev.guide, steps: newSteps } }));
                             setIsDirty(true);
                           }}
                           placeholder="Description (FR)"
-                          rows={2}
+                          minHeight="80px"
                         />
                       </div>
                       <div className="space-y-2" dir="rtl">
@@ -746,16 +750,17 @@ export default function CmsHelpManagerBN() {
                           }}
                           placeholder="Titre (AR)"
                         />
-                        <Textarea
+                        <RichTextEditorCompact
                           value={step.description_ar || ''}
-                          onChange={(e) => {
+                          onChange={(value) => {
                             const newSteps = [...(settings.guide?.steps || [])];
-                            newSteps[index].description_ar = e.target.value;
+                            newSteps[index].description_ar = value;
                             setSettings(prev => ({ ...prev, guide: { ...prev.guide, steps: newSteps } }));
                             setIsDirty(true);
                           }}
-                          placeholder="Description (AR)"
-                          rows={2}
+                          placeholder="الوصف (AR)"
+                          minHeight="80px"
+                          dir="rtl"
                         />
                       </div>
                     </div>
@@ -849,16 +854,16 @@ export default function CmsHelpManagerBN() {
                           }}
                           placeholder="Titre (FR)"
                         />
-                        <Textarea
+                        <RichTextEditorCompact
                           value={tutorial.description_fr}
-                          onChange={(e) => {
+                          onChange={(value) => {
                             const newItems = [...(settings.tutorials?.items || [])];
-                            newItems[index].description_fr = e.target.value;
+                            newItems[index].description_fr = value;
                             setSettings(prev => ({ ...prev, tutorials: { ...prev.tutorials, items: newItems } }));
                             setIsDirty(true);
                           }}
                           placeholder="Description (FR)"
-                          rows={2}
+                          minHeight="80px"
                         />
                       </div>
                       <div className="space-y-2" dir="rtl">
@@ -872,16 +877,17 @@ export default function CmsHelpManagerBN() {
                           }}
                           placeholder="Titre (AR)"
                         />
-                        <Textarea
+                        <RichTextEditorCompact
                           value={tutorial.description_ar || ''}
-                          onChange={(e) => {
+                          onChange={(value) => {
                             const newItems = [...(settings.tutorials?.items || [])];
-                            newItems[index].description_ar = e.target.value;
+                            newItems[index].description_ar = value;
                             setSettings(prev => ({ ...prev, tutorials: { ...prev.tutorials, items: newItems } }));
                             setIsDirty(true);
                           }}
-                          placeholder="Description (AR)"
-                          rows={2}
+                          placeholder="الوصف (AR)"
+                          minHeight="80px"
+                          dir="rtl"
                         />
                       </div>
                     </div>
@@ -1092,24 +1098,27 @@ export default function CmsHelpManagerBN() {
                 </div>
                 <div className="space-y-2">
                   <Label>Description (Français)</Label>
-                  <Textarea
+                  <RichTextEditorCompact
                     value={settings.reproduction?.description_fr || ''}
-                    onChange={(e) => setSettings(prev => ({
+                    onChange={(value) => setSettings(prev => ({
                       ...prev,
-                      reproduction: { ...prev.reproduction, description_fr: e.target.value }
+                      reproduction: { ...prev.reproduction, description_fr: value }
                     }))}
-                    rows={3}
+                    placeholder="Description..."
+                    minHeight="100px"
                   />
                 </div>
                 <div className="space-y-2" dir="rtl">
                   <Label>Description (Arabe)</Label>
-                  <Textarea
+                  <RichTextEditorCompact
                     value={settings.reproduction?.description_ar || ''}
-                    onChange={(e) => setSettings(prev => ({
+                    onChange={(value) => setSettings(prev => ({
                       ...prev,
-                      reproduction: { ...prev.reproduction, description_ar: e.target.value }
+                      reproduction: { ...prev.reproduction, description_ar: value }
                     }))}
-                    rows={3}
+                    placeholder="الوصف..."
+                    minHeight="100px"
+                    dir="rtl"
                   />
                 </div>
               </div>
@@ -1196,16 +1205,16 @@ export default function CmsHelpManagerBN() {
                           }}
                           placeholder="Titre (FR)"
                         />
-                        <Textarea
+                        <RichTextEditorCompact
                           value={step.description_fr}
-                          onChange={(e) => {
+                          onChange={(value) => {
                             const newSteps = [...(settings.reproduction?.steps || [])];
-                            newSteps[index].description_fr = e.target.value;
+                            newSteps[index].description_fr = value;
                             setSettings(prev => ({ ...prev, reproduction: { ...prev.reproduction, steps: newSteps } }));
                             setIsDirty(true);
                           }}
                           placeholder="Description (FR)"
-                          rows={2}
+                          minHeight="80px"
                         />
                       </div>
                       <div className="space-y-2" dir="rtl">
@@ -1219,16 +1228,17 @@ export default function CmsHelpManagerBN() {
                           }}
                           placeholder="Titre (AR)"
                         />
-                        <Textarea
+                        <RichTextEditorCompact
                           value={step.description_ar || ''}
-                          onChange={(e) => {
+                          onChange={(value) => {
                             const newSteps = [...(settings.reproduction?.steps || [])];
-                            newSteps[index].description_ar = e.target.value;
+                            newSteps[index].description_ar = value;
                             setSettings(prev => ({ ...prev, reproduction: { ...prev.reproduction, steps: newSteps } }));
                             setIsDirty(true);
                           }}
-                          placeholder="Description (AR)"
-                          rows={2}
+                          placeholder="الوصف (AR)"
+                          minHeight="80px"
+                          dir="rtl"
                         />
                       </div>
                     </div>
@@ -1274,10 +1284,11 @@ export default function CmsHelpManagerBN() {
                 </div>
                 <div>
                   <Label>Adresse (Français)</Label>
-                  <Textarea
+                  <RichTextEditorCompact
                     value={settings.contact.address_fr}
-                    onChange={(e) => updateContact('address_fr', e.target.value)}
-                    rows={3}
+                    onChange={(value) => updateContact('address_fr', value)}
+                    placeholder="Adresse..."
+                    minHeight="80px"
                   />
                 </div>
                 <div>
@@ -1298,10 +1309,12 @@ export default function CmsHelpManagerBN() {
                 </div>
                 <div>
                   <Label>Adresse (Arabe)</Label>
-                  <Textarea
+                  <RichTextEditorCompact
                     value={settings.contact.address_ar || ''}
-                    onChange={(e) => updateContact('address_ar', e.target.value)}
-                    rows={3}
+                    onChange={(value) => updateContact('address_ar', value)}
+                    placeholder="العنوان..."
+                    minHeight="80px"
+                    dir="rtl"
                   />
                 </div>
                 <div>

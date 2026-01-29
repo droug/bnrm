@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import RichTextEditorCompact from "@/components/cms/RichTextEditorCompact";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Settings, Save, Plus, Trash2, Loader2, Edit2, Eye, X, Check } from "lucide-react";
@@ -324,11 +324,11 @@ export default function CmsDigitalServicesManager() {
 
               <div className="space-y-2">
                 <Label>Description *</Label>
-                <Textarea
+                <RichTextEditorCompact
                   value={editingService.description}
-                  onChange={(e) => setEditingService({ ...editingService, description: e.target.value })}
+                  onChange={(value) => setEditingService({ ...editingService, description: value })}
                   placeholder="Décrivez le service..."
-                  rows={3}
+                  minHeight="120px"
                 />
               </div>
 

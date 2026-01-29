@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import RichTextEditorCompact from "@/components/cms/RichTextEditorCompact";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -299,11 +299,11 @@ export default function CmsBannersManager() {
                     </div>
                     <div className="space-y-2">
                       <Label>Texte (FR)</Label>
-                      <Textarea
+                      <RichTextEditorCompact
                         value={formData.text_fr}
-                        onChange={(e) => setFormData(prev => ({ ...prev, text_fr: e.target.value }))}
+                        onChange={(value) => setFormData(prev => ({ ...prev, text_fr: value }))}
                         placeholder="Description ou message..."
-                        rows={3}
+                        minHeight="100px"
                       />
                     </div>
                     <div className="space-y-2">
@@ -335,11 +335,12 @@ export default function CmsBannersManager() {
                     </div>
                     <div className="space-y-2">
                       <Label>Texte (AR)</Label>
-                      <Textarea
-                        dir="rtl"
+                      <RichTextEditorCompact
                         value={formData.text_ar}
-                        onChange={(e) => setFormData(prev => ({ ...prev, text_ar: e.target.value }))}
-                        rows={3}
+                        onChange={(value) => setFormData(prev => ({ ...prev, text_ar: value }))}
+                        placeholder="النص العربي..."
+                        minHeight="100px"
+                        dir="rtl"
                       />
                     </div>
                     <div className="space-y-2">

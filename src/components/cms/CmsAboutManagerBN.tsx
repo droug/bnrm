@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import RichTextEditorCompact from "@/components/cms/RichTextEditorCompact";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Icon } from "@/components/ui/icon";
 import { toast } from "sonner";
@@ -318,21 +318,21 @@ export default function CmsAboutManagerBN() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label>Sous-titre (Français)</Label>
-                  <Textarea
+                  <RichTextEditorCompact
                     value={formData.hero_subtitle_fr}
-                    onChange={(e) => updateField('hero_subtitle_fr', e.target.value)}
+                    onChange={(value) => updateField('hero_subtitle_fr', value)}
                     placeholder="Description courte..."
-                    rows={3}
+                    minHeight="100px"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>Sous-titre (Arabe)</Label>
-                  <Textarea
-                    dir="rtl"
+                  <RichTextEditorCompact
                     value={formData.hero_subtitle_ar || ''}
-                    onChange={(e) => updateField('hero_subtitle_ar', e.target.value)}
+                    onChange={(value) => updateField('hero_subtitle_ar', value)}
                     placeholder="الوصف القصير..."
-                    rows={3}
+                    minHeight="100px"
+                    dir="rtl"
                   />
                 </div>
               </div>
@@ -367,19 +367,21 @@ export default function CmsAboutManagerBN() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label>Contenu (Français)</Label>
-                  <Textarea
+                  <RichTextEditorCompact
                     value={formData.mission_content_fr}
-                    onChange={(e) => updateField('mission_content_fr', e.target.value)}
-                    rows={5}
+                    onChange={(value) => updateField('mission_content_fr', value)}
+                    placeholder="Contenu de la mission..."
+                    minHeight="150px"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>Contenu (Arabe)</Label>
-                  <Textarea
-                    dir="rtl"
+                  <RichTextEditorCompact
                     value={formData.mission_content_ar || ''}
-                    onChange={(e) => updateField('mission_content_ar', e.target.value)}
-                    rows={5}
+                    onChange={(value) => updateField('mission_content_ar', value)}
+                    placeholder="محتوى المهمة..."
+                    minHeight="150px"
+                    dir="rtl"
                   />
                 </div>
               </div>
@@ -411,19 +413,21 @@ export default function CmsAboutManagerBN() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label>Contenu (Français)</Label>
-                  <Textarea
+                  <RichTextEditorCompact
                     value={formData.vision_content_fr}
-                    onChange={(e) => updateField('vision_content_fr', e.target.value)}
-                    rows={5}
+                    onChange={(value) => updateField('vision_content_fr', value)}
+                    placeholder="Contenu de la vision..."
+                    minHeight="150px"
                   />
                 </div>
                 <div className="space-y-2">
                   <Label>Contenu (Arabe)</Label>
-                  <Textarea
-                    dir="rtl"
+                  <RichTextEditorCompact
                     value={formData.vision_content_ar || ''}
-                    onChange={(e) => updateField('vision_content_ar', e.target.value)}
-                    rows={5}
+                    onChange={(value) => updateField('vision_content_ar', value)}
+                    placeholder="محتوى الرؤية..."
+                    minHeight="150px"
+                    dir="rtl"
                   />
                 </div>
               </div>
@@ -484,18 +488,18 @@ export default function CmsAboutManagerBN() {
                           onChange={(e) => updateValue(index, 'title_ar', e.target.value)}
                           placeholder="العنوان (عربي)"
                         />
-                        <Textarea
+                        <RichTextEditorCompact
                           value={value.description_fr}
-                          onChange={(e) => updateValue(index, 'description_fr', e.target.value)}
+                          onChange={(v) => updateValue(index, 'description_fr', v)}
                           placeholder="Description (Français)"
-                          rows={2}
+                          minHeight="80px"
                         />
-                        <Textarea
-                          dir="rtl"
+                        <RichTextEditorCompact
                           value={value.description_ar || ''}
-                          onChange={(e) => updateValue(index, 'description_ar', e.target.value)}
+                          onChange={(v) => updateValue(index, 'description_ar', v)}
                           placeholder="الوصف (عربي)"
-                          rows={2}
+                          minHeight="80px"
+                          dir="rtl"
                         />
                       </div>
                       <div className="space-y-2">
@@ -578,18 +582,18 @@ export default function CmsAboutManagerBN() {
                           onChange={(e) => updateSection(section.id, 'title_ar', e.target.value)}
                           placeholder="العنوان (عربي)"
                         />
-                        <Textarea
+                        <RichTextEditorCompact
                           value={section.content_fr}
-                          onChange={(e) => updateSection(section.id, 'content_fr', e.target.value)}
+                          onChange={(v) => updateSection(section.id, 'content_fr', v)}
                           placeholder="Contenu (Français)"
-                          rows={4}
+                          minHeight="120px"
                         />
-                        <Textarea
-                          dir="rtl"
+                        <RichTextEditorCompact
                           value={section.content_ar || ''}
-                          onChange={(e) => updateSection(section.id, 'content_ar', e.target.value)}
+                          onChange={(v) => updateSection(section.id, 'content_ar', v)}
                           placeholder="المحتوى (عربي)"
-                          rows={4}
+                          minHeight="120px"
+                          dir="rtl"
                         />
                       </div>
                       <div className="space-y-2">
