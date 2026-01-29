@@ -371,7 +371,8 @@ async function indexContent() {
   const { data: digitalDocs, error: digitalDocsError } = await supabase
     .from('digital_library_documents')
     .select('*')
-    .eq('status', 'published');
+    .eq('publication_status', 'published')
+    .is('deleted_at', null);
 
   if (digitalDocsError) {
     console.error('Error fetching digital library documents:', digitalDocsError);
@@ -379,15 +380,17 @@ async function indexContent() {
     for (const doc of digitalDocs) {
       const keywords = [
         ...generateKeywords(doc.title, doc.description, doc.author),
-        ...(doc.keywords || [])
+        ...(doc.keywords || []),
+        ...(doc.themes || [])
       ];
       const semanticKeywords = expandSemanticKeywords(keywords);
-      const language = detectLanguage(doc.title || doc.description);
-      const docDate = new Date(doc.publication_date || doc.created_at);
+      const language = doc.language || detectLanguage(doc.title || doc.description);
+      const pubYear = doc.publication_year;
+      const docDate = new Date(doc.published_at || doc.created_at);
 
       documents.push({
         id: `digitaldoc_${doc.id}`,
-        title: doc.title,
+        title: doc.title || '',
         title_ar: doc.title_ar || '',
         content: doc.description || '',
         excerpt: doc.description?.substring(0, 200) || '',
@@ -396,15 +399,15 @@ async function indexContent() {
         keywords,
         semantic_keywords: semanticKeywords,
         author: doc.author || 'Inconnu',
-        publisher: doc.publisher || '',
-        publication_year: docDate.getFullYear(),
-        genre: doc.genre || '',
-        category: doc.collection || '',
+        publisher: '',
+        publication_year: pubYear || docDate.getFullYear(),
+        genre: '',
+        category: doc.digital_collections ? doc.digital_collections[0] : '',
         url: `/digital-library/document/${doc.id}`,
         published_at: Math.floor(docDate.getTime() / 1000),
         access_level: doc.access_level || 'public',
-        is_featured: doc.is_featured || false,
-        view_count: doc.view_count || 0,
+        is_featured: false,
+        view_count: doc.views_count || 0,
         status: 'published',
         source_table: 'digital_library_documents'
       });
