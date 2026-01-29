@@ -109,7 +109,8 @@ const BookReader = () => {
   const [isFullPage, setIsFullPage] = useState(false);
 
   const mainContentRef = useRef<HTMLElement | null>(null);
-  const pageFlipRef = useRef<PageFlipBookHandle>(null);
+  // Supporte PageFlipBook (images) et PdfPageFlipBook (PDF)
+  const pageFlipRef = useRef<PageFlipBookHandle | PdfPageFlipBookHandle>(null);
   const [floatingToolbarStyle, setFloatingToolbarStyle] = useState<CSSProperties | null>(null);
 
   useLayoutEffect(() => {
@@ -811,6 +812,47 @@ const BookReader = () => {
       toast.error(getAccessDeniedMessage());
       return;
     }
+
+    // Mode Double: le flipbook ne “saute” pas de page uniquement avec le state;
+    // il faut le piloter via son handle.
+    if (viewMode === "double" && pageFlipRef.current) {
+      pageFlipRef.current.turnToPage(page);
+      setCurrentPage(page);
+      toast.success(`Navigation vers la page ${page}`);
+      return;
+    }
+
+    // Mode Scroll: le state currentPage ne suffit pas, il faut scroller le conteneur.
+    if (viewMode === "scroll") {
+      const virtualizedContainer = document.getElementById("virtualized-scroll-container");
+      const pageElId = `page-${page}`;
+      const pageEl = document.getElementById(pageElId);
+
+      // En mode virtualisé, la page n'est pas forcément dans le DOM.
+      if (virtualizedContainer && !pageEl) {
+        // Doit rester cohérent avec VirtualizedScrollReader (estimation)
+        const ESTIMATED_PAGE_HEIGHT = 800;
+        const estimatedTop = (page - 1) * ESTIMATED_PAGE_HEIGHT * (zoom / 100);
+        virtualizedContainer.scrollTo({ top: estimatedTop, behavior: "smooth" });
+
+        // Après la mise à jour de la virtualisation, on réaligne précisément.
+        window.setTimeout(() => {
+          document.getElementById(pageElId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+        }, 250);
+      } else if (pageEl) {
+        // En mode scroll “images”, scrollIntoView va scroller le parent scrollable.
+        pageEl.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else {
+        // Fallback
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      setCurrentPage(page);
+      toast.success(`Navigation vers la page ${page}`);
+      return;
+    }
+
+    // Mode Single
     setCurrentPage(page);
     toast.success(`Navigation vers la page ${page}`);
   };
@@ -1600,7 +1642,7 @@ const BookReader = () => {
                   >
                     {canUseDoubleMode ? (
                       <PageFlipBook 
-                        ref={pageFlipRef}
+                        ref={pageFlipRef as any}
                         images={generatePageImages()}
                         currentPage={currentPage}
                         onPageChange={setCurrentPage}
@@ -1612,6 +1654,7 @@ const BookReader = () => {
                     ) : pdfUrl ? (
                       /* Mode Double avec PDF - effet livre avec glisser-déposer */
                       <PdfPageFlipBook
+                        ref={pageFlipRef as any}
                         pdfUrl={pdfUrl}
                         currentPage={currentPage}
                         onPageChange={setCurrentPage}
