@@ -1595,119 +1595,116 @@ const BookReader = () => {
                   </PanZoomContainer>
                 </div>
               ) : viewMode === "scroll" ? (
-                /* Mode défilement vertical - scroll isolé dans le conteneur document */
-                <div className="flex-1 min-h-0 h-full overflow-hidden">
-                  {pdfUrl && documentPages.length === 0 ? (
-                    <VirtualizedScrollReader
-                      pdfUrl={pdfUrl}
-                      totalPages={actualTotalPages}
-                      zoom={zoom}
-                      rotation={rotation}
-                      pageRotations={pageRotations}
-                      bookmarks={bookmarks}
-                      onToggleBookmark={toggleBookmark}
-                      onCurrentPageChange={setCurrentPage}
-                      isPageAccessible={isPageAccessible}
-                      restrictedPageDisplay={restrictedPageDisplay}
-                      getAccessDeniedMessage={getAccessDeniedMessage}
-                    />
-                  ) : (
-                    /* Mode scroll avec images pré-extraites */
-                    <div className="flex flex-col items-center gap-6 pb-8 p-4 md:p-8">
-                      {floatingToolbarStyle && (
-                        <div className="h-24 md:h-20" aria-hidden="true" />
-                      )}
-                    {floatingToolbarStyle && (
-                      <div className="h-24 md:h-20" aria-hidden="true" />
-                    )}
-                    {generatePageImages().map((pageImage, index) => {
-                      const pageNum = index + 1;
-                      const isAccessible = isPageAccessible(pageNum);
-                      
-                      if (!isAccessible && restrictedPageDisplay === "hidden") {
-                        return null;
-                      }
-                      
-                      return (
-                        <div 
-                          key={pageNum} 
-                          className="relative"
-                          id={`page-${pageNum}`}
-                        >
-                          <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                            <Badge variant="secondary" className="text-xs">
-                              Page {pageNum}
-                            </Badge>
-                          </div>
+                /* Mode défilement vertical - scroll géré par VirtualizedScrollReader ou le conteneur interne */
+                <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+                  {/* Conteneur pour le scroll - hauteur contrainte */}
+                  <div className="flex-1 min-h-0 h-full">
+                    {pdfUrl && documentPages.length === 0 ? (
+                      <VirtualizedScrollReader
+                        pdfUrl={pdfUrl}
+                        totalPages={actualTotalPages}
+                        zoom={zoom}
+                        rotation={rotation}
+                        pageRotations={pageRotations}
+                        bookmarks={bookmarks}
+                        onToggleBookmark={toggleBookmark}
+                        onCurrentPageChange={setCurrentPage}
+                        isPageAccessible={isPageAccessible}
+                        restrictedPageDisplay={restrictedPageDisplay}
+                        getAccessDeniedMessage={getAccessDeniedMessage}
+                      />
+                    ) : (
+                      /* Mode scroll avec images pré-extraites - scroll interne */
+                      <div className="h-full overflow-y-auto overscroll-contain scroll-smooth flex flex-col items-center gap-6 pb-8 p-4 md:p-8">
+                        {generatePageImages().map((pageImage, index) => {
+                          const pageNum = index + 1;
+                          const isAccessible = isPageAccessible(pageNum);
                           
-                          <Card 
-                            className="shadow-xl"
-                            style={{
-                              transform: `scale(${zoom / 100}) rotate(${rotation + (pageRotations[pageNum] ?? 0)}deg)`,
-                              transformOrigin: 'center',
-                              transition: 'transform 0.3s ease'
-                            }}
-                          >
-                            <CardContent className="p-0">
-                              <div className="w-full max-w-[600px] bg-gradient-to-br from-background to-muted flex items-center justify-center relative overflow-hidden">
-                                {isAccessible ? (
-                                  <img 
-                                    src={pageImage}
-                                    alt={`Page ${pageNum}`}
-                                    className="w-full h-auto object-contain"
-                                    loading="lazy"
-                                  />
-                                ) : restrictedPageDisplay === "blur" ? (
-                                  <div className="relative w-full">
-                                    <img 
-                                      src={pageImage}
-                                      alt={`Page ${pageNum}`}
-                                      className="w-full h-auto object-contain filter blur-lg"
-                                      loading="lazy"
-                                    />
-                                    <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-                                      <div className="text-center p-4 bg-background/90 rounded-lg shadow-lg">
-                                        <AlertCircle className="h-8 w-8 mx-auto mb-2 text-amber-500" />
-                                        <p className="text-sm font-medium">Page restreinte</p>
-                                        <p className="text-xs text-muted-foreground mt-1">
-                                          {getAccessDeniedMessage()}
-                                        </p>
-                                      </div>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <div className="w-full aspect-[3/4] flex items-center justify-center bg-muted/50">
-                                    <div className="text-center p-8">
-                                      <AlertCircle className="h-12 w-12 mx-auto mb-4 text-amber-500" />
-                                      <p className="text-muted-foreground text-sm">
-                                        {getAccessDeniedMessage()}
-                                      </p>
-                                    </div>
-                                  </div>
-                                )}
-                                {bookmarks.includes(pageNum) && (
-                                  <Badge className="absolute top-4 right-4 bg-primary/90">
-                                    <Bookmark className="h-3 w-3 mr-1 fill-current" />
-                                    Marqué
-                                  </Badge>
-                                )}
+                          if (!isAccessible && restrictedPageDisplay === "hidden") {
+                            return null;
+                          }
+                          
+                          return (
+                            <div 
+                              key={pageNum} 
+                              className="relative"
+                              id={`page-${pageNum}`}
+                            >
+                              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                                <Badge variant="secondary" className="text-xs">
+                                  Page {pageNum}
+                                </Badge>
                               </div>
-                            </CardContent>
-                          </Card>
-                          
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="absolute top-2 right-2"
-                            onClick={() => toggleBookmark(pageNum)}
-                          >
-                            <Bookmark className={`h-4 w-4 ${bookmarks.includes(pageNum) ? "fill-current text-primary" : ""}`} />
-                          </Button>
-                        </div>
-                      );
-                    })}
-                    </div>
-                  )}
+                              
+                              <Card 
+                                className="shadow-xl"
+                                style={{
+                                  transform: `scale(${zoom / 100}) rotate(${rotation + (pageRotations[pageNum] ?? 0)}deg)`,
+                                  transformOrigin: 'center',
+                                  transition: 'transform 0.3s ease'
+                                }}
+                              >
+                                <CardContent className="p-0">
+                                  <div className="w-full max-w-[600px] bg-gradient-to-br from-background to-muted flex items-center justify-center relative overflow-hidden">
+                                    {isAccessible ? (
+                                      <img 
+                                        src={pageImage}
+                                        alt={`Page ${pageNum}`}
+                                        className="w-full h-auto object-contain"
+                                        loading="lazy"
+                                      />
+                                    ) : restrictedPageDisplay === "blur" ? (
+                                      <div className="relative w-full">
+                                        <img 
+                                          src={pageImage}
+                                          alt={`Page ${pageNum}`}
+                                          className="w-full h-auto object-contain filter blur-lg"
+                                          loading="lazy"
+                                        />
+                                        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                                          <div className="text-center p-4 bg-background/90 rounded-lg shadow-lg">
+                                            <AlertCircle className="h-8 w-8 mx-auto mb-2 text-amber-500" />
+                                            <p className="text-sm font-medium">Page restreinte</p>
+                                            <p className="text-xs text-muted-foreground mt-1">
+                                              {getAccessDeniedMessage()}
+                                            </p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <div className="w-full aspect-[3/4] flex items-center justify-center bg-muted/50">
+                                        <div className="text-center p-8">
+                                          <AlertCircle className="h-12 w-12 mx-auto mb-4 text-amber-500" />
+                                          <p className="text-muted-foreground text-sm">
+                                            {getAccessDeniedMessage()}
+                                          </p>
+                                        </div>
+                                      </div>
+                                    )}
+                                    {bookmarks.includes(pageNum) && (
+                                      <Badge className="absolute top-4 right-4 bg-primary/90">
+                                        <Bookmark className="h-3 w-3 mr-1 fill-current" />
+                                        Marqué
+                                      </Badge>
+                                    )}
+                                  </div>
+                                </CardContent>
+                              </Card>
+                              
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="absolute top-2 right-2"
+                                onClick={() => toggleBookmark(pageNum)}
+                              >
+                                <Bookmark className={`h-4 w-4 ${bookmarks.includes(pageNum) ? "fill-current text-primary" : ""}`} />
+                              </Button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
                 </div>
               ) : (
                 /* Mode Simple - affichage d'une seule page */
