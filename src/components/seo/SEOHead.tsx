@@ -161,17 +161,13 @@ export default function SEOHead({
       <meta name="twitter:image" content={ogImage} />
       
       {/* Article Meta Tags */}
-      {ogType === 'article' && (
-        <>
-          {articleAuthor && <meta property="article:author" content={articleAuthor} />}
-          {articlePublishedTime && <meta property="article:published_time" content={articlePublishedTime} />}
-          {articleModifiedTime && <meta property="article:modified_time" content={articleModifiedTime} />}
-          {articleSection && <meta property="article:section" content={articleSection} />}
-          {articleTags.map((tag) => (
-            <meta key={tag} property="article:tag" content={tag} />
-          ))}
-        </>
-      )}
+      {ogType === 'article' && articleAuthor && <meta property="article:author" content={articleAuthor} />}
+      {ogType === 'article' && articlePublishedTime && <meta property="article:published_time" content={articlePublishedTime} />}
+      {ogType === 'article' && articleModifiedTime && <meta property="article:modified_time" content={articleModifiedTime} />}
+      {ogType === 'article' && articleSection && <meta property="article:section" content={articleSection} />}
+      {ogType === 'article' && articleTags.map((tag) => (
+        <meta key={tag} property="article:tag" content={tag} />
+      ))}
       
       {/* Technical SEO */}
       <meta httpEquiv="Content-Type" content="text/html; charset=utf-8" />
