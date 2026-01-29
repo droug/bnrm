@@ -1338,9 +1338,13 @@ const BookReader = () => {
                     // En mode scroll, le state currentPage ne reflète pas forcément la position réelle,
                     // donc on force toujours un scroll vers le haut.
                     if (viewMode === "scroll") {
+                      // Try virtualized scroll container first (PDF mode), then fallback
+                      const virtualizedContainer = document.getElementById("virtualized-scroll-container");
                       const scrollContainer = document.getElementById("scroll-container");
-                      if (scrollContainer) {
-                        scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
+                      const targetContainer = virtualizedContainer || scrollContainer;
+                      
+                      if (targetContainer) {
+                        targetContainer.scrollTo({ top: 0, behavior: "smooth" });
                       } else {
                         window.scrollTo({ top: 0, behavior: "smooth" });
                       }
