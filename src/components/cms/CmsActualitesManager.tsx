@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import RichTextEditorCompact from "@/components/cms/RichTextEditorCompact";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -257,20 +257,20 @@ export default function CmsActualitesManager() {
                   </div>
                   <div className="space-y-2">
                     <Label>Chapô (FR)</Label>
-                    <Textarea
+                    <RichTextEditorCompact
                       value={formData.chapo_fr}
-                      onChange={(e) => setFormData(prev => ({ ...prev, chapo_fr: e.target.value }))}
+                      onChange={(value) => setFormData(prev => ({ ...prev, chapo_fr: value }))}
                       placeholder="Résumé court de l'actualité..."
-                      rows={2}
+                      minHeight="80px"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label>Contenu (FR)</Label>
-                    <Textarea
+                    <RichTextEditorCompact
                       value={formData.body_fr}
-                      onChange={(e) => setFormData(prev => ({ ...prev, body_fr: e.target.value }))}
+                      onChange={(value) => setFormData(prev => ({ ...prev, body_fr: value }))}
                       placeholder="Contenu complet de l'actualité..."
-                      rows={8}
+                      minHeight="200px"
                     />
                   </div>
                 </TabsContent>
@@ -286,20 +286,22 @@ export default function CmsActualitesManager() {
                   </div>
                   <div className="space-y-2">
                     <Label>Chapô (AR)</Label>
-                    <Textarea
-                      dir="rtl"
+                    <RichTextEditorCompact
                       value={formData.chapo_ar}
-                      onChange={(e) => setFormData(prev => ({ ...prev, chapo_ar: e.target.value }))}
-                      rows={2}
+                      onChange={(value) => setFormData(prev => ({ ...prev, chapo_ar: value }))}
+                      placeholder="ملخص قصير..."
+                      minHeight="80px"
+                      dir="rtl"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label>Contenu (AR)</Label>
-                    <Textarea
-                      dir="rtl"
+                    <RichTextEditorCompact
                       value={formData.body_ar}
-                      onChange={(e) => setFormData(prev => ({ ...prev, body_ar: e.target.value }))}
-                      rows={8}
+                      onChange={(value) => setFormData(prev => ({ ...prev, body_ar: value }))}
+                      placeholder="المحتوى الكامل..."
+                      minHeight="200px"
+                      dir="rtl"
                     />
                   </div>
                 </TabsContent>

@@ -4,7 +4,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
+import RichTextEditorCompact from "@/components/cms/RichTextEditorCompact";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -278,10 +278,11 @@ export default function CmsEvenementsManager() {
                   </div>
                   <div className="space-y-2">
                     <Label>Description (FR)</Label>
-                    <Textarea
+                    <RichTextEditorCompact
                       value={formData.description_fr}
-                      onChange={(e) => setFormData(prev => ({ ...prev, description_fr: e.target.value }))}
-                      rows={4}
+                      onChange={(value) => setFormData(prev => ({ ...prev, description_fr: value }))}
+                      placeholder="Description de l'événement..."
+                      minHeight="150px"
                     />
                   </div>
                   <div className="space-y-2">
@@ -324,11 +325,12 @@ export default function CmsEvenementsManager() {
                   </div>
                   <div className="space-y-2">
                     <Label>Description (AR)</Label>
-                    <Textarea
-                      dir="rtl"
+                    <RichTextEditorCompact
                       value={formData.description_ar}
-                      onChange={(e) => setFormData(prev => ({ ...prev, description_ar: e.target.value }))}
-                      rows={4}
+                      onChange={(value) => setFormData(prev => ({ ...prev, description_ar: value }))}
+                      placeholder="وصف الحدث..."
+                      minHeight="150px"
+                      dir="rtl"
                     />
                   </div>
                   <div className="space-y-2">
