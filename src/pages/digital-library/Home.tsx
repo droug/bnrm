@@ -1,5 +1,5 @@
-// Force cache regeneration: v5 - 2026-01-19
-import { useState, useEffect, useRef } from "react";
+// Force cache regeneration: v6 - 2026-01-29
+import { useState, useEffect, useRef, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,6 +21,7 @@ import Autoplay from "embla-carousel-autoplay";
 import { format } from "date-fns";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useCmsStyles } from "@/hooks/useCmsStyles";
+import { useElectronicBundles } from "@/hooks/useElectronicBundles";
 import document1 from "@/assets/digital-library/document-1.jpg";
 import document2 from "@/assets/digital-library/document-2.jpg";
 import document3 from "@/assets/digital-library/document-3.jpg";
@@ -39,6 +40,27 @@ import logoBrill from "@/assets/logos/logo-brill.png";
 import logoCairn from "@/assets/logos/logo-cairn.svg";
 import logoAlmanhal from "@/assets/logos/logo-almanhal.png";
 import logoEni from "@/assets/logos/logo-eni.svg";
+import logoRfn from "@/assets/logos/logo-rfn.png";
+import logoEuropeana from "@/assets/logos/logo-europeana.svg";
+import logoIfla from "@/assets/logos/logo-ifla.svg";
+
+// Mapping des logos par nom de provider (insensible à la casse)
+const providerLogoMap: Record<string, string> = {
+  'cairn': logoCairn,
+  'cairn.info': logoCairn,
+  'brill': logoBrill,
+  'rfn': logoRfn,
+  'europeana': logoEuropeana,
+  'ifla': logoIfla,
+  'eni-elearning': logoEni,
+  'eni': logoEni,
+  'almanhal': logoAlmanhal,
+  'al-manhal': logoAlmanhal,
+};
+
+// Providers nécessitant un fond sombre (logos blancs)
+const darkBackgroundProviders = ['almanhal', 'al-manhal', 'eni', 'eni-elearning'];
+
 export default function DigitalLibraryHome() {
   const navigate = useNavigate();
   const {
@@ -52,6 +74,15 @@ export default function DigitalLibraryHome() {
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [repoCarouselIndex, setRepoCarouselIndex] = useState(0);
+  
+  // Fetch active electronic bundles
+  const { activeBundles } = useElectronicBundles();
+  
+  // Calculate max carousel index based on bundles count
+  const maxCarouselIndex = useMemo(() => {
+    if (!activeBundles || activeBundles.length <= 3) return 0;
+    return Math.ceil(activeBundles.length / 3) - 1;
+  }, [activeBundles]);
 
   // Fetch CMS styles for BN platform
   const {
@@ -725,138 +756,136 @@ export default function DigitalLibraryHome() {
           </div>
         </section>}
 
-      {/* Section Ressources électroniques - Style "Page d'accueil BN" */}
-      <section className="py-20 bg-gradient-to-b from-muted to-background relative overflow-hidden">
-        {/* Décorations de fond (très léger) */}
-        <div className="absolute bottom-0 left-0 w-64 h-64 opacity-10">
-          <div className="w-full h-full bg-gradient-to-tr from-gold-bn-primary/30 to-transparent rounded-full blur-3xl" />
-        </div>
-        <div className="absolute bottom-0 right-0 w-64 h-64 opacity-10">
-          <div className="w-full h-full bg-gradient-to-tl from-gold-bn-primary/30 to-transparent rounded-full blur-3xl" />
-        </div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          {/* Header */}
-          <div className="text-center mb-14">
-            {/* Icône dorée (grille + plus) */}
-            <div className="inline-flex items-center justify-center w-12 h-12 border border-gold-bn-primary rounded-lg mb-6">
-              <Icon name="mdi:select-multiple" className="w-6 h-6 text-gold-bn-primary" />
-            </div>
-
-            <h2 className="text-[48px] font-normal text-bn-blue-primary font-gilda">
-              Ressources électroniques
-            </h2>
-            <p className="font-body text-regular text-muted-foreground max-w-2xl mx-auto mt-4">
-              Ces ressources permettent la centralisation et le partage du patrimoine documentaire et culturel à l'échelle internationale
-            </p>
+      {/* Section Ressources électroniques - Dynamique depuis la BDD */}
+      {activeBundles && activeBundles.length > 0 && (
+        <section className="py-20 bg-gradient-to-b from-muted to-background relative overflow-hidden">
+          {/* Décorations de fond (très léger) */}
+          <div className="absolute bottom-0 left-0 w-64 h-64 opacity-10">
+            <div className="w-full h-full bg-gradient-to-tr from-gold-bn-primary/30 to-transparent rounded-full blur-3xl" />
+          </div>
+          <div className="absolute bottom-0 right-0 w-64 h-64 opacity-10">
+            <div className="w-full h-full bg-gradient-to-tl from-gold-bn-primary/30 to-transparent rounded-full blur-3xl" />
           </div>
 
-          {/* Carrousel */}
-          <div className="relative px-16">
-            {/* Flèche gauche */}
-            <button onClick={() => setRepoCarouselIndex(prev => Math.max(0, prev - 1))} disabled={repoCarouselIndex === 0} className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors disabled:opacity-20 disabled:cursor-not-allowed" aria-label="Précédent">
-              <Icon name="mdi:chevron-left" className="h-6 w-6" />
-            </button>
+          <div className="container mx-auto px-4 relative z-10">
+            {/* Header */}
+            <div className="text-center mb-14">
+              {/* Icône dorée (grille + plus) */}
+              <div className="inline-flex items-center justify-center w-12 h-12 border border-gold-bn-primary rounded-lg mb-6">
+                <Icon name="mdi:select-multiple" className="w-6 h-6 text-gold-bn-primary" />
+              </div>
 
-            {/* Slides */}
-            <div className="overflow-hidden">
-              <div className="flex transition-transform duration-500 ease-in-out" style={{
-              transform: `translateX(-${repoCarouselIndex * 33.333}%)`
-            }}>
-                {/* BRILL */}
-                <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <FancyTooltip content="BRILL" description="Maison d'édition académique néerlandaise spécialisée dans les sciences humaines et les études orientales." icon="mdi:book-open-variant" side="top" variant="gold">
-                    <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
-                      <CardContent className="p-8 flex flex-col items-center justify-center">
-                        <div className="flex items-center justify-center h-[80px]">
-                          <img src={logoBrill} alt="BRILL" className="h-[50px] max-w-[200px] object-contain" />
-                        </div>
-                        <a href="https://brill.com/" target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors">
-                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                        </a>
-                      </CardContent>
-                    </Card>
-                  </FancyTooltip>
-                </div>
+              <h2 className="text-[48px] font-normal text-bn-blue-primary font-gilda">
+                Ressources électroniques
+              </h2>
+              <p className="font-body text-regular text-muted-foreground max-w-2xl mx-auto mt-4">
+                Ces ressources permettent la centralisation et le partage du patrimoine documentaire et culturel à l'échelle internationale
+              </p>
+            </div>
 
-                {/* EBSCO */}
-                <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <FancyTooltip content="EBSCO" description="Fournisseur américain de bases de données, revues et livres numériques pour bibliothèques et universités." icon="mdi:database-search" side="top" variant="gold">
-                    <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
-                      <CardContent className="p-8 flex flex-col items-center justify-center">
-                        <div className="flex items-center justify-center h-[80px]">
-                          <div className="font-heading text-[42px] font-semibold text-bn-blue-primary tracking-wide">EBSCO</div>
-                        </div>
-                        <a href="https://www.ebsco.com/" target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors">
-                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                        </a>
-                      </CardContent>
-                    </Card>
-                  </FancyTooltip>
-                </div>
+            {/* Carrousel dynamique */}
+            <div className="relative px-16">
+              {/* Flèche gauche */}
+              <button 
+                onClick={() => setRepoCarouselIndex(prev => Math.max(0, prev - 1))} 
+                disabled={repoCarouselIndex === 0} 
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors disabled:opacity-20 disabled:cursor-not-allowed" 
+                aria-label="Précédent"
+              >
+                <Icon name="mdi:chevron-left" className="h-6 w-6" />
+              </button>
 
-                {/* CAIRN */}
-                <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <FancyTooltip content="CAIRN.INFO" description="Plateforme de référence pour les publications scientifiques francophones en sciences humaines et sociales." icon="mdi:school" side="top" variant="gold">
-                    <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
-                      <CardContent className="p-8 flex flex-col items-center justify-center">
-                        <div className="flex items-center justify-center h-[80px]">
-                          <img src={logoCairn} alt="CAIRN.INFO" className="h-[50px] max-w-[200px] object-contain" />
-                        </div>
-                        <a href="https://shs.cairn.info/" target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors">
-                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                        </a>
-                      </CardContent>
-                    </Card>
-                  </FancyTooltip>
-                </div>
+              {/* Slides */}
+              <div className="overflow-hidden">
+                <div 
+                  className="flex transition-transform duration-500 ease-in-out" 
+                  style={{ transform: `translateX(-${repoCarouselIndex * 33.333}%)` }}
+                >
+                  {activeBundles.map((bundle) => {
+                    // Chercher le logo local en priorité basé sur le nom du provider
+                    const providerKey = bundle.provider?.toLowerCase().trim();
+                    const localLogo = providerKey ? providerLogoMap[providerKey] : null;
+                    const logoSrc = localLogo || bundle.provider_logo_url;
+                    
+                    // Logos avec texte blanc nécessitant un fond sombre
+                    const needsDarkBackground = providerKey && darkBackgroundProviders.includes(providerKey);
+                    
+                    // URL de destination : priorité à api_base_url, sinon website_url
+                    const resourceUrl = bundle.api_base_url || bundle.website_url || '#';
+                    
+                    // Description pour le tooltip
+                    const description = language === 'ar' && bundle.description_ar 
+                      ? bundle.description_ar 
+                      : bundle.description || '';
 
-                {/* ALMANHAL */}
-                <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <FancyTooltip content="Al Manhal" description="La seule plateforme de bases de données académiques arabes entièrement consultables du Moyen-Orient, Afrique et Asie." icon="mdi:book-open-variant" side="top" variant="gold">
-                    <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
-                      <CardContent className="p-8 flex flex-col items-center justify-center">
-                        <div className="flex items-center justify-center h-[80px] bg-bn-blue-primary rounded-lg px-4">
-                          <img src={logoAlmanhal} alt="Al Manhal" className="h-[50px] max-w-[200px] object-contain" />
-                        </div>
-                        <a href="https://almanhal.com/" target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors">
-                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                        </a>
-                      </CardContent>
-                    </Card>
-                  </FancyTooltip>
-                </div>
-
-                {/* ENI elearning */}
-                <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <FancyTooltip content="ENI elearning" description="La plus grande plateforme de contenus IT : formations bureautiques, livres et vidéos conçus par des experts informatiques." icon="mdi:laptop" side="top" variant="gold">
-                    <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
-                      <CardContent className="p-8 flex flex-col items-center justify-center">
-                        <div className="flex items-center justify-center h-[80px] bg-bn-blue-primary rounded-lg px-4">
-                          <img src={logoEni} alt="ENI elearning" className="h-[50px] max-w-[200px] object-contain" />
-                        </div>
-                        <a href="https://www.eni-elearning.com/" target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors">
-                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                        </a>
-                      </CardContent>
-                    </Card>
-                  </FancyTooltip>
+                    return (
+                      <div key={bundle.id} className="flex-shrink-0 w-full md:w-1/3 px-4">
+                        <FancyTooltip 
+                          content={bundle.provider || bundle.name} 
+                          description={description}
+                          icon="mdi:book-open-variant" 
+                          side="top" 
+                          variant="gold"
+                        >
+                          <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+                            <CardContent className="p-8 flex flex-col items-center justify-center">
+                              <div className={`flex items-center justify-center h-[80px] ${needsDarkBackground ? 'bg-bn-blue-primary rounded-lg px-4' : ''}`}>
+                                {logoSrc ? (
+                                  <img 
+                                    src={logoSrc} 
+                                    alt={bundle.provider || bundle.name} 
+                                    className="h-[50px] max-w-[200px] object-contain" 
+                                  />
+                                ) : (
+                                  <div className="font-heading text-[42px] font-semibold text-bn-blue-primary tracking-wide">
+                                    {bundle.provider || bundle.name}
+                                  </div>
+                                )}
+                              </div>
+                              <a 
+                                href={resourceUrl} 
+                                target="_blank" 
+                                rel="noopener noreferrer" 
+                                className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
+                              >
+                                Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
+                              </a>
+                            </CardContent>
+                          </Card>
+                        </FancyTooltip>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
+
+              {/* Flèche droite */}
+              <button 
+                onClick={() => setRepoCarouselIndex(prev => Math.min(maxCarouselIndex, prev + 1))} 
+                disabled={repoCarouselIndex >= maxCarouselIndex} 
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors disabled:opacity-20 disabled:cursor-not-allowed" 
+                aria-label="Suivant"
+              >
+                <Icon name="mdi:chevron-right" className="h-6 w-6" />
+              </button>
             </div>
 
-            {/* Flèche droite */}
-            <button onClick={() => setRepoCarouselIndex(prev => Math.min(2, prev + 1))} disabled={repoCarouselIndex >= 2} className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors disabled:opacity-20 disabled:cursor-not-allowed" aria-label="Suivant">
-              <Icon name="mdi:chevron-right" className="h-6 w-6" />
-            </button>
+            {/* Pagination dynamique */}
+            {maxCarouselIndex > 0 && (
+              <div className="flex justify-center gap-3 mt-14">
+                {Array.from({ length: maxCarouselIndex + 1 }, (_, index) => (
+                  <button 
+                    key={index} 
+                    onClick={() => setRepoCarouselIndex(index)} 
+                    className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${repoCarouselIndex === index ? 'bg-gold-bn-primary' : 'bg-muted-foreground/25 hover:bg-muted-foreground/40'}`} 
+                    aria-label={`Aller à la page ${index + 1}`} 
+                  />
+                ))}
+              </div>
+            )}
           </div>
-
-          {/* Pagination */}
-          <div className="flex justify-center gap-3 mt-14">
-            {[0, 1, 2].map(index => <button key={index} onClick={() => setRepoCarouselIndex(index)} className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${repoCarouselIndex === index ? 'bg-gold-bn-primary' : 'bg-muted-foreground/25 hover:bg-muted-foreground/40'}`} aria-label={`Aller à la page ${index + 1}`} />)}
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Reservation Dialog */}
       {selectedDocument && userProfile && <ReservationRequestDialog isOpen={showReservationDialog} onClose={() => {
