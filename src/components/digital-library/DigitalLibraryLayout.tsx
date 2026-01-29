@@ -383,30 +383,31 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                     // Logos avec texte blanc nécessitant un fond sombre
                     const needsDarkBackground = providerKey === 'almanhal' || providerKey === 'eni' || providerKey === 'eni-elearning';
                     
-                    return (
-                      <DropdownMenuItem 
-                        key={bundle.id} 
-                        className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-2 px-3 rounded-md"
-                        onClick={() => {
-                          if (bundle.website_url) {
-                            window.open(bundle.website_url, '_blank');
-                          }
-                        }}
-                      >
-                        <div className="flex items-center justify-center w-full">
-                          {logoSrc ? (
-                            <div className={`rounded px-3 py-2 ${needsDarkBackground ? 'bg-bn-blue-primary' : ''}`}>
-                              <img src={logoSrc} alt={bundle.provider} className="h-7 w-auto max-w-[120px] object-contain" />
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-2">
-                              <Icon name="mdi:earth" className="h-5 w-5 text-gold-bn-primary" />
-                              <span className="font-medium">{language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name}</span>
-                            </div>
-                          )}
-                        </div>
-                      </DropdownMenuItem>
-                    );
+                      return (
+                        <DropdownMenuItem 
+                          key={bundle.id} 
+                          className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-2 px-3 rounded-md"
+                          asChild
+                        >
+                          <a 
+                            href={bundle.website_url || '#'} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-center w-full"
+                          >
+                            {logoSrc ? (
+                              <div className={`rounded px-3 py-2 ${needsDarkBackground ? 'bg-bn-blue-primary' : ''}`}>
+                                <img src={logoSrc} alt={bundle.provider} className="h-7 w-auto max-w-[120px] object-contain" />
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-2">
+                                <Icon name="mdi:earth" className="h-5 w-5 text-gold-bn-primary" />
+                                <span className="font-medium">{language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name}</span>
+                              </div>
+                            )}
+                          </a>
+                        </DropdownMenuItem>
+                      );
                   })
                 ) : (
                   <DropdownMenuItem disabled className="text-muted-foreground text-sm">
