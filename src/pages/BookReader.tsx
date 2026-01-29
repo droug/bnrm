@@ -767,6 +767,20 @@ const BookReader = () => {
     setRotation((rotation + 90) % 360);
   };
 
+  const handleResetRotation = () => {
+    setRotation(0);
+    setPageRotations({});
+    // Clear from localStorage
+    if (id) {
+      try {
+        localStorage.removeItem(`dl_page_rotations:${id}`);
+      } catch {
+        // ignore storage errors
+      }
+    }
+    toast.success("Rotation réinitialisée");
+  };
+
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen();
@@ -1454,6 +1468,13 @@ const BookReader = () => {
                         {pageRotations[currentPage + 1] ? "Rétablir" : "Tourner"} la page {currentPage + 1} (180°)
                       </DropdownMenuItem>
                     )}
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={handleResetRotation}
+                      disabled={rotation === 0 && Object.keys(pageRotations).length === 0}
+                    >
+                      Réinitialiser (version originale)
+                    </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
 
