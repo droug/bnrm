@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useElectronicBundles, ElectronicBundle } from "@/hooks/useElectronicBundles";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -12,10 +12,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Plus, Pencil, Trash2, Eye, EyeOff, ExternalLink, Key, Globe, Server, ArrowLeft } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, ExternalLink, Key, Globe, Server, ArrowLeft, Upload, X, ImageIcon } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const defaultBundle: Omit<ElectronicBundle, 'id' | 'created_at' | 'updated_at'> = {
   name: "",
@@ -50,11 +52,81 @@ const defaultBundle: Omit<ElectronicBundle, 'id' | 'created_at' | 'updated_at'> 
 
 export default function ElectronicBundlesManagement() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { bundles, isLoading, createBundle, updateBundle, deleteBundle, toggleActive } = useElectronicBundles();
   const [showDialog, setShowDialog] = useState(false);
   const [editingBundle, setEditingBundle] = useState<ElectronicBundle | null>(null);
   const [formData, setFormData] = useState(defaultBundle);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
+  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        title: "Type de fichier non supporté",
+        description: "Veuillez choisir un fichier PNG, JPG, SVG ou WebP",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Fichier trop volumineux",
+        description: "La taille maximale est de 5 Mo",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsUploadingLogo(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      
+      const { data, error } = await supabase.storage
+        .from('electronic-bundles-logos')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (error) throw error;
+
+      const { data: urlData } = supabase.storage
+        .from('electronic-bundles-logos')
+        .getPublicUrl(fileName);
+
+      updateFormField('provider_logo_url', urlData.publicUrl);
+      toast({
+        title: "Logo uploadé",
+        description: "Le logo a été uploadé avec succès",
+      });
+    } catch (error: any) {
+      console.error('Logo upload error:', error);
+      toast({
+        title: "Erreur d'upload",
+        description: error.message || "Impossible d'uploader le logo",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploadingLogo(false);
+      if (logoInputRef.current) {
+        logoInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleRemoveLogo = () => {
+    updateFormField('provider_logo_url', '');
+  };
 
   const handleEdit = (bundle: ElectronicBundle) => {
     setEditingBundle(bundle);
@@ -372,26 +444,81 @@ export default function ElectronicBundlesManagement() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="website_url">Site web</Label>
-                    <Input
-                      id="website_url"
-                      type="url"
-                      value={formData.website_url}
-                      onChange={(e) => updateFormField('website_url', e.target.value)}
-                      placeholder="https://www.jstor.org"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="provider_logo_url">URL du logo</Label>
-                    <Input
-                      id="provider_logo_url"
-                      type="url"
-                      value={formData.provider_logo_url}
-                      onChange={(e) => updateFormField('provider_logo_url', e.target.value)}
-                      placeholder="https://..."
-                    />
+                <div className="space-y-2">
+                  <Label htmlFor="website_url">Site web</Label>
+                  <Input
+                    id="website_url"
+                    type="url"
+                    value={formData.website_url}
+                    onChange={(e) => updateFormField('website_url', e.target.value)}
+                    placeholder="https://www.jstor.org"
+                  />
+                </div>
+
+                {/* Logo Upload Section */}
+                <div className="space-y-2">
+                  <Label>Logo du fournisseur (affiché dans le menu)</Label>
+                  <div className="flex items-start gap-4">
+                    {/* Logo Preview */}
+                    {formData.provider_logo_url ? (
+                      <div className="relative group">
+                        <div className="w-24 h-16 border rounded-lg overflow-hidden bg-muted flex items-center justify-center p-2">
+                          <img 
+                            src={formData.provider_logo_url} 
+                            alt="Logo preview" 
+                            className="max-w-full max-h-full object-contain"
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute -top-2 -right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={handleRemoveLogo}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="w-24 h-16 border-2 border-dashed rounded-lg flex items-center justify-center bg-muted/50">
+                        <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                    )}
+                    
+                    {/* Upload Controls */}
+                    <div className="flex-1 space-y-2">
+                      <input
+                        ref={logoInputRef}
+                        type="file"
+                        accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                        onChange={handleLogoUpload}
+                        className="hidden"
+                        id="logo-upload"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => logoInputRef.current?.click()}
+                        disabled={isUploadingLogo}
+                        className="w-full"
+                      >
+                        {isUploadingLogo ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2" />
+                            Upload en cours...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="h-4 w-4 mr-2" />
+                            Uploader un logo
+                          </>
+                        )}
+                      </Button>
+                      <p className="text-xs text-muted-foreground">
+                        PNG, JPG, SVG ou WebP (max. 5 Mo)
+                      </p>
+                    </div>
                   </div>
                 </div>
 
