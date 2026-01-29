@@ -1707,43 +1707,40 @@ const BookReader = () => {
                   </div>
                 </div>
               ) : (
-                /* Mode Simple - affichage d'une seule page entière dans le conteneur */
-                <div className="flex-1 min-h-0 flex items-center justify-center overflow-hidden">
+                /* Mode Simple - ajuster à la hauteur du conteneur en conservant le ratio */
+                <div className="flex-1 min-h-0 flex items-center justify-center p-4 md:p-8">
                   {(() => {
                     const totalRotation = rotation + (pageRotations[currentPage] ?? 0);
                     const isPdfMode = pdfUrl && documentPages.length === 0;
-                    
+
                     return (
                       <PanZoomContainer
                         zoom={zoom}
                         rotation={isPdfMode ? 0 : totalRotation}
-                        className="w-full h-full flex items-center justify-center"
+                        className="w-full h-full"
                       >
-                        <Card className="shadow-2xl h-full max-h-full flex items-center justify-center">
-                          <CardContent className="p-0 h-full flex items-center justify-center">
-                            <div className="relative h-full flex items-center justify-center">
+                        <Card className="shadow-2xl h-full max-h-full max-w-full">
+                          <CardContent className="p-0 h-full max-h-full max-w-full flex items-center justify-center">
+                            <div className="relative h-full max-h-full max-w-full flex items-center justify-center">
                               {isPdfMode ? (
-                                <div className="h-full flex items-center justify-center" style={{ maxHeight: 'calc(100vh - 10rem)' }}>
-                                  <OptimizedPdfPageRenderer
-                                    pdfUrl={pdfUrl}
-                                    pageNumber={currentPage}
-                                    scale={1}
-                                    rotation={totalRotation}
-                                    className="h-full w-auto object-contain"
-                                    onPageLoad={(totalPages) => {
-                                      if (actualTotalPages !== totalPages) {
-                                        setActualTotalPages(totalPages);
-                                      }
-                                    }}
-                                    preloadPages={[currentPage - 1, currentPage + 1, currentPage + 2]}
-                                  />
-                                </div>
+                                <OptimizedPdfPageRenderer
+                                  pdfUrl={pdfUrl}
+                                  pageNumber={currentPage}
+                                  scale={1.5}
+                                  rotation={totalRotation}
+                                  className="h-full max-h-full max-w-full flex items-center justify-center"
+                                  onPageLoad={(totalPages) => {
+                                    if (actualTotalPages !== totalPages) {
+                                      setActualTotalPages(totalPages);
+                                    }
+                                  }}
+                                  preloadPages={[currentPage - 1, currentPage + 1, currentPage + 2]}
+                                />
                               ) : documentPages.length > 0 || (documentImage && !documentImage.includes('manuscript-page')) ? (
-                                <img 
+                                <img
                                   src={getCurrentPageImage(currentPage) || ''}
                                   alt={`Page ${currentPage}`}
-                                  className="h-full w-auto object-contain pointer-events-none"
-                                  style={{ maxHeight: 'calc(100vh - 10rem)' }}
+                                  className="block max-w-full max-h-full w-auto h-auto object-contain pointer-events-none"
                                 />
                               ) : (
                                 /* Fallback - ne devrait pas arriver grâce à hasDisplayableContent */

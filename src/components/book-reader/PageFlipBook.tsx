@@ -103,26 +103,31 @@ export const PageFlipBook = forwardRef<PageFlipBookHandle, PageFlipBookProps>(({
     // Target aspect ratio (3:4 for document pages)
     const aspectRatio = 3 / 4;
 
-    // Calculate max dimensions with padding
-    const maxWidth = containerWidth * 0.9; // 90% of container width
-    const maxHeight = containerHeight * 0.9; // 90% of container height
+    // Use the available container height and compute per-page size for a 2-page spread
+    const availableWidth = containerWidth - 32; // room for shadows
+    const availableHeight = containerHeight - 16;
 
     let pageWidth: number;
     let pageHeight: number;
 
-    // Calculate based on height first
-    pageHeight = maxHeight;
-    pageWidth = pageHeight * aspectRatio;
+    // Each page gets about half the width
+    const maxPageWidth = (availableWidth / 2) - 8; // small gutter between pages
+    const maxPageHeight = availableHeight;
 
-    // If too wide, scale down by width
-    if (pageWidth * 2 > maxWidth) {
-      pageWidth = maxWidth / 2;
-      pageHeight = pageWidth / aspectRatio;
+    const heightBasedWidth = maxPageHeight * aspectRatio;
+    const widthBasedHeight = maxPageWidth / aspectRatio;
+
+    if (heightBasedWidth <= maxPageWidth) {
+      pageHeight = maxPageHeight;
+      pageWidth = heightBasedWidth;
+    } else {
+      pageWidth = maxPageWidth;
+      pageHeight = widthBasedHeight;
     }
 
-    // Ensure minimum dimensions
-    pageWidth = Math.max(280, Math.min(600, pageWidth));
-    pageHeight = Math.max(373, Math.min(800, pageHeight));
+    // Minimums only (no max cap) so it can scale up with the UI
+    pageWidth = Math.max(280, pageWidth);
+    pageHeight = Math.max(373, pageHeight);
 
     setDimensions({ width: Math.round(pageWidth), height: Math.round(pageHeight) });
   }, []);
@@ -153,15 +158,20 @@ export const PageFlipBook = forwardRef<PageFlipBookHandle, PageFlipBookProps>(({
   const displayImages = isRtl ? [...images].reverse() : images;
 
   return (
-    <div ref={containerRef} className="flex items-center justify-center w-full h-full" style={{ minHeight: "400px" }} dir={isRtl ? "rtl" : "ltr"}>
+    <div
+      ref={containerRef}
+      className="flex items-center justify-center w-full h-full min-h-0"
+      style={{ minHeight: "400px" }}
+      dir={isRtl ? "rtl" : "ltr"}
+    >
       <HTMLFlipBook
         width={dimensions.width}
         height={dimensions.height}
         size="stretch"
         minWidth={280}
-        maxWidth={600}
+        maxWidth={2000}
         minHeight={373}
-        maxHeight={800}
+        maxHeight={2600}
         maxShadowOpacity={0.5}
         showCover={true}
         mobileScrollSupport={true}
@@ -176,7 +186,7 @@ export const PageFlipBook = forwardRef<PageFlipBookHandle, PageFlipBookProps>(({
         startPage={isRtl ? images.length - currentPage : currentPage - 1}
         drawShadow={true}
         flippingTime={800}
-        usePortrait={true}
+        usePortrait={false}
         startZIndex={0}
         autoSize={true}
         clickEventForward={true}
