@@ -37,9 +37,8 @@ import virtualExhibitionBg from "@/assets/virtual-exhibition-bg.png";
 // Logos ressources électroniques
 import logoBrill from "@/assets/logos/logo-brill.png";
 import logoCairn from "@/assets/logos/logo-cairn.svg";
-import logoRfn from "@/assets/logos/logo-rfn.png";
-import logoEuropeana from "@/assets/logos/logo-europeana.svg";
-import logoIfla from "@/assets/logos/logo-ifla.svg";
+import logoAlmanhal from "@/assets/logos/logo-almanhal.png";
+import logoEni from "@/assets/logos/logo-eni.png";
 export default function DigitalLibraryHome() {
   const navigate = useNavigate();
   const {
@@ -812,15 +811,15 @@ export default function DigitalLibraryHome() {
                   </FancyTooltip>
                 </div>
 
-                {/* RFN */}
+                {/* ALMANHAL */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <FancyTooltip content="Réseau Francophone Numérique" description="Collections patrimoniales des bibliothèques nationales francophones pour préserver le patrimoine documentaire commun." icon="mdi:earth" side="top" variant="gold">
+                  <FancyTooltip content="Al Manhal" description="La seule plateforme de bases de données académiques arabes entièrement consultables du Moyen-Orient, Afrique et Asie." icon="mdi:book-open-variant" side="top" variant="gold">
                     <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
                       <CardContent className="p-8 flex flex-col items-center justify-center">
                         <div className="flex items-center justify-center h-[80px]">
-                          <img src={logoRfn} alt="RFN" className="h-[50px] max-w-[200px] object-contain" />
+                          <img src={logoAlmanhal} alt="Al Manhal" className="h-[50px] max-w-[200px] object-contain" />
                         </div>
-                        <a href="https://rfnum.org" target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors">
+                        <a href="https://almanhal.com/" target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors">
                           Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
                         </a>
                       </CardContent>
@@ -828,31 +827,15 @@ export default function DigitalLibraryHome() {
                   </FancyTooltip>
                 </div>
 
-                {/* Europeana */}
+                {/* ENI elearning */}
                 <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <FancyTooltip content="Europeana" description="Agrégateur central du patrimoine culturel européen — initiative de l'UE pour la numérisation culturelle." icon="mdi:castle" side="top" variant="gold">
+                  <FancyTooltip content="ENI elearning" description="La plus grande plateforme de contenus IT : formations bureautiques, livres et vidéos conçus par des experts informatiques." icon="mdi:laptop" side="top" variant="gold">
                     <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
                       <CardContent className="p-8 flex flex-col items-center justify-center">
                         <div className="flex items-center justify-center h-[80px]">
-                          <img src={logoEuropeana} alt="Europeana" className="h-[50px] max-w-[200px] object-contain" />
+                          <img src={logoEni} alt="ENI elearning" className="h-[50px] max-w-[200px] object-contain" />
                         </div>
-                        <a href="https://www.europeana.eu" target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors">
-                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                        </a>
-                      </CardContent>
-                    </Card>
-                  </FancyTooltip>
-                </div>
-
-                {/* IFLA */}
-                <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <FancyTooltip content="IFLA" description="Fédération Internationale des Associations de Bibliothécaires — normes pour l'interopérabilité mondiale." icon="mdi:library" side="top" variant="gold">
-                    <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
-                      <CardContent className="p-8 flex flex-col items-center justify-center">
-                        <div className="flex items-center justify-center h-[80px]">
-                          <img src={logoIfla} alt="IFLA" className="h-[50px] max-w-[200px] object-contain" />
-                        </div>
-                        <a href="https://www.ifla.org" target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors">
+                        <a href="https://www.eni-elearning.com/" target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors">
                           Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
                         </a>
                       </CardContent>
@@ -863,14 +846,14 @@ export default function DigitalLibraryHome() {
             </div>
 
             {/* Flèche droite */}
-            <button onClick={() => setRepoCarouselIndex(prev => Math.min(3, prev + 1))} disabled={repoCarouselIndex >= 3} className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors disabled:opacity-20 disabled:cursor-not-allowed" aria-label="Suivant">
+            <button onClick={() => setRepoCarouselIndex(prev => Math.min(2, prev + 1))} disabled={repoCarouselIndex >= 2} className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors disabled:opacity-20 disabled:cursor-not-allowed" aria-label="Suivant">
               <Icon name="mdi:chevron-right" className="h-6 w-6" />
             </button>
           </div>
 
           {/* Pagination */}
           <div className="flex justify-center gap-3 mt-14">
-            {[0, 1, 2, 3].map(index => <button key={index} onClick={() => setRepoCarouselIndex(index)} className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${repoCarouselIndex === index ? 'bg-gold-bn-primary' : 'bg-muted-foreground/25 hover:bg-muted-foreground/40'}`} aria-label={`Aller à la page ${index + 1}`} />)}
+            {[0, 1, 2].map(index => <button key={index} onClick={() => setRepoCarouselIndex(index)} className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${repoCarouselIndex === index ? 'bg-gold-bn-primary' : 'bg-muted-foreground/25 hover:bg-muted-foreground/40'}`} aria-label={`Aller à la page ${index + 1}`} />)}
           </div>
         </div>
       </section>
