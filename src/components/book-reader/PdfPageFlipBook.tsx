@@ -199,15 +199,15 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
     // Target aspect ratio (3:4 for document pages - typical manuscript ratio)
     const aspectRatio = 3 / 4;
 
-    // Use FULL available space - minimize margins for maximum page size
-    const availableWidth = containerWidth - 32; // Small margin for shadows
-    const availableHeight = containerHeight - 16;
+    // Reserve more space for shadows and avoid clipping - 48px top/bottom margin
+    const availableWidth = containerWidth - 48;
+    const availableHeight = containerHeight - 64; // More margin to prevent top/bottom clipping
 
     let pageWidth: number;
     let pageHeight: number;
 
     // For double-page: each page gets roughly half the width
-    const maxPageWidth = (availableWidth / 2) - 8; // Gap between pages
+    const maxPageWidth = (availableWidth / 2) - 16; // Gap between pages
     const maxPageHeight = availableHeight;
 
     // Calculate dimensions that fit within constraints while maintaining aspect ratio
@@ -224,9 +224,9 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
       pageHeight = widthBasedHeight;
     }
 
-    // Only apply minimum constraints, no maximum - let pages fill the space
-    pageWidth = Math.max(280, pageWidth);
-    pageHeight = Math.max(373, pageHeight);
+    // Apply constraints
+    pageWidth = Math.max(280, Math.min(pageWidth, 800));
+    pageHeight = Math.max(373, Math.min(pageHeight, 1100));
 
     setDimensions({ width: Math.round(pageWidth), height: Math.round(pageHeight) });
   }, []);
