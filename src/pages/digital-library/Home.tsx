@@ -34,11 +34,8 @@ import manuscritsAndalous from "@/assets/digital-library/manuscrits-andalous.jpg
 import documentsAdministratifs from "@/assets/digital-library/documents-administratifs.jpg";
 import libraryBanner from "@/assets/digital-library/library-banner.jpg";
 import virtualExhibitionBg from "@/assets/virtual-exhibition-bg.png";
-// Logos ressources électroniques
-import logoBrill from "@/assets/logos/logo-brill.png";
-import logoCairn from "@/assets/logos/logo-cairn.svg";
-import logoAlmanhal from "@/assets/logos/logo-almanhal.png";
-import logoEni from "@/assets/logos/logo-eni.svg";
+// Dynamic electronic resources section
+import { ElectronicResourcesHomeSection } from "@/components/digital-library/ElectronicResourcesHomeSection";
 export default function DigitalLibraryHome() {
   const navigate = useNavigate();
   const {
@@ -51,7 +48,6 @@ export default function DigitalLibraryHome() {
   const [showReservationDialog, setShowReservationDialog] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
-  const [repoCarouselIndex, setRepoCarouselIndex] = useState(0);
 
   // Fetch CMS styles for BN platform
   const {
@@ -725,138 +721,8 @@ export default function DigitalLibraryHome() {
           </div>
         </section>}
 
-      {/* Section Ressources électroniques - Style "Page d'accueil BN" */}
-      <section className="py-20 bg-gradient-to-b from-muted to-background relative overflow-hidden">
-        {/* Décorations de fond (très léger) */}
-        <div className="absolute bottom-0 left-0 w-64 h-64 opacity-10">
-          <div className="w-full h-full bg-gradient-to-tr from-gold-bn-primary/30 to-transparent rounded-full blur-3xl" />
-        </div>
-        <div className="absolute bottom-0 right-0 w-64 h-64 opacity-10">
-          <div className="w-full h-full bg-gradient-to-tl from-gold-bn-primary/30 to-transparent rounded-full blur-3xl" />
-        </div>
-
-        <div className="container mx-auto px-4 relative z-10">
-          {/* Header */}
-          <div className="text-center mb-14">
-            {/* Icône dorée (grille + plus) */}
-            <div className="inline-flex items-center justify-center w-12 h-12 border border-gold-bn-primary rounded-lg mb-6">
-              <Icon name="mdi:select-multiple" className="w-6 h-6 text-gold-bn-primary" />
-            </div>
-
-            <h2 className="text-[48px] font-normal text-bn-blue-primary font-gilda">
-              Ressources électroniques
-            </h2>
-            <p className="font-body text-regular text-muted-foreground max-w-2xl mx-auto mt-4">
-              Ces ressources permettent la centralisation et le partage du patrimoine documentaire et culturel à l'échelle internationale
-            </p>
-          </div>
-
-          {/* Carrousel */}
-          <div className="relative px-16">
-            {/* Flèche gauche */}
-            <button onClick={() => setRepoCarouselIndex(prev => Math.max(0, prev - 1))} disabled={repoCarouselIndex === 0} className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors disabled:opacity-20 disabled:cursor-not-allowed" aria-label="Précédent">
-              <Icon name="mdi:chevron-left" className="h-6 w-6" />
-            </button>
-
-            {/* Slides */}
-            <div className="overflow-hidden">
-              <div className="flex transition-transform duration-500 ease-in-out" style={{
-              transform: `translateX(-${repoCarouselIndex * 33.333}%)`
-            }}>
-                {/* BRILL */}
-                <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <FancyTooltip content="BRILL" description="Maison d'édition académique néerlandaise spécialisée dans les sciences humaines et les études orientales." icon="mdi:book-open-variant" side="top" variant="gold">
-                    <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
-                      <CardContent className="p-8 flex flex-col items-center justify-center">
-                        <div className="flex items-center justify-center h-[80px]">
-                          <img src={logoBrill} alt="BRILL" className="h-[50px] max-w-[200px] object-contain" />
-                        </div>
-                        <a href="https://brill.com/" target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors">
-                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                        </a>
-                      </CardContent>
-                    </Card>
-                  </FancyTooltip>
-                </div>
-
-                {/* EBSCO */}
-                <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <FancyTooltip content="EBSCO" description="Fournisseur américain de bases de données, revues et livres numériques pour bibliothèques et universités." icon="mdi:database-search" side="top" variant="gold">
-                    <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
-                      <CardContent className="p-8 flex flex-col items-center justify-center">
-                        <div className="flex items-center justify-center h-[80px]">
-                          <div className="font-heading text-[42px] font-semibold text-bn-blue-primary tracking-wide">EBSCO</div>
-                        </div>
-                        <a href="https://www.ebsco.com/" target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors">
-                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                        </a>
-                      </CardContent>
-                    </Card>
-                  </FancyTooltip>
-                </div>
-
-                {/* CAIRN */}
-                <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <FancyTooltip content="CAIRN.INFO" description="Plateforme de référence pour les publications scientifiques francophones en sciences humaines et sociales." icon="mdi:school" side="top" variant="gold">
-                    <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
-                      <CardContent className="p-8 flex flex-col items-center justify-center">
-                        <div className="flex items-center justify-center h-[80px]">
-                          <img src={logoCairn} alt="CAIRN.INFO" className="h-[50px] max-w-[200px] object-contain" />
-                        </div>
-                        <a href="https://shs.cairn.info/" target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors">
-                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                        </a>
-                      </CardContent>
-                    </Card>
-                  </FancyTooltip>
-                </div>
-
-                {/* ALMANHAL */}
-                <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <FancyTooltip content="Al Manhal" description="La seule plateforme de bases de données académiques arabes entièrement consultables du Moyen-Orient, Afrique et Asie." icon="mdi:book-open-variant" side="top" variant="gold">
-                    <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
-                      <CardContent className="p-8 flex flex-col items-center justify-center">
-                        <div className="flex items-center justify-center h-[80px] bg-bn-blue-primary rounded-lg px-4">
-                          <img src={logoAlmanhal} alt="Al Manhal" className="h-[50px] max-w-[200px] object-contain" />
-                        </div>
-                        <a href="https://almanhal.com/" target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors">
-                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                        </a>
-                      </CardContent>
-                    </Card>
-                  </FancyTooltip>
-                </div>
-
-                {/* ENI elearning */}
-                <div className="flex-shrink-0 w-full md:w-1/3 px-4">
-                  <FancyTooltip content="ENI elearning" description="La plus grande plateforme de contenus IT : formations bureautiques, livres et vidéos conçus par des experts informatiques." icon="mdi:laptop" side="top" variant="gold">
-                    <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
-                      <CardContent className="p-8 flex flex-col items-center justify-center">
-                        <div className="flex items-center justify-center h-[80px] bg-bn-blue-primary rounded-lg px-4">
-                          <img src={logoEni} alt="ENI elearning" className="h-[50px] max-w-[200px] object-contain" />
-                        </div>
-                        <a href="https://www.eni-elearning.com/" target="_blank" rel="noopener noreferrer" className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors">
-                          Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                        </a>
-                      </CardContent>
-                    </Card>
-                  </FancyTooltip>
-                </div>
-              </div>
-            </div>
-
-            {/* Flèche droite */}
-            <button onClick={() => setRepoCarouselIndex(prev => Math.min(2, prev + 1))} disabled={repoCarouselIndex >= 2} className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors disabled:opacity-20 disabled:cursor-not-allowed" aria-label="Suivant">
-              <Icon name="mdi:chevron-right" className="h-6 w-6" />
-            </button>
-          </div>
-
-          {/* Pagination */}
-          <div className="flex justify-center gap-3 mt-14">
-            {[0, 1, 2].map(index => <button key={index} onClick={() => setRepoCarouselIndex(index)} className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${repoCarouselIndex === index ? 'bg-gold-bn-primary' : 'bg-muted-foreground/25 hover:bg-muted-foreground/40'}`} aria-label={`Aller à la page ${index + 1}`} />)}
-          </div>
-        </div>
-      </section>
+      {/* Section Ressources électroniques - Dynamic from database */}
+      <ElectronicResourcesHomeSection />
 
       {/* Reservation Dialog */}
       {selectedDocument && userProfile && <ReservationRequestDialog isOpen={showReservationDialog} onClose={() => {
