@@ -47,6 +47,7 @@ export default function DocumentDetails() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [document, setDocument] = useState<any>(null);
+  const [effectiveDocumentId, setEffectiveDocumentId] = useState<string | null>(null);
   const [accessRestrictions, setAccessRestrictions] = useState<any>(null);
   const [pageAccessRestrictions, setPageAccessRestrictions] = useState<any>(null);
   const [isManuscript, setIsManuscript] = useState(false);
@@ -68,25 +69,56 @@ export default function DocumentDetails() {
     
     setLoading(true);
     try {
-      // Charger les restrictions d'accès
-      const { data: restrictionsData } = await supabase
-        .from('digital_library_access_restrictions')
-        .select('*')
-        .eq('document_id', documentId)
-        .maybeSingle();
-      
-      setAccessRestrictions(restrictionsData);
+      const loadRestrictionsFor = async (id: string) => {
+        const [{ data: restrictionsData }, { data: pageRestrictionsData }] = await Promise.all([
+          supabase
+            .from('digital_library_access_restrictions')
+            .select('*')
+            .eq('document_id', id)
+            .maybeSingle(),
+          supabase
+            .from('page_access_restrictions')
+            .select('*')
+            .eq('content_id', id)
+            .maybeSingle(),
+        ]);
 
-      // Charger les restrictions de pages (mode d'accès internet/interne)
-      const { data: pageRestrictionsData } = await supabase
-        .from('page_access_restrictions')
-        .select('*')
-        .eq('content_id', documentId)
-        .maybeSingle();
-      
-      setPageAccessRestrictions(pageRestrictionsData);
+        setAccessRestrictions(restrictionsData);
+        setPageAccessRestrictions(pageRestrictionsData);
+      };
 
-      // Essayer d'abord la table cbn_documents (source principale de la recherche)
+      // 1) Priorité: digital_library_documents (ID utilisé par /admin/digital-library/documents et /digital-library/search)
+      const { data: dlData, error: dlError } = await supabase
+        .from('digital_library_documents')
+        .select('*')
+        .eq('id', documentId)
+        .maybeSingle();
+
+      if (dlData && !dlError) {
+        const mapped = {
+          ...dlData,
+          // Harmoniser le champ utilisé par l'UI (download/read)
+          file_url: (dlData as any).pdf_url ?? (dlData as any).file_url ?? null,
+          // Harmoniser le statut
+          status: (dlData as any).publication_status ?? (dlData as any).status ?? 'published',
+          // Harmoniser les tags
+          tags: (dlData as any).keywords ?? (dlData as any).themes ?? [],
+          // Fallback description
+          description: (dlData as any).description ?? (dlData as any).content_notes ?? null,
+          // Vignettes
+          thumbnail_url: (dlData as any).thumbnail_url ?? (dlData as any).cover_image_url ?? null,
+        };
+
+        setDocument(mapped);
+        setEffectiveDocumentId(dlData.id);
+        setIsManuscript(Boolean((dlData as any).is_manuscript) || String((dlData as any).document_type || '').toLowerCase().includes('manuscr'));
+        setAuthorName((dlData as any).author || '');
+        await loadRestrictionsFor(dlData.id);
+        setLoading(false);
+        return;
+      }
+
+      // 2) Fallback: cbn_documents (anciens liens / index)
       const { data: cbnData, error: cbnError } = await supabase
         .from('cbn_documents')
         .select('*')
@@ -94,6 +126,34 @@ export default function DocumentDetails() {
         .maybeSingle();
 
       if (cbnData && !cbnError) {
+        // Si cbn_documents référence un digital_library_documents, privilégier celui-ci
+        if ((cbnData as any).digital_library_document_id) {
+          const linkedId = (cbnData as any).digital_library_document_id as string;
+          const { data: linkedDl } = await supabase
+            .from('digital_library_documents')
+            .select('*')
+            .eq('id', linkedId)
+            .maybeSingle();
+
+          if (linkedDl) {
+            const mapped = {
+              ...linkedDl,
+              file_url: (linkedDl as any).pdf_url ?? (linkedDl as any).file_url ?? null,
+              status: (linkedDl as any).publication_status ?? (linkedDl as any).status ?? 'published',
+              tags: (linkedDl as any).keywords ?? (linkedDl as any).themes ?? [],
+              description: (linkedDl as any).description ?? (linkedDl as any).content_notes ?? null,
+              thumbnail_url: (linkedDl as any).thumbnail_url ?? (linkedDl as any).cover_image_url ?? null,
+            };
+            setDocument(mapped);
+            setEffectiveDocumentId(linkedDl.id);
+            setIsManuscript(Boolean((linkedDl as any).is_manuscript) || String((linkedDl as any).document_type || '').toLowerCase().includes('manuscr'));
+            setAuthorName((linkedDl as any).author || (cbnData as any).author || '');
+            await loadRestrictionsFor(linkedDl.id);
+            setLoading(false);
+            return;
+          }
+        }
+
         // Transformer les données cbn_documents pour correspondre au format attendu
         setDocument({
           ...cbnData,
@@ -114,8 +174,10 @@ export default function DocumentDetails() {
             marc_300: cbnData.physical_description,
           }
         });
+        setEffectiveDocumentId(cbnData.id);
         setIsManuscript(cbnData.document_type === 'Manuscrit');
         setAuthorName(cbnData.author || '');
+        await loadRestrictionsFor(cbnData.id);
         setLoading(false);
         return;
       }
@@ -189,9 +251,9 @@ export default function DocumentDetails() {
   const handleRead = () => {
     // Tous les documents de la bibliothèque numérique sont numérisés
     if (isManuscript) {
-      navigate(`/manuscript-reader/${documentId}`);
+      navigate(`/manuscript-reader/${effectiveDocumentId || documentId}`);
     } else {
-      navigate(`/digital-library/book-reader/${documentId}`);
+      navigate(`/digital-library/book-reader/${effectiveDocumentId || documentId}`);
     }
   };
 
