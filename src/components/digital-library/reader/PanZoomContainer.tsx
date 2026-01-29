@@ -105,7 +105,8 @@ export function PanZoomContainer({
     <div
       ref={containerRef}
       className={cn(
-        "w-full h-full flex items-stretch justify-center overflow-hidden select-none",
+        "w-full h-full flex items-stretch justify-center select-none",
+        canPan ? "overflow-hidden" : "overflow-visible",
         className
       )}
       onMouseDown={handleMouseDown}
