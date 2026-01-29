@@ -15,6 +15,7 @@ import { PdfPageFlipBook, type PdfPageFlipBookHandle } from "@/components/book-r
 import { DocumentSearchInBook } from "@/components/digital-library/DocumentSearchInBook";
 import { SidebarSearchInBook } from "@/components/digital-library/SidebarSearchInBook";
 import { OptimizedPdfPageRenderer, preloadPdfPages, clearPdfCache } from "@/components/digital-library/OptimizedPdfPageRenderer";
+import { PdfPageWithHighlight } from "@/components/digital-library/PdfPageWithHighlight";
 import { VirtualizedScrollReader } from "@/components/digital-library/reader/VirtualizedScrollReader";
 import { DraggableDoublePage } from "@/components/digital-library/reader/DraggableDoublePage";
 import { ReproductionAuthChoiceModal } from "@/components/digital-library/ReproductionAuthChoiceModal";
@@ -207,6 +208,7 @@ const BookReader = () => {
   const [actualTotalPages, setActualTotalPages] = useState(245);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [documentLanguage, setDocumentLanguage] = useState<string | null>(null);
+  const [searchHighlight, setSearchHighlight] = useState<string>("");
 
   const getDefaultPageRotations = (docId?: string): Record<number, number> => {
     if (!docId) return {};
@@ -1283,6 +1285,10 @@ const BookReader = () => {
                     documentId={documentData?.id || id || ''}
                     onPageSelect={(pageNumber, highlightText) => {
                       goToPage(pageNumber);
+                      // Stocker le texte recherché pour la surbrillance
+                      if (highlightText) {
+                        setSearchHighlight(highlightText);
+                      }
                     }}
                     isOcrProcessed={isOcrProcessed}
                   />
@@ -1494,6 +1500,19 @@ const BookReader = () => {
                 >
                   <Search className="h-4 w-4" />
                 </Button>
+                
+                {/* Indicateur de surbrillance active */}
+                {searchHighlight && (
+                  <Badge 
+                    variant="secondary" 
+                    className="flex items-center gap-1 cursor-pointer hover:bg-destructive/20"
+                    onClick={() => setSearchHighlight("")}
+                    title="Cliquer pour effacer la surbrillance"
+                  >
+                    <span className="max-w-[100px] truncate">"{searchHighlight}"</span>
+                    <span className="text-xs">✕</span>
+                  </Badge>
+                )}
               </div>
 
               {/* Reading Mode */}
@@ -1644,6 +1663,7 @@ const BookReader = () => {
                         isPageAccessible={isPageAccessible}
                         restrictedPageDisplay={restrictedPageDisplay}
                         getAccessDeniedMessage={getAccessDeniedMessage}
+                        searchHighlight={searchHighlight}
                       />
                     ) : (
                       /* Mode scroll avec images pré-extraites - scroll interne */
@@ -1762,7 +1782,7 @@ const BookReader = () => {
                             <CardContent className="p-0 flex items-center justify-center">
                               <div className="relative flex items-center justify-center">
                                 {isPdfMode ? (
-                                  <OptimizedPdfPageRenderer
+                                  <PdfPageWithHighlight
                                     pdfUrl={pdfUrl}
                                     pageNumber={currentPage}
                                     scale={1.2}
@@ -1774,6 +1794,7 @@ const BookReader = () => {
                                       }
                                     }}
                                     preloadPages={[currentPage - 1, currentPage + 1, currentPage + 2]}
+                                    searchHighlight={searchHighlight}
                                   />
                                 ) : documentPages.length > 0 || (documentImage && !documentImage.includes('manuscript-page')) ? (
                                   <img
@@ -1924,6 +1945,10 @@ const BookReader = () => {
             onPageSelect={(pageNumber, highlightText) => {
               goToPage(pageNumber);
               setShowSearch(false);
+              // Stocker le texte recherché pour la surbrillance
+              if (highlightText) {
+                setSearchHighlight(highlightText);
+              }
             }}
             isOcrProcessed={isOcrProcessed}
           />

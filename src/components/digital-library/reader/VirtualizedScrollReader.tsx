@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback, memo } from 'react';
+import { PdfPageWithHighlight } from '../PdfPageWithHighlight';
 import { OptimizedPdfPageRenderer, preloadPdfPages } from '../OptimizedPdfPageRenderer';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -17,6 +18,7 @@ interface VirtualizedScrollReaderProps {
   isPageAccessible: (page: number) => boolean;
   restrictedPageDisplay: 'blur' | 'empty' | 'hidden';
   getAccessDeniedMessage: () => string;
+  searchHighlight?: string;
 }
 
 const BUFFER_PAGES = 3; // Pages à rendre au-dessus/en-dessous de la zone visible
@@ -34,6 +36,7 @@ export const VirtualizedScrollReader = memo(function VirtualizedScrollReader({
   isPageAccessible,
   restrictedPageDisplay,
   getAccessDeniedMessage,
+  searchHighlight,
 }: VirtualizedScrollReaderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [visibleRange, setVisibleRange] = useState({ start: 1, end: 5 });
@@ -158,12 +161,13 @@ export const VirtualizedScrollReader = memo(function VirtualizedScrollReader({
                 <CardContent className="p-0">
                   <div className="w-full max-w-[600px] bg-gradient-to-br from-background to-muted flex items-center justify-center relative overflow-hidden">
                     {isAccessible ? (
-                      <OptimizedPdfPageRenderer
+                      <PdfPageWithHighlight
                         pdfUrl={pdfUrl}
                         pageNumber={pageNum}
                         scale={1.2}
                         rotation={rotation + (pageRotations[pageNum] ?? 0)}
                         priority={pageNum === visibleRange.start || pageNum === visibleRange.start + 1 ? 'high' : 'low'}
+                        searchHighlight={searchHighlight}
                       />
                     ) : restrictedPageDisplay === 'blur' ? (
                       <div className="relative w-full">
