@@ -1707,8 +1707,8 @@ const BookReader = () => {
                   </div>
                 </div>
               ) : (
-                /* Mode Simple - affichage d'une seule page - proportionnel au conteneur */
-                <div className="flex-1 min-h-0 flex items-center justify-center p-2 md:p-4">
+                /* Mode Simple - affichage d'une seule page entière dans le conteneur */
+                <div className="flex-1 min-h-0 flex items-center justify-center overflow-hidden">
                   {(() => {
                     const totalRotation = rotation + (pageRotations[currentPage] ?? 0);
                     const isPdfMode = pdfUrl && documentPages.length === 0;
@@ -1719,28 +1719,31 @@ const BookReader = () => {
                         rotation={isPdfMode ? 0 : totalRotation}
                         className="w-full h-full flex items-center justify-center"
                       >
-                        <Card className="shadow-2xl max-h-full">
-                          <CardContent className="p-0 flex items-center justify-center">
-                            <div className="relative flex items-center justify-center">
+                        <Card className="shadow-2xl h-full max-h-full flex items-center justify-center">
+                          <CardContent className="p-0 h-full flex items-center justify-center">
+                            <div className="relative h-full flex items-center justify-center">
                               {isPdfMode ? (
-                                <OptimizedPdfPageRenderer
-                                  pdfUrl={pdfUrl}
-                                  pageNumber={currentPage}
-                                  scale={0.85}
-                                  rotation={totalRotation}
-                                  className="w-auto max-h-[calc(100vh-12rem)] object-contain"
-                                  onPageLoad={(totalPages) => {
-                                    if (actualTotalPages !== totalPages) {
-                                      setActualTotalPages(totalPages);
-                                    }
-                                  }}
-                                  preloadPages={[currentPage - 1, currentPage + 1, currentPage + 2]}
-                                />
+                                <div className="h-full flex items-center justify-center" style={{ maxHeight: 'calc(100vh - 10rem)' }}>
+                                  <OptimizedPdfPageRenderer
+                                    pdfUrl={pdfUrl}
+                                    pageNumber={currentPage}
+                                    scale={1}
+                                    rotation={totalRotation}
+                                    className="h-full w-auto object-contain"
+                                    onPageLoad={(totalPages) => {
+                                      if (actualTotalPages !== totalPages) {
+                                        setActualTotalPages(totalPages);
+                                      }
+                                    }}
+                                    preloadPages={[currentPage - 1, currentPage + 1, currentPage + 2]}
+                                  />
+                                </div>
                               ) : documentPages.length > 0 || (documentImage && !documentImage.includes('manuscript-page')) ? (
                                 <img 
                                   src={getCurrentPageImage(currentPage) || ''}
                                   alt={`Page ${currentPage}`}
-                                  className="block w-auto max-h-[calc(100vh-12rem)] object-contain pointer-events-none"
+                                  className="h-full w-auto object-contain pointer-events-none"
+                                  style={{ maxHeight: 'calc(100vh - 10rem)' }}
                                 />
                               ) : (
                                 /* Fallback - ne devrait pas arriver grâce à hasDisplayableContent */

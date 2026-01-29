@@ -199,38 +199,36 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
     // Target aspect ratio (3:4 for document pages - typical manuscript ratio)
     const aspectRatio = 3 / 4;
 
-    // Use maximum available space for double-page spread
-    const availableWidth = containerWidth * 0.98;
-    const availableHeight = containerHeight * 0.95;
+    // Use FULL available space - minimize margins for maximum page size
+    const availableWidth = containerWidth - 32; // Small margin for shadows
+    const availableHeight = containerHeight - 16;
 
     let pageWidth: number;
     let pageHeight: number;
 
-    // For double-page: calculate optimal page size to fill available space
-    // Two pages side by side, so each page gets half the width
-    const maxPageWidth = availableWidth / 2;
+    // For double-page: each page gets roughly half the width
+    const maxPageWidth = (availableWidth / 2) - 8; // Gap between pages
     const maxPageHeight = availableHeight;
 
     // Calculate dimensions that fit within constraints while maintaining aspect ratio
-    // Option 1: Fill by height
     const heightBasedWidth = maxPageHeight * aspectRatio;
-    // Option 2: Fill by width
     const widthBasedHeight = maxPageWidth / aspectRatio;
 
     if (heightBasedWidth <= maxPageWidth) {
-      // Height is the limiting factor
+      // Height is the limiting factor - use full height
       pageHeight = maxPageHeight;
       pageWidth = heightBasedWidth;
     } else {
-      // Width is the limiting factor
+      // Width is the limiting factor - use full width
       pageWidth = maxPageWidth;
       pageHeight = widthBasedHeight;
     }
 
-    // Apply reasonable minimum constraints only
-    pageWidth = Math.max(250, pageWidth);
-    pageHeight = Math.max(333, pageHeight);
+    // Only apply minimum constraints, no maximum - let pages fill the space
+    pageWidth = Math.max(280, pageWidth);
+    pageHeight = Math.max(373, pageHeight);
 
+    console.log('Double mode dimensions:', { containerWidth, containerHeight, pageWidth, pageHeight });
     setDimensions({ width: Math.round(pageWidth), height: Math.round(pageHeight) });
   }, []);
 
@@ -290,10 +288,10 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
         width={dimensions.width}
         height={dimensions.height}
         size="stretch"
-        minWidth={250}
-        maxWidth={800}
-        minHeight={333}
-        maxHeight={1000}
+        minWidth={280}
+        maxWidth={1200}
+        minHeight={373}
+        maxHeight={1600}
         maxShadowOpacity={0.5}
         showCover={true}
         mobileScrollSupport={true}
