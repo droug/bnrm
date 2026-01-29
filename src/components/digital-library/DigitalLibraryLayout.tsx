@@ -390,7 +390,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                           asChild
                         >
                           <a 
-                            href={bundle.website_url || '#'} 
+                            href={bundle.api_base_url || bundle.website_url || '#'} 
                             target="_blank" 
                             rel="noopener noreferrer"
                             className="flex items-center justify-center w-full"
