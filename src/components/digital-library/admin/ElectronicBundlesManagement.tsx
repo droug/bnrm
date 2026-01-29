@@ -52,11 +52,81 @@ const defaultBundle: Omit<ElectronicBundle, 'id' | 'created_at' | 'updated_at'> 
 
 export default function ElectronicBundlesManagement() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { bundles, isLoading, createBundle, updateBundle, deleteBundle, toggleActive } = useElectronicBundles();
   const [showDialog, setShowDialog] = useState(false);
   const [editingBundle, setEditingBundle] = useState<ElectronicBundle | null>(null);
   const [formData, setFormData] = useState(defaultBundle);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
+  const handleLogoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/svg+xml', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      toast({
+        title: "Type de fichier non supporté",
+        description: "Veuillez choisir un fichier PNG, JPG, SVG ou WebP",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      toast({
+        title: "Fichier trop volumineux",
+        description: "La taille maximale est de 5 Mo",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsUploadingLogo(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+      
+      const { data, error } = await supabase.storage
+        .from('electronic-bundles-logos')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (error) throw error;
+
+      const { data: urlData } = supabase.storage
+        .from('electronic-bundles-logos')
+        .getPublicUrl(fileName);
+
+      updateFormField('provider_logo_url', urlData.publicUrl);
+      toast({
+        title: "Logo uploadé",
+        description: "Le logo a été uploadé avec succès",
+      });
+    } catch (error: any) {
+      console.error('Logo upload error:', error);
+      toast({
+        title: "Erreur d'upload",
+        description: error.message || "Impossible d'uploader le logo",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploadingLogo(false);
+      if (logoInputRef.current) {
+        logoInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleRemoveLogo = () => {
+    updateFormField('provider_logo_url', '');
+  };
 
   const handleEdit = (bundle: ElectronicBundle) => {
     setEditingBundle(bundle);
