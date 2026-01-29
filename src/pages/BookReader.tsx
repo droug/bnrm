@@ -1664,8 +1664,6 @@ const BookReader = () => {
                         restrictedPageDisplay={restrictedPageDisplay}
                         getAccessDeniedMessage={getAccessDeniedMessage}
                         searchHighlight={searchHighlight}
-                        documentId={documentData?.id || id}
-                        onClearHighlight={() => setSearchHighlight("")}
                       />
                     ) : (
                       /* Mode scroll avec images pré-extraites - scroll interne */
@@ -1784,7 +1782,7 @@ const BookReader = () => {
                             <CardContent className="p-0 flex items-center justify-center">
                               <div className="relative flex items-center justify-center">
                                 {isPdfMode ? (
-                                <PdfPageWithHighlight
+                                  <PdfPageWithHighlight
                                     pdfUrl={pdfUrl}
                                     pageNumber={currentPage}
                                     scale={1.2}
@@ -1797,8 +1795,6 @@ const BookReader = () => {
                                     }}
                                     preloadPages={[currentPage - 1, currentPage + 1, currentPage + 2]}
                                     searchHighlight={searchHighlight}
-                                    documentId={documentData?.id || id}
-                                    onClearHighlight={() => setSearchHighlight("")}
                                   />
                                 ) : documentPages.length > 0 || (documentImage && !documentImage.includes('manuscript-page')) ? (
                                   <img
