@@ -19,6 +19,7 @@ import { VirtualizedScrollReader } from "@/components/digital-library/reader/Vir
 import { DraggableDoublePage } from "@/components/digital-library/reader/DraggableDoublePage";
 import { ReproductionAuthChoiceModal } from "@/components/digital-library/ReproductionAuthChoiceModal";
 import AudioVideoReader from "@/components/digital-library/reader/AudioVideoReader";
+import { PanZoomContainer } from "@/components/digital-library/reader/PanZoomContainer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -1702,19 +1703,12 @@ const BookReader = () => {
                   const isPdfMode = pdfUrl && documentPages.length === 0;
                   
                   return (
-                    <div className="w-full h-full flex items-center justify-center overflow-auto p-4">
-                      <Card 
-                        className="shadow-2xl"
-                        style={{
-                          /* Pour les PDFs, le OptimizedPdfPageRenderer gère la rotation directement via pdf.js */
-                          /* Pour les images, on applique la rotation CSS */
-                          transform: isPdfMode 
-                            ? `scale(${zoom / 100})` 
-                            : `scale(${zoom / 100}) rotate(${totalRotation}deg)`,
-                          transformOrigin: 'center center',
-                          transition: 'transform 0.3s ease',
-                        }}
-                      >
+                    <PanZoomContainer
+                      zoom={zoom}
+                      rotation={isPdfMode ? 0 : totalRotation}
+                      className="w-full h-full p-4"
+                    >
+                      <Card className="shadow-2xl">
                         <CardContent className="p-0 flex items-center justify-center">
                           <div className="relative flex items-center justify-center">
                             {isPdfMode ? (
@@ -1735,7 +1729,7 @@ const BookReader = () => {
                               <img 
                                 src={getCurrentPageImage(currentPage) || ''}
                                 alt={`Page ${currentPage}`}
-                                className="block w-auto object-contain"
+                                className="block w-auto object-contain pointer-events-none"
                               />
                             ) : (
                               /* Fallback - ne devrait pas arriver grâce à hasDisplayableContent */
@@ -1753,7 +1747,7 @@ const BookReader = () => {
                           </div>
                         </CardContent>
                       </Card>
-                    </div>
+                    </PanZoomContainer>
                   );
                 })()
               )}
