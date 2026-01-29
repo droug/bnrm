@@ -380,6 +380,9 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                     const localLogo = providerKey ? providerLogoMap[providerKey] : null;
                     const logoSrc = localLogo || bundle.provider_logo_url;
                     
+                    // Logos avec texte blanc nécessitant un fond sombre
+                    const needsDarkBackground = providerKey === 'almanhal' || providerKey === 'eni' || providerKey === 'eni-elearning';
+                    
                     return (
                       <DropdownMenuItem 
                         key={bundle.id} 
@@ -390,15 +393,17 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                           }
                         }}
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-center w-full">
                           {logoSrc ? (
-                            <div className="bg-muted-foreground/20 rounded px-2 py-1">
-                              <img src={logoSrc} alt={bundle.provider} className="h-6 w-auto max-w-[100px] object-contain" />
+                            <div className={`rounded px-3 py-2 ${needsDarkBackground ? 'bg-bn-blue-primary' : ''}`}>
+                              <img src={logoSrc} alt={bundle.provider} className="h-7 w-auto max-w-[120px] object-contain" />
                             </div>
                           ) : (
-                            <Icon name="mdi:earth" className="h-5 w-5 text-gold-bn-primary" />
+                            <div className="flex items-center gap-2">
+                              <Icon name="mdi:earth" className="h-5 w-5 text-gold-bn-primary" />
+                              <span className="font-medium">{language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name}</span>
+                            </div>
                           )}
-                          <span className="font-medium">{language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name}</span>
                         </div>
                       </DropdownMenuItem>
                     );
