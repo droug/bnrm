@@ -405,7 +405,7 @@ export default function VExpo360ExhibitionWizard() {
                   onUploadingChange={setIsCoverUploading}
                   label=""
                   folder="covers"
-                  maxSizeMB={10}
+                  maxSizeMB={20}
                 />
               </CardContent>
             </Card>
