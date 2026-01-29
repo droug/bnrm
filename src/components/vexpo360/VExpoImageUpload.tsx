@@ -5,9 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Link, Loader2, X, Image as ImageIcon } from "lucide-react";
+import { Upload, Link, Loader2, X, Image as ImageIcon, AlertCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
-
+import { Alert, AlertDescription } from "@/components/ui/alert";
 interface VExpoImageUploadProps {
   value: string;
   onChange: (url: string) => void;
@@ -29,6 +29,66 @@ const sanitizeFilename = (filename: string): string => {
     .toLowerCase();
 };
 
+// Optimize image for panorama display (resize if needed, maintain quality)
+const optimizeImageForPanorama = async (
+  file: File, 
+  maxWidth: number = 8192,
+  quality: number = 0.92
+): Promise<File> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new window.Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        
+        // Only resize if the image is larger than max dimensions
+        if (width > maxWidth) {
+          const ratio = maxWidth / width;
+          width = maxWidth;
+          height = Math.round(height * ratio);
+        }
+        
+        // Create canvas and draw image
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Canvas context not available'));
+          return;
+        }
+        
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convert to blob with high quality
+        canvas.toBlob(
+          (blob) => {
+            if (blob) {
+              const optimizedFile = new File([blob], file.name, {
+                type: 'image/jpeg',
+                lastModified: Date.now(),
+              });
+              resolve(optimizedFile);
+            } else {
+              // If blob creation fails, return original file
+              resolve(file);
+            }
+          },
+          'image/jpeg',
+          quality
+        );
+      };
+      img.onerror = () => reject(new Error('Failed to load image'));
+    };
+    reader.onerror = reject;
+  });
+};
+
 export function VExpoImageUpload({
   value,
   onChange,
@@ -37,12 +97,13 @@ export function VExpoImageUpload({
   description,
   folder = "covers",
   accept = "image/jpeg,image/png,image/webp,image/gif",
-  maxSizeMB = 10
+  maxSizeMB = 20
 }: VExpoImageUploadProps) {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadStatus, setUploadStatus] = useState<string>("");
   const [urlInput, setUrlInput] = useState(value || "");
   const [activeTab, setActiveTab] = useState<string>(value ? "url" : "upload");
 
@@ -85,15 +146,40 @@ export function VExpoImageUpload({
     }
 
     setUploading(true);
-    setUploadProgress(10);
+    setUploadProgress(5);
+    setUploadStatus("Préparation...");
 
     try {
-      // Generate unique filename
-      const timestamp = Date.now();
-      const sanitizedName = sanitizeFilename(file.name);
-      const filePath = `${folder}/${timestamp}_${sanitizedName}`;
+      let fileToUpload = file;
+      const originalSize = file.size;
+      
+      // Optimize image if it's large (> 5MB) or very high resolution
+      if (file.size > 5 * 1024 * 1024) {
+        setUploadStatus("Optimisation de l'image...");
+        setUploadProgress(15);
+        
+        try {
+          // Determine max width based on folder (panoramas need higher resolution)
+          const maxWidth = folder === "panoramas" ? 8192 : 4096;
+          fileToUpload = await optimizeImageForPanorama(file, maxWidth, 0.92);
+          
+          const savedPercent = Math.round((1 - fileToUpload.size / originalSize) * 100);
+          if (savedPercent > 0) {
+            console.log(`Image optimized: ${(originalSize / 1024 / 1024).toFixed(2)}MB → ${(fileToUpload.size / 1024 / 1024).toFixed(2)}MB (${savedPercent}% reduction)`);
+          }
+        } catch (optimizeError) {
+          console.warn("Image optimization failed, using original:", optimizeError);
+          fileToUpload = file;
+        }
+      }
 
       setUploadProgress(30);
+      setUploadStatus("Téléversement...");
+
+      // Generate unique filename
+      const timestamp = Date.now();
+      const sanitizedName = sanitizeFilename(file.name).replace(/\.\w+$/, '.jpg');
+      const filePath = `${folder}/${timestamp}_${sanitizedName}`;
 
       // Upload to Supabase Storage (retry transient network errors)
       let uploadedPath: string | null = null;
@@ -101,10 +187,10 @@ export function VExpoImageUpload({
         try {
           const { data, error } = await supabase.storage
             .from("vexpo-assets")
-            .upload(filePath, file, {
-              cacheControl: "3600",
+            .upload(filePath, fileToUpload, {
+              cacheControl: "31536000", // 1 year cache for optimized images
               upsert: false,
-              contentType: file.type,
+              contentType: 'image/jpeg',
             });
 
           if (error) throw error;
@@ -126,6 +212,7 @@ export function VExpoImageUpload({
       }
 
       setUploadProgress(80);
+      setUploadStatus("Finalisation...");
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
@@ -133,12 +220,13 @@ export function VExpoImageUpload({
         .getPublicUrl(uploadedPath);
 
       setUploadProgress(100);
+      setUploadStatus("Terminé!");
       onChange(publicUrl);
       setUrlInput(publicUrl);
 
       toast({
         title: "Image téléversée",
-        description: "L'image a été ajoutée avec succès"
+        description: "L'image a été optimisée et ajoutée avec succès"
       });
     } catch (error: any) {
       console.error("Upload error:", error);
@@ -150,6 +238,7 @@ export function VExpoImageUpload({
     } finally {
       setUploading(false);
       setUploadProgress(0);
+      setUploadStatus("");
       // Reset input
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
@@ -219,7 +308,7 @@ export function VExpoImageUpload({
               <div className="space-y-4">
                 <Loader2 className="h-10 w-10 mx-auto animate-spin text-primary" />
                 <Progress value={uploadProgress} className="w-full max-w-xs mx-auto" />
-                <p className="text-sm text-muted-foreground">Téléversement en cours...</p>
+                <p className="text-sm text-muted-foreground">{uploadStatus || "Téléversement en cours..."}</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -237,6 +326,12 @@ export function VExpoImageUpload({
                 <p className="text-xs text-muted-foreground">
                   JPG, PNG, WebP ou GIF • Max {maxSizeMB}MB
                 </p>
+                <Alert className="text-left max-w-md mx-auto">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription className="text-xs">
+                    Les images volumineuses seront automatiquement optimisées pour un affichage optimal dans l'exposition virtuelle.
+                  </AlertDescription>
+                </Alert>
               </div>
             )}
           </div>
