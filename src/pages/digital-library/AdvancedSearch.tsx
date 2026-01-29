@@ -77,15 +77,19 @@ export default function AdvancedSearch() {
 
     setIsSearching(true);
     try {
-      // Utiliser any pour éviter l'erreur de type profond avec Supabase
-      // Exclure les documents supprimés (soft delete)
-      let baseQuery: any = supabase.from('cbn_documents').select('*', { count: 'exact' }).is('deleted_at', null);
-      console.log('🗄️ Base query created (excluding deleted documents)');
+      // Utiliser digital_library_documents comme source principale (table utilisée par l'admin)
+      // Exclure les documents supprimés et non publiés
+      let baseQuery: any = supabase
+        .from('digital_library_documents')
+        .select('*', { count: 'exact' })
+        .is('deleted_at', null)
+        .eq('publication_status', 'published');
+      console.log('🗄️ Base query created (digital_library_documents, published only, excluding deleted)');
       
-      // Recherche générale
+      // Recherche générale (adapté aux colonnes de digital_library_documents)
       if (params.keyword) {
         const term = params.keyword;
-        baseQuery = baseQuery.or(`title.ilike.%${term}%,author.ilike.%${term}%,cote.ilike.%${term}%,notes.ilike.%${term}%`);
+        baseQuery = baseQuery.or(`title.ilike.%${term}%,title_ar.ilike.%${term}%,author.ilike.%${term}%`);
       }
       
       // Recherche par auteur
@@ -93,38 +97,22 @@ export default function AdvancedSearch() {
         baseQuery = baseQuery.ilike('author', `%${params.author}%`);
       }
       
-      // Recherche par titre
+      // Recherche par titre (FR ou AR)
       if (params.title) {
-        baseQuery = baseQuery.ilike('title', `%${params.title}%`);
+        baseQuery = baseQuery.or(`title.ilike.%${params.title}%,title_ar.ilike.%${params.title}%`);
       }
       
-      // Recherche par éditeur
-      if (params.publisher) {
-        baseQuery = baseQuery.ilike('publisher', `%${params.publisher}%`);
-      }
+      // Recherche par éditeur - cette colonne n'existe pas dans digital_library_documents
+      // On ignore ce filtre pour l'instant ou on peut l'ajouter via une jointure future
       
-      // Recherche par sujet
+      // Recherche par sujet - recherche dans themes (array)
       if (params.subject) {
-        baseQuery = baseQuery.ilike('subject', `%${params.subject}%`);
+        baseQuery = baseQuery.contains('themes', [params.subject]);
       }
       
-      // Recherche par cote (avec ou sans tirets)
-      if (params.cote) {
-        const normalizedCote = params.cote.replace(/[-\s]/g, '');
-        baseQuery = baseQuery.or(`cote.ilike.%${params.cote}%,cote.ilike.%${normalizedCote}%`);
-      }
-      
-      // Recherche par ISBN (avec ou sans tirets)
-      if (params.isbn) {
-        const normalizedIsbn = params.isbn.replace(/[-\s]/g, '');
-        baseQuery = baseQuery.or(`isbn.ilike.%${params.isbn}%,isbn.ilike.%${normalizedIsbn}%`);
-      }
-      
-      // Recherche par ISSN (avec ou sans tirets)
-      if (params.issn) {
-        const normalizedIssn = params.issn.replace(/[-\s]/g, '');
-        baseQuery = baseQuery.or(`issn.ilike.%${params.issn}%,issn.ilike.%${normalizedIssn}%`);
-      }
+      // Les colonnes cote, isbn, issn n'existent pas dans digital_library_documents
+      // Ces recherches nécessiteraient une jointure avec cbn_documents ou catalog_metadata
+      // Pour l'instant, on les désactive pour éviter les erreurs
       
       // Filtrer par langue
       if (params.language) {
@@ -774,10 +762,9 @@ export default function AdvancedSearch() {
                         </div>
                       </div>
                       
-                      {/* IMPORTANT: Utiliser digital_library_document_id pour les liens vers les documents
-                          car cbn_documents.id est l'ID de l'index de recherche, pas l'ID du document source.
-                          Le document réel est dans digital_library_documents avec un ID différent. */}
-                      <Link to={`/digital-library/document/${doc.digital_library_document_id || doc.id}`}>
+                      {/* Maintenant on utilise directement digital_library_documents,
+                          donc doc.id est l'ID du document source */}
+                      <Link to={`/digital-library/document/${doc.id}`}>
                         <Button variant="default" size="lg">
                           Voir la notice
                         </Button>
