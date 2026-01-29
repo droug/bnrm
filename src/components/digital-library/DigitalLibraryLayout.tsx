@@ -392,7 +392,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                       >
                         <div className="flex items-center gap-3">
                           {logoSrc ? (
-                            <div className="bg-bn-blue-primary rounded px-2 py-1">
+                            <div className="bg-muted-foreground/20 rounded px-2 py-1">
                               <img src={logoSrc} alt={bundle.provider} className="h-6 w-auto max-w-[100px] object-contain" />
                             </div>
                           ) : (
