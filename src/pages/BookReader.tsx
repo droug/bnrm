@@ -1562,30 +1562,36 @@ const BookReader = () => {
                   </div>
                 </div>
               ) : viewMode === "double" ? (
-                canUseDoubleMode ? (
-                  <PageFlipBook 
-                    ref={pageFlipRef}
-                    images={generatePageImages()}
-                    currentPage={currentPage}
-                    onPageChange={setCurrentPage}
-                    zoom={zoom}
-                    rotation={rotation}
-                    pageRotations={pageRotations}
-                    isRtl={isArabicDocument()}
-                  />
-                ) : pdfUrl ? (
-                  /* Mode Double avec PDF - effet livre avec glisser-déposer */
-                  <PdfPageFlipBook
-                    pdfUrl={pdfUrl}
-                    currentPage={currentPage}
-                    onPageChange={setCurrentPage}
-                    zoom={zoom}
-                    rotation={rotation}
-                    pageRotations={pageRotations}
-                    isRtl={isArabicDocument()}
-                    onTotalPagesChange={setActualTotalPages}
-                  />
-                ) : null
+                <PanZoomContainer
+                  zoom={zoom}
+                  rotation={0}
+                  className="w-full h-full"
+                >
+                  {canUseDoubleMode ? (
+                    <PageFlipBook 
+                      ref={pageFlipRef}
+                      images={generatePageImages()}
+                      currentPage={currentPage}
+                      onPageChange={setCurrentPage}
+                      zoom={100}
+                      rotation={rotation}
+                      pageRotations={pageRotations}
+                      isRtl={isArabicDocument()}
+                    />
+                  ) : pdfUrl ? (
+                    /* Mode Double avec PDF - effet livre avec glisser-déposer */
+                    <PdfPageFlipBook
+                      pdfUrl={pdfUrl}
+                      currentPage={currentPage}
+                      onPageChange={setCurrentPage}
+                      zoom={100}
+                      rotation={rotation}
+                      pageRotations={pageRotations}
+                      isRtl={isArabicDocument()}
+                      onTotalPagesChange={setActualTotalPages}
+                    />
+                  ) : null}
+                </PanZoomContainer>
               ) : viewMode === "scroll" ? (
                 /* Mode défilement vertical optimisé avec virtualisation */
                 pdfUrl && documentPages.length === 0 ? (
