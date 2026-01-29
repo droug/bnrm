@@ -116,10 +116,9 @@ export const VirtualizedScrollReader = memo(function VirtualizedScrollReader({
   return (
     <div 
       ref={containerRef}
-      className="flex-1 overflow-y-auto overscroll-contain"
-      style={{ height: '100%' }}
+      className="h-full overflow-y-auto overscroll-contain scroll-smooth"
     >
-      <div className="flex flex-col items-center gap-6 pb-8 pt-4">
+      <div className="flex flex-col items-center gap-6 pb-8 pt-4 px-4">
         {/* Spacer avant */}
         {spacerBefore > 0 && (
           <div style={{ height: spacerBefore, width: '100%' }} aria-hidden="true" />
