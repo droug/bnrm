@@ -3,6 +3,7 @@ import HTMLFlipBook from "react-pageflip";
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { Loader2 } from 'lucide-react';
+import { PdfTextHighlightOverlay } from '@/components/digital-library/PdfTextHighlightOverlay';
 
 // Configure PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerSrc;
@@ -16,6 +17,7 @@ interface PdfPageFlipBookProps {
   pageRotations?: Record<number, number>;
   isRtl?: boolean;
   onTotalPagesChange?: (total: number) => void;
+  searchHighlight?: string;
 }
 
 export interface PdfPageFlipBookHandle {
@@ -29,14 +31,18 @@ const PdfPage = forwardRef<
   HTMLDivElement,
   {
     pdfDoc: pdfjsLib.PDFDocumentProxy | null;
+    pdfUrl: string;
     pageNumber: number;
     zoom: number;
     rotation: number;
     pageRotation: number;
+    searchHighlight?: string;
   }
->(({ pdfDoc, pageNumber, zoom, rotation, pageRotation }, ref) => {
+>(({ pdfDoc, pdfUrl, pageNumber, zoom, rotation, pageRotation, searchHighlight }, ref) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [loading, setLoading] = useState(true);
+  const [canvasSize, setCanvasSize] = useState({ width: 0, height: 0 });
   const finalRotation = rotation + pageRotation;
 
   useEffect(() => {
@@ -65,6 +71,7 @@ const PdfPage = forwardRef<
         }).promise;
         
         if (!cancelled) {
+          setCanvasSize({ width: viewport.width, height: viewport.height });
           setLoading(false);
         }
       } catch (err) {
@@ -83,7 +90,8 @@ const PdfPage = forwardRef<
   return (
     <div ref={ref} className="page bg-white shadow-2xl relative overflow-hidden">
       <div
-        className="w-full h-full flex items-center justify-center overflow-hidden bg-white"
+        ref={containerRef}
+        className="w-full h-full flex items-center justify-center overflow-hidden bg-white relative"
         style={{
           transform: `scale(${zoom / 100}) rotate(${finalRotation}deg)`,
           transformOrigin: "center",
@@ -104,6 +112,19 @@ const PdfPage = forwardRef<
             display: loading ? 'none' : 'block' 
           }}
         />
+        
+        {/* Overlay de surbrillance si une recherche est active */}
+        {searchHighlight && !loading && canvasSize.width > 0 && canvasSize.height > 0 && (
+          <PdfTextHighlightOverlay
+            pdfUrl={pdfUrl}
+            pageNumber={pageNumber}
+            searchText={searchHighlight}
+            scale={1.2}
+            rotation={finalRotation}
+            containerWidth={canvasSize.width}
+            containerHeight={canvasSize.height}
+          />
+        )}
       </div>
       {/* Coins décoratifs de page */}
       <div className="absolute top-0 right-0 w-8 h-8 pointer-events-none">
@@ -126,6 +147,7 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
   pageRotations,
   isRtl = false,
   onTotalPagesChange,
+  searchHighlight,
 }, ref) => {
   const bookRef = useRef<any>();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -323,10 +345,12 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
             <PdfPage
               key={index}
               pdfDoc={pdfDoc}
+              pdfUrl={pdfUrl}
               pageNumber={isRtl ? totalPages - index : pageNum}
               zoom={zoom}
               rotation={rotation}
               pageRotation={pageRotations?.[realPageNumber] ?? 0}
+              searchHighlight={searchHighlight}
             />
           );
         })}

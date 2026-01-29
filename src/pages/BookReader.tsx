@@ -1620,6 +1620,7 @@ const BookReader = () => {
                         pageRotations={pageRotations}
                         isRtl={isArabicDocument()}
                         onTotalPagesChange={setActualTotalPages}
+                        searchHighlight={searchHighlight}
                       />
                     ) : null}
                   </PanZoomContainer>
