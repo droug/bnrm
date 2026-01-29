@@ -1566,7 +1566,7 @@ const BookReader = () => {
                   </div>
                 </div>
               ) : viewMode === "double" ? (
-                <div className="flex-1 min-h-0 flex items-center justify-center p-4 md:p-8">
+                <div className="flex-1 min-h-0 flex items-center justify-center p-4 md:p-8 relative">
                   <PanZoomContainer
                     zoom={zoom}
                     rotation={0}
@@ -1597,6 +1597,33 @@ const BookReader = () => {
                       />
                     ) : null}
                   </PanZoomContainer>
+                  
+                  {/* Bouton marque-page flottant - Mode Double */}
+                  <div className="absolute top-6 right-6 z-20 flex flex-col gap-2">
+                    <Button
+                      variant={bookmarks.includes(currentPage) ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => toggleBookmark(currentPage)}
+                      className="shadow-lg"
+                      title={bookmarks.includes(currentPage) ? "Retirer marque-page" : "Ajouter marque-page"}
+                    >
+                      <Bookmark className={`h-4 w-4 ${bookmarks.includes(currentPage) ? "fill-current" : ""}`} />
+                      <span className="ml-2 hidden sm:inline">Page {currentPage}</span>
+                    </Button>
+                    {/* Bouton pour la page droite en mode double */}
+                    {currentPage + 1 <= totalPages && (
+                      <Button
+                        variant={bookmarks.includes(currentPage + 1) ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => toggleBookmark(currentPage + 1)}
+                        className="shadow-lg"
+                        title={bookmarks.includes(currentPage + 1) ? "Retirer marque-page p." + (currentPage + 1) : "Ajouter marque-page p." + (currentPage + 1)}
+                      >
+                        <Bookmark className={`h-4 w-4 ${bookmarks.includes(currentPage + 1) ? "fill-current" : ""}`} />
+                        <span className="ml-2 hidden sm:inline">Page {currentPage + 1}</span>
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ) : viewMode === "scroll" ? (
                 /* Mode défilement vertical - scroll géré par VirtualizedScrollReader ou le conteneur interne */
@@ -1713,7 +1740,7 @@ const BookReader = () => {
               ) : (
                 /* Mode Simple - ajuster à la hauteur du conteneur en conservant le ratio */
                 <div 
-                  className="flex-1 min-h-0 flex items-center justify-center p-2"
+                  className="flex-1 min-h-0 flex items-center justify-center p-2 relative"
                   style={{ height: 'calc(100vh - 10rem)' }}
                 >
                   {(() => {
@@ -1772,6 +1799,20 @@ const BookReader = () => {
                       </PanZoomContainer>
                     );
                   })()}
+                  
+                  {/* Bouton marque-page flottant - Mode Simple */}
+                  <div className="absolute top-6 right-6 z-20">
+                    <Button
+                      variant={bookmarks.includes(currentPage) ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => toggleBookmark(currentPage)}
+                      className="shadow-lg"
+                      title={bookmarks.includes(currentPage) ? "Retirer marque-page" : "Ajouter marque-page"}
+                    >
+                      <Bookmark className={`h-4 w-4 ${bookmarks.includes(currentPage) ? "fill-current" : ""}`} />
+                      <span className="ml-2 hidden sm:inline">{bookmarks.includes(currentPage) ? "Marqué" : "Marquer"}</span>
+                    </Button>
+                  </div>
                 </div>
               )}
             </main>
