@@ -228,9 +228,9 @@ export const OptimizedPdfPageRenderer = memo(function OptimizedPdfPageRenderer({
   }
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={`relative flex items-center justify-center ${className}`}>
       {loading && !imageUrl && (
-        <div className="flex items-center justify-center bg-muted/30 aspect-[3/4] min-h-[400px]">
+        <div className="flex items-center justify-center bg-muted/30 aspect-[3/4] min-h-[200px]">
           <div className="text-center space-y-2">
             <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
             <p className="text-sm text-muted-foreground">Chargement de la page {pageNumber}...</p>
@@ -241,10 +241,11 @@ export const OptimizedPdfPageRenderer = memo(function OptimizedPdfPageRenderer({
         <img
           src={imageUrl}
           alt={`Page ${pageNumber}`}
-          className="block max-w-full max-h-full w-auto h-auto"
+          className="block w-auto h-auto object-contain"
           style={{ 
             opacity: loading ? 0.7 : 1,
             transition: 'opacity 0.2s ease-in-out',
+            maxHeight: 'calc(100vh - 12rem)',
           }}
           loading={priority === 'high' ? 'eager' : 'lazy'}
           decoding="async"

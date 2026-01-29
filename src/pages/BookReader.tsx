@@ -1708,7 +1708,10 @@ const BookReader = () => {
                 </div>
               ) : (
                 /* Mode Simple - ajuster à la hauteur du conteneur en conservant le ratio */
-                <div className="flex-1 min-h-0 flex items-center justify-center p-4 md:p-8">
+                <div 
+                  className="flex-1 min-h-0 flex items-center justify-center p-2"
+                  style={{ height: 'calc(100vh - 10rem)' }}
+                >
                   {(() => {
                     const totalRotation = rotation + (pageRotations[currentPage] ?? 0);
                     const isPdfMode = pdfUrl && documentPages.length === 0;
@@ -1717,18 +1720,21 @@ const BookReader = () => {
                       <PanZoomContainer
                         zoom={zoom}
                         rotation={isPdfMode ? 0 : totalRotation}
-                        className="w-full h-full"
+                        className="h-full w-full"
                       >
-                        <Card className="shadow-2xl h-full max-h-full max-w-full">
-                          <CardContent className="p-0 h-full max-h-full max-w-full flex items-center justify-center">
-                            <div className="relative h-full max-h-full max-w-full flex items-center justify-center">
+                        <Card 
+                          className="shadow-2xl overflow-hidden"
+                          style={{ maxHeight: '100%', height: 'auto' }}
+                        >
+                          <CardContent className="p-0 flex items-center justify-center">
+                            <div className="relative flex items-center justify-center">
                               {isPdfMode ? (
                                 <OptimizedPdfPageRenderer
                                   pdfUrl={pdfUrl}
                                   pageNumber={currentPage}
-                                  scale={1.5}
+                                  scale={1.2}
                                   rotation={totalRotation}
-                                  className="h-full max-h-full max-w-full flex items-center justify-center"
+                                  className=""
                                   onPageLoad={(totalPages) => {
                                     if (actualTotalPages !== totalPages) {
                                       setActualTotalPages(totalPages);
@@ -1740,7 +1746,8 @@ const BookReader = () => {
                                 <img
                                   src={getCurrentPageImage(currentPage) || ''}
                                   alt={`Page ${currentPage}`}
-                                  className="block max-w-full max-h-full w-auto h-auto object-contain pointer-events-none"
+                                  className="block w-auto h-auto object-contain pointer-events-none"
+                                  style={{ maxHeight: 'calc(100vh - 12rem)' }}
                                 />
                               ) : (
                                 /* Fallback - ne devrait pas arriver grâce à hasDisplayableContent */
