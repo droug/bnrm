@@ -444,26 +444,81 @@ export default function ElectronicBundlesManagement() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="website_url">Site web</Label>
-                    <Input
-                      id="website_url"
-                      type="url"
-                      value={formData.website_url}
-                      onChange={(e) => updateFormField('website_url', e.target.value)}
-                      placeholder="https://www.jstor.org"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="provider_logo_url">URL du logo</Label>
-                    <Input
-                      id="provider_logo_url"
-                      type="url"
-                      value={formData.provider_logo_url}
-                      onChange={(e) => updateFormField('provider_logo_url', e.target.value)}
-                      placeholder="https://..."
-                    />
+                <div className="space-y-2">
+                  <Label htmlFor="website_url">Site web</Label>
+                  <Input
+                    id="website_url"
+                    type="url"
+                    value={formData.website_url}
+                    onChange={(e) => updateFormField('website_url', e.target.value)}
+                    placeholder="https://www.jstor.org"
+                  />
+                </div>
+
+                {/* Logo Upload Section */}
+                <div className="space-y-2">
+                  <Label>Logo du fournisseur (affiché dans le menu)</Label>
+                  <div className="flex items-start gap-4">
+                    {/* Logo Preview */}
+                    {formData.provider_logo_url ? (
+                      <div className="relative group">
+                        <div className="w-24 h-16 border rounded-lg overflow-hidden bg-muted flex items-center justify-center p-2">
+                          <img 
+                            src={formData.provider_logo_url} 
+                            alt="Logo preview" 
+                            className="max-w-full max-h-full object-contain"
+                          />
+                        </div>
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="icon"
+                          className="absolute -top-2 -right-2 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                          onClick={handleRemoveLogo}
+                        >
+                          <X className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    ) : (
+                      <div className="w-24 h-16 border-2 border-dashed rounded-lg flex items-center justify-center bg-muted/50">
+                        <ImageIcon className="h-6 w-6 text-muted-foreground" />
+                      </div>
+                    )}
+                    
+                    {/* Upload Controls */}
+                    <div className="flex-1 space-y-2">
+                      <input
+                        ref={logoInputRef}
+                        type="file"
+                        accept="image/png,image/jpeg,image/svg+xml,image/webp"
+                        onChange={handleLogoUpload}
+                        className="hidden"
+                        id="logo-upload"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => logoInputRef.current?.click()}
+                        disabled={isUploadingLogo}
+                        className="w-full"
+                      >
+                        {isUploadingLogo ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2" />
+                            Upload en cours...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="h-4 w-4 mr-2" />
+                            Uploader un logo
+                          </>
+                        )}
+                      </Button>
+                      <p className="text-xs text-muted-foreground">
+                        PNG, JPG, SVG ou WebP (max. 5 Mo)
+                      </p>
+                    </div>
                   </div>
                 </div>
 
