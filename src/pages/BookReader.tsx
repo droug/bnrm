@@ -1595,8 +1595,8 @@ const BookReader = () => {
                   </PanZoomContainer>
                 </div>
               ) : viewMode === "scroll" ? (
-                /* Mode défilement vertical optimisé avec virtualisation - scroll interne */
-                <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain">
+                /* Mode défilement vertical optimisé avec virtualisation - scroll interne uniquement dans le VirtualizedScrollReader */
+                <div className="flex-1 min-h-0 flex flex-col">
                   {pdfUrl && documentPages.length === 0 ? (
                     <VirtualizedScrollReader
                       pdfUrl={pdfUrl}
