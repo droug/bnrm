@@ -10,20 +10,19 @@ export function ElectronicResourcesHomeSection() {
   const { activeBundles, isLoading } = useElectronicBundles();
 
   // Calculate pagination
-  const itemsPerPage = 3;
   const totalItems = activeBundles?.length || 0;
-  const maxIndex = Math.max(0, Math.ceil(totalItems / itemsPerPage) - 1);
+  const maxIndex = Math.max(0, totalItems - 3);
 
   if (isLoading) {
     return (
-      <section className="py-16 bg-background">
+      <section className="py-20 bg-gradient-to-b from-muted to-background relative overflow-hidden">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
-            <Skeleton className="w-12 h-12 rounded-lg mx-auto mb-4" />
-            <Skeleton className="h-10 w-80 mx-auto" />
+          <div className="text-center mb-14">
+            <Skeleton className="w-12 h-12 rounded-lg mx-auto mb-6" />
+            <Skeleton className="h-12 w-96 mx-auto" />
             <Skeleton className="h-6 w-[600px] mx-auto mt-4" />
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto px-16">
             {[1, 2, 3].map((i) => (
               <Skeleton key={i} className="h-48 rounded-xl" />
             ))}
@@ -34,23 +33,32 @@ export function ElectronicResourcesHomeSection() {
   }
 
   if (!activeBundles || activeBundles.length === 0) {
-    return null; // Hide section if no active bundles
+    return null;
   }
 
+  const paginationCount = Math.ceil(totalItems / 3);
+
   return (
-    <section className="py-16 bg-background">
-      <div className="container mx-auto px-4">
+    <section className="py-20 bg-gradient-to-b from-muted to-background relative overflow-hidden">
+      {/* Decorative backgrounds */}
+      <div className="absolute bottom-0 left-0 w-64 h-64 opacity-10">
+        <div className="w-full h-full bg-gradient-to-tr from-gold-bn-primary/30 to-transparent rounded-full blur-3xl" />
+      </div>
+      <div className="absolute bottom-0 right-0 w-64 h-64 opacity-10">
+        <div className="w-full h-full bg-gradient-to-tl from-gold-bn-primary/30 to-transparent rounded-full blur-3xl" />
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
         {/* Header */}
-        <div className="text-center mb-10">
-          <div className="flex justify-center mb-4">
-            <div className="w-12 h-12 rounded-lg border-2 border-gold-bn-primary flex items-center justify-center">
-              <Icon name="mdi:select-multiple" className="h-6 w-6 text-gold-bn-primary" />
-            </div>
+        <div className="text-center mb-14">
+          <div className="inline-flex items-center justify-center w-12 h-12 border border-gold-bn-primary rounded-lg mb-6">
+            <Icon name="mdi:select-multiple" className="w-6 h-6 text-gold-bn-primary" />
           </div>
+
           <h2 className="text-[48px] font-normal text-bn-blue-primary font-gilda">
             Ressources électroniques
           </h2>
-          <p className="font-body text-muted-foreground max-w-3xl mx-auto mt-4">
+          <p className="font-body text-regular text-muted-foreground max-w-2xl mx-auto mt-4">
             Ces ressources permettent la centralisation et le partage du patrimoine documentaire et culturel à l'échelle internationale
           </p>
         </div>
@@ -92,8 +100,6 @@ export function ElectronicResourcesHomeSection() {
                                 alt={bundle.name}
                                 className="h-[50px] max-w-[200px] object-contain"
                                 onError={(e) => {
-                                  // Fallback to text if image fails
-                                  e.currentTarget.style.display = 'none';
                                   const parent = e.currentTarget.parentElement;
                                   if (parent) {
                                     parent.className = "flex items-center justify-center h-full";
@@ -103,7 +109,7 @@ export function ElectronicResourcesHomeSection() {
                               />
                             </div>
                           ) : (
-                            <div className="font-heading text-[32px] font-semibold text-bn-blue-primary tracking-wide">
+                            <div className="font-heading text-[42px] font-semibold text-bn-blue-primary tracking-wide">
                               {bundle.name}
                             </div>
                           )}
@@ -137,14 +143,14 @@ export function ElectronicResourcesHomeSection() {
         </div>
 
         {/* Pagination */}
-        {maxIndex > 0 && (
+        {paginationCount > 1 && (
           <div className="flex justify-center gap-3 mt-14">
-            {Array.from({ length: maxIndex + 1 }).map((_, index) => (
+            {Array.from({ length: paginationCount }).map((_, index) => (
               <button 
                 key={index} 
-                onClick={() => setCurrentIndex(index)} 
+                onClick={() => setCurrentIndex(index * 3)} 
                 className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                  currentIndex === index 
+                  Math.floor(currentIndex / 3) === index 
                     ? 'bg-gold-bn-primary' 
                     : 'bg-muted-foreground/25 hover:bg-muted-foreground/40'
                 }`} 
