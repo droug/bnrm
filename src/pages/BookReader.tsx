@@ -917,7 +917,7 @@ const BookReader = () => {
 
   return (
     <DigitalLibraryLayout>
-      <div className="flex-1 flex flex-col overflow-hidden bg-background">
+      <div className="flex-1 flex flex-col h-[calc(100vh-4rem)] overflow-hidden bg-background">
       
       {/* Breadcrumb with Language Selector */}
       <div className="bg-muted/30 border-b">
