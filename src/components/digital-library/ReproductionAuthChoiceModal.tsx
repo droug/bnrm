@@ -24,7 +24,7 @@ export const ReproductionAuthChoiceModal = ({
 
   const handleLogin = () => {
     onOpenChange(false);
-    navigate(`/auth?redirect=${encodeURIComponent(redirectPath)}`);
+    navigate(`/auth-BN?redirect=${encodeURIComponent(redirectPath)}`);
   };
 
   const handleSignup = () => {
