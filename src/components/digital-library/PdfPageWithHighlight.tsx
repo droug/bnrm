@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect, memo } from 'react';
+import { memo } from 'react';
 import { OptimizedPdfPageRenderer } from './OptimizedPdfPageRenderer';
-import { PdfTextHighlightOverlay } from './PdfTextHighlightOverlay';
+import { PdfSearchHighlightBanner } from './PdfSearchHighlightBanner';
 
 interface PdfPageWithHighlightProps {
   pdfUrl: string;
@@ -12,6 +12,8 @@ interface PdfPageWithHighlightProps {
   priority?: 'high' | 'low';
   preloadPages?: number[];
   searchHighlight?: string;
+  documentId?: string;
+  onClearHighlight?: () => void;
 }
 
 export const PdfPageWithHighlight = memo(function PdfPageWithHighlight({
@@ -24,38 +26,11 @@ export const PdfPageWithHighlight = memo(function PdfPageWithHighlight({
   priority = 'high',
   preloadPages,
   searchHighlight,
+  documentId,
+  onClearHighlight,
 }: PdfPageWithHighlightProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
-
-  // Observer le changement de taille du conteneur
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        if (width > 0 && height > 0) {
-          setContainerSize({ width, height });
-        }
-      }
-    });
-
-    resizeObserver.observe(containerRef.current);
-
-    // Initial size
-    const rect = containerRef.current.getBoundingClientRect();
-    if (rect.width > 0 && rect.height > 0) {
-      setContainerSize({ width: rect.width, height: rect.height });
-    }
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, []);
-
   return (
-    <div ref={containerRef} className={`relative ${className}`}>
+    <div className={`relative ${className}`}>
       <OptimizedPdfPageRenderer
         pdfUrl={pdfUrl}
         pageNumber={pageNumber}
@@ -66,16 +41,13 @@ export const PdfPageWithHighlight = memo(function PdfPageWithHighlight({
         preloadPages={preloadPages}
       />
       
-      {/* Overlay de surbrillance si une recherche est active */}
-      {searchHighlight && containerSize.width > 0 && containerSize.height > 0 && (
-        <PdfTextHighlightOverlay
-          pdfUrl={pdfUrl}
+      {/* Bandeau de surbrillance si une recherche est active et le documentId est fourni */}
+      {searchHighlight && documentId && (
+        <PdfSearchHighlightBanner
+          documentId={documentId}
           pageNumber={pageNumber}
           searchText={searchHighlight}
-          scale={scale}
-          rotation={rotation}
-          containerWidth={containerSize.width}
-          containerHeight={containerSize.height}
+          onClear={onClearHighlight}
         />
       )}
     </div>

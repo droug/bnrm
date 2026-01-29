@@ -19,6 +19,8 @@ interface VirtualizedScrollReaderProps {
   restrictedPageDisplay: 'blur' | 'empty' | 'hidden';
   getAccessDeniedMessage: () => string;
   searchHighlight?: string;
+  documentId?: string;
+  onClearHighlight?: () => void;
 }
 
 const BUFFER_PAGES = 3; // Pages à rendre au-dessus/en-dessous de la zone visible
@@ -37,6 +39,8 @@ export const VirtualizedScrollReader = memo(function VirtualizedScrollReader({
   restrictedPageDisplay,
   getAccessDeniedMessage,
   searchHighlight,
+  documentId,
+  onClearHighlight,
 }: VirtualizedScrollReaderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [visibleRange, setVisibleRange] = useState({ start: 1, end: 5 });
@@ -168,6 +172,8 @@ export const VirtualizedScrollReader = memo(function VirtualizedScrollReader({
                         rotation={rotation + (pageRotations[pageNum] ?? 0)}
                         priority={pageNum === visibleRange.start || pageNum === visibleRange.start + 1 ? 'high' : 'low'}
                         searchHighlight={searchHighlight}
+                        documentId={documentId}
+                        onClearHighlight={onClearHighlight}
                       />
                     ) : restrictedPageDisplay === 'blur' ? (
                       <div className="relative w-full">
