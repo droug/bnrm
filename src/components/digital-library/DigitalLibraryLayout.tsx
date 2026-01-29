@@ -392,7 +392,9 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                       >
                         <div className="flex items-center gap-3">
                           {logoSrc ? (
-                            <img src={logoSrc} alt={bundle.provider} className="h-6 w-auto max-w-[100px] object-contain" />
+                            <div className="bg-bn-blue-primary rounded px-2 py-1">
+                              <img src={logoSrc} alt={bundle.provider} className="h-6 w-auto max-w-[100px] object-contain" />
+                            </div>
                           ) : (
                             <Icon name="mdi:earth" className="h-5 w-5 text-gold-bn-primary" />
                           )}
