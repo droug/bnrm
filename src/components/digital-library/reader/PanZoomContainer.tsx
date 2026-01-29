@@ -105,7 +105,7 @@ export function PanZoomContainer({
     <div
       ref={containerRef}
       className={cn(
-        "w-full h-full flex items-center justify-center overflow-hidden select-none",
+        "w-full h-full flex items-stretch justify-center overflow-hidden select-none",
         className
       )}
       onMouseDown={handleMouseDown}
@@ -117,7 +117,10 @@ export function PanZoomContainer({
       onTouchEnd={handleTouchEnd}
       onDoubleClick={handleDoubleClick}
     >
-      <div style={containerStyle}>
+      <div
+        className="w-full h-full min-w-0 min-h-0 flex items-center justify-center"
+        style={containerStyle}
+      >
         {children}
       </div>
     </div>

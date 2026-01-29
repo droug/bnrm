@@ -228,7 +228,6 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
     pageWidth = Math.max(280, pageWidth);
     pageHeight = Math.max(373, pageHeight);
 
-    console.log('Double mode dimensions:', { containerWidth, containerHeight, pageWidth, pageHeight });
     setDimensions({ width: Math.round(pageWidth), height: Math.round(pageHeight) });
   }, []);
 
@@ -280,7 +279,7 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
   return (
     <div 
       ref={containerRef} 
-      className="flex items-center justify-center w-full h-full" 
+      className="flex items-center justify-center w-full h-full min-h-0" 
       style={{ minHeight: "400px" }} 
       dir={isRtl ? "rtl" : "ltr"}
     >
