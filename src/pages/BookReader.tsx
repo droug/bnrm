@@ -1707,8 +1707,8 @@ const BookReader = () => {
                   </div>
                 </div>
               ) : (
-                /* Mode Simple - affichage d'une seule page */
-                <div className="flex-1 min-h-0 flex items-center justify-center p-4 md:p-8">
+                /* Mode Simple - affichage d'une seule page - proportionnel au conteneur */
+                <div className="flex-1 min-h-0 flex items-center justify-center p-2 md:p-4">
                   {(() => {
                     const totalRotation = rotation + (pageRotations[currentPage] ?? 0);
                     const isPdfMode = pdfUrl && documentPages.length === 0;
@@ -1717,18 +1717,18 @@ const BookReader = () => {
                       <PanZoomContainer
                         zoom={zoom}
                         rotation={isPdfMode ? 0 : totalRotation}
-                        className="w-full h-full"
+                        className="w-full h-full flex items-center justify-center"
                       >
-                        <Card className="shadow-2xl">
+                        <Card className="shadow-2xl max-h-full">
                           <CardContent className="p-0 flex items-center justify-center">
                             <div className="relative flex items-center justify-center">
                               {isPdfMode ? (
                                 <OptimizedPdfPageRenderer
                                   pdfUrl={pdfUrl}
                                   pageNumber={currentPage}
-                                  scale={1.2}
+                                  scale={0.85}
                                   rotation={totalRotation}
-                                  className="w-auto"
+                                  className="w-auto max-h-[calc(100vh-12rem)] object-contain"
                                   onPageLoad={(totalPages) => {
                                     if (actualTotalPages !== totalPages) {
                                       setActualTotalPages(totalPages);
@@ -1740,7 +1740,7 @@ const BookReader = () => {
                                 <img 
                                   src={getCurrentPageImage(currentPage) || ''}
                                   alt={`Page ${currentPage}`}
-                                  className="block w-auto object-contain pointer-events-none"
+                                  className="block w-auto max-h-[calc(100vh-12rem)] object-contain pointer-events-none"
                                 />
                               ) : (
                                 /* Fallback - ne devrait pas arriver grâce à hasDisplayableContent */
