@@ -88,6 +88,8 @@ export default function FeaturedWorksManager() {
     custom_author: "",
     custom_image_url: "",
     custom_category: "",
+    custom_type: "",
+    custom_type_other: "",
     custom_date: "",
     custom_description: "",
     custom_link: "",
@@ -278,6 +280,8 @@ export default function FeaturedWorksManager() {
       custom_author: "",
       custom_image_url: "",
       custom_category: "",
+      custom_type: "",
+      custom_type_other: "",
       custom_date: "",
       custom_description: "",
       custom_link: "",
@@ -300,6 +304,8 @@ export default function FeaturedWorksManager() {
       custom_author: work.custom_author || "",
       custom_image_url: work.custom_image_url || "",
       custom_category: work.custom_category || "",
+      custom_type: (work as any).custom_type || "",
+      custom_type_other: (work as any).custom_type_other || "",
       custom_date: work.custom_date || "",
       custom_description: work.custom_description || "",
       custom_link: work.custom_link || "",
@@ -651,6 +657,40 @@ export default function FeaturedWorksManager() {
                       </SelectContent>
                     </Select>
                   </div>
+                  <div className="space-y-2">
+                    <Label>Type</Label>
+                    <Select
+                      value={formData.custom_type}
+                      onValueChange={(v) => setFormData(prev => ({ ...prev, custom_type: v, custom_type_other: v !== "Autre" ? "" : prev.custom_type_other }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Livre">Livre</SelectItem>
+                        <SelectItem value="Manuscrit">Manuscrit</SelectItem>
+                        <SelectItem value="Carte">Carte</SelectItem>
+                        <SelectItem value="Estampe">Estampe</SelectItem>
+                        <SelectItem value="Journal">Journal</SelectItem>
+                        <SelectItem value="Revue">Revue</SelectItem>
+                        <SelectItem value="Autre">Autre</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                {formData.custom_type === "Autre" && (
+                  <div className="space-y-2">
+                    <Label>Précisez le type</Label>
+                    <Input
+                      value={formData.custom_type_other}
+                      onChange={(e) => setFormData(prev => ({ ...prev, custom_type_other: e.target.value }))}
+                      placeholder="Saisissez le type de document..."
+                    />
+                  </div>
+                )}
+                
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Période/Date</Label>
                     <Input
