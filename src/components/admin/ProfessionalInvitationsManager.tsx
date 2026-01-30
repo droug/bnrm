@@ -113,8 +113,7 @@ export function ProfessionalInvitationsManager() {
     const labels: Record<string, string> = {
       editor: 'Éditeur',
       printer: 'Imprimeur',
-      producer: 'Producteur',
-      distributor: 'Distributeur'
+      producer: 'Producteur'
     };
     return labels[type] || type;
   };
@@ -164,7 +163,6 @@ export function ProfessionalInvitationsManager() {
                       <SelectItem value="editor">Éditeur</SelectItem>
                       <SelectItem value="printer">Imprimeur</SelectItem>
                       <SelectItem value="producer">Producteur</SelectItem>
-                      <SelectItem value="distributor">Distributeur</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
