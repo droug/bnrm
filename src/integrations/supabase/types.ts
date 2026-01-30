@@ -4076,6 +4076,7 @@ export type Database = {
           pages_count: number
           pdf_url: string | null
           print_enabled: boolean | null
+          publication_date: string | null
           publication_status: string | null
           publication_year: number | null
           published_at: string | null
@@ -4111,6 +4112,7 @@ export type Database = {
           pages_count: number
           pdf_url?: string | null
           print_enabled?: boolean | null
+          publication_date?: string | null
           publication_status?: string | null
           publication_year?: number | null
           published_at?: string | null
@@ -4146,6 +4148,7 @@ export type Database = {
           pages_count?: number
           pdf_url?: string | null
           print_enabled?: boolean | null
+          publication_date?: string | null
           publication_status?: string | null
           publication_year?: number | null
           published_at?: string | null
