@@ -2474,8 +2474,22 @@ export default function DocumentsManager() {
                           variant="outline"
                           onClick={() => {
                             setEditingDocument(doc);
+                            // Extraire le numéro de cote du nom de fichier PDF
+                            const extractCote = () => {
+                              if ((doc as any).cbn_documents?.cote) return (doc as any).cbn_documents.cote;
+                              if (doc.pdf_url) {
+                                try {
+                                  const fileName = doc.pdf_url.split('/').pop() || '';
+                                  const decodedName = decodeURIComponent(fileName);
+                                  return decodedName.replace(/\.pdf$/i, '');
+                                } catch {
+                                  return doc.pdf_url.split('/').pop()?.replace(/\.pdf$/i, '') || '';
+                                }
+                              }
+                              return '';
+                            };
                             form.reset({
-                              cote: (doc as any).cbn_documents?.cote || doc.pdf_url?.split('/').pop()?.replace('.pdf', '') || '',
+                              cote: extractCote(),
                               title: doc.title || '',
                               author: doc.author || '',
                               file_type: doc.document_type || doc.file_format || '',
