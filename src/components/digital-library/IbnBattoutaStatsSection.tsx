@@ -14,25 +14,53 @@ interface StatItem {
 
 const defaultStats: StatItem[] = [
   {
-    iconName: "mdi:book-open-page-variant-outline",
-    value: "+45K",
-    label: "Livres numériques",
-    labelAr: "كتب رقمية",
-    href: "/digital-library/collections/books"
+    iconName: "mdi:script-text-outline",
+    value: "+12K",
+    label: "Manuscrits",
+    labelAr: "مخطوطات",
+    href: "/digital-library/collections/manuscripts"
   },
   {
     iconName: "mdi:newspaper-variant-outline",
-    value: "+8K",
-    label: "Revues et journaux",
-    labelAr: "المجلات والجرائد",
+    value: "+60",
+    label: "Revues",
+    labelAr: "مجلات",
     href: "/digital-library/collections/periodicals"
   },
   {
-    iconName: "mdi:image-outline",
-    value: "+15K",
-    label: "Photographies",
-    labelAr: "صور فوتوغرافية",
-    href: "/digital-library/collections/photos"
+    iconName: "mdi:book-alphabet",
+    value: "+30",
+    label: "Lithographies",
+    labelAr: "مطبوعات حجرية",
+    href: "/digital-library/collections/lithographies"
+  },
+  {
+    iconName: "mdi:book-open-page-variant-outline",
+    value: "+400",
+    label: "Livres",
+    labelAr: "كتب",
+    href: "/digital-library/collections/books"
+  },
+  {
+    iconName: "mdi:newspaper",
+    value: "+10",
+    label: "Journaux",
+    labelAr: "جرائد",
+    href: "/digital-library/collections/newspapers"
+  },
+  {
+    iconName: "mdi:bookshelf",
+    value: "+2K",
+    label: "Collections spécialisées",
+    labelAr: "مجموعات متخصصة",
+    href: "/digital-library/collections/specialized"
+  },
+  {
+    iconName: "mdi:video-outline",
+    value: "+100",
+    label: "Audiovisuel",
+    labelAr: "مواد سمعية بصرية",
+    href: "/digital-library/collections/audiovisual"
   }
 ];
 
