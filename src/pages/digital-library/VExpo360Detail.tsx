@@ -39,7 +39,9 @@ export default function VExpo360Detail() {
       if (error) throw error;
       return data;
     },
-    enabled: !!slug
+    enabled: !!slug,
+    staleTime: 0,
+    refetchOnMount: 'always'
   });
 
   // Fetch panoramas for this exhibition
@@ -55,7 +57,9 @@ export default function VExpo360Detail() {
       if (error) throw error;
       return data;
     },
-    enabled: !!exhibition?.id
+    enabled: !!exhibition?.id,
+    staleTime: 0,
+    refetchOnMount: 'always'
   });
 
   // Fetch all hotspots for all panoramas
@@ -81,7 +85,9 @@ export default function VExpo360Detail() {
       });
       return grouped;
     },
-    enabled: !!panoramas && panoramas.length > 0
+    enabled: !!panoramas && panoramas.length > 0,
+    staleTime: 0,
+    refetchOnMount: 'always'
   });
 
   // Fetch artworks linked to hotspots
@@ -109,7 +115,9 @@ export default function VExpo360Detail() {
       });
       return map;
     },
-    enabled: !!allHotspots && Object.keys(allHotspots).length > 0
+    enabled: !!allHotspots && Object.keys(allHotspots).length > 0,
+    staleTime: 0,
+    refetchOnMount: 'always'
   });
 
   const formatDate = (dateStr: string | null) => {
