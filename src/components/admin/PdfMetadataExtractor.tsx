@@ -47,6 +47,7 @@ const TESSERACT_LANG_MAP: Record<string, string> = {
   'ber': 'ber_proc',
   'fr+ar': 'fra+ara',
   'ar+fr': 'ara+fra',
+  'lat': 'lat',
 };
 
 export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExtractorProps) {
@@ -851,6 +852,7 @@ export default function PdfMetadataExtractor({ onDataExtracted }: PdfMetadataExt
               <SelectItem value="fr">Français uniquement</SelectItem>
               <SelectItem value="ar">Arabe uniquement</SelectItem>
               <SelectItem value="en">Anglais</SelectItem>
+              <SelectItem value="lat">Latin</SelectItem>
             </SelectContent>
           </Select>
         </div>
