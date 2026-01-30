@@ -25,24 +25,52 @@ const iconMap: Record<string, any> = {
 const defaultStats: StatItem[] = [
   {
     icon: "BookOpen",
-    value: "+45K",
-    label: "Livres numériques",
-    labelAr: "كتب رقمية",
+    value: "+12K",
+    label: "Manuscrits",
+    labelAr: "مخطوطات",
+    href: "/digital-library/collections/manuscripts"
+  },
+  {
+    icon: "Newspaper",
+    value: "+60",
+    label: "Revues",
+    labelAr: "مجلات",
+    href: "/digital-library/collections/periodicals"
+  },
+  {
+    icon: "BookOpen",
+    value: "+30",
+    label: "Lithographies",
+    labelAr: "مطبوعات حجرية",
+    href: "/digital-library/collections/lithographies"
+  },
+  {
+    icon: "BookOpen",
+    value: "+400",
+    label: "Livres",
+    labelAr: "كتب",
     href: "/digital-library/collections/books"
   },
   {
     icon: "Newspaper",
-    value: "+8K",
-    label: "Revues et journaux",
-    labelAr: "المجلات والجرائد",
-    href: "/digital-library/collections/periodicals"
+    value: "+10",
+    label: "Journaux",
+    labelAr: "جرائد",
+    href: "/digital-library/collections/newspapers"
+  },
+  {
+    icon: "BookOpen",
+    value: "+2K",
+    label: "Collections spécialisées",
+    labelAr: "مجموعات متخصصة",
+    href: "/digital-library/collections/specialized"
   },
   {
     icon: "Image",
-    value: "+15K",
-    label: "Photographies",
-    labelAr: "صور فوتوغرافية",
-    href: "/digital-library/collections/photos"
+    value: "+100",
+    label: "Audiovisuel",
+    labelAr: "مواد سمعية بصرية",
+    href: "/digital-library/collections/audiovisual"
   }
 ];
 
