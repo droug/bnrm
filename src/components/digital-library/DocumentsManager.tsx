@@ -491,7 +491,7 @@ export default function DocumentsManager() {
           download_enabled: values.download_enabled,
           publication_status: values.is_visible ? 'published' : 'draft',
           digitization_source: values.digitization_source || 'internal',
-          is_rare_book: values.is_rare_book || false,
+          // Note: is_rare_book n'existe pas dans la table, géré via cbn_documents
         })
         .eq('id', values.id);
       
@@ -2009,6 +2009,24 @@ export default function DocumentsManager() {
                   }
                 })} className="space-y-6">
                   <div className="grid grid-cols-2 gap-4">
+                    {/* Champ Cote - Numéro de cote = nom du fichier */}
+                    <FormField
+                      control={form.control}
+                      name="cote"
+                      render={({ field }) => (
+                        <FormItem className="col-span-2">
+                          <FormLabel>N° de Cote</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Numéro de cote (nom du fichier)" readOnly className="bg-muted" />
+                          </FormControl>
+                          <FormDescription className="text-xs">
+                            Le numéro de cote correspond au nom du fichier téléchargé
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
                     <FormField
                       control={form.control}
                       name="title"
@@ -2126,26 +2144,7 @@ export default function DocumentsManager() {
                       )}
                     />
 
-                    {/* Checkbox Livre rare */}
-                    <FormField
-                      control={form.control}
-                      name="is_rare_book"
-                      render={({ field }) => (
-                        <FormItem className="col-span-2 flex items-center gap-3 p-3 border rounded-lg bg-amber-50/50">
-                          <FormControl>
-                            <Switch checked={field.value} onCheckedChange={field.onChange} />
-                          </FormControl>
-                          <div>
-                            <FormLabel className="text-sm font-medium cursor-pointer">
-                              📚 Livre rare
-                            </FormLabel>
-                            <FormDescription className="text-xs">
-                              Marquer ce document comme édition rare ou précieuse
-                            </FormDescription>
-                          </div>
-                        </FormItem>
-                      )}
-                    />
+                    {/* Note: Livre rare est géré via la table cbn_documents, pas digital_library_documents */}
                   </div>
 
                   {/* Permissions */}
@@ -2476,7 +2475,7 @@ export default function DocumentsManager() {
                           onClick={() => {
                             setEditingDocument(doc);
                             form.reset({
-                              cote: (doc as any).cbn_documents?.cote || '',
+                              cote: (doc as any).cbn_documents?.cote || doc.pdf_url?.split('/').pop()?.replace('.pdf', '') || '',
                               title: doc.title || '',
                               author: doc.author || '',
                               file_type: doc.document_type || doc.file_format || '',
@@ -2490,7 +2489,7 @@ export default function DocumentsManager() {
                               copyright_expires_at: '',
                               copyright_derogation: false,
                               digitization_source: (doc.digitization_source === 'external' ? 'external' : 'internal') as "internal" | "external",
-                              is_rare_book: (doc as any).is_rare_book || false,
+                              is_rare_book: false,
                             });
                             setShowEditDialog(true);
                           }}
