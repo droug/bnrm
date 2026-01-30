@@ -257,7 +257,7 @@ export default function DigitalLibraryHome() {
         const {
           data,
           error
-        } = await supabase.from('digital_library_documents').select('id, title, author, publication_year, document_type, cover_image_url, pdf_url, video_url, created_at, is_manuscript').eq('publication_status', 'published').is('deleted_at', null).order('created_at', {
+        } = await supabase.from('digital_library_documents').select('id, title, author, publication_year, document_type, cover_image_url, pdf_url, thumbnail_url, created_at, is_manuscript').eq('publication_status', 'published').is('deleted_at', null).order('created_at', {
           ascending: false
         }).limit(6);
         if (data && !error) {
@@ -301,18 +301,20 @@ export default function DigitalLibraryHome() {
               return null;
             };
 
-            // Extraire l'ID YouTube depuis l'URL vidéo
+            // Extraire l'ID YouTube depuis l'URL (peut être dans pdf_url pour les vidéos)
             const extractYouTubeId = (url: string | null) => {
               if (!url) return null;
               const match = url.match(/(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/watch\?.+&v=))([^&?\s]+)/);
               return match ? match[1] : null;
             };
 
-            const youtubeId = extractYouTubeId(item.video_url);
             const isVideo = item.document_type?.toLowerCase() === 'video';
+            // Pour les vidéos, essayer d'extraire l'ID YouTube depuis pdf_url
+            const youtubeId = isVideo ? extractYouTubeId(item.pdf_url) : null;
             
-            // Utiliser cover_image_url, puis miniature YouTube pour vidéos, puis PDF, puis fallback
+            // Utiliser cover_image_url, puis thumbnail_url, puis miniature YouTube pour vidéos, puis PDF, puis fallback
             const thumbnail = item.cover_image_url || 
+                              item.thumbnail_url ||
                               (isVideo && youtubeId ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg` : null) ||
                               generatePdfThumbnail(item.pdf_url) ||
                               titleImageMap[item.title] || 
@@ -330,7 +332,7 @@ export default function DigitalLibraryHome() {
               pdfUrl: item.pdf_url, // URL du PDF pour générer la miniature dynamiquement
               isManuscript: item.is_manuscript,
               isVideo: isVideo,
-              videoUrl: item.video_url
+              videoUrl: isVideo ? item.pdf_url : null
             };
           });
           console.log('Loaded digital library documents:', formattedItems);
