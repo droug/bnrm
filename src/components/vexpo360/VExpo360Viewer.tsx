@@ -449,23 +449,24 @@ export function VExpo360Viewer({
         </div>
       )}
 
-      {/* Panorama Thumbnails */}
-      {showInfo && panoramas.length > 1 && (
-        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 pointer-events-auto">
-          <div className="flex gap-2 bg-black/50 backdrop-blur-sm rounded-lg p-2">
+      {/* Panorama Thumbnails - always show when multiple panoramas */}
+      {panoramas.length > 1 && (
+        <div className="absolute bottom-28 left-1/2 -translate-x-1/2 pointer-events-auto z-20">
+          <div className="flex gap-2 bg-black/70 backdrop-blur-sm rounded-lg p-2 shadow-lg">
             {panoramas.map((panorama, index) => (
               <button
                 key={panorama.id}
                 onClick={() => setCurrentPanoramaId(panorama.id)}
-                className={`w-16 h-12 rounded overflow-hidden border-2 transition-all ${
+                className={`w-20 h-14 rounded overflow-hidden border-2 transition-all ${
                   currentPanoramaId === panorama.id 
-                    ? 'border-white' 
-                    : 'border-transparent opacity-60 hover:opacity-100'
+                    ? 'border-white ring-2 ring-amber-400' 
+                    : 'border-transparent opacity-70 hover:opacity-100 hover:border-white/50'
                 }`}
+                title={panorama.name_fr || `Panorama ${index + 1}`}
               >
                 <img 
                   src={panorama.panorama_image_url} 
-                  alt={panorama.name_fr}
+                  alt={panorama.name_fr || `Panorama ${index + 1}`}
                   className="w-full h-full object-cover"
                 />
               </button>
