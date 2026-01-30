@@ -308,7 +308,6 @@ export function ProfessionalsList() {
                   <SelectItem value="all">Tous les rôles</SelectItem>
                   <SelectItem value="editor">Éditeur</SelectItem>
                   <SelectItem value="printer">Imprimeur</SelectItem>
-                  <SelectItem value="distributor">Distributeur</SelectItem>
                   <SelectItem value="producer">Producteur</SelectItem>
                   <SelectItem value="author">Auteur</SelectItem>
                 </SelectContent>
