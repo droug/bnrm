@@ -486,12 +486,13 @@ export default function DocumentsManager() {
           title: values.title || null,
           author: values.author || null,
           document_type: values.file_type || null,
+          // Save full date in publication_date, and extract year for publication_year
+          publication_date: values.publication_date || null,
           publication_year: values.publication_date ? parseInt(values.publication_date.split('-')[0]) : null,
           pdf_url: values.file_url || null,
           download_enabled: values.download_enabled,
           publication_status: values.is_visible ? 'published' : 'draft',
           digitization_source: values.digitization_source || 'internal',
-          // Note: is_rare_book n'existe pas dans la table, géré via cbn_documents
         })
         .eq('id', values.id);
       
@@ -2493,7 +2494,8 @@ export default function DocumentsManager() {
                               title: doc.title || '',
                               author: doc.author || '',
                               file_type: doc.document_type || doc.file_format || '',
-                              publication_date: doc.publication_year?.toString() || '',
+                              // Use publication_date if available, otherwise fallback to publication_year as YYYY-01-01
+                              publication_date: doc.publication_date || (doc.publication_year ? `${doc.publication_year}-01-01` : ''),
                               description: '',
                               file_url: doc.pdf_url || '',
                               download_enabled: doc.download_enabled ?? true,
