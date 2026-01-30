@@ -1757,19 +1757,19 @@ export default function DocumentsManager() {
                         <FormItem>
                           <FormLabel>Type de document</FormLabel>
                           <FormControl>
-                            <PortalSelect
-                              placeholder="Sélectionner"
-                              value={field.value}
-                              onChange={field.onChange}
-                              options={[
-                                { value: "manuscrit", label: "Manuscrits" },
-                                { value: "livre", label: "Livres" },
-                                { value: "lithographie", label: "Lithographie" },
-                                { value: "periodique", label: "Périodiques" },
-                                { value: "collection_specialisee", label: "Collections Spécialisées" },
-                                { value: "audiovisuel", label: "Audiovisuel" },
-                              ]}
-                            />
+                            <select
+                              value={field.value || ""}
+                              onChange={(e) => field.onChange(e.target.value)}
+                              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            >
+                              <option value="">Sélectionner</option>
+                              <option value="manuscrit">Manuscrits</option>
+                              <option value="livre">Livres</option>
+                              <option value="lithographie">Lithographie</option>
+                              <option value="periodique">Périodiques</option>
+                              <option value="collection_specialisee">Collections Spécialisées</option>
+                              <option value="audiovisuel">Audiovisuel</option>
+                            </select>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -1797,15 +1797,14 @@ export default function DocumentsManager() {
                         <FormItem>
                           <FormLabel>Source de numérisation</FormLabel>
                           <FormControl>
-                            <PortalSelect
-                              placeholder="Sélectionner"
-                              value={field.value}
-                              onChange={field.onChange}
-                              options={[
-                                { value: "internal", label: "Collections numérisées", description: "Numérisé par la BNRM" },
-                                { value: "external", label: "Ressources numériques", description: "Reçu déjà numérisé" },
-                              ]}
-                            />
+                            <select
+                              value={field.value || "internal"}
+                              onChange={(e) => field.onChange(e.target.value as "internal" | "external")}
+                              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            >
+                              <option value="internal">Collections numérisées (BNRM)</option>
+                              <option value="external">Ressources numériques (externe)</option>
+                            </select>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
