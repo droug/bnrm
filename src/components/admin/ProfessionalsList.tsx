@@ -67,8 +67,20 @@ export function ProfessionalsList() {
   });
 
   const { data: professionals, isLoading, refetch } = useQuery({
-    queryKey: ["professionals"],
+    queryKey: ["professionals-approved"],
     queryFn: async () => {
+      // Récupérer les demandes d'inscription approuvées
+      const { data: approvedRequests, error: requestsError } = await supabase
+        .from("professional_registration_requests")
+        .select("*")
+        .eq("status", "approved");
+
+      if (requestsError) throw requestsError;
+      if (!approvedRequests || approvedRequests.length === 0) return [];
+
+      const userIds = approvedRequests.map(r => r.user_id).filter(Boolean);
+
+      // Récupérer les rôles utilisateurs
       const { data: userRoles, error: rolesError } = await supabase
         .from("user_roles")
         .select("user_id, role")
@@ -76,10 +88,7 @@ export function ProfessionalsList() {
 
       if (rolesError) throw rolesError;
 
-      const userIds = userRoles?.map(r => r.user_id) || [];
-
-      if (userIds.length === 0) return [];
-
+      // Récupérer les profils des utilisateurs approuvés
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
         .select("*")
@@ -87,28 +96,23 @@ export function ProfessionalsList() {
 
       if (profilesError) throw profilesError;
 
-      const { data: usersData, error: usersError } = await supabase.auth.admin.listUsers();
-      if (usersError) throw usersError;
-      
-      const users = usersData?.users || [];
-
-      // Récupérer les données d'inscription
-      const { data: registrations } = await supabase
-        .from("professional_registration_requests")
-        .select("*")
-        .in("user_id", userIds)
-        .eq("status", "approved");
-
-      return (profiles || []).map(profile => {
-        const userRole = userRoles?.find(r => r.user_id === profile.user_id);
-        const authUser = users.find((u: any) => u.id === profile.user_id);
-        const registration = registrations?.find(r => r.user_id === profile.user_id);
+      // Construire la liste des professionnels validés
+      return approvedRequests.map(request => {
+        const profile = profiles?.find(p => p.user_id === request.user_id);
+        const userRole = userRoles?.find(r => r.user_id === request.user_id);
+        const regData = request.registration_data as Record<string, any> | null;
         
         return {
-          ...profile,
-          role: userRole?.role || "unknown",
-          email: authUser?.email || "",
-          registration_data: registration?.registration_data,
+          user_id: request.user_id || request.id,
+          first_name: profile?.first_name || regData?.representativeFirstName || regData?.name || "-",
+          last_name: profile?.last_name || regData?.representativeLastName || "",
+          email: regData?.email || "",
+          phone: profile?.phone || regData?.phone || "",
+          institution: profile?.institution || regData?.name || regData?.companyName || "",
+          role: userRole?.role || request.professional_type || "unknown",
+          is_approved: true,
+          created_at: request.created_at,
+          registration_data: regData,
         };
       });
     },
