@@ -116,6 +116,10 @@ export const digitalLibraryTranslations = {
     'dl.docTypes.periodical': 'Périodique',
     'dl.docTypes.photo': 'Photographie',
     'dl.docTypes.audiovisual': 'Archives A/V',
+    'dl.docTypes.map': 'Carte',
+    'dl.docTypes.audio': 'Audio',
+    'dl.docTypes.video': 'Vidéo',
+    'dl.docTypes.image': 'Image',
     
     
     // ============= Virtual exhibition =============
