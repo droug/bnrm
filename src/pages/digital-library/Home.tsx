@@ -147,25 +147,28 @@ export default function DigitalLibraryHome() {
     refetchOnMount: "always"
   });
 
-  // Fetch latest published virtual exhibition
+  // Fetch all published virtual exhibitions for carousel
   const {
-    data: latestExhibition
+    data: publishedExhibitions
   } = useQuery({
-    queryKey: ["latest-vexpo-exhibition"],
+    queryKey: ["published-vexpo-exhibitions"],
     queryFn: async () => {
       const {
         data,
         error
       } = await supabase.from("vexpo_exhibitions").select("id, slug, title_fr, title_ar, teaser_fr, teaser_ar, cover_image_url").eq("status", "published").order("created_at", {
         ascending: false
-      }).limit(1).maybeSingle();
+      });
       if (error) {
-        console.error("Error fetching exhibition:", error);
-        return null;
+        console.error("Error fetching exhibitions:", error);
+        return [];
       }
-      return data;
+      return data || [];
     }
   });
+
+  // Get the first exhibition for background fallback
+  const latestExhibition = publishedExhibitions?.[0] || null;
   const heroImageUrl = heroSettings?.hero_image_url?.trim() ? heroSettings.hero_image_url : libraryBanner;
   const autoplayPlugin = useRef(Autoplay({
     delay: 5000,
@@ -686,12 +689,12 @@ export default function DigitalLibraryHome() {
         </section>}
 
 
-      {/* Section Exposition Virtuelle */}
-      {latestExhibition && <section className="py-16 relative overflow-hidden">
+      {/* Section Exposition Virtuelle - Carrousel */}
+      {publishedExhibitions && publishedExhibitions.length > 0 && <section className="py-16 relative overflow-hidden">
           {/* Background Image - uses CMS settings (vexpo_hero_bn) if available */}
           <div className="absolute inset-0 bg-cover bg-center" style={{
-        backgroundImage: vexpoHeroSettings?.image_url ? `url(${vexpoHeroSettings.image_url})` : latestExhibition.cover_image_url ? `url(${latestExhibition.cover_image_url})` : `url(${virtualExhibitionBg})`
-      }} />
+            backgroundImage: vexpoHeroSettings?.image_url ? `url(${vexpoHeroSettings.image_url})` : latestExhibition?.cover_image_url ? `url(${latestExhibition.cover_image_url})` : `url(${virtualExhibitionBg})`
+          }} />
           <div className="absolute inset-0 bg-gradient-to-br from-bn-blue-primary/80 via-bn-blue-primary/70 to-bn-blue-deep/80" />
           <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
           <div className="absolute bottom-0 left-0 w-64 h-64 bg-gold-bn-primary/10 rounded-full blur-3xl" />
@@ -704,54 +707,94 @@ export default function DigitalLibraryHome() {
               </div>
               
               <h2 className="text-[48px] font-normal text-white font-gilda">
-                {language === 'ar' ? vexpoHeroSettings?.title_ar || 'معرض افتراضي' : vexpoHeroSettings?.title_fr || 'Exposition Virtuelle'}
+                {language === 'ar' ? vexpoHeroSettings?.title_ar || 'معارض افتراضية' : vexpoHeroSettings?.title_fr || 'Expositions Virtuelles'}
               </h2>
               <p className="font-body text-regular text-white/80 max-w-2xl mx-auto mt-4">
                 {language === 'ar' ? vexpoHeroSettings?.subtitle_ar || 'استكشف تاريخ وتراث المغرب من خلال معارضنا التفاعلية' : vexpoHeroSettings?.subtitle_fr || 'Explorez l\'histoire et le patrimoine du Maroc à travers nos expositions interactives'}
               </p>
             </div>
 
-            <div className="max-w-4xl mx-auto">
-              <Link to={vexpoHeroSettings?.cta_url || `/digital-library/exposition-virtuelle/${latestExhibition.slug}`}>
-                <Card className="group relative overflow-hidden border-2 border-white/20 hover:border-gold-bn-primary/50 transition-all duration-500 bg-white/10 backdrop-blur-md cursor-pointer">
-                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-gold-bn-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                  
-                  <CardContent className="p-8 md:p-12">
-                    <div className="flex flex-col md:flex-row items-center gap-8">
-                      {/* Image/Visual */}
-                      <div className="relative flex-shrink-0">
-                        <div className="w-48 h-48 md:w-56 md:h-56 rounded-2xl bg-gradient-to-br from-gold-bn-primary to-gold-bn-deep p-1 shadow-2xl shadow-gold-bn-primary/30 group-hover:shadow-gold-bn-primary/50 transition-shadow duration-500">
-                          {latestExhibition.cover_image_url ? <img src={latestExhibition.cover_image_url} alt={language === 'ar' ? latestExhibition.title_ar || latestExhibition.title_fr : latestExhibition.title_fr} className="w-full h-full rounded-xl object-cover" /> : <div className="w-full h-full rounded-xl bg-bn-blue-primary/50 backdrop-blur-sm flex items-center justify-center overflow-hidden">
-                              <div className="relative">
-                                <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-gold-bn-primary/20 rounded-full blur-xl animate-pulse" />
-                                <Layers className="h-24 w-24 text-white relative z-10 group-hover:scale-110 transition-transform duration-500" />
+            <div className="max-w-5xl mx-auto">
+              <Carousel
+                opts={{
+                  align: "center",
+                  loop: publishedExhibitions.length > 1,
+                }}
+                className="w-full"
+              >
+                <CarouselContent className="-ml-4">
+                  {publishedExhibitions.map((exhibition) => (
+                    <CarouselItem key={exhibition.id} className="pl-4 md:basis-full">
+                      <Link to={`/digital-library/exposition-virtuelle/${exhibition.slug}`}>
+                        <Card className="group relative overflow-hidden border-2 border-white/20 hover:border-gold-bn-primary/50 transition-all duration-500 bg-white/10 backdrop-blur-md cursor-pointer">
+                          <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/5 to-gold-bn-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                          
+                          <CardContent className="p-8 md:p-12">
+                            <div className="flex flex-col md:flex-row items-center gap-8">
+                              {/* Image/Visual */}
+                              <div className="relative flex-shrink-0">
+                                <div className="w-48 h-48 md:w-56 md:h-56 rounded-2xl bg-gradient-to-br from-gold-bn-primary to-gold-bn-deep p-1 shadow-2xl shadow-gold-bn-primary/30 group-hover:shadow-gold-bn-primary/50 transition-shadow duration-500">
+                                  {exhibition.cover_image_url ? (
+                                    <img 
+                                      src={exhibition.cover_image_url} 
+                                      alt={language === 'ar' ? exhibition.title_ar || exhibition.title_fr : exhibition.title_fr} 
+                                      className="w-full h-full rounded-xl object-cover" 
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full rounded-xl bg-bn-blue-primary/50 backdrop-blur-sm flex items-center justify-center overflow-hidden">
+                                      <div className="relative">
+                                        <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-gold-bn-primary/20 rounded-full blur-xl animate-pulse" />
+                                        <Layers className="h-24 w-24 text-white relative z-10 group-hover:scale-110 transition-transform duration-500" />
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="absolute -bottom-2 -right-2 px-3 py-1 bg-gradient-to-r from-gold-bn-primary to-gold-bn-primary-dark text-white text-xs font-bold rounded-full shadow-lg">
+                                  360°
+                                </div>
                               </div>
-                            </div>}
-                        </div>
-                        <div className="absolute -bottom-2 -right-2 px-3 py-1 bg-gradient-to-r from-gold-bn-primary to-gold-bn-primary-dark text-white text-xs font-bold rounded-full shadow-lg">
-                          360°
-                        </div>
-                      </div>
 
-                      {/* Content */}
-                      <div className="flex-1 text-center md:text-left">
-                        <h3 className="text-2xl md:text-3xl font-bold mb-3 text-white group-hover:text-gold-bn-primary transition-colors">
-                          {language === 'ar' ? latestExhibition.title_ar || latestExhibition.title_fr : latestExhibition.title_fr}
-                        </h3>
-                        <p className="text-white/80 mb-6 leading-relaxed">
-                          {language === 'ar' ? latestExhibition.teaser_ar || latestExhibition.teaser_fr : latestExhibition.teaser_fr}
-                        </p>
-                        <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
-                          <Button className="bg-gradient-to-r from-gold-bn-primary to-gold-bn-primary-dark hover:from-gold-bn-primary-dark hover:to-gold-bn-deep text-white shadow-lg shadow-gold-bn-primary/25 group-hover:shadow-gold-bn-primary/40 transition-all duration-300">
-                            <Eye className="h-4 w-4 mr-2" />
-                            {language === 'ar' ? vexpoHeroSettings?.cta_label_ar || 'زيارة المعرض' : vexpoHeroSettings?.cta_label_fr || 'Visiter l\'exposition'}
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </Link>
+                              {/* Content */}
+                              <div className="flex-1 text-center md:text-left">
+                                <h3 className="text-2xl md:text-3xl font-bold mb-3 text-white group-hover:text-gold-bn-primary transition-colors">
+                                  {language === 'ar' ? exhibition.title_ar || exhibition.title_fr : exhibition.title_fr}
+                                </h3>
+                                <p className="text-white/80 mb-6 leading-relaxed line-clamp-3">
+                                  {language === 'ar' ? exhibition.teaser_ar || exhibition.teaser_fr : exhibition.teaser_fr}
+                                </p>
+                                <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
+                                  <Button className="bg-gradient-to-r from-gold-bn-primary to-gold-bn-primary-dark hover:from-gold-bn-primary-dark hover:to-gold-bn-deep text-white shadow-lg shadow-gold-bn-primary/25 group-hover:shadow-gold-bn-primary/40 transition-all duration-300">
+                                    <Eye className="h-4 w-4 mr-2" />
+                                    {language === 'ar' ? 'زيارة المعرض' : 'Visiter l\'exposition'}
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    </CarouselItem>
+                  ))}
+                </CarouselContent>
+                {publishedExhibitions.length > 1 && (
+                  <>
+                    <CarouselPrevious className="left-0 md:-left-12 bg-white/20 border-white/30 text-white hover:bg-white/30 hover:text-white" />
+                    <CarouselNext className="right-0 md:-right-12 bg-white/20 border-white/30 text-white hover:bg-white/30 hover:text-white" />
+                  </>
+                )}
+              </Carousel>
+              
+              {/* Indicators */}
+              {publishedExhibitions.length > 1 && (
+                <div className="flex justify-center gap-2 mt-6">
+                  {publishedExhibitions.map((_, index) => (
+                    <div 
+                      key={index}
+                      className="w-2 h-2 rounded-full bg-white/30"
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </section>}
