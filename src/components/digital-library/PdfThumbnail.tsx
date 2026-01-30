@@ -2,8 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import { Skeleton } from '@/components/ui/skeleton';
 
-// Configure PDF.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+// Configure PDF.js worker - use the exact version installed (4.4.168)
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.mjs`;
 
 interface PdfThumbnailProps {
   pdfUrl: string;
@@ -42,7 +42,7 @@ export function PdfThumbnail({ pdfUrl, fallbackImage, className = '', alt = 'Doc
         // Charger le PDF
         const loadingTask = pdfjsLib.getDocument({
           url: pdfUrl,
-          cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',
+          cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/cmaps/',
           cMapPacked: true,
         });
 
@@ -149,7 +149,7 @@ export async function generatePdfThumbnailUrl(pdfUrl: string): Promise<string | 
   try {
     const loadingTask = pdfjsLib.getDocument({
       url: pdfUrl,
-      cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',
+      cMapUrl: 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/cmaps/',
       cMapPacked: true,
     });
 

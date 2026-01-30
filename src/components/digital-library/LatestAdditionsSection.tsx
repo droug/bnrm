@@ -124,16 +124,26 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
                     className="group bg-white border border-[#B68F1C]/30 hover:border-[#B68F1C]/50 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer min-h-[420px]"
                   >
                     <div className="relative aspect-[4/3] overflow-hidden bg-slate-light">
-                      {item.pdfUrl && !item.thumbnail?.startsWith('data:') && !item.thumbnail?.includes('cover') ? (
+                      {/* Priorité: cover_image_url > PDF thumbnail > fallback */}
+                      {item.thumbnail?.includes('supabase') && item.thumbnail?.includes('cover') ? (
+                        // Image de couverture uploadée
+                        <img 
+                          src={item.thumbnail} 
+                          alt={item.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : item.pdfUrl ? (
+                        // Générer miniature depuis le PDF
                         <PdfThumbnail 
                           pdfUrl={item.pdfUrl} 
-                          fallbackImage={item.thumbnail}
+                          fallbackImage={undefined}
                           alt={item.title}
                           className="group-hover:scale-105 transition-transform duration-500"
                         />
                       ) : (
+                        // Fallback ultime
                         <img 
-                          src={item.thumbnail} 
+                          src={item.thumbnail || '/placeholder.svg'} 
                           alt={item.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
