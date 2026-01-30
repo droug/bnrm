@@ -191,11 +191,11 @@ const DigitalLibraryFooter = () => {
     <footer className="bg-gradient-to-br from-bn-blue-primary/5 via-gold-bn-primary/5 to-bn-blue-deep/5 text-foreground border-t border-gold-bn-primary/20">
       <div className="container mx-auto px-4 py-16">
         {/* Section principale - Informations et liens */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-8 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 mb-12">
           
           {/* Col 1: À propos - Logo BN */}
           <div className="lg:col-span-1 space-y-6">
-            <div className="flex items-center">
+            <div className="flex items-center space-x-3">
               <img 
                 src={logoDigitalLibrary} 
                 alt="Ibn Battuta - Bibliothèque Numérique" 
@@ -207,7 +207,7 @@ const DigitalLibraryFooter = () => {
               {language === 'ar' ? settings.description_ar : settings.description_fr}
             </p>
             
-            <div className="flex items-center gap-2">
+            <div className="flex items-center space-x-3">
               {activeSocialLinks.map((social, index) => (
                 <Button 
                   key={index}
@@ -231,19 +231,19 @@ const DigitalLibraryFooter = () => {
 
           {/* Col 2: Liens rapides */}
           {quickLinks && (
-            <div className="flex flex-col">
-              <h4 className="text-lg font-semibold mb-4 flex items-center text-bn-blue-primary h-8">
-                <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary flex-shrink-0"></span>
+            <div>
+              <h4 className="text-lg font-semibold mb-6 flex items-center text-bn-blue-primary">
+                <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
                 {language === 'ar' ? quickLinks.title_ar : quickLinks.title_fr}
               </h4>
-              <ul className="space-y-2">
+              <ul className="space-y-3">
                 {quickLinks.links.map((link, index) => (
                   <li key={index}>
                     <a 
                       href={link.href}
                       target={link.external ? "_blank" : undefined}
                       rel={link.external ? "noopener noreferrer" : undefined}
-                      className="text-sm opacity-80 hover:opacity-100 hover:text-gold-bn-primary hover:translate-x-1 transition-all inline-block leading-relaxed"
+                      className="text-sm opacity-80 hover:opacity-100 hover:text-gold-bn-primary hover:translate-x-1 transition-all inline-block"
                     >
                       {language === 'ar' ? link.title_ar : link.title_fr}
                     </a>
@@ -255,19 +255,19 @@ const DigitalLibraryFooter = () => {
 
           {/* Col 3: Réservoirs mondiaux */}
           {worldReservoirs && (
-            <div className="flex flex-col">
-              <h4 className="text-lg font-semibold mb-4 flex items-center text-bn-blue-primary h-8">
-                <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary flex-shrink-0"></span>
+            <div>
+              <h4 className="text-lg font-semibold mb-6 flex items-center text-bn-blue-primary">
+                <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
                 {language === 'ar' ? worldReservoirs.title_ar : worldReservoirs.title_fr}
               </h4>
-              <ul className="space-y-2">
+              <ul className="space-y-3">
                 {worldReservoirs.links.map((link, index) => (
                   <li key={index}>
                     <a 
                       href={link.href}
                       target={link.external ? "_blank" : undefined}
                       rel={link.external ? "noopener noreferrer" : undefined}
-                      className="text-sm opacity-80 hover:opacity-100 hover:text-gold-bn-primary hover:translate-x-1 transition-all inline-block leading-relaxed"
+                      className="text-sm opacity-80 hover:opacity-100 hover:text-gold-bn-primary hover:translate-x-1 transition-all inline-block"
                     >
                       {language === 'ar' ? link.title_ar : link.title_fr}
                     </a>
@@ -279,19 +279,19 @@ const DigitalLibraryFooter = () => {
 
           {/* Col 4: Aide et support */}
           {supportSection && (
-            <div className="flex flex-col">
-              <h4 className="text-lg font-semibold mb-4 flex items-center text-bn-blue-primary h-8">
-                <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary flex-shrink-0"></span>
+            <div>
+              <h4 className="text-lg font-semibold mb-6 flex items-center text-bn-blue-primary">
+                <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
                 {language === 'ar' ? supportSection.title_ar : supportSection.title_fr}
               </h4>
-              <ul className="space-y-2">
+              <ul className="space-y-3">
                 {supportSection.links.map((link, index) => (
                   <li key={index}>
                     <a 
                       href={link.href}
                       target={link.external ? "_blank" : undefined}
                       rel={link.external ? "noopener noreferrer" : undefined}
-                      className="text-sm opacity-80 hover:opacity-100 hover:text-gold-bn-primary hover:translate-x-1 transition-all inline-block leading-relaxed"
+                      className="text-sm opacity-80 hover:opacity-100 hover:text-gold-bn-primary hover:translate-x-1 transition-all inline-block"
                     >
                       {language === 'ar' ? link.title_ar : link.title_fr}
                     </a>
@@ -302,29 +302,29 @@ const DigitalLibraryFooter = () => {
           )}
 
           {/* Col 5: Contact */}
-          <div className="flex flex-col">
-            <h4 className="text-lg font-semibold mb-4 flex items-center text-bn-blue-primary h-8">
-              <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary flex-shrink-0"></span>
+          <div>
+            <h4 className="text-lg font-semibold mb-6 flex items-center text-bn-blue-primary">
+              <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
               {language === 'ar' ? 'اتصل بنا' : 'Contact'}
             </h4>
-            <div className="space-y-3">
-              <div className="flex items-start gap-3">
-                <MapPin className="h-4 w-4 mt-0.5 flex-shrink-0 text-gold-bn-primary" />
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <MapPin className="h-4 w-4 mt-1 flex-shrink-0 text-gold-bn-primary" />
                 <p className="text-sm opacity-80 leading-relaxed">
                   {language === 'ar' ? settings.contact.address_ar : settings.contact.address_fr}
                 </p>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center space-x-3">
                 <Phone className="h-4 w-4 flex-shrink-0 text-gold-bn-primary" />
                 <span className="text-sm opacity-80">{settings.contact.phone}</span>
               </div>
-              <div className="flex items-center gap-3">
+              <div className="flex items-center space-x-3">
                 <Mail className="h-4 w-4 flex-shrink-0 text-gold-bn-primary" />
                 <span className="text-sm opacity-80">{settings.contact.email}</span>
               </div>
-              <div className="flex items-start gap-3">
-                <Clock className="h-4 w-4 mt-0.5 flex-shrink-0 text-gold-bn-primary" />
-                <p className="text-sm opacity-80 leading-relaxed">
+              <div className="flex items-start space-x-3">
+                <Clock className="h-4 w-4 mt-1 flex-shrink-0 text-gold-bn-primary" />
+                <p className="text-sm opacity-80">
                   {language === 'ar' ? settings.contact.hours_ar : settings.contact.hours_fr}
                 </p>
               </div>
@@ -332,9 +332,9 @@ const DigitalLibraryFooter = () => {
           </div>
 
           {/* Col 6: Newsletter */}
-          <div className="flex flex-col">
-            <h4 className="text-lg font-semibold mb-4 flex items-center text-bn-blue-primary h-8">
-              <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary flex-shrink-0"></span>
+          <div>
+            <h4 className="text-lg font-semibold mb-6 flex items-center text-bn-blue-primary">
+              <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
               {language === 'ar' ? 'النشرة الإخبارية' : 'Newsletter'}
             </h4>
             <p className="text-sm opacity-80 mb-4 leading-relaxed">
