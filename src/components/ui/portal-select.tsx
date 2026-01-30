@@ -45,15 +45,25 @@ export function PortalSelect({
     }
   }, [isOpen]);
 
-  // Fermer au clic extérieur
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Fermer au clic extérieur - utiliser un délai pour permettre aux clics sur les options
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (buttonRef.current && !buttonRef.current.contains(event.target as Node)) {
-        const dropdownEl = document.getElementById("portal-select-dropdown");
-        if (dropdownEl && !dropdownEl.contains(event.target as Node)) {
-          setIsOpen(false);
-        }
+      const target = event.target as Node;
+      
+      // Vérifier si le clic est sur le bouton
+      if (buttonRef.current && buttonRef.current.contains(target)) {
+        return;
       }
+      
+      // Vérifier si le clic est sur le dropdown
+      if (dropdownRef.current && dropdownRef.current.contains(target)) {
+        return;
+      }
+      
+      // Sinon, fermer le dropdown
+      setIsOpen(false);
     };
 
     const handleEscape = (event: KeyboardEvent) => {
@@ -63,14 +73,18 @@ export function PortalSelect({
     };
 
     if (isOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      document.addEventListener("keydown", handleEscape);
+      // Utiliser un petit délai pour s'assurer que le dropdown est rendu
+      const timeoutId = setTimeout(() => {
+        document.addEventListener("mousedown", handleClickOutside);
+        document.addEventListener("keydown", handleEscape);
+      }, 0);
+      
+      return () => {
+        clearTimeout(timeoutId);
+        document.removeEventListener("mousedown", handleClickOutside);
+        document.removeEventListener("keydown", handleEscape);
+      };
     }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-      document.removeEventListener("keydown", handleEscape);
-    };
   }, [isOpen]);
 
   const handleSelect = (optionValue: string) => {
@@ -83,6 +97,7 @@ export function PortalSelect({
 
   const dropdownContent = isOpen ? (
     <div
+      ref={dropdownRef}
       id="portal-select-dropdown"
       style={{
         position: "fixed",
@@ -97,7 +112,11 @@ export function PortalSelect({
         {options.map((option) => (
           <li
             key={option.value}
-            onClick={() => handleSelect(option.value)}
+            onMouseDown={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleSelect(option.value);
+            }}
             className={cn(
               "px-4 py-2.5 text-sm cursor-pointer transition-colors",
               "hover:bg-accent",
