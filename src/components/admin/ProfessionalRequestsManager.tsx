@@ -282,7 +282,8 @@ export function ProfessionalRequestsManager() {
   const [rejectionReason, setRejectionReason] = useState('');
   const [observations, setObservations] = useState('');
   const [loading, setLoading] = useState(false);
-  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('pending');
+  const [roleFilter, setRoleFilter] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showRejectionDialog, setShowRejectionDialog] = useState(false);
   const [showApprovalDialog, setShowApprovalDialog] = useState(false);
@@ -727,55 +728,36 @@ export function ProfessionalRequestsManager() {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle>Gestion complète des demandes professionnelles</CardTitle>
+              <CardTitle>Gestion des demandes en attente</CardTitle>
               <CardDescription>
-                Suivez, validez et gérez toutes les demandes des professionnels
+                Validez ou refusez les demandes d'inscription des professionnels
               </CardDescription>
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant={statusFilter === 'all' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setStatusFilter('all')}
-              >
-                Toutes
-              </Button>
-              <Button
-                variant={statusFilter === 'pending' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setStatusFilter('pending')}
-              >
-                En attente
-              </Button>
-              <Button
-                variant={statusFilter === 'approved' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setStatusFilter('approved')}
-              >
-                Validées
-              </Button>
-              <Button
-                variant={statusFilter === 'archived' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setStatusFilter('archived')}
-              >
-                Archivées
-              </Button>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          {/* Search field */}
-          <div className="mb-4">
-            <div className="relative max-w-sm">
+          {/* Filtres */}
+          <div className="mb-4 flex flex-wrap gap-4">
+            <div className="relative flex-1 min-w-[200px] max-w-sm">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Rechercher par nom, email, type..."
+                placeholder="Rechercher par nom, email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9"
               />
             </div>
+            <select 
+              className="h-10 px-3 rounded-md border border-input bg-background text-sm"
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+            >
+              <option value="all">Tous les rôles</option>
+              <option value="editor">Éditeur</option>
+              <option value="printer">Imprimeur</option>
+              <option value="producer">Producteur</option>
+              <option value="author">Auteur</option>
+            </select>
           </div>
           <div className="rounded-md border">
             <Table>
@@ -793,6 +775,12 @@ export function ProfessionalRequestsManager() {
               <TableBody>
                 {(() => {
                   const filteredRequests = requests.filter(request => {
+                    // Filtre par rôle
+                    if (roleFilter !== 'all' && request.professional_type !== roleFilter) {
+                      return false;
+                    }
+                    
+                    // Filtre par recherche
                     if (!searchQuery.trim()) return true;
                     const query = searchQuery.toLowerCase();
                     const email = request.registration_data?.email?.toLowerCase() || '';
