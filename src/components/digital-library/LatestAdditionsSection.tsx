@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Icon } from "@/components/ui/icon";
@@ -6,6 +6,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/hooks/useLanguage";
 import { FancyTooltip } from "@/components/ui/fancy-tooltip";
+import { PdfThumbnail } from "./PdfThumbnail";
 
 interface DocumentItem {
   id: string;
@@ -16,6 +17,7 @@ interface DocumentItem {
   isAvailable: boolean;
   cote: string;
   thumbnail: string;
+  pdfUrl?: string; // URL du PDF pour générer la miniature dynamiquement
   isManuscript?: boolean;
   description?: string;
 }
@@ -122,11 +124,20 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
                     className="group bg-white border border-[#B68F1C]/30 hover:border-[#B68F1C]/50 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer min-h-[420px]"
                   >
                     <div className="relative aspect-[4/3] overflow-hidden bg-slate-light">
-                      <img 
-                        src={item.thumbnail} 
-                        alt={item.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
+                      {item.pdfUrl && !item.thumbnail?.startsWith('data:') && !item.thumbnail?.includes('cover') ? (
+                        <PdfThumbnail 
+                          pdfUrl={item.pdfUrl} 
+                          fallbackImage={item.thumbnail}
+                          alt={item.title}
+                          className="group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <img 
+                          src={item.thumbnail} 
+                          alt={item.title}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      )}
                     </div>
                     
                     {/* Badge moved under image */}

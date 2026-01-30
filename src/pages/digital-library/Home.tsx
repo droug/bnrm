@@ -257,7 +257,7 @@ export default function DigitalLibraryHome() {
         const {
           data,
           error
-        } = await supabase.from('digital_library_documents').select('id, title, author, publication_year, document_type, cover_image_url, created_at, is_manuscript').eq('publication_status', 'published').is('deleted_at', null).order('created_at', {
+        } = await supabase.from('digital_library_documents').select('id, title, author, publication_year, document_type, cover_image_url, pdf_url, created_at, is_manuscript').eq('publication_status', 'published').is('deleted_at', null).order('created_at', {
           ascending: false
         }).limit(6);
         if (data && !error) {
@@ -275,17 +275,48 @@ export default function DigitalLibraryHome() {
             "Documents Administratifs Historiques": documentsAdministratifs
           };
           const formattedItems = data.map((item: any, index: number) => {
+            // Fonction pour mapper le type de document
+            const getDocumentTypeLabel = (docType: string | null, isManuscript: boolean) => {
+              if (isManuscript) return t('dl.docTypes.manuscript');
+              if (!docType) return t('dl.docTypes.document');
+              
+              const typeLower = docType.toLowerCase();
+              if (typeLower === 'book' || typeLower === 'livre') return t('dl.docTypes.book');
+              if (typeLower === 'article') return t('dl.docTypes.article');
+              if (typeLower === 'periodique' || typeLower === 'periodical' || typeLower === 'revue') return t('dl.docTypes.periodical');
+              if (typeLower === 'manuscrit' || typeLower === 'manuscript') return t('dl.docTypes.manuscript');
+              if (typeLower === 'carte' || typeLower === 'map') return t('dl.docTypes.map');
+              if (typeLower === 'audio') return t('dl.docTypes.audio');
+              if (typeLower === 'video') return t('dl.docTypes.video');
+              if (typeLower === 'image' || typeLower === 'photo') return t('dl.docTypes.image');
+              
+              // Retourner le type original capitalisé si non reconnu
+              return docType.charAt(0).toUpperCase() + docType.slice(1);
+            };
+
+            // Générer la miniature depuis la première page du PDF si pas de cover_image_url
+            const generatePdfThumbnail = (pdfUrl: string | null) => {
+              if (!pdfUrl) return null;
+              // Pour l'instant, utiliser une image par défaut - la vraie miniature sera générée côté client
+              return null;
+            };
+
             // Utiliser cover_image_url si elle existe, sinon l'image spécifique par titre, sinon l'image par défaut
-            const thumbnail = item.cover_image_url || titleImageMap[item.title] || exampleImages[index % exampleImages.length];
+            const thumbnail = item.cover_image_url || 
+                              generatePdfThumbnail(item.pdf_url) ||
+                              titleImageMap[item.title] || 
+                              exampleImages[index % exampleImages.length];
+            
             return {
               id: item.id,
               title: item.title,
               author: item.author || t('dl.home.unknownAuthor'),
-              type: item.is_manuscript ? t('dl.docTypes.manuscript') : item.document_type === 'book' ? t('dl.docTypes.book') : item.document_type === 'article' ? t('dl.docTypes.article') : t('dl.docTypes.document'),
+              type: getDocumentTypeLabel(item.document_type, item.is_manuscript),
               date: item.created_at,
               isAvailable: true,
               cote: item.document_type?.toUpperCase() || 'DOC',
               thumbnail: thumbnail,
+              pdfUrl: item.pdf_url, // URL du PDF pour générer la miniature dynamiquement
               isManuscript: item.is_manuscript
             };
           });
