@@ -1702,7 +1702,7 @@ export default function DocumentsManager() {
               </DialogHeader>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit((values) => addDocument.mutate(values))} className="space-y-4">
-                  {/* Cote - Required field first */}
+                  {/* Cote - Auto-filled from uploaded filename, read-only */}
                   <FormField
                     control={form.control}
                     name="cote"
@@ -1710,10 +1710,15 @@ export default function DocumentsManager() {
                       <FormItem>
                         <FormLabel>N° Cote *</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="Ex: BNR-2024-001" className="font-mono" />
+                          <Input 
+                            {...field} 
+                            placeholder="Téléversez un fichier pour remplir automatiquement" 
+                            className="font-mono bg-muted/50" 
+                            readOnly
+                          />
                         </FormControl>
                         <FormDescription>
-                          Identifiant unique du document dans le catalogue. Les autres métadonnées seront récupérées automatiquement.
+                          Généré automatiquement à partir du nom du fichier PDF téléversé.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -1818,7 +1823,14 @@ export default function DocumentsManager() {
                         accept=".pdf"
                         maxSize={100}
                         value={uploadFile}
-                        onChange={setUploadFile}
+                        onChange={(file) => {
+                          setUploadFile(file);
+                          // Auto-fill cote from filename (without extension)
+                          if (file) {
+                            const fileNameWithoutExt = file.name.replace(/\.[^/.]+$/, '');
+                            form.setValue('cote', fileNameWithoutExt);
+                          }
+                        }}
                       />
                       {isUploading && uploadProgress > 0 && (
                         <div className="space-y-1">
