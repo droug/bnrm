@@ -78,7 +78,9 @@ function PanoramaSphere({ imageUrl }: { imageUrl: string }) {
   useEffect(() => {
     const loader = new THREE.TextureLoader();
     loader.load(imageUrl, (loadedTexture) => {
-      loadedTexture.mapping = THREE.EquirectangularReflectionMapping;
+      // NOTE: Keep default UV mapping.
+      // Using EquirectangularReflectionMapping here can desync the visual panorama
+      // from the admin equirectangular picker coordinates.
       loadedTexture.colorSpace = THREE.SRGBColorSpace;
       setTexture(loadedTexture);
     });
@@ -91,7 +93,12 @@ function PanoramaSphere({ imageUrl }: { imageUrl: string }) {
   return (
     <mesh ref={meshRef} scale={[-1, 1, 1]}>
       <sphereGeometry args={[500, 60, 40]} />
-      <meshBasicMaterial map={texture} side={THREE.BackSide} />
+      {/*
+        We flip the sphere on X to render the panorama from inside.
+        Don't also render BackSide here, otherwise we effectively double-flip/mirror,
+        which causes a persistent hotspot offset vs the admin picker.
+      */}
+      <meshBasicMaterial map={texture} side={THREE.FrontSide} />
     </mesh>
   );
 }
