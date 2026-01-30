@@ -129,8 +129,8 @@ function HotspotMarker({
   const pitchRad = THREE.MathUtils.degToRad(hotspot.pitch);
   
   // Corrected conversion: yaw=0 should map to negative Z (in front of camera)
-  // The sphere is flipped on X axis, so we negate X as well
-  const x = -radius * Math.cos(pitchRad) * Math.sin(yawRad);
+  // NOTE: Do NOT negate X here: negating X mirrors left/right and breaks alignment with admin yaw.
+  const x = radius * Math.cos(pitchRad) * Math.sin(yawRad);
   const y = radius * Math.sin(pitchRad);
   const z = -radius * Math.cos(pitchRad) * Math.cos(yawRad);
 
