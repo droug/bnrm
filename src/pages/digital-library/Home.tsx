@@ -257,7 +257,7 @@ export default function DigitalLibraryHome() {
         const {
           data,
           error
-        } = await supabase.from('digital_library_documents').select('id, title, author, publication_year, document_type, cover_image_url, pdf_url, created_at, is_manuscript').eq('publication_status', 'published').is('deleted_at', null).order('created_at', {
+        } = await supabase.from('digital_library_documents').select('id, title, author, publication_year, document_type, cover_image_url, pdf_url, video_url, created_at, is_manuscript').eq('publication_status', 'published').is('deleted_at', null).order('created_at', {
           ascending: false
         }).limit(6);
         if (data && !error) {
@@ -301,8 +301,19 @@ export default function DigitalLibraryHome() {
               return null;
             };
 
-            // Utiliser cover_image_url si elle existe, sinon l'image spécifique par titre, sinon l'image par défaut
+            // Extraire l'ID YouTube depuis l'URL vidéo
+            const extractYouTubeId = (url: string | null) => {
+              if (!url) return null;
+              const match = url.match(/(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/watch\?.+&v=))([^&?\s]+)/);
+              return match ? match[1] : null;
+            };
+
+            const youtubeId = extractYouTubeId(item.video_url);
+            const isVideo = item.document_type?.toLowerCase() === 'video';
+            
+            // Utiliser cover_image_url, puis miniature YouTube pour vidéos, puis PDF, puis fallback
             const thumbnail = item.cover_image_url || 
+                              (isVideo && youtubeId ? `https://img.youtube.com/vi/${youtubeId}/hqdefault.jpg` : null) ||
                               generatePdfThumbnail(item.pdf_url) ||
                               titleImageMap[item.title] || 
                               exampleImages[index % exampleImages.length];
@@ -317,7 +328,9 @@ export default function DigitalLibraryHome() {
               cote: item.document_type?.toUpperCase() || 'DOC',
               thumbnail: thumbnail,
               pdfUrl: item.pdf_url, // URL du PDF pour générer la miniature dynamiquement
-              isManuscript: item.is_manuscript
+              isManuscript: item.is_manuscript,
+              isVideo: isVideo,
+              videoUrl: item.video_url
             };
           });
           console.log('Loaded digital library documents:', formattedItems);
