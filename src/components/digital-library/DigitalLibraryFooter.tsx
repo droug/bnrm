@@ -236,7 +236,7 @@ const DigitalLibraryFooter = () => {
                 <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
                 {language === 'ar' ? quickLinks.title_ar : quickLinks.title_fr}
               </h4>
-              <ul className="space-y-3 pl-4">
+              <ul className="space-y-3">
                 {quickLinks.links.map((link, index) => (
                   <li key={index} className="leading-relaxed">
                     <a 
@@ -260,7 +260,7 @@ const DigitalLibraryFooter = () => {
                 <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
                 {language === 'ar' ? worldReservoirs.title_ar : worldReservoirs.title_fr}
               </h4>
-              <ul className="space-y-3 pl-4">
+              <ul className="space-y-3">
                 {worldReservoirs.links.map((link, index) => (
                   <li key={index} className="leading-relaxed">
                     <a 
@@ -284,7 +284,7 @@ const DigitalLibraryFooter = () => {
                 <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
                 {language === 'ar' ? supportSection.title_ar : supportSection.title_fr}
               </h4>
-              <ul className="space-y-3 pl-4">
+              <ul className="space-y-3">
                 {supportSection.links.map((link, index) => (
                   <li key={index} className="leading-relaxed">
                     <a 
@@ -307,7 +307,7 @@ const DigitalLibraryFooter = () => {
               <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
               {language === 'ar' ? 'اتصل بنا' : 'Contact'}
             </h4>
-            <div className="space-y-4 pl-4">
+            <div className="space-y-4">
               <div className="flex items-start space-x-3">
                 <MapPin className="h-4 w-4 mt-1 flex-shrink-0 text-gold-bn-primary" />
                 <p className="text-sm opacity-80 leading-relaxed">
@@ -337,7 +337,7 @@ const DigitalLibraryFooter = () => {
               <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
               {language === 'ar' ? 'النشرة الإخبارية' : 'Newsletter'}
             </h4>
-            <div className="pl-4">
+            <div>
               <p className="text-sm opacity-80 mb-4 leading-relaxed">
                 {language === 'ar'
                   ? 'ابق على اطلاع بآخر المستجدات والمجموعات الجديدة.'
