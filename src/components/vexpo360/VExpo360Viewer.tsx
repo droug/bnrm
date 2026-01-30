@@ -113,14 +113,26 @@ function HotspotMarker({
   // Convert yaw/pitch to 3D position on sphere
   // Yaw: horizontal angle (-180 to 180), 0 = center of equirectangular image
   // Pitch: vertical angle (-90 to 90), positive = up
+  // 
+  // The equirectangular image in the admin picker:
+  // - Center of image (50%) = yaw 0°
+  // - Left edge (0%) = yaw -180°
+  // - Right edge (100%) = yaw +180°
+  // 
+  // The sphere uses scale={[-1, 1, 1]} which flips X, and camera starts at z=0.1 looking at origin.
+  // So the viewer looks "into" the sphere toward -Z initially.
+  // 
+  // For yaw=0° (center of image) to appear in front of the initial camera view:
+  // We need to map it to -Z direction (since camera looks toward -Z from z=0.1)
   const radius = 100;
   const yawRad = THREE.MathUtils.degToRad(hotspot.yaw);
   const pitchRad = THREE.MathUtils.degToRad(hotspot.pitch);
   
-  // Standard spherical to Cartesian conversion (must match admin yaw/pitch picker)
-  const x = radius * Math.cos(pitchRad) * Math.sin(yawRad);
+  // Corrected conversion: yaw=0 should map to negative Z (in front of camera)
+  // The sphere is flipped on X axis, so we negate X as well
+  const x = -radius * Math.cos(pitchRad) * Math.sin(yawRad);
   const y = radius * Math.sin(pitchRad);
-  const z = radius * Math.cos(pitchRad) * Math.cos(yawRad);
+  const z = -radius * Math.cos(pitchRad) * Math.cos(yawRad);
 
   const getColor = () => {
     switch (hotspot.hotspot_type) {
