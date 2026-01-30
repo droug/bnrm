@@ -92,7 +92,13 @@ function PanoramaSphere({ imageUrl }: { imageUrl: string }) {
   }
 
   return (
-    <mesh ref={meshRef} scale={[1, 1, 1]}>
+    <mesh
+      ref={meshRef}
+      scale={[1, 1, 1]}
+      // Align the center of the equirectangular image (yaw=0 in admin picker)
+      // with the initial camera forward direction.
+      rotation={[0, Math.PI / 2, 0]}
+    >
       <sphereGeometry args={[500, 60, 40]} />
       {/* Render BackSide to see the inside of the sphere as panorama viewer */}
       <meshBasicMaterial map={texture} side={THREE.BackSide} />
