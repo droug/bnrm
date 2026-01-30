@@ -62,9 +62,10 @@ export default function VExpo360Detail() {
     refetchOnMount: 'always'
   });
 
-  // Fetch all hotspots for all panoramas
+  // Fetch all hotspots for all panoramas - use sorted IDs string for stable queryKey
+  const panoramaIdsKey = panoramas?.map(p => p.id).sort().join(',') || '';
   const { data: allHotspots } = useQuery({
-    queryKey: ['vexpo360-public-hotspots', panoramas?.map(p => p.id)],
+    queryKey: ['vexpo360-public-hotspots', panoramaIdsKey],
     queryFn: async () => {
       if (!panoramas || panoramas.length === 0) return {};
       
@@ -87,6 +88,7 @@ export default function VExpo360Detail() {
     },
     enabled: !!panoramas && panoramas.length > 0,
     staleTime: 0,
+    gcTime: 0,
     refetchOnMount: 'always'
   });
 
