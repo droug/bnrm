@@ -232,7 +232,7 @@ const DigitalLibraryFooter = () => {
           {/* Col 2: Liens rapides */}
           {quickLinks && (
             <div className="flex flex-col">
-              <h4 className="text-lg font-semibold mb-6 flex items-center text-bn-blue-primary">
+              <h4 className="text-lg font-semibold mb-6 flex items-start text-bn-blue-primary min-h-[3.5rem]">
                 <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
                 {language === 'ar' ? quickLinks.title_ar : quickLinks.title_fr}
               </h4>
@@ -256,7 +256,7 @@ const DigitalLibraryFooter = () => {
           {/* Col 3: Réservoirs mondiaux */}
           {worldReservoirs && (
             <div className="flex flex-col">
-              <h4 className="text-lg font-semibold mb-6 flex items-center text-bn-blue-primary">
+              <h4 className="text-lg font-semibold mb-6 flex items-start text-bn-blue-primary min-h-[3.5rem]">
                 <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
                 {language === 'ar' ? worldReservoirs.title_ar : worldReservoirs.title_fr}
               </h4>
@@ -280,7 +280,7 @@ const DigitalLibraryFooter = () => {
           {/* Col 4: Aide et support */}
           {supportSection && (
             <div className="flex flex-col">
-              <h4 className="text-lg font-semibold mb-6 flex items-center text-bn-blue-primary">
+              <h4 className="text-lg font-semibold mb-6 flex items-start text-bn-blue-primary min-h-[3.5rem]">
                 <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
                 {language === 'ar' ? supportSection.title_ar : supportSection.title_fr}
               </h4>
@@ -303,7 +303,7 @@ const DigitalLibraryFooter = () => {
 
           {/* Col 5: Contact */}
           <div className="flex flex-col">
-            <h4 className="text-lg font-semibold mb-6 flex items-center text-bn-blue-primary">
+            <h4 className="text-lg font-semibold mb-6 flex items-start text-bn-blue-primary min-h-[3.5rem]">
               <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
               {language === 'ar' ? 'اتصل بنا' : 'Contact'}
             </h4>
@@ -333,7 +333,7 @@ const DigitalLibraryFooter = () => {
 
           {/* Col 6: Newsletter */}
           <div className="flex flex-col">
-            <h4 className="text-lg font-semibold mb-6 flex items-center text-bn-blue-primary">
+            <h4 className="text-lg font-semibold mb-6 flex items-start text-bn-blue-primary min-h-[3.5rem]">
               <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
               {language === 'ar' ? 'النشرة الإخبارية' : 'Newsletter'}
             </h4>
