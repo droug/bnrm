@@ -38,7 +38,9 @@ export function VExpoPublicList() {
         .order('created_at', { ascending: false });
       if (error) throw error;
       return data as VExpoExhibition[];
-    }
+    },
+    staleTime: 0,
+    refetchOnMount: 'always'
   });
 
   // Fetch panorama counts for each exhibition
@@ -63,7 +65,9 @@ export function VExpoPublicList() {
       
       return counts;
     },
-    enabled: !!exhibitions && exhibitions.length > 0
+    enabled: !!exhibitions && exhibitions.length > 0,
+    staleTime: 0,
+    refetchOnMount: 'always'
   });
 
   const formatDateRange = (startDate: string | null, endDate: string | null) => {
