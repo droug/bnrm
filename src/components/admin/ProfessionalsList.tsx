@@ -44,7 +44,7 @@ export function ProfessionalsList() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
-  const [statusFilter, setStatusFilter] = useState<string>("all");
+  
   const [selectedProfessional, setSelectedProfessional] = useState<Professional | null>(null);
   const [showInjectDialog, setShowInjectDialog] = useState(false);
   const [selectedRoleToInject, setSelectedRoleToInject] = useState<string>("");
@@ -126,11 +126,8 @@ export function ProfessionalsList() {
       prof.institution?.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesRole = roleFilter === "all" || prof.role === roleFilter;
-    const matchesStatus = statusFilter === "all" || 
-      (statusFilter === "approved" && prof.is_approved) ||
-      (statusFilter === "pending" && !prof.is_approved);
 
-    return matchesSearch && matchesRole && matchesStatus;
+    return matchesSearch && matchesRole;
   });
 
   const getRoleBadge = (role: string) => {
@@ -289,7 +286,7 @@ export function ProfessionalsList() {
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Filtres */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
@@ -304,23 +301,12 @@ export function ProfessionalsList() {
               <SelectTrigger>
                 <SelectValue placeholder="Tous les rôles" />
               </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les rôles</SelectItem>
-                  <SelectItem value="editor">Éditeur</SelectItem>
-                  <SelectItem value="printer">Imprimeur</SelectItem>
-                  <SelectItem value="producer">Producteur</SelectItem>
-                  <SelectItem value="author">Auteur</SelectItem>
-                </SelectContent>
-            </Select>
-
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="Tous les statuts" />
-              </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tous les statuts</SelectItem>
-                <SelectItem value="approved">Approuvés</SelectItem>
-                <SelectItem value="pending">En attente</SelectItem>
+                <SelectItem value="all">Tous les rôles</SelectItem>
+                <SelectItem value="editor">Éditeur</SelectItem>
+                <SelectItem value="printer">Imprimeur</SelectItem>
+                <SelectItem value="producer">Producteur</SelectItem>
+                <SelectItem value="author">Auteur</SelectItem>
               </SelectContent>
             </Select>
           </div>
