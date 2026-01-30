@@ -145,12 +145,8 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                 <img 
                   src={logoDigitalLibrary} 
                   alt="Ibn Battuta - Bibliothèque Numérique Marocaine" 
-                  className="h-14 w-auto object-contain"
+                  className="h-16 w-auto object-contain"
                 />
-                <div>
-                  <h1 className="text-lg font-bold text-foreground">Bibliothèque Numérique Marocaine</h1>
-                  <p className="text-xs text-muted-foreground">{t('dl.subtitle')}</p>
-                </div>
               </Link>
             </div>
 
