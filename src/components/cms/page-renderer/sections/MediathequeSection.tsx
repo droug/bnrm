@@ -76,9 +76,16 @@ export function MediathequeSection({ section, language }: SectionProps) {
                 <Card key={video.id} className="bg-white overflow-hidden group cursor-pointer">
                   <div className="relative aspect-video bg-slate-200">
                     <img 
-                      src={video.thumbnail || `https://img.youtube.com/vi/${video.youtubeId}/mqdefault.jpg`}
+                      src={video.thumbnail || `https://img.youtube.com/vi/${video.youtubeId}/hqdefault.jpg`}
                       alt={language === 'ar' && video.titleAr ? video.titleAr : video.title}
                       className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // Fallback to medium quality if high quality not available
+                        const target = e.target as HTMLImageElement;
+                        if (target.src.includes('hqdefault')) {
+                          target.src = `https://img.youtube.com/vi/${video.youtubeId}/mqdefault.jpg`;
+                        }
+                      }}
                     />
                     <div className="absolute inset-0 bg-black/30 group-hover:bg-black/50 transition-colors flex items-center justify-center">
                       <div className="w-14 h-14 rounded-full bg-gold-bn-primary flex items-center justify-center group-hover:scale-110 transition-transform">
