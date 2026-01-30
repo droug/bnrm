@@ -479,19 +479,19 @@ export default function DocumentsManager() {
   // Update document
   const updateDocument = useMutation({
     mutationFn: async (values: z.infer<typeof documentSchema> & { id: string }) => {
+      // Update digital_library_documents table
       const { error } = await supabase
-        .from('content')
+        .from('digital_library_documents')
         .update({
-          title: values.title,
-          content_body: values.description || '',
+          title: values.title || null,
+          author: values.author || null,
+          document_type: values.file_type || null,
+          publication_year: values.publication_date ? parseInt(values.publication_date.split('-')[0]) : null,
+          pdf_url: values.file_url || null,
           download_enabled: values.download_enabled,
-          is_visible: values.is_visible,
-          social_share_enabled: values.social_share_enabled,
-          email_share_enabled: values.email_share_enabled,
-          copyright_expires_at: values.copyright_expires_at || null,
-          copyright_derogation: values.copyright_derogation,
-          file_url: values.file_url || null,
-          file_type: values.file_type || null,
+          publication_status: values.is_visible ? 'published' : 'draft',
+          digitization_source: values.digitization_source || 'internal',
+          is_rare_book: values.is_rare_book || false,
         })
         .eq('id', values.id);
       
@@ -505,6 +505,7 @@ export default function DocumentsManager() {
       toast({ title: "Document modifié avec succès" });
     },
     onError: (error) => {
+      console.error("Erreur mise à jour document:", error);
       toast({
         title: "Erreur", 
         description: error.message, 
@@ -2043,19 +2044,19 @@ export default function DocumentsManager() {
                         <FormItem>
                           <FormLabel>Type de document</FormLabel>
                           <FormControl>
-                            <PortalSelect
-                              placeholder="Sélectionner"
-                              value={field.value}
-                              onChange={field.onChange}
-                              options={[
-                                { value: "manuscrit", label: "Manuscrits" },
-                                { value: "livre", label: "Livres" },
-                                { value: "lithographie", label: "Lithographie" },
-                                { value: "periodique", label: "Périodiques" },
-                                { value: "collection_specialisee", label: "Collections Spécialisées" },
-                                { value: "audiovisuel", label: "Audiovisuel" },
-                              ]}
-                            />
+                            <select
+                              value={field.value || ""}
+                              onChange={(e) => field.onChange(e.target.value)}
+                              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            >
+                              <option value="">Sélectionner</option>
+                              <option value="manuscrit">Manuscrits</option>
+                              <option value="livre">Livres</option>
+                              <option value="lithographie">Lithographie</option>
+                              <option value="periodique">Périodiques</option>
+                              <option value="collection_specialisee">Collections Spécialisées</option>
+                              <option value="audiovisuel">Audiovisuel</option>
+                            </select>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -2083,15 +2084,14 @@ export default function DocumentsManager() {
                         <FormItem>
                           <FormLabel>Source de numérisation</FormLabel>
                           <FormControl>
-                            <PortalSelect
-                              placeholder="Sélectionner"
-                              value={field.value}
-                              onChange={field.onChange}
-                              options={[
-                                { value: "internal", label: "Collections numérisées", description: "Numérisé par la BNRM" },
-                                { value: "external", label: "Ressources numériques", description: "Reçu déjà numérisé" },
-                              ]}
-                            />
+                            <select
+                              value={field.value || "internal"}
+                              onChange={(e) => field.onChange(e.target.value)}
+                              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            >
+                              <option value="internal">Collections numérisées (BNRM)</option>
+                              <option value="external">Ressources numériques (externe)</option>
+                            </select>
                           </FormControl>
                           <FormMessage />
                         </FormItem>
