@@ -231,14 +231,14 @@ const DigitalLibraryFooter = () => {
 
           {/* Col 2: Liens rapides */}
           {quickLinks && (
-            <div>
+            <div className="flex flex-col">
               <h4 className="text-lg font-semibold mb-6 flex items-center text-bn-blue-primary">
                 <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
                 {language === 'ar' ? quickLinks.title_ar : quickLinks.title_fr}
               </h4>
-              <ul className="space-y-3">
+              <ul className="space-y-3 pl-4">
                 {quickLinks.links.map((link, index) => (
-                  <li key={index}>
+                  <li key={index} className="leading-relaxed">
                     <a 
                       href={link.href}
                       target={link.external ? "_blank" : undefined}
@@ -255,14 +255,14 @@ const DigitalLibraryFooter = () => {
 
           {/* Col 3: Réservoirs mondiaux */}
           {worldReservoirs && (
-            <div>
+            <div className="flex flex-col">
               <h4 className="text-lg font-semibold mb-6 flex items-center text-bn-blue-primary">
                 <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
                 {language === 'ar' ? worldReservoirs.title_ar : worldReservoirs.title_fr}
               </h4>
-              <ul className="space-y-3">
+              <ul className="space-y-3 pl-4">
                 {worldReservoirs.links.map((link, index) => (
-                  <li key={index}>
+                  <li key={index} className="leading-relaxed">
                     <a 
                       href={link.href}
                       target={link.external ? "_blank" : undefined}
@@ -279,14 +279,14 @@ const DigitalLibraryFooter = () => {
 
           {/* Col 4: Aide et support */}
           {supportSection && (
-            <div>
+            <div className="flex flex-col">
               <h4 className="text-lg font-semibold mb-6 flex items-center text-bn-blue-primary">
                 <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
                 {language === 'ar' ? supportSection.title_ar : supportSection.title_fr}
               </h4>
-              <ul className="space-y-3">
+              <ul className="space-y-3 pl-4">
                 {supportSection.links.map((link, index) => (
-                  <li key={index}>
+                  <li key={index} className="leading-relaxed">
                     <a 
                       href={link.href}
                       target={link.external ? "_blank" : undefined}
@@ -302,12 +302,12 @@ const DigitalLibraryFooter = () => {
           )}
 
           {/* Col 5: Contact */}
-          <div>
+          <div className="flex flex-col">
             <h4 className="text-lg font-semibold mb-6 flex items-center text-bn-blue-primary">
               <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
               {language === 'ar' ? 'اتصل بنا' : 'Contact'}
             </h4>
-            <div className="space-y-4">
+            <div className="space-y-4 pl-4">
               <div className="flex items-start space-x-3">
                 <MapPin className="h-4 w-4 mt-1 flex-shrink-0 text-gold-bn-primary" />
                 <p className="text-sm opacity-80 leading-relaxed">
@@ -332,41 +332,43 @@ const DigitalLibraryFooter = () => {
           </div>
 
           {/* Col 6: Newsletter */}
-          <div>
+          <div className="flex flex-col">
             <h4 className="text-lg font-semibold mb-6 flex items-center text-bn-blue-primary">
               <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
               {language === 'ar' ? 'النشرة الإخبارية' : 'Newsletter'}
             </h4>
-            <p className="text-sm opacity-80 mb-4 leading-relaxed">
-              {language === 'ar'
-                ? 'ابق على اطلاع بآخر المستجدات والمجموعات الجديدة.'
-                : 'Restez informé des dernières actualités et nouvelles collections.'
-              }
-            </p>
-            <form onSubmit={handleNewsletterSubscribe} className="space-y-3">
-              <Input 
-                type="email" 
-                placeholder={language === 'ar' ? 'بريدك الإلكتروني' : 'Votre email'}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isSubscribing}
-                className="bg-background border-gold-bn-primary/30 focus:border-gold-bn-primary text-sm"
-              />
-              <Button 
-                type="submit"
-                disabled={isSubscribing}
-                className="w-full bg-gold-bn-primary hover:bg-gold-bn-primary-dark text-white font-medium text-sm"
-              >
-                {isSubscribing ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    {language === 'ar' ? 'جارٍ الاشتراك...' : 'Abonnement...'}
-                  </>
-                ) : (
-                  language === 'ar' ? 'اشترك' : "S'abonner"
-                )}
-              </Button>
-            </form>
+            <div className="pl-4">
+              <p className="text-sm opacity-80 mb-4 leading-relaxed">
+                {language === 'ar'
+                  ? 'ابق على اطلاع بآخر المستجدات والمجموعات الجديدة.'
+                  : 'Restez informé des dernières actualités et nouvelles collections.'
+                }
+              </p>
+              <form onSubmit={handleNewsletterSubscribe} className="space-y-3">
+                <Input 
+                  type="email" 
+                  placeholder={language === 'ar' ? 'بريدك الإلكتروني' : 'Votre email'}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  disabled={isSubscribing}
+                  className="bg-background border-gold-bn-primary/30 focus:border-gold-bn-primary text-sm"
+                />
+                <Button 
+                  type="submit"
+                  disabled={isSubscribing}
+                  className="w-full bg-gold-bn-primary hover:bg-gold-bn-primary-dark text-white font-medium text-sm"
+                >
+                  {isSubscribing ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      {language === 'ar' ? 'جارٍ الاشتراك...' : 'Abonnement...'}
+                    </>
+                  ) : (
+                    language === 'ar' ? 'اشترك' : "S'abonner"
+                  )}
+                </Button>
+              </form>
+            </div>
           </div>
         </div>
 
