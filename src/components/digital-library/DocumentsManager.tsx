@@ -51,7 +51,7 @@ import documentPreview2Page2 from "@/assets/document-preview-2-page2.jpg";
 import documentPreview3Page2 from "@/assets/document-preview-3-page2.jpg";
 
 const documentSchema = z.object({
-  cote: z.string().min(1, "Le N° de cote est requis"),
+  cote: z.string().optional(), // Optionnel pour l'édition, requis pour l'ajout via validation manuelle
   title: z.string().optional(),
   author: z.string().optional(),
   file_type: z.string().optional(),
@@ -2476,9 +2476,10 @@ export default function DocumentsManager() {
                           onClick={() => {
                             setEditingDocument(doc);
                             form.reset({
+                              cote: (doc as any).cbn_documents?.cote || '',
                               title: doc.title || '',
                               author: doc.author || '',
-                              file_type: doc.file_format || '',
+                              file_type: doc.document_type || doc.file_format || '',
                               publication_date: doc.publication_year?.toString() || '',
                               description: '',
                               file_url: doc.pdf_url || '',
@@ -2489,6 +2490,7 @@ export default function DocumentsManager() {
                               copyright_expires_at: '',
                               copyright_derogation: false,
                               digitization_source: (doc.digitization_source === 'external' ? 'external' : 'internal') as "internal" | "external",
+                              is_rare_book: (doc as any).is_rare_book || false,
                             });
                             setShowEditDialog(true);
                           }}
