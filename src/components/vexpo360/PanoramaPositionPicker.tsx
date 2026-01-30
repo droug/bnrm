@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { MapPin, RotateCcw, ZoomIn, ZoomOut } from "lucide-react";
 
@@ -16,10 +16,46 @@ export function PanoramaPositionPicker({
   onPositionChange,
 }: PanoramaPositionPickerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
   const [zoom, setZoom] = useState(1);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [isPanning, setIsPanning] = useState(false);
   const [lastPanPosition, setLastPanPosition] = useState({ x: 0, y: 0 });
+  const [imageNaturalSize, setImageNaturalSize] = useState<{ w: number; h: number }>({ w: 0, h: 0 });
+  const [containerSize, setContainerSize] = useState<{ w: number; h: number }>({ w: 0, h: 0 });
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const update = () => {
+      const rect = el.getBoundingClientRect();
+      setContainerSize({ w: rect.width, h: rect.height });
+    };
+
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
+
+  const getContainedImageRect = useCallback(() => {
+    // Fallback: treat image as filling container
+    const cw = containerSize.w || 1;
+    const ch = containerSize.h || 1;
+    const iw = imageNaturalSize.w;
+    const ih = imageNaturalSize.h;
+
+    if (!iw || !ih) {
+      return { x: 0, y: 0, w: cw, h: ch };
+    }
+
+    const scale = Math.min(cw / iw, ch / ih);
+    const w = iw * scale;
+    const h = ih * scale;
+    const x = (cw - w) / 2;
+    const y = (ch - h) / 2;
+    return { x, y, w, h };
+  }, [containerSize.h, containerSize.w, imageNaturalSize.h, imageNaturalSize.w]);
 
   // Convert yaw (-180 to 180) and pitch (-90 to 90) to percentage position
   const yawToPercent = (yaw: number) => ((yaw + 180) / 360) * 100;
@@ -40,9 +76,20 @@ export function PanoramaPositionPicker({
     const adjustedX = (x - panOffset.x) / zoom;
     const adjustedY = (y - panOffset.y) / zoom;
 
-    // Calculate percentage
-    const percentX = (adjustedX / (rect.width / zoom)) * 100;
-    const percentY = (adjustedY / (rect.height / zoom)) * 100;
+    // IMPORTANT: The preview must not crop the panorama.
+    // We render the image with object-contain (letterboxing) and map clicks ONLY within the actual image area.
+    const imgRect = getContainedImageRect();
+    const localX = adjustedX - imgRect.x;
+    const localY = adjustedY - imgRect.y;
+
+    if (localX < 0 || localY < 0 || localX > imgRect.w || localY > imgRect.h) {
+      // Click happened in the letterbox area: ignore.
+      return;
+    }
+
+    // Calculate percentage within the actual image area
+    const percentX = (localX / imgRect.w) * 100;
+    const percentY = (localY / imgRect.h) * 100;
 
     // Convert to yaw/pitch
     const newYaw = Math.round(((percentX / 100) * 360 - 180) * 10) / 10;
@@ -53,7 +100,7 @@ export function PanoramaPositionPicker({
     const clampedPitch = Math.max(-90, Math.min(90, newPitch));
 
     onPositionChange(clampedYaw, clampedPitch);
-  }, [isPanning, panOffset, zoom, onPositionChange]);
+  }, [getContainedImageRect, isPanning, onPositionChange, panOffset.x, panOffset.y, zoom]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.button === 1 || e.ctrlKey) { // Middle click or Ctrl+click for panning
@@ -94,6 +141,9 @@ export function PanoramaPositionPicker({
 
   const markerX = yawToPercent(yaw);
   const markerY = pitchToPercent(pitch);
+  const contained = getContainedImageRect();
+  const markerLeftPx = contained.x + (markerX / 100) * contained.w;
+  const markerTopPx = contained.y + (markerY / 100) * contained.h;
 
   return (
     <div className="space-y-2">
@@ -133,18 +183,24 @@ export function PanoramaPositionPicker({
           }}
         >
           <img
+            ref={imgRef}
             src={panoramaUrl}
             alt="Panorama"
-            className="w-full h-full object-cover pointer-events-none"
+            className="w-full h-full object-contain pointer-events-none"
             draggable={false}
+            onLoad={() => {
+              const el = imgRef.current;
+              if (!el) return;
+              setImageNaturalSize({ w: el.naturalWidth || 0, h: el.naturalHeight || 0 });
+            }}
           />
           
           {/* Position marker */}
           <div
             className="absolute w-6 h-6 -ml-3 -mt-3 pointer-events-none"
             style={{
-              left: `${markerX}%`,
-              top: `${markerY}%`,
+              left: `${markerLeftPx}px`,
+              top: `${markerTopPx}px`,
             }}
           >
             {/* Outer ring */}
