@@ -20,6 +20,8 @@ interface DocumentItem {
   pdfUrl?: string; // URL du PDF pour générer la miniature dynamiquement
   isManuscript?: boolean;
   description?: string;
+  isVideo?: boolean;
+  videoUrl?: string;
 }
 
 interface LatestAdditionsSectionProps {
@@ -124,7 +126,7 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
                     className="group bg-white border border-[#B68F1C]/30 hover:border-[#B68F1C]/50 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer min-h-[420px]"
                   >
                     <div className="relative aspect-[4/3] overflow-hidden bg-slate-light">
-                      {/* Priorité: cover_image_url > PDF thumbnail > fallback */}
+                      {/* Priorité: cover_image_url > YouTube thumbnail pour vidéos > PDF thumbnail > fallback */}
                       {item.thumbnail?.includes('supabase') && item.thumbnail?.includes('cover') ? (
                         // Image de couverture uploadée
                         <img 
@@ -132,6 +134,33 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
                           alt={item.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
+                      ) : item.thumbnail?.includes('youtube.com') || item.thumbnail?.includes('img.youtube.com') ? (
+                        // Miniature YouTube pour les vidéos
+                        <div className="relative w-full h-full">
+                          <img 
+                            src={item.thumbnail} 
+                            alt={item.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            onError={(e) => {
+                              // Fallback si la miniature YouTube ne charge pas
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                            }}
+                          />
+                          {/* Icône play pour les vidéos */}
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="w-14 h-14 rounded-full bg-gold-bn-primary/90 flex items-center justify-center shadow-lg">
+                              <Icon name="mdi:play" className="h-8 w-8 text-white ml-1" />
+                            </div>
+                          </div>
+                        </div>
+                      ) : item.isVideo && !item.thumbnail ? (
+                        // Fallback pour vidéos sans miniature
+                        <div className="w-full h-full flex items-center justify-center bg-slate-muted">
+                          <div className="w-16 h-16 rounded-full bg-gold-bn-primary/20 flex items-center justify-center">
+                            <Icon name="mdi:video" className="h-10 w-10 text-gold-bn-primary" />
+                          </div>
+                        </div>
                       ) : item.pdfUrl ? (
                         // Générer miniature depuis le PDF
                         <PdfThumbnail 
