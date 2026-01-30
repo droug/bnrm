@@ -123,42 +123,33 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
                   variant="gold"
                 >
                   <Card 
-                    className="group bg-white border border-[#B68F1C]/30 hover:border-[#B68F1C]/50 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer min-h-[420px]"
+                    className="group bg-white border border-[#B68F1C]/30 hover:border-[#B68F1C]/50 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col cursor-pointer h-[420px]"
                   >
-                    <div className="relative aspect-[4/3] overflow-hidden bg-slate-light">
-                      {/* Priorité: cover_image_url > YouTube thumbnail pour vidéos > PDF thumbnail > fallback */}
-                      {item.thumbnail?.includes('supabase') && item.thumbnail?.includes('cover') ? (
-                        // Image de couverture uploadée
-                        <img 
-                          src={item.thumbnail} 
-                          alt={item.title}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                      ) : item.thumbnail?.includes('youtube.com') || item.thumbnail?.includes('img.youtube.com') ? (
-                        // Miniature YouTube pour les vidéos
+                    {/* Image container - hauteur fixe */}
+                    <div className="relative h-[200px] overflow-hidden bg-slate-light flex-shrink-0">
+                      {/* Priorité: cover_image_url > thumbnail_url > PDF thumbnail > fallback vidéo > fallback image */}
+                      {item.thumbnail?.includes('supabase') && (item.thumbnail?.includes('cover') || item.thumbnail?.includes('thumbnail')) ? (
+                        // Image de couverture ou miniature uploadée
                         <div className="relative w-full h-full">
                           <img 
                             src={item.thumbnail} 
                             alt={item.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            onError={(e) => {
-                              // Fallback si la miniature YouTube ne charge pas
-                              const target = e.target as HTMLImageElement;
-                              target.style.display = 'none';
-                            }}
                           />
                           {/* Icône play pour les vidéos */}
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="w-14 h-14 rounded-full bg-gold-bn-primary/90 flex items-center justify-center shadow-lg">
-                              <Icon name="mdi:play" className="h-8 w-8 text-white ml-1" />
+                          {item.isVideo && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                              <div className="w-14 h-14 rounded-full bg-gold-bn-primary/90 flex items-center justify-center shadow-lg">
+                                <Icon name="mdi:play" className="h-8 w-8 text-white ml-1" />
+                              </div>
                             </div>
-                          </div>
+                          )}
                         </div>
-                      ) : item.isVideo && !item.thumbnail ? (
-                        // Fallback pour vidéos sans miniature
-                        <div className="w-full h-full flex items-center justify-center bg-slate-muted">
-                          <div className="w-16 h-16 rounded-full bg-gold-bn-primary/20 flex items-center justify-center">
-                            <Icon name="mdi:video" className="h-10 w-10 text-gold-bn-primary" />
+                      ) : item.isVideo ? (
+                        // Fallback pour vidéos: icône vidéo avec fond stylisé
+                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
+                          <div className="w-20 h-20 rounded-full bg-gold-bn-primary/20 flex items-center justify-center border-2 border-gold-bn-primary/30">
+                            <Icon name="mdi:play-circle" className="h-12 w-12 text-gold-bn-primary" />
                           </div>
                         </div>
                       ) : item.pdfUrl ? (
@@ -170,7 +161,7 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
                           className="group-hover:scale-105 transition-transform duration-500"
                         />
                       ) : (
-                        // Fallback ultime
+                        // Fallback ultime - image par défaut
                         <img 
                           src={item.thumbnail || '/placeholder.svg'} 
                           alt={item.title}
@@ -179,33 +170,38 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
                       )}
                     </div>
                     
-                    {/* Badge moved under image */}
-                    <div className="px-4 pt-4">
-                      <Badge 
-                        className={`${getBadgeColor(item.type)} px-3 py-1 text-xs font-medium rounded-sm`}
-                      >
-                        {item.type}
-                      </Badge>
-                    </div>
-                    
-                    <CardHeader className="flex-1 p-4 pb-3 pt-3 space-y-3">
-                      <CardTitle className="text-base font-semibold text-slate-base-dark line-clamp-2 leading-relaxed">
+                    {/* Content container - flex pour aligner les éléments */}
+                    <div className="flex flex-col flex-1 p-4">
+                      {/* Badge - toujours en haut, hauteur fixe */}
+                      <div className="h-7 mb-2">
+                        <Badge 
+                          className={`${getBadgeColor(item.type)} px-3 py-1 text-xs font-medium rounded-sm`}
+                        >
+                          {item.type}
+                        </Badge>
+                      </div>
+                      
+                      {/* Title - hauteur fixe avec line-clamp */}
+                      <h3 className="text-base font-semibold text-slate-base-dark line-clamp-2 leading-relaxed h-[52px] mb-2">
                         {item.title}
-                      </CardTitle>
-                      <CardDescription className="text-sm text-slate-text line-clamp-2 leading-relaxed">
+                      </h3>
+                      
+                      {/* Description - flex-1 pour prendre l'espace restant */}
+                      <p className="text-sm text-slate-text line-clamp-2 leading-relaxed flex-1">
                         {item.description || (item.author && item.author !== 'Auteur inconnu' ? item.author : 'Document numérisé de la Bibliothèque Nationale...')}
-                      </CardDescription>
-                    </CardHeader>
-                    
-                    <CardContent className="p-4 pt-2">
-                      <button
-                        onClick={() => onConsultDocument(item)}
-                        className="group/link inline-flex items-center gap-1 text-gold-bn-primary-dark hover:text-gold-bn-primary font-medium text-sm transition-colors"
-                      >
-                        En savoir plus
-                        <Icon name="mdi:chevron-right" className="h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
-                      </button>
-                    </CardContent>
+                      </p>
+                      
+                      {/* CTA - toujours en bas */}
+                      <div className="pt-2 mt-auto">
+                        <button
+                          onClick={() => onConsultDocument(item)}
+                          className="group/link inline-flex items-center gap-1 text-gold-bn-primary-dark hover:text-gold-bn-primary font-medium text-sm transition-colors"
+                        >
+                          En savoir plus
+                          <Icon name="mdi:chevron-right" className="h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
+                        </button>
+                      </div>
+                    </div>
                   </Card>
                 </FancyTooltip>
               ))}
