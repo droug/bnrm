@@ -111,13 +111,17 @@ function HotspotMarker({
   const meshRef = useRef<THREE.Mesh>(null);
   
   // Convert yaw/pitch to 3D position on sphere
+  // Yaw: horizontal angle (-180 to 180), 0 = center of equirectangular image
+  // Pitch: vertical angle (-90 to 90), positive = up
+  // The sphere is flipped with scale={[-1, 1, 1]}, so we negate X to compensate
   const radius = 100;
   const yawRad = THREE.MathUtils.degToRad(hotspot.yaw);
   const pitchRad = THREE.MathUtils.degToRad(hotspot.pitch);
   
-  const x = radius * Math.cos(pitchRad) * Math.sin(yawRad);
+  // Standard spherical to Cartesian conversion, with X negated for flipped sphere
+  const x = -radius * Math.cos(pitchRad) * Math.sin(yawRad);
   const y = radius * Math.sin(pitchRad);
-  const z = radius * Math.cos(pitchRad) * Math.cos(yawRad);
+  const z = -radius * Math.cos(pitchRad) * Math.cos(yawRad);
 
   const getColor = () => {
     switch (hotspot.hotspot_type) {
