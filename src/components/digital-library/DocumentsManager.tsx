@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useLocalWhisperTranscription } from "@/hooks/useLocalWhisperTranscription";
+import { useBackgroundOcr } from "@/hooks/useBackgroundOcr";
 import { registerDocumentInGed, deleteGedDocument, updateGedWorkflowStatus } from "@/hooks/useGedIntegration";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -123,6 +124,16 @@ export default function DocumentsManager() {
   const [transcriptionLanguage, setTranscriptionLanguage] = useState<string>("ar");
   const [transcriptionMethod, setTranscriptionMethod] = useState<"local" | "lovable-ai" | "openai">("local");
   const [documentToTranscribe, setDocumentToTranscribe] = useState<any>(null);
+  
+  // Background OCR with cache invalidation on complete
+  const handleOcrJobComplete = useCallback(() => {
+    queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
+  }, [queryClient]);
+  
+  const { startOcrJob, jobs: backgroundOcrJobs, activeJobsCount: activeBackgroundOcrCount } = useBackgroundOcr({
+    onJobComplete: handleOcrJobComplete
+  });
+  const [runOcrInBackground, setRunOcrInBackground] = useState(true); // Default to background mode
 
   // Exemple de doublons détectés
   const sampleDuplicates = [
@@ -944,6 +955,76 @@ export default function DocumentsManager() {
       return;
     }
 
+    // If background mode is enabled and we have a PDF URL (OCR mode only, not extract)
+    if (runOcrInBackground && ocrMode === 'ocr' && (hasPdfUrl || hasPdfFile)) {
+      setShowOcrDialog(false);
+      
+      // If user uploaded a new PDF, we need to upload it first before background processing
+      let pdfUrlToUse = ocrDocumentTarget.pdf_url;
+      
+      if (hasPdfFile && ocrPdfFile) {
+        // Upload the PDF first
+        try {
+          const safeFileName = ocrPdfFile.name.replace(/[^a-zA-Z0-9._-]/g, "-");
+          const ext = safeFileName.split('.').pop()?.toLowerCase() || 'pdf';
+          const fileName = `${ocrDocumentTarget.id}_${Date.now()}.${ext}`;
+          const filePath = `documents/${fileName}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from('digital-library')
+            .upload(filePath, ocrPdfFile, {
+              upsert: true,
+              contentType: 'application/pdf',
+            });
+          if (uploadError) throw uploadError;
+
+          const { data: urlData } = supabase.storage
+            .from('digital-library')
+            .getPublicUrl(filePath);
+
+          pdfUrlToUse = urlData?.publicUrl || '';
+          
+          // Update document with PDF URL
+          await supabase
+            .from('digital_library_documents')
+            .update({ 
+              pdf_url: pdfUrlToUse,
+              language: ocrLanguage,
+              file_size_mb: parseFloat((ocrPdfFile.size / 1024 / 1024).toFixed(2)),
+              file_format: 'pdf'
+            })
+            .eq('id', ocrDocumentTarget.id);
+        } catch (uploadError: any) {
+          toast({
+            title: "Erreur upload",
+            description: uploadError.message,
+            variant: "destructive"
+          });
+          return;
+        }
+      } else {
+        // Just update the language
+        await supabase
+          .from('digital_library_documents')
+          .update({ language: ocrLanguage })
+          .eq('id', ocrDocumentTarget.id);
+      }
+      
+      // Start background OCR job
+      startOcrJob({
+        documentId: ocrDocumentTarget.id,
+        documentTitle: ocrDocumentTarget.title || 'Document sans titre',
+        pdfUrl: pdfUrlToUse,
+        language: ocrLanguage,
+      });
+      
+      // Clean up dialog state
+      setOcrDocumentTarget(null);
+      setOcrPdfFile(null);
+      return;
+    }
+
+    // Otherwise, run in foreground (existing behavior)
     setShowOcrDialog(false);
     setOcrProcessingDocId(ocrDocumentTarget.id);
     setClientOcrProgress(0);
@@ -1931,11 +2012,19 @@ export default function DocumentsManager() {
     <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold">Gestion des documents numérisés</h1>
-          <p className="text-muted-foreground">
-            Ajoutez, modifiez et gérez vos documents de la bibliothèque numérique
-          </p>
+        <div className="flex items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">Gestion des documents numérisés</h1>
+            <p className="text-muted-foreground">
+              Ajoutez, modifiez et gérez vos documents de la bibliothèque numérique
+            </p>
+          </div>
+          {activeBackgroundOcrCount > 0 && (
+            <Badge variant="secondary" className="animate-pulse bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
+              <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+              {activeBackgroundOcrCount} OCR en cours
+            </Badge>
+          )}
         </div>
         <Button 
           onClick={handleBatchOcr}
@@ -3593,7 +3682,26 @@ export default function DocumentsManager() {
                     <SelectItem value="ber">Amazigh (Tifinagh)</SelectItem>
                     <SelectItem value="mixed">Mixte (Arabe/Français)</SelectItem>
                   </SelectContent>
-                </Select>
+              </Select>
+              </div>
+            )}
+            
+            {/* Background execution option - only for OCR mode */}
+            {ocrMode === "ocr" && (ocrDocumentTarget?.pdf_url || ocrPdfFile) && (
+              <div className="flex items-center justify-between p-3 border rounded-lg bg-muted/30">
+                <div className="space-y-0.5">
+                  <Label htmlFor="run-background" className="text-sm font-medium cursor-pointer">
+                    Exécuter en arrière-plan
+                  </Label>
+                  <p className="text-xs text-muted-foreground">
+                    Continuez à travailler pendant le traitement OCR
+                  </p>
+                </div>
+                <Switch 
+                  id="run-background" 
+                  checked={runOcrInBackground} 
+                  onCheckedChange={setRunOcrInBackground}
+                />
               </div>
             )}
             
@@ -3605,7 +3713,7 @@ export default function DocumentsManager() {
               </div>
             )}
           </div>
-          <DialogFooter>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
             <Button variant="outline" onClick={() => setShowOcrDialog(false)}>
               Annuler
             </Button>
@@ -3618,7 +3726,9 @@ export default function DocumentsManager() {
                 ? "Uploader et traiter" 
                 : ocrMode === "extract" 
                   ? "Extraire le texte" 
-                  : "Lancer l'OCR"
+                  : runOcrInBackground
+                    ? "Lancer en arrière-plan"
+                    : "Lancer l'OCR"
               }
             </Button>
           </DialogFooter>
