@@ -366,9 +366,11 @@ export default function DocumentsManager() {
           .eq('cbn_document_id', cbnDocumentId)
           .maybeSingle();
 
-        if (existingDl) {
-          throw new Error(`Un document numérique existe déjà pour la cote ${values.cote}`);
-        }
+        // NOTE: Au lieu d'échouer sur doublon, on met à jour le document existant.
+        // Cela rend le bouton "Ajouter" idempotent et évite les erreurs quand l'utilisateur
+        // ré-essaie après une première création (ou veut remplacer le PDF).
+        const mode: 'create' | 'update' = existingDl ? 'update' : 'create';
+        const targetDocId = existingDl?.id;
 
         // Handle file upload if a file is provided
         let uploadedPdfUrl = values.file_url || null;
@@ -390,6 +392,10 @@ export default function DocumentsManager() {
           
           const { data: { session } } = await supabase.auth.getSession();
           const accessToken = session?.access_token;
+
+           if (!accessToken) {
+             throw new Error("Session expirée. Veuillez vous reconnecter puis réessayer le téléversement.");
+           }
           
           const uploadUrl = `https://safeppmznupzqkqmzjzt.supabase.co/storage/v1/object/digital-library/${filePath}`;
           
@@ -430,60 +436,92 @@ export default function DocumentsManager() {
           uploadedPdfUrl = publicUrlData.publicUrl;
         }
 
-        // Create the digital_library_document
-        const { data: newDoc, error: dlError } = await supabase
-          .from('digital_library_documents')
-          .insert([{
-            cbn_document_id: cbnDocumentId,
-            title: values.title || existingCbn?.title || `Document ${values.cote}`,
-            author: values.author || existingCbn?.author || null,
-            document_type: values.file_type || existingCbn?.document_type || 'book',
-            publication_year: values.publication_date 
-              ? parseInt(values.publication_date.split('-')[0]) 
-              : existingCbn?.publication_year || null,
-            pdf_url: uploadedPdfUrl,
-            download_enabled: values.download_enabled,
-            publication_status: values.is_visible ? 'published' : 'draft',
-            digitization_source: values.digitization_source,
-            pages_count: 0,
-          }])
-          .select('id')
-          .single();
+        const resolvedTitle = values.title || existingCbn?.title || `Document ${values.cote}`;
+        const resolvedAuthor = values.author || existingCbn?.author || null;
+        const resolvedType = values.file_type || existingCbn?.document_type || 'book';
+        const resolvedYear = values.publication_date
+          ? parseInt(values.publication_date.split('-')[0])
+          : existingCbn?.publication_year || null;
 
-        if (dlError) throw dlError;
+        let docId: string;
 
-        // Enregistrer dans la GED
-        if (newDoc?.id) {
-          const gedResult = await registerDocumentInGed({
-            documentId: newDoc.id,
-            documentTitle: values.title || existingCbn?.title || `Document ${values.cote}`,
-            documentType: values.file_type || existingCbn?.document_type || 'book',
-            description: values.description,
-            fileUrl: uploadedPdfUrl,
-            fileName: uploadFile?.name,
-            fileMimeType: uploadFile?.type || 'application/pdf',
-            fileSizeBytes: uploadFile?.size,
-            workflowStatus: values.is_visible ? 'approved' : 'draft',
-          });
-          
-          if (!gedResult.success) {
-            console.warn('GED registration warning:', gedResult.error);
-          } else {
-            console.log('Document enregistré dans la GED:', gedResult.gedDocumentId);
-          }
+        if (mode === 'update' && targetDocId) {
+          const { error: updateError } = await supabase
+            .from('digital_library_documents')
+            .update({
+              cbn_document_id: cbnDocumentId,
+              title: resolvedTitle,
+              author: resolvedAuthor,
+              document_type: resolvedType,
+              publication_year: resolvedYear,
+              pdf_url: uploadedPdfUrl,
+              download_enabled: values.download_enabled,
+              publication_status: values.is_visible ? 'published' : 'draft',
+              digitization_source: values.digitization_source,
+              pages_count: 0,
+            })
+            .eq('id', targetDocId);
+
+          if (updateError) throw updateError;
+          docId = targetDocId;
+        } else {
+          // Create the digital_library_document
+          const { data: newDoc, error: dlError } = await supabase
+            .from('digital_library_documents')
+            .insert([
+              {
+                cbn_document_id: cbnDocumentId,
+                title: resolvedTitle,
+                author: resolvedAuthor,
+                document_type: resolvedType,
+                publication_year: resolvedYear,
+                pdf_url: uploadedPdfUrl,
+                download_enabled: values.download_enabled,
+                publication_status: values.is_visible ? 'published' : 'draft',
+                digitization_source: values.digitization_source,
+                pages_count: 0,
+              },
+            ])
+            .select('id')
+            .single();
+
+          if (dlError) throw dlError;
+          docId = newDoc.id;
         }
+
+        // Enregistrer dans la GED (non bloquant pour l'ajout UI)
+        const gedResult = await registerDocumentInGed({
+          documentId: docId,
+          documentTitle: resolvedTitle,
+          documentType: resolvedType,
+          description: values.description,
+          fileUrl: uploadedPdfUrl,
+          fileName: uploadFile?.name,
+          fileMimeType: uploadFile?.type || 'application/pdf',
+          fileSizeBytes: uploadFile?.size,
+          workflowStatus: values.is_visible ? 'approved' : 'draft',
+        });
+        if (!gedResult.success) {
+          console.warn('GED registration warning:', gedResult.error);
+        } else {
+          console.log('Document enregistré dans la GED:', gedResult.gedDocumentId);
+        }
+
+        return { id: docId, mode };
       } finally {
         setIsUploading(false);
         setUploadProgress(0);
       }
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
       setShowAddDialog(false);
       setUploadFile(null);
       setUploadProgress(0);
       form.reset();
-      toast({ title: "Document ajouté avec succès" });
+      toast({
+        title: result?.mode === 'update' ? "Document mis à jour" : "Document ajouté avec succès",
+      });
     },
     onError: (error) => {
       toast({ 
