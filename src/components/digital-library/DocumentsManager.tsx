@@ -312,15 +312,20 @@ export default function DocumentsManager() {
   // Add document
   const addDocument = useMutation({
     mutationFn: async (values: z.infer<typeof documentSchema>) => {
+      console.log("[ADD DOC] mutationFn appelée avec:", { values, uploadFile: uploadFile?.name });
+      
       // Validate that either a file is uploaded or a cote is provided
       if (!values.cote || values.cote.trim() === '') {
+        console.error("[ADD DOC] Validation échouée: cote vide");
         throw new Error("Veuillez téléverser un fichier PDF pour générer automatiquement le numéro de cote.");
       }
       
       if (!uploadFile && (!values.file_url || values.file_url.trim() === '')) {
+        console.error("[ADD DOC] Validation échouée: pas de fichier ni URL");
         throw new Error("Veuillez téléverser un fichier PDF ou fournir une URL de fichier.");
       }
       
+      console.log("[ADD DOC] Validation OK, début upload...");
       setIsUploading(true);
       
       try {
@@ -1851,7 +1856,20 @@ export default function DocumentsManager() {
                 </DialogDescription>
               </DialogHeader>
               <Form {...form}>
-                <form onSubmit={form.handleSubmit((values) => addDocument.mutate(values))} className="space-y-4">
+                <form onSubmit={form.handleSubmit(
+                  (values) => {
+                    console.log("[FORM] Validation réussie, appel mutation:", values);
+                    addDocument.mutate(values);
+                  },
+                  (errors) => {
+                    console.error("[FORM] Erreurs de validation:", errors);
+                    toast({
+                      title: "Erreur de validation",
+                      description: Object.entries(errors).map(([key, err]) => `${key}: ${err?.message}`).join(", ") || "Vérifiez les champs du formulaire",
+                      variant: "destructive"
+                    });
+                  }
+                )} className="space-y-4">
                   {/* Cote - Auto-filled from uploaded filename, read-only */}
                   <FormField
                     control={form.control}
