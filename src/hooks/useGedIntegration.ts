@@ -105,7 +105,7 @@ export async function registerDocumentInGed(data: GedDocumentData): Promise<{ su
           is_latest_version: true,
           access_level: 'public',
           confidentiality_level: 1,
-          status: 'active',
+          status: 'draft', // Must be a valid status: draft, pending_review, approved, rejected, archived, deleted
           workflow_status: mapToValidGedStatus(data.workflowStatus),
           thumbnail_url: data.thumbnailUrl || null,
           tags: data.tags || [],
