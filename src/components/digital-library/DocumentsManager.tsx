@@ -96,6 +96,8 @@ export default function DocumentsManager() {
   const [ocrLanguage, setOcrLanguage] = useState("ar");
   const [ocrExistingPagesCount, setOcrExistingPagesCount] = useState(0); // Pages with image_url
   const [ocrPdfFile, setOcrPdfFile] = useState<File | null>(null); // PDF file for OCR upload
+  const [ocrMode, setOcrMode] = useState<"ocr" | "extract">("extract"); // OCR mode: extract embedded text or run Tesseract
+  const [pdfHasEmbeddedText, setPdfHasEmbeddedText] = useState(false); // Whether PDF has embedded text
   const [selectedDocIds, setSelectedDocIds] = useState<string[]>([]);
   const [bulkOcrRunning, setBulkOcrRunning] = useState(false);
   const [clientOcrProgress, setClientOcrProgress] = useState(0);
@@ -663,6 +665,9 @@ export default function DocumentsManager() {
     setOcrDocumentTarget(doc);
     setOcrBaseUrl(doc.base_url || "");
     setOcrLanguage(doc.language || "ar");
+    setOcrPdfFile(null);
+    setPdfHasEmbeddedText(false);
+    setOcrMode("extract"); // Default to extract mode (faster)
     
     // Check if document has existing pages with images
     const { count } = await supabase
@@ -672,6 +677,35 @@ export default function DocumentsManager() {
       .not('image_url', 'is', null);
     
     setOcrExistingPagesCount(count || 0);
+    
+    // Check if PDF has embedded text (for Adobe Acrobat Pro OCR'd PDFs)
+    if (doc.pdf_url) {
+      try {
+        const response = await fetch(doc.pdf_url);
+        if (response.ok) {
+          const pdfBuffer = await response.arrayBuffer();
+          const pdfjsLib = await import('pdfjs-dist');
+          pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerSrc;
+          const pdfDoc = await pdfjsLib.getDocument({ data: pdfBuffer }).promise;
+          
+          // Check first page for embedded text
+          if (pdfDoc.numPages > 0) {
+            const page = await pdfDoc.getPage(1);
+            const textContent = await page.getTextContent();
+            const hasText = textContent.items.length > 10; // Threshold to detect real text
+            setPdfHasEmbeddedText(hasText);
+            if (hasText) {
+              setOcrMode("extract"); // Default to extract if text found
+            } else {
+              setOcrMode("ocr"); // Default to OCR if no text
+            }
+          }
+        }
+      } catch (e) {
+        console.error("Error checking PDF for embedded text:", e);
+      }
+    }
+    
     setShowOcrDialog(true);
   };
 
@@ -692,6 +726,14 @@ export default function DocumentsManager() {
     }).promise;
     
     return canvas.toDataURL('image/png');
+  };
+
+  // Extract embedded text from PDF page (for already OCR'd PDFs from Adobe Acrobat Pro)
+  const extractTextFromPdfPage = async (pdfDoc: any, pageNum: number): Promise<string> => {
+    const page = await pdfDoc.getPage(pageNum);
+    const textContent = await page.getTextContent();
+    const textItems = textContent.items.map((item: any) => item.str || '');
+    return textItems.join(' ').trim();
   };
 
   // Perform OCR on a single page using Tesseract.js
@@ -783,13 +825,17 @@ export default function DocumentsManager() {
 
       // If document has PDF (existing or just uploaded), process it client-side
       if (pdfUrlToUse && !hasExistingPages) {
+        const isExtractMode = ocrMode === "extract";
+        
         toast({
           title: "Téléchargement du PDF...",
-          description: "Préparation du traitement OCR côté client"
+          description: isExtractMode 
+            ? "Extraction du texte embarqué (PDF déjà océrisé)" 
+            : "Préparation du traitement OCR côté client"
         });
 
         // Fetch PDF
-        const pdfResponse = await fetch(ocrDocumentTarget.pdf_url);
+        const pdfResponse = await fetch(pdfUrlToUse);
         if (!pdfResponse.ok) {
           throw new Error(`Impossible de télécharger le PDF: ${pdfResponse.status}`);
         }
@@ -806,8 +852,10 @@ export default function DocumentsManager() {
         setClientOcrTotalPages(numPages);
 
         toast({
-          title: "OCR en cours",
-          description: `Traitement de ${numPages} pages avec Tesseract.js (local)`
+          title: isExtractMode ? "Extraction en cours" : "OCR en cours",
+          description: isExtractMode 
+            ? `Extraction du texte de ${numPages} pages (instantané)`
+            : `Traitement de ${numPages} pages avec Tesseract.js (local)`
         });
 
         let successCount = 0;
@@ -817,13 +865,18 @@ export default function DocumentsManager() {
           setClientOcrProgress(Math.round((pageNum / numPages) * 100));
 
           try {
-            // Convert page to image
-            const imageData = await convertPdfPageToImage(pdfDoc, pageNum);
+            let extractedText = "";
             
-            // Perform OCR
-            const ocrText = await performOcrOnPage(imageData, ocrLanguage);
+            if (isExtractMode) {
+              // Extract embedded text (fast - for Adobe Acrobat Pro OCR'd PDFs)
+              extractedText = await extractTextFromPdfPage(pdfDoc, pageNum);
+            } else {
+              // Convert page to image and run Tesseract OCR
+              const imageData = await convertPdfPageToImage(pdfDoc, pageNum);
+              extractedText = await performOcrOnPage(imageData, ocrLanguage);
+            }
 
-            if (ocrText) {
+            if (extractedText) {
               // Check if page already exists
               const { data: existing } = await supabase
                 .from('digital_library_pages')
@@ -835,7 +888,7 @@ export default function DocumentsManager() {
               if (existing) {
                 await supabase
                   .from('digital_library_pages')
-                  .update({ ocr_text: ocrText })
+                  .update({ ocr_text: extractedText })
                   .eq('id', existing.id);
               } else {
                 await supabase
@@ -843,7 +896,7 @@ export default function DocumentsManager() {
                   .insert({
                     document_id: ocrDocumentTarget.id,
                     page_number: pageNum,
-                    ocr_text: ocrText
+                    ocr_text: extractedText
                   });
               }
               successCount++;
@@ -865,7 +918,7 @@ export default function DocumentsManager() {
         queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
         
         toast({
-          title: "OCR terminé",
+          title: isExtractMode ? "Extraction terminée" : "OCR terminé",
           description: `${successCount}/${numPages} page(s) traitée(s) pour "${ocrDocumentTarget.title}"`
         });
       } else if (hasExistingPages) {
@@ -3175,21 +3228,90 @@ export default function DocumentsManager() {
               </div>
             )}
             
-            {/* Show PDF info if available */}
-            {ocrDocumentTarget?.pdf_url && (
-              <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-                <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
-                  <CheckCircle2 className="h-4 w-4" />
-                  <span className="text-sm font-medium">Fichier PDF disponible</span>
+            {/* Show PDF info and mode selection if available */}
+            {(ocrDocumentTarget?.pdf_url || ocrPdfFile) && (
+              <div className="space-y-3">
+                <div className="p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                  <div className="flex items-center gap-2 text-green-700 dark:text-green-400">
+                    <CheckCircle2 className="h-4 w-4" />
+                    <span className="text-sm font-medium">Fichier PDF disponible</span>
+                  </div>
                 </div>
-                <p className="text-xs text-green-600 dark:text-green-500 mt-1">
-                  L'OCR sera effectué directement sur le PDF du document.
-                </p>
+                
+                {/* OCR Mode Selection */}
+                <div className="space-y-2">
+                  <Label>Mode de traitement</Label>
+                  <div className="grid grid-cols-1 gap-2">
+                    <label 
+                      className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
+                        ocrMode === "extract" 
+                          ? "border-primary bg-primary/5" 
+                          : "border-border hover:bg-muted/50"
+                      }`}
+                    >
+                      <input 
+                        type="radio" 
+                        name="ocrMode" 
+                        value="extract" 
+                        checked={ocrMode === "extract"} 
+                        onChange={() => setOcrMode("extract")}
+                        className="mt-1"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-sm">Extraire le texte embarqué</span>
+                          {pdfHasEmbeddedText && (
+                            <Badge variant="secondary" className="text-xs">Recommandé</Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Pour les PDF déjà océrisés (Adobe Acrobat Pro, ABBYY, etc.). 
+                          <span className="text-green-600 dark:text-green-400 font-medium"> Instantané et sans perte de qualité.</span>
+                        </p>
+                        {pdfHasEmbeddedText && (
+                          <p className="text-xs text-green-600 dark:text-green-400 mt-1 flex items-center gap-1">
+                            <CheckCircle2 className="h-3 w-3" />
+                            Texte embarqué détecté dans ce PDF
+                          </p>
+                        )}
+                      </div>
+                    </label>
+                    
+                    <label 
+                      className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
+                        ocrMode === "ocr" 
+                          ? "border-primary bg-primary/5" 
+                          : "border-border hover:bg-muted/50"
+                      }`}
+                    >
+                      <input 
+                        type="radio" 
+                        name="ocrMode" 
+                        value="ocr" 
+                        checked={ocrMode === "ocr"} 
+                        onChange={() => setOcrMode("ocr")}
+                        className="mt-1"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-sm">Lancer l'OCR (Tesseract)</span>
+                          {!pdfHasEmbeddedText && (
+                            <Badge variant="secondary" className="text-xs">Pour PDF scannés</Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          Pour les PDF scannés sans texte. Reconnaissance optique des caractères.
+                          <span className="text-amber-600 dark:text-amber-400"> Plus lent mais nécessaire si pas de texte.</span>
+                        </p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
               </div>
             )}
             
             {/* Show existing pages info if available (no PDF) */}
-            {!ocrDocumentTarget?.pdf_url && ocrExistingPagesCount > 0 && (
+            {!ocrDocumentTarget?.pdf_url && !ocrPdfFile && ocrExistingPagesCount > 0 && (
               <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
                 <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400">
                   <FileImage className="h-4 w-4" />
@@ -3226,41 +3348,32 @@ export default function DocumentsManager() {
                 )}
                 {!ocrPdfFile && ocrExistingPagesCount === 0 && (
                   <p className="text-xs text-muted-foreground">
-                    Sélectionnez le fichier PDF à traiter par OCR
+                    Sélectionnez le fichier PDF à traiter
                   </p>
                 )}
               </div>
             )}
             
-            {/* Show existing pages info if available (no PDF, no file selected) */}
-            {!ocrDocumentTarget?.pdf_url && !ocrPdfFile && ocrExistingPagesCount > 0 && (
-              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400">
-                  <FileImage className="h-4 w-4" />
-                  <span className="text-sm font-medium">{ocrExistingPagesCount} page(s) avec images disponibles</span>
-                </div>
-                <p className="text-xs text-blue-600 dark:text-blue-500 mt-1">
-                  L'OCR sera effectué sur les images de pages déjà importées.
-                </p>
+            {/* Language selection - only show for OCR mode */}
+            {ocrMode === "ocr" && (
+              <div className="space-y-2">
+                <Label htmlFor="ocr-language">Langue du document</Label>
+                <Select value={ocrLanguage} onValueChange={setOcrLanguage}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner la langue" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="ar">Arabe</SelectItem>
+                    <SelectItem value="fr">Français</SelectItem>
+                    <SelectItem value="en">Anglais</SelectItem>
+                    <SelectItem value="lat">Latin</SelectItem>
+                    <SelectItem value="ber">Amazigh (Tifinagh)</SelectItem>
+                    <SelectItem value="mixed">Mixte (Arabe/Français)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             )}
             
-            <div className="space-y-2">
-              <Label htmlFor="ocr-language">Langue du document</Label>
-              <Select value={ocrLanguage} onValueChange={setOcrLanguage}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sélectionner la langue" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ar">Arabe</SelectItem>
-                  <SelectItem value="fr">Français</SelectItem>
-                  <SelectItem value="en">Anglais</SelectItem>
-                  <SelectItem value="lat">Latin</SelectItem>
-                  <SelectItem value="ber">Amazigh (Tifinagh)</SelectItem>
-                  <SelectItem value="mixed">Mixte (Arabe/Français)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
             {ocrDocumentTarget?.pages_count && (
               <div className="p-3 bg-muted rounded-lg space-y-1">
                 <p className="text-sm">
@@ -3278,7 +3391,12 @@ export default function DocumentsManager() {
               disabled={!ocrDocumentTarget?.pdf_url && !ocrPdfFile && ocrExistingPagesCount === 0}
             >
               <Wand2 className="h-4 w-4 mr-2" />
-              {ocrPdfFile ? "Uploader et lancer l'OCR" : "Lancer l'OCR"}
+              {ocrPdfFile 
+                ? "Uploader et traiter" 
+                : ocrMode === "extract" 
+                  ? "Extraire le texte" 
+                  : "Lancer l'OCR"
+              }
             </Button>
           </DialogFooter>
         </DialogContent>
