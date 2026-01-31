@@ -588,6 +588,25 @@ export default function DocumentsManager() {
     }
   });
 
+  // Mark document as OCR processed (for already searchable PDFs)
+  const markAsOcrProcessed = useMutation({
+    mutationFn: async (docId: string) => {
+      const { error } = await supabase
+        .from('digital_library_documents')
+        .update({ ocr_processed: true })
+        .eq('id', docId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
+      toast({ title: "Document marqué comme OCRisé", description: "La recherche plein texte est maintenant disponible." });
+    },
+    onError: (error) => {
+      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+    }
+  });
+
   // Toggle functions
   const toggleField = useMutation({
     mutationFn: async ({ id, field, value }: { id: string; field: string; value: boolean }) => {
@@ -2673,26 +2692,46 @@ export default function DocumentsManager() {
                           </Button>
                         ) : (
                           // OCR button for other documents
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => openOcrDialog(doc)}
-                            disabled={ocrProcessingDocId === doc.id}
-                            title={ocrProcessingDocId === doc.id && clientOcrTotalPages > 0 
-                              ? `OCR en cours: page ${clientOcrCurrentPage}/${clientOcrTotalPages} (${clientOcrProgress}%)`
-                              : "Lancer l'OCR"}
-                          >
-                            {ocrProcessingDocId === doc.id ? (
-                              <div className="flex items-center gap-1">
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                                {clientOcrTotalPages > 0 && (
-                                  <span className="text-xs">{clientOcrProgress}%</span>
-                                )}
-                              </div>
+                          <div className="flex items-center gap-1">
+                            {doc.ocr_processed ? (
+                              <Badge variant="secondary" className="text-xs bg-green-100 text-green-700 border-green-300">
+                                <CheckCircle2 className="h-3 w-3 mr-1" />
+                                OCRisé
+                              </Badge>
                             ) : (
-                              <Wand2 className="h-4 w-4" />
+                              <>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => openOcrDialog(doc)}
+                                  disabled={ocrProcessingDocId === doc.id}
+                                  title={ocrProcessingDocId === doc.id && clientOcrTotalPages > 0 
+                                    ? `OCR en cours: page ${clientOcrCurrentPage}/${clientOcrTotalPages} (${clientOcrProgress}%)`
+                                    : "Lancer l'OCR"}
+                                >
+                                  {ocrProcessingDocId === doc.id ? (
+                                    <div className="flex items-center gap-1">
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                      {clientOcrTotalPages > 0 && (
+                                        <span className="text-xs">{clientOcrProgress}%</span>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <Wand2 className="h-4 w-4" />
+                                  )}
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => markAsOcrProcessed.mutate(doc.id)}
+                                  disabled={markAsOcrProcessed.isPending}
+                                  title="Marquer comme déjà OCRisé (PDF avec texte embarqué)"
+                                >
+                                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                                </Button>
+                              </>
                             )}
-                          </Button>
+                          </div>
                         )}
                         <Button
                           size="sm"
