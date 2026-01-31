@@ -312,6 +312,15 @@ export default function DocumentsManager() {
   // Add document
   const addDocument = useMutation({
     mutationFn: async (values: z.infer<typeof documentSchema>) => {
+      // Validate that either a file is uploaded or a cote is provided
+      if (!values.cote || values.cote.trim() === '') {
+        throw new Error("Veuillez téléverser un fichier PDF pour générer automatiquement le numéro de cote.");
+      }
+      
+      if (!uploadFile && (!values.file_url || values.file_url.trim() === '')) {
+        throw new Error("Veuillez téléverser un fichier PDF ou fournir une URL de fichier.");
+      }
+      
       setIsUploading(true);
       
       try {
