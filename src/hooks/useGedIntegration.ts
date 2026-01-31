@@ -12,7 +12,27 @@ interface GedDocumentData {
   thumbnailUrl?: string | null;
   tags?: string[];
   keywords?: string[];
-  workflowStatus?: 'draft' | 'pending_review' | 'approved' | 'published' | 'rejected';
+  workflowStatus?: 'draft' | 'pending_review' | 'approved' | 'rejected' | 'archived';
+}
+
+// Mapper les statuts de publication vers les statuts GED valides
+function mapToValidGedStatus(status: string | undefined): 'draft' | 'pending_review' | 'approved' | 'rejected' | 'archived' {
+  switch (status) {
+    case 'published':
+      return 'approved'; // 'published' maps to 'approved' in GED
+    case 'draft':
+      return 'draft';
+    case 'pending_review':
+      return 'pending_review';
+    case 'approved':
+      return 'approved';
+    case 'rejected':
+      return 'rejected';
+    case 'archived':
+      return 'archived';
+    default:
+      return 'draft';
+  }
 }
 
 /**
@@ -49,7 +69,7 @@ export async function registerDocumentInGed(data: GedDocumentData): Promise<{ su
           thumbnail_url: data.thumbnailUrl || null,
           tags: data.tags || [],
           keywords: data.keywords || [],
-          workflow_status: data.workflowStatus || 'draft',
+          workflow_status: mapToValidGedStatus(data.workflowStatus),
           updated_by: user.id,
           updated_at: new Date().toISOString(),
         })
@@ -86,7 +106,7 @@ export async function registerDocumentInGed(data: GedDocumentData): Promise<{ su
           access_level: 'public',
           confidentiality_level: 1,
           status: 'active',
-          workflow_status: data.workflowStatus || 'draft',
+          workflow_status: mapToValidGedStatus(data.workflowStatus),
           thumbnail_url: data.thumbnailUrl || null,
           tags: data.tags || [],
           keywords: data.keywords || [],
