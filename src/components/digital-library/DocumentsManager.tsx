@@ -463,7 +463,7 @@ export default function DocumentsManager() {
             fileName: uploadFile?.name,
             fileMimeType: uploadFile?.type || 'application/pdf',
             fileSizeBytes: uploadFile?.size,
-            workflowStatus: values.is_visible ? 'published' : 'draft',
+            workflowStatus: values.is_visible ? 'approved' : 'draft',
           });
           
           if (!gedResult.success) {
