@@ -29,6 +29,7 @@ import { FileUpload } from "@/components/ui/file-upload";
 import Tesseract from 'tesseract.js';
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { detectPdfEmbeddedText } from '@/utils/pdfTextDetection';
+import { extractTextFromPdf, extractTextFromPdfFile, type ExtractionProgress } from '@/utils/pdfTextExtractor';
 
 // Map language codes to Tesseract language codes
 const TESSERACT_LANG_MAP: Record<string, string> = {
@@ -506,6 +507,39 @@ export default function DocumentsManager() {
           docId = newDoc.id;
         }
 
+        // Si le PDF est détecté comme déjà OCRisé, extraire et indexer le texte
+        if (detectedOcrProcessed && uploadFile) {
+          try {
+            console.log('[Auto-indexing] Extracting text from already OCR\'d PDF...');
+            const extractedPages = await extractTextFromPdfFile(uploadFile);
+            const pagesWithText = extractedPages.filter(p => p.text.length > 10);
+            
+            if (pagesWithText.length > 0) {
+              // Insert extracted pages
+              const pagesToInsert = pagesWithText.map(page => ({
+                document_id: docId,
+                page_number: page.pageNumber,
+                ocr_text: page.text,
+              }));
+
+              await supabase
+                .from('digital_library_pages')
+                .insert(pagesToInsert);
+
+              // Update pages count
+              await supabase
+                .from('digital_library_documents')
+                .update({ pages_count: extractedPages.length })
+                .eq('id', docId);
+
+              console.log(`[Auto-indexing] Indexed ${pagesWithText.length} pages`);
+            }
+          } catch (extractError) {
+            console.warn('[Auto-indexing] Text extraction failed:', extractError);
+            // Don't fail the whole upload, just log the warning
+          }
+        }
+
         // Enregistrer dans la GED (non bloquant pour l'ajout UI)
         const gedResult = await registerDocumentInGed({
           documentId: docId,
@@ -524,7 +558,7 @@ export default function DocumentsManager() {
           console.log('Document enregistré dans la GED:', gedResult.gedDocumentId);
         }
 
-        return { id: docId, mode };
+        return { id: docId, mode, autoIndexed: detectedOcrProcessed };
       } finally {
         setIsUploading(false);
         setUploadProgress(0);
@@ -538,6 +572,7 @@ export default function DocumentsManager() {
       form.reset();
       toast({
         title: result?.mode === 'update' ? "Document mis à jour" : "Document ajouté avec succès",
+        description: result?.autoIndexed ? "Texte détecté et indexé automatiquement. Recherche disponible." : undefined,
       });
     },
     onError: (error) => {
@@ -588,22 +623,81 @@ export default function DocumentsManager() {
     }
   });
 
-  // Mark document as OCR processed (for already searchable PDFs)
+  // State for text extraction progress
+  const [extractionProgress, setExtractionProgress] = useState<{ docId: string; progress: number } | null>(null);
+
+  // Mark document as OCR processed AND extract/index text for search
   const markAsOcrProcessed = useMutation({
     mutationFn: async (docId: string) => {
-      const { error } = await supabase
+      // First, get the document's PDF URL
+      const { data: docData, error: fetchError } = await supabase
         .from('digital_library_documents')
-        .update({ ocr_processed: true })
+        .select('pdf_url, title')
+        .eq('id', docId)
+        .single();
+      
+      if (fetchError) throw fetchError;
+      if (!docData?.pdf_url) {
+        throw new Error("Ce document n'a pas de fichier PDF associé");
+      }
+
+      setExtractionProgress({ docId, progress: 0 });
+
+      // Extract text from the PDF
+      const extractedPages = await extractTextFromPdf(docData.pdf_url, (progress) => {
+        setExtractionProgress({ docId, progress: progress.percentage });
+      });
+
+      // Filter pages with actual text content
+      const pagesWithText = extractedPages.filter(p => p.text.length > 10);
+      
+      if (pagesWithText.length === 0) {
+        throw new Error("Aucun texte trouvé dans ce PDF. Le fichier ne contient peut-être pas de texte embarqué.");
+      }
+
+      // Delete existing pages for this document (if any)
+      await supabase
+        .from('digital_library_pages')
+        .delete()
+        .eq('document_id', docId);
+
+      // Insert extracted pages
+      const pagesToInsert = pagesWithText.map(page => ({
+        document_id: docId,
+        page_number: page.pageNumber,
+        ocr_text: page.text,
+      }));
+
+      const { error: insertError } = await supabase
+        .from('digital_library_pages')
+        .insert(pagesToInsert);
+
+      if (insertError) throw insertError;
+
+      // Mark document as OCR processed
+      const { error: updateError } = await supabase
+        .from('digital_library_documents')
+        .update({ 
+          ocr_processed: true,
+          pages_count: extractedPages.length
+        })
         .eq('id', docId);
       
-      if (error) throw error;
+      if (updateError) throw updateError;
+
+      return { pagesIndexed: pagesWithText.length, totalPages: extractedPages.length };
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
+      setExtractionProgress(null);
       queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
-      toast({ title: "Document marqué comme OCRisé", description: "La recherche plein texte est maintenant disponible." });
+      toast({ 
+        title: "Texte extrait et indexé", 
+        description: `${result.pagesIndexed} pages indexées sur ${result.totalPages}. La recherche est maintenant disponible.` 
+      });
     },
     onError: (error) => {
-      toast({ title: "Erreur", description: error.message, variant: "destructive" });
+      setExtractionProgress(null);
+      toast({ title: "Erreur d'extraction", description: error.message, variant: "destructive" });
     }
   });
 
@@ -2724,10 +2818,18 @@ export default function DocumentsManager() {
                                   size="sm"
                                   variant="ghost"
                                   onClick={() => markAsOcrProcessed.mutate(doc.id)}
-                                  disabled={markAsOcrProcessed.isPending}
-                                  title="Marquer comme déjà OCRisé (PDF avec texte embarqué)"
+                                  disabled={markAsOcrProcessed.isPending || extractionProgress?.docId === doc.id}
+                                  title="Extraire et indexer le texte (PDF déjà OCRisé)"
+                                  className="text-green-600 hover:text-green-700 hover:bg-green-50"
                                 >
-                                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                                  {extractionProgress?.docId === doc.id ? (
+                                    <div className="flex items-center gap-1">
+                                      <Loader2 className="h-4 w-4 animate-spin" />
+                                      <span className="text-xs">{extractionProgress.progress}%</span>
+                                    </div>
+                                  ) : (
+                                    <FileSearch className="h-4 w-4" />
+                                  )}
                                 </Button>
                               </>
                             )}
