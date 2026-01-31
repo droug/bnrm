@@ -28,6 +28,7 @@ import SigbSyncManager from "@/components/digital-library/SigbSyncManager";
 import { FileUpload } from "@/components/ui/file-upload";
 import Tesseract from 'tesseract.js';
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
+import { detectPdfEmbeddedText } from '@/utils/pdfTextDetection';
 
 // Map language codes to Tesseract language codes
 const TESSERACT_LANG_MAP: Record<string, string> = {
@@ -374,8 +375,22 @@ export default function DocumentsManager() {
 
         // Handle file upload if a file is provided
         let uploadedPdfUrl = values.file_url || null;
+        let detectedOcrProcessed = false;
         
         if (uploadFile) {
+          // Detect if PDF already has embedded text (already OCR'd or born-digital)
+          if (uploadFile.type === 'application/pdf') {
+            try {
+              console.log('[ADD DOC] Détection de texte embarqué dans le PDF...');
+              const detection = await detectPdfEmbeddedText(uploadFile, 3);
+              if (detection.hasEmbeddedText && detection.confidence !== 'low') {
+                detectedOcrProcessed = true;
+                console.log('[ADD DOC] PDF déjà OCRisé détecté:', detection);
+              }
+            } catch (detectionError) {
+              console.warn('[ADD DOC] Erreur détection OCR:', detectionError);
+            }
+          }
           // Sanitize filename: remove special chars, accents, spaces
           const sanitizedCote = values.cote
             .normalize("NFD")
@@ -459,6 +474,7 @@ export default function DocumentsManager() {
               publication_status: values.is_visible ? 'published' : 'draft',
               digitization_source: values.digitization_source,
               pages_count: 0,
+              ocr_processed: detectedOcrProcessed || undefined, // Mark as OCR'd if detected
             })
             .eq('id', targetDocId);
 
@@ -480,6 +496,7 @@ export default function DocumentsManager() {
                 publication_status: values.is_visible ? 'published' : 'draft',
                 digitization_source: values.digitization_source,
                 pages_count: 0,
+                ocr_processed: detectedOcrProcessed, // Mark as OCR'd if detected
               },
             ])
             .select('id')
