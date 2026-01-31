@@ -20,7 +20,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye, BookOpen, FileDown, Pencil, Wand2, Loader2, FileSearch, CheckCircle2, AlertCircle, Database, Mic } from "lucide-react";
+import { Plus, Upload, Trash2, Search, Download, FileText, Calendar, Filter, X, Eye, BookOpen, FileDown, Pencil, Wand2, Loader2, FileSearch, CheckCircle2, AlertCircle, Database, Mic, FileImage } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import OcrImportTool from "@/components/digital-library/import/OcrImportTool";
 import PdfOcrTool from "@/components/digital-library/import/PdfOcrTool";
@@ -94,6 +94,7 @@ export default function DocumentsManager() {
   const [ocrDocumentTarget, setOcrDocumentTarget] = useState<any>(null);
   const [ocrBaseUrl, setOcrBaseUrl] = useState("");
   const [ocrLanguage, setOcrLanguage] = useState("ar");
+  const [ocrExistingPagesCount, setOcrExistingPagesCount] = useState(0); // Pages with image_url
   const [selectedDocIds, setSelectedDocIds] = useState<string[]>([]);
   const [bulkOcrRunning, setBulkOcrRunning] = useState(false);
   const [clientOcrProgress, setClientOcrProgress] = useState(0);
@@ -657,10 +658,19 @@ export default function DocumentsManager() {
   };
 
   // Ouvrir le dialogue OCR pour un document - ouvre le dialogue de configuration OCR
-  const openOcrDialog = (doc: any) => {
+  const openOcrDialog = async (doc: any) => {
     setOcrDocumentTarget(doc);
     setOcrBaseUrl(doc.base_url || "");
     setOcrLanguage(doc.language || "ar");
+    
+    // Check if document has existing pages with images
+    const { count } = await supabase
+      .from('digital_library_pages')
+      .select('id', { count: 'exact', head: true })
+      .eq('document_id', doc.id)
+      .not('image_url', 'is', null);
+    
+    setOcrExistingPagesCount(count || 0);
     setShowOcrDialog(true);
   };
 
@@ -695,14 +705,15 @@ export default function DocumentsManager() {
   const runOcrForDocument = async () => {
     if (!ocrDocumentTarget) return;
     
-    // Check if document has a PDF URL or a base URL for images
+    // Check if document has a PDF URL, a base URL for images, or existing pages with images
     const hasPdfUrl = !!ocrDocumentTarget.pdf_url;
     const hasBaseUrl = !!ocrBaseUrl.trim();
+    const hasExistingPages = ocrExistingPagesCount > 0;
     
-    if (!hasPdfUrl && !hasBaseUrl) {
+    if (!hasPdfUrl && !hasBaseUrl && !hasExistingPages) {
       toast({
         title: "Erreur",
-        description: "Ce document n'a pas de fichier PDF. Veuillez saisir l'URL de base des images ou ajouter un PDF au document.",
+        description: "Ce document n'a pas de fichier PDF ni de pages images. Veuillez saisir l'URL de base des images, ajouter un PDF ou importer des images de pages.",
         variant: "destructive"
       });
       return;
@@ -727,7 +738,7 @@ export default function DocumentsManager() {
         .eq('id', ocrDocumentTarget.id);
 
       // If document has PDF, process it client-side
-      if (hasPdfUrl && !hasBaseUrl) {
+      if (hasPdfUrl && !hasBaseUrl && !hasExistingPages) {
         toast({
           title: "Téléchargement du PDF...",
           description: "Préparation du traitement OCR côté client"
@@ -813,8 +824,67 @@ export default function DocumentsManager() {
           title: "OCR terminé",
           description: `${successCount}/${numPages} page(s) traitée(s) pour "${ocrDocumentTarget.title}"`
         });
+      } else if (hasExistingPages && !hasBaseUrl) {
+        // Process existing pages with images (client-side Tesseract)
+        toast({
+          title: "OCR des pages existantes...",
+          description: `Traitement de ${ocrExistingPagesCount} pages avec Tesseract.js (local)`
+        });
+
+        // Fetch all pages with images
+        const { data: pages, error: pagesError } = await supabase
+          .from('digital_library_pages')
+          .select('id, page_number, image_url')
+          .eq('document_id', ocrDocumentTarget.id)
+          .not('image_url', 'is', null)
+          .order('page_number');
+
+        if (pagesError) throw pagesError;
+        if (!pages || pages.length === 0) {
+          throw new Error("Aucune page avec image trouvée");
+        }
+
+        setClientOcrTotalPages(pages.length);
+        let successCount = 0;
+
+        for (let i = 0; i < pages.length; i++) {
+          const page = pages[i];
+          setClientOcrCurrentPage(i + 1);
+          setClientOcrProgress(Math.round(((i + 1) / pages.length) * 100));
+
+          try {
+            // Perform OCR directly on the image URL
+            const ocrText = await performOcrOnPage(page.image_url, ocrLanguage);
+
+            if (ocrText) {
+              await supabase
+                .from('digital_library_pages')
+                .update({ ocr_text: ocrText })
+                .eq('id', page.id);
+              successCount++;
+            }
+          } catch (pageError) {
+            console.error(`Error processing page ${page.page_number}:`, pageError);
+          }
+        }
+
+        // Update document
+        await supabase
+          .from('digital_library_documents')
+          .update({ 
+            ocr_processed: true,
+            pages_count: pages.length
+          })
+          .eq('id', ocrDocumentTarget.id);
+
+        queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
+        
+        toast({
+          title: "OCR terminé",
+          description: `${successCount}/${pages.length} page(s) traitée(s) pour "${ocrDocumentTarget.title}"`
+        });
       } else {
-        // Use server-side processing for image-based OCR
+        // Use server-side processing for image-based OCR (with baseUrl)
         const { data, error } = await supabase.functions.invoke('batch-ocr-indexing', {
           body: {
             documentId: ocrDocumentTarget.id,
@@ -3100,8 +3170,21 @@ export default function DocumentsManager() {
               </div>
             )}
             
-            {/* Show base URL field only if no PDF */}
-            {!ocrDocumentTarget?.pdf_url && (
+            {/* Show existing pages info if available (no PDF) */}
+            {!ocrDocumentTarget?.pdf_url && ocrExistingPagesCount > 0 && (
+              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                <div className="flex items-center gap-2 text-blue-700 dark:text-blue-400">
+                  <FileImage className="h-4 w-4" />
+                  <span className="text-sm font-medium">{ocrExistingPagesCount} page(s) avec images disponibles</span>
+                </div>
+                <p className="text-xs text-blue-600 dark:text-blue-500 mt-1">
+                  L'OCR sera effectué sur les images de pages déjà importées.
+                </p>
+              </div>
+            )}
+            
+            {/* Show base URL field only if no PDF AND no existing pages */}
+            {!ocrDocumentTarget?.pdf_url && ocrExistingPagesCount === 0 && (
               <div className="space-y-2">
                 <Label htmlFor="ocr-base-url">URL de base des images</Label>
                 <Input
@@ -3117,6 +3200,20 @@ export default function DocumentsManager() {
                     <li>{ocrBaseUrl || "https://..."}/digital-library-pages/{ocrDocumentTarget?.id?.slice(0, 8)}.../<strong>img_p1_1.jpg</strong></li>
                   </ul>
                 </div>
+              </div>
+            )}
+            
+            {/* Optional: Show base URL field when there are existing pages (for advanced users) */}
+            {!ocrDocumentTarget?.pdf_url && ocrExistingPagesCount > 0 && (
+              <div className="space-y-2">
+                <Label htmlFor="ocr-base-url" className="text-muted-foreground">URL de base (optionnel - pour rechercher d'autres images)</Label>
+                <Input
+                  id="ocr-base-url"
+                  placeholder="Laisser vide pour utiliser les images existantes"
+                  value={ocrBaseUrl}
+                  onChange={(e) => setOcrBaseUrl(e.target.value)}
+                  className="text-sm"
+                />
               </div>
             )}
             
@@ -3150,7 +3247,7 @@ export default function DocumentsManager() {
             </Button>
             <Button 
               onClick={runOcrForDocument} 
-              disabled={!ocrDocumentTarget?.pdf_url && !ocrBaseUrl.trim()}
+              disabled={!ocrDocumentTarget?.pdf_url && !ocrBaseUrl.trim() && ocrExistingPagesCount === 0}
             >
               <Wand2 className="h-4 w-4 mr-2" />
               Lancer l'OCR
