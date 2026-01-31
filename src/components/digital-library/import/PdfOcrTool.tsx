@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { FileUp, Loader2, FileText, CheckCircle2, AlertCircle, Download, Copy } from "lucide-react";
@@ -40,7 +40,7 @@ const TESSERACT_LANG_MAP: Record<string, string> = {
 };
 
 export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentTitle }: PdfOcrToolProps = {}) {
-  const { toast } = useToast();
+  // Toast is now imported from sonner at top level
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -61,10 +61,8 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
       setProgress(0);
       setCurrentPageProgress(0);
     } else {
-      toast({
-        title: "Format invalide",
-        description: "Veuillez sélectionner un fichier PDF",
-        variant: "destructive"
+      toast.error("Format invalide", {
+        description: "Veuillez sélectionner un fichier PDF"
       });
     }
   };
@@ -140,9 +138,8 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
       }));
       setPageResults(initialResults);
 
-      toast({
-        title: "OCR local en cours",
-        description: `Utilisation de Tesseract.js (open-source) - ${numPages} pages à traiter`,
+      toast.info("OCR local en cours", {
+        description: `Utilisation de Tesseract.js (open-source) - ${numPages} pages à traiter`
       });
 
       // Process each page
@@ -178,17 +175,14 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
         setProgress(Math.round((i / numPages) * 100));
       }
 
-      toast({
-        title: "OCR terminé",
+      toast.success("OCR terminé", {
         description: `${numPages} pages traitées avec Tesseract.js (local)`
       });
 
     } catch (error: any) {
       console.error('PDF processing error:', error);
-      toast({
-        title: "Erreur",
-        description: error.message,
-        variant: "destructive"
+      toast.error("Erreur", {
+        description: error.message
       });
     } finally {
       setIsProcessing(false);
@@ -198,10 +192,8 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
   // Save OCR results to database
   const saveToDatabase = async () => {
     if (pageResults.length === 0) {
-      toast({
-        title: "Erreur",
-        description: "Effectuez l'OCR d'abord",
-        variant: "destructive"
+      toast.error("Erreur", {
+        description: "Effectuez l'OCR d'abord"
       });
       return;
     }
@@ -292,17 +284,14 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
           .update({ digital_library_document_id: newDoc.id, is_digitized: true })
           .eq('id', cbnDoc.id);
         
-        toast({
-          title: "Document créé",
+        toast.success("Document créé", {
           description: `Nouveau document "${fileName}" créé automatiquement`
         });
       }
       
       if (!documentId) {
-        toast({
-          title: "Erreur",
-          description: "Sélectionnez un document ou chargez un fichier PDF",
-          variant: "destructive"
+        toast.error("Erreur", {
+          description: "Sélectionnez un document ou chargez un fichier PDF"
         });
         return;
       }
@@ -383,8 +372,7 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
         console.warn('Could not sync unified index:', syncError);
       }
 
-      toast({
-        title: "✓ Enregistrement réussi",
+      toast.success("✓ Enregistrement réussi", {
         description: `Fichier PDF enregistré avec ${successPages.length} pages OCR liées. Document indexé pour la recherche.`,
         duration: 6000
       });
@@ -394,10 +382,8 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
 
     } catch (error: any) {
       console.error('Save error:', error);
-      toast({
-        title: "Erreur d'enregistrement",
-        description: error.message,
-        variant: "destructive"
+      toast.error("Erreur d'enregistrement", {
+        description: error.message
       });
     }
   };
@@ -424,8 +410,7 @@ export default function PdfOcrTool({ preSelectedDocumentId, preSelectedDocumentT
     const text = successPages.map(p => p.text).join('\n\n');
     
     await navigator.clipboard.writeText(text);
-    toast({
-      title: "Copié",
+    toast.success("Copié", {
       description: "Texte copié dans le presse-papiers"
     });
   };
