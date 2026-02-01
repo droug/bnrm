@@ -429,14 +429,35 @@ export default function DocumentsManager() {
           const filePath = `documents/${fileName}`;
           
           console.log('[ADD DOC] Récupération de la session...');
-          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-          
+          let { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
           if (sessionError) {
             console.error('[ADD DOC] Erreur session:', sessionError);
             throw new Error("Erreur de session. Veuillez vous reconnecter.");
           }
-          
-          const accessToken = session?.access_token;
+
+          if (!session) {
+            console.error('[ADD DOC] Pas de session');
+            throw new Error("Session expirée. Veuillez vous reconnecter puis réessayer le téléversement.");
+          }
+
+          // IMPORTANT: l'upload via XHR ne bénéficie pas de l'auto-refresh de supabase-js.
+          // Sur des fichiers lourds, un token proche de l'expiration peut échouer côté Storage.
+          const nowSec = Math.floor(Date.now() / 1000);
+          const expiresAt = session.expires_at ?? 0;
+          const secondsLeft = expiresAt - nowSec;
+
+          if (secondsLeft > 0 && secondsLeft < 120) {
+            console.log('[ADD DOC] Token proche de l\'expiration (', secondsLeft, 's). Refresh session...');
+            const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
+            if (refreshError) {
+              console.error('[ADD DOC] Erreur refreshSession:', refreshError);
+              throw new Error("Session expirée. Veuillez rafraîchir la page ou vous reconnecter, puis réessayer.");
+            }
+            session = refreshData.session ?? session;
+          }
+
+          const accessToken = session.access_token;
 
           if (!accessToken) {
             console.error('[ADD DOC] Pas de token d\'accès');
@@ -473,6 +494,13 @@ export default function DocumentsManager() {
                   const response = JSON.parse(xhr.responseText);
                   if (response.error || response.message) {
                     errorMessage = response.error || response.message;
+                  }
+                  if (
+                    typeof response?.message === 'string' &&
+                    response.message.toLowerCase().includes('exp') &&
+                    response.message.toLowerCase().includes('timestamp')
+                  ) {
+                    errorMessage = "Session expirée pendant le téléversement. Rafraîchissez la page ou reconnectez-vous puis réessayez.";
                   }
                 } catch (e) {
                   errorMessage = xhr.statusText || errorMessage;
@@ -2513,7 +2541,7 @@ export default function DocumentsManager() {
                           {(addDocument.isPending || isUploading) ? (
                             <>
                               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                              {isUploading ? "Téléversement..." : "Ajout..."}
+                              {isUploading ? `Téléversement... ${uploadProgress}%` : "Ajout..."}
                             </>
                           ) : (
                             "Ajouter le document"
