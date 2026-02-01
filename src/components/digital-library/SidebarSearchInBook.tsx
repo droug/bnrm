@@ -17,10 +17,11 @@ interface SearchResult {
 interface SidebarSearchInBookProps {
   documentId: string;
   onPageSelect: (pageNumber: number, highlightText?: string) => void;
+  /** @deprecated Cette prop n'est plus utilisée, la vérification se fait directement via la base de données */
   isOcrProcessed?: boolean;
 }
 
-export function SidebarSearchInBook({ documentId, onPageSelect, isOcrProcessed = false }: SidebarSearchInBookProps) {
+export function SidebarSearchInBook({ documentId, onPageSelect }: SidebarSearchInBookProps) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
@@ -28,29 +29,41 @@ export function SidebarSearchInBook({ documentId, onPageSelect, isOcrProcessed =
   const [hasOcrPages, setHasOcrPages] = useState<boolean | null>(null);
 
   // Vérifier si le document a des pages OCR indexées
+  // On vérifie directement dans la base de données, indépendamment du flag isOcrProcessed
+  // car celui-ci peut être désynchronisé ou mis à jour tardivement
   useEffect(() => {
     const checkOcrPages = async () => {
-      if (!documentId || !isOcrProcessed) {
+      if (!documentId) {
         setHasOcrPages(false);
         return;
       }
       
       try {
+        console.log('[SidebarSearchInBook] Vérification pages OCR pour document:', documentId);
+        
+        // Vérifier directement si des pages avec texte OCR existent
         const { count, error } = await supabase
           .from('digital_library_pages')
           .select('*', { count: 'exact', head: true })
-          .eq('document_id', documentId);
+          .eq('document_id', documentId)
+          .not('ocr_text', 'is', null);
         
-        if (error) throw error;
-        setHasOcrPages((count || 0) > 0);
+        if (error) {
+          console.error('[SidebarSearchInBook] Erreur requête pages:', error);
+          throw error;
+        }
+        
+        const hasPages = (count || 0) > 0;
+        console.log('[SidebarSearchInBook] Pages OCR trouvées:', count, '- hasOcrPages:', hasPages);
+        setHasOcrPages(hasPages);
       } catch (error) {
-        console.error('Erreur vérification OCR:', error);
+        console.error('[SidebarSearchInBook] Erreur vérification OCR:', error);
         setHasOcrPages(false);
       }
     };
 
     checkOcrPages();
-  }, [documentId, isOcrProcessed]);
+  }, [documentId]);
 
   const performSearch = async () => {
     if (!query.trim() || query.length < 2) {
@@ -179,10 +192,7 @@ export function SidebarSearchInBook({ documentId, onPageSelect, isOcrProcessed =
           <FileText className="h-12 w-12 mx-auto mb-3 opacity-50" />
           <p className="text-sm font-medium">Recherche non disponible</p>
           <p className="text-xs mt-2">
-            {!isOcrProcessed 
-              ? "Ce document n'a pas encore été traité par OCR."
-              : "Le texte OCR de ce document n'a pas encore été indexé."
-            }
+            Ce document n'a pas encore été traité par OCR ou le texte n'a pas été indexé.
           </p>
           <p className="text-xs mt-1">La recherche textuelle sera disponible après le traitement.</p>
           <a 
