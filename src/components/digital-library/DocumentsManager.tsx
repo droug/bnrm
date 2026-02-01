@@ -111,6 +111,7 @@ export default function DocumentsManager() {
   const [uploadFile, setUploadFile] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [documentAddedSuccess, setDocumentAddedSuccess] = useState(false);
   
   // Delete confirmation states
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -577,10 +578,8 @@ export default function DocumentsManager() {
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] });
-      setShowAddDialog(false);
-      setUploadFile(null);
-      setUploadProgress(0);
-      form.reset();
+      // Ne pas fermer la modale - afficher le succès à l'intérieur
+      setDocumentAddedSuccess(true);
       toast({
         title: result?.mode === 'update' ? "Document mis à jour" : "Document ajouté avec succès",
         description: result?.autoIndexed ? "Texte détecté et indexé automatiquement. Recherche disponible." : undefined,
@@ -2104,7 +2103,14 @@ export default function DocumentsManager() {
             </Button>
           </div>
 
-          <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+          <Dialog open={showAddDialog} onOpenChange={(open) => {
+            setShowAddDialog(open);
+            if (!open) {
+              setDocumentAddedSuccess(false);
+              setUploadFile(null);
+              setUploadProgress(0);
+            }
+          }}>
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
                 <DialogTitle>Ajouter un document</DialogTitle>
@@ -2397,27 +2403,56 @@ export default function DocumentsManager() {
                     />
                   </div>
 
+                  {/* Success message after document upload */}
+                  {documentAddedSuccess && (
+                    <Alert className="border-green-500 bg-green-50">
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <AlertTitle className="text-green-700">Document ajouté avec succès</AlertTitle>
+                      <AlertDescription className="text-green-600">
+                        Le document a été téléversé, enregistré dans la base de données et indexé dans la GED.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
                   <DialogFooter>
-                    <Button 
-                      type="button" 
-                      variant="outline" 
-                      onClick={() => {
-                        setShowAddDialog(false);
-                        setUploadFile(null);
-                      }}
-                    >
-                      Annuler
-                    </Button>
-                    <Button type="submit" disabled={addDocument.isPending || isUploading}>
-                      {(addDocument.isPending || isUploading) ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          {isUploading ? "Téléversement..." : "Ajout..."}
-                        </>
-                      ) : (
-                        "Ajouter le document"
-                      )}
-                    </Button>
+                    {documentAddedSuccess ? (
+                      <Button 
+                        type="button" 
+                        onClick={() => {
+                          setShowAddDialog(false);
+                          setUploadFile(null);
+                          setUploadProgress(0);
+                          setDocumentAddedSuccess(false);
+                          form.reset();
+                        }}
+                      >
+                        Fermer
+                      </Button>
+                    ) : (
+                      <>
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          onClick={() => {
+                            setShowAddDialog(false);
+                            setUploadFile(null);
+                            setDocumentAddedSuccess(false);
+                          }}
+                        >
+                          Annuler
+                        </Button>
+                        <Button type="submit" disabled={addDocument.isPending || isUploading}>
+                          {(addDocument.isPending || isUploading) ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              {isUploading ? "Téléversement..." : "Ajout..."}
+                            </>
+                          ) : (
+                            "Ajouter le document"
+                          )}
+                        </Button>
+                      </>
+                    )}
                   </DialogFooter>
                 </form>
               </Form>
