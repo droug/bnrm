@@ -31,6 +31,7 @@ import Tesseract from 'tesseract.js';
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { detectPdfEmbeddedText } from '@/utils/pdfTextDetection';
 import { extractTextFromPdf, extractTextFromPdfFile, type ExtractionProgress } from '@/utils/pdfTextExtractor';
+import { uploadToSupabaseStorage } from "@/utils/supabaseStorageUpload";
 
 // Map language codes to Tesseract language codes
 const TESSERACT_LANG_MAP: Record<string, string> = {
@@ -466,65 +467,32 @@ export default function DocumentsManager() {
           
           console.log('[ADD DOC] Session OK, début upload vers Storage...');
           setUploadProgress(25);
-          
-          const uploadUrl = `https://safeppmznupzqkqmzjzt.supabase.co/storage/v1/object/digital-library/${filePath}`;
-          
-          await new Promise<void>((resolve, reject) => {
-            const xhr = new XMLHttpRequest();
-            
-            xhr.upload.addEventListener('progress', (event) => {
-              if (event.lengthComputable) {
-                // Map 0-100% to 25-90% range for UI
-                const rawProgress = Math.round((event.loaded / event.total) * 100);
-                const mappedProgress = 25 + Math.round(rawProgress * 0.65);
-                console.log('[ADD DOC] Upload progress:', rawProgress, '% -> UI:', mappedProgress, '%');
-                setUploadProgress(mappedProgress);
-              }
-            });
-            
-            xhr.addEventListener('load', () => {
-              console.log('[ADD DOC] XHR load, status:', xhr.status, 'response:', xhr.responseText?.substring(0, 200));
-              if (xhr.status >= 200 && xhr.status < 300) {
-                setUploadProgress(92);
-                resolve();
-              } else {
-                // Try to parse error message from response
-                let errorMessage = `Erreur d'upload (${xhr.status})`;
-                try {
-                  const response = JSON.parse(xhr.responseText);
-                  if (response.error || response.message) {
-                    errorMessage = response.error || response.message;
-                  }
-                  if (
-                    typeof response?.message === 'string' &&
-                    response.message.toLowerCase().includes('exp') &&
-                    response.message.toLowerCase().includes('timestamp')
-                  ) {
-                    errorMessage = "Session expirée pendant le téléversement. Rafraîchissez la page ou reconnectez-vous puis réessayez.";
-                  }
-                } catch (e) {
-                  errorMessage = xhr.statusText || errorMessage;
-                }
-                reject(new Error(errorMessage));
-              }
-            });
-            
-            xhr.addEventListener('error', (e) => {
-              console.error('[ADD DOC] XHR error event:', e);
-              reject(new Error('Erreur réseau lors du téléversement'));
-            });
-            
-            xhr.addEventListener('abort', () => {
-              console.error('[ADD DOC] XHR abort');
-              reject(new Error('Téléversement annulé'));
-            });
-            
-            xhr.open('POST', uploadUrl);
-            xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
-            xhr.setRequestHeader('x-upsert', 'true'); // Allow overwriting existing files
-            xhr.setRequestHeader('Cache-Control', '3600');
-            xhr.send(uploadFile);
+
+          // NOTE: l'upload direct Storage est souvent limité (~50MB) ;
+          // on bascule automatiquement vers un upload resumable (TUS) pour les gros PDF.
+          const supabaseBaseUrl =
+            ((supabase as any)?.supabaseUrl as string | undefined) ||
+            "https://safeppmznupzqkqmzjzt.supabase.co";
+          const supabaseAnonKey = (supabase as any)?.supabaseKey as string | undefined;
+
+          await uploadToSupabaseStorage({
+            baseUrl: supabaseBaseUrl,
+            apikey: supabaseAnonKey,
+            bucket: "digital-library",
+            filePath,
+            file: uploadFile,
+            accessToken,
+            upsert: true,
+            cacheControl: "3600",
+            onProgress: (bytesUploaded, bytesTotal) => {
+              const rawProgress = Math.round((bytesUploaded / bytesTotal) * 100);
+              const mappedProgress = 25 + Math.round(rawProgress * 0.65);
+              console.log('[ADD DOC] Upload progress:', rawProgress, '% -> UI:', mappedProgress, '%');
+              setUploadProgress(mappedProgress);
+            },
           });
+
+          setUploadProgress(92);
 
           console.log('[ADD DOC] Upload terminé, récupération URL publique...');
           setUploadProgress(95);
