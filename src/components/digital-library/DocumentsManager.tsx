@@ -2094,7 +2094,7 @@ export default function DocumentsManager() {
               <FileDown className="h-4 w-4 mr-2" />
               Télécharger le modèle
             </Button>
-            <Button variant="outline" onClick={() => navigate("/admin/digital-library/bulk-import")}>
+            <Button onClick={() => navigate("/admin/digital-library/bulk-import")}>
               <Upload className="h-4 w-4 mr-2" />
               Import en masse
             </Button>
@@ -3635,34 +3635,16 @@ export default function DocumentsManager() {
               </div>
             )}
             
-            {/* PDF upload option when no PDF exists */}
-            {!ocrDocumentTarget?.pdf_url && (
-              <div className="space-y-2">
-                <Label htmlFor="ocr-pdf-upload">Fichier PDF</Label>
-                <div className="flex items-center gap-2">
-                  <Input
-                    id="ocr-pdf-upload"
-                    type="file"
-                    accept=".pdf"
-                    onChange={(e) => setOcrPdfFile(e.target.files?.[0] || null)}
-                    className="flex-1"
-                  />
-                  {ocrPdfFile && (
-                    <Badge variant="secondary" className="whitespace-nowrap">
-                      {(ocrPdfFile.size / 1024 / 1024).toFixed(1)} Mo
-                    </Badge>
-                  )}
+            {/* PDF upload option when no PDF exists AND no pages with images */}
+            {!ocrDocumentTarget?.pdf_url && ocrExistingPagesCount === 0 && (
+              <div className="p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
+                <div className="flex items-center gap-2 text-destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <span className="text-sm font-medium">Aucun fichier PDF associé</span>
                 </div>
-                {ocrPdfFile && (
-                  <p className="text-xs text-green-600">
-                    ✓ Fichier sélectionné : {ocrPdfFile.name}
-                  </p>
-                )}
-                {!ocrPdfFile && ocrExistingPagesCount === 0 && (
-                  <p className="text-xs text-muted-foreground">
-                    Sélectionnez le fichier PDF à traiter
-                  </p>
-                )}
+                <p className="text-xs text-muted-foreground mt-1">
+                  Ce document n'a pas de fichier PDF enregistré. Veuillez d'abord modifier le document pour téléverser un fichier PDF.
+                </p>
               </div>
             )}
             
