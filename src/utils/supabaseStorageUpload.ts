@@ -103,9 +103,13 @@ async function uploadResumableTus(opts: UploadOpts): Promise<void> {
   await new Promise<void>((resolve, reject) => {
     const upload = new tus.Upload(file, {
       endpoint,
-      chunkSize: 6 * 1024 * 1024, // 6MB chunks
+      // Some proxies reject large request bodies during the initial POST when
+      // uploadDataDuringCreation=true. Keep chunks small to avoid 413.
+      chunkSize: 4 * 1024 * 1024, // 4MB chunks
       retryDelays: [0, 1000, 3000, 5000, 10000],
-      uploadDataDuringCreation: true,
+      // Avoid sending the first chunk in the creation request (POST), which can
+      // trigger "Maximum size exceeded" on certain gateways.
+      uploadDataDuringCreation: false,
       removeFingerprintOnSuccess: true,
       headers: {
         // tus-js-client / Supabase docs utilisent souvent 'authorization' en minuscule
