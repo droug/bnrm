@@ -6,7 +6,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { FileText, Upload, FileSearch, UploadCloud, Wand2, Loader2, CheckCircle2, AlertCircle, FileSpreadsheet, Film, Mic, Languages } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import SingleDocumentImport from "./SingleDocumentImport";
+
 import BulkDocumentImport from "./BulkDocumentImport";
 import BulkPdfImport from "./BulkPdfImport";
 import BulkAudiovisualImport from "./BulkAudiovisualImport";
@@ -130,11 +130,7 @@ export default function DigitalLibraryDocumentImporter({
       </Card>
 
       <Tabs defaultValue={defaultTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-7">
-          <TabsTrigger value="single" className="flex items-center gap-2">
-            <FileText className="h-4 w-4" />
-            <span className="hidden sm:inline">Unitaire</span>
-          </TabsTrigger>
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="bulk-pdf" className="flex items-center gap-2">
             <Upload className="h-4 w-4" />
             <span className="hidden sm:inline">PDF</span>
@@ -163,10 +159,6 @@ export default function DigitalLibraryDocumentImporter({
             <span className="sm:hidden">HTR</span>
           </TabsTrigger>
         </TabsList>
-
-        <TabsContent value="single">
-          <SingleDocumentImport onSuccess={onSuccess} />
-        </TabsContent>
 
         <TabsContent value="bulk-pdf">
           <BulkPdfImport onSuccess={onSuccess} />
