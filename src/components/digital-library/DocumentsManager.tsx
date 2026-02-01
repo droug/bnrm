@@ -326,7 +326,12 @@ export default function DocumentsManager() {
   // Add document
   const addDocument = useMutation({
     mutationFn: async (values: z.infer<typeof documentSchema>) => {
-      console.log("[ADD DOC] mutationFn appelée avec:", { values, uploadFile: uploadFile?.name });
+      console.log("[ADD DOC] mutationFn appelée avec:", { 
+        values, 
+        uploadFileName: uploadFile?.name,
+        uploadFileSize: uploadFile?.size,
+        uploadFileType: uploadFile?.type
+      });
       
       // Validate that either a file is uploaded or a cote is provided
       if (!values.cote || values.cote.trim() === '') {
@@ -339,8 +344,9 @@ export default function DocumentsManager() {
         throw new Error("Veuillez téléverser un fichier PDF ou fournir une URL de fichier.");
       }
       
-      console.log("[ADD DOC] Validation OK, début upload...");
+      console.log("[ADD DOC] Validation OK, début du processus...");
       setIsUploading(true);
+      setUploadProgress(5); // Show some initial progress
       
       try {
         // First, check if a cbn_document with this cote already exists
@@ -390,11 +396,15 @@ export default function DocumentsManager() {
         let uploadedPdfUrl = values.file_url || null;
         let detectedOcrProcessed = false;
         
+        console.log('[ADD DOC] Préparation upload, fichier:', uploadFile?.name);
+        setUploadProgress(10);
+        
         if (uploadFile) {
           // Detect if PDF already has embedded text (already OCR'd or born-digital)
           if (uploadFile.type === 'application/pdf') {
             try {
               console.log('[ADD DOC] Détection de texte embarqué dans le PDF...');
+              setUploadProgress(15);
               const detection = await detectPdfEmbeddedText(uploadFile, 3);
               if (detection.hasEmbeddedText && detection.confidence !== 'low') {
                 detectedOcrProcessed = true;
@@ -404,6 +414,9 @@ export default function DocumentsManager() {
               console.warn('[ADD DOC] Erreur détection OCR:', detectionError);
             }
           }
+          
+          setUploadProgress(20);
+          
           // Sanitize filename: remove special chars, accents, spaces
           const sanitizedCote = values.cote
             .normalize("NFD")
@@ -415,15 +428,23 @@ export default function DocumentsManager() {
           const fileName = `${sanitizedCote}_${Date.now()}.${fileExtension}`;
           const filePath = `documents/${fileName}`;
           
-          // Upload with progress tracking using XMLHttpRequest
-          setUploadProgress(0);
+          console.log('[ADD DOC] Récupération de la session...');
+          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
           
-          const { data: { session } } = await supabase.auth.getSession();
+          if (sessionError) {
+            console.error('[ADD DOC] Erreur session:', sessionError);
+            throw new Error("Erreur de session. Veuillez vous reconnecter.");
+          }
+          
           const accessToken = session?.access_token;
 
-           if (!accessToken) {
-             throw new Error("Session expirée. Veuillez vous reconnecter puis réessayer le téléversement.");
-           }
+          if (!accessToken) {
+            console.error('[ADD DOC] Pas de token d\'accès');
+            throw new Error("Session expirée. Veuillez vous reconnecter puis réessayer le téléversement.");
+          }
+          
+          console.log('[ADD DOC] Session OK, début upload vers Storage...');
+          setUploadProgress(25);
           
           const uploadUrl = `https://safeppmznupzqkqmzjzt.supabase.co/storage/v1/object/digital-library/${filePath}`;
           
@@ -432,37 +453,64 @@ export default function DocumentsManager() {
             
             xhr.upload.addEventListener('progress', (event) => {
               if (event.lengthComputable) {
-                const progress = Math.round((event.loaded / event.total) * 100);
-                setUploadProgress(progress);
+                // Map 0-100% to 25-90% range for UI
+                const rawProgress = Math.round((event.loaded / event.total) * 100);
+                const mappedProgress = 25 + Math.round(rawProgress * 0.65);
+                console.log('[ADD DOC] Upload progress:', rawProgress, '% -> UI:', mappedProgress, '%');
+                setUploadProgress(mappedProgress);
               }
             });
             
             xhr.addEventListener('load', () => {
+              console.log('[ADD DOC] XHR load, status:', xhr.status, 'response:', xhr.responseText?.substring(0, 200));
               if (xhr.status >= 200 && xhr.status < 300) {
+                setUploadProgress(92);
                 resolve();
               } else {
-                reject(new Error(`Erreur d'upload: ${xhr.statusText || 'Échec du téléversement'}`));
+                // Try to parse error message from response
+                let errorMessage = `Erreur d'upload (${xhr.status})`;
+                try {
+                  const response = JSON.parse(xhr.responseText);
+                  if (response.error || response.message) {
+                    errorMessage = response.error || response.message;
+                  }
+                } catch (e) {
+                  errorMessage = xhr.statusText || errorMessage;
+                }
+                reject(new Error(errorMessage));
               }
             });
             
-            xhr.addEventListener('error', () => {
+            xhr.addEventListener('error', (e) => {
+              console.error('[ADD DOC] XHR error event:', e);
               reject(new Error('Erreur réseau lors du téléversement'));
+            });
+            
+            xhr.addEventListener('abort', () => {
+              console.error('[ADD DOC] XHR abort');
+              reject(new Error('Téléversement annulé'));
             });
             
             xhr.open('POST', uploadUrl);
             xhr.setRequestHeader('Authorization', `Bearer ${accessToken}`);
-            xhr.setRequestHeader('x-upsert', 'false');
+            xhr.setRequestHeader('x-upsert', 'true'); // Allow overwriting existing files
             xhr.setRequestHeader('Cache-Control', '3600');
             xhr.send(uploadFile);
           });
 
+          console.log('[ADD DOC] Upload terminé, récupération URL publique...');
+          setUploadProgress(95);
+          
           // Get the public URL
           const { data: publicUrlData } = supabase.storage
             .from('digital-library')
             .getPublicUrl(filePath);
 
           uploadedPdfUrl = publicUrlData.publicUrl;
+          console.log('[ADD DOC] URL publique:', uploadedPdfUrl);
         }
+        
+        setUploadProgress(96);
 
         const resolvedTitle = values.title || existingCbn?.title || `Document ${values.cote}`;
         const resolvedAuthor = values.author || existingCbn?.author || null;
@@ -473,7 +521,11 @@ export default function DocumentsManager() {
 
         let docId: string;
 
+        console.log('[ADD DOC] Mode:', mode, '- Création/mise à jour du document...');
+        setUploadProgress(97);
+
         if (mode === 'update' && targetDocId) {
+          console.log('[ADD DOC] Mise à jour document existant:', targetDocId);
           const { error: updateError } = await supabase
             .from('digital_library_documents')
             .update({
@@ -491,9 +543,14 @@ export default function DocumentsManager() {
             })
             .eq('id', targetDocId);
 
-          if (updateError) throw updateError;
+          if (updateError) {
+            console.error('[ADD DOC] Erreur mise à jour:', updateError);
+            throw updateError;
+          }
           docId = targetDocId;
+          console.log('[ADD DOC] Document mis à jour avec succès');
         } else {
+          console.log('[ADD DOC] Création nouveau document avec cbn_document_id:', cbnDocumentId);
           // Create the digital_library_document
           const { data: newDoc, error: dlError } = await supabase
             .from('digital_library_documents')
@@ -515,9 +572,15 @@ export default function DocumentsManager() {
             .select('id')
             .single();
 
-          if (dlError) throw dlError;
+          if (dlError) {
+            console.error('[ADD DOC] Erreur création:', dlError);
+            throw dlError;
+          }
           docId = newDoc.id;
+          console.log('[ADD DOC] Document créé avec succès, id:', docId);
         }
+        
+        setUploadProgress(98);
 
         // Si le PDF est détecté comme déjà OCRisé, extraire et indexer le texte
         if (detectedOcrProcessed && uploadFile) {
@@ -570,7 +633,12 @@ export default function DocumentsManager() {
           console.log('Document enregistré dans la GED:', gedResult.gedDocumentId);
         }
 
+        setUploadProgress(100);
+        console.log('[ADD DOC] Processus terminé avec succès, docId:', docId);
         return { id: docId, mode, autoIndexed: detectedOcrProcessed };
+      } catch (error: any) {
+        console.error('[ADD DOC] Erreur dans mutationFn:', error);
+        throw error;
       } finally {
         setIsUploading(false);
         setUploadProgress(0);
