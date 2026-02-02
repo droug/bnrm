@@ -70,20 +70,43 @@ export default function Auth() {
     const hp = parseHashParams(location.hash);
     const access_token = hp.access_token;
     const refresh_token = hp.refresh_token;
+    const token = hp.token; // OTP token from generateLink
+    const type = hp.type;
 
-    if (!access_token || !refresh_token) return;
+    // Cas 1: Tokens de session complets (access_token + refresh_token)
+    if (access_token && refresh_token) {
+      hasTriedRecoverySession.current = true;
+      setIsLoading(true);
+      supabase.auth
+        .setSession({ access_token, refresh_token })
+        .then(({ error }) => {
+          if (error) {
+            toast.error("Lien invalide ou expiré", { description: error.message });
+          }
+        })
+        .finally(() => setIsLoading(false));
+      return;
+    }
 
-    hasTriedRecoverySession.current = true;
-
-    setIsLoading(true);
-    supabase.auth
-      .setSession({ access_token, refresh_token })
-      .then(({ error }) => {
-        if (error) {
-          toast.error("Lien invalide ou expiré", { description: error.message });
-        }
-      })
-      .finally(() => setIsLoading(false));
+    // Cas 2: Token OTP (recovery link from generateLink)
+    if (token && type === "recovery") {
+      hasTriedRecoverySession.current = true;
+      setIsLoading(true);
+      supabase.auth
+        .verifyOtp({ token_hash: token, type: "recovery" })
+        .then(({ data, error }) => {
+          if (error) {
+            console.error("OTP verification failed:", error);
+            toast.error("Lien invalide ou expiré", { 
+              description: "Veuillez demander un nouveau lien de réinitialisation." 
+            });
+          } else if (data?.session) {
+            console.log("OTP verified, session established");
+          }
+        })
+        .finally(() => setIsLoading(false));
+      return;
+    }
   }, [isResetFlow, location.hash]);
 
   if (user && !loading && !isResetFlow) {

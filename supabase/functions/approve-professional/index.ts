@@ -263,8 +263,30 @@ serve(async (req) => {
       if (linkError) {
         console.error("Error generating recovery link:", linkError);
       } else if (linkData?.properties?.action_link) {
-        passwordResetLink = linkData.properties.action_link;
-        console.log("Password reset link generated successfully");
+        // Le lien brut pointe vers Supabase (xxx.supabase.co/auth/v1/verify?...).
+        // On le transforme pour qu'il pointe directement vers le site avec les tokens dans le hash.
+        const rawLink = linkData.properties.action_link;
+        console.log("Raw action_link from Supabase:", rawLink);
+        
+        try {
+          const linkUrl = new URL(rawLink);
+          const token = linkUrl.searchParams.get("token");
+          const type = linkUrl.searchParams.get("type");
+          
+          if (token && type) {
+            // Construire le lien direct vers le site avec les tokens dans le hash
+            // Format: https://site.com/auth?reset=true#access_token=...&type=recovery
+            passwordResetLink = `${siteUrl}/auth?reset=true#token=${encodeURIComponent(token)}&type=${type}`;
+            console.log("Transformed password reset link for direct access");
+          } else {
+            // Fallback: utiliser le lien brut
+            passwordResetLink = rawLink;
+            console.log("Using raw link (no token/type found)");
+          }
+        } catch (parseError) {
+          console.error("Error parsing action_link:", parseError);
+          passwordResetLink = rawLink;
+        }
       }
     }
 
