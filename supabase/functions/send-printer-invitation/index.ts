@@ -11,7 +11,9 @@ const corsHeaders = {
 interface InvitationRequest {
   printerEmail: string;
   printerName: string;
+  printerPhone?: string;
   printerId: string;
+  notifyByPhone?: boolean;
 }
 
 serve(async (req) => {
@@ -21,7 +23,7 @@ serve(async (req) => {
   }
 
   try {
-    const { printerEmail, printerName, printerId } =
+    const { printerEmail, printerName, printerPhone, printerId, notifyByPhone } =
       (await req.json()) as InvitationRequest;
 
     console.log(`[PRINTER-INVITATION] Processing invitation for: ${printerName} <${printerEmail}>`);
@@ -45,7 +47,16 @@ serve(async (req) => {
     const baseUrl = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
     const encodedEmail = encodeURIComponent(printerEmail);
     const encodedName = encodeURIComponent(printerName);
-    const registrationUrl = `${baseUrl}/signup?type=printer&ref=${printerId}&email=${encodedEmail}&name=${encodedName}`;
+    const encodedPhone = printerPhone ? encodeURIComponent(printerPhone) : "";
+    const registrationUrl = `${baseUrl}/signup?type=printer&ref=${printerId}&email=${encodedEmail}&name=${encodedName}${encodedPhone ? `&phone=${encodedPhone}` : ""}`;
+
+    // Additional phone notification section in email
+    const phoneNotificationSection = notifyByPhone && printerPhone ? `
+    <div style="background: #e3f2fd; padding: 15px; border-radius: 6px; border-left: 4px solid #2196f3; margin: 20px 0;">
+      <p style="margin: 0; font-size: 14px;"><strong>📞 Contact téléphonique :</strong></p>
+      <p style="margin: 5px 0 0 0; font-size: 14px;">Vous pouvez également nous contacter au : <strong>${printerPhone}</strong></p>
+    </div>
+    ` : "";
 
     // Email content
     const emailSubject = "Invitation à rejoindre la plateforme BNRM - Dépôt Légal";
@@ -81,6 +92,8 @@ serve(async (req) => {
         Créer mon compte Imprimeur
       </a>
     </div>
+    
+    ${phoneNotificationSection}
     
     <div style="background: #fff3cd; padding: 15px; border-radius: 6px; border-left: 4px solid #ffc107; margin: 20px 0;">
       <p style="margin: 0; font-size: 14px;"><strong>Important :</strong> Votre inscription sera soumise à validation dans un délai de 10 jours ouvrables.</p>
@@ -125,6 +138,8 @@ serve(async (req) => {
         details: {
           email: printerEmail,
           name: printerName,
+          phone: printerPhone || null,
+          notifyByPhone: notifyByPhone || false,
           reason: emailResult.error || "Email delivery failed, manual follow-up required",
         },
       });
@@ -133,7 +148,8 @@ serve(async (req) => {
         JSON.stringify({ 
           success: false, 
           message: "Email queued for manual delivery",
-          error: emailResult.error
+          error: emailResult.error,
+          phoneNotificationRequired: notifyByPhone && printerPhone ? printerPhone : null,
         }),
         {
           status: 200,
@@ -152,6 +168,8 @@ serve(async (req) => {
       details: {
         email: printerEmail,
         name: printerName,
+        phone: printerPhone || null,
+        notifyByPhone: notifyByPhone || false,
         method: emailResult.method,
         messageId: emailResult.messageId,
       },
@@ -161,7 +179,8 @@ serve(async (req) => {
       JSON.stringify({ 
         success: true, 
         message: "Invitation sent successfully",
-        method: emailResult.method
+        method: emailResult.method,
+        phoneNotificationRequired: notifyByPhone && printerPhone ? printerPhone : null,
       }),
       {
         status: 200,
