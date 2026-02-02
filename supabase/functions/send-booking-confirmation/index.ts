@@ -1,5 +1,5 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import nodemailer from "npm:nodemailer@6.9.12";
+import { sendEmail } from "../_shared/smtp-client.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -25,96 +25,15 @@ interface BookingConfirmationRequest {
   contactCountry: string;
 }
 
-// Fonction d'envoi d'email via SMTP (configuration admin) avec fallback Resend
-async function sendEmail(
-  to: string,
-  subject: string,
-  html: string
-): Promise<{ success: boolean; error?: string; id?: string }> {
-  const SMTP_HOST = Deno.env.get("SMTP_HOST");
-  const SMTP_PORT = Deno.env.get("SMTP_PORT");
-  const SMTP_USER = Deno.env.get("SMTP_USER");
-  const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
-  const SMTP_FROM = Deno.env.get("SMTP_FROM");
-
-  // Essayer SMTP d'abord
-  if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASSWORD) {
-    try {
-      console.log(`[BOOKING-CONFIRM] Sending email via SMTP to: ${to}`);
-      
-      const port = parseInt(SMTP_PORT, 10);
-      const fromAddress = SMTP_FROM && SMTP_FROM.includes('@') ? SMTP_FROM : SMTP_USER;
-      
-      const transporter = nodemailer.createTransport({
-        host: SMTP_HOST,
-        port: port,
-        secure: port === 465,
-        auth: {
-          user: SMTP_USER,
-          pass: SMTP_PASSWORD,
-        },
-      });
-
-      const info = await transporter.sendMail({
-        from: fromAddress,
-        to: to,
-        subject: subject,
-        html: html,
-      });
-
-      console.log("[BOOKING-CONFIRM] Email sent successfully via SMTP, messageId:", info.messageId);
-      return { success: true, id: info.messageId };
-    } catch (error: any) {
-      console.error("[BOOKING-CONFIRM] SMTP error:", error.message);
-      // Continuer vers Resend
-    }
-  }
-
-  // Fallback vers Resend
-  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-  if (RESEND_API_KEY) {
-    try {
-      console.log(`[BOOKING-CONFIRM] Sending email via Resend (fallback) to: ${to}`);
-      
-      const response = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${RESEND_API_KEY}`,
-        },
-        body: JSON.stringify({
-          from: "BNRM Réservations <onboarding@resend.dev>",
-          to: [to],
-          subject: subject,
-          html: html,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        return { success: false, error: errorData.message };
-      }
-
-      const data = await response.json();
-      console.log("[BOOKING-CONFIRM] Email sent via Resend");
-      return { success: true, id: data.id };
-    } catch (error: any) {
-      return { success: false, error: error.message };
-    }
-  }
-
-  return { success: false, error: "No email service configured" };
-}
-
 const handler = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log("Received booking confirmation request");
+    console.log("[BOOKING-CONFIRM] Received booking confirmation request");
     const bookingData: BookingConfirmationRequest = await req.json();
-    console.log("Booking data:", JSON.stringify(bookingData, null, 2));
+    console.log("[BOOKING-CONFIRM] Booking data:", JSON.stringify(bookingData, null, 2));
 
     // Email HTML template pour le client
     const clientEmailHtml = `
@@ -185,14 +104,14 @@ const handler = async (req: Request): Promise<Response> => {
       </html>
     `;
 
-    // Envoyer l'email au client
-    const clientResult = await sendEmail(
-      bookingData.userEmail,
-      "Demande de réservation – Activités culturelles BNRM",
-      clientEmailHtml
-    );
+    // Envoyer l'email au client using unified SMTP
+    const clientResult = await sendEmail({
+      to: bookingData.userEmail,
+      subject: "Demande de réservation – Activités culturelles BNRM",
+      html: clientEmailHtml
+    });
 
-    console.log("Client email result:", clientResult);
+    console.log("[BOOKING-CONFIRM] Client email result:", clientResult);
 
     // Email admin
     const adminEmailHtml = `
@@ -236,21 +155,26 @@ const handler = async (req: Request): Promise<Response> => {
       </html>
     `;
 
-    // Envoyer email admin
-    const adminEmail = Deno.env.get("SMTP_FROM") || Deno.env.get("SMTP_USER") || "useryouness@gmail.com";
-    const adminResult = await sendEmail(
-      adminEmail,
-      `[BNRM] Nouvelle réservation - ${bookingData.eventTitle}`,
-      adminEmailHtml
-    );
+    // Envoyer email admin using unified SMTP
+    const SMTP_FROM = Deno.env.get("SMTP_FROM");
+    const SMTP_USER = Deno.env.get("SMTP_USER");
+    const adminEmail = SMTP_FROM || SMTP_USER || "useryouness@gmail.com";
+    
+    const adminResult = await sendEmail({
+      to: adminEmail,
+      subject: `[BNRM] Nouvelle réservation - ${bookingData.eventTitle}`,
+      html: adminEmailHtml
+    });
 
-    console.log("Admin email result:", adminResult);
+    console.log("[BOOKING-CONFIRM] Admin email result:", adminResult);
 
     return new Response(
       JSON.stringify({ 
         success: true,
-        clientEmailId: clientResult.id,
-        adminEmailId: adminResult.id
+        clientEmailSent: clientResult.success,
+        clientMethod: clientResult.method,
+        adminEmailSent: adminResult.success,
+        adminMethod: adminResult.method
       }),
       {
         status: 200,
@@ -258,7 +182,7 @@ const handler = async (req: Request): Promise<Response> => {
       }
     );
   } catch (error: any) {
-    console.error("Error in send-booking-confirmation function:", error);
+    console.error("[BOOKING-CONFIRM] Error:", error);
     return new Response(
       JSON.stringify({ error: error.message, details: error.toString() }),
       {
