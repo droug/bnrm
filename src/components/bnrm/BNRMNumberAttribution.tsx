@@ -1081,7 +1081,7 @@ export const BNRMNumberAttribution = () => {
             )}
           </TabsTrigger>
           <TabsTrigger value="number-requests" className="text-base font-medium">
-            Demandes N°
+            Demandes ISSN
           </TabsTrigger>
           <TabsTrigger value="attributions" className="text-base font-medium">Attribués</TabsTrigger>
           <TabsTrigger value="reserved" className="text-base font-medium">Gestion N°</TabsTrigger>
