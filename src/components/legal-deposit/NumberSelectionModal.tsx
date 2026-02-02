@@ -58,6 +58,16 @@ interface SelectedRequest {
       name?: string;
       organization?: string;
     };
+    editor?: {
+      name?: string;
+      email?: string;
+      city?: string;
+    };
+    publisher?: {
+      name?: string;
+      email?: string;
+      city?: string;
+    };
     publisher_name?: string;
     publisher_email?: string;
     email?: string;
@@ -94,12 +104,16 @@ export const NumberSelectionModal = ({
   const [activeTab, setActiveTab] = useState("declarant");
   const { toast } = useToast();
 
-  // Extraire les informations du déclarant
-  const declarantName = request?.author_name || 
-                        request?.metadata?.declarant?.name || 
+  // Extraire les informations du déclarant depuis la structure metadata réelle
+  const declarantName = request?.metadata?.editor?.name || 
+                        request?.metadata?.publisher?.name || 
+                        request?.metadata?.declarant?.name ||
                         request?.metadata?.publisher_name || 
+                        request?.author_name || 
                         '';
-  const declarantEmail = request?.metadata?.publisher_email || 
+  const declarantEmail = request?.metadata?.editor?.email || 
+                         request?.metadata?.publisher?.email ||
+                         request?.metadata?.publisher_email || 
                          request?.metadata?.email ||
                          '';
 
