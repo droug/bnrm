@@ -4,9 +4,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, Clock, Download, Eye } from "lucide-react";
+import { FileText, Clock, Download, Eye, History, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { ActivityTimeline } from "./ActivityTimeline";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface ReproductionRequest {
   id: string;
@@ -23,6 +25,19 @@ export function MyReproductionRequests() {
   const navigate = useNavigate();
   const [requests, setRequests] = useState<ReproductionRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedRequests, setExpandedRequests] = useState<Set<string>>(new Set());
+
+  const toggleExpand = (id: string) => {
+    setExpandedRequests(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
 
   useEffect(() => {
     if (user) {
@@ -129,7 +144,7 @@ export function MyReproductionRequests() {
                       )}
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 mb-3">
                       <Button
                         size="sm"
                         variant="outline"
@@ -138,7 +153,31 @@ export function MyReproductionRequests() {
                         <Eye className="h-4 w-4 mr-1" />
                         Voir détails
                       </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => toggleExpand(request.id)}
+                      >
+                        <History className="h-4 w-4 mr-1" />
+                        Historique
+                        {expandedRequests.has(request.id) ? (
+                          <ChevronUp className="h-4 w-4 ml-1" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4 ml-1" />
+                        )}
+                      </Button>
                     </div>
+
+                    {/* Timeline des opérations */}
+                    <Collapsible open={expandedRequests.has(request.id)}>
+                      <CollapsibleContent className="pt-2 border-t">
+                        <ActivityTimeline 
+                          resourceType="reproduction" 
+                          resourceId={request.id} 
+                          compact 
+                        />
+                      </CollapsibleContent>
+                    </Collapsible>
                   </CardContent>
                 </Card>
               ))}
