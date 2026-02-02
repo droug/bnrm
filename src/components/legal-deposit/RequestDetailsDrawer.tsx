@@ -16,7 +16,8 @@ import {
   Layers,
   X,
   ExternalLink,
-  CheckCircle
+  CheckCircle,
+  Printer
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -34,6 +35,7 @@ export const RequestDetailsDrawer = ({ isOpen, onClose, request }: RequestDetail
   const publication = metadata.publication || {};
   // Déclarant peut être dans metadata.declarant ou directement sur request
   const declarant = metadata.declarant || request.declarant || {};
+  const printer = metadata.printer || request.printer || {};
   const support = metadata.support || {};
   
   // Résolution du nom du déclarant
@@ -55,6 +57,25 @@ export const RequestDetailsDrawer = ({ isOpen, onClose, request }: RequestDetail
   const declarantCity = typeof declarant === 'object'
     ? declarant.city
     : (metadata.city || request.city);
+
+  // Résolution des infos de l'imprimeur
+  const printerName = typeof printer === 'object' 
+    ? (printer.name || printer.full_name || printer.nom) 
+    : metadata.printer_name;
+  const printerEmail = typeof printer === 'object'
+    ? printer.email
+    : metadata.printer_email;
+  const printerPhone = typeof printer === 'object'
+    ? printer.phone
+    : metadata.printer_phone;
+  const printerAddress = typeof printer === 'object'
+    ? printer.address
+    : metadata.printer_address;
+  const printerCity = typeof printer === 'object'
+    ? printer.city
+    : metadata.printer_city;
+  
+  const hasPrinterInfo = printerName || printerEmail || printerPhone || printerAddress;
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
@@ -231,6 +252,46 @@ export const RequestDetailsDrawer = ({ isOpen, onClose, request }: RequestDetail
                 />
               </div>
             </section>
+
+            {/* Imprimeur (si présent) */}
+            {hasPrinterInfo && (
+              <>
+                <Separator />
+                <section>
+                  <SectionTitle>
+                    <Printer className="h-4 w-4" />
+                    Imprimeur
+                  </SectionTitle>
+                  <div className="space-y-1 bg-muted/20 rounded-lg p-4">
+                    <InfoRow 
+                      icon={Building} 
+                      label="Nom" 
+                      value={printerName} 
+                    />
+                    <InfoRow 
+                      icon={Mail} 
+                      label="Email" 
+                      value={printerEmail} 
+                    />
+                    <InfoRow 
+                      icon={Phone} 
+                      label="Téléphone" 
+                      value={printerPhone} 
+                    />
+                    <InfoRow 
+                      icon={MapPin} 
+                      label="Adresse" 
+                      value={printerAddress} 
+                    />
+                    <InfoRow 
+                      icon={MapPin} 
+                      label="Ville" 
+                      value={printerCity} 
+                    />
+                  </div>
+                </section>
+              </>
+            )}
 
             <Separator />
 
