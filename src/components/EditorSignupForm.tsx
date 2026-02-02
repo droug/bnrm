@@ -211,13 +211,12 @@ const EditorSignupForm = ({ prefillEmail, prefillName }: EditorSignupFormProps) 
     
     // Validation selon le type d'éditeur
     if (formData.type === "morale") {
-      if (!formData.nameAr) missingFields.push("Nom de l'éditeur (Arabe)");
+      // Nom arabe optionnel
       if (!formData.nameFr) missingFields.push("Nom de l'éditeur (Français)");
       if (!formData.commerceRegistry) missingFields.push("Registre de commerce");
       // Google Maps n'est plus obligatoire
     } else {
-      // Personne physique
-      if (!formData.editorNameAr) missingFields.push("Nom de l'éditeur (Arabe)");
+      // Personne physique - Nom arabe optionnel
       if (!formData.editorNameFr) missingFields.push("Nom de l'éditeur (Français)");
       if (!formData.cin) missingFields.push("Numéro CIN");
       if (!formData.cinFile) missingFields.push("Copie numérisée de la CNIE");
@@ -406,7 +405,7 @@ const EditorSignupForm = ({ prefillEmail, prefillName }: EditorSignupFormProps) 
               {/* Formulaire personne morale */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="nameAr">Nom de l'éditeur (Arabe) *</Label>
+                  <Label htmlFor="nameAr">Nom de l'éditeur (Arabe)</Label>
                   <ArabicInputWithKeyboard
                     value={formData.nameAr || ""}
                     onChange={(value) => setFormData(prev => ({ ...prev, nameAr: value }))}
@@ -493,7 +492,7 @@ const EditorSignupForm = ({ prefillEmail, prefillName }: EditorSignupFormProps) 
               {/* Formulaire personne physique */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="editorNameAr">Nom de l'éditeur (Arabe) *</Label>
+                  <Label htmlFor="editorNameAr">Nom de l'éditeur (Arabe)</Label>
                   <ArabicInputWithKeyboard
                     value={formData.editorNameAr || ""}
                     onChange={(value) => setFormData(prev => ({ ...prev, editorNameAr: value }))}

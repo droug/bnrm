@@ -191,13 +191,12 @@ const PrinterSignupForm = ({ prefillEmail, prefillName }: PrinterSignupFormProps
     
     // Validation selon le type d'imprimeur
     if (formData.type === "morale") {
-      if (!formData.nameAr) missingFields.push("Nom de l'imprimeur (Arabe)");
+      // Nom arabe optionnel
       if (!formData.nameFr) missingFields.push("Nom de l'imprimeur (Français)");
       if (!formData.commerceRegistry) missingFields.push("Registre de commerce");
       // Google Maps n'est plus obligatoire
     } else {
-      // Personne physique
-      if (!formData.printerNameAr) missingFields.push("Nom de l'imprimeur (Arabe)");
+      // Personne physique - Nom arabe optionnel
       if (!formData.printerNameFr) missingFields.push("Nom de l'imprimeur (Français)");
       if (!formData.cin) missingFields.push("Numéro CIN");
       if (!formData.cinFile) missingFields.push("Copie numérisée de la CNIE");
@@ -378,7 +377,7 @@ const PrinterSignupForm = ({ prefillEmail, prefillName }: PrinterSignupFormProps
               {/* Formulaire personne morale */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="nameAr">Nom de l'imprimeur (Arabe) *</Label>
+                  <Label htmlFor="nameAr">Nom de l'imprimeur (Arabe)</Label>
                   <ArabicInputWithKeyboard
                     value={formData.nameAr}
                     onChange={(value) => setFormData(prev => ({ ...prev, nameAr: value }))}
@@ -468,7 +467,7 @@ const PrinterSignupForm = ({ prefillEmail, prefillName }: PrinterSignupFormProps
               {/* Formulaire personne physique */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="printerNameAr">Nom de l'imprimeur (Arabe) *</Label>
+                  <Label htmlFor="printerNameAr">Nom de l'imprimeur (Arabe)</Label>
                   <ArabicInputWithKeyboard
                     value={formData.printerNameAr || ""}
                     onChange={(value) => setFormData(prev => ({ ...prev, printerNameAr: value }))}
