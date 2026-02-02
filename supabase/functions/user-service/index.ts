@@ -7,11 +7,12 @@ const corsHeaders = {
 };
 
 interface UserRequest {
-  action: 'get_profile' | 'update_profile' | 'get_roles' | 'assign_role' | 'get_permissions' | 'list_users';
+  action: 'get_profile' | 'update_profile' | 'get_roles' | 'assign_role' | 'get_permissions' | 'list_users' | 'delete_professional';
   user_id?: string;
   profile_data?: Record<string, any>;
   role?: string;
   filters?: Record<string, any>;
+  reason?: string;
 }
 
 serve(async (req) => {
@@ -194,6 +195,82 @@ serve(async (req) => {
         if (error) throw error;
 
         return new Response(JSON.stringify({ users: data }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+
+      case 'delete_professional': {
+        // Vérifier que l'utilisateur est admin
+        const { data: adminCheck } = await supabaseClient
+          .rpc('has_role', { _user_id: currentUser.id, _role: 'admin' });
+
+        if (!adminCheck) {
+          throw new Error("Seuls les administrateurs peuvent supprimer des comptes professionnels");
+        }
+
+        if (!user_id) {
+          throw new Error("L'ID utilisateur est requis");
+        }
+
+        console.log(`[USER-SERVICE] Deleting professional account: ${user_id}`);
+
+        // Récupérer les infos du profil avant suppression pour le log
+        const { data: profileToDelete } = await supabaseClient
+          .from('profiles')
+          .select('first_name, last_name, email, institution, role')
+          .eq('user_id', user_id)
+          .single();
+
+        // Récupérer les infos de la demande d'inscription
+        const { data: registrationRequest } = await supabaseClient
+          .from('professional_registration_requests')
+          .select('professional_type, company_name, registration_data')
+          .eq('user_id', user_id)
+          .single();
+
+        // Supprimer l'utilisateur de auth.users
+        // Grâce aux ON DELETE CASCADE, cela supprimera automatiquement:
+        // - profiles
+        // - user_roles
+        // - professional_registration_requests
+        // - professional_registration_documents
+        const { error: deleteError } = await supabaseClient.auth.admin.deleteUser(user_id);
+
+        if (deleteError) {
+          console.error('[USER-SERVICE] Error deleting user from auth:', deleteError);
+          throw new Error(`Erreur lors de la suppression: ${deleteError.message}`);
+        }
+
+        console.log(`[USER-SERVICE] User ${user_id} deleted successfully`);
+
+        // Log l'activité
+        await supabaseClient
+          .from('activity_logs')
+          .insert({
+            user_id: currentUser.id,
+            action: 'professional_account_deleted',
+            resource_type: 'professional',
+            resource_id: user_id,
+            details: {
+              deleted_user: {
+                name: profileToDelete ? `${profileToDelete.first_name} ${profileToDelete.last_name}` : 'N/A',
+                email: profileToDelete?.email,
+                institution: profileToDelete?.institution,
+                role: registrationRequest?.professional_type,
+                company_name: registrationRequest?.company_name,
+              },
+              reason: req.json().then ? undefined : undefined, // Optional reason
+              deleted_by: currentUser.email,
+              deleted_at: new Date().toISOString(),
+            },
+          });
+
+        return new Response(JSON.stringify({ 
+          success: true, 
+          message: "Compte professionnel supprimé avec succès",
+          deleted_user_id: user_id 
+        }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
           status: 200,
         });
