@@ -10858,7 +10858,7 @@ export type Database = {
           number_type: string
           range_end: string
           range_start: string
-          requester_id: string
+          requester_id: string | null
           reserved_by: string | null
           status: string | null
           total_numbers: number
@@ -10874,7 +10874,7 @@ export type Database = {
           number_type: string
           range_end: string
           range_start: string
-          requester_id: string
+          requester_id?: string | null
           reserved_by?: string | null
           status?: string | null
           total_numbers: number
@@ -10890,7 +10890,7 @@ export type Database = {
           number_type?: string
           range_end?: string
           range_start?: string
-          requester_id?: string
+          requester_id?: string | null
           reserved_by?: string | null
           status?: string | null
           total_numbers?: number
