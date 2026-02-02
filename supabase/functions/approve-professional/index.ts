@@ -433,12 +433,16 @@ serve(async (req) => {
                   Pour accéder à votre espace professionnel, vous devez créer votre mot de passe en cliquant sur le bouton ci-dessous.
                 </p>
                 <div style="text-align: center;">
-                  <a href="${passwordResetLink}" style="display: inline-block; background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: #ffffff; text-decoration: none; padding: 14px 30px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                  <a href="${passwordResetLink}" style="display: inline-block; background-color: #1e3a5f; color: #ffffff !important; text-decoration: none; padding: 14px 30px; border-radius: 8px; font-weight: 600; font-size: 16px; mso-padding-alt: 14px 30px;">
                     Créer mon mot de passe
                   </a>
                 </div>
                 <p style="color: #744210; font-size: 12px; margin-top: 15px; text-align: center;">
                   Ce lien est valide pendant 24 heures.
+                </p>
+                <p style="color: #744210; font-size: 11px; margin-top: 10px; word-break: break-all;">
+                  Si le bouton ne fonctionne pas, copiez ce lien dans votre navigateur :<br/>
+                  <a href="${passwordResetLink}" style="color: #1e3a5f; text-decoration: underline;">${passwordResetLink}</a>
                 </p>
               </div>
               ` : `
