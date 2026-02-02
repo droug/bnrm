@@ -50,14 +50,35 @@ export const RequestDetailsDrawer = ({ isOpen, onClose, request }: RequestDetail
     return <Badge variant={s.variant}>{s.label}</Badge>;
   };
 
-  const InfoRow = ({ icon: Icon, label, value }: { icon: any; label: string; value: string | undefined | null }) => {
-    if (!value) return null;
+  // Helper to safely convert value to string
+  const safeString = (val: any): string | null => {
+    if (val === null || val === undefined) return null;
+    if (typeof val === 'string') return val;
+    if (typeof val === 'number') return String(val);
+    if (typeof val === 'object') {
+      // If it's an object with a 'name' property, use that
+      if (val.name) return val.name;
+      // If it's an object with a 'title' property, use that
+      if (val.title) return val.title;
+      // Otherwise try to stringify it
+      try {
+        return JSON.stringify(val);
+      } catch {
+        return '[Objet]';
+      }
+    }
+    return String(val);
+  };
+
+  const InfoRow = ({ icon: Icon, label, value }: { icon: any; label: string; value: any }) => {
+    const stringValue = safeString(value);
+    if (!stringValue) return null;
     return (
       <div className="flex items-start gap-3 py-2">
         <Icon className="h-4 w-4 mt-0.5 text-muted-foreground flex-shrink-0" />
         <div className="flex-1 min-w-0">
           <p className="text-xs text-muted-foreground">{label}</p>
-          <p className="text-sm font-medium break-words">{value}</p>
+          <p className="text-sm font-medium break-words">{stringValue}</p>
         </div>
       </div>
     );
