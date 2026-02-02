@@ -9466,9 +9466,11 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string | null
+          deleted_at: string | null
           email: string | null
           google_maps_link: string | null
           id: string
+          is_validated: boolean | null
           name: string
           phone: string | null
           updated_at: string | null
@@ -9478,9 +9480,11 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           email?: string | null
           google_maps_link?: string | null
           id?: string
+          is_validated?: boolean | null
           name: string
           phone?: string | null
           updated_at?: string | null
@@ -9490,9 +9494,11 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           email?: string | null
           google_maps_link?: string | null
           id?: string
+          is_validated?: boolean | null
           name?: string
           phone?: string | null
           updated_at?: string | null
@@ -9979,9 +9985,11 @@ export type Database = {
           city: string | null
           country: string | null
           created_at: string | null
+          deleted_at: string | null
           email: string | null
           google_maps_link: string | null
           id: string
+          is_validated: boolean | null
           name: string
           phone: string | null
           publisher_type: string | null
@@ -9992,9 +10000,11 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           email?: string | null
           google_maps_link?: string | null
           id?: string
+          is_validated?: boolean | null
           name: string
           phone?: string | null
           publisher_type?: string | null
@@ -10005,9 +10015,11 @@ export type Database = {
           city?: string | null
           country?: string | null
           created_at?: string | null
+          deleted_at?: string | null
           email?: string | null
           google_maps_link?: string | null
           id?: string
+          is_validated?: boolean | null
           name?: string
           phone?: string | null
           publisher_type?: string | null

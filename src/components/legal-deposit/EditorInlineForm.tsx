@@ -78,7 +78,7 @@ export const EditorInlineForm = ({
 
     setLoading(true);
     try {
-      // 1. Insert the editor into the publishers table
+      // 1. Insert the editor into the publishers table (NOT validated by default - won't appear in autocomplete until admin validates)
       const { data: editor, error: insertError } = await supabase
         .from("publishers")
         .insert([
@@ -88,6 +88,7 @@ export const EditorInlineForm = ({
             phone: formData.phone.trim() || null,
             city: formData.city.trim() || null,
             country: "Maroc",
+            is_validated: false, // Will be validated by admin after professional registration
           },
         ])
         .select("id, name, city, country, publisher_type, address, phone, email, google_maps_link")

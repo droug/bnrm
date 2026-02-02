@@ -337,10 +337,12 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
   // Fetch publishers from database (static table + approved professionals)
   useEffect(() => {
     const fetchPublishers = async () => {
-      // Fetch from static publishers table
+      // Fetch from static publishers table - only validated and non-deleted
       const { data: staticData, error: staticError } = await supabase
         .from('publishers')
         .select('id, name, city, country, publisher_type, address, phone, email, google_maps_link')
+        .eq('is_validated', true)
+        .is('deleted_at', null)
         .order('name');
       
       // Fetch approved editors from professional_registration_requests
@@ -397,10 +399,12 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
     };
 
     const fetchPrinters = async () => {
-      // Fetch from static printers table
+      // Fetch from static printers table - only validated and non-deleted
       const { data: staticData, error: staticError } = await supabase
         .from('printers')
         .select('id, name, city, country, address, phone, email, google_maps_link')
+        .eq('is_validated', true)
+        .is('deleted_at', null)
         .order('name');
       
       // Fetch approved printers from professional_registration_requests

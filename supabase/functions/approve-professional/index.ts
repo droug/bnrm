@@ -48,6 +48,8 @@ serve(async (req) => {
         phone: registrationData?.phone ?? null,
         email: registrationData?.email ?? registrationData?.contact_email ?? null,
         google_maps_link: registrationData?.google_maps_link ?? null,
+        is_validated: true, // Mark as validated so it appears in autocomplete
+        deleted_at: null, // Ensure not marked as deleted
         updated_at: new Date().toISOString(),
       };
 

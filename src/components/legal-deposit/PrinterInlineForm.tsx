@@ -77,7 +77,7 @@ export const PrinterInlineForm = ({
 
     setLoading(true);
     try {
-      // 1. Insert the printer into the database
+      // 1. Insert the printer into the database (NOT validated by default - won't appear in autocomplete until admin validates)
       const { data: printer, error: insertError } = await supabase
         .from("printers")
         .insert([
@@ -87,6 +87,7 @@ export const PrinterInlineForm = ({
             phone: formData.phone.trim() || null,
             city: formData.city.trim() || null,
             country: "Maroc",
+            is_validated: false, // Will be validated by admin after professional registration
           },
         ])
         .select("id, name, city, country, address, phone, email, google_maps_link")
