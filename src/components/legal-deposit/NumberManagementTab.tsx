@@ -82,6 +82,7 @@ export const NumberManagementTab = () => {
   const [bnrmRanges, setBnrmRanges] = useState<BNRMRange[]>([]);
   const [selectedBnrmRange, setSelectedBnrmRange] = useState<BNRMRange | null>(null);
   const [selectedNumbers, setSelectedNumbers] = useState<string[]>([]);
+  const [selectedQuantity, setSelectedQuantity] = useState<number>(0);
   const [loadingRanges, setLoadingRanges] = useState(false);
   const [rangeForm, setRangeForm] = useState<RangeAssignment>({
     professional_id: '',
@@ -324,6 +325,7 @@ export const NumberManagementTab = () => {
     setAssignmentMode('bnrm');
     setSelectedBnrmRange(null);
     setSelectedNumbers([]);
+    setSelectedQuantity(0);
   };
 
   // Fetch BNRM ranges
@@ -870,115 +872,116 @@ export const NumberManagementTab = () => {
 
                     {/* Number Selection */}
                     {selectedBnrmRange && (
-                      <div className="space-y-3">
-                        {/* Quantity selector */}
-                        <div className="flex items-center gap-4 p-3 bg-background border rounded-lg">
-                          <div className="flex-1">
-                            <Label className="text-sm">Quantité de numéros à attribuer</Label>
-                            <div className="flex items-center gap-2 mt-1">
-                              <Input
-                                type="number"
-                                min={1}
-                                max={generateAvailableNumbers(selectedBnrmRange).length}
-                                value={selectedNumbers.length || ''}
-                                onChange={(e) => {
-                                  const qty = Math.min(
-                                    parseInt(e.target.value) || 0, 
-                                    generateAvailableNumbers(selectedBnrmRange).length
-                                  );
-                                  const availableNums = generateAvailableNumbers(selectedBnrmRange);
-                                  setSelectedNumbers(availableNums.slice(0, qty));
-                                }}
-                                placeholder="Entrer la quantité..."
-                                className="w-32 font-mono"
-                              />
-                              <span className="text-sm text-muted-foreground">
-                                sur {generateAvailableNumbers(selectedBnrmRange).length} disponibles
-                              </span>
-                            </div>
+                      <div className="space-y-4">
+                        {/* Step 1: Quantity Selection - FIRST */}
+                        <div className="p-4 bg-background border-2 border-primary/20 rounded-lg">
+                          <Label className="text-base font-medium flex items-center gap-2 mb-3">
+                            <span className="flex items-center justify-center w-6 h-6 bg-primary text-primary-foreground rounded-full text-sm">1</span>
+                            Choisir la quantité de numéros
+                          </Label>
+                          
+                          <div className="grid grid-cols-4 gap-3">
+                            {[10, 20, 50, 100].map(qty => {
+                              const available = generateAvailableNumbers(selectedBnrmRange).length;
+                              const isDisabled = qty > available;
+                              return (
+                                <Button
+                                  key={qty}
+                                  variant={selectedQuantity === qty ? "default" : "outline"}
+                                  size="lg"
+                                  className={`h-16 text-lg font-bold ${isDisabled ? 'opacity-50' : ''}`}
+                                  disabled={isDisabled}
+                                  onClick={() => {
+                                    setSelectedQuantity(qty);
+                                    const availableNums = generateAvailableNumbers(selectedBnrmRange);
+                                    setSelectedNumbers(availableNums.slice(0, qty));
+                                  }}
+                                >
+                                  {qty}
+                                  <span className="text-xs font-normal ml-1">N°</span>
+                                </Button>
+                              );
+                            })}
                           </div>
-                          <div className="flex gap-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => selectAllNumbers(generateAvailableNumbers(selectedBnrmRange))}
-                            >
-                              Tout sélectionner
-                            </Button>
-                            <Button 
-                              variant="ghost" 
-                              size="sm"
-                              onClick={() => setSelectedNumbers([])}
-                            >
-                              Effacer
-                            </Button>
+                          
+                          <div className="mt-3 flex items-center gap-3">
+                            <span className="text-sm text-muted-foreground">Ou saisir une quantité personnalisée:</span>
+                            <Input
+                              type="number"
+                              min={1}
+                              max={generateAvailableNumbers(selectedBnrmRange).length}
+                              value={selectedQuantity || ''}
+                              onChange={(e) => {
+                                const qty = Math.min(
+                                  Math.max(1, parseInt(e.target.value) || 0),
+                                  generateAvailableNumbers(selectedBnrmRange).length
+                                );
+                                setSelectedQuantity(qty);
+                                const availableNums = generateAvailableNumbers(selectedBnrmRange);
+                                setSelectedNumbers(availableNums.slice(0, qty));
+                              }}
+                              placeholder="Quantité..."
+                              className="w-24 font-mono"
+                            />
+                            <span className="text-sm text-muted-foreground">
+                              (max: {generateAvailableNumbers(selectedBnrmRange).length})
+                            </span>
                           </div>
                         </div>
 
-                        {/* Quick quantity buttons */}
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm text-muted-foreground">Sélection rapide:</span>
-                          {[10, 25, 50, 100].map(qty => {
-                            const available = generateAvailableNumbers(selectedBnrmRange).length;
-                            if (qty > available) return null;
-                            return (
-                              <Button
-                                key={qty}
-                                variant={selectedNumbers.length === qty ? "default" : "outline"}
+                        {/* Step 2: Preview - Only shown when quantity is selected */}
+                        {selectedQuantity > 0 && selectedNumbers.length > 0 && (
+                          <div className="p-4 bg-muted/30 border rounded-lg">
+                            <Label className="text-base font-medium flex items-center gap-2 mb-3">
+                              <span className="flex items-center justify-center w-6 h-6 bg-primary text-primary-foreground rounded-full text-sm">2</span>
+                              Aperçu des numéros attribués
+                            </Label>
+                            
+                            <div className="flex items-center justify-between mb-3">
+                              <Badge variant="secondary" className="text-sm">
+                                {selectedNumbers.length} numéro(s) sélectionné(s)
+                              </Badge>
+                              <Button 
+                                variant="ghost" 
                                 size="sm"
                                 onClick={() => {
-                                  const availableNums = generateAvailableNumbers(selectedBnrmRange);
-                                  setSelectedNumbers(availableNums.slice(0, qty));
+                                  setSelectedQuantity(0);
+                                  setSelectedNumbers([]);
                                 }}
                               >
-                                {qty}
+                                Réinitialiser
                               </Button>
-                            );
-                          })}
-                        </div>
-                        
-                        {/* Numbers preview */}
-                        <div className="border rounded-lg p-3 max-h-48 overflow-y-auto bg-background">
-                          <div className="flex items-center justify-between mb-2">
-                            <Label className="text-sm">Aperçu des numéros sélectionnés</Label>
-                            {selectedNumbers.length > 0 && (
-                              <Badge variant="secondary">{selectedNumbers.length} sélectionné(s)</Badge>
-                            )}
-                          </div>
-                          {selectedNumbers.length === 0 ? (
-                            <p className="text-sm text-muted-foreground text-center py-4">
-                              Entrez une quantité ou utilisez les boutons de sélection rapide
-                            </p>
-                          ) : (
-                            <div className="grid grid-cols-3 gap-2">
-                              {selectedNumbers.slice(0, 30).map((number) => (
-                                <div
-                                  key={number}
-                                  className="flex items-center gap-2 p-2 rounded bg-primary/10 border border-primary/20"
-                                >
-                                  <CheckCircle className="h-3 w-3 text-primary" />
-                                  <span className="font-mono text-xs">{number}</span>
-                                </div>
-                              ))}
-                              {selectedNumbers.length > 30 && (
-                                <div className="col-span-3 text-center text-sm text-muted-foreground py-2">
-                                  ... et {selectedNumbers.length - 30} autres numéros
-                                </div>
-                              )}
                             </div>
-                          )}
-                        </div>
+                            
+                            <div className="border rounded-lg p-3 max-h-40 overflow-y-auto bg-background">
+                              <div className="grid grid-cols-3 gap-2">
+                                {selectedNumbers.slice(0, 15).map((number) => (
+                                  <div
+                                    key={number}
+                                    className="flex items-center gap-2 p-2 rounded bg-primary/10 border border-primary/20"
+                                  >
+                                    <CheckCircle className="h-3 w-3 text-primary" />
+                                    <span className="font-mono text-xs">{number}</span>
+                                  </div>
+                                ))}
+                                {selectedNumbers.length > 15 && (
+                                  <div className="col-span-3 text-center text-sm text-muted-foreground py-2">
+                                    ... et {selectedNumbers.length - 15} autres numéros
+                                  </div>
+                                )}
+                              </div>
+                            </div>
 
-                        {selectedNumbers.length > 0 && (
-                          <div className="flex items-center gap-2 p-3 bg-primary/10 border border-primary/20 rounded-lg">
-                            <CheckCircle className="h-5 w-5 text-primary" />
-                            <div>
-                              <span className="font-medium text-foreground">
-                                {selectedNumbers.length} numéro(s) prêt(s) à être attribués
-                              </span>
-                              <p className="text-xs text-muted-foreground">
-                                De {selectedNumbers[0]} à {selectedNumbers[selectedNumbers.length - 1]}
-                              </p>
+                            <div className="flex items-center gap-2 p-3 mt-3 bg-primary/10 border border-primary/20 rounded-lg">
+                              <CheckCircle className="h-5 w-5 text-primary" />
+                              <div>
+                                <span className="font-medium text-foreground">
+                                  Plage: {selectedNumbers[0]} → {selectedNumbers[selectedNumbers.length - 1]}
+                                </span>
+                                <p className="text-xs text-muted-foreground">
+                                  {selectedNumbers.length} numéros consécutifs prêts à être attribués
+                                </p>
+                              </div>
                             </div>
                           </div>
                         )}
