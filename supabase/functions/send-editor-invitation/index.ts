@@ -39,7 +39,9 @@ serve(async (req) => {
     console.log(`[EDITOR-INVITATION] Sending invitation to: ${editorEmail}`);
 
     // Build registration URL with correct parameter and pre-filled email
-    const baseUrl = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
+    let baseUrl = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
+    // Remove trailing slash to prevent double slashes in the URL
+    baseUrl = baseUrl.replace(/\/+$/, "");
     const encodedEmail = encodeURIComponent(editorEmail);
     const encodedName = encodeURIComponent(editorName);
     const encodedPhone = editorPhone ? encodeURIComponent(editorPhone) : "";
