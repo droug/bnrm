@@ -871,8 +871,32 @@ export const NumberManagementTab = () => {
                     {/* Number Selection */}
                     {selectedBnrmRange && (
                       <div className="space-y-3">
-                        <div className="flex items-center justify-between">
-                          <Label>Numéros disponibles ({generateAvailableNumbers(selectedBnrmRange).length})</Label>
+                        {/* Quantity selector */}
+                        <div className="flex items-center gap-4 p-3 bg-background border rounded-lg">
+                          <div className="flex-1">
+                            <Label className="text-sm">Quantité de numéros à attribuer</Label>
+                            <div className="flex items-center gap-2 mt-1">
+                              <Input
+                                type="number"
+                                min={1}
+                                max={generateAvailableNumbers(selectedBnrmRange).length}
+                                value={selectedNumbers.length || ''}
+                                onChange={(e) => {
+                                  const qty = Math.min(
+                                    parseInt(e.target.value) || 0, 
+                                    generateAvailableNumbers(selectedBnrmRange).length
+                                  );
+                                  const availableNums = generateAvailableNumbers(selectedBnrmRange);
+                                  setSelectedNumbers(availableNums.slice(0, qty));
+                                }}
+                                placeholder="Entrer la quantité..."
+                                className="w-32 font-mono"
+                              />
+                              <span className="text-sm text-muted-foreground">
+                                sur {generateAvailableNumbers(selectedBnrmRange).length} disponibles
+                              </span>
+                            </div>
+                          </div>
                           <div className="flex gap-2">
                             <Button 
                               variant="outline" 
@@ -886,37 +910,76 @@ export const NumberManagementTab = () => {
                               size="sm"
                               onClick={() => setSelectedNumbers([])}
                             >
-                              Désélectionner
+                              Effacer
                             </Button>
                           </div>
                         </div>
-                        
-                        <div className="border rounded-lg p-3 max-h-48 overflow-y-auto bg-background">
-                          <div className="grid grid-cols-3 gap-2">
-                            {generateAvailableNumbers(selectedBnrmRange).map((number) => (
-                              <div
-                                key={number}
-                                className={`flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-muted transition-colors ${
-                                  selectedNumbers.includes(number) ? 'bg-primary/10 border border-primary' : 'border border-transparent'
-                                }`}
-                                onClick={() => toggleNumberSelection(number)}
+
+                        {/* Quick quantity buttons */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm text-muted-foreground">Sélection rapide:</span>
+                          {[10, 25, 50, 100].map(qty => {
+                            const available = generateAvailableNumbers(selectedBnrmRange).length;
+                            if (qty > available) return null;
+                            return (
+                              <Button
+                                key={qty}
+                                variant={selectedNumbers.length === qty ? "default" : "outline"}
+                                size="sm"
+                                onClick={() => {
+                                  const availableNums = generateAvailableNumbers(selectedBnrmRange);
+                                  setSelectedNumbers(availableNums.slice(0, qty));
+                                }}
                               >
-                                <Checkbox 
-                                  checked={selectedNumbers.includes(number)}
-                                  onCheckedChange={() => toggleNumberSelection(number)}
-                                />
-                                <span className="font-mono text-sm">{number}</span>
-                              </div>
-                            ))}
+                                {qty}
+                              </Button>
+                            );
+                          })}
+                        </div>
+                        
+                        {/* Numbers preview */}
+                        <div className="border rounded-lg p-3 max-h-48 overflow-y-auto bg-background">
+                          <div className="flex items-center justify-between mb-2">
+                            <Label className="text-sm">Aperçu des numéros sélectionnés</Label>
+                            {selectedNumbers.length > 0 && (
+                              <Badge variant="secondary">{selectedNumbers.length} sélectionné(s)</Badge>
+                            )}
                           </div>
+                          {selectedNumbers.length === 0 ? (
+                            <p className="text-sm text-muted-foreground text-center py-4">
+                              Entrez une quantité ou utilisez les boutons de sélection rapide
+                            </p>
+                          ) : (
+                            <div className="grid grid-cols-3 gap-2">
+                              {selectedNumbers.slice(0, 30).map((number) => (
+                                <div
+                                  key={number}
+                                  className="flex items-center gap-2 p-2 rounded bg-primary/10 border border-primary/20"
+                                >
+                                  <CheckCircle className="h-3 w-3 text-primary" />
+                                  <span className="font-mono text-xs">{number}</span>
+                                </div>
+                              ))}
+                              {selectedNumbers.length > 30 && (
+                                <div className="col-span-3 text-center text-sm text-muted-foreground py-2">
+                                  ... et {selectedNumbers.length - 30} autres numéros
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
 
                         {selectedNumbers.length > 0 && (
-                          <div className="flex items-center gap-2 p-2 bg-primary/5 rounded-lg">
-                            <CheckCircle className="h-4 w-4 text-primary" />
-                            <span className="text-sm font-medium">
-                              {selectedNumbers.length} numéro(s) sélectionné(s)
-                            </span>
+                          <div className="flex items-center gap-2 p-3 bg-primary/10 border border-primary/20 rounded-lg">
+                            <CheckCircle className="h-5 w-5 text-primary" />
+                            <div>
+                              <span className="font-medium text-foreground">
+                                {selectedNumbers.length} numéro(s) prêt(s) à être attribués
+                              </span>
+                              <p className="text-xs text-muted-foreground">
+                                De {selectedNumbers[0]} à {selectedNumbers[selectedNumbers.length - 1]}
+                              </p>
+                            </div>
                           </div>
                         )}
                       </div>
