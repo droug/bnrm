@@ -231,19 +231,32 @@ serve(async (req) => {
           .single();
 
         // Supprimer l'utilisateur de auth.users
-        // Grâce aux ON DELETE CASCADE, cela supprimera automatiquement:
-        // - profiles
-        // - user_roles
-        // - professional_registration_requests
-        // - professional_registration_documents
+        // NB: l'opération doit être idempotente.
+        // Si l'utilisateur a déjà été supprimé (ex: tentative précédente partiellement réussie),
+        // on ne doit pas renvoyer 500 — on nettoie simplement les données publiques résiduelles.
+        let alreadyDeleted = false;
         const { error: deleteError } = await supabaseClient.auth.admin.deleteUser(user_id);
 
         if (deleteError) {
-          console.error('[USER-SERVICE] Error deleting user from auth:', deleteError);
-          throw new Error(`Erreur lors de la suppression: ${deleteError.message}`);
+          const msg = (deleteError as any)?.message?.toString?.() ?? String(deleteError);
+          const isUserNotFound = msg.toLowerCase().includes('user not found') || msg.toLowerCase().includes('not found');
+          if (isUserNotFound) {
+            alreadyDeleted = true;
+            console.warn(`[USER-SERVICE] User ${user_id} not found in Auth; treating delete as success.`);
+          } else {
+            console.error('[USER-SERVICE] Error deleting user from auth:', deleteError);
+            throw new Error(`Erreur lors de la suppression: ${msg}`);
+          }
+        } else {
+          console.log(`[USER-SERVICE] User ${user_id} deleted successfully`);
         }
 
-        console.log(`[USER-SERVICE] User ${user_id} deleted successfully`);
+        // Nettoyage défensif (au cas où des données publiques resteraient)
+        // Le service role bypass RLS, donc ces suppressions sont autorisées ici.
+        await supabaseClient.from('professional_registration_documents').delete().eq('user_id', user_id);
+        await supabaseClient.from('professional_registration_requests').delete().eq('user_id', user_id);
+        await supabaseClient.from('user_roles').delete().eq('user_id', user_id);
+        await supabaseClient.from('profiles').delete().eq('user_id', user_id);
 
         // Log l'activité
         await supabaseClient
@@ -264,13 +277,14 @@ serve(async (req) => {
               reason: deleted_reason || undefined,
               deleted_by: currentUser.email,
               deleted_at: new Date().toISOString(),
+              already_deleted: alreadyDeleted,
             },
           });
 
         return new Response(JSON.stringify({ 
           success: true, 
           message: "Compte professionnel supprimé avec succès",
-          deleted_user_id: user_id 
+          deleted_user_id: user_id
         }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
           status: 200,
