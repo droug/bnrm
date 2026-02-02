@@ -67,7 +67,7 @@ export const NumberManagementTab = () => {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const [activeTab, setActiveTab] = useState("import");
+  const [activeTab, setActiveTab] = useState("assign");
   const [importing, setImporting] = useState(false);
   const [importedNumbers, setImportedNumbers] = useState<ImportedNumber[]>([]);
   const [importPreview, setImportPreview] = useState<ImportedNumber[]>([]);
@@ -501,15 +501,15 @@ export const NumberManagementTab = () => {
 
   return (
     <div className="space-y-6">
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="assign">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="import" className="flex items-center gap-2">
-            <Upload className="h-4 w-4" />
-            Import Excel
-          </TabsTrigger>
           <TabsTrigger value="assign" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             Attribution Plages
+          </TabsTrigger>
+          <TabsTrigger value="import" className="flex items-center gap-2">
+            <Upload className="h-4 w-4" />
+            Import Excel
           </TabsTrigger>
         </TabsList>
 
