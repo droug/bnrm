@@ -80,6 +80,7 @@ export const BNRMNumberAttribution = () => {
   const [pendingRequests, setPendingRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [pendingSearchTerm, setPendingSearchTerm] = useState("");
   const [numberTypeFilter, setNumberTypeFilter] = useState("all");
   const [selectedAttribution, setSelectedAttribution] = useState<NumberAttribution | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -1084,6 +1085,21 @@ export const BNRMNumberAttribution = () => {
 
         {/* Pending Requests Tab - Approved requests awaiting number attribution */}
         <TabsContent value="pending-requests" className="space-y-4">
+          {/* Search filter for pending requests */}
+          <div className="flex items-center space-x-4 mb-4">
+            <div className="flex-1 max-w-md">
+              <div className="relative">
+                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Rechercher par N° demande, titre ou déclarant..."
+                  value={pendingSearchTerm}
+                  onChange={(e) => setPendingSearchTerm(e.target.value)}
+                  className="pl-8"
+                />
+              </div>
+            </div>
+          </div>
+          
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center justify-between">
@@ -1101,13 +1117,27 @@ export const BNRMNumberAttribution = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {pendingRequests.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-500" />
-                  <p>Aucune demande en attente d'attribution</p>
-                  <p className="text-sm">Toutes les demandes validées ont été traitées</p>
-                </div>
-              ) : (
+              {(() => {
+                const filteredPendingRequests = pendingRequests.filter((request) => {
+                  if (!pendingSearchTerm) return true;
+                  const searchLower = pendingSearchTerm.toLowerCase();
+                  const requestNumber = (request.request_number || request.dl_number || '').toLowerCase();
+                  const title = (request.title || request.metadata?.publication?.title || '').toLowerCase();
+                  const declarant = (request.author_name || request.metadata?.declarant?.name || '').toLowerCase();
+                  return requestNumber.includes(searchLower) || title.includes(searchLower) || declarant.includes(searchLower);
+                });
+                
+                if (filteredPendingRequests.length === 0) {
+                  return (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-500" />
+                      <p>{pendingSearchTerm ? 'Aucune demande correspondant à la recherche' : 'Aucune demande en attente d\'attribution'}</p>
+                      <p className="text-sm">{pendingSearchTerm ? 'Essayez un autre terme de recherche' : 'Toutes les demandes validées ont été traitées'}</p>
+                    </div>
+                  );
+                }
+                
+                return (
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -1120,7 +1150,7 @@ export const BNRMNumberAttribution = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {pendingRequests.map((request) => (
+                    {filteredPendingRequests.map((request) => (
                       <TableRow key={request.id}>
                         <TableCell className="font-mono font-medium">
                           {request.request_number || request.dl_number}
@@ -1178,7 +1208,8 @@ export const BNRMNumberAttribution = () => {
                     ))}
                   </TableBody>
                 </Table>
-              )}
+                );
+              })()}
             </CardContent>
           </Card>
         </TabsContent>
