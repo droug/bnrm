@@ -44,7 +44,9 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Build registration URL with correct parameter and pre-filled email
-    const baseUrl = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
+    let baseUrl = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
+    // Remove trailing slash to prevent double slashes in the URL
+    baseUrl = baseUrl.replace(/\/+$/, "");
     const encodedEmail = encodeURIComponent(printerEmail);
     const encodedName = encodeURIComponent(printerName);
     const encodedPhone = printerPhone ? encodeURIComponent(printerPhone) : "";
