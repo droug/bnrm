@@ -159,6 +159,7 @@ serve(async (req) => {
     let userId = request.user_id;
     let userEmail = request.registration_data?.email || request.registration_data?.contact_email;
     let passwordResetLink: string | null = null;
+    let isNewUser = false;
 
     // Si user_id est null, créer ou récupérer le compte utilisateur
     if (!userId) {
@@ -182,6 +183,8 @@ serve(async (req) => {
         // L'utilisateur existe déjà, utiliser son ID
         userId = existingUser.id;
         console.log("User already exists, using existing ID:", userId);
+        // On génère quand même un lien de récupération pour les utilisateurs existants
+        isNewUser = false;
       } else {
         // Créer un nouvel utilisateur
         console.log("Creating new user for email:", userEmail);
@@ -212,6 +215,7 @@ serve(async (req) => {
 
         userId = newUser.user.id;
         console.log("User created successfully:", userId);
+        isNewUser = true;
       }
 
       // Mettre à jour la demande avec le user_id
@@ -239,8 +243,10 @@ serve(async (req) => {
       if (profileError) {
         console.error("Error creating profile:", profileError);
       }
+    }
 
-      // Générer le lien de réinitialisation de mot de passe
+    // TOUJOURS générer le lien de réinitialisation de mot de passe (pour nouveaux et existants)
+    if (userEmail) {
       const siteUrl = resolvePublicSiteUrl();
       const redirectTo = `${siteUrl}/auth?reset=true`;
 
@@ -258,7 +264,7 @@ serve(async (req) => {
         console.error("Error generating recovery link:", linkError);
       } else if (linkData?.properties?.action_link) {
         passwordResetLink = linkData.properties.action_link;
-        console.log("Password reset link generated");
+        console.log("Password reset link generated successfully");
       }
     }
 
