@@ -41,9 +41,11 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Build registration URL
-    const baseUrl = Deno.env.get("PUBLIC_SITE_URL") || "https://bnrm.lovable.app";
-    const registrationUrl = `${baseUrl}/signup?role=printer&ref=${printerId}`;
+    // Build registration URL with correct parameter and pre-filled email
+    const baseUrl = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
+    const encodedEmail = encodeURIComponent(printerEmail);
+    const encodedName = encodeURIComponent(printerName);
+    const registrationUrl = `${baseUrl}/signup?type=printer&ref=${printerId}&email=${encodedEmail}&name=${encodedName}`;
 
     // Email content
     const emailSubject = "Invitation à rejoindre la plateforme BNRM - Dépôt Légal";

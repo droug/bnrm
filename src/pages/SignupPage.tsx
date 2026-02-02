@@ -13,12 +13,30 @@ import { WatermarkContainer } from "@/components/ui/watermark";
 const SignupPage = () => {
   const [searchParams] = useSearchParams();
   const [selectedType, setSelectedType] = useState<string>("");
+  const [prefillData, setPrefillData] = useState<{
+    email?: string;
+    name?: string;
+    ref?: string;
+  }>({});
 
-  // Pré-sélectionner le type depuis les paramètres URL
+  // Pré-sélectionner le type et extraire les données pré-remplies depuis l'URL
   useEffect(() => {
     const typeParam = searchParams.get("type");
+    const emailParam = searchParams.get("email");
+    const nameParam = searchParams.get("name");
+    const refParam = searchParams.get("ref");
+    
     if (typeParam && ["editor", "printer", "producer"].includes(typeParam)) {
       setSelectedType(typeParam);
+    }
+    
+    // Stocker les données pré-remplies si elles existent
+    if (emailParam || nameParam || refParam) {
+      setPrefillData({
+        email: emailParam || undefined,
+        name: nameParam || undefined,
+        ref: refParam || undefined,
+      });
     }
   }, [searchParams]);
 
@@ -133,8 +151,8 @@ const SignupPage = () => {
                 </h1>
               </div>
 
-              {selectedType === "editor" && <EditorSignupForm />}
-              {selectedType === "printer" && <PrinterSignupForm />}
+              {selectedType === "editor" && <EditorSignupForm prefillEmail={prefillData.email} prefillName={prefillData.name} />}
+              {selectedType === "printer" && <PrinterSignupForm prefillEmail={prefillData.email} prefillName={prefillData.name} />}
               {selectedType === "producer" && <ProducerSignupForm />}
             </div>
           )}
