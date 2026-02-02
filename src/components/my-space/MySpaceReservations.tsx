@@ -4,7 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Building2, Clock, Users, Calendar } from "lucide-react";
+import { Building2, Clock, Users, Calendar, History, ChevronDown, ChevronUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ActivityTimeline } from "./ActivityTimeline";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 
 interface SpaceReservation {
   id: string;
@@ -23,6 +26,19 @@ export function MySpaceReservations() {
   const { user } = useAuth();
   const [reservations, setReservations] = useState<SpaceReservation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedReservations, setExpandedReservations] = useState<Set<string>>(new Set());
+
+  const toggleExpand = (id: string) => {
+    setExpandedReservations(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
 
   useEffect(() => {
     if (user) {
@@ -126,11 +142,37 @@ export function MySpaceReservations() {
                         <Users className="h-3 w-3" />
                         <span>{reservation.participants_count} participants</span>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-3 w-3" />
-                        <span>Créée le {formatDateTime(reservation.created_at)}</span>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Clock className="h-3 w-3" />
+                          <span>Créée le {formatDateTime(reservation.created_at)}</span>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => toggleExpand(reservation.id)}
+                        >
+                          <History className="h-4 w-4 mr-1" />
+                          Historique
+                          {expandedReservations.has(reservation.id) ? (
+                            <ChevronUp className="h-4 w-4 ml-1" />
+                          ) : (
+                            <ChevronDown className="h-4 w-4 ml-1" />
+                          )}
+                        </Button>
                       </div>
                     </div>
+
+                    {/* Timeline des opérations */}
+                    <Collapsible open={expandedReservations.has(reservation.id)}>
+                      <CollapsibleContent className="pt-3 mt-3 border-t">
+                        <ActivityTimeline 
+                          resourceType="booking" 
+                          resourceId={reservation.id} 
+                          compact 
+                        />
+                      </CollapsibleContent>
+                    </Collapsible>
                   </CardContent>
                 </Card>
               ))}

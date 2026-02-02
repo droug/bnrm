@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { AlertCircle, CheckCircle, Clock, DollarSign, FileText, Package, Wrench, Download, Check, X, Upload, Trash2, CreditCard, Building, Coins } from "lucide-react";
+import { AlertCircle, CheckCircle, Clock, DollarSign, FileText, Package, Wrench, Download, Check, X, Upload, Trash2, CreditCard, Building, Coins, History, ChevronDown, ChevronUp } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -15,6 +15,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { generateQuoteDocument } from "@/lib/restorationPdfGenerator";
+import { ActivityTimeline } from "@/components/my-space/ActivityTimeline";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 
 interface RestorationRequest {
   id: string;
@@ -43,6 +45,19 @@ export function MyRestorationRequests() {
   const [isUploadingQuote, setIsUploadingQuote] = useState(false);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<Record<string, string>>({});
+  const [expandedRequests, setExpandedRequests] = useState<Set<string>>(new Set());
+
+  const toggleExpand = (id: string) => {
+    setExpandedRequests(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
 
   const { data: requests, isLoading } = useQuery({
     queryKey: ['my-restoration-requests', user?.id],
@@ -819,6 +834,35 @@ export function MyRestorationRequests() {
                           </div>
                         </DialogContent>
                       </Dialog>
+                    </div>
+
+                    {/* Timeline des opérations */}
+                    <div className="pt-3 border-t">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => toggleExpand(request.id)}
+                        className="w-full justify-between"
+                      >
+                        <span className="flex items-center gap-2">
+                          <History className="h-4 w-4" />
+                          Historique des opérations
+                        </span>
+                        {expandedRequests.has(request.id) ? (
+                          <ChevronUp className="h-4 w-4" />
+                        ) : (
+                          <ChevronDown className="h-4 w-4" />
+                        )}
+                      </Button>
+                      <Collapsible open={expandedRequests.has(request.id)}>
+                        <CollapsibleContent className="pt-2">
+                          <ActivityTimeline 
+                            resourceType="restoration" 
+                            resourceId={request.id} 
+                            compact 
+                          />
+                        </CollapsibleContent>
+                      </Collapsible>
                     </div>
                   </CardContent>
                 </Card>

@@ -5,10 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, Clock, BookOpen, CheckCircle, AlertCircle, Edit, Eye, Award, XCircle } from "lucide-react";
+import { FileText, Clock, BookOpen, CheckCircle, AlertCircle, Edit, Eye, Award, XCircle, History, ChevronDown, ChevronUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ActivityTimeline } from "./ActivityTimeline";
+import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 
 interface LegalDepositRequest {
   id: string;
@@ -34,6 +36,19 @@ export function MyLegalDeposits() {
   const [loading, setLoading] = useState(true);
   const [selectedDeposit, setSelectedDeposit] = useState<LegalDepositRequest | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [expandedDeposits, setExpandedDeposits] = useState<Set<string>>(new Set());
+
+  const toggleExpand = (id: string) => {
+    setExpandedDeposits(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(id)) {
+        newSet.delete(id);
+      } else {
+        newSet.add(id);
+      }
+      return newSet;
+    });
+  };
 
   useEffect(() => {
     if (user) {
@@ -326,7 +341,31 @@ export function MyLegalDeposits() {
                             <Eye className="h-4 w-4 mr-2" />
                             Voir les détails
                           </Button>
+
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => toggleExpand(deposit.id)}
+                          >
+                            <History className="h-4 w-4 mr-1" />
+                            {expandedDeposits.has(deposit.id) ? (
+                              <ChevronUp className="h-4 w-4" />
+                            ) : (
+                              <ChevronDown className="h-4 w-4" />
+                            )}
+                          </Button>
                         </div>
+
+                        {/* Timeline des opérations */}
+                        <Collapsible open={expandedDeposits.has(deposit.id)}>
+                          <CollapsibleContent className="pt-3 mt-3 border-t">
+                            <ActivityTimeline 
+                              resourceType="legal_deposit" 
+                              resourceId={deposit.id} 
+                              compact 
+                            />
+                          </CollapsibleContent>
+                        </Collapsible>
                       </div>
                     </CardContent>
                   </Card>
