@@ -319,16 +319,87 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
     setIsSubmitting(true);
     
     try {
-      // Simulation de l'envoi
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Récupérer l'utilisateur connecté
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error("Vous devez être connecté pour soumettre une demande");
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Générer un numéro de demande unique
+      const requestNumber = `REPRO-${Date.now().toString(36).toUpperCase()}`;
+
+      // Créer la demande dans la base de données avec les champs existants
+      const insertData = {
+        user_id: user.id,
+        request_number: requestNumber,
+        reproduction_modality: formData.reproductionType as 'numerique' | 'papier' | 'microfilm',
+        status: 'soumise' as const,
+        submitted_at: new Date().toISOString(),
+        payment_amount: pricing.total,
+        user_notes: formData.usageDescription || null,
+        metadata: {
+          document_id: document.id,
+          document_title: document.title,
+          document_author: document.author,
+          document_cote: document.cote,
+          format: formData.format,
+          quality: formData.quality,
+          delivery_mode: formData.deliveryMode,
+          reproduction_scope: formData.reproductionScope,
+          pages: formData.pages || null,
+          usage_type: formData.usageType,
+          urgent_request: formData.urgentRequest,
+          certified_copy: formData.certifiedCopy,
+          estimated_cost: pricing.total,
+          is_owner: isOwner
+        }
+      };
+      
+      const { data: request, error: insertError } = await supabase
+        .from('reproduction_requests')
+        .insert(insertData as any)
+        .select()
+        .single();
+
+      if (insertError) {
+        console.error('Erreur insertion demande:', insertError);
+        throw new Error(insertError.message);
+      }
+
+      // Envoyer la notification par email
+      try {
+        await supabase.functions.invoke('send-reproduction-notification', {
+          body: {
+            requestId: request.id,
+            recipientEmail: user.email,
+            recipientId: user.id,
+            notificationType: 'request_received',
+            requestNumber: request.request_number,
+            documentTitle: document.title,
+            reproductionType: formData.reproductionType,
+            format: formData.format,
+            estimatedCost: pricing.total
+          }
+        });
+        console.log('[ReproductionDialog] Email notification sent');
+      } catch (emailError) {
+        console.error('Erreur notification email:', emailError);
+        // Ne pas bloquer même si l'email échoue
+      }
       
       toast.success("Demande de reproduction envoyée", {
-        description: "Vous recevrez une confirmation par email sous 48h avec le devis."
+        description: `Numéro de demande: ${request.request_number}. Vous recevrez une confirmation par email.`
       });
       
       onClose();
-    } catch (error) {
-      toast.error("Erreur lors de l'envoi de la demande");
+    } catch (error: any) {
+      console.error('Erreur soumission:', error);
+      toast.error("Erreur lors de l'envoi de la demande", {
+        description: error.message || "Veuillez réessayer"
+      });
     } finally {
       setIsSubmitting(false);
     }
