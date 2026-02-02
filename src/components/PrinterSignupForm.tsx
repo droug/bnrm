@@ -145,7 +145,12 @@ interface PrinterFormData {
   otherContact?: string;
 }
 
-const PrinterSignupForm = () => {
+interface PrinterSignupFormProps {
+  prefillEmail?: string;
+  prefillName?: string;
+}
+
+const PrinterSignupForm = ({ prefillEmail, prefillName }: PrinterSignupFormProps) => {
   const { toast } = useToast();
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -153,8 +158,8 @@ const PrinterSignupForm = () => {
     type: "morale",
     nature: "",
     nameAr: "",
-    nameFr: "",
-    email: "",
+    nameFr: prefillName || "",
+    email: prefillEmail || "",
     phone: "+212 ",
     googleMapsLink: "",
     region: "",

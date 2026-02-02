@@ -148,17 +148,24 @@ interface EditorFormData {
   otherContact?: string;
 }
 
-const EditorSignupForm = () => {
+interface EditorSignupFormProps {
+  prefillEmail?: string;
+  prefillName?: string;
+}
+
+const EditorSignupForm = ({ prefillEmail, prefillName }: EditorSignupFormProps) => {
   const { toast } = useToast();
   const [formData, setFormData] = useState<EditorFormData>({
     type: "morale",
     nature: "",
-    email: "",
+    email: prefillEmail || "",
     phone: "+212 ",
     googleMapsLink: "",
     region: "",
     city: "",
     isOtherEditor: false,
+    // Pré-remplir le nom si fourni
+    nameFr: prefillName || "",
   });
   const [editors, setEditors] = useState<Array<{ id: string; name: string }>>([]);
   const [editorSearch, setEditorSearch] = useState("");
