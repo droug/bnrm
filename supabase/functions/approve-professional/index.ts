@@ -65,16 +65,21 @@ serve(async (req) => {
       console.log("Directory sync start:", { table, name, professionalType });
 
       // Try to find an existing entry by name (case-insensitive exact match)
-      const { data: existing, error: findError } = await supabaseAdmin
+      // Use .limit(1) instead of .maybeSingle() to avoid errors when duplicates exist
+      const { data: existingRows, error: findError } = await supabaseAdmin
         .from(table)
         .select("id, name")
         .ilike("name", name)
-        .maybeSingle();
+        .limit(1);
 
       if (findError) {
         console.error("Directory sync find error:", { table, name, findError });
-        throw new Error(`Erreur lors de la recherche dans ${table}: ${findError.message}`);
+        // Don't throw - log warning and continue with approval process
+        console.warn("Directory sync skipped due to find error, continuing with approval");
+        return;
       }
+
+      const existing = existingRows?.[0];
 
       if (existing?.id) {
         const { error: updateError } = await supabaseAdmin
@@ -84,7 +89,9 @@ serve(async (req) => {
 
         if (updateError) {
           console.error("Directory sync update error:", { table, id: existing.id, updateError });
-          throw new Error(`Erreur lors de la mise à jour dans ${table}: ${updateError.message}`);
+          // Don't throw - log warning and continue
+          console.warn("Directory sync update failed, continuing with approval");
+          return;
         }
 
         console.log("Directory sync updated:", { table, id: existing.id, name });
@@ -101,7 +108,9 @@ serve(async (req) => {
 
       if (insertError) {
         console.error("Directory sync insert error:", { table, name, insertError });
-        throw new Error(`Erreur lors de l'insertion dans ${table}: ${insertError.message}`);
+        // Don't throw - log warning and continue
+        console.warn("Directory sync insert failed, continuing with approval");
+        return;
       }
 
       console.log("Directory sync inserted:", { table, name });
@@ -281,12 +290,17 @@ serve(async (req) => {
 
     // IMPORTANT: For every approved registration, also sync the corresponding directory table
     // so it appears everywhere the system reads from publishers/printers/producers/distributors.
-    await syncProfessionalDirectoryEntry({
-      supabaseAdmin,
-      professionalType: professional_type,
-      companyName: request.company_name,
-      registrationData: request.registration_data,
-    });
+    // Wrapped in try-catch to ensure approval continues even if directory sync fails
+    try {
+      await syncProfessionalDirectoryEntry({
+        supabaseAdmin,
+        professionalType: professional_type,
+        companyName: request.company_name,
+        registrationData: request.registration_data,
+      });
+    } catch (syncError) {
+      console.error("Directory sync failed but continuing with approval:", syncError);
+    }
 
     // Mettre à jour la demande comme approuvée
     const { error: updateError } = await supabaseAdmin
