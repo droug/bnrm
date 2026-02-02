@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -20,7 +20,17 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Eye, Search, FileDown, Database } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Eye, Search, FileDown, Database, Trash2, Loader2 } from "lucide-react";
 import { CustomDialog, CustomDialogContent, CustomDialogHeader, CustomDialogTitle, CustomDialogClose } from "@/components/ui/custom-portal-dialog";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -42,12 +52,45 @@ interface Professional {
 
 export function ProfessionalsList() {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   
   const [selectedProfessional, setSelectedProfessional] = useState<Professional | null>(null);
+  const [professionalToDelete, setProfessionalToDelete] = useState<Professional | null>(null);
   const [showInjectDialog, setShowInjectDialog] = useState(false);
   const [selectedRoleToInject, setSelectedRoleToInject] = useState<string>("");
+
+  // Mutation pour supprimer un professionnel
+  const deleteMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      const { data, error } = await supabase.functions.invoke("user-service", {
+        body: {
+          action: "delete_professional",
+          user_id: userId,
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      return data;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Compte supprimé",
+        description: "Le compte professionnel a été supprimé avec succès.",
+        className: "bg-green-50 border-green-200",
+      });
+      queryClient.invalidateQueries({ queryKey: ["professionals-approved"] });
+      setProfessionalToDelete(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible de supprimer le compte",
+        variant: "destructive",
+      });
+    },
+  });
 
   // Récupérer tous les rôles professionnels disponibles
   const { data: availableRoles } = useQuery({
@@ -339,14 +382,23 @@ export function ProfessionalsList() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setSelectedProfessional(prof)}
-                      >
-                        <Eye className="h-4 w-4 mr-1" />
-                        Visualiser
-                      </Button>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => setSelectedProfessional(prof)}
+                        >
+                          <Eye className="h-4 w-4 mr-1" />
+                          Visualiser
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => setProfessionalToDelete(prof)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -664,6 +716,56 @@ export function ProfessionalsList() {
           </div>
         </CustomDialogContent>
       </CustomDialog>
+
+      {/* Modal de confirmation de suppression */}
+      <AlertDialog open={!!professionalToDelete} onOpenChange={() => setProfessionalToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Supprimer ce compte professionnel ?</AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2">
+              <p>
+                Vous êtes sur le point de supprimer définitivement le compte de{" "}
+                <strong>{professionalToDelete?.first_name} {professionalToDelete?.last_name}</strong>
+                {professionalToDelete?.institution && (
+                  <> ({professionalToDelete.institution})</>
+                )}.
+              </p>
+              <p className="text-destructive font-medium">
+                Cette action est irréversible. Le compte utilisateur, le profil, les rôles et la demande d'inscription seront supprimés.
+              </p>
+              <p className="text-sm text-muted-foreground">
+                Note : Les entrées dans les répertoires (éditeurs, imprimeurs, etc.) seront conservées pour l'historique des dépôts légaux.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteMutation.isPending}>
+              Annuler
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (professionalToDelete?.user_id) {
+                  deleteMutation.mutate(professionalToDelete.user_id);
+                }
+              }}
+              disabled={deleteMutation.isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleteMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Suppression...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Supprimer définitivement
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
