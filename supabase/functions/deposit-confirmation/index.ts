@@ -433,6 +433,93 @@ serve(async (req) => {
         .update(updateField)
         .eq("id", tokenData.request_id);
 
+      // Notifier l'initiateur que la contrepartie a confirmé
+      const otherPartyToken = await supabase
+        .from("deposit_confirmation_tokens")
+        .select("email, party_type")
+        .eq("request_id", tokenData.request_id)
+        .neq("id", tokenData.id)
+        .single();
+
+      if (otherPartyToken.data?.email) {
+        const siteUrl = resolvePublicSiteUrl();
+        const partyTypeFr = tokenData.party_type === "editor" ? "l'éditeur" : "l'imprimeur";
+        
+        const confirmationEmailHtml = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          </head>
+          <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f7fa;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+              <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); padding: 30px; text-align: center;">
+                <h1 style="color: #ffffff; margin: 0; font-size: 24px;">🏛️ BNRM - Dépôt Légal</h1>
+                <p style="color: #e2e8f0; margin: 10px 0 0;">Confirmation Réciproque Complète</p>
+              </div>
+              
+              <div style="padding: 30px;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                  <div style="width: 60px; height: 60px; background-color: #48bb78; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center;">
+                    <span style="color: white; font-size: 30px;">✓</span>
+                  </div>
+                </div>
+                
+                <p style="color: #2d3748; font-size: 16px;">Bonjour,</p>
+                
+                <p style="color: #4a5568; line-height: 1.6;">
+                  Bonne nouvelle ! <strong>${partyTypeFr}</strong> a confirmé sa participation à votre demande de dépôt légal.
+                </p>
+                
+                <div style="background-color: #c6f6d5; border-left: 4px solid #38a169; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+                  <p style="color: #276749; margin: 0; font-size: 14px;">
+                    <strong>✅ Toutes les confirmations ont été reçues !</strong><br>
+                    Votre demande sera maintenant transmise à la BNRM pour traitement.
+                  </p>
+                </div>
+                
+                <div style="background-color: #edf2f7; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                  <h3 style="color: #2d3748; margin: 0 0 15px;">📋 Détails de la demande</h3>
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                      <td style="padding: 8px 0; color: #718096;">N° de demande:</td>
+                      <td style="padding: 8px 0; color: #2d3748; font-weight: 600;">${tokenData.legal_deposit_requests?.request_number || "N/A"}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0; color: #718096;">Titre:</td>
+                      <td style="padding: 8px 0; color: #2d3748; font-weight: 600;">${tokenData.legal_deposit_requests?.title || "Non spécifié"}</td>
+                    </tr>
+                  </table>
+                </div>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${siteUrl}/my-space" style="display: inline-block; background: linear-gradient(135deg, #38a169 0%, #2f855a 100%); color: #ffffff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
+                    Suivre ma demande
+                  </a>
+                </div>
+              </div>
+              
+              <div style="background-color: #edf2f7; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0;">
+                <p style="color: #718096; font-size: 12px; margin: 0;">
+                  © ${new Date().getFullYear()} Bibliothèque Nationale du Royaume du Maroc<br>
+                  Cet email a été envoyé automatiquement, merci de ne pas y répondre.
+                </p>
+              </div>
+            </div>
+          </body>
+          </html>
+        `;
+
+        await sendEmail({
+          to: otherPartyToken.data.email,
+          subject: `[BNRM] Confirmation reçue - Dépôt Légal ${tokenData.legal_deposit_requests?.request_number || ""}`,
+          html: confirmationEmailHtml,
+        });
+
+        console.log(`[DEPOSIT-CONFIRMATION] Notification email sent to initiator ${otherPartyToken.data.email}`);
+      }
+
       // Le trigger DB vérifiera si les deux parties ont confirmé et mettra à jour le statut
 
       return new Response(

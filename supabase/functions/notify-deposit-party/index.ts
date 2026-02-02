@@ -8,6 +8,12 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+// Helper pour obtenir l'URL du site de manière cohérente
+function resolvePublicSiteUrl(): string {
+  const raw = Deno.env.get("SITE_URL") || Deno.env.get("PUBLIC_SITE_URL") || "https://bnrm-dev.digiup.ma";
+  return raw.trim().replace(/\/$/, "");
+}
+
 interface NotificationRequest {
   partyId: string;
   requestId: string;
@@ -109,7 +115,7 @@ serve(async (req) => {
             <p>Veuillez vous connecter à votre espace personnel pour consulter et valider cette demande.</p>
             
             <p style="text-align: center;">
-              <a href="https://bnrm.lovable.app/my-space" class="btn">Accéder à mon espace</a>
+              <a href="${resolvePublicSiteUrl()}/my-space" class="btn">Accéder à mon espace</a>
             </p>
             
             <p>Cordialement,<br><strong>L'équipe du Dépôt Légal - BNRM</strong></p>
