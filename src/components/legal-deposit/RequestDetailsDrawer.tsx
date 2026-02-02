@@ -32,8 +32,29 @@ export const RequestDetailsDrawer = ({ isOpen, onClose, request }: RequestDetail
 
   const metadata = (request.metadata as Record<string, any>) || {};
   const publication = metadata.publication || {};
-  const declarant = metadata.declarant || {};
+  // Déclarant peut être dans metadata.declarant ou directement sur request
+  const declarant = metadata.declarant || request.declarant || {};
   const support = metadata.support || {};
+  
+  // Résolution du nom du déclarant
+  const declarantName = typeof declarant === 'object' 
+    ? (declarant.name || declarant.full_name || declarant.nom) 
+    : (request.declarant_name || request.requester_name || metadata.declarant_name);
+  const declarantEmail = typeof declarant === 'object'
+    ? declarant.email
+    : (request.declarant_email || request.requester_email || metadata.email);
+  const declarantOrg = typeof declarant === 'object'
+    ? (declarant.organization || declarant.publisher?.name || declarant.publisher)
+    : (metadata.organization || request.publisher?.name);
+  const declarantPhone = typeof declarant === 'object'
+    ? declarant.phone
+    : (metadata.phone || request.phone);
+  const declarantAddress = typeof declarant === 'object'
+    ? declarant.address
+    : (metadata.address || request.address);
+  const declarantCity = typeof declarant === 'object'
+    ? declarant.city
+    : (metadata.city || request.city);
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
@@ -92,7 +113,7 @@ export const RequestDetailsDrawer = ({ isOpen, onClose, request }: RequestDetail
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="left" className="w-full sm:max-w-lg p-0">
+      <SheetContent side="right" className="w-full sm:max-w-lg p-0">
         <SheetHeader className="p-6 pb-4 border-b bg-muted/30">
           <div className="flex items-start justify-between">
             <div className="flex-1">
@@ -181,32 +202,32 @@ export const RequestDetailsDrawer = ({ isOpen, onClose, request }: RequestDetail
                 <InfoRow 
                   icon={User} 
                   label="Nom" 
-                  value={declarant.name || request.declarant_name || metadata.declarant_name} 
+                  value={declarantName} 
                 />
                 <InfoRow 
                   icon={Building} 
                   label="Organisation" 
-                  value={declarant.organization || metadata.organization} 
+                  value={declarantOrg} 
                 />
                 <InfoRow 
                   icon={Mail} 
                   label="Email" 
-                  value={declarant.email || request.declarant_email || metadata.email} 
+                  value={declarantEmail} 
                 />
                 <InfoRow 
                   icon={Phone} 
                   label="Téléphone" 
-                  value={declarant.phone || metadata.phone} 
+                  value={declarantPhone} 
                 />
                 <InfoRow 
                   icon={MapPin} 
                   label="Adresse" 
-                  value={declarant.address || metadata.address} 
+                  value={declarantAddress} 
                 />
                 <InfoRow 
                   icon={MapPin} 
                   label="Ville" 
-                  value={declarant.city || metadata.city} 
+                  value={declarantCity} 
                 />
               </div>
             </section>
