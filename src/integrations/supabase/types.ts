@@ -10858,12 +10858,15 @@ export type Database = {
           number_type: string
           range_end: string
           range_start: string
+          requester_email: string | null
           requester_id: string | null
+          requester_name: string | null
           reserved_by: string | null
           status: string | null
           total_numbers: number
           updated_at: string | null
           used_numbers: number | null
+          used_numbers_list: string[] | null
         }
         Insert: {
           created_at?: string | null
@@ -10874,12 +10877,15 @@ export type Database = {
           number_type: string
           range_end: string
           range_start: string
+          requester_email?: string | null
           requester_id?: string | null
+          requester_name?: string | null
           reserved_by?: string | null
           status?: string | null
           total_numbers: number
           updated_at?: string | null
           used_numbers?: number | null
+          used_numbers_list?: string[] | null
         }
         Update: {
           created_at?: string | null
@@ -10890,12 +10896,15 @@ export type Database = {
           number_type?: string
           range_end?: string
           range_start?: string
+          requester_email?: string | null
           requester_id?: string | null
+          requester_name?: string | null
           reserved_by?: string | null
           status?: string | null
           total_numbers?: number
           updated_at?: string | null
           used_numbers?: number | null
+          used_numbers_list?: string[] | null
         }
         Relationships: []
       }
