@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,6 +9,8 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ScrollableDialog, ScrollableDialogContent, ScrollableDialogHeader, ScrollableDialogTitle } from "@/components/ui/scrollable-dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import * as XLSX from 'xlsx';
@@ -24,7 +26,8 @@ import {
   User,
   CheckCircle,
   AlertCircle,
-  Loader2
+  Loader2,
+  Library
 } from "lucide-react";
 import { ReservedRangesManager } from "./ReservedRangesManager";
 
@@ -48,6 +51,18 @@ interface RangeAssignment {
   notes?: string;
 }
 
+interface BNRMRange {
+  id: string;
+  number_type: string;
+  range_start: string;
+  range_end: string;
+  total_numbers: number;
+  used_numbers: number;
+  used_numbers_list: string[];
+  status: string;
+  requester_name?: string;
+}
+
 export const NumberManagementTab = () => {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -63,6 +78,11 @@ export const NumberManagementTab = () => {
   const [professionals, setProfessionals] = useState<any[]>([]);
   const [professionalSearch, setProfessionalSearch] = useState("");
   const [selectedProfessional, setSelectedProfessional] = useState<any>(null);
+  const [assignmentMode, setAssignmentMode] = useState<'bnrm' | 'manual'>('bnrm');
+  const [bnrmRanges, setBnrmRanges] = useState<BNRMRange[]>([]);
+  const [selectedBnrmRange, setSelectedBnrmRange] = useState<BNRMRange | null>(null);
+  const [selectedNumbers, setSelectedNumbers] = useState<string[]>([]);
+  const [loadingRanges, setLoadingRanges] = useState(false);
   const [rangeForm, setRangeForm] = useState<RangeAssignment>({
     professional_id: '',
     professional_name: '',
@@ -301,6 +321,164 @@ export const NumberManagementTab = () => {
     });
     setSelectedProfessional(null);
     setProfessionalSearch('');
+    setAssignmentMode('bnrm');
+    setSelectedBnrmRange(null);
+    setSelectedNumbers([]);
+  };
+
+  // Fetch BNRM ranges
+  const fetchBnrmRanges = async (numberType: string) => {
+    setLoadingRanges(true);
+    try {
+      const { data, error } = await supabase
+        .from('reserved_number_ranges')
+        .select('*')
+        .eq('number_type', numberType)
+        .eq('status', 'active')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+      setBnrmRanges(data || []);
+    } catch (error) {
+      console.error('Error fetching BNRM ranges:', error);
+      setBnrmRanges([]);
+    } finally {
+      setLoadingRanges(false);
+    }
+  };
+
+  // Generate available numbers from a range
+  const generateAvailableNumbers = (range: BNRMRange): string[] => {
+    const usedList = range.used_numbers_list || [];
+    const numbers: string[] = [];
+    
+    // Parse the range and generate numbers
+    // This is a simplified version - adapt based on your number format
+    const start = range.range_start;
+    const end = range.range_end;
+    
+    // For ISBN format: 978-9920-600-00-0 to 978-9920-600-99-9
+    if (range.number_type === 'isbn') {
+      const prefix = start.substring(0, start.lastIndexOf('-', start.lastIndexOf('-') - 1) + 1);
+      const startNum = parseInt(start.split('-').slice(-2, -1)[0]);
+      const endNum = parseInt(end.split('-').slice(-2, -1)[0]);
+      
+      for (let i = startNum; i <= Math.min(endNum, startNum + 99); i++) {
+        const numStr = i.toString().padStart(2, '0');
+        // Calculate check digit (simplified - you may need proper ISBN check digit calculation)
+        const checkDigit = (i % 10).toString();
+        const fullNumber = `${prefix}${numStr}-${checkDigit}`;
+        if (!usedList.includes(fullNumber)) {
+          numbers.push(fullNumber);
+        }
+      }
+    } else if (range.number_type === 'issn') {
+      const prefix = start.split('-')[0];
+      const startNum = parseInt(start.split('-')[1]);
+      const endNum = parseInt(end.split('-')[1]);
+      
+      for (let i = startNum; i <= Math.min(endNum, startNum + 99); i++) {
+        const fullNumber = `${prefix}-${i.toString().padStart(4, '0')}`;
+        if (!usedList.includes(fullNumber)) {
+          numbers.push(fullNumber);
+        }
+      }
+    } else {
+      // DL or other format
+      const parts = start.split('-');
+      const prefix = parts.slice(0, -1).join('-');
+      const startNum = parseInt(parts[parts.length - 1]);
+      const endParts = end.split('-');
+      const endNum = parseInt(endParts[endParts.length - 1]);
+      
+      for (let i = startNum; i <= Math.min(endNum, startNum + 99); i++) {
+        const fullNumber = `${prefix}-${i.toString().padStart(6, '0')}`;
+        if (!usedList.includes(fullNumber)) {
+          numbers.push(fullNumber);
+        }
+      }
+    }
+    
+    return numbers.slice(0, 50); // Limit to first 50 available
+  };
+
+  // Handle assigning selected numbers from BNRM range
+  const handleAssignFromBnrm = async () => {
+    if (!selectedProfessional || selectedNumbers.length === 0) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez sélectionner un professionnel et au moins un numéro",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      const user = await supabase.auth.getUser();
+      
+      // Create a new range for the professional with the selected numbers
+      const { error } = await supabase
+        .from('reserved_number_ranges')
+        .insert({
+          requester_id: selectedProfessional.id,
+          requester_name: selectedProfessional.name,
+          requester_email: selectedProfessional.email,
+          deposit_type: rangeForm.professional_type,
+          number_type: rangeForm.number_type,
+          range_start: selectedNumbers[0],
+          range_end: selectedNumbers[selectedNumbers.length - 1],
+          current_position: selectedNumbers[0],
+          total_numbers: selectedNumbers.length,
+          used_numbers: 0,
+          used_numbers_list: [],
+          status: 'active',
+          notes: `Attribution de ${selectedNumbers.length} numéros depuis BNRM${rangeForm.notes ? ' - ' + rangeForm.notes : ''}`,
+          reserved_by: user.data.user?.id
+        });
+
+      if (error) throw error;
+
+      // If we took numbers from an existing range, update its used_numbers_list
+      if (selectedBnrmRange) {
+        const updatedUsedList = [...(selectedBnrmRange.used_numbers_list || []), ...selectedNumbers];
+        await supabase
+          .from('reserved_number_ranges')
+          .update({
+            used_numbers_list: updatedUsedList,
+            used_numbers: updatedUsedList.length
+          })
+          .eq('id', selectedBnrmRange.id);
+      }
+
+      toast({
+        title: "Succès",
+        description: `${selectedNumbers.length} numéros attribués à ${selectedProfessional.name}`,
+      });
+
+      setIsAssignDialogOpen(false);
+      resetRangeForm();
+    } catch (error: any) {
+      console.error('Error assigning from BNRM:', error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible d'attribuer les numéros",
+        variant: "destructive"
+      });
+    }
+  };
+
+  // Toggle number selection
+  const toggleNumberSelection = (number: string) => {
+    setSelectedNumbers(prev => 
+      prev.includes(number)
+        ? prev.filter(n => n !== number)
+        : [...prev, number]
+    );
+  };
+
+  // Select all available numbers
+  const selectAllNumbers = (numbers: string[]) => {
+    setSelectedNumbers(numbers);
   };
 
   const getNumberTypeIcon = (type: string) => {
@@ -497,12 +675,12 @@ export const NumberManagementTab = () => {
 
       {/* Range Assignment Dialog */}
       <ScrollableDialog open={isAssignDialogOpen} onOpenChange={setIsAssignDialogOpen}>
-        <ScrollableDialogContent className="max-w-2xl">
+        <ScrollableDialogContent className="max-w-3xl max-h-[90vh]">
           <ScrollableDialogHeader>
             <ScrollableDialogTitle>Attribuer une plage de numéros</ScrollableDialogTitle>
           </ScrollableDialogHeader>
-          <div className="space-y-4 p-6">
-            {/* Professional Type */}
+          <div className="space-y-4 p-6 overflow-y-auto max-h-[70vh]">
+            {/* Professional Type and Number Type */}
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Type de professionnel *</Label>
@@ -530,7 +708,12 @@ export const NumberManagementTab = () => {
                 <Label>Type de numéro *</Label>
                 <Select 
                   value={rangeForm.number_type} 
-                  onValueChange={(v) => setRangeForm(prev => ({ ...prev, number_type: v as any }))}
+                  onValueChange={(v) => {
+                    setRangeForm(prev => ({ ...prev, number_type: v as any }));
+                    fetchBnrmRanges(v);
+                    setSelectedBnrmRange(null);
+                    setSelectedNumbers([]);
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -594,40 +777,191 @@ export const NumberManagementTab = () => {
               )}
             </div>
 
-            {/* Range definition */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label>Début de plage *</Label>
-                <Input
-                  placeholder={rangeForm.number_type === 'isbn' ? '978-9981-XXX-00-0' : 
-                              rangeForm.number_type === 'issn' ? '2550-0000' : 
-                              rangeForm.number_type === 'ismn' ? '979-0-000000-00-0' : 'DL-2025-000001'}
-                  value={rangeForm.range_start}
-                  onChange={(e) => setRangeForm(prev => ({ ...prev, range_start: e.target.value }))}
-                  className="font-mono"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Fin de plage *</Label>
-                <Input
-                  placeholder={rangeForm.number_type === 'isbn' ? '978-9981-XXX-99-9' : 
-                              rangeForm.number_type === 'issn' ? '2550-9999' : 
-                              rangeForm.number_type === 'ismn' ? '979-0-000000-99-9' : 'DL-2025-000099'}
-                  value={rangeForm.range_end}
-                  onChange={(e) => setRangeForm(prev => ({ ...prev, range_end: e.target.value }))}
-                  className="font-mono"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label>Quantité</Label>
-                <Input
-                  type="number"
-                  placeholder="100"
-                  value={rangeForm.quantity || ''}
-                  onChange={(e) => setRangeForm(prev => ({ ...prev, quantity: parseInt(e.target.value) || 0 }))}
-                />
-              </div>
+            {/* Mode Selection */}
+            <div className="space-y-3">
+              <Label>Mode d'attribution *</Label>
+              <RadioGroup 
+                value={assignmentMode} 
+                onValueChange={(v) => {
+                  setAssignmentMode(v as 'bnrm' | 'manual');
+                  if (v === 'bnrm') {
+                    fetchBnrmRanges(rangeForm.number_type);
+                  }
+                }}
+                className="flex gap-4"
+              >
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="bnrm" id="mode-bnrm" />
+                  <Label htmlFor="mode-bnrm" className="flex items-center gap-2 cursor-pointer">
+                    <Library className="h-4 w-4" />
+                    Sélectionner depuis les tranches BNRM
+                  </Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="manual" id="mode-manual" />
+                  <Label htmlFor="mode-manual" className="cursor-pointer">
+                    Saisie manuelle
+                  </Label>
+                </div>
+              </RadioGroup>
             </div>
+
+            {/* BNRM Selection Mode */}
+            {assignmentMode === 'bnrm' && (
+              <div className="space-y-4 border rounded-lg p-4 bg-muted/30">
+                <div className="flex items-center justify-between">
+                  <Label className="text-base font-medium">Tranches BNRM disponibles</Label>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => fetchBnrmRanges(rangeForm.number_type)}
+                    disabled={loadingRanges}
+                  >
+                    {loadingRanges ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Actualiser'}
+                  </Button>
+                </div>
+
+                {loadingRanges ? (
+                  <div className="flex items-center justify-center h-24">
+                    <Loader2 className="h-6 w-6 animate-spin" />
+                  </div>
+                ) : bnrmRanges.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <AlertCircle className="h-8 w-8 mx-auto mb-2" />
+                    <p>Aucune tranche BNRM disponible pour ce type de numéro</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {/* Range Selection */}
+                    <div className="space-y-2">
+                      <Label>Sélectionner une tranche</Label>
+                      <Select 
+                        value={selectedBnrmRange?.id || ''} 
+                        onValueChange={(id) => {
+                          const range = bnrmRanges.find(r => r.id === id);
+                          setSelectedBnrmRange(range || null);
+                          setSelectedNumbers([]);
+                        }}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Choisir une tranche..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {bnrmRanges.map((range) => (
+                            <SelectItem key={range.id} value={range.id}>
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono text-sm">
+                                  {range.range_start} → {range.range_end}
+                                </span>
+                                <Badge variant="outline" className="text-xs">
+                                  {range.total_numbers - range.used_numbers} dispo
+                                </Badge>
+                                {range.requester_name && (
+                                  <span className="text-xs text-muted-foreground">
+                                    ({range.requester_name})
+                                  </span>
+                                )}
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Number Selection */}
+                    {selectedBnrmRange && (
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <Label>Numéros disponibles ({generateAvailableNumbers(selectedBnrmRange).length})</Label>
+                          <div className="flex gap-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => selectAllNumbers(generateAvailableNumbers(selectedBnrmRange))}
+                            >
+                              Tout sélectionner
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => setSelectedNumbers([])}
+                            >
+                              Désélectionner
+                            </Button>
+                          </div>
+                        </div>
+                        
+                        <div className="border rounded-lg p-3 max-h-48 overflow-y-auto bg-background">
+                          <div className="grid grid-cols-3 gap-2">
+                            {generateAvailableNumbers(selectedBnrmRange).map((number) => (
+                              <div
+                                key={number}
+                                className={`flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-muted transition-colors ${
+                                  selectedNumbers.includes(number) ? 'bg-primary/10 border border-primary' : 'border border-transparent'
+                                }`}
+                                onClick={() => toggleNumberSelection(number)}
+                              >
+                                <Checkbox 
+                                  checked={selectedNumbers.includes(number)}
+                                  onCheckedChange={() => toggleNumberSelection(number)}
+                                />
+                                <span className="font-mono text-sm">{number}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {selectedNumbers.length > 0 && (
+                          <div className="flex items-center gap-2 p-2 bg-primary/5 rounded-lg">
+                            <CheckCircle className="h-4 w-4 text-primary" />
+                            <span className="text-sm font-medium">
+                              {selectedNumbers.length} numéro(s) sélectionné(s)
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Manual Mode */}
+            {assignmentMode === 'manual' && (
+              <div className="grid grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label>Début de plage *</Label>
+                  <Input
+                    placeholder={rangeForm.number_type === 'isbn' ? '978-9981-XXX-00-0' : 
+                                rangeForm.number_type === 'issn' ? '2550-0000' : 
+                                rangeForm.number_type === 'ismn' ? '979-0-000000-00-0' : 'DL-2025-000001'}
+                    value={rangeForm.range_start}
+                    onChange={(e) => setRangeForm(prev => ({ ...prev, range_start: e.target.value }))}
+                    className="font-mono"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Fin de plage *</Label>
+                  <Input
+                    placeholder={rangeForm.number_type === 'isbn' ? '978-9981-XXX-99-9' : 
+                                rangeForm.number_type === 'issn' ? '2550-9999' : 
+                                rangeForm.number_type === 'ismn' ? '979-0-000000-99-9' : 'DL-2025-000099'}
+                    value={rangeForm.range_end}
+                    onChange={(e) => setRangeForm(prev => ({ ...prev, range_end: e.target.value }))}
+                    className="font-mono"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label>Quantité</Label>
+                  <Input
+                    type="number"
+                    placeholder="100"
+                    value={rangeForm.quantity || ''}
+                    onChange={(e) => setRangeForm(prev => ({ ...prev, quantity: parseInt(e.target.value) || 0 }))}
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Notes */}
             <div className="space-y-2">
@@ -636,7 +970,7 @@ export const NumberManagementTab = () => {
                 placeholder="Commentaires additionnels..."
                 value={rangeForm.notes || ''}
                 onChange={(e) => setRangeForm(prev => ({ ...prev, notes: e.target.value }))}
-                rows={3}
+                rows={2}
               />
             </div>
 
@@ -648,9 +982,18 @@ export const NumberManagementTab = () => {
               }}>
                 Annuler
               </Button>
-              <Button onClick={handleAssignRange}>
+              <Button 
+                onClick={assignmentMode === 'bnrm' ? handleAssignFromBnrm : handleAssignRange}
+                disabled={
+                  !selectedProfessional || 
+                  (assignmentMode === 'bnrm' && selectedNumbers.length === 0) ||
+                  (assignmentMode === 'manual' && (!rangeForm.range_start || !rangeForm.range_end))
+                }
+              >
                 <CheckCircle className="h-4 w-4 mr-2" />
-                Attribuer la plage
+                {assignmentMode === 'bnrm' 
+                  ? `Attribuer ${selectedNumbers.length} numéro(s)` 
+                  : 'Attribuer la plage'}
               </Button>
             </div>
           </div>
