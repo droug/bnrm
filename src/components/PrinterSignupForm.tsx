@@ -125,6 +125,7 @@ interface PrinterFormData {
   // Commun
   email: string;
   phone: string;
+  address: string;
   googleMapsLink: string;
   region: string;
   city: string;
@@ -161,6 +162,7 @@ const PrinterSignupForm = ({ prefillEmail, prefillName }: PrinterSignupFormProps
     nameFr: prefillName || "",
     email: prefillEmail || "",
     phone: "+212 ",
+    address: "",
     googleMapsLink: "",
     region: "",
     city: "",
@@ -183,6 +185,7 @@ const PrinterSignupForm = ({ prefillEmail, prefillName }: PrinterSignupFormProps
     if (!formData.phone || formData.phone.trim() === "+212" || formData.phone.trim() === "+212 ") {
       missingFields.push("Téléphone");
     }
+    if (!formData.address) missingFields.push("Adresse");
     if (!formData.region) missingFields.push("Région");
     if (!formData.city) missingFields.push("Ville");
     
@@ -191,7 +194,7 @@ const PrinterSignupForm = ({ prefillEmail, prefillName }: PrinterSignupFormProps
       if (!formData.nameAr) missingFields.push("Nom de l'imprimeur (Arabe)");
       if (!formData.nameFr) missingFields.push("Nom de l'imprimeur (Français)");
       if (!formData.commerceRegistry) missingFields.push("Registre de commerce");
-      if (!formData.googleMapsLink) missingFields.push("Lien Google Maps");
+      // Google Maps n'est plus obligatoire
     } else {
       // Personne physique
       if (!formData.printerNameAr) missingFields.push("Nom de l'imprimeur (Arabe)");
@@ -231,7 +234,8 @@ const PrinterSignupForm = ({ prefillEmail, prefillName }: PrinterSignupFormProps
         nature: formData.nature,
         email: formData.email,
         phone: formData.phone,
-        google_maps_link: formData.googleMapsLink,
+        address: formData.address,
+        google_maps_link: formData.googleMapsLink || null,
         region: formData.region,
         city: formData.city,
         contact_name: formData.type === "morale" ? formData.contactPerson : formData.otherContact,
@@ -572,9 +576,20 @@ const PrinterSignupForm = ({ prefillEmail, prefillName }: PrinterSignupFormProps
               </div>
             </div>
 
+            {/* Adresse */}
+            <div className="space-y-2">
+              <Label htmlFor="address">Adresse *</Label>
+              <Input
+                id="address"
+                value={formData.address}
+                onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                placeholder="Adresse complète de l'établissement"
+              />
+            </div>
+
             {formData.type === "morale" && (
               <div className="space-y-2">
-                <Label htmlFor="googleMapsLink">Lien Google Maps *</Label>
+                <Label htmlFor="googleMapsLink">Lien Google Maps (optionnel)</Label>
                 <div className="flex gap-2">
                   <div className="flex items-center justify-center px-3 py-2 border border-input rounded-lg bg-muted/30">
                     <MapPin className="h-4 w-4 text-muted-foreground" />
@@ -588,7 +603,7 @@ const PrinterSignupForm = ({ prefillEmail, prefillName }: PrinterSignupFormProps
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Collez le lien de localisation Google Maps de votre établissement
+                  Collez le lien de localisation Google Maps de votre établissement (facultatif)
                 </p>
               </div>
             )}

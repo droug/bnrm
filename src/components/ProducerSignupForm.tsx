@@ -23,6 +23,7 @@ const producerSchema = z.object({
   companyRegistrationNumber: z.string().min(1, "Numéro d'enregistrement requis"),
   taxIdentificationNumber: z.string().min(1, "Identifiant fiscal requis"),
   address: z.string().min(5, "Adresse complète requise"),
+  googleMapsLink: z.string().optional().or(z.literal("")),
   city: z.string().min(2, "Ville requise"),
   productionType: z.string().min(1, "Type de production requis"),
   productionCapacity: z.string().min(1, "Capacité de production requise"),
@@ -62,6 +63,7 @@ const ProducerSignupForm = () => {
         company_registration_number: data.companyRegistrationNumber,
         tax_identification_number: data.taxIdentificationNumber,
         address: data.address,
+        google_maps_link: data.googleMapsLink || null,
         city: data.city,
         production_type: data.productionType,
         production_capacity: data.productionCapacity,
@@ -273,6 +275,18 @@ const ProducerSignupForm = () => {
             {errors.city && (
               <p className="text-sm text-destructive">{errors.city.message}</p>
             )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="googleMapsLink">Lien Google Maps (optionnel)</Label>
+            <Input
+              id="googleMapsLink"
+              {...register("googleMapsLink")}
+              placeholder="https://maps.google.com/?q=..."
+            />
+            <p className="text-xs text-muted-foreground">
+              Collez le lien de localisation Google Maps de votre établissement (facultatif)
+            </p>
           </div>
 
           <div className="space-y-2">
