@@ -13,6 +13,7 @@ interface UserRequest {
   role?: string;
   filters?: Record<string, any>;
   reason?: string;
+  deleted_reason?: string;
 }
 
 serve(async (req) => {
@@ -35,7 +36,7 @@ serve(async (req) => {
     const currentUser = userData.user;
     if (!currentUser) throw new Error("User not authenticated");
 
-    const { action, user_id, profile_data, role, filters }: UserRequest = await req.json();
+    const { action, user_id, profile_data, role, filters, deleted_reason }: UserRequest = await req.json();
 
     console.log(`[USER-SERVICE] Action: ${action}`);
 
@@ -260,7 +261,7 @@ serve(async (req) => {
                 role: registrationRequest?.professional_type,
                 company_name: registrationRequest?.company_name,
               },
-              reason: req.json().then ? undefined : undefined, // Optional reason
+              reason: deleted_reason || undefined,
               deleted_by: currentUser.email,
               deleted_at: new Date().toISOString(),
             },
