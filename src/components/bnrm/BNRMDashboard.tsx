@@ -314,38 +314,6 @@ export const BNRMDashboard = () => {
         </Card>
       </div>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Actions rapides</CardTitle>
-          <CardDescription>
-            Raccourcis vers les tâches courantes
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Button variant="outline" className="h-20 flex flex-col gap-2">
-              <FileText className="h-6 w-6" />
-              <span className="text-sm">Nouvelle demande</span>
-            </Button>
-            
-            <Button variant="outline" className="h-20 flex flex-col gap-2">
-              <CheckCircle className="h-6 w-6" />
-              <span className="text-sm">Valider demandes</span>
-            </Button>
-            
-            <Button variant="outline" className="h-20 flex flex-col gap-2">
-              <BookOpen className="h-6 w-6" />
-              <span className="text-sm">Attribuer ISBN</span>
-            </Button>
-            
-            <Button variant="outline" className="h-20 flex flex-col gap-2">
-              <Archive className="h-6 w-6" />
-              <span className="text-sm">Gérer dépôts</span>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Alerts */}
       <Card className="border-orange-200 bg-orange-50">
