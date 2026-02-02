@@ -33,30 +33,28 @@ export const RequestDetailsDrawer = ({ isOpen, onClose, request }: RequestDetail
 
   const metadata = (request.metadata as Record<string, any>) || {};
   const publication = metadata.publication || {};
-  // Déclarant peut être dans metadata.declarant ou directement sur request
-  const declarant = metadata.declarant || request.declarant || {};
+  // Éditeur (peut être dans metadata.publisher, metadata.editor, ou request.publisher)
+  const editor = metadata.publisher || metadata.editor || request.publisher || metadata.declarant || {};
+  // Imprimeur (peut être dans metadata.printer ou request.printer)
   const printer = metadata.printer || request.printer || {};
   const support = metadata.support || {};
   
-  // Résolution du nom du déclarant
-  const declarantName = typeof declarant === 'object' 
-    ? (declarant.name || declarant.full_name || declarant.nom) 
-    : (request.declarant_name || request.requester_name || metadata.declarant_name);
-  const declarantEmail = typeof declarant === 'object'
-    ? declarant.email
-    : (request.declarant_email || request.requester_email || metadata.email);
-  const declarantOrg = typeof declarant === 'object'
-    ? (declarant.organization || declarant.publisher?.name || declarant.publisher)
-    : (metadata.organization || request.publisher?.name);
-  const declarantPhone = typeof declarant === 'object'
-    ? declarant.phone
-    : (metadata.phone || request.phone);
-  const declarantAddress = typeof declarant === 'object'
-    ? declarant.address
-    : (metadata.address || request.address);
-  const declarantCity = typeof declarant === 'object'
-    ? declarant.city
-    : (metadata.city || request.city);
+  // Résolution des infos de l'éditeur
+  const editorName = typeof editor === 'object' 
+    ? (editor.name || editor.full_name || editor.nom) 
+    : (request.publisher_name || request.declarant_name || request.requester_name || metadata.publisher_name);
+  const editorEmail = typeof editor === 'object'
+    ? editor.email
+    : (request.publisher_email || request.declarant_email || metadata.email);
+  const editorPhone = typeof editor === 'object'
+    ? editor.phone
+    : (metadata.publisher_phone || metadata.phone);
+  const editorAddress = typeof editor === 'object'
+    ? editor.address
+    : (metadata.publisher_address || metadata.address);
+  const editorCity = typeof editor === 'object'
+    ? editor.city
+    : (metadata.publisher_city || metadata.city);
 
   // Résolution des infos de l'imprimeur
   const printerName = typeof printer === 'object' 
@@ -75,6 +73,7 @@ export const RequestDetailsDrawer = ({ isOpen, onClose, request }: RequestDetail
     ? printer.city
     : metadata.printer_city;
   
+  const hasEditorInfo = editorName || editorEmail || editorPhone || editorAddress;
   const hasPrinterInfo = printerName || printerEmail || printerPhone || printerAddress;
 
   const getStatusBadge = (status: string) => {
@@ -213,45 +212,42 @@ export const RequestDetailsDrawer = ({ isOpen, onClose, request }: RequestDetail
 
             <Separator />
 
-            {/* Déclarant */}
-            <section>
-              <SectionTitle>
-                <User className="h-4 w-4" />
-                Déclarant
-              </SectionTitle>
-              <div className="space-y-1 bg-muted/20 rounded-lg p-4">
-                <InfoRow 
-                  icon={User} 
-                  label="Nom" 
-                  value={declarantName} 
-                />
-                <InfoRow 
-                  icon={Building} 
-                  label="Organisation" 
-                  value={declarantOrg} 
-                />
-                <InfoRow 
-                  icon={Mail} 
-                  label="Email" 
-                  value={declarantEmail} 
-                />
-                <InfoRow 
-                  icon={Phone} 
-                  label="Téléphone" 
-                  value={declarantPhone} 
-                />
-                <InfoRow 
-                  icon={MapPin} 
-                  label="Adresse" 
-                  value={declarantAddress} 
-                />
-                <InfoRow 
-                  icon={MapPin} 
-                  label="Ville" 
-                  value={declarantCity} 
-                />
-              </div>
-            </section>
+            {/* Éditeur */}
+            {hasEditorInfo && (
+              <section>
+                <SectionTitle>
+                  <Building className="h-4 w-4" />
+                  Éditeur
+                </SectionTitle>
+                <div className="space-y-1 bg-muted/20 rounded-lg p-4">
+                  <InfoRow 
+                    icon={Building} 
+                    label="Nom" 
+                    value={editorName} 
+                  />
+                  <InfoRow 
+                    icon={Mail} 
+                    label="Email" 
+                    value={editorEmail} 
+                  />
+                  <InfoRow 
+                    icon={Phone} 
+                    label="Téléphone" 
+                    value={editorPhone} 
+                  />
+                  <InfoRow 
+                    icon={MapPin} 
+                    label="Adresse" 
+                    value={editorAddress} 
+                  />
+                  <InfoRow 
+                    icon={MapPin} 
+                    label="Ville" 
+                    value={editorCity} 
+                  />
+                </div>
+              </section>
+            )}
 
             {/* Imprimeur (si présent) */}
             {hasPrinterInfo && (
