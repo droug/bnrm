@@ -146,6 +146,11 @@ export const BNRMNumberAttribution = () => {
     fetchData();
   }, []);
 
+  // Persister automatiquement les modifications du paramétrage dans localStorage
+  useEffect(() => {
+    localStorage.setItem('depot_legal_number_settings', JSON.stringify(numberSettings));
+  }, [numberSettings]);
+
   const hasAnyAttributedNumber = (req: any) => {
     const metadata = (req?.metadata ?? {}) as Record<string, any>;
 
@@ -1733,17 +1738,18 @@ export const BNRMNumberAttribution = () => {
                   </div>
                 </div>
 
-                <div className="flex justify-end pt-4">
+                <div className="flex justify-between items-center pt-4 border-t">
+                  <p className="text-sm text-muted-foreground">
+                    Les modifications sont enregistrées automatiquement et appliquées immédiatement.
+                  </p>
                   <Button onClick={() => {
-                    // Sauvegarder dans localStorage
-                    localStorage.setItem('depot_legal_number_settings', JSON.stringify(numberSettings));
                     toast({
-                      title: "Paramètres enregistrés",
-                      description: "La configuration des numéros a été mise à jour avec succès.",
+                      title: "Paramètres à jour",
+                      description: "La configuration est synchronisée sur tous les types de document.",
                     });
-                  }}>
+                  }} variant="outline">
                     <CheckCircle className="h-4 w-4 mr-2" />
-                    Enregistrer les paramètres
+                    Vérifier la configuration
                   </Button>
                 </div>
               </div>
