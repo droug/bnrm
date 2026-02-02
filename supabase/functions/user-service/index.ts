@@ -230,10 +230,87 @@ serve(async (req) => {
           .eq('user_id', user_id)
           .single();
 
+        // IMPORTANT: Supprimer TOUTES les données liées AVANT de supprimer l'utilisateur Auth
+        // car il y a des contraintes FK vers auth.users avec ON DELETE NO ACTION ou CASCADE
+        console.log(`[USER-SERVICE] Cleaning up related data for user: ${user_id}`);
+        
+        // Tables avec FK directes vers auth.users - doivent être nettoyées AVANT la suppression Auth
+        const cleanupTables = [
+          { table: 'vexpo_exhibitions', column: 'created_by' },
+          { table: 'vexpo_artworks', column: 'created_by' },
+          { table: 'professional_registration_documents', column: 'user_id' },
+          { table: 'professional_registration_requests', column: 'user_id' },
+          { table: 'user_roles', column: 'user_id' },
+          { table: 'profiles', column: 'user_id' },
+          { table: 'chat_conversations', column: 'user_id' },
+          { table: 'chatbot_interactions', column: 'user_id' },
+          { table: 'reading_history', column: 'user_id' },
+          { table: 'favorites', column: 'user_id' },
+          { table: 'user_bookmarks', column: 'user_id' },
+          { table: 'user_reviews', column: 'user_id' },
+          { table: 'reproduction_requests', column: 'user_id' },
+          { table: 'professional_registry', column: 'user_id' },
+        ];
+
+        for (const { table, column } of cleanupTables) {
+          try {
+            const { error: cleanupError } = await supabaseClient
+              .from(table)
+              .delete()
+              .eq(column, user_id);
+            
+            if (cleanupError) {
+              console.warn(`[USER-SERVICE] Warning cleaning ${table}: ${cleanupError.message}`);
+            } else {
+              console.log(`[USER-SERVICE] Cleaned ${table} for user ${user_id}`);
+            }
+          } catch (e) {
+            console.warn(`[USER-SERVICE] Error cleaning ${table}:`, e);
+          }
+        }
+
+        // Mettre à NULL les références optionnelles (colonnes avec ON DELETE SET NULL)
+        const nullifyTables = [
+          { table: 'bnrm_tarifs_historique', column: 'utilisateur_responsable' },
+          { table: 'legal_deposit_requests', column: 'rejected_by' },
+          { table: 'legal_deposit_requests', column: 'validated_by_committee' },
+          { table: 'legal_deposit_requests', column: 'validated_by_service' },
+          { table: 'legal_deposit_requests', column: 'validated_by_department' },
+          { table: 'deposit_workflow_steps', column: 'gestionnaire_id' },
+          { table: 'deposit_activity_log', column: 'user_id' },
+          { table: 'number_ranges', column: 'created_by' },
+          { table: 'deposit_notifications', column: 'recipient_id' },
+          { table: 'user_reviews', column: 'reviewed_by' },
+          { table: 'catalog_metadata', column: 'created_by' },
+          { table: 'catalog_metadata', column: 'updated_by' },
+          { table: 'metadata_import_history', column: 'imported_by' },
+          { table: 'metadata_exports', column: 'exported_by' },
+          { table: 'sigb_configuration', column: 'configured_by' },
+          { table: 'reproduction_requests', column: 'processed_by' },
+          { table: 'reproduction_requests', column: 'manager_validator_id' },
+          { table: 'reproduction_requests', column: 'service_validator_id' },
+          { table: 'reproduction_requests', column: 'rejected_by' },
+        ];
+
+        for (const { table, column } of nullifyTables) {
+          try {
+            const { error: nullifyError } = await supabaseClient
+              .from(table)
+              .update({ [column]: null })
+              .eq(column, user_id);
+            
+            if (nullifyError) {
+              console.warn(`[USER-SERVICE] Warning nullifying ${table}.${column}: ${nullifyError.message}`);
+            }
+          } catch (e) {
+            console.warn(`[USER-SERVICE] Error nullifying ${table}.${column}:`, e);
+          }
+        }
+
+        console.log(`[USER-SERVICE] Data cleanup completed, now deleting Auth user: ${user_id}`);
+
         // Supprimer l'utilisateur de auth.users
         // NB: l'opération doit être idempotente.
-        // Si l'utilisateur a déjà été supprimé (ex: tentative précédente partiellement réussie),
-        // on ne doit pas renvoyer 500 — on nettoie simplement les données publiques résiduelles.
         let alreadyDeleted = false;
         const { error: deleteError } = await supabaseClient.auth.admin.deleteUser(user_id);
 
@@ -248,15 +325,8 @@ serve(async (req) => {
             throw new Error(`Erreur lors de la suppression: ${msg}`);
           }
         } else {
-          console.log(`[USER-SERVICE] User ${user_id} deleted successfully`);
+          console.log(`[USER-SERVICE] User ${user_id} deleted from Auth successfully`);
         }
-
-        // Nettoyage défensif (au cas où des données publiques resteraient)
-        // Le service role bypass RLS, donc ces suppressions sont autorisées ici.
-        await supabaseClient.from('professional_registration_documents').delete().eq('user_id', user_id);
-        await supabaseClient.from('professional_registration_requests').delete().eq('user_id', user_id);
-        await supabaseClient.from('user_roles').delete().eq('user_id', user_id);
-        await supabaseClient.from('profiles').delete().eq('user_id', user_id);
 
         // Log l'activité
         await supabaseClient
