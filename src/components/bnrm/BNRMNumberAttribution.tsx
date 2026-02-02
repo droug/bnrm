@@ -40,6 +40,7 @@ import { NumberManagementTab } from "@/components/legal-deposit/NumberManagement
 import { SearchPagination } from "@/components/ui/search-pagination";
 import IssnRequestsManager from "@/components/legal-deposit/IssnRequestsManager";
 import { NumberSelectionModal } from "@/components/legal-deposit/NumberSelectionModal";
+import { RequestDetailsDrawer } from "@/components/legal-deposit/RequestDetailsDrawer";
 import * as XLSX from 'xlsx';
 
 interface NumberAttribution {
@@ -2036,57 +2037,15 @@ export const BNRMNumberAttribution = () => {
         generateNextNumber={generateNextNumber}
       />
 
-      {/* View Request Details Dialog */}
-      <Dialog open={isViewRequestDialogOpen} onOpenChange={setIsViewRequestDialogOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>
-              Détails de la demande - {selectedRequestForView?.request_number || selectedRequestForView?.dl_number}
-            </DialogTitle>
-          </DialogHeader>
-          
-          {selectedRequestForView && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-sm font-medium">Publication</Label>
-                  <div className="text-sm mt-1">{selectedRequestForView.title || selectedRequestForView.metadata?.publication?.title}</div>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">Type</Label>
-                  <div className="text-sm mt-1">{selectedRequestForView.deposit_type === 'monographie' ? 'Monographie' : 'Périodique'}</div>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">Déclarant</Label>
-                  <div className="text-sm mt-1">{selectedRequestForView.author_name || selectedRequestForView.metadata?.declarant?.name}</div>
-                </div>
-                <div>
-                  <Label className="text-sm font-medium">Date de création</Label>
-                  <div className="text-sm mt-1">
-                    {selectedRequestForView.created_at 
-                      ? format(new Date(selectedRequestForView.created_at), "dd/MM/yyyy HH:mm", { locale: fr })
-                      : '-'}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex justify-end space-x-2 pt-4">
-                <Button variant="outline" onClick={() => setIsViewRequestDialogOpen(false)}>
-                  Fermer
-                </Button>
-                <Button onClick={() => {
-                  setIsViewRequestDialogOpen(false);
-                  setSelectedRequest(selectedRequestForView);
-                  setIsAttributionDialogOpen(true);
-                }}>
-                  <Hash className="h-4 w-4 mr-2" />
-                  Attribuer N°
-                </Button>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      {/* Request Details Drawer - Fenêtre latérale gauche */}
+      <RequestDetailsDrawer
+        isOpen={isViewRequestDialogOpen}
+        onClose={() => {
+          setIsViewRequestDialogOpen(false);
+          setSelectedRequestForView(null);
+        }}
+        request={selectedRequestForView}
+      />
     </div>
   );
 };
