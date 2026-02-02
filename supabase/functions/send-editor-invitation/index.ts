@@ -11,7 +11,9 @@ const corsHeaders = {
 interface InvitationRequest {
   editorEmail: string;
   editorName: string;
+  editorPhone?: string;
   editorId: string;
+  notifyByPhone?: boolean;
 }
 
 serve(async (req) => {
@@ -21,7 +23,7 @@ serve(async (req) => {
   }
 
   try {
-    const { editorEmail, editorName, editorId } =
+    const { editorEmail, editorName, editorPhone, editorId, notifyByPhone } =
       (await req.json()) as InvitationRequest;
 
     if (!editorEmail || !editorName) {
@@ -40,7 +42,16 @@ serve(async (req) => {
     const baseUrl = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
     const encodedEmail = encodeURIComponent(editorEmail);
     const encodedName = encodeURIComponent(editorName);
-    const registrationUrl = `${baseUrl}/signup?type=editor&ref=${editorId}&email=${encodedEmail}&name=${encodedName}`;
+    const encodedPhone = editorPhone ? encodeURIComponent(editorPhone) : "";
+    const registrationUrl = `${baseUrl}/signup?type=editor&ref=${editorId}&email=${encodedEmail}&name=${encodedName}${encodedPhone ? `&phone=${encodedPhone}` : ""}`;
+
+    // Additional phone notification section in email
+    const phoneNotificationSection = notifyByPhone && editorPhone ? `
+    <div style="background: #e3f2fd; padding: 15px; border-radius: 6px; border-left: 4px solid #2196f3; margin: 20px 0;">
+      <p style="margin: 0; font-size: 14px;"><strong>📞 Contact téléphonique :</strong></p>
+      <p style="margin: 5px 0 0 0; font-size: 14px;">Vous pouvez également nous contacter au : <strong>${editorPhone}</strong></p>
+    </div>
+    ` : "";
 
     // Email content
     const emailSubject = "Invitation à rejoindre la plateforme BNRM - Dépôt Légal";
@@ -76,6 +87,8 @@ serve(async (req) => {
         Créer mon compte Éditeur
       </a>
     </div>
+    
+    ${phoneNotificationSection}
     
     <div style="background: #fff3cd; padding: 15px; border-radius: 6px; border-left: 4px solid #ffc107; margin: 20px 0;">
       <p style="margin: 0; font-size: 14px;"><strong>Important :</strong> Votre inscription sera soumise à validation dans un délai de 10 jours ouvrables.</p>
@@ -124,6 +137,8 @@ serve(async (req) => {
         details: {
           email: editorEmail,
           name: editorName,
+          phone: editorPhone || null,
+          notifyByPhone: notifyByPhone || false,
           reason: result.error || "Email delivery failed, manual follow-up required",
         },
       });
@@ -133,6 +148,7 @@ serve(async (req) => {
           success: false,
           message: "Email queued for manual delivery",
           error: result.error,
+          phoneNotificationRequired: notifyByPhone && editorPhone ? editorPhone : null,
         }),
         {
           status: 200,
@@ -149,6 +165,8 @@ serve(async (req) => {
       details: {
         email: editorEmail,
         name: editorName,
+        phone: editorPhone || null,
+        notifyByPhone: notifyByPhone || false,
         method: result.method,
         messageId: result.messageId,
       },
@@ -162,6 +180,7 @@ serve(async (req) => {
         message: "Invitation sent successfully",
         method: result.method,
         messageId: result.messageId,
+        phoneNotificationRequired: notifyByPhone && editorPhone ? editorPhone : null,
       }),
       {
         status: 200,

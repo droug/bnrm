@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Loader2, Mail, Phone, Building2, Send } from "lucide-react";
+import { Loader2, Mail, Phone, Building2, Send, MessageSquare } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -37,7 +37,8 @@ export const EditorInlineForm = ({
     phone: "",
     city: "",
   });
-  const [sendInvitation, setSendInvitation] = useState(true);
+  const [notifyByEmail, setNotifyByEmail] = useState(true);
+  const [notifyByPhone, setNotifyByPhone] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validateForm = () => {
@@ -47,10 +48,25 @@ export const EditorInlineForm = ({
       newErrors.name = "Le nom est obligatoire";
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = "L'email est obligatoire pour l'invitation";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Email invalide";
+    // Email is required if notification by email is selected
+    if (notifyByEmail) {
+      if (!formData.email.trim()) {
+        newErrors.email = "L'email est obligatoire pour la notification";
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        newErrors.email = "Email invalide";
+      }
+    }
+
+    // Phone is required if notification by phone is selected
+    if (notifyByPhone) {
+      if (!formData.phone.trim()) {
+        newErrors.phone = "Le téléphone est obligatoire pour la notification";
+      }
+    }
+
+    // At least one notification method should be selected when adding a new editor
+    if (!notifyByEmail && !notifyByPhone) {
+      newErrors.notification = "Veuillez sélectionner au moins un mode de notification";
     }
 
     setErrors(newErrors);
@@ -68,7 +84,7 @@ export const EditorInlineForm = ({
         .insert([
           {
             name: formData.name.trim(),
-            email: formData.email.trim(),
+            email: formData.email.trim() || null,
             phone: formData.phone.trim() || null,
             city: formData.city.trim() || null,
             country: "Maroc",
@@ -84,7 +100,7 @@ export const EditorInlineForm = ({
       }
 
       // 2. Send invitation email if requested
-      if (sendInvitation && editor) {
+      if (notifyByEmail && formData.email.trim() && editor) {
         try {
           const { error: inviteError } = await supabase.functions.invoke(
             "send-editor-invitation",
@@ -92,7 +108,9 @@ export const EditorInlineForm = ({
               body: {
                 editorEmail: formData.email.trim(),
                 editorName: formData.name.trim(),
+                editorPhone: formData.phone.trim() || null,
                 editorId: editor.id,
+                notifyByPhone: notifyByPhone,
               },
             }
           );
@@ -100,19 +118,73 @@ export const EditorInlineForm = ({
           if (inviteError) {
             console.error("Error sending invitation:", inviteError);
             toast.warning(
-              "Éditeur ajouté, mais l'invitation n'a pas pu être envoyée"
+              "Éditeur ajouté, mais l'invitation par email n'a pas pu être envoyée"
             );
           } else {
             toast.success(
-              "Éditeur ajouté et invitation envoyée avec succès"
+              "Éditeur ajouté et invitation par email envoyée avec succès"
             );
           }
         } catch (e) {
           console.error("Error calling invitation function:", e);
-          toast.success("Éditeur ajouté (invitation en attente)");
+          toast.success("Éditeur ajouté (invitation par email en attente)");
         }
+      } else if (!notifyByEmail && notifyByPhone) {
+        toast.success("Éditeur ajouté avec succès");
+        toast.info(
+          `Veuillez contacter l'éditeur par téléphone: ${formData.phone}`,
+          {
+            duration: 10000,
+            action: {
+              label: "Copier",
+              onClick: () => {
+                navigator.clipboard.writeText(formData.phone);
+                toast.success("Numéro copié");
+              },
+            },
+          }
+        );
       } else {
         toast.success("Éditeur ajouté avec succès");
+      }
+
+      // Show phone notification reminder if phone notification is selected
+      if (notifyByPhone && formData.phone.trim()) {
+        const phoneNumber = formData.phone.trim();
+        const message = `Bonjour ${formData.name.trim()}, vous êtes invité(e) à vous inscrire sur la plateforme BNRM pour le dépôt légal.`;
+        
+        // Show a persistent notification with the phone number
+        toast.info(
+          <div className="space-y-2">
+            <p className="font-medium">Notification téléphonique requise</p>
+            <p className="text-sm">Contacter: <strong>{phoneNumber}</strong></p>
+            <div className="flex gap-2 mt-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  navigator.clipboard.writeText(phoneNumber);
+                  toast.success("Numéro copié");
+                }}
+              >
+                <Phone className="h-3 w-3 mr-1" />
+                Copier
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => {
+                  navigator.clipboard.writeText(message);
+                  toast.success("Message copié");
+                }}
+              >
+                <MessageSquare className="h-3 w-3 mr-1" />
+                Copier message
+              </Button>
+            </div>
+          </div>,
+          { duration: 15000 }
+        );
       }
 
       // 3. Callback with the new editor
@@ -154,7 +226,7 @@ export const EditorInlineForm = ({
         {/* Email */}
         <div className="space-y-1">
           <Label className="text-xs">
-            Email <span className="text-destructive">*</span>
+            Email {notifyByEmail && <span className="text-destructive">*</span>}
           </Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -175,7 +247,9 @@ export const EditorInlineForm = ({
 
         {/* Phone */}
         <div className="space-y-1">
-          <Label className="text-xs">Téléphone</Label>
+          <Label className="text-xs">
+            Téléphone {notifyByPhone && <span className="text-destructive">*</span>}
+          </Label>
           <div className="relative">
             <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -185,9 +259,12 @@ export const EditorInlineForm = ({
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, phone: e.target.value }))
               }
-              className="pl-10"
+              className={`pl-10 ${errors.phone ? "border-destructive" : ""}`}
             />
           </div>
+          {errors.phone && (
+            <p className="text-xs text-destructive">{errors.phone}</p>
+          )}
         </div>
 
         {/* City */}
@@ -202,20 +279,49 @@ export const EditorInlineForm = ({
           />
         </div>
 
-        {/* Send Invitation Checkbox */}
-        <div className="flex items-center space-x-2 pt-2">
-          <Checkbox
-            id="sendEditorInvitation"
-            checked={sendInvitation}
-            onCheckedChange={(checked) => setSendInvitation(checked as boolean)}
-          />
-          <label
-            htmlFor="sendEditorInvitation"
-            className="text-sm text-muted-foreground cursor-pointer flex items-center gap-1"
-          >
-            <Send className="h-3 w-3" />
-            Envoyer une invitation à s'inscrire
-          </label>
+        {/* Notification Options */}
+        <div className="space-y-2 pt-2 border-t">
+          <Label className="text-xs font-medium">Mode de notification pour l'inscription</Label>
+          
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="notifyEditorByEmail"
+              checked={notifyByEmail}
+              onCheckedChange={(checked) => setNotifyByEmail(checked as boolean)}
+            />
+            <label
+              htmlFor="notifyEditorByEmail"
+              className="text-sm text-muted-foreground cursor-pointer flex items-center gap-1"
+            >
+              <Mail className="h-3 w-3" />
+              Notification par email
+            </label>
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="notifyEditorByPhone"
+              checked={notifyByPhone}
+              onCheckedChange={(checked) => setNotifyByPhone(checked as boolean)}
+            />
+            <label
+              htmlFor="notifyEditorByPhone"
+              className="text-sm text-muted-foreground cursor-pointer flex items-center gap-1"
+            >
+              <Phone className="h-3 w-3" />
+              Notification par téléphone
+            </label>
+          </div>
+
+          {errors.notification && (
+            <p className="text-xs text-destructive">{errors.notification}</p>
+          )}
+
+          {notifyByPhone && (
+            <p className="text-xs text-amber-600 bg-amber-50 p-2 rounded">
+              ℹ️ Après l'ajout, vous recevrez les informations pour contacter l'éditeur par téléphone
+            </p>
+          )}
         </div>
       </div>
 
@@ -244,7 +350,10 @@ export const EditorInlineForm = ({
               Ajout...
             </>
           ) : (
-            "Ajouter"
+            <>
+              <Send className="mr-2 h-4 w-4" />
+              Ajouter et notifier
+            </>
           )}
         </Button>
       </div>
