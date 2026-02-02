@@ -39,6 +39,7 @@ import { ReservedRangesManager } from "@/components/legal-deposit/ReservedRanges
 import { NumberManagementTab } from "@/components/legal-deposit/NumberManagementTab";
 import { SearchPagination } from "@/components/ui/search-pagination";
 import IssnRequestsManager from "@/components/legal-deposit/IssnRequestsManager";
+import { NumberSelectionModal } from "@/components/legal-deposit/NumberSelectionModal";
 import * as XLSX from 'xlsx';
 
 interface NumberAttribution {
@@ -329,6 +330,57 @@ export const BNRMNumberAttribution = () => {
 
       setAttributions(transformedAttributions);
 
+      // Charger les tranches réservées depuis la base de données
+      const { data: reservedRangesFromDB, error: reservedError } = await supabase
+        .from('reserved_number_ranges')
+        .select('*')
+        .eq('status', 'active');
+
+      if (reservedError) {
+        console.error("Error fetching reserved ranges:", reservedError);
+      }
+
+      // Si aucune tranche réservée n'existe, en créer une exemple pour démonstration
+      if (!reservedRangesFromDB || reservedRangesFromDB.length === 0) {
+        // Créer une tranche exemple pour Editions Al Manar
+        try {
+          await supabase.from('reserved_number_ranges').insert([
+            {
+              requester_name: 'Editions Al Manar (Exemple)',
+              requester_email: 'editions.almanar@example.com',
+              deposit_type: 'monographie',
+              number_type: 'isbn',
+              range_start: '978-9920-600-00-0',
+              range_end: '978-9920-600-99-9',
+              current_position: '978-9920-600-03-1',
+              total_numbers: 100,
+              used_numbers: 3,
+              used_numbers_list: ['978-9920-600-00-0', '978-9920-600-01-7', '978-9920-600-02-4'],
+              status: 'active',
+              notes: 'Tranche ISBN réservée pour Editions Al Manar - 100 numéros (Exemple)'
+            },
+            {
+              requester_name: 'Revue Marocaine de Droit (Exemple)',
+              requester_email: 'revue.droit@example.com',
+              deposit_type: 'periodique',
+              number_type: 'issn',
+              range_start: '2820-0001',
+              range_end: '2820-0010',
+              current_position: '2820-0002',
+              total_numbers: 10,
+              used_numbers: 1,
+              used_numbers_list: ['2820-0001'],
+              status: 'active',
+              notes: 'Tranche ISSN réservée pour Revue Marocaine de Droit (Exemple)'
+            }
+          ]);
+          console.log("Created example reserved ranges");
+        } catch (insertError) {
+          console.log("Could not create example ranges:", insertError);
+        }
+      }
+
+      // Tranches BNRM par défaut (peuvent être remplacées par des vraies données)
       setRanges([
         {
           id: "1",
@@ -1888,186 +1940,70 @@ export const BNRMNumberAttribution = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Number Selection Dialog */}
-      <Dialog open={isNumberSelectionOpen} onOpenChange={setIsNumberSelectionOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              {selectedNumberType === 'isbn' && <BookOpen className="h-5 w-5" />}
-              {selectedNumberType === 'issn' && <Newspaper className="h-5 w-5" />}
-              {selectedNumberType === 'ismn' && <Hash className="h-5 w-5" />}
-              Sélection du numéro {selectedNumberType?.toUpperCase()}
-            </DialogTitle>
-          </DialogHeader>
+      {/* Number Selection Modal - Nouveau composant amélioré */}
+      <NumberSelectionModal
+        isOpen={isNumberSelectionOpen}
+        onClose={() => {
+          setIsNumberSelectionOpen(false);
+          setSelectedNumberType(null);
+        }}
+        numberType={selectedNumberType || 'isbn'}
+        request={selectedRequest}
+        availableRanges={availableRanges}
+        onConfirm={async (attributedNumber: string, rangeId?: string) => {
+          if (!selectedRequest || !selectedNumberType) return;
           
-          <div className="space-y-4">
-            {/* Tranches BNRM disponibles */}
-            <div>
-              <Label className="text-sm font-medium mb-2 block">Tranches BNRM disponibles</Label>
-              {availableRanges.length === 0 ? (
-                <div className="bg-muted/50 border border-dashed rounded-lg p-4 text-center text-muted-foreground text-sm">
-                  Aucune tranche {selectedNumberType?.toUpperCase()} disponible
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {availableRanges.map((range) => {
-                    const usagePercent = Math.round((range.used_numbers / range.total_numbers) * 100);
-                    const nextNumber = generateNextNumber(selectedNumberType!, range);
-                    return (
-                      <div 
-                        key={range.id}
-                        className={`border rounded-lg p-3 cursor-pointer transition-colors ${
-                          selectedRangeId === range.id 
-                            ? 'border-primary bg-primary/5' 
-                            : 'hover:border-muted-foreground/50'
-                        }`}
-                        onClick={() => {
-                          setSelectedRangeId(range.id);
-                          setUseCustomNumber(false);
-                        }}
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <input 
-                              type="radio" 
-                              checked={selectedRangeId === range.id && !useCustomNumber}
-                              onChange={() => {
-                                setSelectedRangeId(range.id);
-                                setUseCustomNumber(false);
-                              }}
-                              className="h-4 w-4 text-primary"
-                            />
-                            <div>
-                              <div className="font-mono text-sm font-medium">
-                                {range.range_start} → {range.range_end}
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                {range.agency || 'Source manuelle'} • {range.used_numbers}/{range.total_numbers} utilisés ({usagePercent}%)
-                              </div>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <div className="text-xs text-muted-foreground">Prochain numéro</div>
-                            <div className="font-mono text-sm font-bold text-primary">{nextNumber}</div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
+          const request = pendingRequests.find(r => r.id === selectedRequest.id);
+          const currentMetadata = request?.metadata || {};
+          
+          const updateData: any = {
+            metadata: {
+              ...currentMetadata,
+              [`${selectedNumberType}_assigned`]: attributedNumber,
+              [`${selectedNumberType}_attribution_date`]: new Date().toISOString()
+            }
+          };
 
-            {/* Tranches réservées aux professionnels */}
-            {reservedRanges.length > 0 && (
-              <div>
-                <Label className="text-sm font-medium mb-2 block">Tranches réservées (comptes professionnels)</Label>
-                <div className="space-y-2">
-                  {reservedRanges.map((range) => (
-                    <div 
-                      key={range.id}
-                      className={`border rounded-lg p-3 cursor-pointer transition-colors bg-amber-50/50 ${
-                        selectedRangeId === range.id 
-                          ? 'border-amber-500 bg-amber-100/50' 
-                          : 'border-amber-200 hover:border-amber-400'
-                      }`}
-                      onClick={() => {
-                        setSelectedRangeId(range.id);
-                        setUseCustomNumber(false);
-                      }}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <input 
-                            type="radio" 
-                            checked={selectedRangeId === range.id && !useCustomNumber}
-                            onChange={() => {
-                              setSelectedRangeId(range.id);
-                              setUseCustomNumber(false);
-                            }}
-                            className="h-4 w-4 text-amber-600"
-                          />
-                          <div>
-                            <div className="font-mono text-sm font-medium">
-                              {range.range_start} → {range.range_end}
-                            </div>
-                            <div className="text-xs text-amber-700">
-                              Réservé pour: {range.requester_name || 'Professionnel'}
-                            </div>
-                          </div>
-                        </div>
-                        <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300">
-                          Réservé
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+          const { error } = await supabase
+            .from("legal_deposit_requests")
+            .update(updateData)
+            .eq("id", selectedRequest.id);
 
-            {/* Option numéro personnalisé */}
-            <div>
-              <div 
-                className={`border rounded-lg p-3 cursor-pointer transition-colors ${
-                  useCustomNumber 
-                    ? 'border-primary bg-primary/5' 
-                    : 'hover:border-muted-foreground/50'
-                }`}
-                onClick={() => setUseCustomNumber(true)}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <input 
-                    type="radio" 
-                    checked={useCustomNumber}
-                    onChange={() => setUseCustomNumber(true)}
-                    className="h-4 w-4 text-primary"
-                  />
-                  <Label className="text-sm font-medium cursor-pointer">Saisir un numéro personnalisé</Label>
-                </div>
-                {useCustomNumber && (
-                  <Input
-                    placeholder={`Entrez le numéro ${selectedNumberType?.toUpperCase()}...`}
-                    value={customNumber}
-                    onChange={(e) => setCustomNumber(e.target.value)}
-                    className="mt-2 font-mono"
-                    autoFocus
-                  />
-                )}
-              </div>
-            </div>
+          if (error) throw error;
 
-            {/* Actions */}
-            <div className="flex justify-end gap-2 pt-4 border-t">
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setIsNumberSelectionOpen(false);
-                  setSelectedNumberType(null);
-                }}
-              >
-                Annuler
-              </Button>
-              <Button 
-                onClick={confirmNumberAttribution}
-                disabled={isAttributing || (!selectedRangeId && !useCustomNumber) || (useCustomNumber && !customNumber.trim())}
-              >
-                {isAttributing ? (
-                  <>
-                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                    Attribution...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Confirmer l'attribution
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+          // Ajouter à la liste des attributions
+          const newAttribution: NumberAttribution = {
+            id: Date.now().toString(),
+            deposit_id: selectedRequest.id,
+            number_type: selectedNumberType,
+            attributed_number: attributedNumber,
+            attribution_date: new Date().toISOString(),
+            status: 'attributed',
+            metadata: {
+              publication_title: request?.title || request?.metadata?.publication?.title,
+              declarant_name: request?.author_name || request?.metadata?.declarant?.name,
+              dl_number: request?.request_number || request?.dl_number
+            }
+          };
+
+          setAttributions(prev => [newAttribution, ...prev]);
+          await fetchData();
+
+          toast({
+            title: "Succès",
+            description: `Numéro ${selectedNumberType.toUpperCase()} attribué: ${attributedNumber}`,
+          });
+
+          // Envoyer automatiquement la notification par email
+          await handleNotifyAttribution(newAttribution);
+
+          // Fermer les modales
+          setIsAttributionDialogOpen(false);
+          setSelectedRequest(null);
+          setSelectedNumberType(null);
+        }}
+        generateNextNumber={generateNextNumber}
+      />
 
       {/* View Request Details Dialog */}
       <Dialog open={isViewRequestDialogOpen} onOpenChange={setIsViewRequestDialogOpen}>
