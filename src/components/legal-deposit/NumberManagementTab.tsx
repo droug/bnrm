@@ -419,10 +419,11 @@ export const NumberManagementTab = () => {
       const user = await supabase.auth.getUser();
       
       // Create a new range for the professional with the selected numbers
+      // Note: requester_id references auth.users, so we don't use the publisher ID
+      // We store professional info in requester_name and requester_email instead
       const { error } = await supabase
         .from('reserved_number_ranges')
         .insert({
-          requester_id: selectedProfessional.id,
           requester_name: selectedProfessional.name,
           requester_email: selectedProfessional.email,
           deposit_type: rangeForm.professional_type,
