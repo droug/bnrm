@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { sendEmail } from "../_shared/smtp-client.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -33,23 +34,10 @@ serve(async (req) => {
       );
     }
 
-    // Get SMTP credentials from environment
-    const smtpUser = Deno.env.get("GMAIL_USER");
-    const smtpPass = Deno.env.get("GMAIL_APP_PASSWORD");
-
-    if (!smtpUser || !smtpPass) {
-      console.error("SMTP credentials not configured");
-      return new Response(
-        JSON.stringify({ error: "Email service not configured" }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
-      );
-    }
+    console.log(`[EDITOR-INVITATION] Sending invitation to: ${editorEmail}`);
 
     // Build registration URL
-    const baseUrl = Deno.env.get("PUBLIC_SITE_URL") || "https://bnrm.lovable.app";
+    const baseUrl = Deno.env.get("PUBLIC_SITE_URL") || Deno.env.get("SITE_URL") || "https://bnrm.lovable.app";
     const registrationUrl = `${baseUrl}/signup?role=editor&ref=${editorId}`;
 
     // Email content
@@ -111,83 +99,22 @@ serve(async (req) => {
 </html>
     `.trim();
 
-    // Send email using SMTP
-    const encoder = new TextEncoder();
-    const smtpHost = "smtp.gmail.com";
-    const smtpPorts = [587, 465];
-    
-    let emailSent = false;
-    
-    for (const port of smtpPorts) {
-      try {
-        const conn = await Deno.connect({ hostname: smtpHost, port });
-        
-        const read = async () => {
-          const buf = new Uint8Array(1024);
-          const n = await conn.read(buf);
-          return new TextDecoder().decode(buf.subarray(0, n || 0));
-        };
-        
-        const write = async (cmd: string) => {
-          await conn.write(encoder.encode(cmd + "\r\n"));
-          return await read();
-        };
-        
-        await read(); // Initial greeting
-        await write(`EHLO ${smtpHost}`);
-        await write("STARTTLS");
-        
-        // Upgrade to TLS
-        const tlsConn = await Deno.startTls(conn, { hostname: smtpHost });
-        
-        const readTls = async () => {
-          const buf = new Uint8Array(1024);
-          const n = await tlsConn.read(buf);
-          return new TextDecoder().decode(buf.subarray(0, n || 0));
-        };
-        
-        const writeTls = async (cmd: string) => {
-          await tlsConn.write(encoder.encode(cmd + "\r\n"));
-          return await readTls();
-        };
-        
-        await writeTls(`EHLO ${smtpHost}`);
-        await writeTls("AUTH LOGIN");
-        await writeTls(btoa(smtpUser));
-        await writeTls(btoa(smtpPass));
-        await writeTls(`MAIL FROM:<${smtpUser}>`);
-        await writeTls(`RCPT TO:<${editorEmail}>`);
-        await writeTls("DATA");
-        
-        const emailData = [
-          `From: BNRM - Depot Legal <${smtpUser}>`,
-          `To: ${editorEmail}`,
-          `Subject: ${emailSubject}`,
-          "MIME-Version: 1.0",
-          'Content-Type: text/html; charset="UTF-8"',
-          "",
-          emailBody,
-          ".",
-        ].join("\r\n");
-        
-        await writeTls(emailData);
-        await writeTls("QUIT");
-        
-        tlsConn.close();
-        emailSent = true;
-        break;
-      } catch (e) {
-        console.error(`Failed to send via port ${port}:`, e);
-        continue;
-      }
-    }
+    // Send email using unified SMTP client
+    const result = await sendEmail({
+      to: editorEmail,
+      subject: emailSubject,
+      html: emailBody,
+    });
 
-    if (!emailSent) {
-      // Log the invitation for manual follow-up
-      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-      const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-      const supabase = createClient(supabaseUrl, supabaseKey);
+    // Initialize Supabase client for logging
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    if (!result.success) {
+      console.error("[EDITOR-INVITATION] Email sending failed:", result.error);
       
+      // Log the failed invitation for manual follow-up
       await supabase.from("activity_logs").insert({
         action: "editor_invitation_pending",
         resource_type: "publisher",
@@ -195,14 +122,15 @@ serve(async (req) => {
         details: {
           email: editorEmail,
           name: editorName,
-          reason: "SMTP delivery failed, manual follow-up required",
+          reason: result.error || "Email delivery failed, manual follow-up required",
         },
       });
-      
+
       return new Response(
-        JSON.stringify({ 
-          success: false, 
-          message: "Email queued for manual delivery" 
+        JSON.stringify({
+          success: false,
+          message: "Email queued for manual delivery",
+          error: result.error,
         }),
         {
           status: 200,
@@ -212,10 +140,6 @@ serve(async (req) => {
     }
 
     // Log successful invitation
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    
     await supabase.from("activity_logs").insert({
       action: "editor_invitation_sent",
       resource_type: "publisher",
@@ -223,11 +147,20 @@ serve(async (req) => {
       details: {
         email: editorEmail,
         name: editorName,
+        method: result.method,
+        messageId: result.messageId,
       },
     });
 
+    console.log(`[EDITOR-INVITATION] Email sent successfully via ${result.method}`);
+
     return new Response(
-      JSON.stringify({ success: true, message: "Invitation sent successfully" }),
+      JSON.stringify({ 
+        success: true, 
+        message: "Invitation sent successfully",
+        method: result.method,
+        messageId: result.messageId,
+      }),
       {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },

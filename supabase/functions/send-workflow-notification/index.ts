@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-import nodemailer from "npm:nodemailer@6.9.10";
+import { sendEmail } from "../_shared/smtp-client.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -13,99 +13,6 @@ interface NotificationRequest {
   notification_type: string;
   recipient_email: string;
   additional_data?: any;
-}
-
-// Fonction d'envoi d'email via nodemailer SMTP ou Resend (fallback)
-async function sendEmail(
-  to: string,
-  subject: string,
-  html: string
-): Promise<{ success: boolean; error?: string }> {
-  const SMTP_HOST = Deno.env.get("SMTP_HOST");
-  const SMTP_PORT_RAW = Deno.env.get("SMTP_PORT");
-  const SMTP_USER = Deno.env.get("SMTP_USER");
-  const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
-  const SMTP_FROM = Deno.env.get("SMTP_FROM");
-
-  // Essayer SMTP d'abord via nodemailer
-  if (SMTP_HOST && SMTP_USER && SMTP_PASSWORD) {
-    try {
-      const port = SMTP_PORT_RAW ? parseInt(SMTP_PORT_RAW, 10) : 465;
-      const isSecure = port === 465;
-
-      console.log(`Sending email via nodemailer SMTP (port=${port}) to: ${to}`);
-
-      const transport = nodemailer.createTransport({
-        host: SMTP_HOST,
-        port: port,
-        secure: isSecure,
-        auth: {
-          user: SMTP_USER,
-          pass: SMTP_PASSWORD,
-        },
-      });
-
-      const fromHeader = (SMTP_FROM || SMTP_USER)?.includes("<")
-        ? (SMTP_FROM || SMTP_USER)!
-        : `BNRM - Bibliothèque Nationale <${SMTP_FROM || SMTP_USER}>`;
-
-      await new Promise<void>((resolve, reject) => {
-        transport.sendMail({
-          from: fromHeader,
-          to: to,
-          subject: subject,
-          html: html,
-        }, (error: any) => {
-          if (error) {
-            return reject(error);
-          }
-          resolve();
-        });
-      });
-
-      console.log("Email sent successfully via nodemailer SMTP");
-      return { success: true };
-    } catch (error: any) {
-      console.error("SMTP error:", error);
-      // Continuer vers Resend si SMTP échoue
-    }
-  }
-
-  // Fallback vers Resend
-  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-  if (RESEND_API_KEY) {
-    try {
-      console.log(`Sending email via Resend (fallback) to: ${to}`);
-      
-      const response = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${RESEND_API_KEY}`,
-        },
-        body: JSON.stringify({
-          from: "BNRM - Bibliothèque Nationale <onboarding@resend.dev>",
-          to: [to],
-          subject: subject,
-          html: html,
-        }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Resend error:", errorData);
-        return { success: false, error: errorData.message || "Resend error" };
-      }
-
-      console.log("Email sent successfully via Resend");
-      return { success: true };
-    } catch (error: any) {
-      console.error("Resend error:", error);
-      return { success: false, error: error.message };
-    }
-  }
-
-  return { success: false, error: "No email service configured (SMTP or Resend)" };
 }
 
 serve(async (req) => {
@@ -259,7 +166,7 @@ serve(async (req) => {
     }
 
     // Envoyer l'email via SMTP ou Resend
-    const emailResult = await sendEmail(recipient_email, emailSubject, emailHtml);
+    const emailResult = await sendEmail({ to: recipient_email, subject: emailSubject, html: emailHtml });
 
     if (!emailResult.success) {
       console.warn("Email sending failed:", emailResult.error);

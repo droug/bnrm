@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import nodemailer from "npm:nodemailer@6.9.12";
 import { jsPDF } from "npm:jspdf@2.5.1";
+import { sendEmail } from "../_shared/smtp-client.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,107 +15,6 @@ interface VisitConfirmationRequest {
   slotTime: string;
   langue: string;
   nbVisiteurs: number;
-}
-
-// Fonction d'envoi d'email via SMTP (configuration admin) avec fallback Resend
-async function sendEmail(
-  to: string,
-  subject: string,
-  html: string,
-  attachments?: Array<{ filename: string; content: string }>
-): Promise<{ success: boolean; error?: string; id?: string }> {
-  const SMTP_HOST = Deno.env.get("SMTP_HOST");
-  const SMTP_PORT = Deno.env.get("SMTP_PORT");
-  const SMTP_USER = Deno.env.get("SMTP_USER");
-  const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
-  const SMTP_FROM = Deno.env.get("SMTP_FROM");
-
-  // Essayer SMTP d'abord
-  if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASSWORD) {
-    try {
-      console.log(`[VISIT-CONFIRM] Sending email via SMTP to: ${to}`);
-      
-      const port = parseInt(SMTP_PORT, 10);
-      const fromAddress = SMTP_FROM && SMTP_FROM.includes('@') ? SMTP_FROM : SMTP_USER;
-      
-      const transporter = nodemailer.createTransport({
-        host: SMTP_HOST,
-        port: port,
-        secure: port === 465,
-        auth: {
-          user: SMTP_USER,
-          pass: SMTP_PASSWORD,
-        },
-      });
-
-      const mailOptions: any = {
-        from: fromAddress,
-        to: to,
-        subject: subject,
-        html: html,
-      };
-
-      if (attachments && attachments.length > 0) {
-        mailOptions.attachments = attachments.map(att => ({
-          filename: att.filename,
-          content: att.content,
-          encoding: 'base64',
-        }));
-      }
-
-      const info = await transporter.sendMail(mailOptions);
-
-      console.log("[VISIT-CONFIRM] Email sent successfully via SMTP, messageId:", info.messageId);
-      return { success: true, id: info.messageId };
-    } catch (error: any) {
-      console.error("[VISIT-CONFIRM] SMTP error:", error.message);
-      // Continuer vers Resend
-    }
-  }
-
-  // Fallback vers Resend
-  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-  if (RESEND_API_KEY) {
-    try {
-      console.log(`[VISIT-CONFIRM] Sending email via Resend (fallback) to: ${to}`);
-      
-      const body: any = {
-        from: "BNRM Activités Culturelles <onboarding@resend.dev>",
-        to: [to],
-        subject: subject,
-        html: html,
-      };
-
-      if (attachments && attachments.length > 0) {
-        body.attachments = attachments.map(att => ({
-          filename: att.filename,
-          content: att.content,
-        }));
-      }
-
-      const response = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${RESEND_API_KEY}`,
-        },
-        body: JSON.stringify(body),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        return { success: false, error: errorData.message };
-      }
-
-      const data = await response.json();
-      console.log("[VISIT-CONFIRM] Email sent via Resend");
-      return { success: true, id: data.id };
-    } catch (error: any) {
-      return { success: false, error: error.message };
-    }
-  }
-
-  return { success: false, error: "No email service configured" };
 }
 
 const generateConfirmationPDF = (data: VisitConfirmationRequest): Uint8Array => {
@@ -260,7 +159,7 @@ const handler = async (req: Request): Promise<Response> => {
 
   try {
     const requestData: VisitConfirmationRequest = await req.json();
-    console.log("Sending visit confirmation to:", requestData.email);
+    console.log("[VISIT-CONFIRM] Sending visit confirmation to:", requestData.email);
 
     // Générer le PDF
     const pdfBuffer = generateConfirmationPDF(requestData);
@@ -342,14 +241,15 @@ const handler = async (req: Request): Promise<Response> => {
       </div>
     `;
 
-    const result = await sendEmail(
-      requestData.email,
-      "Confirmation de votre réservation de visite guidée – BNRM",
-      emailHtml,
-      [{ filename: "confirmation-visite-bnrm.pdf", content: pdfBase64 }]
-    );
+    // Use unified SMTP client
+    const result = await sendEmail({
+      to: requestData.email,
+      subject: "Confirmation de votre réservation de visite guidée – BNRM",
+      html: emailHtml,
+      attachments: [{ filename: "confirmation-visite-bnrm.pdf", content: pdfBase64 }]
+    });
 
-    console.log("Email result:", result);
+    console.log("[VISIT-CONFIRM] Email result:", result);
 
     return new Response(JSON.stringify({ success: result.success, data: result }), {
       status: result.success ? 200 : 500,

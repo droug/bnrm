@@ -1,53 +1,11 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.4";
-import nodemailer from "npm:nodemailer@6.9.12";
+import { sendEmail } from "../_shared/smtp-client.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
-
-// Fonction d'envoi d'email via SMTP avec fallback Resend
-async function sendEmail(to: string, subject: string, html: string): Promise<{ success: boolean; error?: string; id?: string }> {
-  const SMTP_HOST = Deno.env.get("SMTP_HOST");
-  const SMTP_PORT = Deno.env.get("SMTP_PORT");
-  const SMTP_USER = Deno.env.get("SMTP_USER");
-  const SMTP_PASSWORD = Deno.env.get("SMTP_PASSWORD");
-  const SMTP_FROM = Deno.env.get("SMTP_FROM");
-
-  if (SMTP_HOST && SMTP_PORT && SMTP_USER && SMTP_PASSWORD) {
-    try {
-      const port = parseInt(SMTP_PORT, 10);
-      const fromAddress = SMTP_FROM && SMTP_FROM.includes('@') ? SMTP_FROM : SMTP_USER;
-      
-      const transporter = nodemailer.createTransport({
-        host: SMTP_HOST, port, secure: port === 465,
-        auth: { user: SMTP_USER, pass: SMTP_PASSWORD },
-      });
-
-      const info = await transporter.sendMail({ from: fromAddress, to, subject, html });
-      console.log("[RESTORATION-NOTIF] Email sent via SMTP:", info.messageId);
-      return { success: true, id: info.messageId };
-    } catch (error: any) {
-      console.error("[RESTORATION-NOTIF] SMTP error:", error.message);
-    }
-  }
-
-  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-  if (RESEND_API_KEY) {
-    try {
-      const response = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${RESEND_API_KEY}` },
-        body: JSON.stringify({ from: "BNRM Restauration <onboarding@resend.dev>", to: [to], subject, html }),
-      });
-      if (!response.ok) { const e = await response.json(); return { success: false, error: e.message }; }
-      const data = await response.json();
-      return { success: true, id: data.id };
-    } catch (error: any) { return { success: false, error: error.message }; }
-  }
-  return { success: false, error: "No email service configured" };
-}
 
 interface NotificationRequest {
   requestId: string;
@@ -87,6 +45,8 @@ serve(async (req) => {
     const supabase = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
     const notification: NotificationRequest = await req.json();
     
+    console.log("[RESTORATION-NOTIF] Sending notification to:", notification.recipientEmail);
+
     await supabase.from('restoration_notifications').insert({
       request_id: notification.requestId, recipient_id: notification.recipientId,
       notification_type: notification.notificationType, title: getEmailContent(notification).subject,
@@ -94,12 +54,20 @@ serve(async (req) => {
     });
 
     const emailContent = getEmailContent(notification);
-    const result = await sendEmail(notification.recipientEmail, emailContent.subject, emailContent.html);
     
-    return new Response(JSON.stringify({ success: true, email_sent: result.success }), 
+    // Use unified SMTP client
+    const result = await sendEmail({
+      to: notification.recipientEmail,
+      subject: emailContent.subject,
+      html: emailContent.html
+    });
+    
+    console.log("[RESTORATION-NOTIF] Email result:", result);
+    
+    return new Response(JSON.stringify({ success: true, email_sent: result.success, method: result.method }), 
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } });
   } catch (error: any) {
-    console.error("Error:", error);
+    console.error("[RESTORATION-NOTIF] Error:", error);
     return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } });
   }
 });
