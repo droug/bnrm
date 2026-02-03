@@ -11,7 +11,7 @@ import SmartChatBot from "@/components/SmartChatBot";
 import { AccessibilityToolkit } from "@/components/AccessibilityToolkit";
 import MessagingButton from "@/components/messaging/MessagingButton";
 import NotificationsButton from "@/components/notifications/NotificationsButton";
-// import { WatermarkContainer, Watermark } from "@/components/ui/watermark"; // Removed to fix runtime error
+import { BNRMTooltip } from "@/components/ui/bnrm-tooltip";
 import logoImage from "@/assets/logo-bnrm.png";
 import {
   NavigationMenu,
@@ -469,28 +469,60 @@ const Header = () => {
                   <span>{t('nav.discover')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-2 p-4 w-[650px] lg:grid-cols-2 bg-white border border-gray-200 shadow-xl">
-                    <div className="space-y-1">
-                      <h4 className="text-base font-bold text-blue-primary-dark mb-2">{menuData.discover.practicalInfo.title[language]}</h4>
-                      {menuData.discover.practicalInfo.items.map((item, idx) => (
-                        <NavigationMenuLink key={idx} asChild>
-                          <Link to={item.href} className="block p-3 text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded border-l-2 border-transparent hover:border-blue-primary-dark">
-                            <div className="font-semibold">{item.title[language]}</div>
-                            <div className="text-xs text-muted-foreground mt-1">{item.desc[language]}</div>
-                          </Link>
-                        </NavigationMenuLink>
-                      ))}
+                  <div className="grid gap-3 p-5 w-[700px] lg:grid-cols-2 bg-gradient-to-br from-white to-slate-50 border border-blue-primary-dark/10 shadow-2xl rounded-xl">
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-bold text-blue-primary-dark mb-3 flex items-center gap-2 px-2">
+                        <span className="w-1.5 h-4 bg-blue-primary-dark rounded-full" />
+                        {menuData.discover.practicalInfo.title[language]}
+                      </h4>
+                      {menuData.discover.practicalInfo.items.map((item, idx) => {
+                        const icons = ['mdi:clock-outline', 'mdi:tag-multiple', 'mdi:video-360', 'mdi:gift-outline'];
+                        return (
+                          <BNRMTooltip 
+                            key={idx}
+                            content={item.title[language]} 
+                            description={item.desc[language]}
+                            icon={icons[idx]}
+                            side="right"
+                            variant="blue"
+                          >
+                            <NavigationMenuLink asChild>
+                              <Link to={item.href} className="block p-3 text-foreground hover:bg-blue-primary-dark/5 hover:text-blue-primary-dark rounded-lg border-l-3 border-transparent hover:border-blue-primary-dark transition-all duration-200 group">
+                                <div className="flex items-center gap-2">
+                                  <div className="font-semibold group-hover:translate-x-0.5 transition-transform">{item.title[language]}</div>
+                                </div>
+                              </Link>
+                            </NavigationMenuLink>
+                          </BNRMTooltip>
+                        );
+                      })}
                     </div>
-                    <div className="space-y-1">
-                      <h4 className="text-base font-bold text-blue-primary-dark mb-2">{menuData.discover.historyMissions.title[language]}</h4>
-                      {menuData.discover.historyMissions.items.map((item, idx) => (
-                        <NavigationMenuLink key={idx} asChild>
-                          <Link to={item.href} className="block p-3 text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded border-l-2 border-transparent hover:border-blue-primary-dark">
-                            <div className="font-semibold">{item.title[language]}</div>
-                            <div className="text-xs text-muted-foreground mt-1">{item.desc[language]}</div>
-                          </Link>
-                        </NavigationMenuLink>
-                      ))}
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-bold text-blue-primary-dark mb-3 flex items-center gap-2 px-2">
+                        <span className="w-1.5 h-4 bg-amber-500 rounded-full" />
+                        {menuData.discover.historyMissions.title[language]}
+                      </h4>
+                      {menuData.discover.historyMissions.items.map((item, idx) => {
+                        const icons = ['mdi:book-open-page-variant', 'mdi:message-text', 'mdi:sitemap'];
+                        return (
+                          <BNRMTooltip 
+                            key={idx}
+                            content={item.title[language]} 
+                            description={item.desc[language]}
+                            icon={icons[idx]}
+                            side="right"
+                            variant="gold"
+                          >
+                            <NavigationMenuLink asChild>
+                              <Link to={item.href} className="block p-3 text-foreground hover:bg-amber-50 hover:text-amber-700 rounded-lg border-l-3 border-transparent hover:border-amber-500 transition-all duration-200 group">
+                                <div className="flex items-center gap-2">
+                                  <div className="font-semibold group-hover:translate-x-0.5 transition-transform">{item.title[language]}</div>
+                                </div>
+                              </Link>
+                            </NavigationMenuLink>
+                          </BNRMTooltip>
+                        );
+                      })}
                     </div>
                   </div>
                 </NavigationMenuContent>
@@ -505,28 +537,60 @@ const Header = () => {
                   <span>{t('nav.services')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-2 p-4 w-[650px] lg:grid-cols-2 bg-white border border-slate-border shadow-xl">
-                    <div className="space-y-1">
-                      <h4 className="text-base font-bold text-blue-primary-dark mb-2">{menuData.services.userServices.title[language]}</h4>
-                      {menuData.services.userServices.items.map((item, idx) => (
-                        <NavigationMenuLink key={idx} asChild>
-                          <Link to={item.href} className="block p-3 text-base font-medium text-foreground hover:bg-blue-light hover:text-blue-primary-dark rounded border-l-2 border-transparent hover:border-blue-primary-dark transition-colors">
-                            <div className="font-semibold">{item.title[language]}</div>
-                            <div className="text-xs text-muted-foreground mt-1">{item.desc[language]}</div>
-                          </Link>
-                        </NavigationMenuLink>
-                      ))}
+                  <div className="grid gap-3 p-5 w-[700px] lg:grid-cols-2 bg-gradient-to-br from-white to-blue-50/30 border border-blue-primary-dark/10 shadow-2xl rounded-xl">
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-bold text-blue-primary-dark mb-3 flex items-center gap-2 px-2">
+                        <span className="w-1.5 h-4 bg-green-500 rounded-full" />
+                        {menuData.services.userServices.title[language]}
+                      </h4>
+                      {menuData.services.userServices.items.map((item, idx) => {
+                        const icons = ['mdi:account-plus', 'mdi:badge-account', 'mdi:library', 'mdi:book-clock', 'mdi:calendar-check'];
+                        return (
+                          <BNRMTooltip 
+                            key={idx}
+                            content={item.title[language]} 
+                            description={item.desc[language]}
+                            icon={icons[idx]}
+                            side="right"
+                            variant="blue"
+                          >
+                            <NavigationMenuLink asChild>
+                              <Link to={item.href} className="block p-3 text-foreground hover:bg-green-50 hover:text-green-700 rounded-lg border-l-3 border-transparent hover:border-green-500 transition-all duration-200 group">
+                                <div className="flex items-center gap-2">
+                                  <div className="font-semibold group-hover:translate-x-0.5 transition-transform">{item.title[language]}</div>
+                                </div>
+                              </Link>
+                            </NavigationMenuLink>
+                          </BNRMTooltip>
+                        );
+                      })}
                     </div>
-                    <div className="space-y-1">
-                      <h4 className="text-base font-bold text-blue-primary-dark mb-2">{menuData.services.specializedServices.title[language]}</h4>
-                      {menuData.services.specializedServices.items.map((item, idx) => (
-                        <NavigationMenuLink key={idx} asChild>
-                          <Link to={item.href} className="block p-3 text-base font-medium text-foreground hover:bg-blue-light hover:text-blue-primary-dark rounded border-l-2 border-transparent hover:border-blue-primary-dark transition-colors">
-                            <div className="font-semibold">{item.title[language]}</div>
-                            <div className="text-xs text-muted-foreground mt-1">{item.desc[language]}</div>
-                          </Link>
-                        </NavigationMenuLink>
-                      ))}
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-bold text-blue-primary-dark mb-3 flex items-center gap-2 px-2">
+                        <span className="w-1.5 h-4 bg-purple-500 rounded-full" />
+                        {menuData.services.specializedServices.title[language]}
+                      </h4>
+                      {menuData.services.specializedServices.items.map((item, idx) => {
+                        const icons = ['mdi:file-document-check', 'mdi:content-copy', 'mdi:auto-fix'];
+                        return (
+                          <BNRMTooltip 
+                            key={idx}
+                            content={item.title[language]} 
+                            description={item.desc[language]}
+                            icon={icons[idx]}
+                            side="right"
+                            variant="gradient"
+                          >
+                            <NavigationMenuLink asChild>
+                              <Link to={item.href} className="block p-3 text-foreground hover:bg-purple-50 hover:text-purple-700 rounded-lg border-l-3 border-transparent hover:border-purple-500 transition-all duration-200 group">
+                                <div className="flex items-center gap-2">
+                                  <div className="font-semibold group-hover:translate-x-0.5 transition-transform">{item.title[language]}</div>
+                                </div>
+                              </Link>
+                            </NavigationMenuLink>
+                          </BNRMTooltip>
+                        );
+                      })}
                     </div>
                   </div>
                 </NavigationMenuContent>
@@ -541,135 +605,207 @@ const Header = () => {
                   <span>{t('nav.explore')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-3 p-5 w-[900px] lg:grid-cols-3 bg-white border border-slate-border shadow-xl">
+                  <div className="grid gap-4 p-6 w-[950px] lg:grid-cols-3 bg-gradient-to-br from-white via-slate-50/50 to-blue-50/30 border border-blue-primary-dark/10 shadow-2xl rounded-xl">
                     {/* Colonne 1 - Galerie et Collections */}
-                    <div className="space-y-2">
-                      <NavigationMenuLink asChild>
-                        <Link to="/galerie-medias" className="block p-3 text-base font-semibold text-blue-primary-dark hover:bg-blue-surface rounded border-l-2 border-blue-primary-dark">
-                          {language === 'ar' ? 'معرض الوسائط' : 'Galerie des médias'}
-                        </Link>
-                      </NavigationMenuLink>
+                    <div className="space-y-3">
+                      <BNRMTooltip 
+                        content={language === 'ar' ? 'معرض الوسائط' : 'Galerie des médias'}
+                        description={language === 'ar' ? 'استكشف مجموعتنا المتنوعة من الوسائط' : 'Explorez notre collection multimédia riche'}
+                        icon="mdi:image-multiple"
+                        side="right"
+                        variant="blue"
+                      >
+                        <NavigationMenuLink asChild>
+                          <Link to="/galerie-medias" className="block p-3 text-base font-semibold text-white bg-gradient-to-r from-blue-primary-dark to-blue-deep hover:from-blue-deep hover:to-blue-primary-dark rounded-lg border-l-4 border-amber-500 transition-all duration-300 shadow-md hover:shadow-lg group">
+                            <span className="group-hover:translate-x-0.5 inline-block transition-transform">
+                              {language === 'ar' ? 'معرض الوسائط' : 'Galerie des médias'}
+                            </span>
+                          </Link>
+                        </NavigationMenuLink>
+                      </BNRMTooltip>
                       
-                      <div className="pt-2">
-                        <h4 className="text-sm font-bold text-blue-primary-dark mb-2 px-2">{language === 'ar' ? 'المجموعات' : 'Collections'}</h4>
-                        <NavigationMenuLink asChild>
-                          <Link to="/collections-specialisees" className="block p-2 text-sm text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded">
-                            {language === 'ar' ? 'المجموعات المتخصصة' : 'Collections spécialisées'}
-                          </Link>
-                        </NavigationMenuLink>
-                        <NavigationMenuLink asChild>
-                          <Link to="/collections-numerisees" className="block p-2 text-sm text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded">
-                            {language === 'ar' ? 'المجموعات الرقمية' : 'Collections numérisées'}
-                          </Link>
-                        </NavigationMenuLink>
-                        <NavigationMenuLink asChild>
-                          <Link to="/collections-offertes" className="block p-2 text-sm text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded">
-                            {language === 'ar' ? 'المجموعات المقدمة' : 'Collections offertes'}
-                          </Link>
-                        </NavigationMenuLink>
-                        <div className="ml-3 mt-1 space-y-1">
-                          <NavigationMenuLink asChild>
-                            <Link to="/plateforme-manuscrits" className="block p-1.5 text-xs text-muted-foreground hover:text-blue-primary-dark rounded">
-                              • {language === 'ar' ? 'المخطوطات' : 'Manuscrits'}
-                            </Link>
-                          </NavigationMenuLink>
-                          <NavigationMenuLink asChild>
-                            <Link to="/monographies" className="block p-1.5 text-xs text-muted-foreground hover:text-blue-primary-dark rounded">
-                              • {language === 'ar' ? 'الأحاديات' : 'Monographies'}
-                            </Link>
-                          </NavigationMenuLink>
-                          <NavigationMenuLink asChild>
-                            <Link to="/periodiques" className="block p-1.5 text-xs text-muted-foreground hover:text-blue-primary-dark rounded">
-                              • {language === 'ar' ? 'الدوريات' : 'Périodiques'}
-                            </Link>
-                          </NavigationMenuLink>
-                          <NavigationMenuLink asChild>
-                            <Link to="/bouquets-abonnements" className="block p-1.5 text-xs text-muted-foreground hover:text-blue-primary-dark rounded">
-                              • {language === 'ar' ? 'باقات الاشتراكات' : 'Bouquets des abonnements'}
-                            </Link>
-                          </NavigationMenuLink>
-                          <NavigationMenuLink asChild>
-                            <Link to="/audiovisuelles" className="block p-1.5 text-xs text-muted-foreground hover:text-blue-primary-dark rounded">
-                              • {language === 'ar' ? 'السمعية البصرية والوسائط المتعددة' : 'Audiovisuelles et multimédias'}
-                            </Link>
-                          </NavigationMenuLink>
+                      <div className="pt-2 bg-white/50 rounded-lg p-3">
+                        <h4 className="text-sm font-bold text-blue-primary-dark mb-3 flex items-center gap-2">
+                          <span className="w-1.5 h-4 bg-emerald-500 rounded-full" />
+                          {language === 'ar' ? 'المجموعات' : 'Collections'}
+                        </h4>
+                        
+                        {[
+                          { href: '/collections-specialisees', fr: 'Collections spécialisées', ar: 'المجموعات المتخصصة', desc: 'Fonds thématiques et spécialisés', icon: 'mdi:bookshelf' },
+                          { href: '/collections-numerisees', fr: 'Collections numérisées', ar: 'المجموعات الرقمية', desc: 'Documents patrimoniaux numérisés', icon: 'mdi:cloud-download' },
+                          { href: '/collections-offertes', fr: 'Collections offertes', ar: 'المجموعات المقدمة', desc: 'Dons et legs de mécènes', icon: 'mdi:gift' }
+                        ].map((item, idx) => (
+                          <BNRMTooltip 
+                            key={idx}
+                            content={language === 'ar' ? item.ar : item.fr}
+                            description={item.desc}
+                            icon={item.icon}
+                            side="right"
+                            variant="blue"
+                          >
+                            <NavigationMenuLink asChild>
+                              <Link to={item.href} className="block p-2.5 text-sm text-foreground hover:bg-emerald-50 hover:text-emerald-700 rounded-lg transition-all group">
+                                <span className="group-hover:translate-x-0.5 inline-block transition-transform font-medium">
+                                  {language === 'ar' ? item.ar : item.fr}
+                                </span>
+                              </Link>
+                            </NavigationMenuLink>
+                          </BNRMTooltip>
+                        ))}
+                        
+                        <div className="ml-2 mt-2 pl-3 border-l-2 border-blue-primary-dark/20 space-y-1">
+                          {[
+                            { href: '/plateforme-manuscrits', fr: 'Manuscrits', ar: 'المخطوطات', desc: 'Manuscrits anciens numérisés' },
+                            { href: '/monographies', fr: 'Monographies', ar: 'الأحاديات', desc: 'Ouvrages et études' },
+                            { href: '/periodiques', fr: 'Périodiques', ar: 'الدوريات', desc: 'Revues et journaux' },
+                            { href: '/bouquets-abonnements', fr: 'Bouquets des abonnements', ar: 'باقات الاشتراكات', desc: 'Ressources électroniques' },
+                            { href: '/audiovisuelles', fr: 'Audiovisuelles et multimédias', ar: 'السمعية البصرية والوسائط المتعددة', desc: 'Contenus audio et vidéo' }
+                          ].map((sub, idx) => (
+                            <BNRMTooltip 
+                              key={idx}
+                              content={language === 'ar' ? sub.ar : sub.fr}
+                              description={sub.desc}
+                              side="right"
+                              variant="gold"
+                            >
+                              <NavigationMenuLink asChild>
+                                <Link to={sub.href} className="block p-1.5 text-xs text-muted-foreground hover:text-blue-primary-dark hover:bg-blue-50 rounded transition-all group">
+                                  <span className="group-hover:translate-x-0.5 inline-block transition-transform">
+                                    • {language === 'ar' ? sub.ar : sub.fr}
+                                  </span>
+                                </Link>
+                              </NavigationMenuLink>
+                            </BNRMTooltip>
+                          ))}
                         </div>
                       </div>
                     </div>
 
                     {/* Colonne 2 - Catalogue général */}
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-bold text-blue-primary-dark mb-2 px-2">{language === 'ar' ? 'الفهرس العام على الإنترنت' : 'Catalogue général en ligne'}</h4>
+                    <div className="space-y-3 bg-white/50 rounded-lg p-3">
+                      <h4 className="text-sm font-bold text-blue-primary-dark mb-3 flex items-center gap-2">
+                        <span className="w-1.5 h-4 bg-violet-500 rounded-full" />
+                        {language === 'ar' ? 'الفهرس العام على الإنترنت' : 'Catalogue général en ligne'}
+                      </h4>
                       
                       <div>
-                        <p className="text-xs font-semibold text-foreground px-2 mb-1">{language === 'ar' ? 'القراءة والاستماع والمشاهدة' : 'Lire, écouter et voir'}</p>
-                        <NavigationMenuLink asChild>
-                          <Link to="/bibliographies" className="block p-2 text-sm text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded">
-                            {language === 'ar' ? 'الببليوغرافيات الوطنية' : 'Bibliographies Nationales'}
-                          </Link>
-                        </NavigationMenuLink>
-                        <NavigationMenuLink asChild>
-                          <Link to="/rapports-activites" className="block p-2 text-sm text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded">
-                            {language === 'ar' ? 'تقرير الأنشطة' : 'Rapport d\'activités'}
-                          </Link>
-                        </NavigationMenuLink>
-                        <NavigationMenuLink asChild>
-                          <Link to="/tresors" className="block p-2 text-sm text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded">
-                            {language === 'ar' ? 'الكنوز' : 'Trésors'}
-                          </Link>
-                        </NavigationMenuLink>
+                        <p className="text-xs font-semibold text-foreground px-2 mb-2 flex items-center gap-1">
+                          <span className="w-1 h-1 bg-violet-400 rounded-full" />
+                          {language === 'ar' ? 'القراءة والاستماع والمشاهدة' : 'Lire, écouter et voir'}
+                        </p>
+                        {[
+                          { href: '/bibliographies', fr: 'Bibliographies Nationales', ar: 'الببليوغرافيات الوطنية', desc: 'Répertoire de la production intellectuelle', icon: 'mdi:book-open-variant' },
+                          { href: '/rapports-activites', fr: "Rapport d'activités", ar: 'تقرير الأنشطة', desc: 'Bilans et perspectives', icon: 'mdi:file-chart' },
+                          { href: '/tresors', fr: 'Trésors', ar: 'الكنوز', desc: 'Joyaux du patrimoine marocain', icon: 'mdi:diamond-stone' }
+                        ].map((item, idx) => (
+                          <BNRMTooltip 
+                            key={idx}
+                            content={language === 'ar' ? item.ar : item.fr}
+                            description={item.desc}
+                            icon={item.icon}
+                            side="right"
+                            variant="gradient"
+                          >
+                            <NavigationMenuLink asChild>
+                              <Link to={item.href} className="block p-2.5 text-sm text-foreground hover:bg-violet-50 hover:text-violet-700 rounded-lg transition-all group">
+                                <span className="group-hover:translate-x-0.5 inline-block transition-transform font-medium">
+                                  {language === 'ar' ? item.ar : item.fr}
+                                </span>
+                              </Link>
+                            </NavigationMenuLink>
+                          </BNRMTooltip>
+                        ))}
                       </div>
 
-                      <div className="pt-2">
-                        <NavigationMenuLink asChild>
-                          <Link to="/archives-manuscrits" className="block p-2 text-sm text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded">
-                            {language === 'ar' ? 'الأرشيف والمخطوطات' : 'Archives et manuscrits'}
-                          </Link>
-                        </NavigationMenuLink>
-                        <NavigationMenuLink asChild>
-                          <Link to="/autres-catalogues" className="block p-2 text-sm text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded">
-                            {language === 'ar' ? 'فهارس وقواعد أخرى' : 'Autres catalogues et bases'}
-                          </Link>
-                        </NavigationMenuLink>
-                        <NavigationMenuLink asChild>
-                          <Link to="/digital-library" className="block p-2 text-sm font-medium text-blue-primary-dark hover:bg-blue-surface rounded border-l-2 border-blue-primary-dark/50">
-                            📚 {language === 'ar' ? 'الفهرس الرقمي (منصة BN)' : 'Catalogue numérisé (Plateforme BN)'}
-                          </Link>
-                        </NavigationMenuLink>
+                      <div className="pt-2 border-t border-violet-100">
+                        {[
+                          { href: '/archives-manuscrits', fr: 'Archives et manuscrits', ar: 'الأرشيف والمخطوطات', desc: 'Documents historiques uniques', icon: 'mdi:archive' },
+                          { href: '/autres-catalogues', fr: 'Autres catalogues et bases', ar: 'فهارس وقواعد أخرى', desc: 'Ressources complémentaires', icon: 'mdi:database' }
+                        ].map((item, idx) => (
+                          <BNRMTooltip 
+                            key={idx}
+                            content={language === 'ar' ? item.ar : item.fr}
+                            description={item.desc}
+                            icon={item.icon}
+                            side="right"
+                            variant="blue"
+                          >
+                            <NavigationMenuLink asChild>
+                              <Link to={item.href} className="block p-2.5 text-sm text-foreground hover:bg-blue-50 hover:text-blue-700 rounded-lg transition-all group">
+                                <span className="group-hover:translate-x-0.5 inline-block transition-transform font-medium">
+                                  {language === 'ar' ? item.ar : item.fr}
+                                </span>
+                              </Link>
+                            </NavigationMenuLink>
+                          </BNRMTooltip>
+                        ))}
+                        <BNRMTooltip 
+                          content={language === 'ar' ? 'الفهرس الرقمي (منصة BN)' : 'Catalogue numérisé (Plateforme BN)'}
+                          description="Accédez à notre bibliothèque numérique complète"
+                          icon="mdi:library"
+                          side="right"
+                          variant="gold"
+                        >
+                          <NavigationMenuLink asChild>
+                            <Link to="/digital-library" className="block p-2.5 mt-2 text-sm font-semibold text-white bg-gradient-to-r from-amber-500 to-orange-500 hover:from-orange-500 hover:to-amber-500 rounded-lg shadow-md hover:shadow-lg transition-all group">
+                              <span className="group-hover:translate-x-0.5 inline-block transition-transform">
+                                📚 {language === 'ar' ? 'الفهرس الرقمي (منصة BN)' : 'Catalogue numérisé (Plateforme BN)'}
+                              </span>
+                            </Link>
+                          </NavigationMenuLink>
+                        </BNRMTooltip>
                       </div>
                     </div>
 
                     {/* Colonne 3 - Recherche avancée */}
-                    <div className="space-y-2">
-                      <h4 className="text-sm font-bold text-blue-primary-dark mb-2 px-2">{language === 'ar' ? 'البحث عن وثيقة' : 'Chercher un document'}</h4>
-                      <NavigationMenuLink asChild>
-                        <Link to="/recherche-avancee" className="block p-2 text-sm font-medium text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded bg-blue-surface/50">
-                          🔍 {language === 'ar' ? 'بحث متقدم' : 'Recherche avancée'}
-                        </Link>
-                      </NavigationMenuLink>
+                    <div className="space-y-3 bg-white/50 rounded-lg p-3">
+                      <h4 className="text-sm font-bold text-blue-primary-dark mb-3 flex items-center gap-2">
+                        <span className="w-1.5 h-4 bg-rose-500 rounded-full" />
+                        {language === 'ar' ? 'البحث عن وثيقة' : 'Chercher un document'}
+                      </h4>
+                      <BNRMTooltip 
+                        content={language === 'ar' ? 'بحث متقدم' : 'Recherche avancée'}
+                        description="Trouvez précisément ce que vous cherchez"
+                        icon="mdi:magnify"
+                        side="right"
+                        variant="blue"
+                      >
+                        <NavigationMenuLink asChild>
+                          <Link to="/recherche-avancee" className="block p-3 text-sm font-semibold text-white bg-gradient-to-r from-rose-500 to-pink-500 hover:from-pink-500 hover:to-rose-500 rounded-lg shadow-md hover:shadow-lg transition-all group">
+                            <span className="group-hover:translate-x-0.5 inline-block transition-transform">
+                              🔍 {language === 'ar' ? 'بحث متقدم' : 'Recherche avancée'}
+                            </span>
+                          </Link>
+                        </NavigationMenuLink>
+                      </BNRMTooltip>
                       
-                      <div className="pt-2 space-y-1">
-                        <p className="text-xs font-semibold text-muted-foreground px-2 mb-2">{language === 'ar' ? 'وثائق في الوصول الحر:' : 'Documents en accès libre :'}</p>
-                        <NavigationMenuLink asChild>
-                          <Link to="/recherche-avancee?type=livres-periodiques" className="block p-2 text-xs text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded">
-                            • {language === 'ar' ? 'الكتب والدوريات المحفوظة' : 'Livres et périodiques conservés'}
-                          </Link>
-                        </NavigationMenuLink>
-                        <NavigationMenuLink asChild>
-                          <Link to="/recherche-avancee?type=manuscrits-archives" className="block p-2 text-xs text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded">
-                            • {language === 'ar' ? 'المخطوطات الحديثة والأرشيف' : 'Manuscrits modernes et archives'}
-                          </Link>
-                        </NavigationMenuLink>
-                        <NavigationMenuLink asChild>
-                          <Link to="/recherche-avancee?type=iconographiques" className="block p-2 text-xs text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded">
-                            • {language === 'ar' ? 'الوثائق الأيقونية (مطبوعات، صور، ملصقات)' : 'Documents iconographiques (estampes, photos, affiches)'}
-                          </Link>
-                        </NavigationMenuLink>
-                        <NavigationMenuLink asChild>
-                          <Link to="/recherche-avancee?type=periodiques-extraits" className="block p-2 text-xs text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded">
-                            • {language === 'ar' ? 'الدوريات (مقتطفات)' : 'Périodiques (extraits)'}
-                          </Link>
-                        </NavigationMenuLink>
+                      <div className="pt-2">
+                        <p className="text-xs font-semibold text-muted-foreground px-2 mb-3 flex items-center gap-1">
+                          <span className="w-1 h-1 bg-green-500 rounded-full" />
+                          {language === 'ar' ? 'وثائق في الوصول الحر:' : 'Documents en accès libre :'}
+                        </p>
+                        {[
+                          { href: '/recherche-avancee?type=livres-periodiques', fr: 'Livres et périodiques conservés', ar: 'الكتب والدوريات المحفوظة', desc: 'Ouvrages du fonds général' },
+                          { href: '/recherche-avancee?type=manuscrits-archives', fr: 'Manuscrits modernes et archives', ar: 'المخطوطات الحديثة والأرشيف', desc: 'Documents historiques' },
+                          { href: '/recherche-avancee?type=iconographiques', fr: 'Documents iconographiques', ar: 'الوثائق الأيقونية', desc: 'Estampes, photos, affiches' },
+                          { href: '/recherche-avancee?type=periodiques-extraits', fr: 'Périodiques (extraits)', ar: 'الدوريات (مقتطفات)', desc: 'Articles de revues' }
+                        ].map((item, idx) => (
+                          <BNRMTooltip 
+                            key={idx}
+                            content={language === 'ar' ? item.ar : item.fr}
+                            description={item.desc}
+                            side="right"
+                            variant="gold"
+                          >
+                            <NavigationMenuLink asChild>
+                              <Link to={item.href} className="block p-2 text-xs text-foreground hover:bg-green-50 hover:text-green-700 rounded-lg transition-all group">
+                                <span className="group-hover:translate-x-0.5 inline-block transition-transform">
+                                  • {language === 'ar' ? item.ar : item.fr}
+                                </span>
+                              </Link>
+                            </NavigationMenuLink>
+                          </BNRMTooltip>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -685,23 +821,56 @@ const Header = () => {
                   <span>{t('nav.consult.news')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-2 p-4 w-[500px] bg-white border border-slate-border shadow-xl">
-                    {menuData.news.news.items.map((item, idx) => (
-                      <NavigationMenuLink key={idx} asChild>
-                        <Link to={item.href} className="block p-3 text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded">
-                          <div className="font-medium">{item.title[language]}</div>
-                          <div className="text-sm text-muted-foreground">{item.desc[language]}</div>
-                        </Link>
-                      </NavigationMenuLink>
-                    ))}
-                    {menuData.news.cultural.items.map((item, idx) => (
-                      <NavigationMenuLink key={idx} asChild>
-                        <Link to={item.href} className="block p-3 text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded">
-                          <div className="font-medium">{item.title[language]}</div>
-                          <div className="text-sm text-muted-foreground">{item.desc[language]}</div>
-                        </Link>
-                      </NavigationMenuLink>
-                    ))}
+                  <div className="grid gap-3 p-5 w-[550px] bg-gradient-to-br from-white to-orange-50/30 border border-orange-200/30 shadow-2xl rounded-xl">
+                    <h4 className="text-sm font-bold text-orange-600 flex items-center gap-2 px-2">
+                      <span className="w-1.5 h-4 bg-orange-500 rounded-full" />
+                      {menuData.news.news.title[language]}
+                    </h4>
+                    {menuData.news.news.items.map((item, idx) => {
+                      const icons = ['mdi:newspaper-variant-outline', 'mdi:television-classic'];
+                      return (
+                        <BNRMTooltip 
+                          key={idx}
+                          content={item.title[language]} 
+                          description={item.desc[language]}
+                          icon={icons[idx]}
+                          side="right"
+                          variant="gold"
+                        >
+                          <NavigationMenuLink asChild>
+                            <Link to={item.href} className="block p-3 text-foreground hover:bg-orange-50 hover:text-orange-700 rounded-lg border-l-3 border-transparent hover:border-orange-500 transition-all duration-200 group">
+                              <div className="font-medium group-hover:translate-x-0.5 transition-transform">{item.title[language]}</div>
+                            </Link>
+                          </NavigationMenuLink>
+                        </BNRMTooltip>
+                      );
+                    })}
+                    
+                    <div className="border-t border-orange-200/50 pt-3 mt-1">
+                      <h4 className="text-sm font-bold text-blue-primary-dark flex items-center gap-2 px-2 mb-2">
+                        <span className="w-1.5 h-4 bg-blue-primary-dark rounded-full" />
+                        {menuData.news.cultural.title[language]}
+                      </h4>
+                      {menuData.news.cultural.items.map((item, idx) => {
+                        const icons = ['mdi:palette', 'mdi:calendar-month', 'mdi:image-multiple'];
+                        return (
+                          <BNRMTooltip 
+                            key={idx}
+                            content={item.title[language]} 
+                            description={item.desc[language]}
+                            icon={icons[idx]}
+                            side="right"
+                            variant="blue"
+                          >
+                            <NavigationMenuLink asChild>
+                              <Link to={item.href} className="block p-3 text-foreground hover:bg-blue-primary-dark/5 hover:text-blue-primary-dark rounded-lg border-l-3 border-transparent hover:border-blue-primary-dark transition-all duration-200 group">
+                                <div className="font-medium group-hover:translate-x-0.5 transition-transform">{item.title[language]}</div>
+                              </Link>
+                            </NavigationMenuLink>
+                          </BNRMTooltip>
+                        );
+                      })}
+                    </div>
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
@@ -715,19 +884,37 @@ const Header = () => {
                   <span>{t('nav.collaborate')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-2 p-4 w-[500px] bg-white border border-slate-border shadow-xl">
-                    <NavigationMenuLink asChild>
-                      <Link to="/collaborations-nationales" className="block p-3 text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded">
-                        <div className="font-medium">{t('nav.national.collaborations')}</div>
-                        <p className="text-sm text-muted-foreground">{t('nav.national.collaborations.desc')}</p>
-                      </Link>
-                    </NavigationMenuLink>
-                    <NavigationMenuLink asChild>
-                      <Link to="/collaborations-internationales" className="block p-3 text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded">
-                        <div className="font-medium">{t('nav.international.collaborations')}</div>
-                        <p className="text-sm text-muted-foreground">{t('nav.international.collaborations.desc')}</p>
-                      </Link>
-                    </NavigationMenuLink>
+                  <div className="grid gap-3 p-5 w-[500px] bg-gradient-to-br from-white to-teal-50/30 border border-teal-200/30 shadow-2xl rounded-xl">
+                    <h4 className="text-sm font-bold text-teal-600 flex items-center gap-2 px-2">
+                      <span className="w-1.5 h-4 bg-teal-500 rounded-full" />
+                      {language === 'ar' ? 'الشراكات' : 'Partenariats'}
+                    </h4>
+                    <BNRMTooltip 
+                      content={t('nav.national.collaborations')} 
+                      description={t('nav.national.collaborations.desc')}
+                      icon="mdi:handshake"
+                      side="right"
+                      variant="blue"
+                    >
+                      <NavigationMenuLink asChild>
+                        <Link to="/collaborations-nationales" className="block p-3 text-foreground hover:bg-teal-50 hover:text-teal-700 rounded-lg border-l-3 border-transparent hover:border-teal-500 transition-all duration-200 group">
+                          <div className="font-medium group-hover:translate-x-0.5 transition-transform">{t('nav.national.collaborations')}</div>
+                        </Link>
+                      </NavigationMenuLink>
+                    </BNRMTooltip>
+                    <BNRMTooltip 
+                      content={t('nav.international.collaborations')} 
+                      description={t('nav.international.collaborations.desc')}
+                      icon="mdi:earth"
+                      side="right"
+                      variant="gradient"
+                    >
+                      <NavigationMenuLink asChild>
+                        <Link to="/collaborations-internationales" className="block p-3 text-foreground hover:bg-indigo-50 hover:text-indigo-700 rounded-lg border-l-3 border-transparent hover:border-indigo-500 transition-all duration-200 group">
+                          <div className="font-medium group-hover:translate-x-0.5 transition-transform">{t('nav.international.collaborations')}</div>
+                        </Link>
+                      </NavigationMenuLink>
+                    </BNRMTooltip>
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
@@ -741,15 +928,30 @@ const Header = () => {
                   <span>{menuData.mecenat.title[language]}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-2 p-4 w-[500px] bg-white border border-slate-border shadow-xl">
-                    {menuData.mecenat.items.map((item, idx) => (
-                      <NavigationMenuLink key={idx} asChild>
-                        <Link to={item.href} className="block p-3 text-foreground hover:bg-blue-surface hover:text-blue-primary-dark rounded">
-                          <div className="font-medium">{item.title[language]}</div>
-                          <div className="text-sm text-muted-foreground">{item.desc[language]}</div>
-                        </Link>
-                      </NavigationMenuLink>
-                    ))}
+                  <div className="grid gap-3 p-5 w-[500px] bg-gradient-to-br from-white to-amber-50/50 border border-amber-200/30 shadow-2xl rounded-xl">
+                    <h4 className="text-sm font-bold text-amber-700 flex items-center gap-2 px-2">
+                      <span className="w-1.5 h-4 bg-amber-500 rounded-full" />
+                      {menuData.mecenat.title[language]}
+                    </h4>
+                    {menuData.mecenat.items.map((item, idx) => {
+                      const icons = ['mdi:account-heart', 'mdi:book-heart', 'mdi:currency-usd'];
+                      return (
+                        <BNRMTooltip 
+                          key={idx}
+                          content={item.title[language]} 
+                          description={item.desc[language]}
+                          icon={icons[idx]}
+                          side="right"
+                          variant="gold"
+                        >
+                          <NavigationMenuLink asChild>
+                            <Link to={item.href} className="block p-3 text-foreground hover:bg-amber-50 hover:text-amber-700 rounded-lg border-l-3 border-transparent hover:border-amber-500 transition-all duration-200 group">
+                              <div className="font-medium group-hover:translate-x-0.5 transition-transform">{item.title[language]}</div>
+                            </Link>
+                          </NavigationMenuLink>
+                        </BNRMTooltip>
+                      );
+                    })}
                   </div>
                 </NavigationMenuContent>
               </NavigationMenuItem>
