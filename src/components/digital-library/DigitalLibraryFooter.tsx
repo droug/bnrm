@@ -194,20 +194,21 @@ const DigitalLibraryFooter = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 mb-12">
           
           {/* Col 1: À propos - Logo BN */}
-          <div className="lg:col-span-1 space-y-6">
-            <div className="flex items-center space-x-3">
+          <div className="lg:col-span-1 flex flex-col">
+            {/* Logo aligné avec les titres des autres sections */}
+            <div className="min-h-[3.5rem] flex items-start mb-6">
               <img 
                 src={logoDigitalLibrary} 
                 alt="Ibn Battuta - Bibliothèque Numérique" 
-                className="h-40 w-auto object-contain"
+                className="h-14 w-auto object-contain"
               />
             </div>
             
-            <p className="text-sm opacity-90 leading-relaxed">
+            <p className="text-sm opacity-90 leading-relaxed mb-4">
               {language === 'ar' ? settings.description_ar : settings.description_fr}
             </p>
             
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-3 mt-auto">
               {activeSocialLinks.map((social, index) => (
                 <Button 
                   key={index}
