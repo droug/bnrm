@@ -17,7 +17,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
-import logoDigitalLibrary from "@/assets/FINAL_LOGO_2.png";
+import logoDigitalLibrary from "@/assets/FINAL_LOGO_3.png";
 
 interface FooterLink {
   title_fr: string;
@@ -191,16 +191,16 @@ const DigitalLibraryFooter = () => {
     <footer className="bg-gradient-to-br from-bn-blue-primary/5 via-gold-bn-primary/5 to-bn-blue-deep/5 text-foreground border-t border-gold-bn-primary/20">
       <div className="container mx-auto px-4 py-16">
         {/* Section principale - Informations et liens */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 mb-12 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-7 gap-12 mb-12 items-start">
           
-          {/* Col 1: À propos - Logo BN */}
-          <div className="lg:col-span-1 flex flex-col">
+          {/* Col 1: À propos - Logo BN (agrandi et aligné avec les titres de section) */}
+          <div className="lg:col-span-2 flex flex-col">
             {/* Logo aligné sur la même ligne de base que les titres des autres sections */}
-            <div className="mb-6 flex items-start min-h-[3.5rem]">
+            <div className="mb-6 flex items-start">
               <img
                 src={logoDigitalLibrary}
                 alt="Bibliothèque Numérique Marocaine — Ibn Battûta"
-                className="h-16 md:h-20 w-full object-contain object-left object-top"
+                className="h-24 md:h-28 w-auto object-contain"
                 loading="lazy"
               />
             </div>
