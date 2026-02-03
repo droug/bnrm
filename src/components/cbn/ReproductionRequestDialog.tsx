@@ -74,7 +74,7 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
     sections: "",
     
     // Usage
-    usageType: "personnel", // personnel, recherche, commercial, enseignement
+    usageType: "non_commercial", // commercial, non_commercial
     usageDescription: "",
     
     // Livraison
@@ -755,11 +755,8 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                 value={formData.usageType}
                 onChange={(value) => setFormData({ ...formData, usageType: value })}
                 options={[
-                  { value: "personnel", label: "Usage personnel" },
-                  { value: "recherche", label: "Recherche académique" },
-                  { value: "enseignement", label: "Enseignement" },
-                  { value: "commercial", label: "Usage commercial" },
-                  { value: "autre", label: "Autre" }
+                  { value: "commercial", label: "Commercial" },
+                  { value: "non_commercial", label: "Non commercial" }
                 ]}
               />
             </div>
