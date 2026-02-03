@@ -895,8 +895,12 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                   </div>
                 )}
                 ℹ️ Tarifs indicatifs. Un devis définitif vous sera communiqué par email sous 48h.
-                <br />
-                Concernant les manuscrits, votre demande sera satisfaite dans les plus brefs délais, à condition que le nombre demandé ne dépasse pas cinq manuscrits par demande et par jour.
+                {isManuscript && (
+                  <>
+                    <br />
+                    Votre demande sera satisfaite dans les plus brefs délais, à condition que le nombre de manuscrits demandés ne dépasse pas cinq manuscrits par demande et par jour.
+                  </>
+                )}
               </div>
             </div>
           </div>
