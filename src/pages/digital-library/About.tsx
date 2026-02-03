@@ -1,11 +1,12 @@
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Icon } from "@/components/ui/icon";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { motion } from "framer-motion";
 import { useLanguage } from "@/hooks/useLanguage";
 import { cn } from "@/lib/utils";
+import { BNPageHeader } from "@/components/digital-library/shared";
 
 interface AboutSection {
   id: string;
@@ -107,35 +108,12 @@ export default function About() {
   return (
     <DigitalLibraryLayout>
       <div className="min-h-screen bg-background" dir={isArabic ? 'rtl' : 'ltr'}>
-        {/* Hero Section */}
-        <section className="relative overflow-hidden bg-bn-blue-primary py-16 lg:py-24">
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute top-1/4 right-0 w-72 h-72 bg-gold-bn-primary/20 rounded-full blur-[80px]" />
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full blur-[60px]" />
-          </div>
-          
-          <div className="container mx-auto px-4 relative z-10">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-              className="text-center max-w-3xl mx-auto"
-            >
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 text-white/90 text-sm font-medium mb-6">
-                <Icon name="mdi:information-outline" className="h-4 w-4" />
-                {isArabic ? 'حول المكتبة' : 'À propos'}
-              </div>
-              
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4">
-                {getText(content.hero_title_fr, content.hero_title_ar)}
-              </h1>
-              
-              <p className="text-lg text-white/80 max-w-2xl mx-auto">
-                {getText(content.hero_subtitle_fr, content.hero_subtitle_ar)}
-              </p>
-            </motion.div>
-          </div>
-        </section>
+        {/* Hero Section with BNPageHeader */}
+        <BNPageHeader
+          title={getText(content.hero_title_fr, content.hero_title_ar)}
+          subtitle={getText(content.hero_subtitle_fr, content.hero_subtitle_ar)}
+          icon="mdi:information-outline"
+        />
 
         {/* Statistics Section */}
         <section className="py-12 lg:py-16 bg-muted/30">
@@ -149,9 +127,9 @@ export default function About() {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <Card className="text-center border shadow-sm hover:shadow-md transition-shadow">
+                  <Card className="text-center border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-gradient-to-br from-card to-muted/30">
                     <CardContent className="p-5">
-                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-bn-blue-primary/10 text-bn-blue-primary mb-3">
+                      <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-bn-blue-primary/10 to-gold-bn-primary/10 border border-bn-blue-primary/20 text-bn-blue-primary mb-3">
                         <Icon name={stat.icon} className="h-6 w-6" />
                       </div>
                       <p className="text-2xl lg:text-3xl font-bold text-foreground mb-1">
@@ -177,11 +155,11 @@ export default function About() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <Card className="h-full border-0 shadow-lg overflow-hidden">
-                  <div className="h-1 bg-bn-blue-primary" />
+                <Card className="h-full border-0 shadow-xl overflow-hidden bg-gradient-to-br from-card to-bn-blue-primary/5">
+                  <div className="h-1 bg-gradient-to-r from-bn-blue-primary to-bn-blue-deep" />
                   <CardContent className="p-6 lg:p-8">
                     <div className="flex items-center gap-4 mb-5">
-                      <div className="p-3 rounded-xl bg-bn-blue-primary text-white">
+                      <div className="p-3 rounded-xl bg-bn-blue-primary text-white shadow-lg">
                         <Icon name="mdi:target" className="h-6 w-6" />
                       </div>
                       <h2 className="text-xl lg:text-2xl font-bold text-foreground">
@@ -200,11 +178,11 @@ export default function About() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
               >
-                <Card className="h-full border-0 shadow-lg overflow-hidden">
-                  <div className="h-1 bg-gold-bn-primary" />
+                <Card className="h-full border-0 shadow-xl overflow-hidden bg-gradient-to-br from-card to-gold-bn-primary/5">
+                  <div className="h-1 bg-gradient-to-r from-gold-bn-primary to-gold-bn-primary/60" />
                   <CardContent className="p-6 lg:p-8">
                     <div className="flex items-center gap-4 mb-5">
-                      <div className="p-3 rounded-xl bg-gold-bn-primary text-white">
+                      <div className="p-3 rounded-xl bg-gold-bn-primary text-white shadow-lg">
                         <Icon name="mdi:eye-outline" className="h-6 w-6" />
                       </div>
                       <h2 className="text-xl lg:text-2xl font-bold text-foreground">
@@ -243,10 +221,10 @@ export default function About() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {content.values.map((value, index) => {
                 const colors = [
-                  { bg: 'bg-blue-500', light: 'bg-blue-50' },
-                  { bg: 'bg-amber-500', light: 'bg-amber-50' },
-                  { bg: 'bg-emerald-500', light: 'bg-emerald-50' },
-                  { bg: 'bg-purple-500', light: 'bg-purple-50' },
+                  { bg: 'bg-blue-500', light: 'from-blue-500/10 to-blue-500/5', border: 'border-blue-500/20' },
+                  { bg: 'bg-amber-500', light: 'from-amber-500/10 to-amber-500/5', border: 'border-amber-500/20' },
+                  { bg: 'bg-emerald-500', light: 'from-emerald-500/10 to-emerald-500/5', border: 'border-emerald-500/20' },
+                  { bg: 'bg-purple-500', light: 'from-purple-500/10 to-purple-500/5', border: 'border-purple-500/20' },
                 ];
                 const color = colors[index % colors.length];
                 
@@ -258,10 +236,14 @@ export default function About() {
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <Card className="h-full text-center border shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                    <Card className={cn(
+                      "h-full text-center border shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 bg-gradient-to-br",
+                      color.light,
+                      color.border
+                    )}>
                       <CardContent className="p-6">
                         <div className={cn(
-                          "inline-flex items-center justify-center w-14 h-14 rounded-2xl text-white mb-4",
+                          "inline-flex items-center justify-center w-14 h-14 rounded-2xl text-white mb-4 shadow-lg",
                           color.bg
                         )}>
                           <Icon name={value.icon} className="h-7 w-7" />
@@ -306,13 +288,13 @@ export default function About() {
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <Card className="h-full border-0 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                    <Card className="h-full border-0 shadow-xl hover:shadow-2xl transition-all duration-300 group bg-gradient-to-br from-card to-muted/20">
                       <CardContent className="p-6">
                         <div className="flex items-center gap-3 mb-4">
-                          <div className="p-2.5 rounded-xl bg-gold-bn-primary/10 text-gold-bn-primary group-hover:bg-gold-bn-primary group-hover:text-white transition-colors">
+                          <div className="p-2.5 rounded-xl bg-gold-bn-primary/10 text-gold-bn-primary group-hover:bg-gold-bn-primary group-hover:text-white transition-colors shadow-sm">
                             <Icon name={section.icon} className="h-5 w-5" />
                           </div>
-                          <span className="text-xs font-bold text-muted-foreground">
+                          <span className="text-xs font-bold text-muted-foreground bg-muted px-2 py-1 rounded-full">
                             {String(index + 1).padStart(2, '0')}
                           </span>
                         </div>
@@ -332,23 +314,28 @@ export default function About() {
 
         {/* Team Section */}
         {content.team_title_fr && (
-          <section className="py-12 lg:py-20 bg-bn-blue-primary">
-            <div className="container mx-auto px-4">
+          <section className="py-12 lg:py-20 bg-gradient-to-br from-bn-blue-primary via-bn-blue-deep to-bn-blue-primary relative overflow-hidden">
+            {/* Decorative elements */}
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-10 right-10 w-32 h-32 bg-gold-bn-primary rounded-full blur-3xl" />
+              <div className="absolute bottom-10 left-10 w-40 h-40 bg-white rounded-full blur-3xl" />
+            </div>
+            
+            <div className="container mx-auto px-4 relative z-10">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 className="text-center max-w-2xl mx-auto"
               >
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 mb-6">
-                  <Icon name="mdi:account-group" className="h-8 w-8 text-white" />
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6">
+                  <Icon name="mdi:account-group" className="h-8 w-8 text-gold-bn-primary" />
                 </div>
-                
                 <h2 className="text-2xl lg:text-3xl font-bold text-white mb-4">
-                  {getText(content.team_title_fr || '', content.team_title_ar)}
+                  {getText(content.team_title_fr!, content.team_title_ar)}
                 </h2>
                 <p className="text-white/80 leading-relaxed">
-                  {getText(content.team_description_fr || '', content.team_description_ar)}
+                  {getText(content.team_description_fr!, content.team_description_ar)}
                 </p>
               </motion.div>
             </div>
