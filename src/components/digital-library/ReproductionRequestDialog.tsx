@@ -82,7 +82,7 @@ const REPRODUCTION_TYPES = [
 
 const DELIVERY_METHOD_OPTIONS = [
   { value: "telecharger_espace", label: "À télécharger sur Mon espace" },
-  { value: "support_cd", label: "Sous support CD" },
+  { value: "support_cd", label: "Retrait sur place sous support CD" },
   { value: "autre", label: "Autre" },
 ];
 
