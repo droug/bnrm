@@ -297,221 +297,236 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
           {/* Main Menu */}
           <div className="flex items-center gap-1 mt-3 overflow-x-auto" role="menubar" aria-label="Menu principal">
             <SimpleTooltip content={t('dl.home')}>
-              <Link to="/digital-library">
+              <Link to="/digital-library" className="relative group">
                 <Button variant="ghost" size="icon" className="h-8 w-8 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" role="menuitem" aria-label={t('dl.home')}>
                   <Icon name="mdi:home-outline" className="h-5 w-5" />
                 </Button>
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 group-hover:w-3/4 rounded-full" />
               </Link>
             </SimpleTooltip>
 
-            <Link to="/digital-library/about">
+            <Link to="/digital-library/about" className="relative group">
               <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" role="menuitem" aria-label="À propos">
                 <Icon name="mdi:information-outline" className="h-4 w-4" />
                 À propos
               </Button>
+              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 group-hover:w-3/4 rounded-full" />
             </Link>
 
             {/* Collections Dropdown */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" role="menuitem" aria-haspopup="true" aria-label={t('dl.collections')}>
-                  <Icon name="mdi:book-open-page-variant-outline" className="h-4 w-4" />
-                  {t('dl.collections')}
-                  <Icon name="mdi:chevron-down" className="h-3 w-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="bg-card z-50 min-w-[320px] p-2" role="menu" aria-label={t('dl.collections')}>
-                {collectionsSubmenu.map((item, index) => {
-                  const badgeStyles = [
-                    "bg-gradient-to-r from-gold-bn-primary to-amber-500 text-white shadow-lg shadow-gold-bn-primary/30 rotate-2",
-                    "bg-white border-2 border-bn-blue text-gray-900 shadow-lg shadow-bn-blue/20 -rotate-1",
-                    "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30 rotate-1",
-                    "bg-gradient-to-br from-purple-500 to-violet-600 text-white shadow-lg shadow-purple-500/30 -rotate-2",
-                    "bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-500/30 rotate-1",
-                    "bg-gradient-to-br from-orange-500 to-amber-600 text-white shadow-lg shadow-orange-500/30 -rotate-1",
-                  ];
-                  
-                  return (
-                    <FancyTooltip 
-                      key={item.href}
-                      content={t(item.labelKey)} 
-                      description={(item as any).customDesc ? item.descKey : t(item.descKey)}
-                      icon={item.iconName}
-                      side="right"
-                      variant="gold"
-                    >
-                      <Link to={item.href} className="block">
-                        <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group">
-                          <div className="flex items-center gap-3 flex-1">
-                            <div className="p-2 rounded-xl bg-gradient-to-br from-gold-bn-primary/20 to-gold-bn-primary/5 group-hover:from-gold-bn-primary/30 group-hover:to-gold-bn-primary/10 transition-all duration-200 group-hover:scale-110">
-                              <Icon name={item.iconName} className="h-5 w-5 text-gold-bn-primary" />
+            <div className="relative group">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" role="menuitem" aria-haspopup="true" aria-label={t('dl.collections')}>
+                    <Icon name="mdi:book-open-page-variant-outline" className="h-4 w-4" />
+                    {t('dl.collections')}
+                    <Icon name="mdi:chevron-down" className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="bg-card z-50 min-w-[320px] p-2" role="menu" aria-label={t('dl.collections')}>
+                  {collectionsSubmenu.map((item, index) => {
+                    const badgeStyles = [
+                      "bg-gradient-to-r from-gold-bn-primary to-amber-500 text-white shadow-lg shadow-gold-bn-primary/30 rotate-2",
+                      "bg-white border-2 border-bn-blue text-gray-900 shadow-lg shadow-bn-blue/20 -rotate-1",
+                      "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30 rotate-1",
+                      "bg-gradient-to-br from-purple-500 to-violet-600 text-white shadow-lg shadow-purple-500/30 -rotate-2",
+                      "bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-500/30 rotate-1",
+                      "bg-gradient-to-br from-orange-500 to-amber-600 text-white shadow-lg shadow-orange-500/30 -rotate-1",
+                    ];
+                    
+                    return (
+                      <FancyTooltip 
+                        key={item.href}
+                        content={t(item.labelKey)} 
+                        description={(item as any).customDesc ? item.descKey : t(item.descKey)}
+                        icon={item.iconName}
+                        side="right"
+                        variant="gold"
+                      >
+                        <Link to={item.href} className="block">
+                          <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group">
+                            <div className="flex items-center gap-3 flex-1">
+                              <div className="p-2 rounded-xl bg-gradient-to-br from-gold-bn-primary/20 to-gold-bn-primary/5 group-hover:from-gold-bn-primary/30 group-hover:to-gold-bn-primary/10 transition-all duration-200 group-hover:scale-110">
+                                <Icon name={item.iconName} className="h-5 w-5 text-gold-bn-primary" />
+                              </div>
+                              <span className="font-semibold text-foreground group-hover:text-gold-bn-primary transition-colors">{t(item.labelKey)}</span>
                             </div>
-                            <span className="font-semibold text-foreground group-hover:text-gold-bn-primary transition-colors">{t(item.labelKey)}</span>
-                          </div>
-                          <span className={`px-3 py-1 text-xs font-bold rounded-none transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-0 ${badgeStyles[index % badgeStyles.length]}`}>
-                            {item.count}
-                          </span>
-                        </DropdownMenuItem>
-                      </Link>
-                    </FancyTooltip>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                            <span className={`px-3 py-1 text-xs font-bold rounded-none transform transition-all duration-300 group-hover:scale-110 group-hover:rotate-0 ${badgeStyles[index % badgeStyles.length]}`}>
+                              {item.count}
+                            </span>
+                          </DropdownMenuItem>
+                        </Link>
+                      </FancyTooltip>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 group-hover:w-3/4 rounded-full" />
+            </div>
 
             {/* Bouquets électroniques */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label="Ressources électroniques" aria-haspopup="true">
-                  <Icon name="mdi:library" className="h-4 w-4" />
-                  Ressources électroniques
-                  <Icon name="mdi:chevron-down" className="h-3 w-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="bg-card z-50 min-w-[240px] p-2">
-                {activeBundles && activeBundles.length > 0 ? (
-                  activeBundles.map((bundle) => {
-                    // Chercher le logo local en priorité basé sur le nom du provider
-                    const providerKey = bundle.provider?.toLowerCase().trim();
-                    const localLogo = providerKey ? providerLogoMap[providerKey] : null;
-                    const logoSrc = localLogo || bundle.provider_logo_url;
-                    
-                    // Logos avec texte blanc nécessitant un fond sombre
-                    const needsDarkBackground = providerKey === 'almanhal' || providerKey === 'eni' || providerKey === 'eni-elearning';
-                    
-                      return (
-                        <DropdownMenuItem 
-                          key={bundle.id} 
-                          className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-2 px-3 rounded-md"
-                          asChild
-                        >
-                          <a 
-                            href={bundle.api_base_url || bundle.website_url || '#'} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="flex items-center justify-center w-full"
+            <div className="relative group">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label="Ressources électroniques" aria-haspopup="true">
+                    <Icon name="mdi:library" className="h-4 w-4" />
+                    Ressources électroniques
+                    <Icon name="mdi:chevron-down" className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="bg-card z-50 min-w-[240px] p-2">
+                  {activeBundles && activeBundles.length > 0 ? (
+                    activeBundles.map((bundle) => {
+                      // Chercher le logo local en priorité basé sur le nom du provider
+                      const providerKey = bundle.provider?.toLowerCase().trim();
+                      const localLogo = providerKey ? providerLogoMap[providerKey] : null;
+                      const logoSrc = localLogo || bundle.provider_logo_url;
+                      
+                      // Logos avec texte blanc nécessitant un fond sombre
+                      const needsDarkBackground = providerKey === 'almanhal' || providerKey === 'eni' || providerKey === 'eni-elearning';
+                      
+                        return (
+                          <DropdownMenuItem 
+                            key={bundle.id} 
+                            className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-2 px-3 rounded-md"
+                            asChild
                           >
-                            {logoSrc ? (
-                              <div className={`rounded px-3 py-2 ${needsDarkBackground ? 'bg-bn-blue-primary' : ''}`}>
-                                <img src={logoSrc} alt={bundle.provider} className="h-7 w-auto max-w-[120px] object-contain" />
-                              </div>
-                            ) : (
-                              <div className="flex items-center gap-2">
-                                <Icon name="mdi:earth" className="h-5 w-5 text-gold-bn-primary" />
-                                <span className="font-medium">{language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name}</span>
-                              </div>
-                            )}
-                          </a>
-                        </DropdownMenuItem>
-                      );
-                  })
-                ) : (
-                  <DropdownMenuItem disabled className="text-muted-foreground text-sm">
-                    Aucune ressource disponible
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                            <a 
+                              href={bundle.api_base_url || bundle.website_url || '#'} 
+                              target="_blank" 
+                              rel="noopener noreferrer"
+                              className="flex items-center justify-center w-full"
+                            >
+                              {logoSrc ? (
+                                <div className={`rounded px-3 py-2 ${needsDarkBackground ? 'bg-bn-blue-primary' : ''}`}>
+                                  <img src={logoSrc} alt={bundle.provider} className="h-7 w-auto max-w-[120px] object-contain" />
+                                </div>
+                              ) : (
+                                <div className="flex items-center gap-2">
+                                  <Icon name="mdi:earth" className="h-5 w-5 text-gold-bn-primary" />
+                                  <span className="font-medium">{language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name}</span>
+                                </div>
+                              )}
+                            </a>
+                          </DropdownMenuItem>
+                        );
+                    })
+                  ) : (
+                    <DropdownMenuItem disabled className="text-muted-foreground text-sm">
+                      Aucune ressource disponible
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 group-hover:w-3/4 rounded-full" />
+            </div>
 
-            <Link to="/digital-library/search">
+            <Link to="/digital-library/search" className="relative group">
               <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.advancedSearch')}>
                 <Icon name="mdi:magnify" className="h-4 w-4" />
                 {t('dl.advancedSearch')}
               </Button>
+              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 group-hover:w-3/4 rounded-full" />
             </Link>
 
             {/* Services aux lecteurs */}
             {isAuthenticated && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.readerServices')} aria-haspopup="true">
-                    <Icon name="mdi:bookmark-check-outline" className="h-4 w-4" />
-                    {t('dl.readerServices')}
-                    <Icon name="mdi:chevron-down" className="h-3 w-3" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="bg-card z-50 min-w-[280px] p-2" role="menu" aria-label={t('dl.readerServices')}>
-                  <FancyTooltip 
-                    content={t('dl.membership')} 
-                    description="Abonnez-vous pour accéder à l'ensemble des ressources numériques"
-                    icon="mdi:account-plus-outline"
-                    side="right"
-                    variant="gold"
-                  >
-                    <Link to="/abonnements?platform=bn" className="block">
-                      <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group">
-                        <div className="p-2 rounded-xl bg-gradient-to-br from-gold-bn-primary/20 to-gold-bn-primary/5 group-hover:from-gold-bn-primary/30 group-hover:to-gold-bn-primary/10 transition-all duration-200 group-hover:scale-110">
-                          <Icon name="mdi:account-plus-outline" className="h-5 w-5 text-gold-bn-primary" />
-                        </div>
-                        <span className="font-semibold text-foreground group-hover:text-gold-bn-primary transition-colors">{t('dl.membership')}</span>
-                      </DropdownMenuItem>
-                    </Link>
-                  </FancyTooltip>
-                  <FancyTooltip 
-                    content="Demande de Reproduction" 
-                    description="Demandez une copie numérique ou papier d'un document patrimonial"
-                    icon="mdi:content-copy"
-                    side="right"
-                    variant="gold"
-                  >
-                    <div className="block">
-                      <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group" onClick={() => setShowReproductionDialog(true)}>
-                        <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-500/5 group-hover:from-purple-500/30 group-hover:to-purple-500/10 transition-all duration-200 group-hover:scale-110">
-                          <Icon name="mdi:content-copy" className="h-5 w-5 text-purple-600" />
-                        </div>
-                        <span className="font-semibold text-foreground group-hover:text-purple-600 transition-colors">Demande de Reproduction</span>
-                      </DropdownMenuItem>
-                    </div>
-                  </FancyTooltip>
-                </DropdownMenuContent>
-              </DropdownMenu>
+              <div className="relative group">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.readerServices')} aria-haspopup="true">
+                      <Icon name="mdi:bookmark-check-outline" className="h-4 w-4" />
+                      {t('dl.readerServices')}
+                      <Icon name="mdi:chevron-down" className="h-3 w-3" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="start" className="bg-card z-50 min-w-[280px] p-2" role="menu" aria-label={t('dl.readerServices')}>
+                    <FancyTooltip 
+                      content={t('dl.membership')} 
+                      description="Abonnez-vous pour accéder à l'ensemble des ressources numériques"
+                      icon="mdi:account-plus-outline"
+                      side="right"
+                      variant="gold"
+                    >
+                      <Link to="/abonnements?platform=bn" className="block">
+                        <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group">
+                          <div className="p-2 rounded-xl bg-gradient-to-br from-gold-bn-primary/20 to-gold-bn-primary/5 group-hover:from-gold-bn-primary/30 group-hover:to-gold-bn-primary/10 transition-all duration-200 group-hover:scale-110">
+                            <Icon name="mdi:account-plus-outline" className="h-5 w-5 text-gold-bn-primary" />
+                          </div>
+                          <span className="font-semibold text-foreground group-hover:text-gold-bn-primary transition-colors">{t('dl.membership')}</span>
+                        </DropdownMenuItem>
+                      </Link>
+                    </FancyTooltip>
+                    <FancyTooltip 
+                      content="Demande de Reproduction" 
+                      description="Demandez une copie numérique ou papier d'un document patrimonial"
+                      icon="mdi:content-copy"
+                      side="right"
+                      variant="gold"
+                    >
+                      <div className="block">
+                        <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group" onClick={() => setShowReproductionDialog(true)}>
+                          <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-500/5 group-hover:from-purple-500/30 group-hover:to-purple-500/10 transition-all duration-200 group-hover:scale-110">
+                            <Icon name="mdi:content-copy" className="h-5 w-5 text-purple-600" />
+                          </div>
+                          <span className="font-semibold text-foreground group-hover:text-purple-600 transition-colors">Demande de Reproduction</span>
+                        </DropdownMenuItem>
+                      </div>
+                    </FancyTooltip>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 group-hover:w-3/4 rounded-full" />
+              </div>
             )}
 
             {/* Themes */}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.exploreByTheme')} aria-haspopup="true">
-                  <Icon name="mdi:earth" className="h-4 w-4" />
-                  {t('dl.exploreByTheme')}
-                  <Icon name="mdi:chevron-down" className="h-3 w-3" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="bg-card z-50 w-[340px] p-1.5 grid grid-cols-1 gap-0.5" role="menu" aria-label={t('dl.exploreByTheme')}>
-                {themesSubmenu.map((item, index) => {
-                  const iconColors = [
-                    "from-blue-500 to-indigo-600",
-                    "from-purple-500 to-violet-600", 
-                    "from-emerald-500 to-teal-600",
-                    "from-amber-500 to-orange-600",
-                    "from-cyan-500 to-blue-500",
-                    "from-rose-500 to-pink-600",
-                    "from-green-500 to-emerald-600",
-                    "from-fuchsia-500 to-purple-600",
-                    "from-indigo-500 to-blue-600",
-                    "from-teal-500 to-cyan-600",
-                  ];
-                  
-                  return (
-                    <Link key={item.href} to={item.href} className="block">
-                      <DropdownMenuItem className="gap-2.5 cursor-pointer focus:bg-accent py-2 px-2.5 rounded-md hover:bg-bn-blue/5 transition-all duration-200 group">
-                        <div className={`p-1.5 rounded-lg bg-gradient-to-br ${iconColors[index % iconColors.length]} shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200`}>
-                          <Icon name={item.iconName} className="h-4 w-4 text-white" />
-                        </div>
-                        <span className="text-sm font-medium text-foreground/80 group-hover:text-bn-blue transition-colors flex-1 truncate">{item.label}</span>
-                        <Icon name="mdi:chevron-right" className="h-3.5 w-3.5 text-muted-foreground/50 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
-                      </DropdownMenuItem>
-                    </Link>
-                  );
-                })}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <div className="relative group">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.exploreByTheme')} aria-haspopup="true">
+                    <Icon name="mdi:earth" className="h-4 w-4" />
+                    {t('dl.exploreByTheme')}
+                    <Icon name="mdi:chevron-down" className="h-3 w-3" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="bg-card z-50 w-[340px] p-1.5 grid grid-cols-1 gap-0.5" role="menu" aria-label={t('dl.exploreByTheme')}>
+                  {themesSubmenu.map((item, index) => {
+                    const iconColors = [
+                      "from-blue-500 to-indigo-600",
+                      "from-purple-500 to-violet-600", 
+                      "from-emerald-500 to-teal-600",
+                      "from-amber-500 to-orange-600",
+                      "from-cyan-500 to-blue-500",
+                      "from-rose-500 to-pink-600",
+                      "from-green-500 to-emerald-600",
+                      "from-fuchsia-500 to-purple-600",
+                      "from-indigo-500 to-blue-600",
+                      "from-teal-500 to-cyan-600",
+                    ];
+                    
+                    return (
+                      <Link key={item.href} to={item.href} className="block">
+                        <DropdownMenuItem className="gap-2.5 cursor-pointer focus:bg-accent py-2 px-2.5 rounded-md hover:bg-bn-blue/5 transition-all duration-200 group">
+                          <div className={`p-1.5 rounded-lg bg-gradient-to-br ${iconColors[index % iconColors.length]} shadow-sm group-hover:shadow-md group-hover:scale-105 transition-all duration-200`}>
+                            <Icon name={item.iconName} className="h-4 w-4 text-white" />
+                          </div>
+                          <span className="text-sm font-medium text-foreground/80 group-hover:text-bn-blue transition-colors flex-1 truncate">{item.label}</span>
+                          <Icon name="mdi:chevron-right" className="h-3.5 w-3.5 text-muted-foreground/50 opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all" />
+                        </DropdownMenuItem>
+                      </Link>
+                    );
+                  })}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 group-hover:w-3/4 rounded-full" />
+            </div>
 
-
-            <Link to="/digital-library/help">
+            <Link to="/digital-library/help" className="relative group">
               <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.helpFaq')}>
                 <Icon name="mdi:help-circle-outline" className="h-4 w-4" />
                 {t('dl.helpFaq')}
               </Button>
+              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 group-hover:w-3/4 rounded-full" />
             </Link>
           </div>
 
