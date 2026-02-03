@@ -199,7 +199,7 @@ const DigitalLibraryFooter = () => {
               <img 
                 src={logoDigitalLibrary} 
                 alt="Ibn Battuta - Bibliothèque Numérique" 
-                className="h-32 w-auto object-contain"
+                className="h-40 w-auto object-contain"
               />
             </div>
             
