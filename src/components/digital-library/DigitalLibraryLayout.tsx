@@ -40,6 +40,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ReproductionRequestDialog } from "@/components/digital-library/ReproductionRequestDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useElectronicBundles } from "@/hooks/useElectronicBundles";
@@ -374,7 +375,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                     <Icon name="mdi:chevron-down" className="h-3 w-3" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="bg-card z-50 min-w-[240px] p-2">
+                <DropdownMenuContent align="start" className="bg-card z-50 min-w-[280px] p-2">
                   {activeBundles && activeBundles.length > 0 ? (
                     activeBundles.map((bundle) => {
                       // Chercher le logo local en priorité basé sur le nom du provider
@@ -385,31 +386,53 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                       // Logos avec texte blanc nécessitant un fond sombre
                       const needsDarkBackground = providerKey === 'almanhal' || providerKey === 'eni' || providerKey === 'eni-elearning';
                       
-                        return (
-                          <DropdownMenuItem 
-                            key={bundle.id} 
-                            className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-2 px-3 rounded-md"
-                            asChild
-                          >
-                            <a 
-                              href={bundle.api_base_url || bundle.website_url || '#'} 
-                              target="_blank" 
-                              rel="noopener noreferrer"
-                              className="flex items-center justify-center w-full"
+                      // Description du bouquet (bilingue)
+                      const bundleDescription = language === 'ar' && bundle.description_ar 
+                        ? bundle.description_ar 
+                        : bundle.description;
+                      const bundleName = language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name;
+                      
+                      return (
+                        <Tooltip key={bundle.id}>
+                          <TooltipTrigger asChild>
+                            <DropdownMenuItem 
+                              className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-2 px-3 rounded-md"
+                              asChild
                             >
-                              {logoSrc ? (
-                                <div className={`rounded px-3 py-2 ${needsDarkBackground ? 'bg-bn-blue-primary' : ''}`}>
-                                  <img src={logoSrc} alt={bundle.provider} className="h-7 w-auto max-w-[120px] object-contain" />
-                                </div>
-                              ) : (
-                                <div className="flex items-center gap-2">
-                                  <Icon name="mdi:earth" className="h-5 w-5 text-gold-bn-primary" />
-                                  <span className="font-medium">{language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name}</span>
-                                </div>
+                              <a 
+                                href={bundle.api_base_url || bundle.website_url || '#'} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="flex items-center justify-center w-full"
+                              >
+                                {logoSrc ? (
+                                  <div className={`rounded px-3 py-2 ${needsDarkBackground ? 'bg-bn-blue-primary' : ''}`}>
+                                    <img src={logoSrc} alt={bundle.provider} className="h-7 w-auto max-w-[120px] object-contain" />
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-2">
+                                    <Icon name="mdi:earth" className="h-5 w-5 text-gold-bn-primary" />
+                                    <span className="font-medium">{bundleName}</span>
+                                  </div>
+                                )}
+                              </a>
+                            </DropdownMenuItem>
+                          </TooltipTrigger>
+                          <TooltipContent side="right" className="max-w-[280px] p-3">
+                            <div className="space-y-1.5">
+                              <p className="font-semibold text-sm">{bundleName}</p>
+                              {bundleDescription && (
+                                <p className="text-xs text-muted-foreground leading-relaxed">{bundleDescription}</p>
                               )}
-                            </a>
-                          </DropdownMenuItem>
-                        );
+                              {bundle.document_count && bundle.document_count > 0 && (
+                                <p className="text-xs text-gold-bn-primary font-medium">
+                                  {bundle.document_count.toLocaleString()} documents
+                                </p>
+                              )}
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      );
                     })
                   ) : (
                     <DropdownMenuItem disabled className="text-muted-foreground text-sm">
