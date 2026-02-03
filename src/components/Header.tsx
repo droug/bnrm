@@ -469,7 +469,7 @@ const Header = () => {
                   <span>{t('nav.discover')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-3 p-5 w-[700px] lg:grid-cols-2 bg-gradient-to-br from-white to-slate-50 border border-blue-primary-dark/10 shadow-2xl rounded-xl">
+                  <div className="grid gap-3 p-5 w-[700px] lg:grid-cols-2 bg-white border border-slate-200 shadow-2xl rounded-xl">
                     <div className="space-y-2">
                       <h4 className="text-sm font-bold text-blue-primary-dark mb-3 flex items-center gap-2 px-2">
                         <span className="w-1.5 h-4 bg-blue-primary-dark rounded-full" />
@@ -537,7 +537,7 @@ const Header = () => {
                   <span>{t('nav.services')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-3 p-5 w-[700px] lg:grid-cols-2 bg-gradient-to-br from-white to-blue-50/30 border border-blue-primary-dark/10 shadow-2xl rounded-xl">
+                  <div className="grid gap-3 p-5 w-[700px] lg:grid-cols-2 bg-white border border-slate-200 shadow-2xl rounded-xl">
                     <div className="space-y-2">
                       <h4 className="text-sm font-bold text-blue-primary-dark mb-3 flex items-center gap-2 px-2">
                         <span className="w-1.5 h-4 bg-green-500 rounded-full" />
@@ -605,7 +605,7 @@ const Header = () => {
                   <span>{t('nav.explore')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-4 p-6 w-[950px] lg:grid-cols-3 bg-gradient-to-br from-white via-slate-50/50 to-blue-50/30 border border-blue-primary-dark/10 shadow-2xl rounded-xl">
+                  <div className="grid gap-4 p-6 w-[950px] lg:grid-cols-3 bg-white border border-slate-200 shadow-2xl rounded-xl">
                     {/* Colonne 1 - Galerie et Collections */}
                     <div className="space-y-3">
                       <BNRMTooltip 
@@ -624,7 +624,7 @@ const Header = () => {
                         </NavigationMenuLink>
                       </BNRMTooltip>
                       
-                      <div className="pt-2 bg-white/50 rounded-lg p-3">
+                      <div className="pt-2 bg-slate-50 rounded-lg p-3">
                         <h4 className="text-sm font-bold text-blue-primary-dark mb-3 flex items-center gap-2">
                           <span className="w-1.5 h-4 bg-emerald-500 rounded-full" />
                           {language === 'ar' ? 'المجموعات' : 'Collections'}
@@ -682,7 +682,7 @@ const Header = () => {
                     </div>
 
                     {/* Colonne 2 - Catalogue général */}
-                    <div className="space-y-3 bg-white/50 rounded-lg p-3">
+                    <div className="space-y-3 bg-slate-50 rounded-lg p-3">
                       <h4 className="text-sm font-bold text-blue-primary-dark mb-3 flex items-center gap-2">
                         <span className="w-1.5 h-4 bg-violet-500 rounded-full" />
                         {language === 'ar' ? 'الفهرس العام على الإنترنت' : 'Catalogue général en ligne'}
@@ -758,7 +758,7 @@ const Header = () => {
                     </div>
 
                     {/* Colonne 3 - Recherche avancée */}
-                    <div className="space-y-3 bg-white/50 rounded-lg p-3">
+                    <div className="space-y-3 bg-slate-50 rounded-lg p-3">
                       <h4 className="text-sm font-bold text-blue-primary-dark mb-3 flex items-center gap-2">
                         <span className="w-1.5 h-4 bg-rose-500 rounded-full" />
                         {language === 'ar' ? 'البحث عن وثيقة' : 'Chercher un document'}
@@ -821,7 +821,7 @@ const Header = () => {
                   <span>{t('nav.consult.news')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-3 p-5 w-[550px] bg-gradient-to-br from-white to-orange-50/30 border border-orange-200/30 shadow-2xl rounded-xl">
+                  <div className="grid gap-3 p-5 w-[550px] bg-white border border-slate-200 shadow-2xl rounded-xl">
                     <h4 className="text-sm font-bold text-orange-600 flex items-center gap-2 px-2">
                       <span className="w-1.5 h-4 bg-orange-500 rounded-full" />
                       {menuData.news.news.title[language]}
@@ -884,7 +884,7 @@ const Header = () => {
                   <span>{t('nav.collaborate')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-3 p-5 w-[500px] bg-gradient-to-br from-white to-teal-50/30 border border-teal-200/30 shadow-2xl rounded-xl">
+                  <div className="grid gap-3 p-5 w-[500px] bg-white border border-slate-200 shadow-2xl rounded-xl">
                     <h4 className="text-sm font-bold text-teal-600 flex items-center gap-2 px-2">
                       <span className="w-1.5 h-4 bg-teal-500 rounded-full" />
                       {language === 'ar' ? 'الشراكات' : 'Partenariats'}
@@ -928,7 +928,7 @@ const Header = () => {
                   <span>{menuData.mecenat.title[language]}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
-                  <div className="grid gap-3 p-5 w-[500px] bg-gradient-to-br from-white to-amber-50/50 border border-amber-200/30 shadow-2xl rounded-xl">
+                  <div className="grid gap-3 p-5 w-[500px] bg-white border border-slate-200 shadow-2xl rounded-xl">
                     <h4 className="text-sm font-bold text-amber-700 flex items-center gap-2 px-2">
                       <span className="w-1.5 h-4 bg-amber-500 rounded-full" />
                       {menuData.mecenat.title[language]}
