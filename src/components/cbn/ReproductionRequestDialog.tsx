@@ -359,11 +359,23 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
       // Générer un numéro de demande unique
       const requestNumber = `REPRO-${Date.now().toString(36).toUpperCase()}`;
 
+      // Mapper les valeurs du formulaire vers les valeurs de l'enum de la base
+      const getReproductionModality = (): 'papier' | 'numerique_mail' | 'numerique_espace' | 'support_physique' => {
+        if (formData.reproductionType === 'papier') return 'papier';
+        if (formData.reproductionType === 'numerique') {
+          // Déterminer si c'est par email ou sur l'espace personnel
+          if (formData.deliveryMode === 'telechargement') return 'numerique_espace';
+          return 'numerique_mail';
+        }
+        // microfilm = support physique
+        return 'support_physique';
+      };
+
       // Créer la demande dans la base de données avec les champs existants
       const insertData = {
         user_id: user.id,
         request_number: requestNumber,
-        reproduction_modality: formData.reproductionType as 'numerique' | 'papier' | 'microfilm',
+        reproduction_modality: getReproductionModality(),
         status: 'soumise' as const,
         submitted_at: new Date().toISOString(),
         payment_amount: pricing.total,
