@@ -143,14 +143,14 @@ export default function AdvancedSearch() {
       
       // Filtrer par type de document (insensible à la casse avec support des variantes)
       if (params.documentType) {
-        // Mapping des types avec leurs variantes possibles dans la base
+        // Mapping des types avec leurs variantes possibles dans la base (aligné avec le menu Collections)
         const typeVariantsMap: Record<string, string[]> = {
-          'book': ['book', 'Livre', 'livre'],
-          'periodical': ['periodical', 'Périodique', 'periodique'],
           'manuscript': ['manuscript', 'Manuscrit', 'manuscrit'],
-          'image': ['image', 'Image', 'Cartes et Plans', 'cartes et plans'],
-          'audio': ['audio', 'Audio'],
-          'video': ['video', 'Vidéo', 'Video'],
+          'lithography': ['lithography', 'Lithographie', 'lithographie'],
+          'book': ['book', 'Livre', 'livre', 'rare_book', 'ebook', 'Imprimé'],
+          'periodical': ['periodical', 'Périodique', 'periodique', 'Revue', 'revue', 'Journal', 'journal'],
+          'specialized': ['image', 'Image', 'Cartes et Plans', 'cartes et plans', 'photo', 'Photo', 'affiche', 'Affiche', 'map', 'Map'],
+          'audiovisual': ['audio', 'Audio', 'video', 'Vidéo', 'Video', 'audiovisual', 'Audiovisuel'],
         };
         
         const variants = typeVariantsMap[params.documentType];
@@ -400,12 +400,12 @@ export default function AdvancedSearch() {
                           <SelectValue placeholder="Tous les types" />
                         </SelectTrigger>
                         <SelectContent className="bg-background z-50">
-                          <SelectItem value="book">Livre</SelectItem>
-                          <SelectItem value="periodical">Périodique</SelectItem>
-                          <SelectItem value="manuscript">Manuscrit</SelectItem>
-                          <SelectItem value="image">Image/Carte</SelectItem>
-                          <SelectItem value="audio">Audio</SelectItem>
-                          <SelectItem value="video">Vidéo</SelectItem>
+                          <SelectItem value="manuscript">Manuscrits</SelectItem>
+                          <SelectItem value="lithography">Lithographies</SelectItem>
+                          <SelectItem value="book">Livres (Rares, Imprimés & E-Books)</SelectItem>
+                          <SelectItem value="periodical">Périodiques (Revues & Journaux)</SelectItem>
+                          <SelectItem value="specialized">Cartes, Plans, Photos & Affiches</SelectItem>
+                          <SelectItem value="audiovisual">Documents Audiovisuels</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
