@@ -895,8 +895,6 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                   </div>
                 )}
                 ℹ️ Tarifs indicatifs. Un devis définitif vous sera communiqué par email sous 48h.
-                <br />
-                Les liens de téléchargement des documents numériques seront valables pendant 2 mois.
               </div>
             </div>
           </div>
