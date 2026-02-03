@@ -40,7 +40,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { ReproductionRequestDialog } from "@/components/digital-library/ReproductionRequestDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { useElectronicBundles } from "@/hooks/useElectronicBundles";
@@ -375,9 +374,9 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                     <Icon name="mdi:chevron-down" className="h-3 w-3" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="bg-card z-50 min-w-[280px] p-2">
+                <DropdownMenuContent align="start" className="bg-card z-50 min-w-[320px] p-2">
                   {activeBundles && activeBundles.length > 0 ? (
-                    activeBundles.map((bundle) => {
+                    activeBundles.map((bundle, index) => {
                       // Chercher le logo local en priorité basé sur le nom du provider
                       const providerKey = bundle.provider?.toLowerCase().trim();
                       const localLogo = providerKey ? providerLogoMap[providerKey] : null;
@@ -386,52 +385,108 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                       // Logos avec texte blanc nécessitant un fond sombre
                       const needsDarkBackground = providerKey === 'almanhal' || providerKey === 'eni' || providerKey === 'eni-elearning';
                       
-                      // Description du bouquet (bilingue)
-                      const bundleDescription = language === 'ar' && bundle.description_ar 
-                        ? bundle.description_ar 
-                        : bundle.description;
+                      // Description du bouquet (bilingue) avec fallback
+                      const defaultDescriptions: Record<string, { fr: string; ar: string; icon: string }> = {
+                        'cairn': { 
+                          fr: "Revues et ouvrages en sciences humaines et sociales francophones", 
+                          ar: "مجلات وكتب في العلوم الإنسانية والاجتماعية الفرنكوفونية",
+                          icon: "mdi:book-open-page-variant"
+                        },
+                        'ebsco': { 
+                          fr: "Base de données multidisciplinaire avec des milliers de revues académiques", 
+                          ar: "قاعدة بيانات متعددة التخصصات مع آلاف المجلات الأكاديمية",
+                          icon: "mdi:database-search"
+                        },
+                        'brill': { 
+                          fr: "Éditeur académique spécialisé en études orientales, religion et histoire", 
+                          ar: "ناشر أكاديمي متخصص في الدراسات الشرقية والدين والتاريخ",
+                          icon: "mdi:book-education"
+                        },
+                        'almanhal': { 
+                          fr: "Plateforme de ressources numériques en langue arabe", 
+                          ar: "منصة موارد رقمية باللغة العربية",
+                          icon: "mdi:library"
+                        },
+                        'eni-elearning': { 
+                          fr: "Formation en informatique et technologies numériques", 
+                          ar: "تدريب في تكنولوجيا المعلومات والتقنيات الرقمية",
+                          icon: "mdi:laptop"
+                        },
+                        'eni': { 
+                          fr: "Formation en informatique et technologies numériques", 
+                          ar: "تدريب في تكنولوجيا المعلومات والتقنيات الرقمية",
+                          icon: "mdi:laptop"
+                        },
+                        'europeana': { 
+                          fr: "Patrimoine culturel européen numérisé", 
+                          ar: "التراث الثقافي الأوروبي الرقمي",
+                          icon: "mdi:castle"
+                        },
+                        'rfn': { 
+                          fr: "Réseau francophone numérique", 
+                          ar: "الشبكة الفرنكوفونية الرقمية",
+                          icon: "mdi:earth"
+                        },
+                        'ifla': { 
+                          fr: "Fédération internationale des associations de bibliothèques", 
+                          ar: "الاتحاد الدولي لجمعيات المكتبات",
+                          icon: "mdi:account-group"
+                        },
+                      };
+                      
+                      const defaultData = providerKey ? defaultDescriptions[providerKey] : null;
+                      const bundleDescription = language === 'ar' 
+                        ? (bundle.description_ar || defaultData?.ar || '')
+                        : (bundle.description || defaultData?.fr || '');
                       const bundleName = language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name;
+                      const bundleIcon = defaultData?.icon || 'mdi:book-open-variant';
+                      
+                      // Styles de badges variés
+                      const badgeStyles = [
+                        "bg-gradient-to-r from-gold-bn-primary to-amber-500 text-white shadow-lg shadow-gold-bn-primary/30",
+                        "bg-gradient-to-r from-bn-blue-primary to-blue-600 text-white shadow-lg shadow-bn-blue-primary/30",
+                        "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30",
+                        "bg-gradient-to-br from-purple-500 to-violet-600 text-white shadow-lg shadow-purple-500/30",
+                        "bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-500/30",
+                      ];
                       
                       return (
-                        <Tooltip key={bundle.id}>
-                          <TooltipTrigger asChild>
-                            <DropdownMenuItem 
-                              className="cursor-pointer focus:bg-accent focus:text-accent-foreground py-2 px-3 rounded-md"
-                              asChild
-                            >
-                              <a 
-                                href={bundle.api_base_url || bundle.website_url || '#'} 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="flex items-center justify-center w-full"
-                              >
+                        <FancyTooltip 
+                          key={bundle.id}
+                          content={bundleName} 
+                          description={bundleDescription || "Accédez à cette ressource électronique"}
+                          icon={bundleIcon}
+                          side="right"
+                          variant="gold"
+                        >
+                          <a 
+                            href={bundle.api_base_url || bundle.website_url || '#'} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="block"
+                          >
+                            <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group">
+                              <div className="flex items-center gap-3 flex-1">
                                 {logoSrc ? (
-                                  <div className={`rounded px-3 py-2 ${needsDarkBackground ? 'bg-bn-blue-primary' : ''}`}>
-                                    <img src={logoSrc} alt={bundle.provider} className="h-7 w-auto max-w-[120px] object-contain" />
+                                  <div className={`p-2 rounded-xl ${needsDarkBackground ? 'bg-bn-blue-primary' : 'bg-gradient-to-br from-gold-bn-primary/20 to-gold-bn-primary/5 group-hover:from-gold-bn-primary/30 group-hover:to-gold-bn-primary/10'} transition-all duration-200 group-hover:scale-110`}>
+                                    <img src={logoSrc} alt={bundle.provider} className="h-6 w-auto max-w-[80px] object-contain" />
                                   </div>
                                 ) : (
-                                  <div className="flex items-center gap-2">
-                                    <Icon name="mdi:earth" className="h-5 w-5 text-gold-bn-primary" />
-                                    <span className="font-medium">{bundleName}</span>
+                                  <div className="p-2 rounded-xl bg-gradient-to-br from-gold-bn-primary/20 to-gold-bn-primary/5 group-hover:from-gold-bn-primary/30 group-hover:to-gold-bn-primary/10 transition-all duration-200 group-hover:scale-110">
+                                    <Icon name={bundleIcon} className="h-5 w-5 text-gold-bn-primary" />
                                   </div>
                                 )}
-                              </a>
-                            </DropdownMenuItem>
-                          </TooltipTrigger>
-                          <TooltipContent side="right" className="max-w-[280px] p-3">
-                            <div className="space-y-1.5">
-                              <p className="font-semibold text-sm">{bundleName}</p>
-                              {bundleDescription && (
-                                <p className="text-xs text-muted-foreground leading-relaxed">{bundleDescription}</p>
-                              )}
+                                <span className="font-semibold text-foreground group-hover:text-gold-bn-primary transition-colors">{bundleName}</span>
+                              </div>
                               {bundle.document_count && bundle.document_count > 0 && (
-                                <p className="text-xs text-gold-bn-primary font-medium">
-                                  {bundle.document_count.toLocaleString()} documents
-                                </p>
+                                <span className={`px-2 py-0.5 text-xs font-bold rounded-none transform transition-all duration-300 group-hover:scale-110 ${badgeStyles[index % badgeStyles.length]}`}>
+                                  {bundle.document_count > 1000 ? `+${Math.floor(bundle.document_count / 1000)}K` : bundle.document_count}
+                                </span>
                               )}
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
+                              <Icon name="mdi:open-in-new" className="h-4 w-4 text-muted-foreground group-hover:text-gold-bn-primary transition-colors" />
+                            </DropdownMenuItem>
+                          </a>
+                        </FancyTooltip>
                       );
                     })
                   ) : (
