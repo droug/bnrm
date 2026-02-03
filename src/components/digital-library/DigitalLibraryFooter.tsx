@@ -191,17 +191,16 @@ const DigitalLibraryFooter = () => {
     <footer className="bg-gradient-to-br from-bn-blue-primary/5 via-gold-bn-primary/5 to-bn-blue-deep/5 text-foreground border-t border-gold-bn-primary/20">
       <div className="container mx-auto px-4 py-16">
         {/* Section principale - Informations et liens */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-12 mb-12 items-start">
           
           {/* Col 1: À propos - Logo BN */}
           <div className="lg:col-span-1 flex flex-col">
-            {/* Logo aligné exactement sur la ligne des titres des autres sections */}
-            <div className="text-lg font-semibold mb-6 flex items-start text-bn-blue-primary min-h-[3.5rem]">
-              <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary" aria-hidden="true"></span>
+            {/* Logo aligné sur la même ligne de base que les titres des autres sections */}
+            <div className="mb-6">
               <img
                 src={logoDigitalLibrary}
                 alt="Ibn Battuta - Bibliothèque Numérique"
-                className="h-24 w-auto object-contain"
+                className="h-20 w-auto object-contain"
               />
             </div>
             
