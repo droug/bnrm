@@ -38,6 +38,8 @@ const reproductionRequestSchema = z.object({
   documentTitle: z.string().min(2, "Le titre du document est requis"),
   documentCote: z.string().optional(),
   reproductionType: z.string().min(1, "Sélectionnez un type de reproduction"),
+  deliveryMethod: z.string().min(1, "Sélectionnez un mode de réception"),
+  deliveryMethodOther: z.string().optional(),
   quantity: z.number().min(1, "La quantité doit être au moins 1").max(100, "Maximum 100 pages"),
   purpose: z.string().min(1, "Précisez l'usage prévu"),
   urgentRequest: z.boolean().default(false),
@@ -45,6 +47,14 @@ const reproductionRequestSchema = z.object({
   acceptTerms: z.boolean().refine((val) => val === true, {
     message: "Vous devez accepter les conditions d'utilisation",
   }),
+}).refine((data) => {
+  if (data.deliveryMethod === "autre" && (!data.deliveryMethodOther || data.deliveryMethodOther.trim() === "")) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Veuillez préciser le mode de réception",
+  path: ["deliveryMethodOther"],
 });
 
 type ReproductionRequestFormData = z.infer<typeof reproductionRequestSchema>;
@@ -70,6 +80,12 @@ const REPRODUCTION_TYPES = [
 ];
 
 
+const DELIVERY_METHOD_OPTIONS = [
+  { value: "telecharger_espace", label: "À télécharger sur Mon espace" },
+  { value: "support_cd", label: "Sous support CD" },
+  { value: "autre", label: "Autre" },
+];
+
 const PURPOSE_OPTIONS = [
   { value: "recherche", label: "Recherche académique" },
   { value: "publication", label: "Publication scientifique" },
@@ -94,6 +110,8 @@ export function ReproductionRequestDialog({
       documentTitle: documentTitle || "",
       documentCote: documentCote || "",
       reproductionType: "",
+      deliveryMethod: "",
+      deliveryMethodOther: "",
       quantity: 1,
       purpose: "",
       urgentRequest: false,
@@ -129,6 +147,8 @@ export function ReproductionRequestDialog({
           document_title: data.documentTitle,
           document_cote: data.documentCote || null,
           reproduction_type: data.reproductionType,
+          delivery_method: data.deliveryMethod,
+          delivery_method_other: data.deliveryMethod === "autre" ? data.deliveryMethodOther : null,
           quantity: data.quantity,
           purpose: data.purpose,
           urgent_request: data.urgentRequest,
@@ -259,22 +279,60 @@ export function ReproductionRequestDialog({
               <div className="space-y-4">
                 <h4 className="text-sm font-semibold">Options de reproduction</h4>
                 
-                <FormField
-                  control={form.control}
-                  name="reproductionType"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Type de reproduction *</FormLabel>
-                      <PortalSelect 
-                        value={field.value}
-                        onChange={field.onChange}
-                        placeholder="Sélectionner..."
-                        options={REPRODUCTION_TYPES}
-                      />
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="reproductionType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Type de reproduction *</FormLabel>
+                        <PortalSelect 
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Sélectionner..."
+                          options={REPRODUCTION_TYPES}
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="deliveryMethod"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Mode de réception *</FormLabel>
+                        <PortalSelect 
+                          value={field.value}
+                          onChange={field.onChange}
+                          placeholder="Sélectionner..."
+                          options={DELIVERY_METHOD_OPTIONS}
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {form.watch("deliveryMethod") === "autre" && (
+                  <FormField
+                    control={form.control}
+                    name="deliveryMethodOther"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Précisez le mode de réception *</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            placeholder="Ex: Envoi postal, retrait sur place..."
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
