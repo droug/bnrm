@@ -17,7 +17,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery } from "@tanstack/react-query";
-import logoDigitalLibrary from "@/assets/BN_LOGO_FINAL.png";
+import logoDigitalLibrary from "@/assets/FINAL_LOGO_2.png";
 
 interface FooterLink {
   title_fr: string;
@@ -199,8 +199,9 @@ const DigitalLibraryFooter = () => {
             <div className="mb-6 flex items-start min-h-[3.5rem]">
               <img
                 src={logoDigitalLibrary}
-                alt="Ibn Battuta - Bibliothèque Numérique"
-                className="h-20 w-auto object-contain -mt-2"
+                alt="Bibliothèque Numérique Marocaine — Ibn Battûta"
+                className="h-16 md:h-20 w-full object-contain object-left object-top"
+                loading="lazy"
               />
             </div>
             
