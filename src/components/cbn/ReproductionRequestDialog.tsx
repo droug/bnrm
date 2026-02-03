@@ -811,7 +811,7 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
           {/* Informations tarifaires */}
           <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
             <h4 className="font-semibold mb-3 flex items-center gap-2">
-              💰 Tarification estimative
+              💰 Tarification
               {isOwner && (
                 <Badge variant="secondary" className="bg-green-100 text-green-800 ml-2">
                   -50% Propriétaire
@@ -875,7 +875,7 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
               <Separator className="my-3" />
               
               <div className="flex justify-between text-base pt-1">
-                <span className="font-semibold">Total estimé</span>
+                <span className="font-semibold">Total</span>
                 <span className="font-bold text-primary text-lg">{pricing.total.toFixed(2)} MAD</span>
               </div>
               
