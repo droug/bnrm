@@ -245,7 +245,9 @@ serve(async (req) => {
         title: `Demande de reproduction ${notification.notificationType}`,
         message: `Mise à jour pour la demande ${notification.requestNumber}`,
         is_read: false,
-        metadata: {
+        category: 'reproduction',
+        module: 'digital-library',
+        data: {
           request_id: notification.requestId,
           request_number: notification.requestNumber,
           notification_type: notification.notificationType
