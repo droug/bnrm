@@ -222,14 +222,14 @@ export default function DemandeReproduction() {
 
         {/* Panier de sélection */}
         {selectedDocuments.length > 0 && (
-          <Card className="mb-6 border-2 border-primary/20">
+          <Card className="mb-6 border-2 border-primary/20 sticky top-20 z-40 bg-background shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ShoppingCart className="h-5 w-5" />
                 Documents sélectionnés ({selectedDocuments.length})
               </CardTitle>
               <CardDescription>
-                Cliquez sur "Demander" pour chaque document à reproduire
+                Cliquez sur "Demande de reproduction" pour chaque document à reproduire
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -251,7 +251,7 @@ export default function DemandeReproduction() {
                       onClick={() => handleOpenReproductionDialog(doc)}
                     >
                       <FileText className="h-4 w-4 mr-1" />
-                      Demander
+                      Demande de reproduction
                     </Button>
                     <Button
                       variant="ghost"
