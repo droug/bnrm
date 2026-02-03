@@ -61,7 +61,8 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
     reproductionType: document.supportType === "Microfilm" ? "microfilm" : "numerique", // numerique, papier, microfilm
     format: document.supportType === "Microfilm" ? "35mm" : "pdf", // pdf, jpeg, tiff pour numérique | A4, A3 pour papier | 35mm, 16mm, microfiche pour microfilm
     quality: "haute", // standard, haute
-    deliveryMode: "email", // email, telechargement, sous_support
+    deliveryMode: "telechargement", // telechargement, retrait_cd, autre
+    deliveryModeOther: "", // précision si deliveryMode === "autre"
     supportType: "cd", // cd, usb, ssd, autre
     numberOfCopies: "1", // pour papier
     paperFormat: "A4", // A4, A3, autre pour papier (forcé à A4 pour manuscrits)
@@ -617,34 +618,6 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
               </RadioGroup>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              {formData.reproductionType === "numerique" && (
-                <div>
-                  <Label htmlFor="format">Format</Label>
-                  <SimpleSelect
-                    value={formData.format}
-                    onChange={(value) => setFormData({ ...formData, format: value })}
-                    options={
-                      isMapOrPlan 
-                        ? [{ value: "jpeg", label: "JPEG" }]
-                        : [
-                            { value: "pdf", label: "PDF" },
-                            { value: "jpeg", label: "JPEG" },
-                            { value: "tiff", label: "TIFF" }
-                          ]
-                    }
-                    disabled={isMapOrPlan}
-                    className={isMapOrPlan ? "bg-muted cursor-not-allowed" : ""}
-                  />
-                  {isMapOrPlan && (
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Pour les cartes et plans, seul le format JPEG est disponible
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-
             {formData.reproductionType === "numerique" && (
               <>
                 <div>
@@ -652,30 +625,24 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                   <SimpleSelect
                     id="deliveryMode"
                     value={formData.deliveryMode}
-                    onChange={(value) => setFormData({ ...formData, deliveryMode: value })}
+                    onChange={(value) => setFormData({ ...formData, deliveryMode: value, deliveryModeOther: "" })}
                     options={[
-                      { value: "email", label: "Par E-mail" },
-                      { value: "telechargement", label: "À télécharger" },
-                      { value: "sous_support", label: "Sous support" },
-                      { value: "retrait", label: "Retrait sur place (BNRM)" },
+                      { value: "telechargement", label: "À télécharger sur Mon espace" },
+                      { value: "retrait_cd", label: "Retrait sur place sous support CD" },
                       { value: "autre", label: "Autre" }
                     ]}
                   />
                 </div>
 
-                {formData.deliveryMode === "sous_support" && (
+                {formData.deliveryMode === "autre" && (
                   <div>
-                    <Label htmlFor="supportType">Type de support *</Label>
-                    <SimpleSelect
-                      id="supportType"
-                      value={formData.supportType}
-                      onChange={(value) => setFormData({ ...formData, supportType: value })}
-                      options={[
-                        { value: "cd", label: "CD" },
-                        { value: "usb", label: "USB" },
-                        { value: "ssd", label: "Carte SD" },
-                        { value: "autre", label: "Autre" }
-                      ]}
+                    <Label htmlFor="deliveryModeOther">Précisez le mode de réception *</Label>
+                    <Input
+                      id="deliveryModeOther"
+                      value={formData.deliveryModeOther || ""}
+                      onChange={(e) => setFormData({ ...formData, deliveryModeOther: e.target.value })}
+                      placeholder="Ex: Envoi postal, autre support..."
+                      required
                     />
                   </div>
                 )}
