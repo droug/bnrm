@@ -38,7 +38,6 @@ const reproductionRequestSchema = z.object({
   documentTitle: z.string().min(2, "Le titre du document est requis"),
   documentCote: z.string().optional(),
   reproductionType: z.string().min(1, "Sélectionnez un type de reproduction"),
-  format: z.string().min(1, "Sélectionnez un format"),
   quantity: z.number().min(1, "La quantité doit être au moins 1").max(100, "Maximum 100 pages"),
   purpose: z.string().min(1, "Précisez l'usage prévu"),
   urgentRequest: z.boolean().default(false),
@@ -70,12 +69,6 @@ const REPRODUCTION_TYPES = [
   { value: "support_physique", label: "Reproduction sur support physique" },
 ];
 
-const FORMAT_OPTIONS = [
-  { value: "a4", label: "A4 (210 x 297 mm)" },
-  { value: "a3", label: "A3 (297 x 420 mm)" },
-  { value: "original", label: "Format original" },
-  { value: "personnalise", label: "Format personnalisé" },
-];
 
 const PURPOSE_OPTIONS = [
   { value: "recherche", label: "Recherche académique" },
@@ -101,7 +94,6 @@ export function ReproductionRequestDialog({
       documentTitle: documentTitle || "",
       documentCote: documentCote || "",
       reproductionType: "",
-      format: "",
       quantity: 1,
       purpose: "",
       urgentRequest: false,
@@ -137,7 +129,6 @@ export function ReproductionRequestDialog({
           document_title: data.documentTitle,
           document_cote: data.documentCote || null,
           reproduction_type: data.reproductionType,
-          format: data.format,
           quantity: data.quantity,
           purpose: data.purpose,
           urgent_request: data.urgentRequest,
@@ -268,41 +259,22 @@ export function ReproductionRequestDialog({
               <div className="space-y-4">
                 <h4 className="text-sm font-semibold">Options de reproduction</h4>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="reproductionType"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Type de reproduction *</FormLabel>
-                        <PortalSelect 
-                          value={field.value}
-                          onChange={field.onChange}
-                          placeholder="Sélectionner..."
-                          options={REPRODUCTION_TYPES}
-                        />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="format"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Format souhaité *</FormLabel>
-                        <PortalSelect 
-                          value={field.value}
-                          onChange={field.onChange}
-                          placeholder="Sélectionner..."
-                          options={FORMAT_OPTIONS}
-                        />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
+                <FormField
+                  control={form.control}
+                  name="reproductionType"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Type de reproduction *</FormLabel>
+                      <PortalSelect 
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Sélectionner..."
+                        options={REPRODUCTION_TYPES}
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <FormField
