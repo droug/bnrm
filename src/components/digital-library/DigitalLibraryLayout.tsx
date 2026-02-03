@@ -295,26 +295,26 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
           </div>
 
           {/* Main Menu */}
-          <div className="flex items-center gap-1 mt-3 overflow-x-auto" role="menubar" aria-label="Menu principal">
+          <div className="flex items-center gap-1 mt-3 pb-1 overflow-x-auto" role="menubar" aria-label="Menu principal">
             <SimpleTooltip content={t('dl.home')}>
-              <Link to="/digital-library" className="relative group">
+              <Link to="/digital-library" className="relative group pb-1">
                 <Button variant="ghost" size="icon" className="h-8 w-8 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" role="menuitem" aria-label={t('dl.home')}>
                   <Icon name="mdi:home-outline" className="h-5 w-5" />
                 </Button>
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 group-hover:w-3/4 rounded-full" />
+                <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 ease-out group-hover:w-4/5 rounded-full" />
               </Link>
             </SimpleTooltip>
 
-            <Link to="/digital-library/about" className="relative group">
+            <Link to="/digital-library/about" className="relative group pb-1">
               <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" role="menuitem" aria-label="À propos">
                 <Icon name="mdi:information-outline" className="h-4 w-4" />
                 À propos
               </Button>
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 group-hover:w-3/4 rounded-full" />
+              <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 ease-out group-hover:w-4/5 rounded-full" />
             </Link>
 
             {/* Collections Dropdown */}
-            <div className="relative group">
+            <div className="relative group pb-1">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" role="menuitem" aria-haspopup="true" aria-label={t('dl.collections')}>
@@ -361,11 +361,11 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   })}
                 </DropdownMenuContent>
               </DropdownMenu>
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 group-hover:w-3/4 rounded-full" />
+              <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 ease-out group-hover:w-4/5 rounded-full" />
             </div>
 
             {/* Bouquets électroniques */}
-            <div className="relative group">
+            <div className="relative group pb-1">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label="Ressources électroniques" aria-haspopup="true">
@@ -418,20 +418,20 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   )}
                 </DropdownMenuContent>
               </DropdownMenu>
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 group-hover:w-3/4 rounded-full" />
+              <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 ease-out group-hover:w-4/5 rounded-full" />
             </div>
 
-            <Link to="/digital-library/search" className="relative group">
+            <Link to="/digital-library/search" className="relative group pb-1">
               <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.advancedSearch')}>
                 <Icon name="mdi:magnify" className="h-4 w-4" />
                 {t('dl.advancedSearch')}
               </Button>
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 group-hover:w-3/4 rounded-full" />
+              <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 ease-out group-hover:w-4/5 rounded-full" />
             </Link>
 
             {/* Services aux lecteurs */}
             {isAuthenticated && (
-              <div className="relative group">
+              <div className="relative group pb-1">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.readerServices')} aria-haspopup="true">
@@ -475,12 +475,12 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                     </FancyTooltip>
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 group-hover:w-3/4 rounded-full" />
+                <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 ease-out group-hover:w-4/5 rounded-full" />
               </div>
             )}
 
             {/* Themes */}
-            <div className="relative group">
+            <div className="relative group pb-1">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.exploreByTheme')} aria-haspopup="true">
@@ -518,15 +518,15 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   })}
                 </DropdownMenuContent>
               </DropdownMenu>
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 group-hover:w-3/4 rounded-full" />
+              <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 ease-out group-hover:w-4/5 rounded-full" />
             </div>
 
-            <Link to="/digital-library/help" className="relative group">
+            <Link to="/digital-library/help" className="relative group pb-1">
               <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.helpFaq')}>
                 <Icon name="mdi:help-circle-outline" className="h-4 w-4" />
                 {t('dl.helpFaq')}
               </Button>
-              <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 group-hover:w-3/4 rounded-full" />
+              <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 ease-out group-hover:w-4/5 rounded-full" />
             </Link>
           </div>
 
