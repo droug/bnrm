@@ -196,11 +196,11 @@ const DigitalLibraryFooter = () => {
           {/* Col 1: À propos - Logo BN */}
           <div className="lg:col-span-1 flex flex-col">
             {/* Logo aligné sur la même ligne de base que les titres des autres sections */}
-            <div className="mb-6">
+            <div className="mb-6 flex items-start min-h-[3.5rem]">
               <img
                 src={logoDigitalLibrary}
                 alt="Ibn Battuta - Bibliothèque Numérique"
-                className="h-20 w-auto object-contain"
+                className="h-20 w-auto object-contain -mt-2"
               />
             </div>
             
