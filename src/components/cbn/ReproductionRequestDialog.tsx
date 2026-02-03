@@ -627,6 +627,7 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                     value={formData.deliveryMode}
                     onChange={(value) => setFormData({ ...formData, deliveryMode: value, deliveryModeOther: "" })}
                     options={[
+                      { value: "email", label: "Par E-mail" },
                       { value: "telechargement", label: "À télécharger sur Mon espace" },
                       { value: "retrait_cd", label: "Retrait sur place sous support CD" },
                       { value: "autre", label: "Autre" }
