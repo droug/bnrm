@@ -4,9 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, FileText, Book, Image, Video, Music, Filter, Search } from "lucide-react";
+import { BookOpen, FileText, Book, Image, Video, Filter, Search } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
+import { BNPageHeader } from "@/components/digital-library/shared";
+import { Icon } from "@iconify/react";
 
 export default function Collections() {
   const navigate = useNavigate();
@@ -17,49 +19,64 @@ export default function Collections() {
 
   const collections = [
     {
+      id: "manuscripts",
+      title: "Manuscrits numérisés",
+      icon: "mdi:script-text-outline",
+      count: "+12 000",
+      description: "Manuscrits arabes, berbères et hébraïques du patrimoine marocain",
+      color: "text-purple-600",
+      bgColor: "from-purple-500/10 to-purple-500/5",
+      borderColor: "border-purple-500/20 hover:border-purple-500/40",
+    },
+    {
+      id: "lithography",
+      title: "Lithographies",
+      icon: "mdi:draw",
+      count: "+30",
+      description: "Collection de lithographies marocaines historiques",
+      color: "text-amber-600",
+      bgColor: "from-amber-500/10 to-amber-500/5",
+      borderColor: "border-amber-500/20 hover:border-amber-500/40",
+    },
+    {
       id: "books",
       title: "Livres",
-      icon: Book,
-      count: "45,670",
+      icon: "mdi:book-open-variant",
+      count: "+400",
       description: "Ouvrages numérisés sur le patrimoine marocain, littérature classique et contemporaine",
       color: "text-blue-600",
-      bgColor: "bg-blue-50",
+      bgColor: "from-blue-500/10 to-blue-500/5",
+      borderColor: "border-blue-500/20 hover:border-blue-500/40",
     },
     {
       id: "periodicals",
-      title: "Revues et journaux",
-      icon: FileText,
-      count: "8,320",
-      description: "Journaux marocains historiques, revues scientifiques et culturelles",
+      title: "Périodiques",
+      icon: "mdi:newspaper-variant-outline",
+      count: "+70",
+      description: "Journaux et revues marocains historiques, publications scientifiques et culturelles",
       color: "text-green-600",
-      bgColor: "bg-green-50",
+      bgColor: "from-green-500/10 to-green-500/5",
+      borderColor: "border-green-500/20 hover:border-green-500/40",
     },
     {
-      id: "manuscripts",
-      title: "Manuscrits numérisés",
-      icon: BookOpen,
-      count: "12,450",
-      description: "Manuscrits arabes, berbères et hébraïques du patrimoine marocain",
-      color: "text-purple-600",
-      bgColor: "bg-purple-50",
-    },
-    {
-      id: "photos",
+      id: "specialized",
       title: "Collections spécialisées",
-      icon: Image,
-      count: "15,890",
-      description: "Collections de photographies historiques, cartes anciennes et lithographies",
-      color: "text-amber-600",
-      bgColor: "bg-amber-50",
+      icon: "mdi:folder-star-outline",
+      count: "+2 000",
+      description: "Collections de photographies historiques, cartes anciennes et documents rares",
+      color: "text-rose-600",
+      bgColor: "from-rose-500/10 to-rose-500/5",
+      borderColor: "border-rose-500/20 hover:border-rose-500/40",
     },
     {
       id: "audiovisual",
       title: "Audio-visuel",
-      icon: Video,
-      count: "2,890",
+      icon: "mdi:play-circle-outline",
+      count: "+100",
       description: "Enregistrements audio, vidéos documentaires et archives orales",
       color: "text-red-600",
-      bgColor: "bg-red-50",
+      bgColor: "from-red-500/10 to-red-500/5",
+      borderColor: "border-red-500/20 hover:border-red-500/40",
     },
   ];
 
@@ -74,32 +91,35 @@ export default function Collections() {
 
   return (
     <DigitalLibraryLayout>
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">Collections Numériques</h1>
-          <p className="text-lg text-muted-foreground">
-            Explorez nos fonds documentaires numérisés classés par type et thématique
-          </p>
-        </div>
+      <BNPageHeader
+        title="Collections Numériques"
+        subtitle="Explorez nos fonds documentaires numérisés classés par type et thématique"
+        icon="mdi:library-shelves"
+      />
 
+      <div className="container mx-auto px-4 py-8">
         {/* Search and Filters */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Filter className="h-5 w-5" />
+        <Card className="mb-8 border-0 shadow-xl bg-white/80 dark:bg-card/80 backdrop-blur-sm">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-bn-blue-primary/10 to-gold-bn-primary/10 border border-bn-blue-primary/20">
+                <Filter className="h-5 w-5 text-bn-blue-primary" />
+              </div>
               Filtrer les collections
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex gap-4">
-              <div className="flex-1">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Rechercher par auteur, titre, sujet..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 h-11 border-border/50 focus:border-bn-blue-primary"
                 />
               </div>
-              <Button onClick={handleSearch}>
+              <Button onClick={handleSearch} className="bg-bn-blue-primary hover:bg-bn-blue-deep">
                 <Search className="h-4 w-4 mr-2" />
                 Rechercher
               </Button>
@@ -107,9 +127,9 @@ export default function Collections() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="text-sm font-medium mb-2 block">Type de document</label>
+                <label className="text-sm font-medium mb-2 block text-muted-foreground">Type de document</label>
                 <Select value={selectedType} onValueChange={setSelectedType}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-11">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -124,9 +144,9 @@ export default function Collections() {
               </div>
 
               <div>
-                <label className="text-sm font-medium mb-2 block">Langue</label>
+                <label className="text-sm font-medium mb-2 block text-muted-foreground">Langue</label>
                 <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-11">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -140,9 +160,9 @@ export default function Collections() {
               </div>
 
               <div>
-                <label className="text-sm font-medium mb-2 block">Date</label>
+                <label className="text-sm font-medium mb-2 block text-muted-foreground">Date</label>
                 <Select value={selectedDate} onValueChange={setSelectedDate}>
-                  <SelectTrigger>
+                  <SelectTrigger className="h-11">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -163,25 +183,30 @@ export default function Collections() {
           {collections.map((collection) => (
             <Card
               key={collection.id}
-              className="hover:shadow-lg transition-all cursor-pointer group"
+              className={`group relative overflow-hidden cursor-pointer transition-all duration-300 hover:shadow-xl hover:-translate-y-1 border bg-gradient-to-br ${collection.bgColor} ${collection.borderColor}`}
               onClick={() => navigate(`/digital-library/collections/${collection.id}`)}
             >
-              <CardHeader>
-                <div className={`p-4 rounded-lg ${collection.bgColor} w-fit mb-3 group-hover:scale-110 transition-transform`}>
-                  <collection.icon className={`h-8 w-8 ${collection.color}`} />
-                </div>
-                <CardTitle className="text-xl">{collection.title}</CardTitle>
-                <CardDescription className="text-sm">{collection.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex items-center justify-between">
-                  <Badge variant="secondary" className="text-sm px-3 py-1">
-                    {collection.count} documents
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div className={`p-4 rounded-2xl bg-white/80 dark:bg-card/80 shadow-sm group-hover:scale-110 transition-transform duration-300`}>
+                    <Icon icon={collection.icon} className={`h-8 w-8 ${collection.color}`} />
+                  </div>
+                  <Badge variant="secondary" className="text-sm px-3 py-1 bg-white/80 dark:bg-card/80">
+                    {collection.count}
                   </Badge>
-                  <Button variant="ghost" size="sm">
-                    Explorer →
-                  </Button>
                 </div>
+                <CardTitle className="text-xl mt-4 group-hover:text-bn-blue-primary transition-colors">
+                  {collection.title}
+                </CardTitle>
+                <CardDescription className="text-sm leading-relaxed">
+                  {collection.description}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <Button variant="ghost" size="sm" className="group-hover:text-bn-blue-primary group-hover:bg-bn-blue-primary/10 transition-all">
+                  Explorer la collection
+                  <Icon icon="mdi:arrow-right" className="h-4 w-4 ml-2 group-hover:translate-x-1 transition-transform" />
+                </Button>
               </CardContent>
             </Card>
           ))}
