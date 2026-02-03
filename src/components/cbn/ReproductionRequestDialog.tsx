@@ -35,6 +35,7 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
   const [tariffs, setTariffs] = useState<any[]>([]);
   const [isOwner, setIsOwner] = useState(false);
   const [loadingOwnership, setLoadingOwnership] = useState(true);
+  const [userProfile, setUserProfile] = useState<{ first_name: string; last_name: string; email: string } | null>(null);
   const [pricing, setPricing] = useState({
     baseCost: 0,
     qualityCost: 0,
@@ -53,10 +54,6 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
   const isMapOrPlan = document.type === "Cartes et Plans" || document.supportType === "Cartes et Plans";
   
   const [formData, setFormData] = useState({
-    // Informations du demandeur (pré-remplies depuis le compte adhérent)
-    lastName: "Nom Adhérent",
-    firstName: "Prénom Adhérent",
-    
     // Type de reproduction
     reproductionType: document.supportType === "Microfilm" ? "microfilm" : "numerique", // numerique, papier, microfilm
     format: document.supportType === "Microfilm" ? "35mm" : "pdf", // pdf, jpeg, tiff pour numérique | A4, A3 pour papier | 35mm, 16mm, microfiche pour microfilm
@@ -89,6 +86,36 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
     termsAccepted: false,
     copyrightAcknowledged: false,
   });
+
+  // Charger le profil utilisateur
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('first_name, last_name')
+            .eq('id', user.id)
+            .maybeSingle();
+          
+          if (profile) {
+            setUserProfile({
+              first_name: profile.first_name || '',
+              last_name: profile.last_name || '',
+              email: user.email || ''
+            });
+          }
+        }
+      } catch (err) {
+        console.error('Erreur chargement profil:', err);
+      }
+    };
+    
+    if (isOpen) {
+      loadUserProfile();
+    }
+  }, [isOpen]);
   
   // Charger les tarifs
   useEffect(() => {
@@ -473,7 +500,7 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                 <Input
                   id="lastName"
                   disabled
-                  value={formData.lastName}
+                  value={userProfile?.last_name || 'Chargement...'}
                   className="bg-muted cursor-not-allowed"
                 />
               </div>
@@ -482,7 +509,7 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                 <Input
                   id="firstName"
                   disabled
-                  value={formData.firstName}
+                  value={userProfile?.first_name || 'Chargement...'}
                   className="bg-muted cursor-not-allowed"
                 />
               </div>
