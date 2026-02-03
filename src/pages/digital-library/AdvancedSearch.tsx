@@ -279,58 +279,85 @@ export default function AdvancedSearch() {
 
   return (
     <DigitalLibraryLayout>
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-foreground mb-3">Recherche Avancée</h1>
-          <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-            Recherchez dans nos collections en utilisant plusieurs critères organisés par onglets thématiques
-          </p>
+      <div className="min-h-screen">
+        {/* Hero Section */}
+        <div className="relative bg-gradient-to-br from-bn-blue-primary via-bn-blue-deep to-bn-blue-primary overflow-hidden">
+          {/* Decorative patterns */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 left-0 w-96 h-96 bg-gold-bn-primary rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+            <div className="absolute bottom-0 right-0 w-96 h-96 bg-gold-bn-primary rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+          </div>
+          
+          <div className="container mx-auto px-4 py-16 relative z-10">
+            <div className="text-center max-w-3xl mx-auto">
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-6">
+                <Search className="h-4 w-4 text-gold-bn-primary" />
+                <span className="text-sm font-medium text-white/90">Bibliothèque Numérique Ibn Battûta</span>
+              </div>
+              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+                Recherche Avancée
+              </h1>
+              <p className="text-lg text-white/80 leading-relaxed">
+                Explorez nos collections avec des critères précis pour trouver exactement ce que vous cherchez
+              </p>
+            </div>
+          </div>
+          
+          {/* Wave separator */}
+          <div className="absolute bottom-0 left-0 right-0">
+            <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
+              <path d="M0 60L60 55C120 50 240 40 360 35C480 30 600 30 720 32.5C840 35 960 40 1080 42.5C1200 45 1320 45 1380 45L1440 45V60H1380C1320 60 1200 60 1080 60C960 60 840 60 720 60C600 60 480 60 360 60C240 60 120 60 60 60H0Z" className="fill-background"/>
+            </svg>
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <Card className="mb-6 shadow-lg">
-            <CardHeader className="border-b bg-gradient-to-r from-primary/5 via-secondary/5 to-primary/5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2 text-xl">
-                    <Library className="h-6 w-6" />
-                    Critères de recherche
-                  </CardTitle>
-                  <CardDescription className="mt-1">
-                    Sélectionnez un onglet et remplissez les champs correspondants
-                  </CardDescription>
+        <div className="container mx-auto px-4 py-8 max-w-6xl -mt-4 relative z-20">
+          <form onSubmit={handleSubmit}>
+            <Card className="mb-6 shadow-xl border-0 bg-card/95 backdrop-blur-sm">
+              <CardHeader className="border-b bg-gradient-to-r from-gold-bn-primary/10 via-transparent to-bn-blue-primary/10">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="flex items-center gap-3 text-xl">
+                      <div className="p-2 rounded-xl bg-gradient-to-br from-gold-bn-primary to-gold-bn-secondary shadow-lg">
+                        <Library className="h-5 w-5 text-white" />
+                      </div>
+                      Critères de recherche
+                    </CardTitle>
+                    <CardDescription className="mt-2">
+                      Sélectionnez un onglet et remplissez les champs correspondants
+                    </CardDescription>
+                  </div>
                 </div>
-              </div>
-            </CardHeader>
+              </CardHeader>
             <CardContent className="p-6">
               <Tabs defaultValue="all" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 h-auto gap-2 bg-muted/50 p-1">
-                  <TabsTrigger value="all" className="data-[state=active]:bg-background">
+                <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 h-auto gap-2 bg-gradient-to-r from-muted/80 via-muted/50 to-muted/80 p-2 rounded-xl">
+                  <TabsTrigger value="all" className="data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-bn-blue-primary rounded-lg transition-all duration-200">
                     <Search className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Tous les champs</span>
                     <span className="sm:hidden">Tous</span>
                   </TabsTrigger>
-                  <TabsTrigger value="author" className="data-[state=active]:bg-background">
+                  <TabsTrigger value="author" className="data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-bn-blue-primary rounded-lg transition-all duration-200">
                     <User className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Auteur</span>
                     <span className="sm:hidden">Auteur</span>
                   </TabsTrigger>
-                  <TabsTrigger value="title" className="data-[state=active]:bg-background">
+                  <TabsTrigger value="title" className="data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-bn-blue-primary rounded-lg transition-all duration-200">
                     <BookOpen className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Titre</span>
                     <span className="sm:hidden">Titre</span>
                   </TabsTrigger>
-                  <TabsTrigger value="subject" className="data-[state=active]:bg-background">
+                  <TabsTrigger value="subject" className="data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-bn-blue-primary rounded-lg transition-all duration-200">
                     <Tag className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Sujet</span>
                     <span className="sm:hidden">Sujet</span>
                   </TabsTrigger>
-                  <TabsTrigger value="date" className="data-[state=active]:bg-background">
+                  <TabsTrigger value="date" className="data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-bn-blue-primary rounded-lg transition-all duration-200">
                     <Calendar className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Date</span>
                     <span className="sm:hidden">Date</span>
                   </TabsTrigger>
-                  <TabsTrigger value="number" className="data-[state=active]:bg-background">
+                  <TabsTrigger value="number" className="data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-bn-blue-primary rounded-lg transition-all duration-200">
                     <Hash className="h-4 w-4 mr-2" />
                     <span className="hidden sm:inline">Numéro</span>
                     <span className="sm:hidden">N°</span>
@@ -667,7 +694,7 @@ export default function AdvancedSearch() {
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-4">
-            <Button type="submit" size="lg" className="flex-1 h-14 text-base font-semibold shadow-md hover:shadow-lg transition-shadow">
+            <Button type="submit" size="lg" className="flex-1 h-14 text-base font-semibold bg-gradient-to-r from-bn-blue-primary to-bn-blue-deep hover:from-bn-blue-deep hover:to-bn-blue-primary shadow-lg hover:shadow-xl transition-all duration-300">
               <Search className="h-5 w-5 mr-2" />
               Lancer la recherche
             </Button>
@@ -676,7 +703,7 @@ export default function AdvancedSearch() {
               variant="outline" 
               size="lg" 
               onClick={handleReset} 
-              className="sm:w-auto h-14 text-base font-semibold"
+              className="sm:w-auto h-14 text-base font-semibold border-2 hover:bg-muted/50"
             >
               <RotateCcw className="h-5 w-5 mr-2" />
               Réinitialiser
@@ -684,36 +711,38 @@ export default function AdvancedSearch() {
           </div>
 
           {/* Search Tips */}
-          <Card className="mt-6 bg-gradient-to-br from-muted/30 to-muted/10">
-            <CardHeader>
-              <CardTitle className="text-base flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-primary animate-pulse" />
+          <Card className="mt-6 bg-gradient-to-br from-gold-bn-primary/5 via-transparent to-bn-blue-primary/5 border-gold-bn-primary/20">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-3">
+                <div className="p-1.5 rounded-lg bg-gradient-to-br from-gold-bn-primary to-gold-bn-secondary">
+                  <Sparkles className="h-4 w-4 text-white" />
+                </div>
                 Conseils de recherche
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-start gap-3">
-                <div className="mt-1 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
+            <CardContent className="grid sm:grid-cols-2 gap-4">
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-background/50">
+                <div className="mt-0.5 h-2 w-2 rounded-full bg-gold-bn-primary flex-shrink-0" />
                 <p className="text-sm text-muted-foreground">
-                  Utilisez les <strong className="text-foreground">guillemets ""</strong> pour rechercher une expression exacte
+                  Utilisez les <strong className="text-foreground">guillemets ""</strong> pour une expression exacte
                 </p>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-1 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-background/50">
+                <div className="mt-0.5 h-2 w-2 rounded-full bg-gold-bn-primary flex-shrink-0" />
                 <p className="text-sm text-muted-foreground">
-                  Combinez plusieurs critères dans <strong className="text-foreground">différents onglets</strong> pour affiner vos résultats
+                  Combinez <strong className="text-foreground">plusieurs onglets</strong> pour affiner
                 </p>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-1 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-background/50">
+                <div className="mt-0.5 h-2 w-2 rounded-full bg-gold-bn-primary flex-shrink-0" />
                 <p className="text-sm text-muted-foreground">
-                  L'<strong className="text-foreground">autocomplétion</strong> vous suggère automatiquement des valeurs existantes dans la base
+                  L'<strong className="text-foreground">autocomplétion</strong> suggère les valeurs existantes
                 </p>
               </div>
-              <div className="flex items-start gap-3">
-                <div className="mt-1 h-1.5 w-1.5 rounded-full bg-primary flex-shrink-0" />
+              <div className="flex items-start gap-3 p-3 rounded-lg bg-background/50">
+                <div className="mt-0.5 h-2 w-2 rounded-full bg-gold-bn-primary flex-shrink-0" />
                 <p className="text-sm text-muted-foreground">
-                  La recherche est <strong className="text-foreground">insensible à la casse</strong> (majuscules/minuscules)
+                  La recherche est <strong className="text-foreground">insensible à la casse</strong>
                 </p>
               </div>
             </CardContent>
@@ -722,19 +751,39 @@ export default function AdvancedSearch() {
 
         {/* Search Results */}
         {isSearching && (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <span className="ml-3 text-lg">Recherche en cours...</span>
+          <div className="flex flex-col items-center justify-center py-16">
+            <div className="relative">
+              <div className="absolute inset-0 rounded-full bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary blur-xl opacity-30 animate-pulse" />
+              <div className="relative p-6 rounded-full bg-gradient-to-br from-bn-blue-primary/10 to-gold-bn-primary/10">
+                <Loader2 className="h-12 w-12 animate-spin text-bn-blue-primary" />
+              </div>
+            </div>
+            <span className="mt-6 text-lg font-medium text-foreground">Recherche en cours...</span>
+            <span className="text-sm text-muted-foreground">Exploration des collections</span>
           </div>
         )}
 
         {!isSearching && searchResults.length > 0 && (
-          <Card className="mt-8">
-            <CardHeader>
-              <CardTitle>Résultats de recherche</CardTitle>
-              <CardDescription>{totalResults} document(s) trouvé(s)</CardDescription>
+          <Card className="mt-8 shadow-xl border-0 bg-card/95 backdrop-blur-sm overflow-hidden">
+            <CardHeader className="bg-gradient-to-r from-bn-blue-primary/5 via-transparent to-gold-bn-primary/5 border-b">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-3">
+                    <div className="p-2 rounded-xl bg-gradient-to-br from-bn-blue-primary to-bn-blue-deep shadow-lg">
+                      <FileText className="h-5 w-5 text-white" />
+                    </div>
+                    Résultats de recherche
+                  </CardTitle>
+                  <CardDescription className="mt-2 flex items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gold-bn-primary/10 text-gold-bn-primary font-semibold text-sm">
+                      {totalResults}
+                    </span>
+                    document(s) trouvé(s)
+                  </CardDescription>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="p-6 space-y-4">
               <SearchPagination
                 currentPage={currentPage}
                 totalPages={Math.ceil(totalResults / itemsPerPage)}
@@ -749,54 +798,74 @@ export default function AdvancedSearch() {
                 }}
               />
 
-              {searchResults.map((doc) => (
-                <Card key={doc.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-start gap-3 mb-3">
-                          <BookOpen className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                          <div>
-                            <h3 className="font-bold text-lg text-foreground mb-1">
-                              {doc.title}
-                            </h3>
-                            <p className="text-sm text-muted-foreground">
-                              Par {doc.author || 'Auteur inconnu'} • {doc.publication_year || 'Date inconnue'}
-                            </p>
+              <div className="grid gap-4">
+                {searchResults.map((doc, index) => (
+                  <Card key={doc.id} className="group hover:shadow-lg transition-all duration-300 border-l-4 border-l-transparent hover:border-l-gold-bn-primary overflow-hidden">
+                    <CardContent className="p-0">
+                      <div className="flex">
+                        {/* Thumbnail/Icon area */}
+                        <div className="hidden sm:flex w-24 bg-gradient-to-br from-bn-blue-primary/10 to-gold-bn-primary/10 items-center justify-center flex-shrink-0">
+                          <div className="p-3 rounded-xl bg-white/80 shadow-sm group-hover:scale-110 transition-transform duration-300">
+                            <BookOpen className="h-8 w-8 text-bn-blue-primary" />
                           </div>
                         </div>
                         
-                        {doc.description && (
-                          <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                            {doc.description}
-                          </p>
-                        )}
-                        
-                        <div className="flex flex-wrap gap-2">
-                          {doc.cote && (
-                            <span className="text-xs px-2 py-1 bg-muted rounded">
-                              Cote: {doc.cote}
-                            </span>
-                          )}
-                          {doc.document_type && (
-                            <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded">
-                              {doc.document_type}
-                            </span>
-                          )}
+                        {/* Content area */}
+                        <div className="flex-1 p-5">
+                          <div className="flex justify-between items-start gap-4">
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-2">
+                                <span className="text-xs font-mono text-muted-foreground bg-muted px-2 py-0.5 rounded">
+                                  #{index + 1 + (currentPage - 1) * itemsPerPage}
+                                </span>
+                                {doc.document_type && (
+                                  <span className="text-xs px-2.5 py-1 bg-bn-blue-primary/10 text-bn-blue-primary rounded-full font-medium">
+                                    {doc.document_type}
+                                  </span>
+                                )}
+                              </div>
+                              
+                              <h3 className="font-bold text-lg text-foreground mb-1 line-clamp-1 group-hover:text-bn-blue-primary transition-colors">
+                                {doc.title}
+                              </h3>
+                              <p className="text-sm text-muted-foreground mb-2">
+                                <span className="font-medium">Par</span> {doc.author || 'Auteur inconnu'} 
+                                <span className="mx-2">•</span>
+                                <span className="font-medium">{doc.publication_year || 'Date inconnue'}</span>
+                              </p>
+                              
+                              {doc.description && (
+                                <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                                  {doc.description}
+                                </p>
+                              )}
+                              
+                              <div className="flex flex-wrap gap-2">
+                                {doc.cote && (
+                                  <span className="text-xs px-2 py-1 bg-muted rounded-lg font-mono">
+                                    {doc.cote}
+                                  </span>
+                                )}
+                                {doc.language && (
+                                  <span className="text-xs px-2 py-1 bg-gold-bn-primary/10 text-gold-bn-primary rounded-lg">
+                                    {doc.language}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                            
+                            <Link to={`/digital-library/document/${doc.id}`} className="flex-shrink-0">
+                              <Button className="bg-gradient-to-r from-bn-blue-primary to-bn-blue-deep hover:from-bn-blue-deep hover:to-bn-blue-primary shadow-md hover:shadow-lg transition-all">
+                                Consulter
+                              </Button>
+                            </Link>
+                          </div>
                         </div>
                       </div>
-                      
-                      {/* Maintenant on utilise directement digital_library_documents,
-                          donc doc.id est l'ID du document source */}
-                      <Link to={`/digital-library/document/${doc.id}`}>
-                        <Button variant="default" size="lg">
-                          Voir la notice
-                        </Button>
-                      </Link>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
 
               <SearchPagination
                 currentPage={currentPage}
@@ -814,6 +883,7 @@ export default function AdvancedSearch() {
             </CardContent>
           </Card>
         )}
+        </div>
       </div>
     </DigitalLibraryLayout>
   );
