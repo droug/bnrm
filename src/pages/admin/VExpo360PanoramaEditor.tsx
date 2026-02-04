@@ -15,6 +15,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Plus, Trash2, Edit, Image, MapPin, FileText, Video, Navigation } from "lucide-react";
 import { VExpoImageUpload } from "@/components/vexpo360/VExpoImageUpload";
+import { VExpoMediaUpload } from "@/components/vexpo360/VExpoMediaUpload";
 import { PanoramaPositionPicker } from "@/components/vexpo360/PanoramaPositionPicker";
 
 interface Panorama {
@@ -619,14 +620,25 @@ export default function VExpo360PanoramaEditor() {
                         )}
 
                         {hotspotForm.hotspot_type === 'media' && (
-                          <div>
-                            <Label>URL du média</Label>
-                            <Input
-                              value={hotspotForm.media_url}
-                              onChange={(e) => setHotspotForm(h => ({ ...h, media_url: e.target.value }))}
-                              placeholder="https://..."
-                            />
-                          </div>
+                          <VExpoMediaUpload
+                            value={hotspotForm.media_url}
+                            onChange={(url) => setHotspotForm(h => ({ ...h, media_url: url }))}
+                            label="Fichier média (vidéo/audio)"
+                            description="Téléversez un fichier vidéo ou audio pour ce hotspot"
+                            folder="hotspot-media"
+                            maxSizeMB={100}
+                          />
+                        )}
+
+                        {(hotspotForm.hotspot_type === 'artwork' || hotspotForm.hotspot_type === 'text') && (
+                          <VExpoImageUpload
+                            value={hotspotForm.media_url}
+                            onChange={(url) => setHotspotForm(h => ({ ...h, media_url: url }))}
+                            label="Image associée (optionnel)"
+                            description="Ajoutez une image pour illustrer ce hotspot"
+                            folder="hotspot-images"
+                            maxSizeMB={10}
+                          />
                         )}
 
                         {(hotspotForm.hotspot_type === 'text' || hotspotForm.hotspot_type === 'artwork') && (
