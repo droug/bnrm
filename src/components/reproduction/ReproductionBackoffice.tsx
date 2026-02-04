@@ -145,7 +145,9 @@ export function ReproductionBackoffice() {
 
       if (error) throw error;
 
-      // Si approuvé, générer le lien de paiement
+      let paymentUrl: string | null = null;
+
+      // Si approuvé, générer le lien de paiement et envoyer l'email avec le lien
       if (approve && requestDetails?.payment_amount && requestDetails?.user_id && userEmail) {
         try {
           const { data: paymentData, error: paymentError } = await supabase.functions.invoke(
@@ -170,14 +172,37 @@ export function ReproductionBackoffice() {
                 : "Approuvé mais échec de génération du lien de paiement"
             );
           } else {
-            console.log("Lien de paiement généré:", paymentData?.paymentUrl);
+            paymentUrl = paymentData?.paymentUrl;
+            console.log("Lien de paiement généré:", paymentUrl);
           }
         } catch (paymentLinkError) {
           console.error("Erreur lors de la génération du lien de paiement:", paymentLinkError);
         }
       }
 
-      // Create notification
+      // Envoyer la notification par email avec le lien de paiement
+      if (approve && userEmail) {
+        try {
+          await supabase.functions.invoke('send-reproduction-notification', {
+            body: {
+              requestId: requestId,
+              recipientEmail: userEmail,
+              recipientId: requestDetails.user_id,
+              notificationType: 'payment_pending',
+              requestNumber: requestDetails.request_number,
+              documentTitle: (requestDetails as any).metadata?.documentTitle || 'Document demandé',
+              estimatedCost: requestDetails.payment_amount,
+              paymentLink: paymentUrl,
+              paymentMethod: 'all', // Afficher toutes les options de paiement
+            },
+          });
+          console.log("Email de notification avec lien de paiement envoyé");
+        } catch (emailError) {
+          console.error("Erreur envoi email:", emailError);
+        }
+      }
+
+      // Create notification in database
       await supabase.from("reproduction_notifications").insert({
         request_id: requestId,
         recipient_id: selectedRequest?.user_id,
@@ -190,7 +215,7 @@ export function ReproductionBackoffice() {
 
       toast.success(
         approve
-          ? language === "ar" ? "تمت الموافقة النهائية" : "Approbation finale effectuée"
+          ? language === "ar" ? "تمت الموافقة النهائية مع إرسال رابط الدفع" : "Approbation effectuée - Lien de paiement envoyé"
           : language === "ar" ? "تم الرفض" : "Refus effectué"
       );
 
