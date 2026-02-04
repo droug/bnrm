@@ -27,37 +27,36 @@ import {
   Calendar,
   FileImage,
   Printer,
-  Download,
   Image as ImageIcon
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Link } from "react-router-dom";
 
-interface ReproductionItem {
-  id: string;
-  title: string;
-  reference: string | null;
-  formats: string[];
-  pages_specification: string | null;
-  color_mode: string | null;
-  resolution_dpi: number | null;
-  quantity: number | null;
-  unit_price: number | null;
-  total_price: number | null;
-  unified_document_id: string | null;
-  document_source_id: string | null;
-  document_source_type: string | null;
-}
-
 interface DocumentInfo {
   id: string;
   title: string;
   author: string | null;
   document_type: string | null;
-  cbn_document_id: string;
+  cbn_document_id: string | null;
   cover_image_url: string | null;
   pdf_url: string | null;
+}
+
+interface RequestMetadata {
+  document_id?: string;
+  document_title?: string;
+  document_author?: string;
+  document_cote?: string;
+  format?: string;
+  pages?: string;
+  quality?: string;
+  reproduction_scope?: string;
+  certified_copy?: boolean;
+  urgent_request?: boolean;
+  estimated_cost?: number;
+  delivery_mode?: string;
+  usage_type?: string;
 }
 
 interface ReproductionRequest {
@@ -67,17 +66,16 @@ interface ReproductionRequest {
   status: string;
   reproduction_modality: string;
   submitted_at: string;
-  user_notes: string;
-  internal_notes: string;
-  service_validation_notes: string;
-  manager_validation_notes: string;
-  rejection_reason: string;
-  payment_method: string;
-  payment_amount: number;
-  payment_status: string;
-  paid_at: string;
-  user_email?: string;
-  user_name?: string;
+  user_notes: string | null;
+  internal_notes: string | null;
+  service_validation_notes: string | null;
+  manager_validation_notes: string | null;
+  rejection_reason: string | null;
+  payment_method: string | null;
+  payment_amount: number | null;
+  payment_status: string | null;
+  paid_at: string | null;
+  metadata?: RequestMetadata | null;
 }
 
 interface Props {
@@ -88,8 +86,7 @@ interface Props {
 
 export function ReproductionDetailsSheet({ requestId, open, onOpenChange }: Props) {
   const [request, setRequest] = useState<ReproductionRequest | null>(null);
-  const [items, setItems] = useState<ReproductionItem[]>([]);
-  const [documents, setDocuments] = useState<Record<string, DocumentInfo>>({});
+  const [document, setDocument] = useState<DocumentInfo | null>(null);
   const [userInfo, setUserInfo] = useState<{ email: string; full_name: string } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -112,9 +109,15 @@ export function ReproductionDetailsSheet({ requestId, open, onOpenChange }: Prop
         .single();
 
       if (requestError) throw requestError;
-      setRequest(requestData);
+      
+      // Cast metadata safely
+      const typedRequest: ReproductionRequest = {
+        ...requestData,
+        metadata: requestData.metadata as RequestMetadata | null
+      };
+      setRequest(typedRequest);
 
-      // Fetch user info from request data if available
+      // Fetch user info
       if (requestData.user_id) {
         const { data: profileData } = await supabase
           .from("profiles")
@@ -130,46 +133,17 @@ export function ReproductionDetailsSheet({ requestId, open, onOpenChange }: Prop
         }
       }
 
-      // Fetch items
-      const { data: itemsData, error: itemsError } = await supabase
-        .from("reproduction_items")
-        .select("*")
-        .eq("request_id", requestId);
-
-      if (itemsError) throw itemsError;
-      
-      // Map to our interface
-      const mappedItems: ReproductionItem[] = (itemsData || []).map(item => ({
-        id: item.id,
-        title: item.title,
-        reference: item.reference,
-        formats: item.formats || [],
-        pages_specification: item.pages_specification,
-        color_mode: item.color_mode,
-        resolution_dpi: item.resolution_dpi,
-        quantity: item.quantity,
-        unit_price: item.unit_price,
-        total_price: item.total_price,
-        unified_document_id: item.unified_document_id,
-        document_source_id: item.document_source_id,
-        document_source_type: item.document_source_type,
-      }));
-      setItems(mappedItems);
-
-      // Fetch document details for each item
-      const documentIds = [...new Set(mappedItems.map(i => i.unified_document_id || i.document_source_id).filter(Boolean))] as string[];
-      if (documentIds.length > 0) {
-        const { data: docsData } = await supabase
+      // Fetch document from metadata.document_id
+      const metadata = requestData.metadata as RequestMetadata | null;
+      if (metadata?.document_id) {
+        const { data: docData } = await supabase
           .from("digital_library_documents")
           .select("id, title, author, document_type, cbn_document_id, cover_image_url, pdf_url")
-          .in("id", documentIds);
+          .eq("id", metadata.document_id)
+          .single();
         
-        if (docsData) {
-          const docsMap: Record<string, DocumentInfo> = {};
-          docsData.forEach(doc => {
-            docsMap[doc.id] = doc;
-          });
-          setDocuments(docsMap);
+        if (docData) {
+          setDocument(docData);
         }
       }
     } catch (error) {
@@ -219,7 +193,8 @@ export function ReproductionDetailsSheet({ requestId, open, onOpenChange }: Prop
     return labels[modality] || modality;
   };
 
-  const getPaymentMethodLabel = (method: string) => {
+  const getPaymentMethodLabel = (method: string | null) => {
+    if (!method) return "-";
     const labels: Record<string, string> = {
       online: "Paiement en ligne (Stripe)",
       virement: "Virement bancaire",
@@ -231,24 +206,26 @@ export function ReproductionDetailsSheet({ requestId, open, onOpenChange }: Prop
     return labels[method] || method;
   };
 
-  const getFormatLabel = (format: string) => {
+  const getQualityLabel = (quality: string | null) => {
+    if (!quality) return "-";
     const labels: Record<string, string> = {
-      pdf: "PDF",
-      jpeg: "JPEG",
-      tiff: "TIFF",
-      papier: "Papier",
+      standard: "Standard",
+      haute: "Haute qualité",
+      professionnelle: "Professionnelle",
     };
-    return labels[format] || format;
+    return labels[quality] || quality;
   };
 
-  const getColorModeLabel = (mode: string) => {
+  const getScopeLabel = (scope: string | null) => {
+    if (!scope) return "-";
     const labels: Record<string, string> = {
-      couleur: "Couleur",
-      noir_blanc: "Noir et blanc",
-      niveaux_gris: "Niveaux de gris",
+      complete: "Document complet",
+      partial: "Pages spécifiques",
     };
-    return labels[mode] || mode;
+    return labels[scope] || scope;
   };
+
+  const metadata = request?.metadata;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -335,101 +312,107 @@ export function ReproductionDetailsSheet({ requestId, open, onOpenChange }: Prop
                 </div>
               </div>
 
-              {/* Documents à reproduire */}
+              {/* Document à reproduire - FROM METADATA */}
               <div className="space-y-3">
                 <h3 className="font-semibold flex items-center gap-2 text-base">
                   <BookOpen className="h-4 w-4" />
-                  Documents à reproduire ({items.length})
+                  Document à reproduire
                 </h3>
-                <div className="space-y-3">
-                  {items.map((item) => {
-                    const docId = item.unified_document_id || item.document_source_id;
-                    const doc = docId ? documents[docId] : null;
-                    return (
-                      <div key={item.id} className="border rounded-lg overflow-hidden">
-                        <div className="flex gap-4 p-4">
-                          {/* Thumbnail */}
-                          <div className="flex-shrink-0 w-20 h-24 bg-muted rounded-md overflow-hidden flex items-center justify-center">
-                            {doc?.cover_image_url ? (
-                              <img 
-                                src={doc.cover_image_url} 
-                                alt={doc.title}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <ImageIcon className="h-8 w-8 text-muted-foreground" />
-                            )}
-                          </div>
-                          
-                          {/* Document info */}
-                          <div className="flex-1 min-w-0">
-                            <h4 className="font-medium text-sm truncate">
-                              {item.title || doc?.title || "Document"}
-                            </h4>
-                            {doc?.author && (
-                              <p className="text-xs text-muted-foreground mt-0.5">{doc.author}</p>
-                            )}
-                            <p className="text-xs text-muted-foreground font-mono mt-1">
-                              Réf: {item.reference || doc?.cbn_document_id || "-"}
-                            </p>
-                            
-                            {/* Document link - PROMINENT */}
-                            {doc && (
-                              <Link 
-                                to={`/bibliotheque-numerique/document/${doc.id}`}
-                                target="_blank"
-                                className="inline-flex items-center gap-2 mt-3 px-3 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-colors text-sm font-medium"
-                              >
-                                <BookOpen className="h-4 w-4" />
-                                Ouvrir le document
-                                <ExternalLink className="h-3 w-3" />
-                              </Link>
-                            )}
-                          </div>
-                        </div>
-                        
-                        {/* Item details */}
-                        <div className="bg-muted/30 px-4 py-3 border-t">
-                          <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
-                            <div>
-                              <span className="text-muted-foreground">Format(s):</span>
-                              <span className="ml-1 font-medium">{item.formats?.join(", ") || "-"}</span>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Pages:</span>
-                              <span className="ml-1 font-medium">{item.pages_specification || "Toutes"}</span>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Couleur:</span>
-                              <span className="ml-1 font-medium">{getColorModeLabel(item.color_mode) || "-"}</span>
-                            </div>
-                            {item.resolution_dpi && (
-                              <div>
-                                <span className="text-muted-foreground">Résolution:</span>
-                                <span className="ml-1 font-medium">{item.resolution_dpi} DPI</span>
-                              </div>
-                            )}
-                            <div>
-                              <span className="text-muted-foreground">Quantité:</span>
-                              <span className="ml-1 font-medium">{item.quantity || 1}</span>
-                            </div>
-                          </div>
-                          
-                          {/* Pricing */}
-                          {(item.unit_price || item.total_price) && (
-                            <div className="mt-3 pt-2 border-t border-muted flex justify-between items-center">
-                              <span className="text-xs text-muted-foreground">
-                                {item.unit_price ? `${item.unit_price} DH/unité` : ""}
-                              </span>
-                              <span className="text-sm font-bold text-primary">
-                                {item.total_price || 0} DH
-                              </span>
-                            </div>
-                          )}
-                        </div>
+                
+                <div className="border rounded-lg overflow-hidden">
+                  <div className="flex gap-4 p-4">
+                    {/* Thumbnail */}
+                    <div className="flex-shrink-0 w-24 h-32 bg-muted rounded-md overflow-hidden flex items-center justify-center">
+                      {document?.cover_image_url ? (
+                        <img 
+                          src={document.cover_image_url} 
+                          alt={document.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <ImageIcon className="h-10 w-10 text-muted-foreground" />
+                      )}
+                    </div>
+                    
+                    {/* Document info */}
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-base">
+                        {metadata?.document_title || document?.title || "Document"}
+                      </h4>
+                      {(metadata?.document_author || document?.author) && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {metadata?.document_author || document?.author}
+                        </p>
+                      )}
+                      {(metadata?.document_cote || document?.cbn_document_id) && (
+                        <p className="text-xs text-muted-foreground font-mono mt-2">
+                          Cote: {metadata?.document_cote || document?.cbn_document_id}
+                        </p>
+                      )}
+                      
+                      {/* Document link - PROMINENT */}
+                      {document && (
+                        <Link 
+                          to={`/bibliotheque-numerique/document/${document.id}`}
+                          target="_blank"
+                          className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md transition-colors text-sm font-medium shadow-sm"
+                        >
+                          <BookOpen className="h-4 w-4" />
+                          Ouvrir le document
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </Link>
+                      )}
+                      
+                      {!document && metadata?.document_id && (
+                        <Link 
+                          to={`/bibliotheque-numerique/document/${metadata.document_id}`}
+                          target="_blank"
+                          className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md transition-colors text-sm font-medium shadow-sm"
+                        >
+                          <BookOpen className="h-4 w-4" />
+                          Ouvrir le document
+                          <ExternalLink className="h-3.5 w-3.5" />
+                        </Link>
+                      )}
+                    </div>
+                  </div>
+                  
+                  {/* Item details from metadata */}
+                  <div className="bg-muted/30 px-4 py-3 border-t">
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
+                      <div>
+                        <span className="text-muted-foreground">Format:</span>
+                        <span className="ml-2 font-medium uppercase">{metadata?.format || "-"}</span>
                       </div>
-                    );
-                  })}
+                      <div>
+                        <span className="text-muted-foreground">Pages:</span>
+                        <span className="ml-2 font-medium">{metadata?.pages || "Toutes"}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Qualité:</span>
+                        <span className="ml-2 font-medium">{getQualityLabel(metadata?.quality || null)}</span>
+                      </div>
+                      <div>
+                        <span className="text-muted-foreground">Étendue:</span>
+                        <span className="ml-2 font-medium">{getScopeLabel(metadata?.reproduction_scope || null)}</span>
+                      </div>
+                      {metadata?.certified_copy && (
+                        <div className="col-span-2">
+                          <Badge variant="outline" className="gap-1">
+                            <CheckCircle2 className="h-3 w-3" />
+                            Copie certifiée conforme
+                          </Badge>
+                        </div>
+                      )}
+                      {metadata?.urgent_request && (
+                        <div className="col-span-2">
+                          <Badge variant="destructive" className="gap-1">
+                            Demande urgente
+                          </Badge>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -451,80 +434,80 @@ export function ReproductionDetailsSheet({ requestId, open, onOpenChange }: Prop
                 <>
                   <Separator />
                   <div className="space-y-3">
-                    <h3 className="font-semibold flex items-center gap-2 text-base">
-                      <CheckCircle2 className="h-4 w-4" />
-                      Validations
-                    </h3>
-                    <div className="space-y-3">
-                      {request.service_validation_notes && (
-                        <div className="bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
-                          <label className="text-xs font-medium text-blue-700 dark:text-blue-400 uppercase tracking-wide">
-                            Notes validation service
-                          </label>
-                          <p className="text-sm mt-1 whitespace-pre-wrap">{request.service_validation_notes}</p>
-                        </div>
-                      )}
-
-                      {request.manager_validation_notes && (
-                        <div className="bg-purple-50 dark:bg-purple-950/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
-                          <label className="text-xs font-medium text-purple-700 dark:text-purple-400 uppercase tracking-wide">
-                            Notes du responsable
-                          </label>
-                          <p className="text-sm mt-1 whitespace-pre-wrap">{request.manager_validation_notes}</p>
-                        </div>
-                      )}
-
-                      {request.rejection_reason && (
-                        <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
-                          <label className="text-xs font-medium text-destructive uppercase tracking-wide">
-                            Raison du refus
-                          </label>
-                          <p className="text-sm mt-1">{request.rejection_reason}</p>
-                        </div>
-                      )}
-                    </div>
+                    <h3 className="font-semibold text-base">Notes de validation</h3>
+                    
+                    {request.service_validation_notes && (
+                      <div className="bg-blue-50 dark:bg-blue-950/30 rounded-lg p-4">
+                        <p className="text-xs text-blue-600 dark:text-blue-400 font-medium mb-1">Service</p>
+                        <p className="text-sm">{request.service_validation_notes}</p>
+                      </div>
+                    )}
+                    
+                    {request.manager_validation_notes && (
+                      <div className="bg-purple-50 dark:bg-purple-950/30 rounded-lg p-4">
+                        <p className="text-xs text-purple-600 dark:text-purple-400 font-medium mb-1">Responsable</p>
+                        <p className="text-sm">{request.manager_validation_notes}</p>
+                      </div>
+                    )}
+                    
+                    {request.rejection_reason && (
+                      <div className="bg-red-50 dark:bg-red-950/30 rounded-lg p-4">
+                        <p className="text-xs text-red-600 dark:text-red-400 font-medium mb-1">Motif de refus</p>
+                        <p className="text-sm">{request.rejection_reason}</p>
+                      </div>
+                    )}
                   </div>
                 </>
               )}
 
+              <Separator />
+
               {/* Paiement */}
-              {request.payment_amount && (
-                <>
-                  <Separator />
-                  <div className="space-y-3">
-                    <h3 className="font-semibold flex items-center gap-2 text-base">
-                      <CreditCard className="h-4 w-4" />
-                      Paiement
-                    </h3>
-                    <div className="bg-muted/50 rounded-lg p-4 space-y-3">
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Montant total</span>
-                        <span className="text-lg font-bold">{request.payment_amount} DH</span>
-                      </div>
-
-                      <div className="flex justify-between items-center">
-                        <span className="text-sm text-muted-foreground">Statut</span>
-                        <Badge variant={request.payment_status === 'paid' ? 'default' : 'secondary'}>
-                          {request.payment_status === 'paid' ? "Payé" : "En attente"}
-                        </Badge>
-                      </div>
-
-                      {request.payment_method && (
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-muted-foreground">Méthode</span>
-                          <span className="text-sm">{getPaymentMethodLabel(request.payment_method)}</span>
-                        </div>
-                      )}
-
-                      {request.paid_at && (
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-muted-foreground">Date de paiement</span>
-                          <span className="text-sm">{formatDate(request.paid_at)}</span>
-                        </div>
-                      )}
-                    </div>
+              <div className="space-y-3">
+                <h3 className="font-semibold flex items-center gap-2 text-base">
+                  <CreditCard className="h-4 w-4" />
+                  Paiement
+                </h3>
+                <div className="bg-muted/50 rounded-lg p-4 space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-muted-foreground">Montant total</span>
+                    <span className="text-xl font-bold text-primary">
+                      {request.payment_amount || metadata?.estimated_cost || 0} DH
+                    </span>
                   </div>
-                </>
+                  <Separator />
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-muted-foreground">Statut</span>
+                    <Badge variant={request.payment_status === 'paid' ? 'default' : 'secondary'} className={request.payment_status === 'paid' ? 'bg-green-500 text-white' : ''}>
+                      {request.payment_status === 'paid' ? 'Payé' : 'En attente'}
+                    </Badge>
+                  </div>
+                  {request.payment_method && (
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Méthode</span>
+                      <span className="font-medium">{getPaymentMethodLabel(request.payment_method)}</span>
+                    </div>
+                  )}
+                  {request.paid_at && (
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Date de paiement</span>
+                      <span>{formatDate(request.paid_at)}</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Notes internes */}
+              {request.internal_notes && (
+                <div className="space-y-3">
+                  <h3 className="font-semibold flex items-center gap-2 text-base">
+                    <FileText className="h-4 w-4" />
+                    Notes internes
+                  </h3>
+                  <div className="bg-amber-50 dark:bg-amber-950/30 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
+                    <p className="text-sm whitespace-pre-wrap">{request.internal_notes}</p>
+                  </div>
+                </div>
               )}
             </div>
           )}
