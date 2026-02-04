@@ -123,8 +123,8 @@ serve(async (req) => {
           request_id: requestId,
         },
       },
-      // Expiration de la session après 7 jours (max autorisé par Stripe)
-      expires_at: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60),
+      // Expiration de la session après 23 heures (Stripe limite à 24h max)
+      expires_at: Math.floor(Date.now() / 1000) + (23 * 60 * 60),
     });
 
     // Mettre à jour avec l'ID de session Stripe
@@ -170,7 +170,7 @@ serve(async (req) => {
         sessionId: session.id,
         transactionId: transaction.id,
         transactionNumber: transaction.transaction_number,
-        expiresAt: new Date(Date.now() + (7 * 24 * 60 * 60 * 1000)).toISOString(),
+        expiresAt: new Date(Date.now() + (23 * 60 * 60 * 1000)).toISOString(),
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
