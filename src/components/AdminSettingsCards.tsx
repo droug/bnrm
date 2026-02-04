@@ -83,9 +83,9 @@ export function AdminSettingsCards() {
     {
       icon: CreditCard,
       title: "Paiement Électronique",
-      description: "Paramétrage de l'interconnexion CMI et passerelles de paiement",
+      description: "Paramétrage de l'interconnexion CMI, Stripe et passerelles de paiement",
       href: "/admin/payment-gateway",
-      permission: "content.manage"
+      permission: "system.admin"
     }
   ];
 
