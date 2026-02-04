@@ -59,6 +59,15 @@ const WORKFLOW_STEPS: WorkflowStep[] = [
     borderClass: "border-teal-500"
   },
   { 
+    key: "en_cours_reproduction", 
+    labelFr: "Reproduction", 
+    labelAr: "الاستنساخ", 
+    icon: FileCheck,
+    colorClass: "text-indigo-600 dark:text-indigo-400",
+    bgClass: "bg-indigo-100 dark:bg-indigo-900/40",
+    borderClass: "border-indigo-500"
+  },
+  { 
     key: "terminee", 
     labelFr: "Terminée", 
     labelAr: "منتهية", 
@@ -76,7 +85,8 @@ const STATUS_TO_STEP: Record<string, number> = {
   en_validation_responsable: 2,
   en_attente_paiement: 3,
   paiement_recu: 4,
-  terminee: 5,
+  en_cours_reproduction: 5,
+  terminee: 6,
   refusee: -1,
 };
 
@@ -87,6 +97,7 @@ const STEP_COLORS = [
   "from-purple-500 to-purple-600",
   "from-orange-500 to-orange-600",
   "from-teal-500 to-teal-600",
+  "from-indigo-500 to-indigo-600",
   "from-green-500 to-green-600",
 ];
 
@@ -218,6 +229,7 @@ export function getStatusLabel(status: string, language: string): string {
     en_validation_responsable: { fr: "En attente approbation", ar: "في انتظار الموافقة" },
     en_attente_paiement: { fr: "En attente de paiement", ar: "في انتظار الدفع" },
     paiement_recu: { fr: "En validation comptabilité", ar: "قيد التحقق المحاسبي" },
+    en_cours_reproduction: { fr: "En cours de reproduction", ar: "قيد الاستنساخ" },
     terminee: { fr: "Terminée", ar: "منتهية" },
     refusee: { fr: "Refusée", ar: "مرفوضة" },
   };
@@ -232,6 +244,7 @@ export function getStepRoleInfo(status: string, language: string): { role: strin
     en_validation_responsable: { role: "manager", roleFr: "Responsable", roleAr: "المسؤول" },
     en_attente_paiement: { role: "user", roleFr: "Demandeur", roleAr: "مقدم الطلب" },
     paiement_recu: { role: "accounting", roleFr: "Comptabilité", roleAr: "المحاسبة" },
+    en_cours_reproduction: { role: "reproduction", roleFr: "Service reproduction", roleAr: "خدمة الاستنساخ" },
     terminee: { role: "none", roleFr: "-", roleAr: "-" },
   };
   const info = roleInfo[status] || { role: "unknown", roleFr: "-", roleAr: "-" };
