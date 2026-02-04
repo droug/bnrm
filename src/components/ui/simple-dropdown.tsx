@@ -45,7 +45,7 @@ export function SimpleDropdown({ value, onChange, placeholder = "Sélectionnez..
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-full p-0 bg-background text-foreground border shadow-lg" style={{ zIndex: 9999 }}>
+      <PopoverContent className="w-full p-0 bg-background text-foreground border shadow-lg pointer-events-auto" style={{ zIndex: 100001 }}>
         <Command>
           <CommandInput placeholder="Rechercher..." />
           <CommandEmpty>Aucun résultat trouvé.</CommandEmpty>
