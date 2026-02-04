@@ -222,8 +222,8 @@ export default function DigitalLibraryBackoffice() {
     },
     {
       icon: FileImage,
-      title: "Gestion des demandes de reproduction",
-      description: "Enregistrement, suivi et validation des demandes de reproduction",
+      title: "Gestion des documents de reproduction",
+      description: "Enregistrement, suivi et validation des documents de reproduction",
       count: null,
       action: () => navigate('/admin/digital-library/reproduction'),
       gradient: "from-orange-500 to-amber-600"
