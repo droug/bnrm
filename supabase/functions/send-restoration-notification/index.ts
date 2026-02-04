@@ -27,6 +27,31 @@ const getEmailContent = (n: NotificationRequest) => {
   switch (notificationType) {
     case 'request_received':
       return { subject: `Demande de restauration reçue - ${requestNumber}`, html: `${base}<h2 style="color: #2c5aa0;">Demande de restauration enregistrée</h2><p>Votre demande a été enregistrée.</p><div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px;"><p><strong>Numéro:</strong> ${requestNumber}</p><p><strong>Manuscrit:</strong> ${manuscriptTitle}</p></div>${footer}` };
+    case 'authorized':
+      return { 
+        subject: `Demande de restauration autorisée - ${requestNumber}`, 
+        html: `${base}
+          <h2 style="color: #2c5aa0;">Demande de restauration autorisée</h2>
+          <p>Nous avons le plaisir de vous informer que votre demande de restauration a été <strong>autorisée</strong>.</p>
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <p><strong>Numéro de demande:</strong> ${requestNumber}</p>
+            <p><strong>Œuvre concernée:</strong> ${manuscriptTitle}</p>
+          </div>
+          <div style="background-color: #e8f4fd; border-left: 4px solid #2c5aa0; padding: 15px; margin: 20px 0;">
+            <h3 style="color: #2c5aa0; margin-top: 0;">📋 Prochaine étape</h3>
+            <p style="margin-bottom: 0;"><strong>Veuillez vous présenter au Service de Restauration de la BNRM</strong> afin d'apporter votre œuvre pour le diagnostic et les travaux de restauration.</p>
+          </div>
+          <div style="background-color: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; margin: 20px 0;">
+            <h4 style="color: #856404; margin-top: 0;">⚠️ Informations importantes</h4>
+            <ul style="margin-bottom: 0; padding-left: 20px;">
+              <li>Munissez-vous de ce numéro de demande: <strong>${requestNumber}</strong></li>
+              <li>Apportez une pièce d'identité valide</li>
+              <li>L'œuvre doit être protégée pour le transport</li>
+            </ul>
+          </div>
+          <p>Pour toute question, n'hésitez pas à nous contacter.</p>
+          ${footer}` 
+      };
     case 'quote_sent':
       return { subject: `Devis disponible - ${requestNumber}`, html: `${base}<h2 style="color: #2c5aa0;">Devis disponible</h2><div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px;"><p><strong>Numéro:</strong> ${requestNumber}</p><p><strong>Manuscrit:</strong> ${manuscriptTitle}</p>${quoteAmount ? `<p><strong>Montant:</strong> ${quoteAmount} DH</p>` : ''}</div>${footer}` };
     case 'payment_confirmed':
