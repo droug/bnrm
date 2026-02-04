@@ -12,8 +12,8 @@ export default function DigitalLibraryReproduction() {
   if (loading) {
     return (
       <AdminPageWrapper
-        title="Demandes de reproduction"
-        description="Traitement des demandes"
+        title="Documents de Reproduction"
+        description="Traitement des documents"
         icon="mdi:content-copy"
         iconColor="text-cyan-600"
         iconBgColor="bg-cyan-500/10"
@@ -31,13 +31,13 @@ export default function DigitalLibraryReproduction() {
   return (
     <>
       <SEOHead
-        title="Demandes de reproduction - Administration BN"
-        description="Gestion et traitement des demandes de reproduction de documents"
+        title="Documents de Reproduction - Administration BN"
+        description="Gestion et traitement des documents de reproduction"
         noindex={true}
       />
       <AdminPageWrapper
-        title="Demandes de reproduction"
-        description="Gestion et traitement des demandes de reproduction de documents de la bibliothèque numérique"
+        title="Documents de Reproduction"
+        description="Gestion et traitement des documents de reproduction de la bibliothèque numérique"
         icon="mdi:content-copy"
         iconColor="text-cyan-600"
         iconBgColor="bg-cyan-500/10"
