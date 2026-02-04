@@ -865,11 +865,38 @@ const BookReader = () => {
     toast.success(`Téléchargement en cours (${format})...`);
   };
 
-  const handlePrint = () => {
+  const handlePrint = async () => {
+    // Seuls les admins et bibliothécaires BN peuvent imprimer
+    if (!isAdmin && !isLibrarian) {
+      toast.error("L'impression est réservée au personnel de la bibliothèque");
+      return;
+    }
+    
     if (accessRestrictions?.block_print) {
       toast.error("L'impression est désactivée pour ce document protégé");
       return;
     }
+    
+    // Si on a un PDF direct, l'ouvrir dans un nouvel onglet pour impression
+    if (pdfUrl) {
+      toast.success("Préparation de l'impression du document...");
+      const printWindow = window.open(pdfUrl, '_blank');
+      if (printWindow) {
+        printWindow.onload = () => {
+          printWindow.print();
+        };
+      } else {
+        // Fallback: télécharger le PDF
+        const link = document.createElement('a');
+        link.href = pdfUrl;
+        link.download = `${documentData?.title || 'document'}.pdf`;
+        link.click();
+        toast.info("Le PDF a été téléchargé. Vous pouvez l'imprimer depuis votre lecteur PDF.");
+      }
+      return;
+    }
+    
+    // Fallback: impression de la page actuelle
     toast.success("Préparation de l'impression...");
     window.print();
   };
@@ -1541,6 +1568,19 @@ const BookReader = () => {
                 >
                   <Maximize className="h-4 w-4" />
                 </Button>
+                
+                {/* Bouton d'impression - visible uniquement pour le personnel BN */}
+                {(isAdmin || isLibrarian) && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handlePrint}
+                    title="Imprimer le document (Service BN)"
+                    className="text-primary hover:bg-primary/10"
+                  >
+                    <Printer className="h-4 w-4" />
+                  </Button>
+                )}
                 <Button
                   variant={showSearch ? "default" : "outline"}
                   size="sm"
