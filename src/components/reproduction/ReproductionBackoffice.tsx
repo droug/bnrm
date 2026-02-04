@@ -308,6 +308,17 @@ export function ReproductionBackoffice() {
                   )}
                   <div className="flex gap-2">
                     <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedRequestId(request.id);
+                        setDetailsSheetOpen(true);
+                      }}
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      {language === "ar" ? "عرض التفاصيل" : "Voir détails"}
+                    </Button>
+                    <Button
                       variant="default"
                       onClick={() => openValidationDialog(request, "approve")}
                     >
