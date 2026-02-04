@@ -31,6 +31,7 @@ interface ReproductionRequest {
   user_email?: string;
   user_name?: string;
   user_id?: string;
+  metadata?: Record<string, any>;
 }
 
 export default function ReproductionManager() {
@@ -116,38 +117,49 @@ export default function ReproductionManager() {
   // Complete reproduction and send notification
   const completeReproduction = useMutation({
     mutationFn: async (request: ReproductionRequest) => {
-      // Update status to terminee
+      // Update status to terminee (utilise updated_at qui existe)
       const { error: updateError } = await supabase
         .from('reproduction_requests')
         .update({
           status: 'terminee',
-          completed_at: new Date().toISOString(),
-          completed_by: user?.id,
+          updated_at: new Date().toISOString(),
         })
         .eq('id', request.id);
 
       if (updateError) throw updateError;
 
-      // Send ready_for_pickup notification via edge function
+      // Récupérer les infos du document pour l'email
+      const metadata = request.metadata as Record<string, any> | null;
+      const documentTitle = metadata?.document_title || 'Document';
+
+      // Send ready notification via edge function (utilise le template 'ready')
       const { error: notifError } = await supabase.functions.invoke('send-reproduction-notification', {
         body: {
           requestId: request.id,
-          notificationType: 'ready_for_pickup'
+          recipientId: request.user_id,
+          notificationType: 'ready',
+          requestNumber: request.request_number,
+          documentTitle: documentTitle,
         }
       });
 
       if (notifError) {
         console.error('Error sending notification:', notifError);
+        // Ne pas bloquer - l'update du status a réussi
       }
 
-      // Insert notification record
-      await supabase.from('reproduction_notifications').insert([{
-        request_id: request.id,
-        recipient_id: request.user_id || user?.id || '',
-        notification_type: 'ready_for_pickup',
-        title: 'Reproduction prête',
-        message: 'Votre reproduction est prête pour récupération',
-      }]);
+      // Insert notification record (optionnel - catch silently)
+      try {
+        await supabase.from('reproduction_notifications').insert([{
+          request_id: request.id,
+          recipient_id: request.user_id || user?.id || '',
+          notification_type: 'ready_for_pickup',
+          title: 'Reproduction prête',
+          message: 'Votre reproduction est prête pour récupération',
+        }]);
+      } catch (e) {
+        console.warn('Could not insert notification record:', e);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reproduction-requests-admin'] });
