@@ -4,7 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
 serve(async (req) => {
@@ -57,6 +57,52 @@ serve(async (req) => {
       .single();
 
     if (updateError) throw updateError;
+
+    // Si paiement réussi, mettre à jour le statut de la demande de reproduction
+    if (session.payment_status === 'paid') {
+      const requestId = session.metadata?.request_id;
+      
+      if (requestId) {
+        console.log(`Updating reproduction request ${requestId} to paiement_recu`);
+        
+        const { error: reproductionError } = await supabaseClient
+          .from('reproduction_requests')
+          .update({
+            status: 'paiement_recu',
+            paid_at: new Date().toISOString(),
+          })
+          .eq('id', requestId);
+
+        if (reproductionError) {
+          console.error('Error updating reproduction request status:', reproductionError);
+        } else {
+          console.log(`Reproduction request ${requestId} updated to paiement_recu`);
+          
+          // Envoyer notification de confirmation de paiement
+          try {
+            const { data: requestDetails } = await supabaseClient
+              .from('reproduction_requests')
+              .select('request_number, user_id, metadata')
+              .eq('id', requestId)
+              .single();
+
+            if (requestDetails) {
+              await supabaseClient.functions.invoke('send-reproduction-notification', {
+                body: {
+                  requestId: requestId,
+                  recipientId: requestDetails.user_id,
+                  notificationType: 'payment_received',
+                  requestNumber: requestDetails.request_number,
+                  documentTitle: (requestDetails.metadata as any)?.documentTitle || 'Document demandé',
+                },
+              });
+            }
+          } catch (notifError) {
+            console.error('Error sending payment confirmation:', notifError);
+          }
+        }
+      }
+    }
 
     // Si c'est une recharge de wallet, créditer le wallet
     if (transaction.transaction_type === 'recharge_wallet' && session.payment_status === 'paid') {
