@@ -218,9 +218,9 @@ export default function RestorationRequests() {
     if (!selectedRequest) return;
 
     const notificationTypeMap: Record<string, string> = {
-      'director_approve': 'request_received',
-      'director_reject': 'request_received',
-      'receive_artwork': 'request_received',
+      'director_approve': 'authorized',
+      'director_reject': 'request_rejected',
+      'receive_artwork': 'artwork_received',
       'send_quote': 'quote_sent',
       'accept_quote': 'quote_accepted',
       'reject_quote': 'quote_rejected',
