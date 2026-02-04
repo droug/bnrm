@@ -116,6 +116,15 @@ export function ReproductionBackoffice() {
   const handleManagerApproval = async (requestId: string, approve: boolean) => {
     setIsProcessing(true);
     try {
+      // Récupérer les détails de la demande pour le paiement
+      const { data: requestDetails, error: fetchError } = await supabase
+        .from("reproduction_requests")
+        .select("*, profiles:user_id(email)")
+        .eq("id", requestId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
       const { error } = await supabase
         .from("reproduction_requests")
         .update({
@@ -130,6 +139,42 @@ export function ReproductionBackoffice() {
         .eq("id", requestId);
 
       if (error) throw error;
+
+      // Si approuvé, générer le lien de paiement
+      if (approve && requestDetails?.payment_amount && requestDetails?.user_id) {
+        try {
+          const userEmail = (requestDetails as any).profiles?.email;
+          
+          if (userEmail) {
+            const { data: paymentData, error: paymentError } = await supabase.functions.invoke(
+              'generate-reproduction-payment-link',
+              {
+                body: {
+                  requestId: requestId,
+                  amount: requestDetails.payment_amount,
+                  requestNumber: requestDetails.request_number,
+                  userEmail: userEmail,
+                  userId: requestDetails.user_id,
+                  description: `Reproduction de documents - ${requestDetails.request_number}`,
+                },
+              }
+            );
+
+            if (paymentError) {
+              console.error("Erreur génération lien paiement:", paymentError);
+              toast.warning(
+                language === "ar" 
+                  ? "تمت الموافقة ولكن فشل إنشاء رابط الدفع" 
+                  : "Approuvé mais échec de génération du lien de paiement"
+              );
+            } else {
+              console.log("Lien de paiement généré:", paymentData?.paymentUrl);
+            }
+          }
+        } catch (paymentLinkError) {
+          console.error("Erreur lors de la génération du lien de paiement:", paymentLinkError);
+        }
+      }
 
       // Create notification
       await supabase.from("reproduction_notifications").insert({

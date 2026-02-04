@@ -132,3 +132,6 @@ verify_jwt = false
 
 [functions.send-workflow-notification]
 verify_jwt = false
+
+[functions.generate-reproduction-payment-link]
+verify_jwt = false
