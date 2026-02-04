@@ -234,6 +234,7 @@ const SpaceGalleryPage = lazy(() => import("./pages/cultural-activities/SpaceGal
 // Admin - Cookie Settings
 const CookieSettingsPage = lazy(() => import("./pages/admin/CookieSettingsPage"));
 const IntegrationsPage = lazy(() => import("./pages/admin/IntegrationsPage"));
+const PaymentGatewaySettings = lazy(() => import("./pages/admin/PaymentGatewaySettings"));
 
 // Loading fallback component
 const PageLoader = () => (
@@ -322,6 +323,7 @@ const App = () => {
         <Route path="/admin/roles" element={<RolesManagement />} />
             <Route path="/admin/cookie-settings" element={<CookieSettingsPage />} />
             <Route path="/admin/integrations" element={<IntegrationsPage />} />
+            <Route path="/admin/payment-gateway" element={<PaymentGatewaySettings />} />
         <Route path="/admin/form-builder" element={<FormBuilder />} />
           <Route path="/admin/import-form-fields" element={<ImportFormFields />} />
           <Route path="/admin/manage-section-fields" element={<ManageSectionFields />} />
