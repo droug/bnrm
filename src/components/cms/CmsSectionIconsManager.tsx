@@ -598,7 +598,7 @@ const elementConfigs: Record<string, Record<string, Record<string, Array<{ id: s
       section: [
         { id: "bn_hero", label: "Section Hero BN", defaultIcon: "mdi:home-outline" },
         { id: "bn_ressources_electroniques", label: "Ressources électroniques", defaultIcon: "mdi:select-multiple" },
-        { id: "bn_ibn_battouta_stats", label: "Ibn Battúta en chiffres", defaultIcon: "mdi:format-list-numbered" },
+        { id: "bn_ibn_battouta_stats", label: "Ibn Battuta en chiffres", defaultIcon: "mdi:format-list-numbered" },
         { id: "bn_derniers_ajouts", label: "Derniers ajouts", defaultIcon: "mdi:book-open-page-variant-outline" },
         { id: "bn_mediatheque", label: "Médiathèque", defaultIcon: "mdi:video-box" },
         { id: "bn_collections", label: "Collections", defaultIcon: "mdi:library" },
