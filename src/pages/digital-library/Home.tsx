@@ -864,10 +864,10 @@ export default function DigitalLibraryHome() {
                 <Icon name="mdi:select-multiple" className="w-6 h-6 text-gold-bn-primary" />
               </div>
 
-              <h2 className="text-[48px] font-normal text-bn-blue-primary font-gilda">
+              <h2 className="text-[48px] font-normal text-foreground font-gilda">
                 Ressources électroniques
               </h2>
-              <p className="font-body text-regular text-muted-foreground max-w-2xl mx-auto mt-4">
+              <p className="font-body text-regular text-foreground max-w-2xl mx-auto mt-4">
                 Ces ressources permettent la centralisation et le partage du patrimoine documentaire et culturel à l'échelle internationale
               </p>
             </div>
