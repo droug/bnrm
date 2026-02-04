@@ -21,10 +21,12 @@ import {
   XCircle,
   Clock,
   DollarSign,
-  FileImage
+  FileImage,
+  GitBranch
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr, arDZ } from "date-fns/locale";
+import { WorkflowSteps, getStepRoleInfo } from "./WorkflowSteps";
 
 interface ReproductionItem {
   id: string;
@@ -211,6 +213,29 @@ export function ReproductionRequestDetails() {
           {language === "ar" ? "تم الإنشاء في" : "Créée le"} {formatDate(request.created_at)}
         </p>
       </div>
+
+      {/* Workflow Steps Progress */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <GitBranch className="h-5 w-5" />
+            {language === "ar" ? "مراحل المعالجة" : "Progression du traitement"}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <WorkflowSteps currentStatus={request.status} />
+          {request.status !== 'terminee' && request.status !== 'refusee' && (
+            <div className="text-center pt-4 border-t">
+              <p className="text-sm text-muted-foreground">
+                {language === "ar" ? "الخطوة الحالية في انتظار:" : "Étape actuelle en attente de:"}{" "}
+                <span className="font-semibold text-foreground">
+                  {getStepRoleInfo(request.status, language).canValidate}
+                </span>
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 md:grid-cols-2">
         {/* Informations générales */}
