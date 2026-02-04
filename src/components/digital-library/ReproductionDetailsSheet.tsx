@@ -31,7 +31,20 @@ import {
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Link } from "react-router-dom";
+
+const getPublicSiteOrigin = () => {
+  if (typeof window === "undefined") return "https://bnrm-dev.digiup.ma";
+  // In Lovable preview, the origin is always *.lovable.app / *.lovableproject.com.
+  // For user-facing links we prefer the authoritative domain.
+  const host = window.location.hostname;
+  if (host.endsWith("lovable.app") || host.endsWith("lovableproject.com")) {
+    return "https://bnrm-dev.digiup.ma";
+  }
+  return window.location.origin;
+};
+
+const buildPublicDocumentUrl = (documentId: string) =>
+  `${getPublicSiteOrigin()}/digital-library/document/${documentId}`;
 
 interface DocumentInfo {
   id: string;
@@ -136,15 +149,41 @@ export function ReproductionDetailsSheet({ requestId, open, onOpenChange }: Prop
       // Fetch document from metadata.document_id
       const metadata = requestData.metadata as RequestMetadata | null;
       if (metadata?.document_id) {
-        const { data: docData } = await supabase
+        const docSelect = "id, title, author, document_type, cbn_document_id, cover_image_url, pdf_url";
+
+        // 1) Try by direct ID
+        const { data: docById } = await supabase
           .from("digital_library_documents")
-          .select("id, title, author, document_type, cbn_document_id, cover_image_url, pdf_url")
+          .select(docSelect)
           .eq("id", metadata.document_id)
-          .single();
-        
-        if (docData) {
-          setDocument(docData);
-        }
+          .maybeSingle();
+
+        // 2) Try by CBN linkage (some flows store cbn_document_id instead of the DL doc ID)
+        const { data: docByCbn } = !docById
+          ? await supabase
+              .from("digital_library_documents")
+              .select(docSelect)
+              .eq("cbn_document_id", metadata.document_id)
+              .maybeSingle()
+          : { data: null };
+
+        // 3) Last resort: match by title (and author when available)
+        const { data: docByTitle } = !docById && !docByCbn && metadata.document_title
+          ? await (() => {
+              let q = supabase
+                .from("digital_library_documents")
+                .select(docSelect)
+                .ilike("title", metadata.document_title!)
+                .limit(1);
+              if (metadata.document_author) {
+                q = q.ilike("author", metadata.document_author);
+              }
+              return q.maybeSingle();
+            })()
+          : { data: null };
+
+        const docData = docById || docByCbn || docByTitle;
+        if (docData) setDocument(docData);
       }
     } catch (error) {
       console.error("Error fetching request:", error);
@@ -226,6 +265,8 @@ export function ReproductionDetailsSheet({ requestId, open, onOpenChange }: Prop
   };
 
   const metadata = request?.metadata;
+  const openDocumentId = document?.id ?? metadata?.document_id;
+  const openDocumentUrl = openDocumentId ? buildPublicDocumentUrl(openDocumentId) : null;
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -351,28 +392,17 @@ export function ReproductionDetailsSheet({ requestId, open, onOpenChange }: Prop
                       )}
                       
                       {/* Document link - PROMINENT */}
-                      {document && (
-                        <Link 
-                          to={`/digital-library/document/${document.id}`}
+                      {openDocumentUrl && (
+                        <a
+                          href={openDocumentUrl}
                           target="_blank"
+                          rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md transition-colors text-sm font-medium shadow-sm"
                         >
                           <BookOpen className="h-4 w-4" />
                           Ouvrir le document
                           <ExternalLink className="h-3.5 w-3.5" />
-                        </Link>
-                      )}
-                      
-                      {!document && metadata?.document_id && (
-                        <Link 
-                          to={`/digital-library/document/${metadata.document_id}`}
-                          target="_blank"
-                          className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md transition-colors text-sm font-medium shadow-sm"
-                        >
-                          <BookOpen className="h-4 w-4" />
-                          Ouvrir le document
-                          <ExternalLink className="h-3.5 w-3.5" />
-                        </Link>
+                        </a>
                       )}
                     </div>
                   </div>
