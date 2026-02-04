@@ -118,6 +118,32 @@ export default function DocumentDetails() {
         return;
       }
 
+      // 1bis) Fallback: digital_library_documents via cbn_document_id (certains flux conservent cet identifiant)
+      const { data: dlByCbnId, error: dlByCbnIdError } = await supabase
+        .from('digital_library_documents')
+        .select('*')
+        .eq('cbn_document_id', documentId)
+        .maybeSingle();
+
+      if (dlByCbnId && !dlByCbnIdError) {
+        const mapped = {
+          ...dlByCbnId,
+          file_url: (dlByCbnId as any).pdf_url ?? (dlByCbnId as any).file_url ?? null,
+          status: (dlByCbnId as any).publication_status ?? (dlByCbnId as any).status ?? 'published',
+          tags: (dlByCbnId as any).keywords ?? (dlByCbnId as any).themes ?? [],
+          description: (dlByCbnId as any).description ?? (dlByCbnId as any).content_notes ?? null,
+          thumbnail_url: (dlByCbnId as any).thumbnail_url ?? (dlByCbnId as any).cover_image_url ?? null,
+        };
+
+        setDocument(mapped);
+        setEffectiveDocumentId(dlByCbnId.id);
+        setIsManuscript(Boolean((dlByCbnId as any).is_manuscript) || String((dlByCbnId as any).document_type || '').toLowerCase().includes('manuscr'));
+        setAuthorName((dlByCbnId as any).author || '');
+        await loadRestrictionsFor(dlByCbnId.id);
+        setLoading(false);
+        return;
+      }
+
       // 2) Fallback: cbn_documents (anciens liens / index)
       const { data: cbnData, error: cbnError } = await supabase
         .from('cbn_documents')
