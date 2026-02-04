@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertCircle, CheckCircle, XCircle, Clock, Copy, Eye, Filter } from "lucide-react";
+import { AlertCircle, CheckCircle, XCircle, Clock, Copy, Eye, Filter, Printer, Send } from "lucide-react";
 import { format } from "date-fns";
 
 interface ReproductionRequest {
@@ -27,6 +27,9 @@ interface ReproductionRequest {
   service_validation_notes?: string;
   manager_validation_notes?: string;
   created_at: string;
+  user_email?: string;
+  user_name?: string;
+  user_id?: string;
 }
 
 export default function ReproductionManager() {
@@ -36,13 +39,15 @@ export default function ReproductionManager() {
   const [selectedRequest, setSelectedRequest] = useState<ReproductionRequest | null>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [showActionDialog, setShowActionDialog] = useState(false);
+  const [showReproductionCompleteDialog, setShowReproductionCompleteDialog] = useState(false);
   const [actionType, setActionType] = useState<"approve" | "reject">("approve");
   const [actionNotes, setActionNotes] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [alertThresholdDays, setAlertThresholdDays] = useState(7);
+  const [activeTab, setActiveTab] = useState("pending_reproduction");
 
   // Fetch all reproduction requests
-  const { data: allRequests, isLoading } = useQuery({
+  const { data: allRequests, isLoading, refetch } = useQuery({
     queryKey: ['reproduction-requests-admin'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -55,7 +60,11 @@ export default function ReproductionManager() {
     }
   });
 
-  // Filter requests client-side
+  // Filter requests for reproduction (en_traitement status)
+  const pendingReproduction = allRequests?.filter(r => r.status === 'en_traitement') || [];
+  const completedReproduction = allRequests?.filter(r => r.status === 'terminee') || [];
+
+  // Filter requests client-side for the "all" tab
   const requests = allRequests?.filter(r => {
     if (statusFilter === 'all') return true;
     return r.status === statusFilter;
@@ -118,6 +127,61 @@ export default function ReproductionManager() {
     }
   });
 
+  // Complete reproduction and send notification
+  const completeReproduction = useMutation({
+    mutationFn: async (request: ReproductionRequest) => {
+      // Update status to terminee
+      const { error: updateError } = await supabase
+        .from('reproduction_requests')
+        .update({
+          status: 'terminee',
+          completed_at: new Date().toISOString(),
+          completed_by: user?.id,
+        })
+        .eq('id', request.id);
+
+      if (updateError) throw updateError;
+
+      // Send ready_for_pickup notification via edge function
+      const { error: notifError } = await supabase.functions.invoke('send-reproduction-notification', {
+        body: {
+          requestId: request.id,
+          notificationType: 'ready_for_pickup'
+        }
+      });
+
+      if (notifError) {
+        console.error('Error sending notification:', notifError);
+      }
+
+      // Insert notification record
+      await supabase.from('reproduction_notifications').insert([{
+        request_id: request.id,
+        recipient_id: request.user_id || user?.id || '',
+        notification_type: 'ready_for_pickup',
+        title: 'Reproduction prête',
+        message: 'Votre reproduction est prête pour récupération',
+      }]);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reproduction-requests-admin'] });
+      setShowReproductionCompleteDialog(false);
+      setSelectedRequest(null);
+      toast({ 
+        title: "Reproduction terminée", 
+        description: "L'email de notification a été envoyé au demandeur" 
+      });
+    },
+    onError: (error) => {
+      console.error('Error completing reproduction:', error);
+      toast({ 
+        title: "Erreur", 
+        description: "Impossible de finaliser la reproduction", 
+        variant: "destructive" 
+      });
+    }
+  });
+
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { label: string; variant: any }> = {
       'soumise': { label: 'Soumise', variant: 'default' },
@@ -126,6 +190,9 @@ export default function ReproductionManager() {
       'validee': { label: 'Validée', variant: 'default' },
       'refusee': { label: 'Refusée', variant: 'destructive' },
       'en_attente_paiement': { label: 'Attente paiement', variant: 'secondary' },
+      'paiement_recu': { label: 'Paiement reçu', variant: 'default' },
+      'en_traitement': { label: 'En reproduction', variant: 'secondary' },
+      'terminee': { label: 'Terminée', variant: 'default' },
       'traitee': { label: 'Traitée', variant: 'default' }
     };
 
@@ -137,16 +204,16 @@ export default function ReproductionManager() {
     const submittedDate = new Date(request.submitted_at);
     const daysSinceSubmission = Math.floor((Date.now() - submittedDate.getTime()) / (1000 * 60 * 60 * 24));
     return daysSinceSubmission > alertThresholdDays && 
-           !['validee', 'refusee', 'traitee'].includes(request.status);
+           !['validee', 'refusee', 'traitee', 'terminee'].includes(request.status);
   };
 
   const delayedRequests = requests?.filter(isRequestDelayed) || [];
 
   // Stats
-  const totalRequests = requests?.length || 0;
-  const pendingRequests = requests?.filter(r => ['soumise', 'en_validation_service', 'en_validation_responsable'].includes(r.status)).length || 0;
-  const approvedRequests = requests?.filter(r => r.status === 'validee').length || 0;
-  const rejectedRequests = requests?.filter(r => r.status === 'refusee').length || 0;
+  const totalRequests = allRequests?.length || 0;
+  const pendingRequests = allRequests?.filter(r => ['soumise', 'en_validation_service', 'en_validation_responsable'].includes(r.status)).length || 0;
+  const inReproduction = pendingReproduction.length;
+  const completedCount = completedReproduction.length;
 
   const handleAction = (request: ReproductionRequest, type: "approve" | "reject") => {
     setSelectedRequest(request);
@@ -163,6 +230,11 @@ export default function ReproductionManager() {
       status: newStatus,
       notes: actionNotes
     });
+  };
+
+  const handleCompleteReproduction = (request: ReproductionRequest) => {
+    setSelectedRequest(request);
+    setShowReproductionCompleteDialog(true);
   };
 
   return (
@@ -213,10 +285,10 @@ export default function ReproductionManager() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Validées</p>
-                <p className="text-2xl font-bold">{approvedRequests}</p>
+                <p className="text-sm text-muted-foreground">En reproduction</p>
+                <p className="text-2xl font-bold">{inReproduction}</p>
               </div>
-              <CheckCircle className="h-8 w-8 text-green-500" />
+              <Printer className="h-8 w-8 text-indigo-500" />
             </div>
           </CardContent>
         </Card>
@@ -224,10 +296,10 @@ export default function ReproductionManager() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Refusées</p>
-                <p className="text-2xl font-bold">{rejectedRequests}</p>
+                <p className="text-sm text-muted-foreground">Terminées</p>
+                <p className="text-2xl font-bold">{completedCount}</p>
               </div>
-              <XCircle className="h-8 w-8 text-red-500" />
+              <CheckCircle className="h-8 w-8 text-green-500" />
             </div>
           </CardContent>
         </Card>
@@ -282,95 +354,206 @@ export default function ReproductionManager() {
         </Card>
       )}
 
-      {/* Requests List */}
-      <Card>
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <div>
-              <CardTitle>Liste des Demandes</CardTitle>
-              <CardDescription>Toutes les demandes de reproduction</CardDescription>
-            </div>
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4" />
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[200px]">
-                  <SelectValue placeholder="Filtrer par statut" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous les statuts</SelectItem>
-                  <SelectItem value="soumise">Soumise</SelectItem>
-                  <SelectItem value="en_validation_service">En validation</SelectItem>
-                  <SelectItem value="en_validation_responsable">Attente manager</SelectItem>
-                  <SelectItem value="validee">Validée</SelectItem>
-                  <SelectItem value="refusee">Refusée</SelectItem>
-                  <SelectItem value="traitee">Traitée</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <p>Chargement...</p>
-          ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>N° Demande</TableHead>
-                  <TableHead>Modalité</TableHead>
-                  <TableHead>Statut</TableHead>
-                  <TableHead>Date soumission</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {requests?.map((request) => (
-                  <TableRow key={request.id}>
-                    <TableCell className="font-medium">{request.request_number}</TableCell>
-                    <TableCell>{request.reproduction_modality}</TableCell>
-                    <TableCell>{getStatusBadge(request.status)}</TableCell>
-                    <TableCell>{format(new Date(request.submitted_at), 'dd/MM/yyyy HH:mm')}</TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setSelectedRequest(request);
-                            setShowDetailsDialog(true);
-                          }}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        {['soumise', 'en_validation_service', 'en_validation_responsable'].includes(request.status) && (
-                          <>
+      {/* Tabs for different views */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="pending_reproduction" className="gap-2">
+            <Printer className="h-4 w-4" />
+            À reproduire ({pendingReproduction.length})
+          </TabsTrigger>
+          <TabsTrigger value="completed" className="gap-2">
+            <CheckCircle className="h-4 w-4" />
+            Terminées ({completedReproduction.length})
+          </TabsTrigger>
+          <TabsTrigger value="all" className="gap-2">
+            <Copy className="h-4 w-4" />
+            Toutes
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Pending Reproduction Tab */}
+        <TabsContent value="pending_reproduction">
+          <Card>
+            <CardHeader>
+              <CardTitle>Demandes à reproduire</CardTitle>
+              <CardDescription>
+                Documents en attente de reproduction après validation comptable
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {pendingReproduction.length === 0 ? (
+                <p className="text-muted-foreground text-center py-8">
+                  Aucune demande en attente de reproduction
+                </p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>N° Demande</TableHead>
+                      <TableHead>Modalité</TableHead>
+                      <TableHead>Date soumission</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {pendingReproduction.map((request) => (
+                      <TableRow key={request.id}>
+                        <TableCell className="font-medium">{request.request_number}</TableCell>
+                        <TableCell>{request.reproduction_modality}</TableCell>
+                        <TableCell>{format(new Date(request.submitted_at), 'dd/MM/yyyy HH:mm')}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleAction(request, "approve")}
-                              className="text-green-600 hover:text-green-700"
+                              onClick={() => {
+                                setSelectedRequest(request);
+                                setShowDetailsDialog(true);
+                              }}
                             >
-                              <CheckCircle className="h-4 w-4" />
+                              <Eye className="h-4 w-4" />
                             </Button>
+                            <Button
+                              size="sm"
+                              onClick={() => handleCompleteReproduction(request)}
+                              className="gap-1"
+                            >
+                              <Send className="h-4 w-4" />
+                              Reproduction terminée
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Completed Tab */}
+        <TabsContent value="completed">
+          <Card>
+            <CardHeader>
+              <CardTitle>Reproductions terminées</CardTitle>
+              <CardDescription>
+                Demandes finalisées et prêtes pour récupération
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {completedReproduction.length === 0 ? (
+                <p className="text-muted-foreground text-center py-8">
+                  Aucune reproduction terminée
+                </p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>N° Demande</TableHead>
+                      <TableHead>Modalité</TableHead>
+                      <TableHead>Date soumission</TableHead>
+                      <TableHead>Statut</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {completedReproduction.map((request) => (
+                      <TableRow key={request.id}>
+                        <TableCell className="font-medium">{request.request_number}</TableCell>
+                        <TableCell>{request.reproduction_modality}</TableCell>
+                        <TableCell>{format(new Date(request.submitted_at), 'dd/MM/yyyy HH:mm')}</TableCell>
+                        <TableCell>{getStatusBadge(request.status)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* All Requests Tab */}
+        <TabsContent value="all">
+          <Card>
+            <CardHeader>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>Toutes les demandes</CardTitle>
+                  <CardDescription>Historique complet des demandes de reproduction</CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Filter className="h-4 w-4" />
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-[200px]">
+                      <SelectValue placeholder="Filtrer par statut" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Tous les statuts</SelectItem>
+                      <SelectItem value="soumise">Soumise</SelectItem>
+                      <SelectItem value="en_validation_service">En validation</SelectItem>
+                      <SelectItem value="en_validation_responsable">Attente manager</SelectItem>
+                      <SelectItem value="en_traitement">En reproduction</SelectItem>
+                      <SelectItem value="terminee">Terminée</SelectItem>
+                      <SelectItem value="refusee">Refusée</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {isLoading ? (
+                <p>Chargement...</p>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>N° Demande</TableHead>
+                      <TableHead>Modalité</TableHead>
+                      <TableHead>Statut</TableHead>
+                      <TableHead>Date soumission</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {requests?.map((request) => (
+                      <TableRow key={request.id}>
+                        <TableCell className="font-medium">{request.request_number}</TableCell>
+                        <TableCell>{request.reproduction_modality}</TableCell>
+                        <TableCell>{getStatusBadge(request.status)}</TableCell>
+                        <TableCell>{format(new Date(request.submitted_at), 'dd/MM/yyyy HH:mm')}</TableCell>
+                        <TableCell>
+                          <div className="flex gap-2">
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleAction(request, "reject")}
-                              className="text-red-600 hover:text-red-700"
+                              onClick={() => {
+                                setSelectedRequest(request);
+                                setShowDetailsDialog(true);
+                              }}
                             >
-                              <XCircle className="h-4 w-4" />
+                              <Eye className="h-4 w-4" />
                             </Button>
-                          </>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
-        </CardContent>
-      </Card>
+                            {request.status === 'en_traitement' && (
+                              <Button
+                                size="sm"
+                                onClick={() => handleCompleteReproduction(request)}
+                                className="gap-1"
+                              >
+                                <Send className="h-4 w-4" />
+                                Terminer
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
 
       {/* Details Dialog */}
       <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
@@ -484,6 +667,51 @@ export default function ReproductionManager() {
               variant={actionType === "approve" ? "default" : "destructive"}
             >
               {actionType === "approve" ? "Valider" : "Refuser"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Reproduction Complete Dialog */}
+      <Dialog open={showReproductionCompleteDialog} onOpenChange={setShowReproductionCompleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              Confirmer la fin de reproduction
+            </DialogTitle>
+            <DialogDescription>
+              Demande N° {selectedRequest?.request_number}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <p className="text-sm text-muted-foreground">
+              En confirmant, un email sera automatiquement envoyé au demandeur pour l'informer 
+              que sa reproduction est prête pour récupération.
+            </p>
+            <div className="p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
+              <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                📧 Un email "Votre reproduction est prête" sera envoyé
+              </p>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowReproductionCompleteDialog(false)}>
+              Annuler
+            </Button>
+            <Button
+              onClick={() => selectedRequest && completeReproduction.mutate(selectedRequest)}
+              disabled={completeReproduction.isPending}
+              className="gap-2"
+            >
+              {completeReproduction.isPending ? (
+                <>Envoi en cours...</>
+              ) : (
+                <>
+                  <Send className="h-4 w-4" />
+                  Confirmer et notifier
+                </>
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
