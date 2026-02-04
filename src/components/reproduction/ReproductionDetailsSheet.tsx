@@ -23,11 +23,13 @@ import {
   Clock,
   DollarSign,
   FileImage,
-  X
+  X,
+  GitBranch
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr, arDZ } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
+import { WorkflowSteps, getStepRoleInfo } from "./WorkflowSteps";
 
 interface ReproductionItem {
   id: string;
@@ -212,7 +214,28 @@ export function ReproductionDetailsSheet({ requestId, open, onOpenChange }: Repr
             </div>
           ) : (
             <div className="p-6 space-y-6">
-              {/* Status */}
+              {/* Workflow Steps */}
+              <div className="space-y-4">
+                <h3 className="font-semibold flex items-center gap-2 text-base">
+                  <GitBranch className="h-4 w-4" />
+                  {language === "ar" ? "مراحل الطلب" : "Étapes du workflow"}
+                </h3>
+                <div className="bg-muted/30 rounded-xl p-4 border">
+                  <WorkflowSteps currentStatus={request.status} />
+                  {request.status !== "terminee" && request.status !== "refusee" && (
+                    <div className="mt-4 pt-4 border-t border-muted">
+                      <p className="text-xs text-muted-foreground text-center">
+                        {language === "ar" ? "المسؤول الحالي:" : "Responsable actuel:"}{" "}
+                        <span className="font-semibold text-foreground">
+                          {getStepRoleInfo(request.status, language).canValidate}
+                        </span>
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Status badge */}
               <div className="flex items-center justify-between">
                 {getStatusBadge(request.status)}
                 <span className="text-sm text-muted-foreground">
