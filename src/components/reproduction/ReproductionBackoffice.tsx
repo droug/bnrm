@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { CheckCircle, XCircle, Clock, FileText, DollarSign, Eye } from "lucide-react";
+import { CheckCircle, XCircle, Clock, FileText, DollarSign, Eye, Calculator } from "lucide-react";
 import { format } from "date-fns";
 import { fr, arDZ } from "date-fns/locale";
 import {
@@ -20,6 +20,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ReproductionDetailsSheet } from "./ReproductionDetailsSheet";
+import { WorkflowSteps } from "./WorkflowSteps";
 
 interface ReproductionRequest {
   id: string;
@@ -33,6 +34,7 @@ interface ReproductionRequest {
   manager_validation_notes: string | null;
   rejection_reason: string | null;
   payment_amount: number | null;
+  paid_at?: string | null;
 }
 
 export function ReproductionBackoffice() {
@@ -56,7 +58,7 @@ export function ReproductionBackoffice() {
       const { data, error } = await supabase
         .from("reproduction_requests")
         .select("*")
-        .in("status", ["soumise", "en_validation_service", "en_validation_responsable"])
+        .in("status", ["soumise", "en_validation_service", "en_validation_responsable", "payee", "en_validation_comptabilite"])
         .order("submitted_at", { ascending: true });
 
       if (error) throw error;
