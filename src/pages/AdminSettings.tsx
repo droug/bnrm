@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users, Database, Copy, Library, ShieldCheck, UserCog, Newspaper, ClockAlert, ArchiveRestore, PenSquare, Coins, BookMarked, DatabaseZap, FileImage, BookOpenCheck, Languages, Mail, GitBranch, List, Sliders, FolderTree, Wrench, Home, FormInput, Network, MapPin, Bell, Activity, ScrollText, Heart } from "lucide-react";
+import { Settings, Shield, FileText, Clock, Archive, Scale, ArrowLeft, Edit, DollarSign, BookOpen, Users, Database, Copy, Library, ShieldCheck, UserCog, Newspaper, ClockAlert, ArchiveRestore, PenSquare, Coins, BookMarked, DatabaseZap, FileImage, BookOpenCheck, Languages, Mail, GitBranch, List, Sliders, FolderTree, Wrench, Home, FormInput, Network, MapPin, Bell, Activity, ScrollText, Heart, CreditCard } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
@@ -99,6 +99,14 @@ export default function AdminSettings() {
       href: "/admin/notifications",
       permission: "content.manage",
       gradient: "from-rose-500 to-pink-600"
+    },
+    {
+      icon: CreditCard,
+      title: "Paiement Électronique",
+      description: "Paramétrage de l'interconnexion CMI et Stripe",
+      href: "/admin/payment-gateway",
+      permission: "content.manage",
+      gradient: "from-primary to-primary"
     },
     {
       icon: ShieldCheck,
