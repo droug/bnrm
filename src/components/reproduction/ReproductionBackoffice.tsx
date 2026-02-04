@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { CheckCircle, XCircle, Clock, FileText, DollarSign, Eye, Calculator } from "lucide-react";
+import { CheckCircle, XCircle, Clock, FileText, DollarSign, Eye, Calculator, CreditCard, Building, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import { fr, arDZ } from "date-fns/locale";
 import {
@@ -59,7 +59,7 @@ export function ReproductionBackoffice() {
       const { data, error } = await supabase
         .from("reproduction_requests")
         .select("*")
-        .in("status", ["soumise", "en_validation_service", "en_validation_responsable", "paiement_recu"] as any[])
+        .in("status", ["soumise", "en_validation_service", "en_validation_responsable", "en_attente_paiement", "paiement_recu"] as any[])
         .order("submitted_at", { ascending: true });
 
       if (error) throw error;
@@ -236,6 +236,42 @@ export function ReproductionBackoffice() {
     }
   };
 
+  // Confirmer la réception du paiement (virement ou sur place)
+  const handlePaymentConfirmation = async (requestId: string) => {
+    setIsProcessing(true);
+    try {
+      const { error } = await supabase
+        .from("reproduction_requests")
+        .update({
+          status: "paiement_recu",
+          paid_at: new Date().toISOString(),
+        } as any)
+        .eq("id", requestId);
+
+      if (error) throw error;
+
+      // Create notification
+      await supabase.from("reproduction_notifications").insert({
+        request_id: requestId,
+        recipient_id: selectedRequest?.user_id,
+        notification_type: "payment_received",
+        title: language === "ar" ? "تم استلام الدفع" : "Paiement reçu",
+        message: language === "ar" ? "تم تأكيد استلام الدفع الخاص بك" : "Votre paiement a été confirmé",
+      } as any);
+
+      toast.success(language === "ar" ? "تم تأكيد الدفع" : "Paiement confirmé");
+
+      setShowDialog(false);
+      setValidationNotes("");
+      fetchPendingRequests();
+    } catch (error: any) {
+      console.error("Error confirming payment:", error);
+      toast.error(language === "ar" ? "خطأ في تأكيد الدفع" : "Erreur lors de la confirmation du paiement");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const handleAccountingApproval = async (requestId: string, approve: boolean) => {
     setIsProcessing(true);
     try {
@@ -296,7 +332,27 @@ export function ReproductionBackoffice() {
 
   const pendingService = requests.filter(r => r.status === "soumise" || r.status === "en_validation_service");
   const pendingManager = requests.filter(r => r.status === "en_validation_responsable");
+  const pendingPayment = requests.filter(r => r.status === "en_attente_paiement");
   const pendingAccounting = requests.filter(r => r.status === "paiement_recu");
+
+  // Helper pour obtenir le mode de paiement
+  const getPaymentMethod = (request: ReproductionRequest) => {
+    const metadata = (request as any).metadata;
+    return metadata?.paymentMethod || metadata?.reception_mode || "online";
+  };
+
+  const getPaymentMethodBadge = (method: string) => {
+    switch (method) {
+      case "virement":
+      case "bank_transfer":
+        return { icon: Building, label: language === "ar" ? "تحويل بنكي" : "Virement", color: "bg-blue-100 text-blue-800" };
+      case "sur_place":
+      case "on_site":
+        return { icon: MapPin, label: language === "ar" ? "في الموقع" : "Sur place", color: "bg-amber-100 text-amber-800" };
+      default:
+        return { icon: CreditCard, label: language === "ar" ? "عبر الإنترنت" : "En ligne", color: "bg-green-100 text-green-800" };
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -314,7 +370,7 @@ export function ReproductionBackoffice() {
       </div>
 
       <Tabs defaultValue="service" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="service" className="gap-2">
             <Clock className="h-4 w-4" />
             {language === "ar" ? "تحقق الخدمة" : "Validation Service"}
@@ -327,6 +383,13 @@ export function ReproductionBackoffice() {
             {language === "ar" ? "موافقة المسؤول" : "Approbation Responsable"}
             {pendingManager.length > 0 && (
               <Badge variant="destructive" className="ml-2">{pendingManager.length}</Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="payment" className="gap-2">
+            <DollarSign className="h-4 w-4" />
+            {language === "ar" ? "تأكيد الدفع" : "Confirmation Paiement"}
+            {pendingPayment.length > 0 && (
+              <Badge variant="destructive" className="ml-2">{pendingPayment.length}</Badge>
             )}
           </TabsTrigger>
           <TabsTrigger value="accounting" className="gap-2">
@@ -473,6 +536,92 @@ export function ReproductionBackoffice() {
                 </CardContent>
               </Card>
             ))
+          )}
+        </TabsContent>
+
+        {/* Onglet Confirmation Paiement - pour virement et sur place */}
+        <TabsContent value="payment" className="space-y-4 mt-6">
+          {pendingPayment.length === 0 ? (
+            <Card>
+              <CardContent className="p-12 text-center">
+                <DollarSign className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                <p className="text-muted-foreground">
+                  {language === "ar" ? "لا توجد مدفوعات في انتظار التأكيد" : "Aucun paiement en attente de confirmation"}
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            pendingPayment.map((request) => {
+              const paymentMethod = getPaymentMethod(request);
+              const methodBadge = getPaymentMethodBadge(paymentMethod);
+              const MethodIcon = methodBadge.icon;
+              
+              return (
+                <Card key={request.id}>
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <CardTitle>{request.request_number}</CardTitle>
+                        <CardDescription>
+                          {language === "ar" ? "في انتظار الدفع منذ" : "En attente de paiement depuis le"} {formatDate(request.submitted_at)}
+                        </CardDescription>
+                      </div>
+                      <div className="flex gap-2">
+                        <Badge className={methodBadge.color}>
+                          <MethodIcon className="h-3 w-3 mr-1" />
+                          {methodBadge.label}
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <WorkflowSteps currentStatus={request.status} className="mb-6" />
+                    {request.payment_amount && (
+                      <div className="p-4 bg-muted rounded-lg">
+                        <h4 className="font-medium mb-2">
+                          {language === "ar" ? "المبلغ المستحق:" : "Montant dû:"}
+                        </h4>
+                        <p className="text-lg font-bold text-primary">
+                          {request.payment_amount.toFixed(2)} MAD
+                        </p>
+                      </div>
+                    )}
+                    {request.manager_validation_notes && (
+                      <div>
+                        <h4 className="font-medium mb-2">
+                          {language === "ar" ? "ملاحظات المسؤول:" : "Notes du responsable:"}
+                        </h4>
+                        <p className="text-sm text-muted-foreground">{request.manager_validation_notes}</p>
+                      </div>
+                    )}
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedRequestId(request.id);
+                          setDetailsSheetOpen(true);
+                        }}
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        {language === "ar" ? "عرض التفاصيل" : "Voir détails"}
+                      </Button>
+                      <Button
+                        variant="default"
+                        onClick={() => {
+                          setSelectedRequest(request);
+                          handlePaymentConfirmation(request.id);
+                        }}
+                        disabled={isProcessing}
+                      >
+                        <CheckCircle className="h-4 w-4 mr-2" />
+                        {language === "ar" ? "تأكيد استلام الدفع" : "Confirmer réception du paiement"}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })
           )}
         </TabsContent>
 
