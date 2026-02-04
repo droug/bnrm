@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
@@ -20,6 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ReproductionDetailsSheet } from "./ReproductionDetailsSheet";
 
 interface ReproductionRequest {
   id: string;
@@ -38,13 +38,14 @@ interface ReproductionRequest {
 export function ReproductionBackoffice() {
   const { user, profile } = useAuth();
   const { language } = useLanguage();
-  const navigate = useNavigate();
   const [requests, setRequests] = useState<ReproductionRequest[]>([]);
   const [selectedRequest, setSelectedRequest] = useState<ReproductionRequest | null>(null);
   const [validationNotes, setValidationNotes] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [dialogAction, setDialogAction] = useState<"approve" | "reject">("approve");
+  const [detailsSheetOpen, setDetailsSheetOpen] = useState(false);
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchPendingRequests();
@@ -241,7 +242,10 @@ export function ReproductionBackoffice() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => navigate(`/reproduction/details/${request.id}`)}
+                      onClick={() => {
+                        setSelectedRequestId(request.id);
+                        setDetailsSheetOpen(true);
+                      }}
                     >
                       <Eye className="h-4 w-4 mr-2" />
                       {language === "ar" ? "عرض التفاصيل" : "Voir détails"}
@@ -367,6 +371,12 @@ export function ReproductionBackoffice() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <ReproductionDetailsSheet
+        requestId={selectedRequestId}
+        open={detailsSheetOpen}
+        onOpenChange={setDetailsSheetOpen}
+      />
     </div>
   );
 }
