@@ -18,10 +18,77 @@ interface NotificationRequest {
   format?: string;
   estimatedCost?: number;
   additionalInfo?: string;
+  paymentLink?: string; // Lien de paiement Stripe
+  paymentMethod?: 'stripe' | 'virement' | 'especes' | 'all'; // Méthode de paiement
 }
 
+// Helper pour générer le HTML des options de paiement
+const getPaymentOptionsHtml = (
+  amount: number | undefined, 
+  stripeLink: string | undefined, 
+  siteUrl: string,
+  paymentMethod?: string
+): string => {
+  const showStripe = !paymentMethod || paymentMethod === 'stripe' || paymentMethod === 'all';
+  const showVirement = !paymentMethod || paymentMethod === 'virement' || paymentMethod === 'all';
+  const showEspeces = !paymentMethod || paymentMethod === 'especes' || paymentMethod === 'all';
+  
+  let html = `<h3 style="color: #002B45; margin-top: 25px;">💳 Options de paiement</h3>`;
+  
+  // Option 1: Paiement en ligne Stripe
+  if (showStripe) {
+    html += `
+      <div style="background: #e8f5e9; padding: 20px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #4caf50;">
+        <h4 style="margin: 0 0 10px 0; color: #2e7d32;">💳 Paiement par carte bancaire (en ligne)</h4>
+        <p style="margin: 0 0 15px 0;">Payez immédiatement et en toute sécurité avec votre carte bancaire.</p>
+        ${stripeLink ? `
+          <a href="${stripeLink}" style="display: inline-block; background: #4caf50; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            Payer maintenant ${amount ? `(${amount} DH)` : ''}
+          </a>
+        ` : `
+          <a href="${siteUrl}/my-space?tab=reproductions" style="display: inline-block; background: #4caf50; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            Payer depuis mon espace
+          </a>
+        `}
+      </div>
+    `;
+  }
+  
+  // Option 2: Virement bancaire
+  if (showVirement) {
+    html += `
+      <div style="background: #e3f2fd; padding: 20px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #1976d2;">
+        <h4 style="margin: 0 0 10px 0; color: #1565c0;">🏦 Virement bancaire</h4>
+        <p style="margin: 0 0 10px 0;">Effectuez un virement sur le compte de la BNRM:</p>
+        <div style="background: white; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 13px;">
+          <p style="margin: 5px 0;"><strong>Banque:</strong> Trésorerie Générale du Royaume</p>
+          <p style="margin: 5px 0;"><strong>RIB:</strong> 310 780 1001 0009 7500 0000 01</p>
+          <p style="margin: 5px 0;"><strong>Objet:</strong> Reproduction - ${amount ? `${amount} DH` : ''}</p>
+        </div>
+        <p style="margin: 10px 0 0 0; font-size: 12px; color: #666;">Envoyez-nous le justificatif de virement par email à reproduction@bnrm.ma</p>
+      </div>
+    `;
+  }
+  
+  // Option 3: Paiement sur place
+  if (showEspeces) {
+    html += `
+      <div style="background: #fff3e0; padding: 20px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #ff9800;">
+        <h4 style="margin: 0 0 10px 0; color: #e65100;">🏛️ Paiement sur place</h4>
+        <p style="margin: 0;">Présentez-vous à la caisse de la BNRM avec votre numéro de demande.</p>
+        <p style="margin: 10px 0 0 0; font-size: 13px;">
+          <strong>Horaires:</strong> Du lundi au vendredi, 9h00 - 16h00<br>
+          <strong>Adresse:</strong> Avenue Ibn Khaldoun, Rabat
+        </p>
+      </div>
+    `;
+  }
+  
+  return html;
+};
+
 const getEmailContent = (n: NotificationRequest) => {
-  const { notificationType, requestNumber, documentTitle, reproductionType, format, estimatedCost, additionalInfo } = n;
+  const { notificationType, requestNumber, documentTitle, reproductionType, format, estimatedCost, additionalInfo, paymentLink, paymentMethod } = n;
   
   const formatLabel = format ? 
     (format === 'pdf' ? 'PDF' : format === 'jpeg' ? 'JPEG' : format === 'tiff' ? 'TIFF' : format) : '';
@@ -139,20 +206,34 @@ const getEmailContent = (n: NotificationRequest) => {
         ${footer}`
       };
       
+    case 'payment_pending':
     case 'approved':
+    case 'approval':
+      const siteUrl = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
+      const paymentOptions = getPaymentOptionsHtml(estimatedCost, paymentLink, siteUrl, paymentMethod);
+      
       return {
-        subject: `✅ Demande approuvée - ${requestNumber}`,
+        subject: `✅ Demande approuvée - En attente de paiement - ${requestNumber}`,
         html: `${base}
           <h2>✅ Votre demande a été approuvée</h2>
-          <p>Nous avons le plaisir de vous informer que votre demande de reproduction a été <strong>approuvée</strong>.</p>
+          <p>Votre demande de reproduction a été <strong>approuvée</strong> et est prête pour le paiement.</p>
           
           <div class="info-box">
-            <p class="info-row"><span class="info-label">N° de demande:</span><span class="info-value"><strong>${requestNumber}</strong></span></p>
-            <p class="info-row"><span class="info-label">Document:</span><span class="info-value">${documentTitle}</span></p>
-            <p class="info-row"><span class="info-label">Statut:</span><span class="status-badge status-approved">Approuvée</span></p>
+            <p class="info-row"><span class="info-label">Numéro de demande:</span><span class="info-value"><strong>${requestNumber}</strong></span></p>
+            <p class="info-row"><span class="info-label">Statut:</span><span class="status-badge status-pending">En attente de paiement</span></p>
+            ${estimatedCost ? `<p class="info-row"><span class="info-label">Montant:</span><span class="info-value"><strong>${estimatedCost} DH</strong></span></p>` : ''}
           </div>
           
-          <p>Le traitement de votre demande est en cours. Vous serez notifié dès que votre reproduction sera prête.</p>
+          ${estimatedCost ? `
+            <div class="cost-highlight">
+              <p style="margin: 0;">Montant à régler</p>
+              <p class="cost-amount">${estimatedCost} DH</p>
+            </div>
+          ` : ''}
+          
+          ${paymentOptions}
+          
+          <p style="margin-top: 20px; color: #666; font-size: 13px;">Pour toute question, contactez notre service au <strong>+212 537 77 18 73</strong> ou par email à <strong>reproduction@bnrm.ma</strong></p>
         ${footer}`
       };
       
