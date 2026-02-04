@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ActivityTimeline } from "./ActivityTimeline";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { WorkflowSteps, getStepRoleInfo } from "@/components/reproduction/WorkflowSteps";
+import { useLanguage } from "@/hooks/useLanguage";
 
 interface ReproductionRequest {
   id: string;
@@ -23,6 +25,7 @@ interface ReproductionRequest {
 export function MyReproductionRequests() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { language } = useLanguage();
   const [requests, setRequests] = useState<ReproductionRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedRequests, setExpandedRequests] = useState<Set<string>>(new Set());
@@ -124,6 +127,17 @@ export function MyReproductionRequests() {
                         )}
                       </div>
                       {getStatusBadge(request.status)}
+                    </div>
+
+                    {/* Workflow Steps - Progress visualization */}
+                    <div className="mb-4 p-3 bg-muted/30 rounded-lg">
+                      <WorkflowSteps currentStatus={request.status} compact />
+                      {request.status !== 'terminee' && request.status !== 'refusee' && (
+                        <p className="text-xs text-muted-foreground mt-2 text-center">
+                          {language === "ar" ? "في انتظار:" : "En attente de:"}{" "}
+                          <span className="font-medium">{getStepRoleInfo(request.status, language).canValidate}</span>
+                        </p>
+                      )}
                     </div>
 
                     {request.user_notes && (
