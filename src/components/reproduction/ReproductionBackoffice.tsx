@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dialog";
 import { ReproductionDetailsSheet } from "./ReproductionDetailsSheet";
 import { WorkflowSteps } from "./WorkflowSteps";
+import { ReproductionPaymentSettingsCard } from "./ReproductionPaymentSettingsCard";
 
 interface ReproductionRequest {
   id: string;
@@ -127,8 +128,11 @@ export function ReproductionBackoffice() {
 
       if (fetchError) throw fetchError;
       
-      // L'email est directement dans la demande (contact_email ou metadata)
-      const userEmail = (requestDetails as any)?.contact_email || (requestDetails as any)?.metadata?.email;
+      // Tenter de récupérer l'email depuis la demande (sinon, l'Edge Function fera le lookup via auth.users)
+      const userEmail =
+        (requestDetails as any)?.contact_email ||
+        (requestDetails as any)?.metadata?.email ||
+        (requestDetails as any)?.metadata?.user_email;
 
       const { error } = await supabase
         .from("reproduction_requests")
@@ -148,7 +152,7 @@ export function ReproductionBackoffice() {
       let paymentUrl: string | null = null;
 
       // Si approuvé, générer le lien de paiement et envoyer l'email avec le lien
-      if (approve && requestDetails?.payment_amount && requestDetails?.user_id && userEmail) {
+      if (approve && requestDetails?.payment_amount && requestDetails?.user_id) {
         try {
           const { data: paymentData, error: paymentError } = await supabase.functions.invoke(
             'generate-reproduction-payment-link',
@@ -181,7 +185,7 @@ export function ReproductionBackoffice() {
       }
 
       // Envoyer la notification par email avec le lien de paiement
-      if (approve && userEmail) {
+      if (approve && requestDetails?.user_id) {
         try {
           await supabase.functions.invoke('send-reproduction-notification', {
             body: {
@@ -200,6 +204,8 @@ export function ReproductionBackoffice() {
         } catch (emailError) {
           console.error("Erreur envoi email:", emailError);
         }
+      } else if (approve && !requestDetails?.user_id) {
+        toast.error(language === "ar" ? "معرف المستخدم غير متوفر" : "Utilisateur de la demande introuvable");
       }
 
       // Create notification in database
@@ -301,6 +307,10 @@ export function ReproductionBackoffice() {
         <p className="text-muted-foreground">
           {language === "ar" ? "التحقق والموافقة على الطلبات" : "Validation et approbation des demandes"}
         </p>
+      </div>
+
+      <div className="mb-6">
+        <ReproductionPaymentSettingsCard />
       </div>
 
       <Tabs defaultValue="service" className="w-full">

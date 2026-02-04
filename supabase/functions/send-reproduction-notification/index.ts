@@ -9,8 +9,8 @@ const corsHeaders = {
 
 interface NotificationRequest {
   requestId: string;
-  recipientEmail: string;
-  recipientId: string;
+  recipientEmail?: string;
+  recipientId?: string;
   notificationType: string;
   requestNumber: string;
   documentTitle: string;
@@ -22,16 +22,88 @@ interface NotificationRequest {
   paymentMethod?: 'stripe' | 'virement' | 'especes' | 'all'; // Méthode de paiement
 }
 
+type ReproductionPaymentSettings = {
+  stripe: { enabled: boolean };
+  virement: {
+    enabled: boolean;
+    bank_name: string;
+    rib: string;
+    proof_email: string;
+    object_prefix: string;
+  };
+  espece: { enabled: boolean; address: string; hours: string };
+};
+
+const DEFAULT_PAYMENT_SETTINGS: ReproductionPaymentSettings = {
+  stripe: { enabled: true },
+  virement: {
+    enabled: true,
+    bank_name: "Trésorerie Générale du Royaume",
+    rib: "310 780 1001 0009 7500 0000 01",
+    proof_email: "reproduction@bnrm.ma",
+    object_prefix: "Reproduction",
+  },
+  espece: {
+    enabled: true,
+    address: "Avenue Ibn Khaldoun, Rabat",
+    hours: "Du lundi au vendredi, 9h00 - 16h00",
+  },
+};
+
+const PAYMENT_SETTINGS_PARAM_KEY = "reproduction_payment_settings";
+
+const safeParsePaymentSettings = (raw: unknown): ReproductionPaymentSettings => {
+  if (typeof raw !== "string" || raw.trim() === "") return DEFAULT_PAYMENT_SETTINGS;
+  try {
+    const parsed = JSON.parse(raw);
+    return {
+      stripe: { enabled: !!parsed?.stripe?.enabled },
+      virement: {
+        enabled: parsed?.virement?.enabled !== false,
+        bank_name: String(parsed?.virement?.bank_name ?? DEFAULT_PAYMENT_SETTINGS.virement.bank_name),
+        rib: String(parsed?.virement?.rib ?? DEFAULT_PAYMENT_SETTINGS.virement.rib),
+        proof_email: String(parsed?.virement?.proof_email ?? DEFAULT_PAYMENT_SETTINGS.virement.proof_email),
+        object_prefix: String(parsed?.virement?.object_prefix ?? DEFAULT_PAYMENT_SETTINGS.virement.object_prefix),
+      },
+      espece: {
+        enabled: parsed?.espece?.enabled !== false,
+        address: String(parsed?.espece?.address ?? DEFAULT_PAYMENT_SETTINGS.espece.address),
+        hours: String(parsed?.espece?.hours ?? DEFAULT_PAYMENT_SETTINGS.espece.hours),
+      },
+    };
+  } catch {
+    return DEFAULT_PAYMENT_SETTINGS;
+  }
+};
+
+const loadPaymentSettings = async (supabase: ReturnType<typeof createClient>): Promise<ReproductionPaymentSettings> => {
+  try {
+    const { data, error } = await supabase
+      .from("bnrm_parametres")
+      .select("valeur")
+      .eq("parametre", PAYMENT_SETTINGS_PARAM_KEY)
+      .maybeSingle();
+
+    if (error) throw error;
+    return safeParsePaymentSettings(data?.valeur);
+  } catch (e) {
+    console.warn("[REPRODUCTION-NOTIF] Could not load payment settings, fallback to defaults:", e);
+    return DEFAULT_PAYMENT_SETTINGS;
+  }
+};
+
 // Helper pour générer le HTML des options de paiement
 const getPaymentOptionsHtml = (
   amount: number | undefined, 
   stripeLink: string | undefined, 
   siteUrl: string,
-  paymentMethod?: string
+  paymentMethod: string | undefined,
+  settings: ReproductionPaymentSettings,
+  requestNumber: string
 ): string => {
-  const showStripe = !paymentMethod || paymentMethod === 'stripe' || paymentMethod === 'all';
-  const showVirement = !paymentMethod || paymentMethod === 'virement' || paymentMethod === 'all';
-  const showEspeces = !paymentMethod || paymentMethod === 'especes' || paymentMethod === 'all';
+  const showStripe = settings.stripe.enabled && (!paymentMethod || paymentMethod === 'stripe' || paymentMethod === 'all');
+  const showVirement = settings.virement.enabled && (!paymentMethod || paymentMethod === 'virement' || paymentMethod === 'all');
+  const showEspeces = settings.espece.enabled && (!paymentMethod || paymentMethod === 'especes' || paymentMethod === 'all');
   
   let html = `<h3 style="color: #002B45; margin-top: 25px;">💳 Options de paiement</h3>`;
   
@@ -61,11 +133,11 @@ const getPaymentOptionsHtml = (
         <h4 style="margin: 0 0 10px 0; color: #1565c0;">🏦 Virement bancaire</h4>
         <p style="margin: 0 0 10px 0;">Effectuez un virement sur le compte de la BNRM:</p>
         <div style="background: white; padding: 15px; border-radius: 5px; font-family: monospace; font-size: 13px;">
-          <p style="margin: 5px 0;"><strong>Banque:</strong> Trésorerie Générale du Royaume</p>
-          <p style="margin: 5px 0;"><strong>RIB:</strong> 310 780 1001 0009 7500 0000 01</p>
-          <p style="margin: 5px 0;"><strong>Objet:</strong> Reproduction - ${amount ? `${amount} DH` : ''}</p>
+          <p style="margin: 5px 0;"><strong>Banque:</strong> ${settings.virement.bank_name}</p>
+          <p style="margin: 5px 0;"><strong>RIB:</strong> ${settings.virement.rib}</p>
+          <p style="margin: 5px 0;"><strong>Objet:</strong> ${settings.virement.object_prefix} - ${requestNumber}${amount ? ` - ${amount} DH` : ''}</p>
         </div>
-        <p style="margin: 10px 0 0 0; font-size: 12px; color: #666;">Envoyez-nous le justificatif de virement par email à reproduction@bnrm.ma</p>
+        <p style="margin: 10px 0 0 0; font-size: 12px; color: #666;">Envoyez-nous le justificatif de virement par email à ${settings.virement.proof_email}</p>
       </div>
     `;
   }
@@ -77,8 +149,8 @@ const getPaymentOptionsHtml = (
         <h4 style="margin: 0 0 10px 0; color: #e65100;">🏛️ Paiement sur place</h4>
         <p style="margin: 0;">Présentez-vous à la caisse de la BNRM avec votre numéro de demande.</p>
         <p style="margin: 10px 0 0 0; font-size: 13px;">
-          <strong>Horaires:</strong> Du lundi au vendredi, 9h00 - 16h00<br>
-          <strong>Adresse:</strong> Avenue Ibn Khaldoun, Rabat
+          <strong>Horaires:</strong> ${settings.espece.hours}<br>
+          <strong>Adresse:</strong> ${settings.espece.address}
         </p>
       </div>
     `;
@@ -87,7 +159,10 @@ const getPaymentOptionsHtml = (
   return html;
 };
 
-const getEmailContent = (n: NotificationRequest) => {
+const getEmailContent = (
+  n: NotificationRequest,
+  paymentSettings: ReproductionPaymentSettings = DEFAULT_PAYMENT_SETTINGS
+) => {
   const { notificationType, requestNumber, documentTitle, reproductionType, format, estimatedCost, additionalInfo, paymentLink, paymentMethod } = n;
   
   const formatLabel = format ? 
@@ -210,7 +285,14 @@ const getEmailContent = (n: NotificationRequest) => {
     case 'approved':
     case 'approval':
       const siteUrl = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
-      const paymentOptions = getPaymentOptionsHtml(estimatedCost, paymentLink, siteUrl, paymentMethod);
+      const paymentOptions = getPaymentOptionsHtml(
+        estimatedCost,
+        paymentLink,
+        siteUrl,
+        paymentMethod,
+        paymentSettings,
+        requestNumber
+      );
       
       return {
         subject: `✅ Demande approuvée - En attente de paiement - ${requestNumber}`,
@@ -311,17 +393,35 @@ serve(async (req) => {
     );
     
     const notification: NotificationRequest = await req.json();
+
+     // Résoudre l'email du destinataire si non fourni (lookup auth.users via admin API)
+     let recipientEmail = notification.recipientEmail;
+     if (!recipientEmail) {
+       if (!notification.recipientId) {
+         throw new Error("recipientEmail ou recipientId est requis");
+       }
+       const { data: userData, error: userError } = await supabase.auth.admin.getUserById(notification.recipientId);
+       if (userError) throw userError;
+       recipientEmail = userData.user?.email;
+     }
+
+     if (!recipientEmail) {
+       throw new Error("Impossible de déterminer l'email du destinataire");
+     }
+
+     // Charger settings paiement
+     const paymentSettings = await loadPaymentSettings(supabase);
     
     console.log("[REPRODUCTION-NOTIF] Sending notification:", {
       type: notification.notificationType,
-      to: notification.recipientEmail,
+      to: recipientEmail,
       requestNumber: notification.requestNumber
     });
 
     // Enregistrer la notification dans la base (optionnel)
     try {
-      await supabase.from('notifications').insert({
-        user_id: notification.recipientId,
+        await supabase.from('notifications').insert({
+          user_id: notification.recipientId,
         type: 'reproduction',
         title: `Demande de reproduction ${notification.notificationType}`,
         message: `Mise à jour pour la demande ${notification.requestNumber}`,
@@ -338,11 +438,11 @@ serve(async (req) => {
       console.warn("[REPRODUCTION-NOTIF] Could not save to notifications table:", dbError);
     }
 
-    const emailContent = getEmailContent(notification);
+    const emailContent = getEmailContent(notification, paymentSettings);
     
     // Utiliser le client SMTP unifié
     const result = await sendEmail({
-      to: notification.recipientEmail,
+      to: recipientEmail,
       subject: emailContent.subject,
       html: emailContent.html
     });

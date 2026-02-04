@@ -11,7 +11,7 @@ interface PaymentLinkRequest {
   requestId: string;
   amount: number;
   requestNumber: string;
-  userEmail: string;
+  userEmail?: string;
   userId: string;
   description?: string;
 }
@@ -22,18 +22,30 @@ serve(async (req) => {
   }
 
   try {
-    const { requestId, amount, requestNumber, userEmail, userId, description }: PaymentLinkRequest = await req.json();
+    const { requestId, amount, requestNumber, userEmail: providedEmail, userId, description }: PaymentLinkRequest = await req.json();
 
-    console.log("[GENERATE-PAYMENT-LINK] Creating payment link for:", { requestId, requestNumber, amount, userEmail });
+    console.log("[GENERATE-PAYMENT-LINK] Creating payment link for:", { requestId, requestNumber, amount, userId });
 
-    if (!requestId || !amount || !requestNumber || !userEmail || !userId) {
-      throw new Error("Paramètres manquants: requestId, amount, requestNumber, userEmail, userId sont requis");
+    if (!requestId || !amount || !requestNumber || !userId) {
+      throw new Error("Paramètres manquants: requestId, amount, requestNumber, userId sont requis");
     }
 
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
+
+    // Résoudre l'email du payeur si non fourni
+    let userEmail = providedEmail;
+    if (!userEmail) {
+      const { data: userData, error: userError } = await supabaseClient.auth.admin.getUserById(userId);
+      if (userError) throw userError;
+      userEmail = userData.user?.email;
+    }
+
+    if (!userEmail) {
+      throw new Error("Impossible de déterminer l'email du payeur");
+    }
 
     // Initialiser Stripe
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
@@ -124,18 +136,30 @@ serve(async (req) => {
       })
       .eq('id', transaction.id);
 
-    // Sauvegarder le lien de paiement dans la demande de reproduction
+    // Sauvegarder le lien de paiement dans la demande de reproduction (merge metadata)
+    const { data: existingRequest, error: existingRequestError } = await supabaseClient
+      .from("reproduction_requests")
+      .select("metadata")
+      .eq("id", requestId)
+      .maybeSingle();
+
+    if (existingRequestError) {
+      console.warn("[GENERATE-PAYMENT-LINK] Could not fetch existing metadata:", existingRequestError);
+    }
+
+    const existingMetadata = (existingRequest as any)?.metadata ?? {};
+    const mergedMetadata = {
+      ...(existingMetadata || {}),
+      payment_link: session.url,
+      payment_session_id: session.id,
+      payment_transaction_id: transaction.id,
+      payment_link_generated_at: new Date().toISOString(),
+    };
+
     await supabaseClient
-      .from('reproduction_requests')
-      .update({
-        metadata: {
-          payment_link: session.url,
-          payment_session_id: session.id,
-          payment_transaction_id: transaction.id,
-          payment_link_generated_at: new Date().toISOString(),
-        }
-      })
-      .eq('id', requestId);
+      .from("reproduction_requests")
+      .update({ metadata: mergedMetadata } as any)
+      .eq("id", requestId);
 
     console.log("[GENERATE-PAYMENT-LINK] Payment link generated:", session.url);
 
