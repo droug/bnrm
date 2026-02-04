@@ -24,8 +24,14 @@ import {
   DollarSign,
   FileImage,
   X,
-  GitBranch
+  GitBranch,
+  ExternalLink
 } from "lucide-react";
+
+// Helper pour obtenir le domaine public (force le domaine de production)
+const getPublicSiteOrigin = () => {
+  return "https://bnrm-dev.digiup.ma";
+};
 import { format } from "date-fns";
 import { fr, arDZ } from "date-fns/locale";
 import { Button } from "@/components/ui/button";
@@ -242,6 +248,37 @@ export function ReproductionDetailsSheet({ requestId, open, onOpenChange }: Repr
                   {formatDate(request.submitted_at)}
                 </span>
               </div>
+
+              {/* Lien vers le document */}
+              {(request.metadata?.document_id || request.metadata?.cbn_document_id) && (
+                <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium text-sm">
+                        {language === "ar" ? "الوثيقة المطلوبة" : "Document demandé"}
+                      </h4>
+                      {request.metadata?.document_title && (
+                        <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
+                          {request.metadata.document_title}
+                        </p>
+                      )}
+                    </div>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="gap-2"
+                      onClick={() => {
+                        const docId = request.metadata?.document_id || request.metadata?.cbn_document_id;
+                        const url = `${getPublicSiteOrigin()}/digital-library/document/${docId}`;
+                        window.open(url, '_blank');
+                      }}
+                    >
+                      <ExternalLink className="h-4 w-4" />
+                      {language === "ar" ? "فتح الوثيقة" : "Ouvrir le document"}
+                    </Button>
+                  </div>
+                </div>
+              )}
 
               {/* Informations générales */}
               <div className="space-y-4">
