@@ -373,15 +373,16 @@ export function ReproductionDetailsSheet({ requestId, open, onOpenChange }: Prop
                               Réf: {item.reference || doc?.cbn_document_id || "-"}
                             </p>
                             
-                            {/* Document link */}
+                            {/* Document link - PROMINENT */}
                             {doc && (
                               <Link 
                                 to={`/bibliotheque-numerique/document/${doc.id}`}
-                                className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-2"
                                 target="_blank"
+                                className="inline-flex items-center gap-2 mt-3 px-3 py-2 bg-primary/10 hover:bg-primary/20 text-primary rounded-md transition-colors text-sm font-medium"
                               >
+                                <BookOpen className="h-4 w-4" />
+                                Ouvrir le document
                                 <ExternalLink className="h-3 w-3" />
-                                Voir le document
                               </Link>
                             )}
                           </div>
@@ -393,10 +394,6 @@ export function ReproductionDetailsSheet({ requestId, open, onOpenChange }: Prop
                             <div>
                               <span className="text-muted-foreground">Format(s):</span>
                               <span className="ml-1 font-medium">{item.formats?.join(", ") || "-"}</span>
-                            </div>
-                            <div>
-                              <span className="text-muted-foreground">Pages:</span>
-                              <span className="ml-1 font-medium">{item.pages_specification || "Toutes"}</span>
                             </div>
                             <div>
                               <span className="text-muted-foreground">Pages:</span>
