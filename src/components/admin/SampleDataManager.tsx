@@ -158,24 +158,26 @@ export function SampleDataManager() {
             Ajouter ou supprimer des données de test pour le système
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex flex-wrap gap-3">
-          <Button
-            onClick={handleAddSampleData}
-            disabled={isAdding}
-            className="flex-1 min-w-[200px]"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            {isAdding ? "Ajout en cours..." : "Ajouter données d'exemple"}
-          </Button>
-          <Button
-            onClick={() => setShowDeleteConfirm(true)}
-            disabled={isDeleting}
-            variant="destructive"
-            className="flex-1 min-w-[200px]"
-          >
-            <Trash2 className="w-4 h-4 mr-2" />
-            Supprimer toutes les données
-          </Button>
+        <CardContent>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button
+              onClick={handleAddSampleData}
+              disabled={isAdding}
+              className="flex-1"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              {isAdding ? "Ajout en cours..." : "Ajouter données d'exemple"}
+            </Button>
+            <Button
+              onClick={() => setShowDeleteConfirm(true)}
+              disabled={isDeleting}
+              variant="destructive"
+              className="flex-1"
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              Supprimer toutes les données
+            </Button>
+          </div>
         </CardContent>
       </Card>
 
