@@ -229,7 +229,7 @@ export function ReproductionDetailsSheet({ requestId, open, onOpenChange }: Prop
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent side="left" className="w-full sm:max-w-xl md:max-w-2xl p-0">
+      <SheetContent side="right" className="w-full sm:max-w-xl md:max-w-2xl p-0">
         <SheetHeader className="p-6 pb-4 border-b bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-950/20 dark:to-blue-950/20">
           <div className="flex items-center justify-between">
             <div>
@@ -353,7 +353,7 @@ export function ReproductionDetailsSheet({ requestId, open, onOpenChange }: Prop
                       {/* Document link - PROMINENT */}
                       {document && (
                         <Link 
-                          to={`/bibliotheque-numerique/document/${document.id}`}
+                          to={`/digital-library/document/${document.id}`}
                           target="_blank"
                           className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md transition-colors text-sm font-medium shadow-sm"
                         >
@@ -365,7 +365,7 @@ export function ReproductionDetailsSheet({ requestId, open, onOpenChange }: Prop
                       
                       {!document && metadata?.document_id && (
                         <Link 
-                          to={`/bibliotheque-numerique/document/${metadata.document_id}`}
+                          to={`/digital-library/document/${metadata.document_id}`}
                           target="_blank"
                           className="inline-flex items-center gap-2 mt-4 px-4 py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md transition-colors text-sm font-medium shadow-sm"
                         >
