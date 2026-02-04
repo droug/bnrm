@@ -228,8 +228,8 @@ export default function ReproductionManager() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold">Gestion des Demandes de Reproduction</h2>
-          <p className="text-muted-foreground">Suivi et validation des demandes de reproduction</p>
+          <h2 className="text-2xl font-bold">Gestion des Documents de Reproduction</h2>
+          <p className="text-muted-foreground">Suivi et validation des documents de reproduction</p>
         </div>
         <div className="flex items-center gap-2">
           <Label>Délai d'alerte (jours)</Label>
@@ -361,7 +361,7 @@ export default function ReproductionManager() {
         <TabsContent value="pending_reproduction">
           <Card>
             <CardHeader>
-              <CardTitle>Demandes à reproduire</CardTitle>
+              <CardTitle>Documents à reproduire</CardTitle>
               <CardDescription>
                 Documents en attente de reproduction après validation comptable
               </CardDescription>
