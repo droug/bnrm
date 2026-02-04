@@ -88,7 +88,7 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
           </div>
           
           <h2 className="text-[48px] font-normal font-gilda text-slate-dark mb-6">
-            Ibn Battúta en chiffres
+            Ibn Battuta en chiffres
           </h2>
           
           <p className="font-body text-lg text-slate-text max-w-2xl mx-auto">
