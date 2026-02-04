@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AlertCircle, CheckCircle, XCircle, Clock, Copy, Eye, Filter, Printer, Send } from "lucide-react";
 import { format } from "date-fns";
+import { ReproductionDetailsSheet } from "./ReproductionDetailsSheet";
 
 interface ReproductionRequest {
   id: string;
@@ -37,6 +38,8 @@ export default function ReproductionManager() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [selectedRequest, setSelectedRequest] = useState<ReproductionRequest | null>(null);
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
+  const [detailsSheetOpen, setDetailsSheetOpen] = useState(false);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
   const [showActionDialog, setShowActionDialog] = useState(false);
   const [showReproductionCompleteDialog, setShowReproductionCompleteDialog] = useState(false);
@@ -68,23 +71,6 @@ export default function ReproductionManager() {
   const requests = allRequests?.filter(r => {
     if (statusFilter === 'all') return true;
     return r.status === statusFilter;
-  });
-
-  // Fetch reproduction items for a specific request
-  const { data: requestItems } = useQuery({
-    queryKey: ['reproduction-items', selectedRequest?.id],
-    queryFn: async () => {
-      if (!selectedRequest) return null;
-      
-      const { data, error } = await supabase
-        .from('reproduction_items')
-        .select('*')
-        .eq('request_id', selectedRequest.id);
-      
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!selectedRequest
   });
 
   // Update request status
@@ -404,14 +390,16 @@ export default function ReproductionManager() {
                         <TableCell>
                           <div className="flex gap-2">
                             <Button
-                              variant="ghost"
+                              variant="outline"
                               size="sm"
                               onClick={() => {
-                                setSelectedRequest(request);
-                                setShowDetailsDialog(true);
+                                setSelectedRequestId(request.id);
+                                setDetailsSheetOpen(true);
                               }}
+                              className="gap-1"
                             >
                               <Eye className="h-4 w-4" />
+                              Détails
                             </Button>
                             <Button
                               size="sm"
@@ -453,7 +441,7 @@ export default function ReproductionManager() {
                       <TableHead>N° Demande</TableHead>
                       <TableHead>Modalité</TableHead>
                       <TableHead>Date soumission</TableHead>
-                      <TableHead>Statut</TableHead>
+                      <TableHead>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -462,7 +450,20 @@ export default function ReproductionManager() {
                         <TableCell className="font-medium">{request.request_number}</TableCell>
                         <TableCell>{request.reproduction_modality}</TableCell>
                         <TableCell>{format(new Date(request.submitted_at), 'dd/MM/yyyy HH:mm')}</TableCell>
-                        <TableCell>{getStatusBadge(request.status)}</TableCell>
+                        <TableCell>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedRequestId(request.id);
+                              setDetailsSheetOpen(true);
+                            }}
+                            className="gap-1"
+                          >
+                            <Eye className="h-4 w-4" />
+                            Détails
+                          </Button>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -524,14 +525,16 @@ export default function ReproductionManager() {
                         <TableCell>
                           <div className="flex gap-2">
                             <Button
-                              variant="ghost"
+                              variant="outline"
                               size="sm"
                               onClick={() => {
-                                setSelectedRequest(request);
-                                setShowDetailsDialog(true);
+                                setSelectedRequestId(request.id);
+                                setDetailsSheetOpen(true);
                               }}
+                              className="gap-1"
                             >
                               <Eye className="h-4 w-4" />
+                              Détails
                             </Button>
                             {request.status === 'en_traitement' && (
                               <Button
@@ -554,82 +557,6 @@ export default function ReproductionManager() {
           </Card>
         </TabsContent>
       </Tabs>
-
-      {/* Details Dialog */}
-      <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
-        <DialogContent className="max-w-3xl">
-          <DialogHeader>
-            <DialogTitle>Détails de la demande {selectedRequest?.request_number}</DialogTitle>
-            <DialogDescription>
-              Informations complètes sur la demande de reproduction
-            </DialogDescription>
-          </DialogHeader>
-          {selectedRequest && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label>Modalité de reproduction</Label>
-                  <p className="text-sm font-medium">{selectedRequest.reproduction_modality}</p>
-                </div>
-                <div>
-                  <Label>Statut actuel</Label>
-                  <div className="mt-1">{getStatusBadge(selectedRequest.status)}</div>
-                </div>
-                <div>
-                  <Label>Date de soumission</Label>
-                  <p className="text-sm">{format(new Date(selectedRequest.submitted_at), 'dd/MM/yyyy HH:mm')}</p>
-                </div>
-              </div>
-              
-              {selectedRequest.user_notes && (
-                <div>
-                  <Label>Notes de l'utilisateur</Label>
-                  <p className="text-sm mt-1 p-3 bg-muted rounded">{selectedRequest.user_notes}</p>
-                </div>
-              )}
-
-              {selectedRequest.service_validation_notes && (
-                <div>
-                  <Label>Notes de validation service</Label>
-                  <p className="text-sm mt-1 p-3 bg-muted rounded">{selectedRequest.service_validation_notes}</p>
-                </div>
-              )}
-
-              {selectedRequest.rejection_reason && (
-                <div>
-                  <Label>Raison du refus</Label>
-                  <p className="text-sm mt-1 p-3 bg-destructive/10 text-destructive rounded">
-                    {selectedRequest.rejection_reason}
-                  </p>
-                </div>
-              )}
-
-              {requestItems && requestItems.length > 0 && (
-                <div>
-                  <Label>Items demandés ({requestItems.length})</Label>
-                  <div className="mt-2 space-y-2">
-                    {requestItems.map((item: any) => (
-                      <div key={item.id} className="p-3 border rounded">
-                        <p className="font-medium">{item.document_title}</p>
-                        <div className="grid grid-cols-3 gap-2 mt-2 text-sm text-muted-foreground">
-                          <span>Type: {item.type_item}</span>
-                          <span>Format: {item.format_demande}</span>
-                          <span>Quantité: {item.quantity}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDetailsDialog(false)}>
-              Fermer
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Action Dialog */}
       <Dialog open={showActionDialog} onOpenChange={setShowActionDialog}>
@@ -716,6 +643,13 @@ export default function ReproductionManager() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Details Sheet */}
+      <ReproductionDetailsSheet
+        requestId={selectedRequestId}
+        open={detailsSheetOpen}
+        onOpenChange={setDetailsSheetOpen}
+      />
     </div>
   );
 }
