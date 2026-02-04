@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Settings, Shield, FileText, Clock, Archive, Scale, Library, UserCog, Calendar, Wrench } from "lucide-react";
+import { Settings, Shield, FileText, Clock, Archive, Scale, Library, UserCog, Calendar, Wrench, CreditCard } from "lucide-react";
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useNavigate } from "react-router-dom";
@@ -78,6 +78,13 @@ export function AdminSettingsCards() {
       title: "Demandes de restauration",
       description: "Gestion des demandes de restauration de manuscrits",
       href: "/admin/restoration-requests",
+      permission: "content.manage"
+    },
+    {
+      icon: CreditCard,
+      title: "Paiement Électronique",
+      description: "Paramétrage de l'interconnexion CMI et passerelles de paiement",
+      href: "/admin/payment-gateway",
       permission: "content.manage"
     }
   ];
