@@ -65,8 +65,16 @@ serve(async (req) => {
           .eq("id", request_id)
           .single();
         requestData = reproduction;
+        // Extraire le lien de paiement depuis les metadata si disponible
+        const paymentLink = reproduction?.metadata?.payment_link;
+        const reproductionAdditionalData = {
+          ...additional_data,
+          payment_link: paymentLink,
+          payment_amount: reproduction?.payment_amount,
+          rejection_reason: reproduction?.rejection_reason,
+        };
         emailSubject = getReproductionEmailSubject(notification_type, requestData);
-        emailHtml = getReproductionEmailHtml(notification_type, requestData, additional_data);
+        emailHtml = getReproductionEmailHtml(notification_type, requestData, reproductionAdditionalData);
         break;
 
       case "booking":
@@ -338,31 +346,138 @@ function getLegalDepositEmailHtml(type: string, data: any, additionalData: any):
 function getReproductionEmailSubject(type: string, data: any): string {
   switch (type) {
     case "created":
+    case "soumise":
       return `Demande de reproduction enregistrée - ${data.request_number}`;
+    case "en_validation_service":
+      return `Votre demande de reproduction est en cours de validation - ${data.request_number}`;
+    case "en_validation_responsable":
+      return `Votre demande de reproduction a été validée par le service - ${data.request_number}`;
+    case "en_attente_paiement":
+      return `💳 Paiement requis - Demande de reproduction ${data.request_number}`;
     case "approved":
       return `Votre demande de reproduction a été approuvée - ${data.request_number}`;
+    case "en_traitement":
+      return `Votre reproduction est en cours de traitement - ${data.request_number}`;
+    case "terminee":
     case "ready":
-      return `Votre commande de reproduction est prête - ${data.request_number}`;
+      return `🎉 Votre reproduction est prête - ${data.request_number}`;
+    case "refusee":
+    case "rejected":
+      return `Demande de reproduction refusée - ${data.request_number}`;
     default:
       return `Notification - Demande de reproduction ${data.request_number}`;
   }
 }
 
 function getReproductionEmailHtml(type: string, data: any, additionalData: any): string {
+  const paymentAmount = data.payment_amount || additionalData?.payment_amount;
+  const paymentLink = additionalData?.payment_link;
+  const rejectionReason = data.rejection_reason || additionalData?.rejection_reason;
+  
+  let statusBadge = '';
+  let statusClass = 'status-pending';
+  
+  switch (type) {
+    case "created":
+    case "soumise":
+      statusBadge = 'Reçue';
+      statusClass = 'status-created';
+      break;
+    case "en_validation_service":
+    case "en_validation_responsable":
+      statusBadge = 'En validation';
+      statusClass = 'status-pending';
+      break;
+    case "en_attente_paiement":
+      statusBadge = 'En attente de paiement';
+      statusClass = 'status-pending';
+      break;
+    case "approved":
+    case "en_traitement":
+      statusBadge = 'Approuvée';
+      statusClass = 'status-approved';
+      break;
+    case "terminee":
+    case "ready":
+      statusBadge = 'Prête';
+      statusClass = 'status-approved';
+      break;
+    case "refusee":
+    case "rejected":
+      statusBadge = 'Refusée';
+      statusClass = 'status-rejected';
+      break;
+    default:
+      statusBadge = data.status || 'En cours';
+  }
+  
   let content = `
-    <h2 style="color: #002B45;">Notification - Demande de reproduction</h2>
+    <h2 style="color: #002B45;">📚 Service de Reproduction</h2>
     <div class="info-box">
       <p><strong>Numéro de demande:</strong> ${data.request_number}</p>
-      <p><strong>Statut:</strong> ${data.status || 'N/A'}</p>
+      <p><strong>Statut:</strong> <span class="status ${statusClass}">${statusBadge}</span></p>
+      ${paymentAmount ? `<p><strong>Montant:</strong> ${paymentAmount} DH</p>` : ''}
     </div>
   `;
 
-  if (type === "created") {
-    content += `<p>Votre demande de reproduction a été enregistrée. Nous la traiterons dans les meilleurs délais.</p>`;
-  } else if (type === "approved") {
+  if (type === "created" || type === "soumise") {
+    content += `
+      <p>Votre demande de reproduction a été <strong>enregistrée avec succès</strong>.</p>
+      <p>Elle sera examinée par notre équipe dans les meilleurs délais.</p>
+      <h3>📌 Prochaines étapes</h3>
+      <ol>
+        <li>Validation de votre demande par notre équipe</li>
+        <li>Envoi du devis définitif</li>
+        <li>Paiement et traitement</li>
+        <li>Réception de votre reproduction</li>
+      </ol>
+    `;
+  } else if (type === "en_validation_service") {
+    content += `<p>Votre demande est actuellement en cours de validation par notre service de reproduction.</p>`;
+  } else if (type === "en_validation_responsable") {
+    content += `<p>Votre demande a été validée par le service de reproduction et est en attente d'approbation finale par le responsable.</p>`;
+  } else if (type === "en_attente_paiement") {
+    content += `
+      <p>Votre demande de reproduction a été <strong>approuvée</strong> et est prête pour le paiement.</p>
+      ${paymentAmount ? `
+        <div style="background: linear-gradient(135deg, #002B45 0%, #004d7a 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; margin: 20px 0;">
+          <p style="margin: 0; font-size: 14px;">Montant à régler</p>
+          <p style="margin: 10px 0; font-size: 32px; font-weight: bold;">${paymentAmount} DH</p>
+        </div>
+      ` : ''}
+      ${paymentLink ? `
+        <div style="text-align: center; margin: 25px 0;">
+          <a href="${paymentLink}" style="display: inline-block; background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; padding: 15px 40px; text-decoration: none; border-radius: 8px; font-size: 18px; font-weight: bold; box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);">
+            💳 Payer maintenant
+          </a>
+        </div>
+        <p style="text-align: center; font-size: 12px; color: #666;">
+          Ce lien de paiement est valable pendant 7 jours.<br>
+          Vous pouvez également payer depuis votre espace personnel.
+        </p>
+      ` : `
+        <p>Veuillez vous connecter à votre espace personnel pour procéder au paiement.</p>
+      `}
+    `;
+  } else if (type === "approved" || type === "en_traitement") {
     content += `<p>Votre demande de reproduction a été approuvée et est en cours de traitement.</p>`;
-  } else if (type === "ready") {
-    content += `<p>Votre commande de reproduction est prête. Vous pouvez venir la récupérer.</p>`;
+  } else if (type === "terminee" || type === "ready") {
+    content += `
+      <p>🎉 Votre commande de reproduction est <strong>prête</strong> !</p>
+      <h3>📍 Retrait</h3>
+      <p>Vous pouvez récupérer votre reproduction au <strong>Service de reproduction</strong> de la Bibliothèque Nationale, du lundi au vendredi de 9h à 16h.</p>
+      <p>N'oubliez pas de vous munir d'une pièce d'identité et de votre numéro de demande.</p>
+    `;
+  } else if (type === "refusee" || type === "rejected") {
+    content += `
+      <p>Nous regrettons de vous informer que votre demande de reproduction n'a pas pu être acceptée.</p>
+      ${rejectionReason ? `
+        <div style="background: #fff3e0; padding: 15px; border-radius: 5px; margin: 15px 0; border-left: 4px solid #f57c00;">
+          <p style="margin: 0;"><strong>Motif:</strong> ${rejectionReason}</p>
+        </div>
+      ` : ''}
+      <p>Pour plus d'informations, vous pouvez contacter notre service de reproduction.</p>
+    `;
   }
 
   return getEmailBase(content);
