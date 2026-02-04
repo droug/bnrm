@@ -58,7 +58,7 @@ export function ReproductionBackoffice() {
       const { data, error } = await supabase
         .from("reproduction_requests")
         .select("*")
-        .in("status", ["soumise", "en_validation_service", "en_validation_responsable", "payee", "en_validation_comptabilite"])
+        .in("status", ["soumise", "en_validation_service", "en_validation_responsable", "paiement_recu"] as any[])
         .order("submitted_at", { ascending: true });
 
       if (error) throw error;
@@ -206,6 +206,52 @@ export function ReproductionBackoffice() {
     }
   };
 
+  const handleAccountingApproval = async (requestId: string, approve: boolean) => {
+    setIsProcessing(true);
+    try {
+      const { error } = await supabase
+        .from("reproduction_requests")
+        .update({
+          status: approve ? "terminee" : "refusee",
+          accounting_validator_id: user?.id,
+          accounting_validated_at: new Date().toISOString(),
+          accounting_validation_notes: validationNotes,
+          rejection_reason: approve ? null : validationNotes,
+          rejected_by: approve ? null : user?.id,
+          rejected_at: approve ? null : new Date().toISOString(),
+        } as any)
+        .eq("id", requestId);
+
+      if (error) throw error;
+
+      // Create notification
+      await supabase.from("reproduction_notifications").insert({
+        request_id: requestId,
+        recipient_id: selectedRequest?.user_id,
+        notification_type: approve ? "comptabilite_approved" : "rejection",
+        title: approve
+          ? language === "ar" ? "تم التحقق من الدفع" : "Paiement validé par la comptabilité"
+          : language === "ar" ? "تم رفض طلبك" : "Votre demande a été refusée",
+        message: validationNotes,
+      } as any);
+
+      toast.success(
+        approve
+          ? language === "ar" ? "تم التحقق من الدفع" : "Paiement validé - Demande terminée"
+          : language === "ar" ? "تم الرفض" : "Demande refusée"
+      );
+
+      setShowDialog(false);
+      setValidationNotes("");
+      fetchPendingRequests();
+    } catch (error: any) {
+      console.error("Error processing request:", error);
+      toast.error(language === "ar" ? "خطأ في المعالجة" : "Erreur de traitement");
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
   const openValidationDialog = (request: ReproductionRequest, action: "approve" | "reject") => {
     setSelectedRequest(request);
     setDialogAction(action);
@@ -220,6 +266,7 @@ export function ReproductionBackoffice() {
 
   const pendingService = requests.filter(r => r.status === "soumise" || r.status === "en_validation_service");
   const pendingManager = requests.filter(r => r.status === "en_validation_responsable");
+  const pendingAccounting = requests.filter(r => r.status === "paiement_recu");
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -233,7 +280,7 @@ export function ReproductionBackoffice() {
       </div>
 
       <Tabs defaultValue="service" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="service" className="gap-2">
             <Clock className="h-4 w-4" />
             {language === "ar" ? "تحقق الخدمة" : "Validation Service"}
@@ -246,6 +293,13 @@ export function ReproductionBackoffice() {
             {language === "ar" ? "موافقة المسؤول" : "Approbation Responsable"}
             {pendingManager.length > 0 && (
               <Badge variant="destructive" className="ml-2">{pendingManager.length}</Badge>
+            )}
+          </TabsTrigger>
+          <TabsTrigger value="accounting" className="gap-2">
+            <Calculator className="h-4 w-4" />
+            {language === "ar" ? "التحقق المحاسبي" : "Validation Comptabilité"}
+            {pendingAccounting.length > 0 && (
+              <Badge variant="destructive" className="ml-2">{pendingAccounting.length}</Badge>
             )}
           </TabsTrigger>
         </TabsList>
@@ -277,6 +331,7 @@ export function ReproductionBackoffice() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  <WorkflowSteps currentStatus={request.status} className="mb-6" />
                   {request.user_notes && (
                     <div>
                       <h4 className="font-medium mb-2">
@@ -345,6 +400,7 @@ export function ReproductionBackoffice() {
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  <WorkflowSteps currentStatus={request.status} className="mb-6" />
                   {request.service_validation_notes && (
                     <div>
                       <h4 className="font-medium mb-2">
@@ -385,6 +441,86 @@ export function ReproductionBackoffice() {
             ))
           )}
         </TabsContent>
+
+        <TabsContent value="accounting" className="space-y-4 mt-6">
+          {pendingAccounting.length === 0 ? (
+            <Card>
+              <CardContent className="p-12 text-center">
+                <Calculator className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
+                <p className="text-muted-foreground">
+                  {language === "ar" ? "لا توجد مدفوعات تنتظر التحقق" : "Aucun paiement en attente de validation"}
+                </p>
+              </CardContent>
+            </Card>
+          ) : (
+            pendingAccounting.map((request) => (
+              <Card key={request.id}>
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <CardTitle>{request.request_number}</CardTitle>
+                      <CardDescription>
+                        {language === "ar" ? "تم الدفع في" : "Payée le"} {formatDate(request.paid_at || request.submitted_at)}
+                      </CardDescription>
+                    </div>
+                    <Badge variant="outline" className="border-primary/50 bg-primary/10 text-primary">
+                      <DollarSign className="h-3 w-3 mr-1" />
+                      {language === "ar" ? "مدفوعة" : "Payée"}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <WorkflowSteps currentStatus={request.status} className="mb-6" />
+                  {request.payment_amount && (
+                    <div className="p-4 bg-muted rounded-lg">
+                      <h4 className="font-medium mb-2">
+                        {language === "ar" ? "معلومات الدفع:" : "Informations de paiement:"}
+                      </h4>
+                      <p className="text-lg font-bold text-primary">
+                        {request.payment_amount.toFixed(2)} MAD
+                      </p>
+                    </div>
+                  )}
+                  {request.manager_validation_notes && (
+                    <div>
+                      <h4 className="font-medium mb-2">
+                        {language === "ar" ? "ملاحظات المسؤول:" : "Notes du responsable:"}
+                      </h4>
+                      <p className="text-sm text-muted-foreground">{request.manager_validation_notes}</p>
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedRequestId(request.id);
+                        setDetailsSheetOpen(true);
+                      }}
+                    >
+                      <Eye className="h-4 w-4 mr-2" />
+                      {language === "ar" ? "عرض التفاصيل" : "Voir détails"}
+                    </Button>
+                    <Button
+                      variant="default"
+                      onClick={() => openValidationDialog(request, "approve")}
+                    >
+                      <CheckCircle className="h-4 w-4 mr-2" />
+                      {language === "ar" ? "تأكيد الدفع" : "Confirmer le paiement"}
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      onClick={() => openValidationDialog(request, "reject")}
+                    >
+                      <XCircle className="h-4 w-4 mr-2" />
+                      {language === "ar" ? "رفض" : "Rejeter"}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))
+          )}
+        </TabsContent>
       </Tabs>
 
       <Dialog open={showDialog} onOpenChange={setShowDialog}>
@@ -416,8 +552,10 @@ export function ReproductionBackoffice() {
                 if (!selectedRequest) return;
                 if (selectedRequest.status === "soumise" || selectedRequest.status === "en_validation_service") {
                   handleServiceValidation(selectedRequest.id, dialogAction === "approve");
-                } else {
+                } else if (selectedRequest.status === "en_validation_responsable") {
                   handleManagerApproval(selectedRequest.id, dialogAction === "approve");
+                } else if (selectedRequest.status === "paiement_recu") {
+                  handleAccountingApproval(selectedRequest.id, dialogAction === "approve");
                 }
               }}
               disabled={isProcessing}

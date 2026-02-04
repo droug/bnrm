@@ -14,7 +14,7 @@ const WORKFLOW_STEPS: WorkflowStep[] = [
   { key: "en_validation_service", labelFr: "Validation Service", labelAr: "تحقق الخدمة", icon: Clock },
   { key: "en_validation_responsable", labelFr: "Approbation Responsable", labelAr: "موافقة المسؤول", icon: UserCheck },
   { key: "en_attente_paiement", labelFr: "Paiement", labelAr: "الدفع", icon: CreditCard },
-  { key: "en_validation_comptabilite", labelFr: "Validation Comptabilité", labelAr: "التحقق المحاسبي", icon: Calculator },
+  { key: "paiement_recu", labelFr: "Validation Comptabilité", labelAr: "التحقق المحاسبي", icon: Calculator },
   { key: "terminee", labelFr: "Terminée", labelAr: "منتهية", icon: Check },
 ];
 
@@ -24,8 +24,7 @@ const STATUS_TO_STEP: Record<string, number> = {
   en_validation_service: 1,
   en_validation_responsable: 2,
   en_attente_paiement: 3,
-  payee: 4,
-  en_validation_comptabilite: 4,
+  paiement_recu: 4,
   terminee: 5,
   refusee: -1,
 };
@@ -111,8 +110,7 @@ export function getStatusLabel(status: string, language: string): string {
     en_validation_service: { fr: "En validation service", ar: "قيد التحقق" },
     en_validation_responsable: { fr: "En attente approbation", ar: "في انتظار الموافقة" },
     en_attente_paiement: { fr: "En attente de paiement", ar: "في انتظار الدفع" },
-    payee: { fr: "Payée", ar: "مدفوعة" },
-    en_validation_comptabilite: { fr: "En validation comptabilité", ar: "قيد التحقق المحاسبي" },
+    paiement_recu: { fr: "En validation comptabilité", ar: "قيد التحقق المحاسبي" },
     terminee: { fr: "Terminée", ar: "منتهية" },
     refusee: { fr: "Refusée", ar: "مرفوضة" },
   };

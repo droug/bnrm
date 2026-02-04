@@ -10516,6 +10516,9 @@ export type Database = {
       }
       reproduction_requests: {
         Row: {
+          accounting_validated_at: string | null
+          accounting_validation_notes: string | null
+          accounting_validator_id: string | null
           available_at: string | null
           created_at: string | null
           download_count: number | null
@@ -10549,6 +10552,9 @@ export type Database = {
           user_notes: string | null
         }
         Insert: {
+          accounting_validated_at?: string | null
+          accounting_validation_notes?: string | null
+          accounting_validator_id?: string | null
           available_at?: string | null
           created_at?: string | null
           download_count?: number | null
@@ -10582,6 +10588,9 @@ export type Database = {
           user_notes?: string | null
         }
         Update: {
+          accounting_validated_at?: string | null
+          accounting_validation_notes?: string | null
+          accounting_validator_id?: string | null
           available_at?: string | null
           created_at?: string | null
           download_count?: number | null
