@@ -1,0 +1,52 @@
+-- Insérer 2 expositions virtuelles de démonstration
+INSERT INTO vexpo_exhibitions (
+  slug, 
+  status, 
+  title_fr, 
+  title_ar, 
+  teaser_fr, 
+  teaser_ar,
+  intro_fr,
+  intro_ar,
+  cover_image_url,
+  cta_title_fr,
+  cta_title_ar,
+  visitor_count,
+  published_at,
+  created_at,
+  updated_at
+) VALUES 
+(
+  'visite-virtuelle-bnrm',
+  'published',
+  'Visite Virtuelle de la BNRM',
+  'جولة افتراضية في المكتبة الوطنية',
+  'Découvrez les trésors architecturaux et patrimoniaux de la Bibliothèque Nationale du Royaume du Maroc à travers une visite immersive à 360°.',
+  'اكتشف الكنوز المعمارية والتراثية للمكتبة الوطنية للمملكة المغربية من خلال جولة غامرة بتقنية 360 درجة.',
+  'Bienvenue dans cette visite virtuelle exceptionnelle de la Bibliothèque Nationale du Royaume du Maroc. Explorez nos salles de lecture, nos espaces d''exposition et découvrez notre riche patrimoine documentaire.',
+  'مرحبًا بكم في هذه الجولة الافتراضية الاستثنائية للمكتبة الوطنية للمملكة المغربية. استكشفوا قاعات المطالعة ومساحات العرض واكتشفوا تراثنا الوثائقي الغني.',
+  'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=1200',
+  'Commencer la visite',
+  'ابدأ الجولة',
+  1250,
+  NOW(),
+  NOW(),
+  NOW()
+),
+(
+  'manuscrits-anciens-maroc',
+  'published',
+  'Les Manuscrits Anciens du Maroc',
+  'المخطوطات القديمة للمغرب',
+  'Plongez dans l''univers fascinant des manuscrits historiques marocains, témoins précieux de notre riche héritage culturel et scientifique.',
+  'انغمس في عالم المخطوطات التاريخية المغربية الرائع، شهود ثمينة على تراثنا الثقافي والعلمي الغني.',
+  'Cette exposition virtuelle vous invite à découvrir une sélection exceptionnelle de manuscrits anciens conservés à la BNRM, datant du Moyen Âge à l''époque moderne.',
+  'يدعوكم هذا المعرض الافتراضي لاكتشاف مجموعة استثنائية من المخطوطات القديمة المحفوظة في المكتبة الوطنية، والتي تعود إلى العصور الوسطى حتى العصر الحديث.',
+  'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=1200',
+  'Explorer les manuscrits',
+  'استكشف المخطوطات',
+  890,
+  NOW(),
+  NOW(),
+  NOW()
+);
