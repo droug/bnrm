@@ -78,7 +78,7 @@ export function IbnBattoutaStatsSection({ section, language }: SectionProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   
   const stats: StatItem[] = section.props?.stats || defaultStats;
-  const title = language === 'ar' ? (section.title_ar || 'ابن بطوطة بالأرقام') : (section.title_fr || 'Ibn Battouta en chiffres');
+  const title = language === 'ar' ? (section.title_ar || 'ابن بطوطة بالأرقام') : (section.title_fr || 'Ibn Battúta en chiffres');
   const subtitle = language === 'ar' 
     ? (section.content_ar || 'اكتشف الوثائق المضافة حديثًا إلى مجموعاتنا')
     : (section.content_fr || 'Découvrez les documents récemment ajoutés à nos collections, soigneusement sélectionnés pour enrichir votre expérience.');
