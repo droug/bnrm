@@ -64,6 +64,8 @@ export default function RestorationRequests() {
   const [alertThresholdDays, setAlertThresholdDays] = useState(7);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [delayedCurrentPage, setDelayedCurrentPage] = useState(1);
+  const delayedItemsPerPage = 5;
 
   // Fetch all restoration requests
   const { data: allRequests, isLoading } = useQuery({
@@ -611,60 +613,92 @@ export default function RestorationRequests() {
             </div>
 
             {/* Delayed Requests Alert */}
-            {delayedRequests.length > 0 && (
-              <Card className="border-destructive/50">
-                <CardHeader>
-                  <div className="flex items-center gap-2">
-                    <AlertCircle className="h-5 w-5 text-destructive" />
-                    <CardTitle className="text-destructive">
-                      Demandes en retard ({delayedRequests.length})
-                    </CardTitle>
-                  </div>
-                  <CardDescription>
-                    Demandes dépassant le délai de {alertThresholdDays} jours
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>N° Demande</TableHead>
-                        <TableHead>Manuscrit</TableHead>
-                        <TableHead>Urgence</TableHead>
-                        <TableHead>Statut</TableHead>
-                        <TableHead>Date soumission</TableHead>
-                        <TableHead>Jours écoulés</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {delayedRequests.slice(0, 5).map((request) => {
-                        const daysElapsed = Math.floor((Date.now() - new Date(request.submitted_at).getTime()) / (1000 * 60 * 60 * 24));
-                        return (
-                          <TableRow key={request.id} className="cursor-pointer" onClick={() => {
-                            setSelectedRequest(request);
-                            setShowDetailsDialog(true);
-                          }}>
-                            <TableCell className="font-medium">{request.request_number}</TableCell>
-                            <TableCell>
-                              <div>
-                                <p className="font-medium">{request.manuscript_title}</p>
-                                <p className="text-xs text-muted-foreground">{request.manuscript_cote}</p>
-                              </div>
-                            </TableCell>
-                            <TableCell>{getUrgencyBadge(request.urgency_level)}</TableCell>
-                            <TableCell>{getStatusBadge(request.status)}</TableCell>
-                            <TableCell>{format(new Date(request.submitted_at), 'dd/MM/yyyy')}</TableCell>
-                            <TableCell>
-                              <Badge variant="destructive">{daysElapsed} jours</Badge>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            )}
+            {delayedRequests.length > 0 && (() => {
+              const delayedTotalPages = Math.ceil(delayedRequests.length / delayedItemsPerPage);
+              const delayedStartIndex = (delayedCurrentPage - 1) * delayedItemsPerPage;
+              const delayedEndIndex = delayedStartIndex + delayedItemsPerPage;
+              const paginatedDelayedRequests = delayedRequests.slice(delayedStartIndex, delayedEndIndex);
+              
+              return (
+                <Card className="border-destructive/50">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <AlertCircle className="h-5 w-5 text-destructive" />
+                        <CardTitle className="text-destructive">
+                          Demandes en retard ({delayedRequests.length})
+                        </CardTitle>
+                      </div>
+                      {delayedTotalPages > 1 && (
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setDelayedCurrentPage(prev => Math.max(1, prev - 1))}
+                            disabled={delayedCurrentPage === 1}
+                          >
+                            <ChevronLeft className="h-4 w-4" />
+                          </Button>
+                          <span className="text-sm text-muted-foreground">
+                            {delayedCurrentPage} / {delayedTotalPages}
+                          </span>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setDelayedCurrentPage(prev => Math.min(delayedTotalPages, prev + 1))}
+                            disabled={delayedCurrentPage === delayedTotalPages}
+                          >
+                            <ChevronRight className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                    <CardDescription>
+                      Demandes dépassant le délai de {alertThresholdDays} jours
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>N° Demande</TableHead>
+                          <TableHead>Manuscrit</TableHead>
+                          <TableHead>Urgence</TableHead>
+                          <TableHead>Statut</TableHead>
+                          <TableHead>Date soumission</TableHead>
+                          <TableHead>Jours écoulés</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {paginatedDelayedRequests.map((request) => {
+                          const daysElapsed = Math.floor((Date.now() - new Date(request.submitted_at).getTime()) / (1000 * 60 * 60 * 24));
+                          return (
+                            <TableRow key={request.id} className="cursor-pointer" onClick={() => {
+                              setSelectedRequest(request);
+                              setShowDetailsDialog(true);
+                            }}>
+                              <TableCell className="font-medium">{request.request_number}</TableCell>
+                              <TableCell>
+                                <div>
+                                  <p className="font-medium">{request.manuscript_title}</p>
+                                  <p className="text-xs text-muted-foreground">{request.manuscript_cote}</p>
+                                </div>
+                              </TableCell>
+                              <TableCell>{getUrgencyBadge(request.urgency_level)}</TableCell>
+                              <TableCell>{getStatusBadge(request.status)}</TableCell>
+                              <TableCell>{format(new Date(request.submitted_at), 'dd/MM/yyyy')}</TableCell>
+                              <TableCell>
+                                <Badge variant="destructive">{daysElapsed} jours</Badge>
+                              </TableCell>
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                  </CardContent>
+                </Card>
+              );
+            })()}
 
             {/* Gestion des données d'exemple */}
             <SampleDataManager />
