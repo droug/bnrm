@@ -59,7 +59,7 @@ export function ReproductionBackoffice() {
       const { data, error } = await supabase
         .from("reproduction_requests")
         .select("*")
-        .in("status", ["soumise", "en_validation_service", "en_validation_responsable", "en_attente_paiement", "paiement_recu", "en_cours_reproduction"] as any[])
+        .in("status", ["soumise", "en_validation_service", "en_validation_responsable", "en_attente_paiement", "paiement_recu", "en_traitement"] as any[])
         .order("submitted_at", { ascending: true });
 
       if (error) throw error;
@@ -278,7 +278,7 @@ export function ReproductionBackoffice() {
       const { error } = await supabase
         .from("reproduction_requests")
         .update({
-          status: approve ? "en_cours_reproduction" : "refusee",
+          status: approve ? "en_traitement" : "refusee",
           accounting_validator_id: user?.id,
           accounting_validated_at: new Date().toISOString(),
           accounting_validation_notes: validationNotes,
@@ -409,7 +409,7 @@ export function ReproductionBackoffice() {
   const pendingManager = requests.filter(r => r.status === "en_validation_responsable");
   const pendingPayment = requests.filter(r => r.status === "en_attente_paiement");
   const pendingAccounting = requests.filter(r => r.status === "paiement_recu");
-  const pendingReproduction = requests.filter(r => r.status === "en_cours_reproduction");
+  const pendingReproduction = requests.filter(r => r.status === "en_traitement");
 
   // Helper pour obtenir le mode de paiement
   const getPaymentMethod = (request: ReproductionRequest) => {
