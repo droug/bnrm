@@ -243,7 +243,7 @@ const Header = () => {
               {/* Navigation Portails */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-2 text-gray-600 hover:text-blue-primary-dark hover:bg-gray-100">
+                  <Button variant="ghost" size="sm" className="gap-2 bnrm-nav-menu text-gray-600 hover:text-blue-primary-dark hover:bg-gray-100">
                     <Building className="h-4 w-4" />
                     <span className="hidden md:inline">{language === 'ar' ? 'البوابات' : 'Portails'}</span>
                     <ChevronDown className="h-3 w-3" />
