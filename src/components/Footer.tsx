@@ -261,7 +261,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
                 disabled={isSubscribing}
                 className={isKitabPage 
                   ? "w-full bg-[hsl(var(--kitab-accent))] hover:bg-[hsl(var(--kitab-accent))]/90 text-white font-medium text-sm" 
-                  : "w-full bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-sm"
+                  : "w-full bnrm-btn-primary font-medium text-sm"
                 }
               >
                 {isSubscribing ? (
