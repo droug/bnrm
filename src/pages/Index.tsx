@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
 import { FloatingButtons } from "@/components/FloatingButtons";
 import WelcomePopup from "@/components/WelcomePopup";
-import { useLanguage } from "@/hooks/useLanguage";
+import { useTranslation } from "@/hooks/useTranslation";
 import SEOHead from "@/components/seo/SEOHead";
 import { Search, Book, BookOpen, Users, Download, Calendar, Globe, Accessibility, Share2, MousePointer, CreditCard, BadgeCheck, UserPlus, Filter, Scroll, HelpCircle } from "lucide-react";
 import emblemeMaroc from "@/assets/embleme-maroc.png";
@@ -29,7 +29,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 const Index = () => {
-  const { t, language } = useLanguage();
+  const { t, language, isRTL } = useTranslation();
   const navigate = useNavigate();
   const [showWelcomePopup, setShowWelcomePopup] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -59,12 +59,22 @@ const Index = () => {
 
   // Get hero image URL with fallback to static image
   const heroImageUrl = heroSettings?.hero_image_url || bnrmBuildingNight;
-  const heroTitle = language === 'ar' 
-    ? (heroSettings?.hero_title_ar || t('header.title'))
-    : (heroSettings?.hero_title_fr || t('header.title'));
-  const heroSubtitle = language === 'ar'
-    ? (heroSettings?.hero_subtitle_ar || 'الحفاظ على التراث المخطوط المغربي وتثمينه. اكتشف آلاف المخطوطات القديمة الرقمية في إطار معماري استثنائي.')
-    : (heroSettings?.hero_subtitle_fr || 'Préservation et valorisation du patrimoine manuscrit marocain. Découvrez des milliers de manuscrits anciens numérisés dans un cadre architectural exceptionnel.');
+  
+  // Get hero content with proper language fallback
+  const getHeroTitle = () => {
+    if (language === 'ar' && heroSettings?.hero_title_ar) return heroSettings.hero_title_ar;
+    if (heroSettings?.hero_title_fr) return heroSettings.hero_title_fr;
+    return t('portal.hero.title');
+  };
+  
+  const getHeroSubtitle = () => {
+    if (language === 'ar' && heroSettings?.hero_subtitle_ar) return heroSettings.hero_subtitle_ar;
+    if (heroSettings?.hero_subtitle_fr) return heroSettings.hero_subtitle_fr;
+    return t('portal.hero.description');
+  };
+  
+  const heroTitle = getHeroTitle();
+  const heroSubtitle = getHeroSubtitle();
 
   useEffect(() => {
     const hasSeenWelcome = sessionStorage.getItem('bnrm-welcome-popup-dismissed');
@@ -113,7 +123,7 @@ const Index = () => {
             <div className="max-w-full sm:max-w-xl md:max-w-2xl">
               {/* Tagline */}
               <p className="bnrm-caption uppercase tracking-widest text-blue-primary-light mb-2 sm:mb-4">
-                {language === 'ar' ? 'التراث الوطني المغربي' : 'Patrimoine National Marocain'}
+                {t('portal.hero.tagline')}
               </p>
               
               {/* Heading 2 - Main title - Responsive font sizes */}
@@ -132,8 +142,8 @@ const Index = () => {
                   onClick={() => navigate('/help')}
                   className="bnrm-btn-primary px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 text-sm sm:text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
                 >
-                  <HelpCircle className={`h-4 w-4 sm:h-5 sm:w-5 text-white ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
-                  <span className="text-white">{language === 'ar' ? 'المساعدة والدعم' : 'Aide & Support'}</span>
+                  <HelpCircle className={`h-4 w-4 sm:h-5 sm:w-5 text-white ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                  <span className="text-white">{t('portal.hero.helpBtn')}</span>
                 </Button>
               </div>
             </div>
@@ -156,18 +166,15 @@ const Index = () => {
                         BNRM
                       </p>
                       <h2 className="bnrm-section-title text-blue-dark mb-2 sm:mb-4">
-                        {language === 'ar' ? 'خدماتنا الرقمية' : 'Nos Services Numériques'}
+                        {t('portal.digitalServices.title')}
                       </h2>
                       <div className="w-16 sm:w-20 md:w-24 h-1 bg-primary mb-2 sm:mb-4"></div>
                       <p className="bnrm-section-subtitle">
-                        {language === 'ar'
-                          ? 'اكتشف مجموعة واسعة من الخدمات الرقمية المتاحة'
-                          : 'Découvrez notre large gamme de services numériques disponibles'
-                        }
+                        {t('portal.digitalServices.subtitle')}
                       </p>
                     </div>
 
-                    <DigitalServicesCarousel language={language === 'ar' ? 'ar' : 'fr'} />
+                    <DigitalServicesCarousel language={language} />
                   </div>
                 </div>
               </div>
@@ -177,19 +184,16 @@ const Index = () => {
 
               {/* Quick Links */}
               <div className="mb-8 sm:mb-10 md:mb-12">
-                <div className={`mb-6 sm:mb-8 md:mb-10 ${language === 'ar' ? 'text-center' : 'text-left'}`}>
+                <div className={`mb-6 sm:mb-8 md:mb-10 ${isRTL ? 'text-center' : 'text-left'}`}>
                   <p className="bnrm-caption uppercase tracking-widest text-primary mb-1 sm:mb-2">
                     BNRM
                   </p>
                   <h2 className="bnrm-section-title text-blue-dark mb-2 sm:mb-4">
-                    {language === 'ar' ? 'روابط سريعة' : 'Liens rapides'}
+                    {t('portal.quickLinks.title')}
                   </h2>
-                  <div className={`w-16 sm:w-20 md:w-24 h-1 bg-primary mb-2 sm:mb-4 ${language === 'ar' ? 'mx-auto' : ''}`}></div>
+                  <div className={`w-16 sm:w-20 md:w-24 h-1 bg-primary mb-2 sm:mb-4 ${isRTL ? 'mx-auto' : ''}`}></div>
                   <p className="bnrm-section-subtitle">
-                    {language === 'ar'
-                      ? 'الوصول السريع إلى خدماتنا الأساسية'
-                      : 'Accès rapide à nos services essentiels'
-                    }
+                    {t('portal.quickLinks.subtitle')}
                   </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
@@ -209,12 +213,10 @@ const Index = () => {
                         <UserPlus className="h-10 w-10 text-primary" />
                       </div>
                       <h3 className="bnrm-card-title group-hover:text-primary transition-colors">
-                        {language === 'ar' ? 'تسجيل' : 'Inscription'}
+                        {t('portal.quickLinks.registration.title')}
                       </h3>
                       <p className="bnrm-body-text-sm">
-                        {language === 'ar' 
-                          ? 'إنشاء حساب جديد للوصول إلى جميع خدماتنا' 
-                          : 'Créez votre compte pour accéder à tous nos services'}
+                        {t('portal.quickLinks.registration.desc')}
                       </p>
                     </CardContent>
                   </Card>
@@ -235,12 +237,10 @@ const Index = () => {
                         <CreditCard className="h-10 w-10 text-primary" />
                       </div>
                       <h3 className="bnrm-card-title group-hover:text-primary transition-colors">
-                        {language === 'ar' ? 'الاشتراكات' : 'Adhésions'}
+                        {t('portal.quickLinks.subscriptions.title')}
                       </h3>
                       <p className="bnrm-body-text-sm">
-                        {language === 'ar' 
-                          ? 'اكتشف أنواع الاشتراكات والخدمات المتاحة' 
-                          : 'Découvrez nos différentes formules d\'adhésion'}
+                        {t('portal.quickLinks.subscriptions.desc')}
                       </p>
                     </CardContent>
                   </Card>
@@ -261,12 +261,10 @@ const Index = () => {
                         <MousePointer className="h-10 w-10 text-primary" />
                       </div>
                       <h3 className="bnrm-card-title group-hover:text-primary transition-colors">
-                        {language === 'ar' ? 'المساعدة والدعم' : 'Aide & Support'}
+                        {t('portal.quickLinks.help.title')}
                       </h3>
                       <p className="bnrm-body-text-sm">
-                        {language === 'ar' 
-                          ? 'احصل على المساعدة والدعم الذي تحتاجه' 
-                          : 'Obtenez l\'aide dont vous avez besoin'}
+                        {t('portal.quickLinks.help.desc')}
                       </p>
                     </CardContent>
                   </Card>

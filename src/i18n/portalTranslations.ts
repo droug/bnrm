@@ -93,12 +93,28 @@ export const portalTranslations = {
     'portal.nav.patronage.projects.desc': 'Participez à nos projets',
     
     // ============= Hero Section =============
+    'portal.hero.tagline': 'Patrimoine National Marocain',
     'portal.hero.title': 'Bibliothèque Nationale du Royaume du Maroc',
     'portal.hero.subtitle': 'Gardienne du Patrimoine Écrit Marocain',
     'portal.hero.description': 'Découvrez les trésors documentaires du Royaume à travers nos collections de manuscrits anciens, livres rares et ressources numériques d\'exception.',
     'portal.hero.exploreBtn': 'Explorer le Catalogue',
     'portal.hero.digitalBtn': 'Collections Numériques',
+    'portal.hero.helpBtn': 'Aide & Support',
     'portal.hero.searchPlaceholder': 'Rechercher dans le catalogue...',
+    
+    // ============= Digital Services Section =============
+    'portal.digitalServices.title': 'Nos Services Numériques',
+    'portal.digitalServices.subtitle': 'Découvrez notre large gamme de services numériques disponibles',
+    
+    // ============= Quick Links Section =============
+    'portal.quickLinks.title': 'Liens rapides',
+    'portal.quickLinks.subtitle': 'Accès rapide à nos services essentiels',
+    'portal.quickLinks.registration.title': 'Inscription',
+    'portal.quickLinks.registration.desc': 'Créez votre compte pour accéder à tous nos services',
+    'portal.quickLinks.subscriptions.title': 'Adhésions',
+    'portal.quickLinks.subscriptions.desc': 'Découvrez nos différentes formules d\'adhésion',
+    'portal.quickLinks.help.title': 'Aide & Support',
+    'portal.quickLinks.help.desc': 'Obtenez l\'aide dont vous avez besoin',
     
     // ============= Services Section =============
     'portal.services.title': 'Nos Services',
@@ -358,12 +374,28 @@ export const portalTranslations = {
     'portal.nav.patronage.projects.desc': 'شارك في مشاريعنا',
     
     // ============= Hero Section =============
+    'portal.hero.tagline': 'التراث الوطني المغربي',
     'portal.hero.title': 'المكتبة الوطنية للمملكة المغربية',
     'portal.hero.subtitle': 'حارسة التراث المكتوب المغربي',
     'portal.hero.description': 'اكتشف كنوز المملكة الوثائقية من خلال مجموعاتنا من المخطوطات القديمة والكتب النادرة والموارد الرقمية الاستثنائية.',
     'portal.hero.exploreBtn': 'استكشف الفهرس',
     'portal.hero.digitalBtn': 'المجموعات الرقمية',
+    'portal.hero.helpBtn': 'المساعدة والدعم',
     'portal.hero.searchPlaceholder': 'البحث في الفهرس...',
+    
+    // ============= Digital Services Section =============
+    'portal.digitalServices.title': 'خدماتنا الرقمية',
+    'portal.digitalServices.subtitle': 'اكتشف مجموعة واسعة من الخدمات الرقمية المتاحة',
+    
+    // ============= Quick Links Section =============
+    'portal.quickLinks.title': 'روابط سريعة',
+    'portal.quickLinks.subtitle': 'الوصول السريع إلى خدماتنا الأساسية',
+    'portal.quickLinks.registration.title': 'التسجيل',
+    'portal.quickLinks.registration.desc': 'إنشاء حساب جديد للوصول إلى جميع خدماتنا',
+    'portal.quickLinks.subscriptions.title': 'الاشتراكات',
+    'portal.quickLinks.subscriptions.desc': 'اكتشف أنواع الاشتراكات والخدمات المتاحة',
+    'portal.quickLinks.help.title': 'المساعدة والدعم',
+    'portal.quickLinks.help.desc': 'احصل على المساعدة والدعم الذي تحتاجه',
     
     // ============= Services Section =============
     'portal.services.title': 'خدماتنا',
@@ -623,12 +655,28 @@ export const portalTranslations = {
     'portal.nav.patronage.projects.desc': 'Participate in our projects',
     
     // ============= Hero Section =============
+    'portal.hero.tagline': 'Moroccan National Heritage',
     'portal.hero.title': 'National Library of the Kingdom of Morocco',
     'portal.hero.subtitle': 'Guardian of Moroccan Written Heritage',
     'portal.hero.description': 'Discover the documentary treasures of the Kingdom through our collections of ancient manuscripts, rare books and exceptional digital resources.',
     'portal.hero.exploreBtn': 'Explore Catalog',
     'portal.hero.digitalBtn': 'Digital Collections',
+    'portal.hero.helpBtn': 'Help & Support',
     'portal.hero.searchPlaceholder': 'Search the catalog...',
+    
+    // ============= Digital Services Section =============
+    'portal.digitalServices.title': 'Our Digital Services',
+    'portal.digitalServices.subtitle': 'Discover our wide range of available digital services',
+    
+    // ============= Quick Links Section =============
+    'portal.quickLinks.title': 'Quick Links',
+    'portal.quickLinks.subtitle': 'Quick access to our essential services',
+    'portal.quickLinks.registration.title': 'Registration',
+    'portal.quickLinks.registration.desc': 'Create your account to access all our services',
+    'portal.quickLinks.subscriptions.title': 'Memberships',
+    'portal.quickLinks.subscriptions.desc': 'Discover our different membership plans',
+    'portal.quickLinks.help.title': 'Help & Support',
+    'portal.quickLinks.help.desc': 'Get the help you need',
     
     // ============= Services Section =============
     'portal.services.title': 'Our Services',
@@ -888,12 +936,28 @@ export const portalTranslations = {
     'portal.nav.patronage.projects.desc': 'Participe en nuestros proyectos',
     
     // ============= Hero Section =============
+    'portal.hero.tagline': 'Patrimonio Nacional Marroquí',
     'portal.hero.title': 'Biblioteca Nacional del Reino de Marruecos',
     'portal.hero.subtitle': 'Guardiana del Patrimonio Escrito Marroquí',
     'portal.hero.description': 'Descubra los tesoros documentales del Reino a través de nuestras colecciones de manuscritos antiguos, libros raros y recursos digitales excepcionales.',
     'portal.hero.exploreBtn': 'Explorar el Catálogo',
     'portal.hero.digitalBtn': 'Colecciones Digitales',
+    'portal.hero.helpBtn': 'Ayuda y Soporte',
     'portal.hero.searchPlaceholder': 'Buscar en el catálogo...',
+    
+    // ============= Digital Services Section =============
+    'portal.digitalServices.title': 'Nuestros Servicios Digitales',
+    'portal.digitalServices.subtitle': 'Descubra nuestra amplia gama de servicios digitales disponibles',
+    
+    // ============= Quick Links Section =============
+    'portal.quickLinks.title': 'Enlaces Rápidos',
+    'portal.quickLinks.subtitle': 'Acceso rápido a nuestros servicios esenciales',
+    'portal.quickLinks.registration.title': 'Inscripción',
+    'portal.quickLinks.registration.desc': 'Cree su cuenta para acceder a todos nuestros servicios',
+    'portal.quickLinks.subscriptions.title': 'Suscripciones',
+    'portal.quickLinks.subscriptions.desc': 'Descubra nuestras diferentes fórmulas de suscripción',
+    'portal.quickLinks.help.title': 'Ayuda y Soporte',
+    'portal.quickLinks.help.desc': 'Obtenga la ayuda que necesita',
     
     // ============= Services Section =============
     'portal.services.title': 'Nuestros Servicios',
@@ -1085,12 +1149,28 @@ export const portalTranslations = {
     'portal.nav.patronage.desc': 'ⵙⵎⵓⵏ ⵜⴰⴷⵍⵙⴰ',
     
     // ============= Hero Section =============
+    'portal.hero.tagline': 'ⴰⵢⴷⴰ ⴰⵏⴰⵎⵓⵔ ⴰⵎⵖⵔⵉⴱⵉ',
     'portal.hero.title': 'ⵜⴰⵙⴷⵍⵉⵙⵜ ⵜⴰⵏⴰⵎⵓⵔⵜ ⵏ ⵜⴳⵍⴷⵉⵜ ⵏ ⵍⵎⵖⵔⵉⴱ',
     'portal.hero.subtitle': 'ⵜⴰⵎⵃⴹⵉⵜ ⵏ ⵓⵢⴷⴰ ⵉⵜⵜⵢⴰⵔⴰⵏ ⴰⵎⵖⵔⵉⴱⵉ',
     'portal.hero.description': 'ⵙⵙⵓⴷⵓ ⵉⵎⵓⴷⴰⵔ ⵏ ⵜⴳⵍⴷⵉⵜ ⵙⴳ ⵜⴳⵔⴰⵡⵉⵏ ⵏⵏⵖ ⵏ ⵉⴹⵕⵉⵚⵏ ⵉⵇⴱⵓⵔⵏ, ⵉⴷⵍⵉⵙⵏ ⵉⵜⵜⵓⵙⴽⴽⵉⵍⵏ ⴷ ⵜⵖⴱⵓⵍⴰ ⵜⵉⵏⵓⵎⴰⵏⵉⵏ ⵜⵓⵙⵜⵉⵏ.',
     'portal.hero.exploreBtn': 'ⵙⵙⵓⴷⵓ ⴰⴽⵜⴰⵍⵓⴳ',
     'portal.hero.digitalBtn': 'ⵜⵉⴳⵔⴰⵡⵉⵏ ⵜⵉⵏⵓⵎⴰⵏⵉⵏ',
+    'portal.hero.helpBtn': 'ⵜⴰⵡⵉⵙⵉ ⴷ ⵓⵙⵎⵓⵏ',
     'portal.hero.searchPlaceholder': 'ⵔⵣⵓ ⴳ ⵓⴽⵜⴰⵍⵓⴳ...',
+    
+    // ============= Digital Services Section =============
+    'portal.digitalServices.title': 'ⵜⵉⵏⴰⴼⵓⵜⵉⵏ ⵏⵏⵖ ⵜⵉⵏⵓⵎⴰⵏⵉⵏ',
+    'portal.digitalServices.subtitle': 'ⵙⵙⵓⴷⵓ ⵜⴳⵔⴰⵡⵜ ⵜⴰⵎⵇⵔⴰⵏⵜ ⵏ ⵜⵉⵏⴰⴼⵓⵜⵉⵏ ⵜⵉⵏⵓⵎⴰⵏⵉⵏ',
+    
+    // ============= Quick Links Section =============
+    'portal.quickLinks.title': 'ⵉⵣⴷⴰⵢⵏ ⵉⵎⵍⴰⵍⵏ',
+    'portal.quickLinks.subtitle': 'ⴰⴽⵛⵛⵓⵎ ⴰⵎⵍⴰⵍ ⵖⵔ ⵜⵉⵏⴰⴼⵓⵜⵉⵏ ⵏⵏⵖ ⵜⵉⴷⵙⵍⴰⵏⵉⵏ',
+    'portal.quickLinks.registration.title': 'ⴰⵙⵎⴰⵍ',
+    'portal.quickLinks.registration.desc': 'ⵙⵏⴼⵍⵓⵍ ⴰⵎⵉⴹⴰⵏ ⵏⵏⴽ ⴰⴷ ⵜⴽⵛⵎⵜ ⵖⵔ ⵜⵉⵏⴰⴼⵓⵜⵉⵏ ⵏⵏⵖ ⴽⵓⵍⵍⵓ',
+    'portal.quickLinks.subscriptions.title': 'ⵉⵙⴽⵍⴰⵙⵏ',
+    'portal.quickLinks.subscriptions.desc': 'ⵙⵙⵓⴷⵓ ⵜⵉⵏⴰⵡⵉⵏ ⵏⵏⵖ ⵏ ⵓⵙⴽⵍⴰⵙ',
+    'portal.quickLinks.help.title': 'ⵜⴰⵡⵉⵙⵉ ⴷ ⵓⵙⵎⵓⵏ',
+    'portal.quickLinks.help.desc': 'ⴰⵡⵉ ⵜⴰⵡⵉⵙⵉ ⵉ ⵜⵃⵜⴰⵊⴷ',
     
     // ============= Services Section =============
     'portal.services.title': 'ⵜⵉⵏⴰⴼⵓⵜⵉⵏ ⵏⵏⵖ',
