@@ -134,7 +134,7 @@ export default function FeaturedWorksManager() {
       
       const { data, error } = await supabase
         .from('digital_library_documents')
-        .select('id, title, author, cover_image_url, document_type, publication_year, cbn_documents(cote)')
+        .select('id, title, author, cover_image_url, document_type, publication_year, cbn_documents!fk_digital_library_cbn_document(cote)')
         .not('cbn_document_id', 'is', null)
         .limit(20);
       
@@ -159,7 +159,7 @@ export default function FeaturedWorksManager() {
       
       const { data, error } = await supabase
         .from('digital_library_documents')
-        .select('id, title, author, cover_image_url, document_type, publication_year, cbn_documents(cote)')
+        .select('id, title, author, cover_image_url, document_type, publication_year, cbn_documents!fk_digital_library_cbn_document(cote)')
         .or(`title.ilike.%${searchQuery}%,author.ilike.%${searchQuery}%`)
         .limit(10);
       
