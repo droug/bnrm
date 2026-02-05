@@ -50,10 +50,12 @@ export default function SearchBar({
 
   const defaultPlaceholder = language === 'ar' 
     ? 'البحث في الكتالوج...' 
-    : language === 'ber'
+    : language === 'amz'
     ? 'Arezzu deg ukatalog...'
     : language === 'en'
     ? 'Search catalog...'
+    : language === 'es'
+    ? 'Buscar en el catálogo...'
     : 'Rechercher dans le catalogue...';
 
   // Debounced suggestions

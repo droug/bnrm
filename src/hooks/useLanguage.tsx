@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { digitalLibraryTranslations } from '@/i18n/digitalLibraryTranslations';
 
-export type Language = 'fr' | 'ar' | 'ber' | 'en';
+export type Language = 'fr' | 'ar' | 'amz' | 'en' | 'es';
 
 interface LanguageContextType {
   language: Language;

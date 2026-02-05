@@ -62,7 +62,7 @@ export default function DynamicFormPage() {
     }
   };
 
-  const normalizedLanguage = language === "ber" || language === "en" ? "fr" : language;
+  const normalizedLanguage = language === "amz" || language === "en" || language === "es" ? "fr" : language;
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

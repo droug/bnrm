@@ -3728,7 +3728,8 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                 { value: "ar", label: "العربية" },
                 { value: "fr", label: "الفرنسية" },
                 { value: "en", label: "الإنجليزية" },
-                { value: "ber", label: "الأمازيغية" },
+                { value: "es", label: "الإسبانية" },
+                { value: "amz", label: "الأمازيغية" },
               ]}
             />
           </div>

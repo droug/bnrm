@@ -288,7 +288,7 @@ const Header = () => {
                   <DropdownMenuItem onClick={() => setLanguage('ar')} className="cursor-pointer">
                     🇲🇦 العربية
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setLanguage('ber')} className="cursor-pointer">
+                  <DropdownMenuItem onClick={() => setLanguage('amz')} className="cursor-pointer">
                     ⵣ ⵜⴰⵎⴰⵣⵉⵖⵜ
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setLanguage('fr')} className="cursor-pointer">
@@ -296,6 +296,9 @@ const Header = () => {
                   </DropdownMenuItem>
                   <DropdownMenuItem onClick={() => setLanguage('en')} className="cursor-pointer">
                     🇺🇸 English
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setLanguage('es')} className="cursor-pointer">
+                    🇪🇸 Español
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

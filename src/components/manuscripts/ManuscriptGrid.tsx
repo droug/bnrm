@@ -75,11 +75,13 @@ export function ManuscriptGrid({
     const languageMap: { [key: string]: string } = {
       'ar': 'Arabe',
       'fr': 'Français',
-      'ber': 'Berbère',
+      'amz': 'Amazighe',
+      'es': 'Espagnol',
       'la': 'Latin',
       'arabe': 'Arabe',
       'français': 'Français',
-      'berbère': 'Berbère',
+      'amazighe': 'Amazighe',
+      'espagnol': 'Espagnol',
       'latin': 'Latin'
     };
     
