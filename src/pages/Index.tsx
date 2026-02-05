@@ -130,7 +130,7 @@ const Index = () => {
                 <Button 
                   size="default"
                   onClick={() => navigate('/help')}
-                  className="bg-blue-primary-dark hover:bg-blue-deep text-white px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 text-sm sm:text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
+                  className="bnrm-btn-primary px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 text-sm sm:text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all w-full sm:w-auto"
                 >
                   <HelpCircle className={`h-4 w-4 sm:h-5 sm:w-5 text-white ${language === 'ar' ? 'ml-2' : 'mr-2'}`} />
                   <span className="text-white">{language === 'ar' ? 'المساعدة والدعم' : 'Aide & Support'}</span>
@@ -155,7 +155,7 @@ const Index = () => {
                       <p className="bnrm-caption uppercase tracking-widest text-primary mb-1 sm:mb-2">
                         BNRM
                       </p>
-                      <h2 className="bnrm-section-title text-[#1e3a8a] mb-2 sm:mb-4">
+                      <h2 className="bnrm-section-title text-blue-dark mb-2 sm:mb-4">
                         {language === 'ar' ? 'خدماتنا الرقمية' : 'Nos Services Numériques'}
                       </h2>
                       <div className="w-16 sm:w-20 md:w-24 h-1 bg-primary mb-2 sm:mb-4"></div>
@@ -181,7 +181,7 @@ const Index = () => {
                   <p className="bnrm-caption uppercase tracking-widest text-primary mb-1 sm:mb-2">
                     BNRM
                   </p>
-                  <h2 className="bnrm-section-title text-[#1e3a8a] mb-2 sm:mb-4">
+                  <h2 className="bnrm-section-title text-blue-dark mb-2 sm:mb-4">
                     {language === 'ar' ? 'روابط سريعة' : 'Liens rapides'}
                   </h2>
                   <div className={`w-16 sm:w-20 md:w-24 h-1 bg-primary mb-2 sm:mb-4 ${language === 'ar' ? 'mx-auto' : ''}`}></div>
