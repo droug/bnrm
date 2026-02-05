@@ -236,7 +236,7 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
                 <div className="p-6 flex flex-col flex-1">
                   {/* Category */}
                   <div className="mb-4">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary text-white">
+                    <span className="bnrm-tag inline-flex items-center">
                       {service.category}
                     </span>
                   </div>
