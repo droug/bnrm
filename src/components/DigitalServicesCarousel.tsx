@@ -242,12 +242,12 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
                   </div>
 
                   {/* Title */}
-                  <h3 className="heading-6 text-foreground mb-3 line-clamp-2 group-hover:text-primary transition-colors">
+                  <h3 className="bnrm-card-title mb-3 line-clamp-2 group-hover:text-primary transition-colors">
                     {service.title}
                   </h3>
 
                   {/* Description */}
-                  <p className="text-small text-muted-foreground line-clamp-3 flex-1">
+                  <p className="bnrm-body-text-sm line-clamp-3 flex-1">
                     {service.description}
                   </p>
                 </div>

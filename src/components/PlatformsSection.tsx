@@ -83,14 +83,14 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
       <div className="absolute inset-0 bg-black/20" />
       <div className="container mx-auto px-4 relative z-10">
         <div className="mb-12">
-          <p className="tagline text-orange-500 mb-2">
+          <p className="bnrm-caption uppercase tracking-widest text-orange-500 mb-2">
             BNRM
           </p>
-          <h2 className="heading-3 text-white mb-4">
+          <h2 className="bnrm-section-title text-white mb-4">
             {language === 'ar' ? 'منصاتنا' : 'Nos Plateformes'}
           </h2>
           <div className="w-24 h-1 bg-orange-500 mb-4"></div>
-          <p className="text-regular text-white/80">
+          <p className="bnrm-body-text text-white/80">
             {language === 'ar' 
               ? 'اكتشف منصاتنا الرقمية'
               : 'Découvrez nos plateformes numériques'

@@ -461,14 +461,14 @@ const Header = () => {
               
               {/* Découvrir la Bibliothèque */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-slate-text-dark hover:text-blue-primary-dark hover:bg-slate-light h-12 text-sm font-medium px-3 rounded-none">
+                <NavigationMenuTrigger className="bg-transparent text-slate-text-dark hover:text-blue-primary-dark hover:bg-slate-light h-12 bnrm-nav-menu px-3 rounded-none">
                   <BookOpen className="w-4 h-4 mr-2" />
                   <span>{t('nav.discover')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
                   <div className="grid gap-3 p-5 w-[700px] lg:grid-cols-2 bg-white border border-slate-200 shadow-2xl rounded-xl">
                     <div className="space-y-2">
-                      <h4 className="text-sm font-bold text-blue-primary-dark mb-3 flex items-center gap-2 px-2">
+                      <h4 className="bnrm-nav-submenu-header text-blue-primary-dark mb-3 flex items-center gap-2 px-2">
                         <span className="w-1.5 h-4 bg-blue-primary-dark rounded-full" />
                         {menuData.discover.practicalInfo.title[language]}
                       </h4>
@@ -486,7 +486,7 @@ const Header = () => {
                             <NavigationMenuLink asChild>
                               <Link to={item.href} className="block p-3 text-foreground hover:bg-blue-primary-dark/5 hover:text-blue-primary-dark rounded-lg border-l-3 border-transparent hover:border-blue-primary-dark transition-all duration-200 group">
                                 <div className="flex items-center gap-2">
-                                  <div className="font-semibold group-hover:translate-x-0.5 transition-transform">{item.title[language]}</div>
+                                  <div className="bnrm-nav-submenu-item group-hover:translate-x-0.5 transition-transform">{item.title[language]}</div>
                                 </div>
                               </Link>
                             </NavigationMenuLink>
@@ -495,7 +495,7 @@ const Header = () => {
                       })}
                     </div>
                     <div className="space-y-2">
-                      <h4 className="text-sm font-bold text-blue-primary-dark mb-3 flex items-center gap-2 px-2">
+                      <h4 className="bnrm-nav-submenu-header text-blue-primary-dark mb-3 flex items-center gap-2 px-2">
                         <span className="w-1.5 h-4 bg-amber-500 rounded-full" />
                         {menuData.discover.historyMissions.title[language]}
                       </h4>
@@ -513,7 +513,7 @@ const Header = () => {
                             <NavigationMenuLink asChild>
                               <Link to={item.href} className="block p-3 text-foreground hover:bg-amber-50 hover:text-amber-700 rounded-lg border-l-3 border-transparent hover:border-amber-500 transition-all duration-200 group">
                                 <div className="flex items-center gap-2">
-                                  <div className="font-semibold group-hover:translate-x-0.5 transition-transform">{item.title[language]}</div>
+                                  <div className="bnrm-nav-submenu-item group-hover:translate-x-0.5 transition-transform">{item.title[language]}</div>
                                 </div>
                               </Link>
                             </NavigationMenuLink>
@@ -529,14 +529,14 @@ const Header = () => {
 
               {/* Accéder à nos services */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-slate-text-dark hover:text-blue-primary-dark hover:bg-slate-light h-12 text-sm font-medium px-3 rounded-none">
+                <NavigationMenuTrigger className="bg-transparent text-slate-text-dark hover:text-blue-primary-dark hover:bg-slate-light h-12 bnrm-nav-menu px-3 rounded-none">
                   <Users className="w-4 h-4 mr-2" />
                   <span>{t('nav.services')}</span>
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="z-50">
                   <div className="grid gap-3 p-5 w-[700px] lg:grid-cols-2 bg-white border border-slate-200 shadow-2xl rounded-xl">
                     <div className="space-y-2">
-                      <h4 className="text-sm font-bold text-blue-primary-dark mb-3 flex items-center gap-2 px-2">
+                      <h4 className="bnrm-nav-submenu-header text-blue-primary-dark mb-3 flex items-center gap-2 px-2">
                         <span className="w-1.5 h-4 bg-green-500 rounded-full" />
                         {menuData.services.userServices.title[language]}
                       </h4>
@@ -554,7 +554,7 @@ const Header = () => {
                             <NavigationMenuLink asChild>
                               <Link to={item.href} className="block p-3 text-foreground hover:bg-green-50 hover:text-green-700 rounded-lg border-l-3 border-transparent hover:border-green-500 transition-all duration-200 group">
                                 <div className="flex items-center gap-2">
-                                  <div className="font-semibold group-hover:translate-x-0.5 transition-transform">{item.title[language]}</div>
+                                  <div className="bnrm-nav-submenu-item group-hover:translate-x-0.5 transition-transform">{item.title[language]}</div>
                                 </div>
                               </Link>
                             </NavigationMenuLink>
@@ -563,7 +563,7 @@ const Header = () => {
                       })}
                     </div>
                     <div className="space-y-2">
-                      <h4 className="text-sm font-bold text-blue-primary-dark mb-3 flex items-center gap-2 px-2">
+                      <h4 className="bnrm-nav-submenu-header text-blue-primary-dark mb-3 flex items-center gap-2 px-2">
                         <span className="w-1.5 h-4 bg-purple-500 rounded-full" />
                         {menuData.services.specializedServices.title[language]}
                       </h4>
@@ -581,7 +581,7 @@ const Header = () => {
                             <NavigationMenuLink asChild>
                               <Link to={item.href} className="block p-3 text-foreground hover:bg-purple-50 hover:text-purple-700 rounded-lg border-l-3 border-transparent hover:border-purple-500 transition-all duration-200 group">
                                 <div className="flex items-center gap-2">
-                                  <div className="font-semibold group-hover:translate-x-0.5 transition-transform">{item.title[language]}</div>
+                                  <div className="bnrm-nav-submenu-item group-hover:translate-x-0.5 transition-transform">{item.title[language]}</div>
                                 </div>
                               </Link>
                             </NavigationMenuLink>
@@ -597,7 +597,7 @@ const Header = () => {
 
               {/* Explorer le patrimoine */}
               <NavigationMenuItem>
-                <NavigationMenuTrigger className="bg-transparent text-slate-text-dark hover:text-blue-primary-dark hover:bg-slate-light h-12 text-sm font-medium px-3 rounded-none">
+                <NavigationMenuTrigger className="bg-transparent text-slate-text-dark hover:text-blue-primary-dark hover:bg-slate-light h-12 bnrm-nav-menu px-3 rounded-none">
                   <Book className="w-4 h-4 mr-2" />
                   <span>{t('nav.explore')}</span>
                 </NavigationMenuTrigger>
