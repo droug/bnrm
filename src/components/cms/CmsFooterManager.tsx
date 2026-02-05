@@ -226,24 +226,44 @@ export default function CmsFooterManager() {
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle className="flex items-center gap-2">
-            <Footprints className="h-5 w-5" />
-            Configuration du Footer
-          </CardTitle>
-          <CardDescription>
-            Personnalisez le pied de page du site (bilingue FR/AR)
-          </CardDescription>
+      <CardHeader className="space-y-4">
+        <div className="flex flex-row items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Footprints className="h-5 w-5" />
+              Configuration du Footer
+            </CardTitle>
+            <CardDescription>
+              Personnalisez le pied de page du site (bilingue FR/AR)
+            </CardDescription>
+          </div>
+          <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
+            {saveMutation.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <Save className="h-4 w-4 mr-2" />
+            )}
+            Sauvegarder
+          </Button>
         </div>
-        <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending}>
-          {saveMutation.isPending ? (
-            <Loader2 className="h-4 w-4 animate-spin mr-2" />
-          ) : (
-            <Save className="h-4 w-4 mr-2" />
-          )}
-          Sauvegarder
-        </Button>
+        
+        {/* Aperçu du logo actuel */}
+        <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg border">
+          <div className="flex-shrink-0">
+            <img 
+              src="/bnrm-portal-logo.gif" 
+              alt="Logo actuel du portail BNRM" 
+              className="h-16 object-contain"
+            />
+          </div>
+          <div className="space-y-1">
+            <p className="text-sm font-medium">Logo actuel du portail</p>
+            <p className="text-xs text-muted-foreground">
+              Ce logo est affiché dans le footer du portail BNRM. Pour le modifier, 
+              remplacez le fichier <code className="bg-muted px-1 rounded">/bnrm-portal-logo.gif</code>
+            </p>
+          </div>
+        </div>
       </CardHeader>
 
       <CardContent className="space-y-6">
