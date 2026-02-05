@@ -396,20 +396,6 @@ export function MultipleAuthorsSection({
         })}
       </div>
 
-      {authors.length > 0 && authors.length < maxAuthors && (
-        <div className="mt-4 text-center">
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={addAuthor}
-            className="text-primary hover:text-primary"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Ajouter un autre auteur ({authors.length}/{maxAuthors})
-          </Button>
-        </div>
-      )}
     </div>
   );
 }
