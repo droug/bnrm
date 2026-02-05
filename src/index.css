@@ -599,14 +599,14 @@ Enhanced Moroccan Heritage Design System
     }
   }
   
-  /* BNRM Primary Button - Logo color (Blue Deep) */
+  /* BNRM Primary Button - Logo color (Blue Dark #1E3A8A) */
   .bnrm-btn-primary {
-    background-color: hsl(var(--blue-dark));
-    color: white;
+    background-color: hsl(var(--blue-dark)) !important;
+    color: white !important;
     transition: all 0.2s ease;
   }
   .bnrm-btn-primary:hover {
-    background-color: hsl(var(--blue-shadow));
+    background-color: hsl(var(--blue-shadow)) !important;
   }
 
   /* Section Subtitle - Inter, 16px, regular */
