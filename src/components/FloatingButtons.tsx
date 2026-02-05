@@ -93,7 +93,7 @@ export function FloatingButtons() {
         <Button
           size="lg"
           onClick={() => setShowAccessibility(true)}
-          className="h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 bg-primary/90 hover:bg-primary"
+          className="h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 bnrm-btn-primary"
           title={language === 'ar' ? 'أدوات إمكانية الوصول' : 'Outils d\'accessibilité'}
         >
           <Accessibility className="h-6 w-6" />
@@ -103,9 +103,7 @@ export function FloatingButtons() {
         <Button
           size="lg"
           onClick={() => setIsChatBotOpen(!isChatBotOpen)}
-          className={`h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 relative ${
-            isChatBotOpen ? 'bg-primary' : 'bg-primary/90'
-          }`}
+          className="h-14 w-14 rounded-full shadow-lg hover:shadow-xl transition-all hover:scale-110 relative bnrm-btn-primary"
           title={language === 'ar' ? 'المساعد الذكي' : 'Assistant IA'}
         >
           <Bot className="h-6 w-6" />
