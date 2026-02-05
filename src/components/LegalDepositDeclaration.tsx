@@ -1689,11 +1689,27 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                   />
                 </div>
 
-                {/* Informations d'identité */}
+                {/* Nom */}
                 <div className="space-y-2">
-                  <Label>{directorType === "personne_morale" ? "Nom de la collectivité" : "Nom et prénom"}</Label>
-                  <Input placeholder={directorType === "personne_morale" ? "Nom de la collectivité" : "Nom et prénom"} />
+                  <Label>{directorType === "personne_morale" ? "Nom de la collectivité" : "Nom"} <span className="text-destructive">*</span></Label>
+                  <Input 
+                    placeholder={directorType === "personne_morale" ? "Nom de la collectivité" : "Nom de famille"}
+                    value={formData.directorLastName || ""}
+                    onChange={(e) => setFormData({ ...formData, directorLastName: e.target.value })}
+                  />
                 </div>
+
+                {/* Prénom - only for Personne Physique */}
+                {directorType !== "personne_morale" && (
+                  <div className="space-y-2 animate-fade-in">
+                    <Label>Prénom <span className="text-destructive">*</span></Label>
+                    <Input 
+                      placeholder="Prénom du directeur"
+                      value={formData.directorFirstName || ""}
+                      onChange={(e) => setFormData({ ...formData, directorFirstName: e.target.value })}
+                    />
+                  </div>
+                )}
 
                 {directorType === "personne_physique" && (
                   <div className="space-y-2 animate-fade-in">
@@ -1736,7 +1752,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                 </div>
 
                 <div className="space-y-2">
-                  <Label>Téléphone Mobile</Label>
+                  <Label>Téléphone Mobile <span className="text-destructive">*</span></Label>
                   <PhoneInput
                     value={formData.directorPhoneMobile || ""}
                     onChange={(value) => setFormData({ ...formData, directorPhoneMobile: value })}
