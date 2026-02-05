@@ -367,7 +367,7 @@ export default function AdvancedSearch() {
                 {/* ONGLET: Tous les champs */}
                 <TabsContent value="all" className="mt-6 space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="keyword" className="text-base font-semibold">Recherche générale</Label>
+                    <Label htmlFor="keyword" className="text-base font-semibold">Recherche par mot clé</Label>
                     <Input
                       id="keyword"
                       placeholder="Recherchez dans tous les champs (titre, auteur, sujet...)"
