@@ -15,7 +15,9 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 export interface Author {
   id: string;
   authorType: string;
-  authorName: string;
+  authorLastName: string;
+  authorFirstName: string;
+  authorName: string; // Keep for backward compatibility (will be computed)
   pseudonym: string;
   gender: string;
   nationality: string;
@@ -40,6 +42,8 @@ interface MultipleAuthorsSectionProps {
 const createEmptyAuthor = (): Author => ({
   id: crypto.randomUUID(),
   authorType: "",
+  authorLastName: "",
+  authorFirstName: "",
   authorName: "",
   pseudonym: "",
   gender: "",
@@ -141,7 +145,8 @@ export function MultipleAuthorsSection({
                       <div>
                         <span className="font-medium">
                           Auteur {index + 1}
-                          {author.authorName && ` - ${author.authorName}`}
+                          {(author.authorLastName || author.authorFirstName || author.authorName) && 
+                            ` - ${author.authorLastName || ''} ${author.authorFirstName || author.authorName || ''}`.trim()}
                         </span>
                         {author.authorType && (
                           <span className="text-sm text-muted-foreground ml-2">
@@ -205,18 +210,42 @@ export function MultipleAuthorsSection({
                         </div>
                       )}
 
-                      {/* Nom de l'auteur */}
+                      {/* Nom / Nom de la collectivité */}
                       <div className="space-y-2">
                         <Label>
-                          {isPersonneMorale ? "Nom de la collectivité" : "Nom et prénom de l'auteur"}{" "}
+                          {isPersonneMorale ? "Nom de la collectivité" : "Nom"}{" "}
                           <span className="text-destructive">*</span>
                         </Label>
                         <Input
-                          placeholder={isPersonneMorale ? "Nom de la collectivité" : "Nom et prénom"}
-                          value={author.authorName}
-                          onChange={(e) => updateAuthor(author.id, { authorName: e.target.value })}
+                          placeholder={isPersonneMorale ? "Nom de la collectivité" : "Nom de famille"}
+                          value={isPersonneMorale ? author.authorName : author.authorLastName}
+                          onChange={(e) => {
+                            if (isPersonneMorale) {
+                              updateAuthor(author.id, { authorName: e.target.value });
+                            } else {
+                              updateAuthor(author.id, { 
+                                authorLastName: e.target.value,
+                                authorName: `${e.target.value} ${author.authorFirstName}`.trim()
+                              });
+                            }
+                          }}
                         />
                       </div>
+
+                      {/* Prénom - only for Personne Physique */}
+                      {isPersonnePhysique && (
+                        <div className="space-y-2">
+                          <Label>Prénom <span className="text-destructive">*</span></Label>
+                          <Input
+                            placeholder="Prénom de l'auteur"
+                            value={author.authorFirstName}
+                            onChange={(e) => updateAuthor(author.id, { 
+                              authorFirstName: e.target.value,
+                              authorName: `${author.authorLastName} ${e.target.value}`.trim()
+                            })}
+                          />
+                        </div>
+                      )}
 
                       {/* Genre - only for Personne Physique */}
                       {isPersonnePhysique && (
@@ -272,7 +301,7 @@ export function MultipleAuthorsSection({
 
                       {/* Téléphone Mobile */}
                       <div className="space-y-2">
-                        <Label>Téléphone Mobile</Label>
+                        <Label>Téléphone Mobile <span className="text-destructive">*</span></Label>
                         <PhoneInput
                           value={author.phoneMobile}
                           onChange={(value) => updateAuthor(author.id, { phoneMobile: value })}
