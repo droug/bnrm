@@ -241,7 +241,7 @@ const Header = () => {
             {/* Actions à droite */}
             <div className="flex items-center gap-2">
               {/* Navigation Portails */}
-              <DropdownMenu>
+              <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm" className="gap-2 bnrm-nav-menu text-gray-600 hover:text-blue-primary-dark hover:bg-gray-100">
                     <Building className="h-4 w-4" />
@@ -249,7 +249,7 @@ const Header = () => {
                     <ChevronDown className="h-3 w-3" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-64 bg-white border border-gray-200 z-50">
+                <DropdownMenuContent align="end" sideOffset={8} className="w-64 bg-white border border-gray-200 shadow-lg">
                   <DropdownMenuItem asChild className="cursor-pointer">
                     <Link to="/">
                       <BookOpen className="h-4 w-4 mr-2" />
@@ -278,13 +278,13 @@ const Header = () => {
               </DropdownMenu>
 
               {/* Langue */}
-              <DropdownMenu>
+              <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="text-gray-600 hover:text-blue-primary-dark hover:bg-gray-100">
                     <Globe className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-white border border-gray-200 z-50">
+                <DropdownMenuContent sideOffset={8} className="bg-white border border-gray-200 shadow-lg">
                   <DropdownMenuItem onClick={() => setLanguage('ar')} className="cursor-pointer">
                     🇲🇦 العربية
                   </DropdownMenuItem>
@@ -332,14 +332,14 @@ const Header = () => {
               
               {/* Bouton Mon Espace / Connexion */}
               {user ? (
-                <DropdownMenu>
+                <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
-                <Button className="bnrm-btn-primary px-4 py-2 rounded transition-colors">
+                    <Button className="bnrm-btn-primary px-4 py-2 rounded transition-colors">
                       <User className="h-4 w-4 mr-2" />
                       {language === 'ar' ? 'مساحتي' : 'Mon espace'}
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="bg-white border border-gray-200 z-50 w-48">
+                  <DropdownMenuContent align="end" sideOffset={8} className="bg-white border border-gray-200 shadow-lg w-48">
                     <DropdownMenuItem asChild className="cursor-pointer">
                       <Link to="/my-space" className="flex items-center gap-2">
                         <BookOpen className="h-4 w-4" />
