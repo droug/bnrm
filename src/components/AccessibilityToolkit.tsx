@@ -126,7 +126,7 @@ export const AccessibilityToolkit = ({ className = "" }: { className?: string })
             }}
             variant="ghost"
             size="sm"
-            className={`flex items-center gap-2 px-2 h-11 text-base font-medium ${className}`}
+            className={`flex items-center gap-2 px-2 h-11 bnrm-nav-menu ${className}`}
           >
             <Accessibility className="h-4 w-4" />
             <span className="hidden sm:inline">{language === 'ar' ? 'إمكانية الوصول' : 'Accessibilité'}</span>
