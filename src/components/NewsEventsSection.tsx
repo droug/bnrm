@@ -2,39 +2,75 @@ import { ArrowRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { Language } from "@/hooks/useLanguage";
+import { useTranslation } from "@/hooks/useTranslation";
 import eventRoiImage from "@/assets/event-roi-mohammed-6.png";
 import eventTurquieImage from "@/assets/event-turquie-bnrm.png";
 
 interface NewsEventsSectionProps {
-  language: Language;
+  language: string;
 }
 
 export function NewsEventsSection({ language }: NewsEventsSectionProps) {
   const navigate = useNavigate();
+  const { t, isRTL } = useTranslation();
 
   const news = [
     {
       id: 1,
-      tag_fr: "Actualité Royale",
-      tag_ar: "أخبار ملكية",
-      title_fr: "Le Roi annonce la clôture définitive du dossier du Sahara",
-      title_ar: "الملك يعلن الإغلاق النهائي لملف الصحراء",
-      excerpt_fr: "Sa Majesté le Roi Mohammed VI a présidé une cérémonie historique marquant une nouvelle ère pour le Royaume.",
-      excerpt_ar: "ترأس جلالة الملك محمد السادس حفلا تاريخيا يعلن عهدا جديدا للمملكة.",
+      tag: {
+        fr: "Actualité Royale",
+        ar: "أخبار ملكية",
+        en: "Royal News",
+        es: "Noticias Reales",
+        amz: "ⵉⵙⴰⵍⵏ ⵉⴳⵍⴷⴰⵏ",
+      },
+      title: {
+        fr: "Le Roi annonce la clôture définitive du dossier du Sahara",
+        ar: "الملك يعلن الإغلاق النهائي لملف الصحراء",
+        en: "The King announces the definitive closure of the Sahara dossier",
+        es: "El Rey anuncia el cierre definitivo del expediente del Sahara",
+        amz: "ⴰⴳⵍⵍⵉⴷ ⵉⵙⵙⵍⴽⵏ ⴰⵇⴼⵍ ⴰⵎⴳⴳⴰⵔⵓ ⵏ ⵓⵙⴷⴰⵡ ⵏ ⵜⵏⵥⵕⵓⴼⵜ",
+      },
+      excerpt: {
+        fr: "Sa Majesté le Roi Mohammed VI a présidé une cérémonie historique marquant une nouvelle ère pour le Royaume.",
+        ar: "ترأس جلالة الملك محمد السادس حفلا تاريخيا يعلن عهدا جديدا للمملكة.",
+        en: "His Majesty King Mohammed VI presided over a historic ceremony marking a new era for the Kingdom.",
+        es: "Su Majestad el Rey Mohammed VI presidió una ceremonia histórica que marca una nueva era para el Reino.",
+        amz: "ⵉⵙⵙⵉⵅⴼ ⴱⴰⴱ ⵏ ⵡⴰⴷⴷⵓⵔ ⴰⴳⵍⵍⵉⴷ ⵎⵓⵃⵎⵎⴷ ⵡⵉⵙⵙ ⵚⴹⵉⵚ ⵢⴰⵏ ⵓⵏⵎⵓⴳⴳⴰⵔ ⴰⵎⵣⵔⴰⵢⴰⵏ.",
+      },
       image: eventRoiImage,
     },
     {
       id: 2,
-      tag_fr: "Coopération Internationale",
-      tag_ar: "تعاون دولي",
-      title_fr: "La Directrice de la BNRM en visite à la Bibliothèque Nationale de Turquie",
-      title_ar: "مديرة المكتبة الوطنية في زيارة إلى مكتبة تركيا الوطنية",
-      excerpt_fr: "Madame Samira El Malizi renforce les liens culturels lors d'une visite officielle en Turquie.",
-      excerpt_ar: "السيدة سميرة المليزي تعزز الروابط الثقافية خلال زيارة رسمية إلى تركيا.",
+      tag: {
+        fr: "Coopération Internationale",
+        ar: "تعاون دولي",
+        en: "International Cooperation",
+        es: "Cooperación Internacional",
+        amz: "ⴰⵎⵢⴰⵡⴰⵙ ⴰⵎⴰⴹⵍⴰⵏ",
+      },
+      title: {
+        fr: "La Directrice de la BNRM en visite à la Bibliothèque Nationale de Turquie",
+        ar: "مديرة المكتبة الوطنية في زيارة إلى مكتبة تركيا الوطنية",
+        en: "The Director of BNRM visits the National Library of Turkey",
+        es: "La Directora de la BNRM visita la Biblioteca Nacional de Turquía",
+        amz: "ⵜⴰⵏⵎⵀⴰⵍⵜ ⵏ ⵜⵎⴰⵙⴷⴰⵡⵉⵜ ⵜⴰⵏⴰⵎⵓⵔⵜ ⵜⵔⵣⵓ ⵜⴰⵎⴰⵙⴷⴰⵡⵉⵜ ⵜⴰⵏⴰⵎⵓⵔⵜ ⵏ ⵜⵜⵓⵔⴽ",
+      },
+      excerpt: {
+        fr: "Madame Samira El Malizi renforce les liens culturels lors d'une visite officielle en Turquie.",
+        ar: "السيدة سميرة المليزي تعزز الروابط الثقافية خلال زيارة رسمية إلى تركيا.",
+        en: "Mrs. Samira El Malizi strengthens cultural ties during an official visit to Turkey.",
+        es: "La Sra. Samira El Malizi refuerza los vínculos culturales durante una visita oficial a Turquía.",
+        amz: "ⵎⴰⵙⵙⴰ ⵙⴰⵎⵉⵔⴰ ⵍⵎⵍⵉⵣⵉ ⵜⵙⵙⵖⵥⵏ ⵉⵣⴷⴰⵢⵏ ⵉⴷⵍⵙⴰⵏⵏ ⵙ ⵜⵔⵣⵉ ⵜⴰⵎⴰⴷⴷⵓⴷⵜ ⵖⵔ ⵜⵜⵓⵔⴽ.",
+      },
       image: eventTurquieImage,
     },
   ];
+
+  // Get text for current language with fallback
+  const getText = (textObj: Record<string, string>) => {
+    return textObj[language] || textObj.fr;
+  };
 
   return (
     <section className="pt-8 pb-8 bg-slate-50">
@@ -47,14 +83,11 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
                 BNRM
               </p>
               <h2 className="bnrm-section-title text-white mb-4">
-                {language === 'ar' ? 'الأخبار و الأحداث' : 'Actualités & Événements'}
+                {t('portal.newsEvents.title')}
               </h2>
               <div className="w-24 h-1 bg-blue-soft mb-4"></div>
               <p className="bnrm-body-text text-white/90 max-w-2xl">
-                {language === 'ar' 
-                  ? 'اطلع على آخر الأخبار والفعاليات'
-                  : 'Découvrez les dernières actualités et événements'
-                }
+                {t('portal.newsEvents.subtitle')}
               </p>
             </div>
             <Button 
@@ -62,7 +95,7 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
               onClick={() => navigate('/news')}
               className="bg-blue-primary-dark text-white border-blue-primary-dark hover:bg-blue-deep"
             >
-              {language === 'ar' ? 'عرض الكل' : 'Tout afficher'}
+              {t('portal.newsEvents.viewAll')}
             </Button>
           </div>
         </div>
@@ -79,7 +112,7 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
               <div className="relative aspect-[16/9] overflow-hidden">
                 <img 
                   src={item.image} 
-                  alt={language === 'ar' ? item.title_ar : item.title_fr}
+                  alt={getText(item.title)}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -88,16 +121,16 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
               {/* Content */}
               <div className="p-6">
                 <Badge variant="outline" className="bnrm-tag mb-3">
-                  {language === 'ar' ? item.tag_ar : item.tag_fr}
+                  {getText(item.tag)}
                 </Badge>
                 <h3 className="bnrm-card-title text-[#1e3a8a] mb-2 group-hover:text-blue-600 transition-colors">
-                  {language === 'ar' ? item.title_ar : item.title_fr}
+                  {getText(item.title)}
                 </h3>
                 <p className="bnrm-body-text-sm mb-3">
-                  {language === 'ar' ? item.excerpt_ar : item.excerpt_fr}
+                  {getText(item.excerpt)}
                 </p>
-                <Button variant="ghost" size="sm" className="p-0 h-auto font-semibold group-hover:translate-x-1 transition-transform">
-                  {language === 'ar' ? "المزيد من المعلومات" : "Plus d'infos"} <ArrowRight className="ml-1 h-4 w-4" />
+                <Button variant="ghost" size="sm" className={`p-0 h-auto font-semibold group-hover:translate-x-1 transition-transform ${isRTL ? 'flex-row-reverse' : ''}`}>
+                  {t('portal.newsEvents.moreInfo')} <ArrowRight className={`h-4 w-4 ${isRTL ? 'mr-1 rotate-180' : 'ml-1'}`} />
                 </Button>
               </div>
             </div>
@@ -107,4 +140,3 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
     </section>
   );
 }
-
