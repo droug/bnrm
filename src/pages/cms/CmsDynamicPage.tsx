@@ -5,7 +5,7 @@ import { Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { supabase } from "@/integrations/supabase/client";
-import { useLanguage } from "@/hooks/useLanguage";
+import { useTranslation } from "@/hooks/useTranslation";
 import DOMPurify from "dompurify";
 
 interface ContentPage {
@@ -20,7 +20,7 @@ interface ContentPage {
 
 export default function CmsDynamicPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { language } = useLanguage();
+  const { language, t } = useTranslation();
   const [page, setPage] = useState<ContentPage | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -76,10 +76,10 @@ export default function CmsDynamicPage() {
         <Header />
         <main className="container mx-auto py-12 text-center">
           <h1 className="text-2xl font-bold text-destructive mb-4">
-            {language === 'ar' ? 'خطأ' : 'Erreur'}
+            {t('portal.common.error')}
           </h1>
           <p className="text-muted-foreground">
-            {language === 'ar' ? 'الصفحة غير موجودة' : error || 'Page introuvable'}
+            {t('portal.error.404.desc')}
           </p>
         </main>
         <Footer />
@@ -137,9 +137,7 @@ export default function CmsDynamicPage() {
         ) : (
           <div className="text-center py-12 bg-muted/30 rounded-lg">
             <p className="text-muted-foreground">
-              {language === 'ar' 
-                ? 'محتوى هذه الصفحة قيد الإنشاء' 
-                : 'Le contenu de cette page est en cours de rédaction'}
+              {t('portal.common.loading')}
             </p>
           </div>
         )}
