@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, Menu, X, Book, Globe, Users, User, LogIn, BookOpen, FileText, Calendar, Building, Download, Phone, MapPin, Mail, UserCheck, Archive, ChevronDown, Accessibility, Bot, MessageCircle, Shield, HelpCircle, Network } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
-import { useLanguage } from "@/hooks/useLanguage";
+import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigationHistory } from "@/hooks/useNavigationHistory";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -31,7 +31,7 @@ import {
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isChatBotOpen, setIsChatBotOpen] = useState(false);
-  const { language, setLanguage, t, isRTL } = useLanguage();
+  const { language, setLanguage, t, isRTL } = useTranslation();
   const { user, profile, signOut } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
