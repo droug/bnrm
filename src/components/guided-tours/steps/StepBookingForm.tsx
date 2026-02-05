@@ -20,7 +20,7 @@ const formSchema = z.object({
   telephone: z.string().regex(/^(\+212|0)[5-7]\d{8}$/, "Numéro de téléphone marocain invalide"),
   organisme: z.string().max(200).optional(),
   nbVisiteurs: z.coerce.number().int().min(1, "Au moins 1 visiteur").max(100),
-  langue: z.enum(["arabe", "français", "anglais", "amazigh"]),
+  langue: z.enum(["arabe", "français", "anglais", "amazighe"]),
   commentaire: z.string().max(500).optional(),
 });
 
@@ -182,7 +182,7 @@ const StepBookingForm = ({ data, onUpdate }: StepBookingFormProps) => {
                       <SelectItem value="arabe" className="font-light">العربية (Arabe)</SelectItem>
                       <SelectItem value="français" className="font-light">Français</SelectItem>
                       <SelectItem value="anglais" className="font-light">English (Anglais)</SelectItem>
-                      <SelectItem value="amazigh" className="font-light">ⵜⴰⵎⴰⵣⵉⵖⵜ (Amazigh)</SelectItem>
+                      <SelectItem value="amazighe" className="font-light">ⵜⴰⵎⴰⵣⵉⵖⵜ (Amazighe)</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

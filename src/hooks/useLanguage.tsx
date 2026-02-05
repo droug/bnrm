@@ -109,7 +109,7 @@ const translations = {
     'collections.subtitle': 'Explorez notre patrimoine numérisé accessible en ligne',
     'collections.manuscripts.title': 'Manuscrits Anciens',
     'collections.manuscripts.count': '15,000+ manuscrits',
-    'collections.manuscripts.desc': 'Collection exceptionnelle de manuscrits arabes, amazighs et hébraïques du Moyen Âge à l\'époque moderne.',
+    'collections.manuscripts.desc': 'Collection exceptionnelle de manuscrits arabes, amazighes et hébraïques du Moyen Âge à l\'époque moderne.',
     'collections.rare.title': 'Livres Rares',
     'collections.rare.count': '25,000+ ouvrages',
     'collections.rare.desc': 'Éditions princeps, incunables et ouvrages précieux de la littérature maghrébine et orientale.',

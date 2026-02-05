@@ -94,7 +94,7 @@ export default function AudiovisualTranscriptionTool() {
     { value: "de", label: "Allemand" },
     { value: "it", label: "Italien" },
     { value: "pt", label: "Portugais" },
-    { value: "ber", label: "Amazigh" },
+    { value: "ber", label: "Amazighe" },
   ];
 
   // Load documents from database

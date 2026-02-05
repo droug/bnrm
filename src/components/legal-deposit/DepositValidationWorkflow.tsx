@@ -369,7 +369,7 @@ export function DepositValidationWorkflow() {
         {
           id: "example-14",
           request_number: "DL-2025-000208",
-          title: "Dictionnaire Amazigh-Français",
+          title: "Dictionnaire Amazighe-Français",
           subtitle: "Volume 1: A-M",
           support_type: "Livre",
           status: "soumis",

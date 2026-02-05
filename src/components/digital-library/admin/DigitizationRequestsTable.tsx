@@ -105,7 +105,7 @@ export function DigitizationRequestsTable() {
             id: "mock-dig-2",
             user_name: "Leila Mansouri",
             user_email: "l.mansouri@example.ma",
-            document_title: "Recueil de poésie amazigh",
+            document_title: "Recueil de poésie amazighe",
             document_cote: "POE-AMZ-234",
             pages_count: 120,
             justification: "Conservation personnelle et étude linguistique",

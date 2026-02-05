@@ -35,7 +35,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
       title: language === 'ar' ? 'مخطوطات' : 'Manuscrits',
       description: language === 'ar' 
         ? 'اكتشف كنوز المخطوطات العربية والأمازيغية النادرة'
-        : 'Découvrez les trésors des manuscrits arabes et amazighs rares',
+        : 'Découvrez les trésors des manuscrits arabes et amazighes rares',
       path: '/plateforme-manuscrits',
       image: manuscritsBackground,
       number: '02'

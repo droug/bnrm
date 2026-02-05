@@ -23,7 +23,7 @@ export const programContributionSchema = z.object({
   public_cible: z.enum(["etudiants", "professionnels", "grand_public", "jeunes", "chercheurs", "autre"], {
     errorMap: () => ({ message: "Veuillez sélectionner un public cible" })
   }),
-  langue: z.enum(["arabe", "francais", "anglais", "amazigh", "autre"], {
+  langue: z.enum(["arabe", "francais", "anglais", "amazighe", "autre"], {
     errorMap: () => ({ message: "Veuillez sélectionner une langue" })
   }),
   nb_participants_estime: z.number().int().positive().optional(),

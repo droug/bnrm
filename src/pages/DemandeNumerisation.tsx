@@ -296,7 +296,7 @@ const DemandeNumerisation = () => {
                                 <SelectItem value="Français">Français</SelectItem>
                                 <SelectItem value="Anglais">Anglais</SelectItem>
                                 <SelectItem value="Espagnol">Espagnol</SelectItem>
-                                <SelectItem value="Amazigh">Amazigh</SelectItem>
+                                <SelectItem value="Amazighe">Amazighe</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>

@@ -496,7 +496,7 @@ export function useCollectionDocuments(collectionType: CollectionType) {
               content_type: 'video',
               view_count: 3421,
               download_enabled: true,
-              tags: ['Oral', 'Amazigh', 'Traditions'],
+              tags: ['Oral', 'Amazighe', 'Traditions'],
             },
             {
               id: 'mock-av-5',

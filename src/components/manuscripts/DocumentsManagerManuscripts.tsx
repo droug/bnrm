@@ -270,7 +270,7 @@ export default function DocumentsManagerManuscripts() {
                             <SelectContent>
                               <SelectItem value="arabic">Arabe</SelectItem>
                               <SelectItem value="french">Français</SelectItem>
-                              <SelectItem value="berber">Amazigh</SelectItem>
+                              <SelectItem value="berber">Amazighe</SelectItem>
                               <SelectItem value="latin">Latin</SelectItem>
                               <SelectItem value="hebrew">Hébreu</SelectItem>
                             </SelectContent>
@@ -458,7 +458,7 @@ export default function DocumentsManagerManuscripts() {
                 <SelectItem value="all">Toutes les langues</SelectItem>
                 <SelectItem value="arabic">Arabe</SelectItem>
                 <SelectItem value="french">Français</SelectItem>
-                <SelectItem value="berber">Amazigh</SelectItem>
+                <SelectItem value="berber">Amazighe</SelectItem>
                 <SelectItem value="latin">Latin</SelectItem>
               </SelectContent>
             </Select>
