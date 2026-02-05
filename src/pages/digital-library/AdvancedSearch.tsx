@@ -490,17 +490,6 @@ export default function AdvancedSearch() {
                         className="h-11"
                       />
                     </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="series" className="text-base font-semibold">Titre de série</Label>
-                      <Input
-                        id="series"
-                        placeholder="Nom de la série"
-                        value={formData.series}
-                        onChange={(e) => setFormData({ ...formData, series: e.target.value })}
-                        className="h-11"
-                      />
-                    </div>
                   </div>
 
                   <div className="space-y-2">
