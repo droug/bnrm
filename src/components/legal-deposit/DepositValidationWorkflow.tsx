@@ -183,7 +183,10 @@ export function DepositValidationWorkflow() {
       .order("created_at", { ascending: false });
 
     if (activeTab === "pending") {
-      query = query.in("status", ["brouillon", "soumis", "en_attente_validation_b", "en_cours"]);
+      // Exclure les demandes en attente de confirmation réciproque (non confirmées par les 2 parties)
+      query = query
+        .in("status", ["brouillon", "soumis", "en_attente_validation_b", "en_cours"])
+        .or('confirmation_status.is.null,confirmation_status.eq.confirmed,confirmation_status.eq.not_required');
     } else if (activeTab === "validated") {
       query = query.in("status", ["valide_par_b", "valide_par_comite", "attribue"]);
     } else if (activeTab === "rejected") {
