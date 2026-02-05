@@ -601,9 +601,9 @@ const EditorSignupForm = ({ prefillEmail, prefillName }: EditorSignupFormProps) 
               </div>
             </div>
 
-            {/* Adresse */}
+            {/* Adresse au Maroc */}
             <div className="space-y-2">
-              <Label htmlFor="address">Adresse *</Label>
+              <Label htmlFor="address">Adresse au Maroc *</Label>
               <Input
                 id="address"
                 value={formData.address}
