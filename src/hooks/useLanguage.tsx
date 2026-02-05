@@ -992,7 +992,9 @@ export const LanguageProvider = ({ children }: { children: ReactNode }) => {
     if (dlTranslations && dlTranslations[key]) {
       return dlTranslations[key];
     }
-    return translations[language][key] || key;
+    // Fallback to French for languages without full translations (es, amz)
+    const langTranslations = translations[language as keyof typeof translations] || translations.fr;
+    return langTranslations[key] || key;
   };
 
   const isRTL = language === 'ar';
