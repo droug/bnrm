@@ -36,6 +36,7 @@ import { useLegalDepositStorage } from "@/hooks/useLegalDepositStorage";
 import { DisciplineAutocomplete } from "@/components/ui/discipline-autocomplete";
 import { LanguageAutocomplete } from "@/components/ui/language-autocomplete";
 import { CountrySingleAutocomplete } from "@/components/ui/country-single-autocomplete";
+import { NationalityMultiSelect } from "@/components/ui/nationality-multi-select";
 import { PublisherAutocomplete } from "@/components/ui/publisher-autocomplete";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -1734,6 +1735,21 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                     onChange={(e) => setDirectorPseudonym(e.target.value)}
                   />
                 </div>
+
+                {/* Nationalité - only for Personne Physique (multi-select) */}
+                {directorType !== "personne_morale" && (
+                  <div className="space-y-2 animate-fade-in">
+                    <Label>Nationalité(s)</Label>
+                    <NationalityMultiSelect
+                      value={formData.directorNationalities || []}
+                      onChange={(value) => setFormData({ ...formData, directorNationalities: value })}
+                      placeholder="Sélectionner nationalité(s)"
+                      gender={directorGender as 'homme' | 'femme' | ''}
+                      otherValue={formData.directorOtherNationality || ""}
+                      onOtherValueChange={(value) => setFormData({ ...formData, directorOtherNationality: value })}
+                    />
+                  </div>
+                )}
 
                 {/* Informations de contact */}
                 <div className="space-y-2">

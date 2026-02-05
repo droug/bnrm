@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { InlineSelect } from "@/components/ui/inline-select";
 import { SimpleEntitySelect } from "@/components/ui/simple-entity-select";
 import { PhoneInput } from "@/components/ui/phone-input";
-import { NationalityAutocomplete } from "@/components/ui/nationality-autocomplete";
+import { NationalityMultiSelect } from "@/components/ui/nationality-multi-select";
 import { Plus, Trash2, User, ChevronDown, ChevronUp } from "lucide-react";
 import { moroccanRegions, getCitiesByRegion } from "@/data/moroccanRegions";
 import { DynamicFieldRenderer } from "@/components/form-builder/DynamicFieldRenderer";
@@ -20,7 +20,7 @@ export interface Author {
   authorName: string; // Keep for backward compatibility (will be computed)
   pseudonym: string;
   gender: string;
-  nationality: string;
+  nationalities: string[];
   otherNationality: string;
   phoneFixed: string;
   phoneMobile: string;
@@ -47,7 +47,7 @@ const createEmptyAuthor = (): Author => ({
   authorName: "",
   pseudonym: "",
   gender: "",
-  nationality: "",
+  nationalities: [],
   otherNationality: "",
   phoneFixed: "",
   phoneMobile: "",
@@ -273,14 +273,14 @@ export function MultipleAuthorsSection({
                         />
                       </div>
 
-                      {/* Nationalité - for Personne Physique */}
-                      {isPersonnePhysique && (
+                      {/* Nationalité - for Personne Physique (multi-select) */}
+                      {!isPersonneMorale && (
                         <div className="space-y-2">
-                          <Label>Nationalité</Label>
-                          <NationalityAutocomplete
-                            value={author.nationality}
-                            onChange={(value) => updateAuthor(author.id, { nationality: value })}
-                            placeholder="Sélectionner nationalité"
+                          <Label>Nationalité(s)</Label>
+                          <NationalityMultiSelect
+                            value={author.nationalities}
+                            onChange={(value) => updateAuthor(author.id, { nationalities: value })}
+                            placeholder="Sélectionner nationalité(s)"
                             gender={author.gender as 'homme' | 'femme' | ''}
                             otherValue={author.otherNationality}
                             onOtherValueChange={(value) => updateAuthor(author.id, { otherNationality: value })}
