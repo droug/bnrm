@@ -279,14 +279,14 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
         <div className="flex gap-2">
           <button
             onClick={() => api?.scrollPrev()}
-            className="p-3 rounded-lg transition-colors bg-blue-600 text-white hover:bg-blue-700"
+            className="p-3 rounded-lg transition-colors bnrm-btn-primary"
             aria-label="Previous slide"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
           <button
             onClick={() => api?.scrollNext()}
-            className="p-3 rounded-lg transition-colors bg-blue-600 text-white hover:bg-blue-700"
+            className="p-3 rounded-lg transition-colors bnrm-btn-primary"
             aria-label="Next slide"
           >
             <ChevronRight className="h-5 w-5" />
@@ -299,7 +299,7 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
         <Button
           onClick={() => navigate('/services-bnrm')}
           size="lg"
-          className="bg-blue-primary-dark hover:bg-blue-deep text-white px-8 py-6 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
+          className="bnrm-btn-primary px-8 py-6 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
         >
           {language === 'ar' ? 'عرض جميع الخدمات' : 'Voir tous nos services'}
           <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
