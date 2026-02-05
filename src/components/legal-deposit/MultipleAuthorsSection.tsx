@@ -232,8 +232,8 @@ export function MultipleAuthorsSection({
                         />
                       </div>
 
-                      {/* Prénom - only for Personne Physique */}
-                      {isPersonnePhysique && (
+                      {/* Prénom - only for Personne Physique or when type is not set */}
+                      {!isPersonneMorale && (
                         <div className="space-y-2">
                           <Label>Prénom <span className="text-destructive">*</span></Label>
                           <Input
