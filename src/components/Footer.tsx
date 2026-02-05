@@ -19,7 +19,7 @@ import { useLanguage } from "@/hooks/useLanguage";
 import { useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import logoBnrm from "@/assets/bnrm-portal-logo.gif";
+import logoBnrm from "@/assets/logo-bnrm.png";
 
 const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {}) => {
   const currentYear = new Date().getFullYear();
