@@ -155,6 +155,12 @@ export const portalTranslations = {
     'portal.collections.explore': 'Explorer',
     'portal.collections.viewAll': 'Voir toutes les collections',
     
+    // ============= News & Events Section (Homepage) =============
+    'portal.newsEvents.title': 'Actualités & Événements',
+    'portal.newsEvents.subtitle': 'Découvrez les dernières actualités et événements',
+    'portal.newsEvents.viewAll': 'Tout afficher',
+    'portal.newsEvents.moreInfo': 'Plus d\'infos',
+    
     // ============= News Section =============
     'portal.news.title': 'Actualités',
     'portal.news.subtitle': 'Restez informé des dernières nouvelles de la BNRM',
@@ -435,6 +441,12 @@ export const portalTranslations = {
     'portal.collections.audiovisual.desc': 'التسجيلات الصوتية والصور والأفلام من التراث المغربي.',
     'portal.collections.explore': 'استكشف',
     'portal.collections.viewAll': 'عرض جميع المجموعات',
+    
+    // ============= News & Events Section (Homepage) =============
+    'portal.newsEvents.title': 'الأخبار و الأحداث',
+    'portal.newsEvents.subtitle': 'اطلع على آخر الأخبار والفعاليات',
+    'portal.newsEvents.viewAll': 'عرض الكل',
+    'portal.newsEvents.moreInfo': 'المزيد من المعلومات',
     
     // ============= News Section =============
     'portal.news.title': 'الأخبار',
@@ -717,6 +729,12 @@ export const portalTranslations = {
     'portal.collections.explore': 'Explore',
     'portal.collections.viewAll': 'View all collections',
     
+    // ============= News & Events Section (Homepage) =============
+    'portal.newsEvents.title': 'News & Events',
+    'portal.newsEvents.subtitle': 'Discover the latest news and events',
+    'portal.newsEvents.viewAll': 'View all',
+    'portal.newsEvents.moreInfo': 'More info',
+    
     // ============= News Section =============
     'portal.news.title': 'News',
     'portal.news.subtitle': 'Stay informed of the latest news from BNRM',
@@ -998,6 +1016,12 @@ export const portalTranslations = {
     'portal.collections.explore': 'Explorar',
     'portal.collections.viewAll': 'Ver todas las colecciones',
     
+    // ============= News & Events Section (Homepage) =============
+    'portal.newsEvents.title': 'Noticias y Eventos',
+    'portal.newsEvents.subtitle': 'Descubra las últimas noticias y eventos',
+    'portal.newsEvents.viewAll': 'Ver todo',
+    'portal.newsEvents.moreInfo': 'Más información',
+    
     // ============= News Section =============
     'portal.news.title': 'Noticias',
     'portal.news.subtitle': 'Manténgase informado de las últimas noticias de la BNRM',
@@ -1191,7 +1215,18 @@ export const portalTranslations = {
     'portal.collections.explore': 'ⵙⵙⵓⴷⵓ',
     'portal.collections.viewAll': 'ⵥⵕ ⵜⵉⴳⵔⴰⵡⵉⵏ ⴽⵓⵍⵍⵓ',
     
-    // ============= Footer =============
+    // ============= News & Events Section (Homepage) =============
+    'portal.newsEvents.title': 'ⵉⵏⵖⵎⵉⵙⵏ ⴷ ⵉⵎⵓⵙⵙⵓⵜⵏ',
+    'portal.newsEvents.subtitle': 'ⵙⵙⵓⴷⵓ ⵉⵏⵖⵎⵉⵙⵏ ⴷ ⵉⵎⵓⵙⵙⵓⵜⵏ ⵉⵎⴳⴳⵓⵔⴰ',
+    'portal.newsEvents.viewAll': 'ⵥⵕ ⴽⵓⵍⵍⵓ',
+    'portal.newsEvents.moreInfo': 'ⵓⴳⴳⴰⵔ ⵏ ⵉⵏⵖⵎⵉⵙⵏ',
+    
+    // ============= News Section =============
+    'portal.news.title': 'ⵉⵏⵖⵎⵉⵙⵏ',
+    'portal.news.subtitle': 'ⴹⴼⵕ ⵉⵏⵖⵎⵉⵙⵏ ⵉⵎⴳⴳⵓⵔⴰ',
+    'portal.news.readMore': 'ⵖⵔ ⵓⴳⴳⴰⵔ',
+    'portal.news.viewAll': 'ⵉⵏⵖⵎⵉⵙⵏ ⴽⵓⵍⵍⵓ',
+
     'portal.footer.title': 'ⵜⴰⵙⴷⵍⵉⵙⵜ ⵜⴰⵏⴰⵎⵓⵔⵜ ⵏ ⵜⴳⵍⴷⵉⵜ ⵏ ⵍⵎⵖⵔⵉⴱ',
     'portal.footer.description': 'ⵜⴰⵎⵙⵙⵓⴳⵓⵔⵜ ⵜⴰⵏⴰⵎⵓⵔⵜ ⵉⵜⵜⵓⵙⵎⴰⴳⵍⵏ ⵙ ⵓⵙⵎⵓⵏ, ⵓⵃⵟⵟⵓ ⴷ ⵓⵙⵎⵓⵙⵙⵓ ⵏ ⵓⵢⴷⴰ ⴰⵜⴰⵔⵔⴰⵜⴰⵏ ⴰⵎⵖⵔⵉⴱⵉ.',
     'portal.footer.quickLinks': 'ⵉⵣⴷⴰⵢⵏ ⵉⵎⵍⴰⵍⵏ',

@@ -60,16 +60,30 @@ const Index = () => {
   // Get hero image URL with fallback to static image
   const heroImageUrl = heroSettings?.hero_image_url || bnrmBuildingNight;
   
-  // Get hero content with proper language fallback
+  // Get hero content with proper language fallback - prioritize translations for non-CMS languages
   const getHeroTitle = () => {
-    if (language === 'ar' && heroSettings?.hero_title_ar) return heroSettings.hero_title_ar;
-    if (heroSettings?.hero_title_fr) return heroSettings.hero_title_fr;
+    // For Arabic, use CMS Arabic content if available
+    if (language === 'ar' && heroSettings?.hero_title_ar) {
+      return heroSettings.hero_title_ar;
+    }
+    // For French, use CMS French content if available
+    if (language === 'fr' && heroSettings?.hero_title_fr) {
+      return heroSettings.hero_title_fr;
+    }
+    // For all other languages (EN, ES, AMZ), use translation system
     return t('portal.hero.title');
   };
   
   const getHeroSubtitle = () => {
-    if (language === 'ar' && heroSettings?.hero_subtitle_ar) return heroSettings.hero_subtitle_ar;
-    if (heroSettings?.hero_subtitle_fr) return heroSettings.hero_subtitle_fr;
+    // For Arabic, use CMS Arabic content if available
+    if (language === 'ar' && heroSettings?.hero_subtitle_ar) {
+      return heroSettings.hero_subtitle_ar;
+    }
+    // For French, use CMS French content if available
+    if (language === 'fr' && heroSettings?.hero_subtitle_fr) {
+      return heroSettings.hero_subtitle_fr;
+    }
+    // For all other languages (EN, ES, AMZ), use translation system
     return t('portal.hero.description');
   };
   
