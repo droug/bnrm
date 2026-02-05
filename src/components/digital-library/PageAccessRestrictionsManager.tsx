@@ -66,8 +66,7 @@ export function PageAccessRestrictionsManager() {
     { value: "restauration", label: "Pages retirées pour restauration" },
     { value: "censure_historique", label: "Censure historique" },
     { value: "numerisation_incomplete", label: "Numérisation incomplète" },
-    { value: "perte", label: "Pages perdues ou égarées" },
-    { value: "non_communicable", label: "Pages non communicables" },
+    { value: "pages_brulees", label: "Pages brulées" },
     { value: "autre", label: "Autre (préciser)" },
   ];
 
