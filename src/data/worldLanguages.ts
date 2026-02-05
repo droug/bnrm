@@ -7,7 +7,7 @@
 
 export const worldLanguages = [
   { code: "ar", name: "Arabe" },
-  { code: "am", name: "Amazigh (Tifinagh)" },
+  { code: "am", name: "Amazighe (Tifinagh)" },
   { code: "fr", name: "Français" },
   { code: "en", name: "Anglais" },
   { code: "es", name: "Espagnol" },
