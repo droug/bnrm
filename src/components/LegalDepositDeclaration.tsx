@@ -5046,7 +5046,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
     return null;
   };
 
-  // Render avec Header fixe et filigrane BNRM
+  // Render avec Header fixe, filigrane BNRM et design premium
   return (
     <WatermarkContainer
       watermarkProps={{
@@ -5058,25 +5058,86 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
     >
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-background to-muted/20">
         <Header />
-        <main className="flex-1 container mx-auto px-4 py-8">
-          <Card className="border-0 bg-gradient-to-r from-primary/10 via-primary/5 to-transparent shadow-sm mb-6">
-            <CardContent className="p-4 md:p-6">
-              <div className="flex items-center gap-4">
-                <div className="p-3 rounded-xl bg-primary/10 shadow-md">
-                  <FileText className="h-6 w-6 text-primary" />
-                </div>
-                <div className="flex-1">
-                  <h1 className="text-xl md:text-2xl font-bold text-foreground">
-                    Déclaration de dépôt légal - {depositTypeLabels[depositType]}
-                  </h1>
-                  <p className="text-muted-foreground text-sm mt-1">
-                    Remplissez le formulaire ci-dessous pour soumettre votre déclaration
-                  </p>
+        <main className="flex-1 relative">
+          {/* Background decorative elements */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-gradient-to-br from-accent/15 via-primary/10 to-transparent rounded-full blur-3xl" />
+            <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-gradient-to-tr from-highlight/10 via-accent/5 to-transparent rounded-full blur-3xl" />
+          </div>
+
+          <div className="relative z-10">
+            {/* Premium Header Section */}
+            <div className="relative overflow-hidden bg-gradient-to-r from-primary/5 via-accent/5 to-highlight/5 border-b border-border/30">
+              <div className="container mx-auto px-4 pt-6 pb-8">
+                {/* Back button with animation */}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onClose}
+                  className="mb-4 group hover:bg-primary/10 transition-all duration-300"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform duration-300" />
+                  Retour
+                </Button>
+
+                {/* Title section with premium styling */}
+                <div className="flex items-start gap-4 md:gap-6">
+                  <div className="relative hidden sm:block">
+                    <div className="absolute inset-0 bg-gradient-to-br from-accent to-highlight rounded-2xl blur-xl opacity-50" />
+                    <div className="relative p-4 md:p-5 bg-gradient-to-br from-accent via-primary to-highlight rounded-2xl shadow-xl">
+                      <FileText className="h-8 w-8 md:h-10 md:w-10 text-white" />
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground tracking-tight">
+                      Déclaration de dépôt légal
+                    </h1>
+                    <div className="flex flex-wrap items-center gap-2 mt-2">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gradient-to-r from-accent to-highlight text-white shadow-md">
+                        {depositTypeLabels[depositType]}
+                      </span>
+                      {editId && (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-700 border border-amber-200">
+                          Mode édition
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-muted-foreground mt-3 text-base md:text-lg">
+                      Remplissez le formulaire ci-dessous pour soumettre votre déclaration
+                    </p>
+                  </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-          {renderStepContent()}
+
+              {/* Decorative wave separator */}
+              <svg 
+                className="absolute bottom-0 left-0 w-full h-6 text-background" 
+                viewBox="0 0 1200 30" 
+                preserveAspectRatio="none"
+              >
+                <path 
+                  d="M0,15 C300,0 600,30 900,15 C1050,7 1150,20 1200,15 L1200,30 L0,30 Z" 
+                  fill="currentColor"
+                />
+              </svg>
+            </div>
+
+            {/* Main Content Area with premium card */}
+            <div className="container mx-auto px-4 py-6 md:py-8">
+              <div className="relative">
+                {/* Premium card container */}
+                <div className="relative bg-card rounded-2xl shadow-2xl border border-border/40 overflow-hidden">
+                  {/* Top gradient accent line */}
+                  <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-accent via-highlight to-primary" />
+                  
+                  {/* Content */}
+                  <div className="p-4 md:p-6 lg:p-8">
+                    {renderStepContent()}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </main>
         <Footer />
       </div>
