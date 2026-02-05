@@ -42,14 +42,16 @@ const defaultContent: MultilingualContent = {
   fr: '',
   ar: '',
   en: '',
-  ber: ''
+  es: '',
+  amz: ''
 };
 
 const defaultTitles: MultilingualContent = {
   fr: '',
   ar: '',
   en: '',
-  ber: ''
+  es: '',
+  amz: ''
 };
 
 export default function CmsWysiwygModule() {
@@ -173,13 +175,15 @@ export default function CmsWysiwygModule() {
       fr: item.title_fr || '',
       ar: item.title_ar || '',
       en: '',
-      ber: ''
+      es: '',
+      amz: ''
     });
     setContent({
       fr: '',
       ar: '',
       en: '',
-      ber: ''
+      es: '',
+      amz: ''
     });
     setSlug(item.slug);
     setStatus(item.status as 'draft' | 'published' | 'archived');
@@ -401,7 +405,7 @@ export default function CmsWysiwygModule() {
               <MultilingualWysiwygEditor
                 value={content}
                 onChange={setContent}
-                supportedLanguages={['fr', 'ar', 'en', 'ber']}
+                supportedLanguages={['fr', 'ar', 'en', 'es', 'amz']}
                 minHeight="400px"
                 placeholder="Rédigez votre contenu ici..."
               />

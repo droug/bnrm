@@ -160,7 +160,7 @@ export function CBNAdvancedSearch({ onSearch, onSelectDocument, compact = false 
     { value: "yi", label: "Yiddish" },
     { value: "la", label: "Latin" },
     { value: "sa", label: "Sanskrit" },
-    { value: "ber", label: "Berbère (Tamazight)" },
+    { value: "amz", label: "Amazighe (Tamazight)" },
     { value: "kab", label: "Kabyle" },
     { value: "tzm", label: "Tamazight du Maroc central" },
     { value: "shi", label: "Tachelhit" },

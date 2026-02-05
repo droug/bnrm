@@ -1015,7 +1015,7 @@ export const BNRMRequestManager = () => {
                       <SelectContent>
                         <SelectItem value="fr">Français</SelectItem>
                         <SelectItem value="ar">Arabe</SelectItem>
-                        <SelectItem value="ber">Amazighe</SelectItem>
+                        <SelectItem value="amz">Amazighe</SelectItem>
                         <SelectItem value="en">Anglais</SelectItem>
                         <SelectItem value="es">Espagnol</SelectItem>
                       </SelectContent>

@@ -221,11 +221,11 @@ export default function SearchResults() {
 
   const getContentTypeLabel = (type: string) => {
     const labels: Record<string, Record<string, string>> = {
-      'article': { fr: 'Article', ar: 'مقال', en: 'Article', ber: 'Amagrad' },
-      'news': { fr: 'Actualité', ar: 'أخبار', en: 'News', ber: 'Isallen' },
-      'event': { fr: 'Événement', ar: 'حدث', en: 'Event', ber: 'Anagar' },
-      'manuscript': { fr: 'Manuscrit', ar: 'مخطوط', en: 'Manuscript', ber: 'Aṛun' },
-      'exhibition': { fr: 'Exposition', ar: 'معرض', en: 'Exhibition', ber: 'Timleyt' }
+      'article': { fr: 'Article', ar: 'مقال', en: 'Article', es: 'Artículo', amz: 'Amagrad' },
+      'news': { fr: 'Actualité', ar: 'أخبار', en: 'News', es: 'Noticias', amz: 'Isallen' },
+      'event': { fr: 'Événement', ar: 'حدث', en: 'Event', es: 'Evento', amz: 'Anagar' },
+      'manuscript': { fr: 'Manuscrit', ar: 'مخطوط', en: 'Manuscript', es: 'Manuscrito', amz: 'Aṛun' },
+      'exhibition': { fr: 'Exposition', ar: 'معرض', en: 'Exhibition', es: 'Exposición', amz: 'Timleyt' }
     };
     return labels[type]?.[language] || type;
   };

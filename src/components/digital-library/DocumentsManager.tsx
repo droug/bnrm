@@ -1350,7 +1350,8 @@ export default function DocumentsManager() {
     { value: "ar", label: "العربية (Arabe)" },
     { value: "fr", label: "Français" },
     { value: "en", label: "English (Anglais)" },
-    { value: "ber", label: "ⵜⴰⵎⴰⵣⵉⵖⵜ (Amazigh)" },
+    { value: "es", label: "Español (Espagnol)" },
+    { value: "amz", label: "ⵜⴰⵎⴰⵣⵉⵖⵜ (Amazigh)" },
     { value: "auto", label: "Détection automatique" },
   ];
 
@@ -3630,8 +3631,9 @@ export default function DocumentsManager() {
                     <SelectItem value="ar">Arabe</SelectItem>
                     <SelectItem value="fr">Français</SelectItem>
                     <SelectItem value="en">Anglais</SelectItem>
+                    <SelectItem value="es">Espagnol</SelectItem>
                     <SelectItem value="lat">Latin</SelectItem>
-                    <SelectItem value="ber">Amazigh (Tifinagh)</SelectItem>
+                    <SelectItem value="amz">Amazighe (Tifinagh)</SelectItem>
                     <SelectItem value="mixed">Mixte (Arabe/Français)</SelectItem>
                   </SelectContent>
               </Select>

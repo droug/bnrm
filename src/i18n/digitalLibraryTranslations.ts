@@ -1,4 +1,4 @@
-// Digital Library Translations - FR, AR, EN, BER
+// Digital Library Translations - FR, AR, EN, ES, AMZ
 // Complete translations for all digital library interfaces
 
 export const digitalLibraryTranslations = {
@@ -1194,7 +1194,118 @@ export const digitalLibraryTranslations = {
     'dl.common.linkCopied': 'Link copied to clipboard',
   },
   
-  ber: {
+  es: {
+    // ============= Layout & Navigation =============
+    'dl.title': 'Biblioteca Digital',
+    'dl.subtitle': 'IBN BATTOUTA',
+    'dl.home': 'Inicio',
+    'dl.collections': 'Colecciones',
+    'dl.electronicBundles': 'Paquetes electrónicos',
+    'dl.electronicResources': 'Recursos electrónicos',
+    'dl.noBundlesAvailable': 'No hay paquetes disponibles',
+    'dl.advancedSearch': 'Búsqueda avanzada',
+    'dl.readerServices': 'Servicios para lectores',
+    'dl.membership': 'Membresía',
+    'dl.reservationRequest': 'Solicitud de reserva',
+    'dl.digitizationRequest': 'Solicitud de digitalización',
+    'dl.exploreByTheme': 'Explorar por tema',
+    'dl.newsEvents': 'Noticias y eventos',
+    'dl.helpFaq': 'Ayuda y FAQ',
+    'dl.login': 'Iniciar sesión',
+    'dl.logout': 'Cerrar sesión',
+    'dl.myAccount': 'Mi cuenta',
+    'dl.myPersonalSpace': 'Mi espacio personal',
+    'dl.myRequests': 'Mis solicitudes',
+    'dl.myDigitalLoans': 'Mis préstamos digitales',
+    'dl.myAnnotations': 'Mis anotaciones',
+    'dl.accountSettings': 'Configuración de cuenta',
+    'dl.administration': 'Administración',
+    'dl.manageLibrary': 'Gestión Biblioteca Digital',
+    'dl.backToPortal': 'Volver al portal principal BNRM',
+    'dl.chooseLanguage': 'Elegir idioma',
+    'dl.changeLanguageTo': 'Cambiar idioma a',
+    
+    // ============= Collections submenu =============
+    'dl.collections.manuscripts': 'Manuscritos',
+    'dl.collections.manuscripts.desc': 'Manuscritos antiguos',
+    'dl.collections.manuscripts.tooltip': 'Manuscritos árabes, hebreos, bereberes y otros manuscritos antiguos del patrimonio marroquí',
+    'dl.collections.books': 'Libros',
+    'dl.collections.books.desc': 'Obras impresas',
+    'dl.collections.books.tooltip': 'Obras impresas, libros raros y ediciones antiguas',
+    'dl.collections.lithography': 'Litografía',
+    'dl.collections.lithography.desc': 'Obras litografiadas',
+    'dl.collections.lithography.tooltip': 'Litografías antiguas y obras impresas por técnica litográfica',
+    'dl.collections.periodicals': 'Revistas y periódicos',
+    'dl.collections.periodicals.desc': 'Publicaciones periódicas',
+    'dl.collections.periodicals.tooltip': 'Periódicos históricos, revistas científicas, magazines y boletines oficiales',
+    'dl.collections.specialized': 'Colecciones especializadas',
+    'dl.collections.specialized.desc': 'Documentos iconográficos',
+    'dl.collections.specialized.tooltip': 'Documentos cartográficos, documentos iconográficos y obras de arte',
+    'dl.collections.audiovisual': 'Documentos audiovisuales',
+    'dl.collections.audiovisual.desc': 'Archivos sonoros y videos',
+    'dl.collections.audiovisual.tooltip': 'Grabaciones sonoras, películas, videos y archivos radiofónicos',
+    'dl.collections.digitizedManuscripts': 'Manuscritos digitalizados',
+    'dl.collections.historicalPhotos': 'Fotografías históricas',
+    
+    // ============= Document details =============
+    'dl.document.title': 'Título',
+    'dl.document.author': 'Autor',
+    'dl.document.year': 'Año de publicación',
+    'dl.document.type': 'Tipo de documento',
+    'dl.document.language': 'Idioma',
+    'dl.document.pages': 'Número de páginas',
+    'dl.document.isbn': 'ISBN',
+    'dl.document.issn': 'ISSN',
+    'dl.document.dewey': 'Clasificación Dewey',
+    'dl.document.cote': 'Signatura',
+    'dl.document.publisher': 'Editor',
+    'dl.document.description': 'Descripción',
+    'dl.document.keywords': 'Palabras clave',
+    'dl.document.consultDocument': 'Consultar documento',
+    'dl.document.download': 'Descargar',
+    'dl.document.share': 'Compartir',
+    'dl.document.addToFavorites': 'Añadir a favoritos',
+    'dl.document.removeFromFavorites': 'Quitar de favoritos',
+    'dl.document.relatedDocuments': 'Documentos relacionados',
+    'dl.document.notFound': 'Documento no encontrado',
+    'dl.document.return': 'Volver',
+    
+    // ============= Search =============
+    'dl.search.title': 'Búsqueda avanzada',
+    'dl.search.subtitle': 'Busque en nuestras colecciones utilizando varios criterios organizados por pestañas temáticas',
+    'dl.search.placeholder': 'Buscar en las colecciones...',
+    'dl.search.searchButton': 'Buscar',
+    'dl.search.filters': 'Filtros',
+    'dl.search.clearFilters': 'Borrar filtros',
+    'dl.search.results': 'resultados',
+    'dl.search.noResults': 'No se encontraron resultados',
+    'dl.search.noResultsDesc': 'Ningún documento corresponde a sus criterios de búsqueda.',
+    
+    // ============= Common =============
+    'dl.common.loading': 'Cargando...',
+    'dl.common.error': 'Error',
+    'dl.common.save': 'Guardar',
+    'dl.common.cancel': 'Cancelar',
+    'dl.common.delete': 'Eliminar',
+    'dl.common.edit': 'Editar',
+    'dl.common.view': 'Ver',
+    'dl.common.back': 'Volver',
+    'dl.common.next': 'Siguiente',
+    'dl.common.previous': 'Anterior',
+    'dl.common.search': 'Buscar',
+    'dl.common.filter': 'Filtrar',
+    'dl.common.sortBy': 'Ordenar por',
+    'dl.common.all': 'Todos',
+    'dl.common.none': 'Ninguno',
+    'dl.common.yes': 'Sí',
+    'dl.common.no': 'No',
+    'dl.common.document': 'Documento',
+    'dl.common.article': 'Artículo',
+    'dl.common.fileUnavailable': 'Archivo no disponible',
+    'dl.common.linkCopied': 'Enlace copiado al portapapeles',
+  },
+  
+  amz: {
     // ============= Layout & Navigation =============
     'dl.title': 'ⵜⴰⵎⴽⵜⴰⵢⵜ ⵜⴰⵏⵓⵎⴰⵏⵜ',
     'dl.subtitle': 'ⵜ.ⵏ.ⵜ.ⵎ - ⴰⵢⴷⴰ ⴰⵏⵓⵎⴰⵏ ⵏ ⵍⵎⵖⵔⵉⴱ',
@@ -1585,7 +1696,7 @@ export const digitalLibraryTranslations = {
 };
 
 // Helper function to get translation
-export function getDigitalLibraryTranslation(key: string, language: 'fr' | 'ar' | 'en' | 'ber'): string {
+export function getDigitalLibraryTranslation(key: string, language: 'fr' | 'ar' | 'en' | 'es' | 'amz'): string {
   const translations = digitalLibraryTranslations[language] || digitalLibraryTranslations.fr;
   return translations[key as keyof typeof translations] || digitalLibraryTranslations.fr[key as keyof typeof digitalLibraryTranslations.fr] || key;
 }
