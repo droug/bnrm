@@ -126,7 +126,8 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
     { code: 'fr', label: 'Français' },
     { code: 'ar', label: 'العربية' },
     { code: 'en', label: 'English' },
-    { code: 'ber', label: 'ⵜⴰⵎⴰⵣⵉⵖⵜ' },
+    { code: 'es', label: 'Español' },
+    { code: 'amz', label: 'ⵜⴰⵎⴰⵣⵉⵖⵜ' },
   ];
 
   return (

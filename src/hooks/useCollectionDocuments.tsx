@@ -603,7 +603,7 @@ export function useCollectionDocuments(collectionType: CollectionType) {
           .not('file_type', 'is', null);
 
         setFacets({
-          languages: ['fr', 'ar', 'en', 'ber'],
+          languages: ['fr', 'ar', 'en', 'es', 'amz'],
           types: [...new Set(types?.map(d => d.file_type) || [])],
           materials: [],
         });

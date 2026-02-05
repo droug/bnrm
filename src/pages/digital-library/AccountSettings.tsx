@@ -299,7 +299,8 @@ export default function AccountSettings() {
                       <SelectItem value="fr">Français</SelectItem>
                       <SelectItem value="ar">العربية</SelectItem>
                       <SelectItem value="en">English</SelectItem>
-                      <SelectItem value="ber">ⵜⴰⵎⴰⵣⵉⵖⵜ</SelectItem>
+                      <SelectItem value="es">Español</SelectItem>
+                      <SelectItem value="amz">ⵜⴰⵎⴰⵣⵉⵖⵜ</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>

@@ -34,8 +34,9 @@ interface ContentTranslationManagerProps {
 const LANGUAGES = [
   { code: 'fr', name: 'Français', flag: '🇫🇷' },
   { code: 'ar', name: 'العربية', flag: '🇲🇦' },
-  { code: 'ber', name: 'Tamazight', flag: 'ⵣ' },
   { code: 'en', name: 'English', flag: '🇬🇧' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
+  { code: 'amz', name: 'ⵜⴰⵎⴰⵣⵉⵖⵜ', flag: 'ⵣ' },
 ];
 
 export default function ContentTranslationManager({ contentId, contentTitle }: ContentTranslationManagerProps) {

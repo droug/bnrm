@@ -154,7 +154,8 @@ export default function Collections() {
                     <SelectItem value="ar">Arabe</SelectItem>
                     <SelectItem value="fr">Français</SelectItem>
                     <SelectItem value="en">Anglais</SelectItem>
-                    <SelectItem value="ber">Amazighe</SelectItem>
+                    <SelectItem value="es">Espagnol</SelectItem>
+                    <SelectItem value="amz">Amazighe</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

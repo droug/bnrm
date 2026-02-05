@@ -37,13 +37,14 @@ export interface MultilingualContent {
   fr: string;
   ar: string;
   en: string;
-  ber: string;
+  es: string;
+  amz: string;
 }
 
 interface MultilingualWysiwygEditorProps {
   value: MultilingualContent;
   onChange: (value: MultilingualContent) => void;
-  supportedLanguages?: Array<'fr' | 'ar' | 'en' | 'ber'>;
+  supportedLanguages?: Array<'fr' | 'ar' | 'en' | 'es' | 'amz'>;
   minHeight?: string;
   placeholder?: string;
 }
@@ -52,7 +53,8 @@ const languageConfig = {
   fr: { label: "Français", flag: "🇫🇷", dir: "ltr" },
   ar: { label: "العربية", flag: "🇲🇦", dir: "rtl" },
   en: { label: "English", flag: "🇬🇧", dir: "ltr" },
-  ber: { label: "ⵜⴰⵎⴰⵣⵉⵖⵜ", flag: "ⵣ", dir: "ltr" },
+  es: { label: "Español", flag: "🇪🇸", dir: "ltr" },
+  amz: { label: "ⵜⴰⵎⴰⵣⵉⵖⵜ", flag: "ⵣ", dir: "ltr" },
 };
 
 interface ToolbarButtonProps {
@@ -91,11 +93,11 @@ function ToolbarButton({ icon, tooltip, onClick, active }: ToolbarButtonProps) {
 export default function MultilingualWysiwygEditor({ 
   value, 
   onChange,
-  supportedLanguages = ['fr', 'ar', 'en', 'ber'],
+  supportedLanguages = ['fr', 'ar', 'en', 'es', 'amz'],
   minHeight = "300px",
   placeholder = "Commencez à écrire..."
 }: MultilingualWysiwygEditorProps) {
-  const [activeLanguage, setActiveLanguage] = useState<'fr' | 'ar' | 'en' | 'ber'>('fr');
+  const [activeLanguage, setActiveLanguage] = useState<'fr' | 'ar' | 'en' | 'es' | 'amz'>('fr');
   const editorRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const [editedLanguages, setEditedLanguages] = useState<Set<string>>(new Set());
 
@@ -118,7 +120,7 @@ export default function MultilingualWysiwygEditor({
     }
   };
 
-  const handleInput = (lang: 'fr' | 'ar' | 'en' | 'ber') => {
+  const handleInput = (lang: 'fr' | 'ar' | 'en' | 'es' | 'amz') => {
     const ref = editorRefs.current[lang];
     if (ref) {
       onChange({
@@ -378,7 +380,7 @@ export default function MultilingualWysiwygEditor({
                 "prose-li:text-foreground",
                 "empty:before:content-[attr(data-placeholder)] empty:before:text-muted-foreground empty:before:pointer-events-none",
                 lang === 'ar' && "font-arabic text-right",
-                lang === 'ber' && "font-tifinagh"
+                lang === 'amz' && "font-tifinagh"
               )}
               style={{ 
                 minHeight,
