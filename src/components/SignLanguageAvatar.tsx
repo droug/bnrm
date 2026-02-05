@@ -44,8 +44,10 @@ const SignLanguageAvatar: React.FC<SignLanguageAvatarProps> = ({
     switch (language) {
       case 'ar':
         return 'مساعد لغة الإشارة';
-      case 'ber':
+      case 'amz':
         return 'Tutlayt n yifassen';
+      case 'es':
+        return 'Asistente de Lengua de Signos';
       default:
         return 'Assistant Langue des Signes';
     }

@@ -18,7 +18,8 @@ const TESSERACT_LANG_MAP: Record<string, string> = {
   'ar': 'ara',
   'fr': 'fra',
   'en': 'eng',
-  'ber': 'ara+fra+eng',
+  'es': 'spa',
+  'amz': 'ara+fra+eng',
   'lat': 'lat'
 };
 

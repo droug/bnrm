@@ -290,7 +290,8 @@ export function ManuscriptsManager() {
                       <SelectContent>
                         <SelectItem value="ar">Arabe</SelectItem>
                         <SelectItem value="fr">Français</SelectItem>
-                        <SelectItem value="ber">Berbère</SelectItem>
+                        <SelectItem value="amz">Amazighe</SelectItem>
+                        <SelectItem value="es">Espagnol</SelectItem>
                         <SelectItem value="la">Latin</SelectItem>
                       </SelectContent>
                     </Select>
