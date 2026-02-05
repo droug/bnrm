@@ -201,6 +201,7 @@ const Header = () => {
   // Pages d'accueil principales (pas de bouton retour)
   const isDigitalLibraryHome = location.pathname === "/digital-library";
   const isManuscriptsPlatformHome = location.pathname === "/plateforme-manuscrits" || location.pathname === "/manuscripts-platform";
+  const isSignupPage = location.pathname === "/signup"; // Les formulaires ont leur propre bouton Retour
   
   // Vérifier si on est sur une des plateformes spéciales
   const isDigitalLibrary = location.pathname.startsWith("/digital-library");
@@ -210,8 +211,8 @@ const Header = () => {
   const isCBMPortal = location.pathname.startsWith("/cbm");
   const hideNavigation = isDigitalLibrary || isManuscriptsPlatform || isManuscriptsHelp || isBackoffice || isCBMPortal;
   
-  // Afficher le bouton retour sur toutes les pages SAUF les pages d'accueil principales
-  const showBackButton = !isHomePage && !isDigitalLibraryHome && !isManuscriptsPlatformHome;
+  // Afficher le bouton retour sur toutes les pages SAUF les pages d'accueil principales et signup (qui a son propre bouton)
+  const showBackButton = !isHomePage && !isDigitalLibraryHome && !isManuscriptsPlatformHome && !isSignupPage;
 
   return (
     <header className="sticky top-0 z-50 shadow-lg">
