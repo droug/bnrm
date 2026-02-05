@@ -47,67 +47,87 @@ import { supabase } from "@/integrations/supabase/client";
 import { motion, AnimatePresence } from "framer-motion";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-// Modules spécifiques au Portail BNRM
+// Modules spécifiques au Portail BNRM - Ordonnés selon la page d'accueil
 const tabs = [
+  // === SECTION 1: CONTENU DE LA PAGE D'ACCUEIL (ordre d'affichage) ===
   { 
     id: "hero", 
-    label: "Hero Portail", 
+    label: "1. Hero Portail", 
     icon: Home, 
     color: "text-blue-600",
     bgColor: "bg-blue-500/10",
     borderColor: "border-blue-500/30",
     gradient: "from-blue-500/20 to-blue-600/5",
-    description: "Section Hero de la page d'accueil"
+    description: "Section Hero de la page d'accueil",
+    category: "accueil"
   },
   { 
-    id: "seo", 
-    label: "SEO & Référencement", 
-    icon: TrendingUp, 
-    color: "text-green-600",
-    bgColor: "bg-green-500/10",
-    borderColor: "border-green-500/30",
-    gradient: "from-green-500/20 to-green-600/5",
-    description: "Optimisation moteurs de recherche"
-  },
-  { 
-    id: "wysiwyg", 
-    label: "Éditeur WYSIWYG", 
-    icon: PenSquare, 
-    color: "text-pink-600",
-    bgColor: "bg-pink-500/10",
-    borderColor: "border-pink-500/30",
-    gradient: "from-pink-500/20 to-pink-600/5",
-    description: "Éditeur visuel multilingue"
-  },
-  { 
-    id: "styles", 
-    label: "Styles & Design", 
-    icon: Palette, 
-    color: "text-fuchsia-500",
-    bgColor: "bg-fuchsia-500/10",
-    borderColor: "border-fuchsia-500/30",
-    gradient: "from-fuchsia-500/20 to-fuchsia-600/5",
-    description: "Couleurs, polices et boutons"
+    id: "actualites", 
+    label: "2. Actualités & Événements", 
+    icon: Newspaper, 
+    color: "text-emerald-500",
+    bgColor: "bg-emerald-500/10",
+    borderColor: "border-emerald-500/30",
+    gradient: "from-emerald-500/20 to-emerald-600/5",
+    description: "Section Actualités et Événements",
+    category: "accueil"
   },
   { 
     id: "services-numeriques", 
-    label: "Services Numériques", 
+    label: "3. Services Numériques", 
     icon: Settings2, 
     color: "text-sky-500",
     bgColor: "bg-sky-500/10",
     borderColor: "border-sky-500/30",
     gradient: "from-sky-500/20 to-sky-600/5",
-    description: "Carousel des services numériques"
+    description: "Carousel des services numériques",
+    category: "accueil"
+  },
+  { 
+    id: "plateformes", 
+    label: "4. Plateformes", 
+    icon: Globe, 
+    color: "text-indigo-500",
+    bgColor: "bg-indigo-500/10",
+    borderColor: "border-indigo-500/30",
+    gradient: "from-indigo-500/20 to-indigo-600/5",
+    description: "Section Plateformes (CBN, BN, CBM...)",
+    category: "accueil"
+  },
+  { 
+    id: "liens-rapides", 
+    label: "5. Liens Rapides", 
+    icon: ChevronRight, 
+    color: "text-violet-500",
+    bgColor: "bg-violet-500/10",
+    borderColor: "border-violet-500/30",
+    gradient: "from-violet-500/20 to-violet-600/5",
+    description: "Cartes Inscription, Adhésions, Aide",
+    category: "accueil"
   },
   { 
     id: "mediatheque", 
-    label: "Médiathèque", 
+    label: "6. Médiathèque", 
     icon: Video, 
     color: "text-red-500",
     bgColor: "bg-red-500/10",
     borderColor: "border-red-500/30",
     gradient: "from-red-500/20 to-red-600/5",
-    description: "Vidéos YouTube de la BNRM"
+    description: "Vidéos YouTube de la BNRM",
+    category: "accueil"
+  },
+
+  // === SECTION 2: GESTION DU CONTENU ===
+  { 
+    id: "evenements", 
+    label: "Événements BNRM", 
+    icon: CalendarDays, 
+    color: "text-orange-500",
+    bgColor: "bg-orange-500/10",
+    borderColor: "border-orange-500/30",
+    gradient: "from-orange-500/20 to-orange-600/5",
+    description: "Programmation culturelle de la BNRM",
+    category: "contenu"
   },
   {
     id: "bannieres", 
@@ -117,57 +137,8 @@ const tabs = [
     bgColor: "bg-pink-500/10",
     borderColor: "border-pink-500/30",
     gradient: "from-pink-500/20 to-pink-600/5",
-    description: "Bannières promotionnelles du portail"
-  },
-  { 
-    id: "actualites", 
-    label: "Actualités BNRM", 
-    icon: Newspaper, 
-    color: "text-emerald-500",
-    bgColor: "bg-emerald-500/10",
-    borderColor: "border-emerald-500/30",
-    gradient: "from-emerald-500/20 to-emerald-600/5",
-    description: "Actualités et annonces de la BNRM"
-  },
-  { 
-    id: "evenements", 
-    label: "Événements BNRM", 
-    icon: CalendarDays, 
-    color: "text-orange-500",
-    bgColor: "bg-orange-500/10",
-    borderColor: "border-orange-500/30",
-    gradient: "from-orange-500/20 to-orange-600/5",
-    description: "Programmation culturelle de la BNRM"
-  },
-  { 
-    id: "infos-pratiques", 
-    label: "Infos Pratiques", 
-    icon: Info, 
-    color: "text-teal-500",
-    bgColor: "bg-teal-500/10",
-    borderColor: "border-teal-500/30",
-    gradient: "from-teal-500/20 to-teal-600/5",
-    description: "Horaires, accès, tarifs"
-  },
-  { 
-    id: "services", 
-    label: "Services", 
-    icon: Building2, 
-    color: "text-violet-500",
-    bgColor: "bg-violet-500/10",
-    borderColor: "border-violet-500/30",
-    gradient: "from-violet-500/20 to-violet-600/5",
-    description: "Services proposés par la BNRM"
-  },
-  { 
-    id: "espaces", 
-    label: "Espaces", 
-    icon: MapPin, 
-    color: "text-rose-500",
-    bgColor: "bg-rose-500/10",
-    borderColor: "border-rose-500/30",
-    gradient: "from-rose-500/20 to-rose-600/5",
-    description: "Espaces culturels et salles"
+    description: "Bannières promotionnelles du portail",
+    category: "contenu"
   },
   { 
     id: "pages", 
@@ -177,7 +148,8 @@ const tabs = [
     bgColor: "bg-purple-500/10",
     borderColor: "border-purple-500/30",
     gradient: "from-purple-500/20 to-purple-600/5",
-    description: "Pages statiques du portail"
+    description: "Pages statiques du portail",
+    category: "contenu"
   },
   { 
     id: "sections", 
@@ -187,7 +159,32 @@ const tabs = [
     bgColor: "bg-indigo-500/10",
     borderColor: "border-indigo-500/30",
     gradient: "from-indigo-500/20 to-indigo-600/5",
-    description: "Blocs de contenu des pages"
+    description: "Blocs de contenu des pages",
+    category: "contenu"
+  },
+  { 
+    id: "wysiwyg", 
+    label: "Éditeur WYSIWYG", 
+    icon: PenSquare, 
+    color: "text-pink-600",
+    bgColor: "bg-pink-500/10",
+    borderColor: "border-pink-500/30",
+    gradient: "from-pink-500/20 to-pink-600/5",
+    description: "Éditeur visuel multilingue",
+    category: "contenu"
+  },
+
+  // === SECTION 3: DESIGN & MÉDIAS ===
+  { 
+    id: "styles", 
+    label: "Styles & Design", 
+    icon: Palette, 
+    color: "text-fuchsia-500",
+    bgColor: "bg-fuchsia-500/10",
+    borderColor: "border-fuchsia-500/30",
+    gradient: "from-fuchsia-500/20 to-fuchsia-600/5",
+    description: "Couleurs, polices et boutons",
+    category: "design"
   },
   { 
     id: "visual-resources", 
@@ -197,7 +194,8 @@ const tabs = [
     bgColor: "bg-violet-500/10",
     borderColor: "border-violet-500/30",
     gradient: "from-violet-500/20 to-violet-600/5",
-    description: "Icônes, logos et pictogrammes"
+    description: "Icônes, logos et pictogrammes",
+    category: "design"
   },
   { 
     id: "media", 
@@ -207,8 +205,11 @@ const tabs = [
     bgColor: "bg-amber-500/10",
     borderColor: "border-amber-500/30",
     gradient: "from-amber-500/20 to-amber-600/5",
-    description: "Bibliothèque d'images et fichiers"
+    description: "Bibliothèque d'images et fichiers",
+    category: "design"
   },
+
+  // === SECTION 4: NAVIGATION & STRUCTURE ===
   { 
     id: "menus", 
     label: "Menus Portail", 
@@ -217,7 +218,8 @@ const tabs = [
     bgColor: "bg-cyan-500/10",
     borderColor: "border-cyan-500/30",
     gradient: "from-cyan-500/20 to-cyan-600/5",
-    description: "Navigation du portail BNRM"
+    description: "Navigation du portail BNRM",
+    category: "navigation"
   },
   { 
     id: "footer", 
@@ -227,7 +229,21 @@ const tabs = [
     bgColor: "bg-slate-500/10",
     borderColor: "border-slate-500/30",
     gradient: "from-slate-500/20 to-slate-600/5",
-    description: "Pied de page du portail"
+    description: "Pied de page du portail",
+    category: "navigation"
+  },
+
+  // === SECTION 5: SEO & TECHNIQUE ===
+  { 
+    id: "seo", 
+    label: "SEO & Référencement", 
+    icon: TrendingUp, 
+    color: "text-green-600",
+    bgColor: "bg-green-500/10",
+    borderColor: "border-green-500/30",
+    gradient: "from-green-500/20 to-green-600/5",
+    description: "Optimisation moteurs de recherche",
+    category: "technique"
   },
   { 
     id: "webhooks", 
@@ -237,7 +253,8 @@ const tabs = [
     bgColor: "bg-gray-500/10",
     borderColor: "border-gray-500/30",
     gradient: "from-gray-500/20 to-gray-600/5",
-    description: "Intégrations et notifications"
+    description: "Intégrations et notifications",
+    category: "technique"
   },
 ];
 
@@ -328,64 +345,86 @@ export default function PortalContentManagementSystem() {
 
   const activeTabData = tabs.find(t => t.id === activeTab);
 
+  // Grouper les tabs par catégorie pour l'affichage
+  const categories = [
+    { id: "accueil", label: "🏠 Page d'Accueil", description: "Modules dans l'ordre d'affichage" },
+    { id: "contenu", label: "📝 Gestion du Contenu", description: "Actualités, pages et sections" },
+    { id: "design", label: "🎨 Design & Médias", description: "Styles et ressources visuelles" },
+    { id: "navigation", label: "🧭 Navigation", description: "Menus et footer" },
+    { id: "technique", label: "⚙️ SEO & Technique", description: "Référencement et intégrations" },
+  ];
+
   const renderContent = () => {
     switch (activeTab) {
       case "hero":
         return <CmsHeroManagerPortal />;
-      case "wysiwyg":
-        return <CmsWysiwygModule />;
-      case "styles":
-        return <CmsStyleManager />;
-      case "services-numeriques":
-        return <CmsDigitalServicesManager />;
-      case "bannieres":
-        return <CmsBannersManager />;
       case "actualites":
         return <CmsActualitesManager />;
+      case "services-numeriques":
+        return <CmsDigitalServicesManager />;
+      case "plateformes":
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Globe className="h-5 w-5 text-indigo-500" />
+                Plateformes
+              </CardTitle>
+              <CardDescription>
+                Gestion de la section Plateformes (CBN, BN, CBM, Kitab) affichée sur la page d'accueil
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="p-4 bg-indigo-50 rounded-lg border border-indigo-200">
+                <p className="text-sm text-indigo-700">
+                  <strong>Position sur la page d'accueil :</strong> Section 4 - Après les Services Numériques
+                </p>
+              </div>
+              <p className="text-muted-foreground">
+                Module en développement - Permet de configurer les cartes des plateformes (CBN, Bibliothèque Numérique, CBM, Kitab) 
+                avec leurs titres, descriptions et liens.
+              </p>
+            </CardContent>
+          </Card>
+        );
+      case "liens-rapides":
+        return (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ChevronRight className="h-5 w-5 text-violet-500" />
+                Liens Rapides
+              </CardTitle>
+              <CardDescription>
+                Gestion des cartes de raccourcis (Inscription, Adhésions, Aide & Support)
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="p-4 bg-violet-50 rounded-lg border border-violet-200">
+                <p className="text-sm text-violet-700">
+                  <strong>Position sur la page d'accueil :</strong> Section 5 - Avant la Médiathèque
+                </p>
+              </div>
+              <p className="text-muted-foreground">
+                Module en développement - Configure les 3 cartes de liens rapides avec icônes, titres bilingues et destinations.
+              </p>
+            </CardContent>
+          </Card>
+        );
+      case "mediatheque":
+        return <CmsMediathequeManager />;
       case "evenements":
         return <CmsEvenementsManager />;
-      case "infos-pratiques":
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Informations Pratiques</CardTitle>
-              <CardDescription>Gestion des horaires, accès et tarifs du portail BNRM</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Module en développement - Gérez les informations pratiques affichées sur le portail.</p>
-            </CardContent>
-          </Card>
-        );
-      case "services":
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Services BNRM</CardTitle>
-              <CardDescription>Gestion des services proposés par la BNRM</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Module en développement - Gérez les services affichés sur le portail.</p>
-            </CardContent>
-          </Card>
-        );
-      case "espaces":
-        return (
-          <Card>
-            <CardHeader>
-              <CardTitle>Espaces Culturels</CardTitle>
-              <CardDescription>Gestion des espaces et salles de la BNRM</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">Module en développement - Accédez à la gestion des espaces depuis le menu Administration.</p>
-            </CardContent>
-          </Card>
-        );
+      case "bannieres":
+        return <CmsBannersManager />;
       case "pages":
         return <CmsPagesManager />;
       case "sections":
         return <CmsSectionsManager />;
-      case "mediatheque":
-        return <CmsMediathequeManager />;
+      case "wysiwyg":
+        return <CmsWysiwygModule />;
+      case "styles":
+        return <CmsStyleManager />;
       case "visual-resources":
         return <CmsVisualResourcesManager />;
       case "media":
@@ -394,10 +433,10 @@ export default function PortalContentManagementSystem() {
         return <CmsMenusManager />;
       case "footer":
         return <CmsFooterManager />;
-      case "webhooks":
-        return <CmsWebhooksManager />;
       case "seo":
         return <CmsSeoManager />;
+      case "webhooks":
+        return <CmsWebhooksManager />;
       default:
         return null;
     }
@@ -478,49 +517,65 @@ export default function PortalContentManagementSystem() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4, delay: 0.1 }}
         >
-          <Card className="sticky top-6 border shadow-sm">
+          <Card className="sticky top-6 border shadow-sm max-h-[calc(100vh-8rem)] overflow-y-auto">
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
                 Modules du Portail BNRM
               </CardTitle>
             </CardHeader>
             <CardContent className="p-2">
-              <nav className="space-y-1">
-                {tabs.map((tab, index) => {
-                  const Icon = tab.icon;
-                  const isActive = activeTab === tab.id;
+              <nav className="space-y-4">
+                {categories.map((category) => {
+                  const categoryTabs = tabs.filter(t => t.category === category.id);
                   
                   return (
-                    <motion.button
-                      key={tab.id}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.2, delay: index * 0.03 }}
-                      onClick={() => setActiveTab(tab.id)}
-                      className={cn(
-                        "w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-all duration-200 group relative",
-                        isActive 
-                          ? `bg-gradient-to-r ${tab.gradient} border ${tab.borderColor}` 
-                          : "hover:bg-muted/50"
-                      )}
-                    >
-                      <div className={cn(
-                        "p-1.5 rounded-md transition-colors flex-shrink-0",
-                        isActive ? tab.bgColor : "bg-muted group-hover:bg-muted"
-                      )}>
-                        <Icon className={cn("h-3.5 w-3.5", tab.color)} />
+                    <div key={category.id} className="space-y-1">
+                      {/* Category Header */}
+                      <div className="px-2 py-1.5">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                          {category.label}
+                        </p>
                       </div>
-                      <span className={cn(
-                        "font-medium text-xs truncate flex-1",
-                        isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
-                      )}>
-                        {tab.label}
-                      </span>
-                      <ChevronRight className={cn(
-                        "h-3 w-3 flex-shrink-0 transition-all",
-                        isActive ? "opacity-100 text-muted-foreground" : "opacity-0 group-hover:opacity-50"
-                      )} />
-                    </motion.button>
+                      
+                      {/* Category Tabs */}
+                      {categoryTabs.map((tab, index) => {
+                        const Icon = tab.icon;
+                        const isActive = activeTab === tab.id;
+                        
+                        return (
+                          <motion.button
+                            key={tab.id}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.2, delay: index * 0.03 }}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={cn(
+                              "w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-left transition-all duration-200 group relative",
+                              isActive 
+                                ? `bg-gradient-to-r ${tab.gradient} border ${tab.borderColor}` 
+                                : "hover:bg-muted/50"
+                            )}
+                          >
+                            <div className={cn(
+                              "p-1.5 rounded-md transition-colors flex-shrink-0",
+                              isActive ? tab.bgColor : "bg-muted group-hover:bg-muted"
+                            )}>
+                              <Icon className={cn("h-3.5 w-3.5", tab.color)} />
+                            </div>
+                            <span className={cn(
+                              "font-medium text-xs truncate flex-1",
+                              isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
+                            )}>
+                              {tab.label}
+                            </span>
+                            <ChevronRight className={cn(
+                              "h-3 w-3 flex-shrink-0 transition-all",
+                              isActive ? "opacity-100 text-muted-foreground" : "opacity-0 group-hover:opacity-50"
+                            )} />
+                          </motion.button>
+                        );
+                      })}
+                    </div>
                   );
                 })}
               </nav>
