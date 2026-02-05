@@ -334,8 +334,8 @@ export default function AdvancedSearch() {
                 <TabsList className="grid w-full grid-cols-2 md:grid-cols-6 h-auto gap-2 bg-gradient-to-r from-muted/80 via-muted/50 to-muted/80 p-2 rounded-xl">
                   <TabsTrigger value="all" className="data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-bn-blue-primary rounded-lg transition-all duration-200">
                     <Search className="h-4 w-4 mr-2" />
-                    <span className="hidden sm:inline">Tous les champs</span>
-                    <span className="sm:hidden">Tous</span>
+                    <span className="hidden sm:inline">Recherche simple</span>
+                    <span className="sm:hidden">Simple</span>
                   </TabsTrigger>
                   <TabsTrigger value="author" className="data-[state=active]:bg-white data-[state=active]:shadow-md data-[state=active]:text-bn-blue-primary rounded-lg transition-all duration-200">
                     <User className="h-4 w-4 mr-2" />
