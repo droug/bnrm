@@ -87,7 +87,7 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
               
               {/* Content */}
               <div className="p-6">
-                <Badge variant="outline" className="bg-blue-primary-dark text-white border-0 mb-3">
+                <Badge variant="outline" className="bnrm-tag mb-3">
                   {language === 'ar' ? item.tag_ar : item.tag_fr}
                 </Badge>
                 <h3 className="bnrm-card-title text-[#1e3a8a] mb-2 group-hover:text-blue-600 transition-colors">

@@ -608,6 +608,17 @@ Enhanced Moroccan Heritage Design System
   .bnrm-btn-primary:hover {
     background-color: hsl(var(--blue-shadow)) !important;
   }
+  
+  /* BNRM Tag/Badge - Unified styling (Blue Dark #1E3A8A) */
+  .bnrm-tag {
+    background-color: hsl(var(--blue-dark)) !important;
+    color: white !important;
+    border: none !important;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+  }
 
   /* Section Subtitle - Inter, 16px, regular */
   .bnrm-section-subtitle {
