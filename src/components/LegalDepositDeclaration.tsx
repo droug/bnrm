@@ -824,37 +824,17 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
   const handleFileUpload = (documentType: string, file: File | null) => {
     if (!file) return;
 
-    // Validate file type and size
-    const allowedTypes = {
-      cover: ['image/jpeg', 'image/jpg'],
-      summary: ['application/pdf'],
-      abstract: ['application/pdf'],
-      cin: ['image/jpeg', 'image/jpg', 'application/pdf'],
-      'court-decision': ['application/pdf'],
-      'thesis-recommendation': ['application/pdf'],
-      'quran-authorization': ['application/pdf']
-    };
+    // Validate file type and size - All documents accept PDF, JPG, JPEG, PNG up to 10MB
+    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+    const maxSize = 10 * 1024 * 1024; // 10MB for all documents
 
-    const maxSizes = {
-      cover: 1 * 1024 * 1024, // 1MB
-      summary: 2 * 1024 * 1024, // 2MB
-      abstract: 2 * 1024 * 1024, // 2MB
-      cin: 2 * 1024 * 1024, // 2MB
-      'court-decision': 5 * 1024 * 1024, // 5MB
-      'thesis-recommendation': 5 * 1024 * 1024, // 5MB
-      'quran-authorization': 5 * 1024 * 1024 // 5MB
-    };
-
-    const allowedTypesForDoc = allowedTypes[documentType as keyof typeof allowedTypes] || [];
-    const maxSize = maxSizes[documentType as keyof typeof maxSizes] || 5 * 1024 * 1024;
-
-    if (!allowedTypesForDoc.includes(file.type)) {
-      toast.error(`Type de fichier non autorisé pour ${documentType}. Types acceptés: ${allowedTypesForDoc.join(', ')}`);
+    if (!allowedTypes.includes(file.type)) {
+      toast.error(`Type de fichier non autorisé. Types acceptés: PDF, JPG, JPEG, PNG`);
       return;
     }
 
     if (file.size > maxSize) {
-      toast.error(`Fichier trop volumineux. Taille maximum: ${Math.round(maxSize / 1024 / 1024)}MB`);
+      toast.error(`Fichier trop volumineux. Taille maximum: 10 Mo`);
       return;
     }
 
@@ -3468,30 +3448,31 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         {/* Pièces à fournir */}
         <div>
           <h3 className="text-2xl font-semibold mb-4">Pièces à fournir</h3>
+          <p className="text-sm text-muted-foreground mb-4">Formats acceptés : PDF, JPG, JPEG, PNG — Taille max : 10 Mo</p>
           <div className="space-y-4">
-            {renderFileUpload("cover", "Joindre la couverture ou une capture (format « jpg » moins de 1 MO)", true, "image/jpeg")}
+            {renderFileUpload("cover", "Joindre la couverture ou une capture", true, "application/pdf,image/jpeg,image/jpg,image/png")}
             
             {(depositType === "monographie" || depositType === "periodique") && (
               <>
-                {renderFileUpload("summary", "Joindre le sommaire (format « PDF » moins de 2 MO)", true, "application/pdf")}
-                {renderFileUpload("abstract", "Joindre résumé de l'ouvrage (format « PDF » moins de 2 MO)", true, "application/pdf")}
+                {renderFileUpload("summary", "Joindre le sommaire", true, "application/pdf,image/jpeg,image/jpg,image/png")}
+                {renderFileUpload("abstract", "Joindre résumé de l'ouvrage", true, "application/pdf,image/jpeg,image/jpg,image/png")}
               </>
             )}
             
             {depositType === "bd_logiciels" && (
-              renderFileUpload("summary", "Joindre le Résumé de la publication (format « PDF » moins de 2 MO)", true, "application/pdf")
+              renderFileUpload("summary", "Joindre le Résumé de la publication", true, "application/pdf,image/jpeg,image/jpg,image/png")
             )}
             
             {depositType === "collections_specialisees" && (
-              renderFileUpload("summary", "Joindre le Résumé de la publication ou descriptif (format « PDF » moins de 2 MO)", true, "application/pdf")
+              renderFileUpload("summary", "Joindre le Résumé de la publication ou descriptif", true, "application/pdf,image/jpeg,image/jpg,image/png")
             )}
             
             {/* Pour périodiques: masquer CNIE si personne morale */}
             {depositType === "periodique" && directorType !== "personne_morale" && (
-              renderFileUpload("cin", "Joindre une copie de la CNIE du Directeur de la publication", true, "image/jpeg,application/pdf")
+              renderFileUpload("cin", "Joindre une copie de la CNIE du Directeur de la publication", true, "application/pdf,image/jpeg,image/jpg,image/png")
             )}
             {depositType !== "periodique" && (
-              renderFileUpload("cin", "Joindre une copie de la CNIE de l'Auteur", true, "image/jpeg,application/pdf")
+              renderFileUpload("cin", "Joindre une copie de la CNIE de l'Auteur", true, "application/pdf,image/jpeg,image/jpg,image/png")
             )}
             
             {/* Pièces conditionnelles selon le type de publication */}
@@ -3500,7 +3481,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                 "thesis-recommendation", 
                 "Recommandation de publication (pour les thèses)", 
                 true, 
-                "application/pdf"
+                "application/pdf,image/jpeg,image/jpg,image/png"
               )
             )}
             
@@ -3509,7 +3490,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                 "quran-authorization", 
                 "Autorisation de publication de la Fondation Mohammed VI (pour les Corans)", 
                 true, 
-                "application/pdf"
+                "application/pdf,image/jpeg,image/jpg,image/png"
               )
             )}
             
@@ -3853,12 +3834,13 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
       {/* الوثائق المطلوب تقديمها */}
       <div>
         <h3 className="text-2xl font-semibold mb-4">الوثائق المطلوب تقديمها</h3>
+        <p className="text-sm text-muted-foreground mb-4">الصيغ المقبولة: PDF، JPG، JPEG، PNG — الحجم الأقصى: 10 ميجابايت</p>
         <div className="space-y-4">
-          {renderFileUpload("cover", "إرفاق الغلاف (Format « jpg » moins de 1 MO)", true, "image/jpeg")}
-          {renderFileUpload("summary", "إرفاق الفهرس (Format « PDF » moins de 2 MO)", true, "application/pdf")}
-          {renderFileUpload("cin", "إرسال نسخة من البطاقة الوطنية للمؤلف", true, "image/jpeg,application/pdf")}
-          {renderFileUpload("thesis-recommendation", "إرسال توصية النشر (للأطروحات)", false, "application/pdf")}
-          {renderFileUpload("quran-authorization", "إرسال توصية النشر من مؤسسة محمد السادس لنشر القرآن الكريم (للمصاحف)", false, "application/pdf")}
+          {renderFileUpload("cover", "إرفاق الغلاف", true, "application/pdf,image/jpeg,image/jpg,image/png")}
+          {renderFileUpload("summary", "إرفاق الفهرس", true, "application/pdf,image/jpeg,image/jpg,image/png")}
+          {renderFileUpload("cin", "إرسال نسخة من البطاقة الوطنية للمؤلف", true, "application/pdf,image/jpeg,image/jpg,image/png")}
+          {renderFileUpload("thesis-recommendation", "إرسال توصية النشر (للأطروحات)", false, "application/pdf,image/jpeg,image/jpg,image/png")}
+          {renderFileUpload("quran-authorization", "إرسال توصية النشر من مؤسسة محمد السادس لنشر القرآن الكريم (للمصاحف)", false, "application/pdf,image/jpeg,image/jpg,image/png")}
         </div>
 
         {Object.keys(uploadedFiles).length > 0 && (
