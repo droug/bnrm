@@ -12,7 +12,7 @@ import { AccessibilityToolkit } from "@/components/AccessibilityToolkit";
 import MessagingButton from "@/components/messaging/MessagingButton";
 import NotificationsButton from "@/components/notifications/NotificationsButton";
 import { BNRMTooltip } from "@/components/ui/bnrm-tooltip";
-import logoImage from "@/assets/bnrm-portal-logo.gif";
+import logoImage from "@/assets/logo-bnrm.png";
 import {
   NavigationMenu,
   NavigationMenuContent,
