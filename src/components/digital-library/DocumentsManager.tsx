@@ -26,6 +26,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import OcrImportTool from "@/components/digital-library/import/OcrImportTool";
 import PdfOcrTool from "@/components/digital-library/import/PdfOcrTool";
 import SigbSyncManager from "@/components/digital-library/SigbSyncManager";
+import { DraggableDocumentsList } from "@/components/digital-library/DraggableDocumentsList";
 import { FileUpload } from "@/components/ui/file-upload";
 import Tesseract from 'tesseract.js';
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
@@ -310,13 +311,14 @@ export default function DocumentsManager() {
     },
   });
 
-  // Fetch documents
+  // Fetch documents - ordered by sort_order for drag-and-drop consistency
   const { data: documents, isLoading } = useQuery({
     queryKey: ['digital-library-documents'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('digital_library_documents')
-        .select('*')
+        .select('*, cbn_documents(cote)')
+        .order('sort_order', { ascending: true, nullsFirst: false })
         .order('created_at', { ascending: false });
       
       if (error) throw error;
@@ -2898,196 +2900,65 @@ export default function DocumentsManager() {
           {isLoading ? (
             <p>Chargement...</p>
           ) : filteredDocuments && filteredDocuments.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-10">
-                    <Checkbox 
-                      checked={filteredDocuments && filteredDocuments.length > 0 && filteredDocuments.every(doc => selectedDocIds.includes(doc.id))}
-                      onCheckedChange={toggleSelectAll}
-                      aria-label="Sélectionner tous"
-                    />
-                  </TableHead>
-                  <TableHead className="min-w-[200px]">Titre</TableHead>
-                  <TableHead className="w-28 text-center">N° Cote</TableHead>
-                  <TableHead className="w-28">Type</TableHead>
-                  <TableHead className="w-36">Auteur</TableHead>
-                  <TableHead className="w-28 text-center">OCR/Transcription</TableHead>
-                  <TableHead className="w-32 text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredDocuments.map((doc) => (
-                  <TableRow key={doc.id} className={selectedDocIds.includes(doc.id) ? "bg-primary/5" : ""}>
-                    <TableCell>
-                      <Checkbox 
-                        checked={selectedDocIds.includes(doc.id)}
-                        onCheckedChange={() => toggleDocumentSelection(doc.id)}
-                        aria-label={`Sélectionner ${doc.title}`}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium">{doc.title}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {doc.created_at ? new Date(doc.created_at).toLocaleDateString() : '-'}
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell className="w-28 text-center">
-                      <span className="text-sm font-mono">{(doc as any).cbn_documents?.cote || '-'}</span>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{doc.document_type || doc.file_format || 'Non défini'}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <span className="text-sm">{doc.author || '-'}</span>
-                    </TableCell>
-                    <TableCell>
-                      {doc.ocr_processed ? (
-                        <Badge variant="default" className="bg-green-600">Oui</Badge>
-                      ) : (
-                        <Badge variant="secondary">Non</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex gap-2 justify-end">
-                        {isAudioVideoDocument(doc) ? (
-                          // Transcription button for audio/video documents
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => openTranscriptionDialog(doc)}
-                            disabled={transcriptionProcessingDocId === doc.id}
-                            title={transcriptionProcessingDocId === doc.id 
-                              ? `Transcription en cours (${transcriptionProgress}%)`
-                              : "Lancer la transcription (Whisper)"}
-                          >
-                            {transcriptionProcessingDocId === doc.id ? (
-                              <div className="flex items-center gap-1">
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                                <span className="text-xs">{transcriptionProgress}%</span>
-                              </div>
-                            ) : (
-                              <Mic className="h-4 w-4" />
-                            )}
-                          </Button>
-                        ) : (
-                          // OCR button for other documents
-                          <div className="flex items-center gap-1">
-                            {doc.ocr_processed ? (
-                              <Badge variant="secondary" className="text-xs bg-green-100 text-green-700 border-green-300">
-                                <CheckCircle2 className="h-3 w-3 mr-1" />
-                                OCRisé
-                              </Badge>
-                            ) : (
-                              <>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  onClick={() => openOcrDialog(doc)}
-                                  disabled={ocrProcessingDocId === doc.id}
-                                  title={ocrProcessingDocId === doc.id && clientOcrTotalPages > 0 
-                                    ? `OCR en cours: page ${clientOcrCurrentPage}/${clientOcrTotalPages} (${clientOcrProgress}%)`
-                                    : "Lancer l'OCR"}
-                                >
-                                  {ocrProcessingDocId === doc.id ? (
-                                    <div className="flex items-center gap-1">
-                                      <Loader2 className="h-4 w-4 animate-spin" />
-                                      {clientOcrTotalPages > 0 && (
-                                        <span className="text-xs">{clientOcrProgress}%</span>
-                                      )}
-                                    </div>
-                                  ) : (
-                                    <Wand2 className="h-4 w-4" />
-                                  )}
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => markAsOcrProcessed.mutate(doc.id)}
-                                  disabled={markAsOcrProcessed.isPending || extractionProgress?.docId === doc.id}
-                                  title="Extraire et indexer le texte (PDF déjà OCRisé)"
-                                  className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                                >
-                                  {extractionProgress?.docId === doc.id ? (
-                                    <div className="flex items-center gap-1">
-                                      <Loader2 className="h-4 w-4 animate-spin" />
-                                      <span className="text-xs">{extractionProgress.progress}%</span>
-                                    </div>
-                                  ) : (
-                                    <FileSearch className="h-4 w-4" />
-                                  )}
-                                </Button>
-                              </>
-                            )}
-                          </div>
-                        )}
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setSelectedDocument(doc);
-                            setShowDetailsDialog(true);
-                          }}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setEditingDocument(doc);
-                            // Extraire le numéro de cote du nom de fichier PDF
-                            const extractCote = () => {
-                              if ((doc as any).cbn_documents?.cote) return (doc as any).cbn_documents.cote;
-                              if (doc.pdf_url) {
-                                try {
-                                  const fileName = doc.pdf_url.split('/').pop() || '';
-                                  const decodedName = decodeURIComponent(fileName);
-                                  return decodedName.replace(/\.pdf$/i, '');
-                                } catch {
-                                  return doc.pdf_url.split('/').pop()?.replace(/\.pdf$/i, '') || '';
-                                }
-                              }
-                              return '';
-                            };
-                            form.reset({
-                              cote: extractCote(),
-                              title: doc.title || '',
-                              author: doc.author || '',
-                              file_type: doc.document_type || doc.file_format || '',
-                              // Use publication_date if available, otherwise fallback to publication_year as YYYY-01-01
-                              publication_date: doc.publication_date || (doc.publication_year ? `${doc.publication_year}-01-01` : ''),
-                              description: '',
-                              file_url: doc.pdf_url || '',
-                              download_enabled: doc.download_enabled ?? true,
-                              is_visible: doc.publication_status === 'published',
-                              social_share_enabled: true,
-                              email_share_enabled: true,
-                              copyright_expires_at: '',
-                              copyright_derogation: false,
-                              digitization_source: (doc.digitization_source === 'external' ? 'external' : 'internal') as "internal" | "external",
-                              is_rare_book: false,
-                            });
-                            setShowEditDialog(true);
-                          }}
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleDeleteClick(doc)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <DraggableDocumentsList
+              documents={filteredDocuments as any}
+              selectedDocIds={selectedDocIds}
+              onToggleSelection={toggleDocumentSelection}
+              onToggleSelectAll={toggleSelectAll}
+              onViewDetails={(doc) => {
+                setSelectedDocument(doc);
+                setShowDetailsDialog(true);
+              }}
+              onEdit={(doc) => {
+                setEditingDocument(doc);
+                // Extraire le numéro de cote du nom de fichier PDF
+                const extractCote = () => {
+                  if ((doc as any).cbn_documents?.cote) return (doc as any).cbn_documents.cote;
+                  if ((doc as any).pdf_url) {
+                    try {
+                      const fileName = (doc as any).pdf_url.split('/').pop() || '';
+                      const decodedName = decodeURIComponent(fileName);
+                      return decodedName.replace(/\.pdf$/i, '');
+                    } catch {
+                      return (doc as any).pdf_url.split('/').pop()?.replace(/\.pdf$/i, '') || '';
+                    }
+                  }
+                  return '';
+                };
+                
+                form.reset({
+                  cote: extractCote(),
+                  title: doc.title || "",
+                  author: doc.author || "",
+                  file_type: (doc as any).document_type || "",
+                  publication_date: (doc as any).publication_year ? String((doc as any).publication_year) : "",
+                  description: (doc as any).content_body || "",
+                  file_url: (doc as any).pdf_url || "",
+                  download_enabled: (doc as any).download_enabled ?? true,
+                  is_visible: (doc as any).publication_status === 'published',
+                  social_share_enabled: (doc as any).social_share_enabled ?? true,
+                  email_share_enabled: (doc as any).email_share_enabled ?? true,
+                  copyright_expires_at: (doc as any).copyright_expires_at || "",
+                  copyright_derogation: false,
+                  digitization_source: ((doc as any).digitization_source === 'external' ? 'external' : 'internal') as "internal" | "external",
+                  is_rare_book: false,
+                });
+                setShowEditDialog(true);
+              }}
+              onDelete={(doc) => handleDeleteClick(doc)}
+              onOcr={(doc) => openOcrDialog(doc)}
+              onTranscription={(doc) => openTranscriptionDialog(doc)}
+              onMarkAsOcrProcessed={(docId) => markAsOcrProcessed.mutate(docId)}
+              ocrProcessingDocId={ocrProcessingDocId}
+              transcriptionProcessingDocId={transcriptionProcessingDocId}
+              clientOcrProgress={clientOcrProgress}
+              clientOcrCurrentPage={clientOcrCurrentPage}
+              clientOcrTotalPages={clientOcrTotalPages}
+              transcriptionProgress={transcriptionProgress}
+              extractionProgress={extractionProgress}
+              isAudioVideo={isAudioVideoDocument}
+              markAsOcrProcessedPending={markAsOcrProcessed.isPending}
+            />
           ) : (
             <div className="text-center py-12 text-muted-foreground">
               <p>Aucun document trouvé</p>
