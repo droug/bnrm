@@ -3919,6 +3919,18 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
     try {
       // Récupérer l'ID du professionnel
       let initiatorId: string | null = null;
+      let isAdminUser = false;
+      
+      // Vérifier si l'utilisateur est admin ou super_admin
+      const { data: roleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin');
+      
+      if (roleData && roleData.length > 0) {
+        isAdminUser = true;
+      }
       
       const { data: registryData } = await supabase
         .from('professional_registry')
@@ -3941,10 +3953,16 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         }
       }
       
-      if (!initiatorId) {
+      // Autoriser les admins même sans profil professionnel
+      if (!initiatorId && !isAdminUser) {
         toast.error("Vous devez être enregistré comme professionnel");
         setIsSavingDraft(false);
         return;
+      }
+      
+      // Pour les admins sans profil professionnel, utiliser l'user_id comme initiator_id
+      if (!initiatorId && isAdminUser) {
+        initiatorId = user.id;
       }
 
       // Préparer les données du brouillon
@@ -4068,6 +4086,18 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
 
       // 2. Récupérer l'ID du professionnel - chercher d'abord dans professional_registry, sinon dans professional_registration_requests
       let initiatorId: string | null = null;
+      let isAdminUser = false;
+      
+      // Vérifier si l'utilisateur est admin
+      const { data: adminRoleData } = await supabase
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin');
+      
+      if (adminRoleData && adminRoleData.length > 0) {
+        isAdminUser = true;
+      }
       
       // Essayer d'abord professional_registry
       const { data: registryData, error: registryError } = await supabase
@@ -4102,10 +4132,17 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         }
       }
       
-      if (!initiatorId) {
+      // Autoriser les admins même sans profil professionnel
+      if (!initiatorId && !isAdminUser) {
         toast.dismiss();
         toast.error("Vous devez être enregistré comme professionnel pour soumettre une déclaration");
         return;
+      }
+      
+      // Pour les admins sans profil professionnel, utiliser l'user_id comme initiator_id
+      if (!initiatorId && isAdminUser) {
+        initiatorId = user.id;
+        console.log('[DEPOSIT] Admin user, using user_id as initiator:', initiatorId);
       }
 
       console.log('[DEPOSIT DEBUG] User ID:', user.id);
