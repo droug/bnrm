@@ -220,12 +220,7 @@ const Header = () => {
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center py-3">
             {/* Logo + Titre trilingue */}
-            <Link to="/" className="flex items-center gap-4 hover:opacity-90 transition-opacity">
-              <div className="hidden lg:flex flex-col text-right leading-tight">
-                <span className="text-sm text-gray-700 font-medium">المكتبة الوطنية للمملكة المغربية</span>
-                <span className="text-xs text-gray-500">ⵜⴰⵙⴷⴰⵡⵉⵜ ⵜⴰⵏⴰⵎⵓⵔⵜ ⵏ ⵜⴳⵍⴷⵉⵜ ⵏ ⵍⵎⵖⵔⵉⴱ</span>
-                <span className="text-xs text-gray-600">Bibliothèque Nationale du Royaume du Maroc</span>
-              </div>
+            <Link to="/" className="flex items-center hover:opacity-90 transition-opacity">
               <img src={logoImage} alt="Logo BNRM" className="h-14 w-auto" />
             </Link>
           
