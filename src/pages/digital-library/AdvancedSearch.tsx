@@ -370,7 +370,7 @@ export default function AdvancedSearch() {
                     <Label htmlFor="keyword" className="text-base font-semibold">Recherche par mot clé</Label>
                     <Input
                       id="keyword"
-                      placeholder="Recherchez dans tous les champs (titre, auteur, sujet...)"
+                      placeholder="Saisissez un ou plusieurs mots clés"
                       value={formData.keyword}
                       onChange={(e) => setFormData({ ...formData, keyword: e.target.value })}
                       className="h-12 text-base"
