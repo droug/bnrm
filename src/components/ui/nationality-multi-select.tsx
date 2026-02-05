@@ -196,12 +196,10 @@ export function NationalityMultiSelect({
                 <CommandItem
                   key={nationality.code}
                   value={nationality.code === 'OTHER' ? 'Autre' : getDisplayLabel(nationality.label_fr)}
-                  onPointerDown={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
+                  onSelect={() => {
                     handleToggleCode(nationality.code);
                   }}
-                  onSelect={() => handleToggleCode(nationality.code)}
+                  className="cursor-pointer"
                 >
                   <Check
                     className={cn(
