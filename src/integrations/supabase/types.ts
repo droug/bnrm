@@ -4081,6 +4081,7 @@ export type Database = {
           publication_year: number | null
           published_at: string | null
           requires_authentication: boolean | null
+          sort_order: number | null
           themes: string[] | null
           thumbnail_url: string | null
           title: string
@@ -4117,6 +4118,7 @@ export type Database = {
           publication_year?: number | null
           published_at?: string | null
           requires_authentication?: boolean | null
+          sort_order?: number | null
           themes?: string[] | null
           thumbnail_url?: string | null
           title: string
@@ -4153,6 +4155,7 @@ export type Database = {
           publication_year?: number | null
           published_at?: string | null
           requires_authentication?: boolean | null
+          sort_order?: number | null
           themes?: string[] | null
           thumbnail_url?: string | null
           title?: string

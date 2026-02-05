@@ -254,10 +254,14 @@ export default function DigitalLibraryHome() {
       setLoading(true);
       try {
         // Charger depuis digital_library_documents
+        // Order by sort_order (for admin-controlled ordering), then by created_at
         const {
           data,
           error
-        } = await supabase.from('digital_library_documents').select('id, title, author, publication_year, document_type, cover_image_url, pdf_url, thumbnail_url, created_at, is_manuscript').eq('publication_status', 'published').is('deleted_at', null).order('created_at', {
+        } = await supabase.from('digital_library_documents').select('id, title, author, publication_year, document_type, cover_image_url, pdf_url, thumbnail_url, created_at, is_manuscript, sort_order').eq('publication_status', 'published').is('deleted_at', null).order('sort_order', {
+          ascending: true,
+          nullsFirst: false
+        }).order('created_at', {
           ascending: false
         }).limit(6);
         if (data && !error) {
