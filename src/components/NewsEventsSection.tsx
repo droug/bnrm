@@ -43,14 +43,14 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
         <div className="bg-[#1e3a8a] text-white px-8 py-8 rounded-lg mb-8">
           <div className="flex items-start justify-between">
             <div>
-              <p className="tagline text-blue-soft mb-2">
+              <p className="bnrm-caption uppercase tracking-widest text-blue-soft mb-2">
                 BNRM
               </p>
-              <h2 className="heading-3 mb-4">
+              <h2 className="bnrm-section-title text-white mb-4">
                 {language === 'ar' ? 'الأخبار و الأحداث' : 'Actualités & Événements'}
               </h2>
               <div className="w-24 h-1 bg-blue-soft mb-4"></div>
-              <p className="text-medium text-white/90 max-w-2xl">
+              <p className="bnrm-body-text text-white/90 max-w-2xl">
                 {language === 'ar' 
                   ? 'اطلع على آخر الأخبار والفعاليات'
                   : 'Découvrez les dernières actualités et événements'
@@ -90,10 +90,10 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
                 <Badge variant="outline" className="bg-blue-primary-dark text-white border-0 mb-3">
                   {language === 'ar' ? item.tag_ar : item.tag_fr}
                 </Badge>
-                <h3 className="heading-6 text-[#1e3a8a] mb-2 group-hover:text-blue-600 transition-colors">
+                <h3 className="bnrm-card-title text-[#1e3a8a] mb-2 group-hover:text-blue-600 transition-colors">
                   {language === 'ar' ? item.title_ar : item.title_fr}
                 </h3>
-                <p className="text-small text-muted-foreground mb-3">
+                <p className="bnrm-body-text-sm mb-3">
                   {language === 'ar' ? item.excerpt_ar : item.excerpt_fr}
                 </p>
                 <Button variant="ghost" size="sm" className="p-0 h-auto font-semibold group-hover:translate-x-1 transition-transform">

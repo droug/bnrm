@@ -581,6 +581,142 @@ Enhanced Moroccan Heritage Design System
   .font-normal { font-weight: 400; }
   .font-light { font-weight: 300; }
 
+  /* ============================================== */
+  /* === BNRM PORTAL - UNIFIED TYPOGRAPHY SYSTEM === */
+  /* ============================================== */
+  
+  /* Section Titles - Gilda Display, 28px, semibold */
+  .bnrm-section-title {
+    font-family: 'Gilda Display', Georgia, serif;
+    font-size: 1.5rem;
+    line-height: 1.3;
+    font-weight: 600;
+    color: hsl(var(--foreground));
+  }
+  @media (min-width: 768px) {
+    .bnrm-section-title {
+      font-size: 1.75rem;
+    }
+  }
+
+  /* Section Subtitle - Inter, 16px, regular */
+  .bnrm-section-subtitle {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    font-weight: 400;
+    color: hsl(var(--muted-foreground));
+  }
+  @media (min-width: 768px) {
+    .bnrm-section-subtitle {
+      font-size: 1rem;
+    }
+  }
+
+  /* Navigation Menu Items - Inter, 14px, medium */
+  .bnrm-nav-menu {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  /* Navigation Submenu Headers - Inter, 13px, semibold */
+  .bnrm-nav-submenu-header {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  /* Navigation Submenu Items - Inter, 14px, medium */
+  .bnrm-nav-submenu-item {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  /* Body Text - Inter, 15px, regular */
+  .bnrm-body-text {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    font-weight: 400;
+    color: hsl(var(--foreground));
+  }
+
+  /* Body Text Small - Inter, 14px, regular */
+  .bnrm-body-text-sm {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    font-weight: 400;
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* Card Titles - Gilda Display, 18px, semibold */
+  .bnrm-card-title {
+    font-family: 'Gilda Display', Georgia, serif;
+    font-size: 1rem;
+    line-height: 1.35;
+    font-weight: 600;
+    color: hsl(var(--foreground));
+  }
+  @media (min-width: 768px) {
+    .bnrm-card-title {
+      font-size: 1.125rem;
+    }
+  }
+
+  /* Button Text - Inter, 14px, medium */
+  .bnrm-button-text {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  /* Caption / Labels - Inter, 12px, medium */
+  .bnrm-caption {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    font-weight: 500;
+    color: hsl(var(--muted-foreground));
+  }
+
+  /* Page Title - Gilda Display, 32px, semibold */
+  .bnrm-page-title {
+    font-family: 'Gilda Display', Georgia, serif;
+    font-size: 1.75rem;
+    line-height: 1.2;
+    font-weight: 600;
+    color: hsl(var(--foreground));
+  }
+  @media (min-width: 768px) {
+    .bnrm-page-title {
+      font-size: 2rem;
+    }
+  }
+
+  /* Hero Title - Gilda Display, 40px, normal */
+  .bnrm-hero-title {
+    font-family: 'Gilda Display', Georgia, serif;
+    font-size: 2rem;
+    line-height: 1.15;
+    font-weight: 400;
+  }
+  @media (min-width: 768px) {
+    .bnrm-hero-title {
+      font-size: 2.5rem;
+    }
+  }
+
   /* BNRM Official Icons - Material Symbols */
   .material-symbols-outlined {
     font-family: 'Material Symbols Outlined';

@@ -112,17 +112,17 @@ const Index = () => {
           <div className="relative z-10 container mx-auto px-4 sm:px-6 h-full flex items-center min-h-[50vh] sm:min-h-[60vh] md:min-h-[70vh]">
             <div className="max-w-full sm:max-w-xl md:max-w-2xl">
               {/* Tagline */}
-              <p className="tagline text-blue-primary-light mb-2 sm:mb-4 text-xs sm:text-sm">
+              <p className="bnrm-caption uppercase tracking-widest text-blue-primary-light mb-2 sm:mb-4">
                 {language === 'ar' ? 'التراث الوطني المغربي' : 'Patrimoine National Marocain'}
               </p>
               
               {/* Heading 2 - Main title - Responsive font sizes */}
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-4 md:mb-6 leading-tight">
+              <h1 className="bnrm-hero-title text-white mb-3 sm:mb-4 md:mb-6 leading-tight">
                 {heroTitle}
               </h1>
               
               {/* Text medium - Description */}
-              <p className="text-sm sm:text-base md:text-lg text-white/90 mb-4 sm:mb-6 md:mb-8 max-w-full sm:max-w-lg md:max-w-xl line-clamp-3 sm:line-clamp-none">
+              <p className="bnrm-body-text text-white/90 mb-4 sm:mb-6 md:mb-8 max-w-full sm:max-w-lg md:max-w-xl line-clamp-3 sm:line-clamp-none">
                 {heroSubtitle}
               </p>
               
@@ -152,14 +152,14 @@ const Index = () => {
                 <div className="py-4 sm:py-6 md:py-8 bg-gradient-to-b from-slate-50 to-white rounded-lg">
                   <div className="container mx-auto px-3 sm:px-4">
                     <div className="mb-6 sm:mb-8 md:mb-10">
-                      <p className="tagline text-primary mb-1 sm:mb-2 text-xs sm:text-sm">
+                      <p className="bnrm-caption uppercase tracking-widest text-primary mb-1 sm:mb-2">
                         BNRM
                       </p>
-                      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1e3a8a] mb-2 sm:mb-4">
+                      <h2 className="bnrm-section-title text-[#1e3a8a] mb-2 sm:mb-4">
                         {language === 'ar' ? 'خدماتنا الرقمية' : 'Nos Services Numériques'}
                       </h2>
                       <div className="w-16 sm:w-20 md:w-24 h-1 bg-primary mb-2 sm:mb-4"></div>
-                      <p className="text-sm sm:text-base text-muted-foreground">
+                      <p className="bnrm-section-subtitle">
                         {language === 'ar'
                           ? 'اكتشف مجموعة واسعة من الخدمات الرقمية المتاحة'
                           : 'Découvrez notre large gamme de services numériques disponibles'
@@ -178,14 +178,14 @@ const Index = () => {
               {/* Quick Links */}
               <div className="mb-8 sm:mb-10 md:mb-12">
                 <div className={`mb-6 sm:mb-8 md:mb-10 ${language === 'ar' ? 'text-center' : 'text-left'}`}>
-                  <p className="tagline text-primary mb-1 sm:mb-2 text-xs sm:text-sm">
+                  <p className="bnrm-caption uppercase tracking-widest text-primary mb-1 sm:mb-2">
                     BNRM
                   </p>
-                  <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-[#1e3a8a] mb-2 sm:mb-4">
+                  <h2 className="bnrm-section-title text-[#1e3a8a] mb-2 sm:mb-4">
                     {language === 'ar' ? 'روابط سريعة' : 'Liens rapides'}
                   </h2>
                   <div className={`w-16 sm:w-20 md:w-24 h-1 bg-primary mb-2 sm:mb-4 ${language === 'ar' ? 'mx-auto' : ''}`}></div>
-                  <p className="text-sm sm:text-base text-muted-foreground">
+                  <p className="bnrm-section-subtitle">
                     {language === 'ar'
                       ? 'الوصول السريع إلى خدماتنا الأساسية'
                       : 'Accès rapide à nos services essentiels'
@@ -208,10 +208,10 @@ const Index = () => {
                       <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         <UserPlus className="h-10 w-10 text-primary" />
                       </div>
-                      <h3 className="heading-6 text-foreground group-hover:text-primary transition-colors">
+                      <h3 className="bnrm-card-title group-hover:text-primary transition-colors">
                         {language === 'ar' ? 'تسجيل' : 'Inscription'}
                       </h3>
-                      <p className="text-small text-muted-foreground">
+                      <p className="bnrm-body-text-sm">
                         {language === 'ar' 
                           ? 'إنشاء حساب جديد للوصول إلى جميع خدماتنا' 
                           : 'Créez votre compte pour accéder à tous nos services'}
@@ -234,10 +234,10 @@ const Index = () => {
                       <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         <CreditCard className="h-10 w-10 text-primary" />
                       </div>
-                      <h3 className="heading-6 text-foreground group-hover:text-primary transition-colors">
+                      <h3 className="bnrm-card-title group-hover:text-primary transition-colors">
                         {language === 'ar' ? 'الاشتراكات' : 'Adhésions'}
                       </h3>
-                      <p className="text-small text-muted-foreground">
+                      <p className="bnrm-body-text-sm">
                         {language === 'ar' 
                           ? 'اكتشف أنواع الاشتراكات والخدمات المتاحة' 
                           : 'Découvrez nos différentes formules d\'adhésion'}
@@ -260,10 +260,10 @@ const Index = () => {
                       <div className="w-20 h-20 mx-auto bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
                         <MousePointer className="h-10 w-10 text-primary" />
                       </div>
-                      <h3 className="heading-6 text-foreground group-hover:text-primary transition-colors">
+                      <h3 className="bnrm-card-title group-hover:text-primary transition-colors">
                         {language === 'ar' ? 'المساعدة والدعم' : 'Aide & Support'}
                       </h3>
-                      <p className="text-small text-muted-foreground">
+                      <p className="bnrm-body-text-sm">
                         {language === 'ar' 
                           ? 'احصل على المساعدة والدعم الذي تحتاجه' 
                           : 'Obtenez l\'aide dont vous avez besoin'}
