@@ -17,7 +17,7 @@ export const visitGuidedSchema = z.object({
     .int("Le nombre doit être un entier")
     .min(1, "Au moins 1 visiteur requis")
     .max(100, "Maximum 100 visiteurs"),
-  langue: z.enum(["arabe", "français", "anglais", "amazigh"], {
+  langue: z.enum(["arabe", "français", "anglais", "amazighe"], {
     errorMap: () => ({ message: "Veuillez sélectionner une langue" }),
   }),
   commentaire: z.string()

@@ -242,7 +242,7 @@ export default function CmsWysiwygModule() {
               <div>
                 <CardTitle className="text-2xl">Éditeur WYSIWYG Multilingue</CardTitle>
                 <CardDescription>
-                  Créez et gérez du contenu enrichi en 4 langues (FR, AR, EN, Amazigh)
+                  Créez et gérez du contenu enrichi en 4 langues (FR, AR, EN, Amazighe)
                 </CardDescription>
               </div>
             </div>

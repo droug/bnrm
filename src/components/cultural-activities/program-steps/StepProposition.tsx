@@ -210,7 +210,7 @@ const StepProposition = ({ form }: StepPropositionProps) => {
                   <SelectItem value="arabe">Arabe</SelectItem>
                   <SelectItem value="francais">Français</SelectItem>
                   <SelectItem value="anglais">Anglais</SelectItem>
-                  <SelectItem value="amazigh">Amazigh</SelectItem>
+                  <SelectItem value="amazighe">Amazighe</SelectItem>
                   <SelectItem value="autre">Autre</SelectItem>
                 </SelectContent>
               </Select>

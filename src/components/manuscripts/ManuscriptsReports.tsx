@@ -146,7 +146,7 @@ export function ManuscriptsReports() {
         const langMap: Record<string, string> = {
           "arabic": "Arabe",
           "french": "Francais",
-          "berber": "Amazigh",
+          "berber": "Amazighe",
           "latin": "Latin"
         };
         doc.text(`- Langue: ${langMap[filterLanguage] || filterLanguage}`, 25, yPos);
@@ -480,7 +480,7 @@ export function ManuscriptsReports() {
                     <SelectItem value="all">Toutes les langues</SelectItem>
                     <SelectItem value="arabic">Arabe</SelectItem>
                     <SelectItem value="french">Français</SelectItem>
-                    <SelectItem value="berber">Amazigh</SelectItem>
+                    <SelectItem value="berber">Amazighe</SelectItem>
                     <SelectItem value="latin">Latin</SelectItem>
                   </SelectContent>
                 </Select>

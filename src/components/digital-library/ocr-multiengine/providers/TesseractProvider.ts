@@ -112,7 +112,7 @@ class TesseractProviderClass {
       { code: 'ara', name: 'Arabe' },
       { code: 'fra', name: 'Français' },
       { code: 'eng', name: 'Anglais' },
-      { code: 'ber', name: 'Amazigh' },
+      { code: 'ber', name: 'Amazighe' },
       { code: 'lat', name: 'Latin' }
     ];
   }

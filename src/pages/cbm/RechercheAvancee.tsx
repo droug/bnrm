@@ -122,7 +122,7 @@ const RechercheAvancee = () => {
   const languages = [
     'Français',
     'Arabe',
-    'Amazigh (Tifinagh)',
+    'Amazighe (Tifinagh)',
     'Anglais',
     'Espagnol',
     'Autres'

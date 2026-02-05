@@ -129,7 +129,7 @@ export const LANGUAGES_LIST: AutocompleteListDefinition = {
   max_levels: 1,
   values: [
     { value_code: 'ar', value_label: 'Arabe', value_label_ar: 'العربية', level: 1, sort_order: 1 },
-    { value_code: 'am', value_label: 'Amazigh (Tifinagh)', value_label_ar: 'ⴰⵎⴰⵣⵉⵖ', level: 1, sort_order: 2 },
+    { value_code: 'am', value_label: 'Amazighe (Tifinagh)', value_label_ar: 'ⴰⵎⴰⵣⵉⵖ', level: 1, sort_order: 2 },
     { value_code: 'fr', value_label: 'Français', value_label_ar: 'الفرنسية', level: 1, sort_order: 3 },
     { value_code: 'en', value_label: 'Anglais', value_label_ar: 'الإنجليزية', level: 1, sort_order: 4 },
     { value_code: 'es', value_label: 'Espagnol', value_label_ar: 'الإسبانية', level: 1, sort_order: 5 },
@@ -275,7 +275,7 @@ export const MANUSCRIPT_LANGUAGES_LIST: AutocompleteListDefinition = {
   values: [
     { value_code: "arabe", value_label: "Arabe", value_label_ar: "العربية", level: 1, sort_order: 1 },
     { value_code: "arabe_classique", value_label: "Arabe classique", value_label_ar: "العربية الفصحى", level: 1, sort_order: 2 },
-    { value_code: "amazigh", value_label: "Amazigh (Tifinagh)", value_label_ar: "ⴰⵎⴰⵣⵉⵖ", level: 1, sort_order: 3 },
+    { value_code: "amazigh", value_label: "Amazighe (Tifinagh)", value_label_ar: "ⴰⵎⴰⵣⵉⵖ", level: 1, sort_order: 3 },
     { value_code: "hebreu", value_label: "Hébreu", value_label_ar: "العبرية", level: 1, sort_order: 4 },
     { value_code: "latin", value_label: "Latin", value_label_ar: "اللاتينية", level: 1, sort_order: 5 },
     { value_code: "espagnol_ancien", value_label: "Espagnol ancien", value_label_ar: "الإسبانية القديمة", level: 1, sort_order: 6 },
