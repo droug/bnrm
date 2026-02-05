@@ -30,7 +30,7 @@ interface BNRMTariff {
 }
 
 interface DigitalServicesCarouselProps {
-  language: 'fr' | 'ar';
+  language: string;
 }
 
 export function DigitalServicesCarousel({ language }: DigitalServicesCarouselProps) {
