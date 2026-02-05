@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Footprints, Save, Plus, Trash2, Loader2, Link as LinkIcon, Facebook, Twitter, Instagram, Linkedin, Youtube, ExternalLink } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Json } from "@/integrations/supabase/types";
+import logoBnrm from "@/assets/bnrm-portal-logo.gif";
 
 interface FooterColumn {
   title_fr: string;
@@ -251,7 +252,7 @@ export default function CmsFooterManager() {
         <div className="flex items-center gap-4 p-4 bg-muted/50 rounded-lg border">
           <div className="flex-shrink-0">
             <img 
-              src="/bnrm-portal-logo.gif" 
+              src={logoBnrm} 
               alt="Logo actuel du portail BNRM" 
               className="h-16 object-contain"
             />
@@ -260,7 +261,7 @@ export default function CmsFooterManager() {
             <p className="text-sm font-medium">Logo actuel du portail</p>
             <p className="text-xs text-muted-foreground">
               Ce logo est affiché dans le footer du portail BNRM. Pour le modifier, 
-              remplacez le fichier <code className="bg-muted px-1 rounded">/bnrm-portal-logo.gif</code>
+              remplacez le fichier <code className="bg-muted px-1 rounded">src/assets/bnrm-portal-logo.gif</code>
             </p>
           </div>
         </div>
