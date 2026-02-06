@@ -120,7 +120,7 @@ serve(async (req) => {
     }
 
     // Générer le lien vers la page de validation
-    const siteUrl = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
+    const siteUrl = (Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma").replace(/\/$/, '');
     const arbitrationLink = `${siteUrl}/admin/depot-legal?arbitration=${request_id}`;
 
     // Créer les notifications système pour chaque validateur
