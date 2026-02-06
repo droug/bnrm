@@ -1,16 +1,17 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useAccessControl } from "@/hooks/useAccessControl";
+import { useReproductionFormConfig } from "@/hooks/useReproductionFormConfig";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { Upload, FileText, Plus, Trash2, Check } from "lucide-react";
+import { Upload, FileText, Plus, Trash2, Check, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { CBNSearchWithSelection } from "@/components/cbn/CBNSearchWithSelection";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -33,6 +34,7 @@ export function ReproductionRequestForm() {
   const { language } = useLanguage();
   const navigate = useNavigate();
   const { checkReproductionByContentType } = useAccessControl();
+  const { reproductionTypes, loading: configLoading } = useReproductionFormConfig();
 
   const [modality, setModality] = useState<string>("numerique_mail");
   const [items, setItems] = useState<ReproductionItem[]>([]);
@@ -41,12 +43,15 @@ export function ReproductionRequestForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSearchDialog, setShowSearchDialog] = useState(false);
 
-  const modalityOptions = [
-    { value: "papier", label: language === "ar" ? "ورقي" : "Papier" },
-    { value: "numerique_mail", label: language === "ar" ? "رقمي - البريد الإلكتروني" : "Numérique - Email" },
-    { value: "numerique_espace", label: language === "ar" ? "رقمي - المساحة الشخصية" : "Numérique - Espace personnel" },
-    { value: "support_physique", label: language === "ar" ? "دعم مادي (USB, CD)" : "Support physique (USB, CD)" },
-  ];
+  // Utiliser les options de modalité depuis la configuration
+  const modalityOptions = useMemo(() => {
+    return reproductionTypes
+      .filter(type => type.enabled)
+      .map(type => ({
+        value: type.value,
+        label: language === "ar" ? type.label_ar : type.label,
+      }));
+  }, [reproductionTypes, language]);
 
   const addItem = (selectedDoc: any) => {
     // Déterminer le type de contenu
@@ -231,16 +236,27 @@ export function ReproductionRequestForm() {
             <Label className="text-base font-semibold">
               {language === "ar" ? "طريقة الاستنساخ" : "Modalité de reproduction"}
             </Label>
-            <RadioGroup value={modality} onValueChange={setModality}>
-              {modalityOptions.map((option) => (
-                <div key={option.value} className="flex items-center space-x-2 rtl:space-x-reverse">
-                  <RadioGroupItem value={option.value} id={option.value} />
-                  <Label htmlFor={option.value} className="cursor-pointer">
-                    {option.label}
-                  </Label>
-                </div>
-              ))}
-            </RadioGroup>
+            {configLoading ? (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>{language === "ar" ? "تحميل الخيارات..." : "Chargement des options..."}</span>
+              </div>
+            ) : modalityOptions.length === 0 ? (
+              <p className="text-muted-foreground">
+                {language === "ar" ? "لا توجد خيارات متاحة" : "Aucune option disponible"}
+              </p>
+            ) : (
+              <RadioGroup value={modality} onValueChange={setModality}>
+                {modalityOptions.map((option) => (
+                  <div key={option.value} className="flex items-center space-x-2 rtl:space-x-reverse">
+                    <RadioGroupItem value={option.value} id={option.value} />
+                    <Label htmlFor={option.value} className="cursor-pointer">
+                      {option.label}
+                    </Label>
+                  </div>
+                ))}
+              </RadioGroup>
+            )}
           </div>
 
           {/* Items List */}
