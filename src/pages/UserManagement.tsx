@@ -679,7 +679,7 @@ export default function UserManagement() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {users.map((userProfile) => (
+                      {filteredUsers.map((userProfile) => (
                         <TableRow key={userProfile.id}>
                           <TableCell>
                             <div className="flex items-center gap-3">
