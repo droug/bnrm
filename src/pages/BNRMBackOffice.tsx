@@ -71,17 +71,22 @@ export default function BNRMBackOffice() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('legal_deposit_requests')
-        .select('status, arbitration_status', { count: 'exact' });
+        .select('status, arbitration_status, validated_by_department', { count: 'exact' });
       
       if (error) throw error;
       
-      const requests = data || [];
-      // Les demandes validées par arbitrage sont en attente de validation ABN finale
-      const pending = requests.filter(r => 
-        ['soumis', 'en_cours', 'en_attente_validation_b', 'en_attente_comite_validation'].includes(r.status || '') ||
-        r.arbitration_status === 'approved'
-      ).length;
-      const validated = requests.filter(r => ['valide_par_b', 'valide_par_comite', 'attribue'].includes(r.status || '')).length;
+      const requests = (data || []) as { status: string | null; arbitration_status: string | null; validated_by_department: string | null }[];
+      
+      // Demandes en attente: status en cours de traitement ET pas encore validées par ABN
+      // OU demandes approuvées par arbitrage sans validation ABN
+      const pending = requests.filter(r => {
+        const hasNoPendingStatus = ['soumis', 'en_cours', 'en_attente_validation_b', 'en_attente_comite_validation'].includes(r.status || '');
+        const isArbitrationPending = r.arbitration_status === 'approved' && !r.validated_by_department;
+        return (hasNoPendingStatus && !r.validated_by_department) || isArbitrationPending;
+      }).length;
+      
+      // Demandes validées: status attribue OU validated_by_department non null
+      const validated = requests.filter(r => r.status === 'attribue' || r.validated_by_department).length;
       const rejected = requests.filter(r => ['rejete', 'rejete_par_b', 'rejete_par_comite'].includes(r.status || '')).length;
       const attributed = requests.filter(r => r.status === 'attribue').length;
       
@@ -102,19 +107,22 @@ export default function BNRMBackOffice() {
     queryFn: async () => {
       const { data } = await supabase
         .from('legal_deposit_requests')
-        .select('status, arbitration_status');
+        .select('status, arbitration_status, validated_by_department');
       
-      const requests = data || [];
+      const requests = (data || []) as { status: string | null; arbitration_status: string | null; validated_by_department: string | null }[];
       return {
-        // Inclure les demandes validées par arbitrage dans les demandes en attente
-        pending: requests.filter(r => 
-          ['soumis', 'en_cours', 'en_attente_validation_b'].includes(r.status || '') ||
-          r.arbitration_status === 'approved'
-        ).length,
-        validated: requests.filter(r => ['valide_par_b', 'valide_par_comite'].includes(r.status || '')).length,
+        // Demandes en attente: pas encore validées par ABN
+        pending: requests.filter(r => {
+          const isPendingStatus = ['soumis', 'en_cours', 'en_attente_validation_b'].includes(r.status || '');
+          const isArbitrationPending = r.arbitration_status === 'approved' && !r.validated_by_department;
+          return (isPendingStatus && !r.validated_by_department) || isArbitrationPending;
+        }).length,
+        // Demandes validées
+        validated: requests.filter(r => r.status === 'attribue' || r.validated_by_department).length,
+        // À attribuer: validées mais pas encore attribuées
         toAttribute: requests.filter(r => 
-          ['valide_par_b', 'valide_par_comite'].includes(r.status || '') ||
-          r.arbitration_status === 'approved'
+          (r.validated_by_department && r.status !== 'attribue') ||
+          (r.arbitration_status === 'approved' && !r.validated_by_department)
         ).length,
       };
     }

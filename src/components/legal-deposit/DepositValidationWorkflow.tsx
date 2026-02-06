@@ -198,16 +198,18 @@ export function DepositValidationWorkflow() {
       .order("created_at", { ascending: false });
 
     if (activeTab === "pending") {
-      // Exclure les demandes en attente de confirmation réciproque (non confirmées par les 2 parties)
-      // Exclure aussi les demandes déjà validées (valide_par_b, valide_par_comite, attribue)
-      // Exclure celles déjà validées par le département ABN (validated_by_department != null)
+      // Demandes en attente de validation:
+      // 1. Status en cours de traitement (non finaux)
+      // 2. OU demandes approuvées par arbitrage qui n'ont pas encore été validées par le Département ABN
+      // 3. Exclure celles déjà validées par le département ABN
+      // 4. Exclure les demandes en attente de confirmation réciproque (pending_confirmation)
       query = query
-        .in("status", ["brouillon", "soumis", "en_attente_validation_b", "en_cours"])
-        .is("validated_by_department", null)
-        .or('confirmation_status.is.null,confirmation_status.eq.confirmed,confirmation_status.eq.not_required');
+        .or('status.in.(brouillon,soumis,en_attente_validation_b,en_cours),and(arbitration_status.eq.approved,validated_by_department.is.null)')
+        .or('confirmation_status.is.null,confirmation_status.eq.confirmed,confirmation_status.eq.not_required')
+        .neq('confirmation_status', 'pending_confirmation');
     } else if (activeTab === "validated") {
-      // Demandes validées par le workflow normal OU validées par le département ABN après arbitrage
-      query = query.or('status.in.(valide_par_b,valide_par_comite,attribue),validated_by_department.not.is.null');
+      // Demandes validées: status attribue OU validated_by_department non null
+      query = query.or('status.eq.attribue,validated_by_department.not.is.null');
     } else if (activeTab === "rejected") {
       query = query.in("status", ["rejete", "rejete_par_b", "rejete_par_comite"]);
     }
