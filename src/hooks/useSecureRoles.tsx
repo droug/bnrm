@@ -12,6 +12,7 @@ export function useSecureRoles() {
   const { hasRole, getPrimaryRole, loading, isAdmin } = useUserRoles();
 
   const isLibrarian = hasRole('librarian') || isAdmin;
+  const isValidator = hasRole('validateur');
   const isProfessional = hasRole('editor') || hasRole('printer') || hasRole('producer') || hasRole('distributor');
   const isPartner = hasRole('partner');
   const isResearcher = hasRole('researcher');
@@ -35,6 +36,7 @@ export function useSecureRoles() {
     // Vérifications de rôles individuels
     isAdmin,
     isLibrarian,
+    isValidator,
     isProfessional,
     isPartner,
     isResearcher,
