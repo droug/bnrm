@@ -98,10 +98,12 @@ export function useSystemRoles(targetUserId?: string) {
     }
   }, [user?.id]);
 
-  // Toujours charger les rôles disponibles (indépendamment de l'utilisateur)
+  // Charger les rôles disponibles uniquement quand l'utilisateur est authentifié.
+  // Sinon, Supabase envoie la requête avec le token "anon" et, avec la RLS, on obtient [] (liste vide).
   useEffect(() => {
+    if (!user?.id) return;
     fetchAvailableRoles();
-  }, [fetchAvailableRoles]);
+  }, [user?.id, fetchAvailableRoles]);
 
   // Charger les rôles de l'utilisateur seulement si userId existe
   useEffect(() => {
