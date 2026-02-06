@@ -36,6 +36,7 @@ interface Profile {
   research_specialization?: string[];
   access_level_details?: any;
   profile_preferences?: any;
+  email?: string;
 }
 
 interface AccessRequest {
@@ -191,17 +192,15 @@ export default function UserManagement() {
 
   const fetchData = async () => {
     try {
-      // Fetch all users - RLS will ensure only admins can see this data
+      // Fetch all users with email using secure admin function
       const { data: profilesData, error: usersError } = await supabase
-        .from('profiles')
-        .select('id, user_id, first_name, last_name, phone, institution, research_field, is_approved, created_at, updated_at, subscription_type, partner_organization, research_specialization, access_level_details, profile_preferences')
-        .order('created_at', { ascending: false });
+        .rpc('get_admin_users_with_email');
 
       if (usersError) throw usersError;
       
       // Fetch roles for each user - check both user_roles (enum) and user_system_roles (dynamic)
       const usersWithRoles = await Promise.all(
-        (profilesData || []).map(async (profile) => {
+        (profilesData || []).map(async (profile: any) => {
           let roleCode = 'visitor';
           
           // 1. Check user_roles (enum) for admin role
@@ -475,11 +474,12 @@ export default function UserManagement() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // Filtrer les utilisateurs selon la recherche
+  // Filtrer les utilisateurs selon la recherche (nom, institution, rôle, email)
   const filteredUsers = users.filter(u => 
     `${u.first_name} ${u.last_name}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
     u.institution?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    u.role?.toLowerCase().includes(searchQuery.toLowerCase())
+    u.role?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    u.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
@@ -529,7 +529,7 @@ export default function UserManagement() {
               <div className="relative">
                 <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Rechercher un utilisateur..."
+                  placeholder="Rechercher par nom, email, institution..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"
