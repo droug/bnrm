@@ -69,6 +69,14 @@ export default function AdminSettings() {
   // Autres cartes de paramétrage
   const otherCards = [
     {
+      icon: BookMarked,
+      title: "Gestion du Dépôt Légal",
+      description: "Interface complète de gestion du dépôt légal BNRM",
+      href: "/admin/depot-legal",
+      permission: "legal_deposit.manage",
+      gradient: "from-emerald-500 to-emerald-600"
+    },
+    {
       icon: Heart,
       title: "Gestion du Mécénat",
       description: "Gérer les donateurs, donations et propositions de dons",
@@ -147,14 +155,6 @@ export default function AdminSettings() {
       href: "/admin/bnrm-tariffs",
       permission: "content.manage",
       gradient: "from-yellow-500 to-yellow-600"
-    },
-    {
-      icon: BookMarked,
-      title: "Gestion du Dépôt Légal",
-      description: "Interface complète de gestion du dépôt légal BNRM",
-      href: "/admin/depot-legal",
-      permission: "legal_deposit.manage",
-      gradient: "from-emerald-500 to-emerald-600"
     },
     {
       icon: DatabaseZap,
