@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
@@ -34,9 +34,18 @@ import {
   UserCheck,
   Mail,
   Bell,
-  BarChart3
+  BarChart3,
+  Loader2,
+  Save,
+  RefreshCw
 } from "lucide-react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Database as DBTypes } from "@/integrations/supabase/types";
+
+type UserRole = DBTypes['public']['Enums']['user_role'];
 
 interface Permission {
   id: string;
@@ -66,8 +75,145 @@ interface RolePermissionsMatrixProps {
   selectedPlatform: string;
 }
 
+// Liste des 17 rôles enum du système
+const SYSTEM_ROLES: { id: UserRole; name: string; color: string; description: string }[] = [
+  { id: "admin", name: "Administrateur", color: "bg-red-500", description: "Accès complet" },
+  { id: "librarian", name: "Bibliothécaire", color: "bg-blue-500", description: "Gestion bibliothèque" },
+  { id: "validateur", name: "Validateur DL", color: "bg-fuchsia-500", description: "Validation dépôt légal" },
+  { id: "dac", name: "DAC", color: "bg-rose-500", description: "Affaires culturelles" },
+  { id: "comptable", name: "Comptable", color: "bg-lime-500", description: "Gestion financière" },
+  { id: "direction", name: "Direction", color: "bg-sky-500", description: "Direction BNRM" },
+  { id: "editor", name: "Éditeur", color: "bg-purple-500", description: "Maison d'édition" },
+  { id: "printer", name: "Imprimeur", color: "bg-pink-500", description: "Imprimerie" },
+  { id: "producer", name: "Producteur", color: "bg-orange-500", description: "Production AV" },
+  { id: "author", name: "Auteur", color: "bg-cyan-500", description: "Auteur/Écrivain" },
+  { id: "researcher", name: "Chercheur", color: "bg-emerald-500", description: "Recherche" },
+  { id: "subscriber", name: "Abonné", color: "bg-violet-500", description: "Abonné premium" },
+  { id: "partner", name: "Partenaire", color: "bg-amber-500", description: "Institution partenaire" },
+  { id: "visitor", name: "Visiteur", color: "bg-gray-400", description: "Lecture seule" },
+  { id: "public_user", name: "Grand Public", color: "bg-teal-500", description: "Utilisateur inscrit" },
+  { id: "distributor", name: "Distributeur", color: "bg-indigo-500", description: "Distribution" },
+  { id: "read_only", name: "Lecture Seule", color: "bg-slate-500", description: "Accès restreint" },
+];
+
 export function RolePermissionsMatrix({ searchQuery, selectedPlatform }: RolePermissionsMatrixProps) {
-  const [permissions, setPermissions] = useState<Record<string, Record<string, boolean>>>({});
+  const queryClient = useQueryClient();
+  const [pendingChanges, setPendingChanges] = useState<Map<string, { roleCode: UserRole; permissionId: string; granted: boolean }>>(new Map());
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Charger les permissions depuis la base
+  const { data: dbPermissions = [], isLoading: loadingDbPermissions } = useQuery({
+    queryKey: ['db-permissions'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('permissions')
+        .select('*')
+        .order('category')
+        .order('name');
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Charger les affectations role_permissions
+  const { data: rolePermissionsData = [], isLoading: loadingRolePerms, refetch: refetchRolePerms } = useQuery({
+    queryKey: ['all-role-permissions'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('role_permissions')
+        .select('*')
+        .eq('granted', true);
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Créer un index pour vérifier rapidement les permissions
+  const permissionsIndex = useMemo(() => {
+    const index = new Map<string, boolean>();
+    rolePermissionsData.forEach(rp => {
+      const key = `${rp.role}:${rp.permission_id}`;
+      index.set(key, rp.granted);
+    });
+    // Appliquer les changements en attente
+    pendingChanges.forEach((change, key) => {
+      index.set(key, change.granted);
+    });
+    return index;
+  }, [rolePermissionsData, pendingChanges]);
+
+  const hasPermission = useCallback((roleId: UserRole, permissionId: string) => {
+    const key = `${roleId}:${permissionId}`;
+    return permissionsIndex.get(key) || false;
+  }, [permissionsIndex]);
+
+  const togglePermission = useCallback((roleId: UserRole, permissionId: string) => {
+    const key = `${roleId}:${permissionId}`;
+    const currentValue = hasPermission(roleId, permissionId);
+    
+    setPendingChanges(prev => {
+      const next = new Map(prev);
+      next.set(key, { roleCode: roleId, permissionId, granted: !currentValue });
+      return next;
+    });
+  }, [hasPermission]);
+
+  // Sauvegarder les changements
+  const saveChanges = async () => {
+    if (pendingChanges.size === 0) return;
+    
+    setIsSaving(true);
+    try {
+      for (const [key, change] of pendingChanges) {
+        // Vérifier si l'entrée existe déjà
+        const { data: existing } = await supabase
+          .from('role_permissions')
+          .select('id')
+          .eq('role', change.roleCode)
+          .eq('permission_id', change.permissionId)
+          .single();
+
+        if (existing) {
+          // Mettre à jour
+          await supabase
+            .from('role_permissions')
+            .update({ granted: change.granted })
+            .eq('id', existing.id);
+        } else if (change.granted) {
+          // Insérer seulement si on accorde la permission
+          await supabase
+            .from('role_permissions')
+            .insert({
+              role: change.roleCode,
+              permission_id: change.permissionId,
+              granted: true,
+            });
+        }
+      }
+      
+      toast.success("Permissions enregistrées", {
+        description: `${pendingChanges.size} modification(s) sauvegardée(s)`,
+      });
+      setPendingChanges(new Map());
+      refetchRolePerms();
+    } catch (error: any) {
+      toast.error("Erreur", {
+        description: error.message || "Impossible de sauvegarder les permissions",
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Grouper les permissions par catégorie pour l'affichage
+  const permissionsByCategory = useMemo(() => {
+    const grouped: Record<string, typeof dbPermissions> = {};
+    dbPermissions.forEach(p => {
+      if (!grouped[p.category]) grouped[p.category] = [];
+      grouped[p.category].push(p);
+    });
+    return grouped;
+  }, [dbPermissions]);
 
   // Structure complète des plateformes, modules et permissions
   const platforms: Platform[] = [
@@ -507,15 +653,6 @@ export function RolePermissionsMatrix({ searchQuery, selectedPlatform }: RolePer
     }
   ];
 
-  const roles = [
-    { id: "admin", name: "Administrateur", color: "bg-red-500", description: "Accès complet" },
-    { id: "librarian", name: "Bibliothécaire", color: "bg-blue-500", description: "Gestion bibliothèque" },
-    { id: "cataloger", name: "Catalogueur", color: "bg-green-500", description: "Catalogage" },
-    { id: "editor", name: "Éditeur", color: "bg-purple-500", description: "Gestion contenu" },
-    { id: "researcher", name: "Chercheur", color: "bg-amber-500", description: "Recherche" },
-    { id: "reader", name: "Lecteur", color: "bg-gray-500", description: "Consultation" },
-  ];
-
   // Filtrer les plateformes selon la sélection
   const filteredPlatforms = useMemo(() => {
     let filtered = selectedPlatform === "all" ? platforms : platforms.filter(p => p.id === selectedPlatform);
@@ -537,22 +674,53 @@ export function RolePermissionsMatrix({ searchQuery, selectedPlatform }: RolePer
     return filtered;
   }, [selectedPlatform, searchQuery]);
 
-  const togglePermission = (roleId: string, permissionId: string) => {
-    setPermissions(prev => ({
-      ...prev,
-      [roleId]: {
-        ...(prev[roleId] || {}),
-        [permissionId]: !(prev[roleId]?.[permissionId] || false)
-      }
-    }));
-  };
+  const isLoading = loadingDbPermissions || loadingRolePerms;
 
-  const hasPermission = (roleId: string, permissionId: string) => {
-    return permissions[roleId]?.[permissionId] || false;
-  };
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <div className="space-y-6">
+      {/* Barre d'actions avec indicateur de changements */}
+      {pendingChanges.size > 0 && (
+        <Card className="border-amber-500/50 bg-amber-50/50">
+          <CardContent className="py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-amber-700">
+                <Badge variant="outline" className="bg-amber-100 text-amber-800 border-amber-300">
+                  {pendingChanges.size} modification(s) en attente
+                </Badge>
+              </div>
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => setPendingChanges(new Map())}
+                >
+                  Annuler
+                </Button>
+                <Button 
+                  size="sm"
+                  onClick={saveChanges}
+                  disabled={isSaving}
+                  className="gap-2"
+                >
+                  {isSaving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                  Enregistrer
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Platforms and Modules */}
       {filteredPlatforms.map((platform) => {
         const PlatformIcon = platform.icon;
@@ -581,14 +749,14 @@ export function RolePermissionsMatrix({ searchQuery, selectedPlatform }: RolePer
                       </AccordionTrigger>
                       <AccordionContent className="px-6 pb-6">
                         <ScrollArea className="w-full">
-                          <div className="min-w-full">
+                          <div className="min-w-full overflow-x-auto">
                             <table className="w-full border-collapse">
                               <thead>
                                 <tr className="border-b">
-                                  <th className="text-left py-3 px-4 font-semibold">Permission</th>
-                                  {roles.map((role) => (
-                                    <th key={role.id} className="text-center py-3 px-4">
-                                      <Badge className={`${role.color} text-white`}>
+                                  <th className="text-left py-3 px-4 font-semibold sticky left-0 bg-background z-10">Permission</th>
+                                  {SYSTEM_ROLES.slice(0, 8).map((role) => (
+                                    <th key={role.id} className="text-center py-3 px-2 min-w-[100px]">
+                                      <Badge className={`${role.color} text-white text-xs`}>
                                         {role.name}
                                       </Badge>
                                     </th>
@@ -598,24 +766,28 @@ export function RolePermissionsMatrix({ searchQuery, selectedPlatform }: RolePer
                               <tbody>
                                 {module.permissions.map((permission) => {
                                   const PermIcon = permission.icon;
+                                  // Trouver le permission_id dans la base
+                                  const dbPerm = dbPermissions.find(p => p.name === permission.id);
+                                  
                                   return (
                                     <tr key={permission.id} className="border-b hover:bg-muted/50">
-                                      <td className="py-3 px-4">
+                                      <td className="py-3 px-4 sticky left-0 bg-background z-10">
                                         <div className="flex items-center gap-3">
                                           <PermIcon className="h-4 w-4 text-muted-foreground" />
                                           <div>
-                                            <div className="font-medium">{permission.name}</div>
-                                            <div className="text-xs text-muted-foreground">
+                                            <code className="text-xs bg-muted px-1 py-0.5 rounded">{permission.id}</code>
+                                            <div className="text-xs text-muted-foreground mt-1">
                                               {permission.description}
                                             </div>
                                           </div>
                                         </div>
                                       </td>
-                                      {roles.map((role) => (
-                                        <td key={role.id} className="py-3 px-4 text-center">
+                                      {SYSTEM_ROLES.slice(0, 8).map((role) => (
+                                        <td key={role.id} className="py-3 px-2 text-center">
                                           <Switch
-                                            checked={hasPermission(role.id, permission.id)}
-                                            onCheckedChange={() => togglePermission(role.id, permission.id)}
+                                            checked={dbPerm ? hasPermission(role.id, dbPerm.id) : false}
+                                            onCheckedChange={() => dbPerm && togglePermission(role.id, dbPerm.id)}
+                                            disabled={!dbPerm}
                                           />
                                         </td>
                                       ))}
@@ -637,7 +809,80 @@ export function RolePermissionsMatrix({ searchQuery, selectedPlatform }: RolePer
         );
       })}
 
-      {filteredPlatforms.length === 0 && (
+      {/* Section avec les permissions de la base (par catégorie) */}
+      <Card>
+        <CardHeader className="bg-gradient-to-r from-primary/10 to-transparent">
+          <CardTitle className="flex items-center gap-3">
+            <Database className="h-6 w-6 text-primary" />
+            Permissions Base de Données
+          </CardTitle>
+          <CardDescription>
+            Toutes les permissions configurées dans la base ({dbPermissions.length})
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-0">
+          <Accordion type="multiple" className="w-full">
+            {Object.entries(permissionsByCategory).map(([category, perms]) => (
+              <AccordionItem key={category} value={category}>
+                <AccordionTrigger className="px-6 hover:bg-muted/50">
+                  <div className="flex items-center gap-3 text-left">
+                    <FileCheck className="h-5 w-5 text-primary" />
+                    <div>
+                      <div className="font-semibold capitalize">{category.replace(/_/g, ' ')}</div>
+                      <div className="text-sm text-muted-foreground">{perms.length} permissions</div>
+                    </div>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-6 pb-6">
+                  <ScrollArea className="w-full">
+                    <div className="min-w-full overflow-x-auto">
+                      <table className="w-full border-collapse">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left py-3 px-4 font-semibold sticky left-0 bg-background z-10">Permission</th>
+                            {SYSTEM_ROLES.slice(0, 8).map((role) => (
+                              <th key={role.id} className="text-center py-3 px-2 min-w-[90px]">
+                                <Badge className={`${role.color} text-white text-xs`}>
+                                  {role.name.substring(0, 6)}
+                                </Badge>
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {perms.map((perm) => (
+                            <tr key={perm.id} className="border-b hover:bg-muted/50">
+                              <td className="py-3 px-4 sticky left-0 bg-background z-10">
+                                <div>
+                                  <code className="text-xs bg-muted px-1 py-0.5 rounded">{perm.name}</code>
+                                  <div className="text-xs text-muted-foreground mt-1">
+                                    {perm.description}
+                                  </div>
+                                </div>
+                              </td>
+                              {SYSTEM_ROLES.slice(0, 8).map((role) => (
+                                <td key={role.id} className="py-3 px-2 text-center">
+                                  <Switch
+                                    checked={hasPermission(role.id, perm.id)}
+                                    onCheckedChange={() => togglePermission(role.id, perm.id)}
+                                  />
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                    <ScrollBar orientation="horizontal" />
+                  </ScrollArea>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </CardContent>
+      </Card>
+
+      {filteredPlatforms.length === 0 && Object.keys(permissionsByCategory).length === 0 && (
         <Card>
           <CardContent className="py-12 text-center">
             <Search className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
