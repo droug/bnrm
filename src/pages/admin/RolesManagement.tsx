@@ -198,25 +198,30 @@ export default function RolesManagement() {
   const [selectedPlatform, setSelectedPlatform] = useState<string>("all");
   const [activeTab, setActiveTab] = useState("matrix");
 
+  // Nombre de rôles enum définis dans le système (17 rôles)
+  const ENUM_ROLES_COUNT = 17;
+  
   // Fetch stats from available tables
   const { data: stats } = useQuery({
     queryKey: ['roles-management-stats'],
     queryFn: async () => {
-      const [userRoles, profiles, activityTypes] = await Promise.all([
-        supabase.from('user_roles').select('id, role', { count: 'exact' }),
-        supabase.from('profiles').select('id, role', { count: 'exact' }),
+      const [systemRoles, profiles, activityTypes] = await Promise.all([
+        supabase.from('system_roles').select('id, is_active', { count: 'exact' }),
+        supabase.from('profiles').select('id', { count: 'exact' }),
         supabase.from('activity_types').select('id, is_active', { count: 'exact' }),
       ]);
 
-      // Count distinct roles from user_roles
-      const distinctRoles = new Set(userRoles.data?.map(ur => ur.role) || []);
+      // Total roles = 17 enum roles + dynamic system roles
+      const dynamicRolesCount = systemRoles.count || 0;
+      const totalRoles = ENUM_ROLES_COUNT + dynamicRolesCount;
+      const activeSystemRoles = systemRoles.data?.filter(r => r.is_active).length || 0;
 
       return {
         roles: {
-          total: distinctRoles.size,
-          active: distinctRoles.size, // All configured roles are active
+          total: totalRoles,
+          active: ENUM_ROLES_COUNT + activeSystemRoles,
         },
-        permissions: 45, // Placeholder - can be replaced with actual count
+        permissions: 45, // Permission count (static for now)
         modules: {
           total: activityTypes.count || 0,
           active: activityTypes.data?.filter(m => m.is_active).length || 0,
