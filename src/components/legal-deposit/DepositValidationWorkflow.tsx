@@ -468,7 +468,8 @@ export function DepositValidationWorkflow() {
 
   const getValidationStep = (request: DepositRequest): number => {
     if (request.validated_by_department) return 2;
-    if (request.validated_by_committee) return 1;
+    // Les demandes approuvées par arbitrage ont déjà reçu l'approbation du comité via le validateur
+    if (request.validated_by_committee || request.arbitration_status === 'approved') return 1;
     return 0;
   };
 
