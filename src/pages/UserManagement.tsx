@@ -199,20 +199,42 @@ export default function UserManagement() {
 
       if (usersError) throw usersError;
       
-      // Fetch roles for each user
+      // Fetch roles for each user - check both user_roles (enum) and user_system_roles (dynamic)
       const usersWithRoles = await Promise.all(
         (profilesData || []).map(async (profile) => {
-          const { data: roleData } = await supabase
+          let roleCode = 'visitor';
+          
+          // 1. Check user_roles (enum) for admin role
+          const { data: enumRoleData } = await supabase
             .from('user_roles')
             .select('role')
             .eq('user_id', profile.user_id)
             .order('granted_at', { ascending: false })
             .limit(1)
-            .single();
+            .maybeSingle();
+          
+          if (enumRoleData?.role) {
+            roleCode = enumRoleData.role;
+          } else {
+            // 2. Check user_system_roles (dynamic) with join to get role_code
+            const { data: systemRoleData } = await supabase
+              .from('user_system_roles')
+              .select('role_id, system_roles!inner(role_code, role_name)')
+              .eq('user_id', profile.user_id)
+              .order('granted_at', { ascending: false })
+              .limit(1)
+              .maybeSingle();
+            
+            if (systemRoleData?.system_roles) {
+              // Access the nested system_roles data
+              const sysRole = systemRoleData.system_roles as any;
+              roleCode = sysRole.role_code || 'visitor';
+            }
+          }
           
           return {
             ...profile,
-            role: roleData?.role || 'visitor'
+            role: roleCode
           };
         })
       );
