@@ -18,7 +18,7 @@ import { useSystemRoles } from "@/hooks/useSystemRoles";
 import SubscriptionPlansManager from "@/components/SubscriptionPlansManager";
 import AddInternalUserDialog from "@/components/AddInternalUserDialog";
 import { EditUserDialog } from "@/components/EditUserDialog";
-
+import { UserCategoryTable } from "@/components/admin/UserCategoryTable";
 interface Profile {
   id: string;
   user_id: string;
@@ -181,7 +181,7 @@ export default function UserManagement() {
   const [users, setUsers] = useState<Profile[]>([]);
   const [pendingRequests, setPendingRequests] = useState<AccessRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedTab, setSelectedTab] = useState("users");
+  const [selectedTab, setSelectedTab] = useState("internal");
   const [editingUser, setEditingUser] = useState<Profile | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
 
@@ -466,12 +466,34 @@ export default function UserManagement() {
     return <Navigate to="/dashboard" replace />;
   }
 
+  // Définir les catégories de rôles
+  const INTERNAL_ROLES = ['admin', 'librarian', 'dac', 'comptable', 'direction', 'validateur', 'read_only'];
+  const PROFESSIONAL_ROLES = ['editor', 'printer', 'producer', 'distributor'];
+  const SUBSCRIBER_ROLES = ['public_user', 'subscriber', 'researcher', 'partner', 'visitor'];
+
+  // Fonction pour vérifier si un utilisateur appartient à une catégorie
+  const hasRoleInCategory = (userProfile: Profile, categoryRoles: string[]) => {
+    if (userProfile.all_roles && userProfile.all_roles.length > 0) {
+      return userProfile.all_roles.some(role => categoryRoles.includes(role));
+    }
+    return categoryRoles.includes(userProfile.role);
+  };
+
   // Filtrer les utilisateurs selon la recherche (nom, institution, rôle, email)
   const filteredUsers = users.filter(u => 
     `${u.first_name} ${u.last_name}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
     u.institution?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     u.role?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     u.email?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Séparer les utilisateurs par catégorie
+  const internalUsers = filteredUsers.filter(u => hasRoleInCategory(u, INTERNAL_ROLES));
+  const professionalUsers = filteredUsers.filter(u => hasRoleInCategory(u, PROFESSIONAL_ROLES));
+  const subscriberUsers = filteredUsers.filter(u => 
+    hasRoleInCategory(u, SUBSCRIBER_ROLES) && 
+    !hasRoleInCategory(u, INTERNAL_ROLES) && 
+    !hasRoleInCategory(u, PROFESSIONAL_ROLES)
   );
 
   return (
@@ -575,17 +597,25 @@ export default function UserManagement() {
 
           {/* Tabs */}
           <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="users" className="flex items-center gap-2">
+            <TabsList className="grid w-full grid-cols-6">
+              <TabsTrigger value="internal" className="flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                Internes ({internalUsers.length})
+              </TabsTrigger>
+              <TabsTrigger value="professionals" className="flex items-center gap-2">
+                <Building className="h-4 w-4" />
+                Professionnels ({professionalUsers.length})
+              </TabsTrigger>
+              <TabsTrigger value="subscribers" className="flex items-center gap-2">
                 <Users className="h-4 w-4" />
-                Utilisateurs
+                Abonnés ({subscriberUsers.length})
               </TabsTrigger>
               <TabsTrigger value="permissions" className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
                 Permissions
               </TabsTrigger>
               <TabsTrigger value="plans" className="flex items-center gap-2">
-                <Shield className="h-4 w-4" />
+                <UserPlus className="h-4 w-4" />
                 Profils & Plans
               </TabsTrigger>
               <TabsTrigger value="requests" className="flex items-center gap-2">
@@ -594,286 +624,119 @@ export default function UserManagement() {
               </TabsTrigger>
             </TabsList>
 
-            {/* Gestion des utilisateurs */}
-            <TabsContent value="users" className="space-y-6">
+            {/* Onglet Utilisateurs Internes */}
+            <TabsContent value="internal" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Shield className="h-5 w-5" />
+                    Utilisateurs Internes
+                  </CardTitle>
+                  <CardDescription>
+                    Personnel BNRM : administrateurs, bibliothécaires, direction, comptabilité, etc.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <UserCategoryTable
+                    users={internalUsers}
+                    rolePermissions={ROLE_PERMISSIONS}
+                    availableRoleOptions={[
+                      { value: 'admin', label: 'Administrateur' },
+                      ...availableRoles.map(role => ({
+                        value: role.role_code,
+                        label: role.role_name,
+                      }))
+                    ]}
+                    onEditUser={(user) => {
+                      setEditingUser(user);
+                      setShowEditDialog(true);
+                    }}
+                    onUpdateRole={updateUserRole}
+                    onUpdateApproval={updateUserApproval}
+                    onDeleteUser={deleteUser}
+                    getRoleBadgeVariant={getRoleBadgeVariant}
+                    formatDate={formatDate}
+                    emptyMessage="Aucun utilisateur interne trouvé"
+                  />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Onglet Professionnels */}
+            <TabsContent value="professionals" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Building className="h-5 w-5" />
+                    Comptes Professionnels
+                  </CardTitle>
+                  <CardDescription>
+                    Éditeurs, imprimeurs, producteurs et distributeurs inscrits pour le dépôt légal
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <UserCategoryTable
+                    users={professionalUsers}
+                    rolePermissions={ROLE_PERMISSIONS}
+                    availableRoleOptions={[
+                      { value: 'admin', label: 'Administrateur' },
+                      ...availableRoles.map(role => ({
+                        value: role.role_code,
+                        label: role.role_name,
+                      }))
+                    ]}
+                    onEditUser={(user) => {
+                      setEditingUser(user);
+                      setShowEditDialog(true);
+                    }}
+                    onUpdateRole={updateUserRole}
+                    onUpdateApproval={updateUserApproval}
+                    onDeleteUser={deleteUser}
+                    getRoleBadgeVariant={getRoleBadgeVariant}
+                    formatDate={formatDate}
+                    emptyMessage="Aucun compte professionnel trouvé"
+                  />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Onglet Abonnés */}
+            <TabsContent value="subscribers" className="space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Users className="h-5 w-5" />
-                    Liste des Utilisateurs
+                    Abonnés & Usagers
                   </CardTitle>
                   <CardDescription>
-                    Gérez les rôles et approbations des utilisateurs ({filteredUsers.length} résultats)
+                    Chercheurs, abonnés premium, partenaires institutionnels et grand public
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                {/* Statistiques des utilisateurs internes */}
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                  <Card className="bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/20 dark:to-red-800/20">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-2">
-                        <Shield className="h-4 w-4 text-red-600" />
-                        <span className="text-sm font-medium">Administrateurs</span>
-                      </div>
-                      <div className="text-2xl font-bold text-red-700 dark:text-red-400">
-                        {users.filter(u => u.role === 'admin').length}
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-2">
-                        <Users className="h-4 w-4 text-blue-600" />
-                        <span className="text-sm font-medium">Bibliothécaires</span>
-                      </div>
-                      <div className="text-2xl font-bold text-blue-700 dark:text-blue-400">
-                        {users.filter(u => u.role === 'librarian').length}
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-2">
-                        <Building className="h-4 w-4 text-purple-600" />
-                        <span className="text-sm font-medium">Partenaires</span>
-                      </div>
-                      <div className="text-2xl font-bold text-purple-700 dark:text-purple-400">
-                        {users.filter(u => u.role === 'partner').length}
-                      </div>
-                    </CardContent>
-                  </Card>
-                  
-                  <Card className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-600" />
-                        <span className="text-sm font-medium">Approuvés</span>
-                      </div>
-                      <div className="text-2xl font-bold text-green-700 dark:text-green-400">
-                        {users.filter(u => u.is_approved).length}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-                <div className="rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Utilisateur</TableHead>
-                        <TableHead>Contact</TableHead>
-                        <TableHead>Institution</TableHead>
-                        <TableHead>Rôle</TableHead>
-                        <TableHead>Statut</TableHead>
-                        <TableHead>Inscription</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredUsers.map((userProfile) => (
-                        <TableRow key={userProfile.id}>
-                          <TableCell>
-                            <div className="flex items-center gap-3">
-                              <div className="relative">
-                                <User className="h-4 w-4 text-muted-foreground" />
-                                {['admin', 'librarian', 'partner'].includes(userProfile.role) && (
-                                  <div className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full" title="Utilisateur interne" />
-                                )}
-                              </div>
-                              <div>
-                                <div className="font-medium">
-                                  {userProfile.first_name} {userProfile.last_name}
-                                  {['admin', 'librarian', 'partner'].includes(userProfile.role) && (
-                                    <Badge variant="outline" className="ml-2 text-xs">
-                                      Interne
-                                    </Badge>
-                                  )}
-                                </div>
-                                <div className="text-sm text-muted-foreground">
-                                  ID: {userProfile.id.slice(0, 8)}...
-                                </div>
-                                {userProfile.partner_organization && (
-                                  <div className="text-xs text-blue-600 font-medium">
-                                    Partenaire: {userProfile.partner_organization}
-                                  </div>
-                                )}
-                                {userProfile.subscription_type && (
-                                  <div className="text-xs text-green-600 font-medium">
-                                    Abonnement: {userProfile.subscription_type}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="space-y-1">
-                              {userProfile.phone && (
-                                <div className="flex items-center gap-1 text-sm">
-                                  <Phone className="h-3 w-3" />
-                                  {userProfile.phone}
-                                </div>
-                              )}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            {userProfile.institution && (
-                              <div className="flex items-center gap-1 text-sm">
-                                <Building className="h-3 w-3" />
-                                {userProfile.institution}
-                              </div>
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            <div className="space-y-1">
-                              {/* Afficher tous les rôles si disponibles */}
-                              {userProfile.all_roles && userProfile.all_roles.length > 0 ? (
-                                <div className="flex flex-wrap gap-1">
-                                  {userProfile.all_roles.map((role: string) => (
-                                    <Badge 
-                                      key={role} 
-                                      variant={getRoleBadgeVariant(role)}
-                                      className="text-xs"
-                                    >
-                                      {ROLE_PERMISSIONS[role as keyof typeof ROLE_PERMISSIONS]?.name || role}
-                                    </Badge>
-                                  ))}
-                                </div>
-                              ) : (
-                                <Badge variant={getRoleBadgeVariant(userProfile.role)}>
-                                  {ROLE_PERMISSIONS[userProfile.role as keyof typeof ROLE_PERMISSIONS]?.name || userProfile.role}
-                                </Badge>
-                              )}
-                              {/* Sélecteur pour ajouter/modifier les rôles */}
-                              <SimpleSelect
-                                value={userProfile.role}
-                                onChange={(newRole) => updateUserRole(userProfile.id, newRole)}
-                                options={[
-                                  {
-                                    value: 'admin',
-                                    label: 'Administrateur',
-                                  },
-                                  ...availableRoles.map(role => ({
-                                    value: role.role_code,
-                                    label: role.role_name,
-                                  }))
-                                ]}
-                                className="w-full min-w-[180px] mt-1"
-                              />
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={userProfile.is_approved ? "default" : "secondary"}>
-                              {userProfile.is_approved ? "Approuvé" : "En attente"}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                              <Calendar className="h-3 w-3" />
-                              {formatDate(userProfile.created_at)}
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex gap-2">
-                              {/* Bouton Modifier */}
-                              <Button 
-                                size="sm" 
-                                variant="outline"
-                                onClick={() => {
-                                  setEditingUser(userProfile);
-                                  setShowEditDialog(true);
-                                }}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
-                              
-                              {/* Boutons Approuver/Révoquer */}
-                              {!userProfile.is_approved ? (
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button size="sm" variant="outline">
-                                      <UserCheck className="h-4 w-4" />
-                                    </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>Approuver l'utilisateur</AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        Êtes-vous sûr de vouloir approuver cet utilisateur ? Il pourra accéder aux fonctionnalités selon son rôle.
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                      <AlertDialogAction
-                                        onClick={() => updateUserApproval(userProfile.id, true)}
-                                      >
-                                        Approuver
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
-                              ) : (
-                                <AlertDialog>
-                                  <AlertDialogTrigger asChild>
-                                    <Button size="sm" variant="outline">
-                                      <UserX className="h-4 w-4" />
-                                    </Button>
-                                  </AlertDialogTrigger>
-                                  <AlertDialogContent>
-                                    <AlertDialogHeader>
-                                      <AlertDialogTitle>Révoquer l'approbation</AlertDialogTitle>
-                                      <AlertDialogDescription>
-                                        Êtes-vous sûr de vouloir révoquer l'approbation de cet utilisateur ? Il perdra l'accès aux fonctionnalités.
-                                      </AlertDialogDescription>
-                                    </AlertDialogHeader>
-                                    <AlertDialogFooter>
-                                      <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                      <AlertDialogAction
-                                        onClick={() => updateUserApproval(userProfile.id, false)}
-                                      >
-                                        Révoquer
-                                      </AlertDialogAction>
-                                    </AlertDialogFooter>
-                                  </AlertDialogContent>
-                                </AlertDialog>
-                              )}
-                              
-                              {/* Bouton Supprimer */}
-                              <AlertDialog>
-                                <AlertDialogTrigger asChild>
-                                  <Button size="sm" variant="destructive">
-                                    <Trash className="h-4 w-4" />
-                                  </Button>
-                                </AlertDialogTrigger>
-                                <AlertDialogContent>
-                                  <AlertDialogHeader>
-                                    <AlertDialogTitle>Supprimer l'utilisateur</AlertDialogTitle>
-                                    <AlertDialogDescription>
-                                      Êtes-vous sûr de vouloir supprimer définitivement cet utilisateur ? 
-                                      Cette action est irréversible et supprimera toutes les données associées.
-                                    </AlertDialogDescription>
-                                  </AlertDialogHeader>
-                                  <AlertDialogFooter>
-                                    <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                    <AlertDialogAction
-                                      onClick={() => deleteUser(userProfile.id)}
-                                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                    >
-                                      Supprimer
-                                    </AlertDialogAction>
-                                  </AlertDialogFooter>
-                                </AlertDialogContent>
-                              </AlertDialog>
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
+                  <UserCategoryTable
+                    users={subscriberUsers}
+                    rolePermissions={ROLE_PERMISSIONS}
+                    availableRoleOptions={[
+                      { value: 'admin', label: 'Administrateur' },
+                      ...availableRoles.map(role => ({
+                        value: role.role_code,
+                        label: role.role_name,
+                      }))
+                    ]}
+                    onEditUser={(user) => {
+                      setEditingUser(user);
+                      setShowEditDialog(true);
+                    }}
+                    onUpdateRole={updateUserRole}
+                    onUpdateApproval={updateUserApproval}
+                    onDeleteUser={deleteUser}
+                    getRoleBadgeVariant={getRoleBadgeVariant}
+                    formatDate={formatDate}
+                    emptyMessage="Aucun abonné trouvé"
+                  />
+                </CardContent>
+              </Card>
+            </TabsContent>
 
           {/* Gestion des permissions */}
           <TabsContent value="permissions" className="space-y-6">
