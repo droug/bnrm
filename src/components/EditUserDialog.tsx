@@ -335,22 +335,25 @@ export const EditUserDialog: React.FC<EditUserDialogProps> = ({
                 />
               </div>
             </div>
-
             {/* Email (lecture seule) */}
-            {user?.email && (
-              <div className="space-y-2">
-                <Label className="flex items-center gap-1">
-                  <Mail className="h-3 w-3" />
-                  Email
-                </Label>
-                <Input
-                  value={user.email}
-                  readOnly
-                  disabled
-                  className="bg-muted cursor-not-allowed"
-                />
-              </div>
-            )}
+            <div className="space-y-2">
+              <Label className="flex items-center gap-1">
+                <Mail className="h-3 w-3" />
+                Email
+              </Label>
+              <Input
+                value={user?.email ?? ""}
+                placeholder="Non disponible"
+                readOnly
+                disabled
+                className="bg-muted cursor-not-allowed"
+              />
+              {!user?.email && (
+                <p className="text-xs text-muted-foreground">
+                  Email non disponible (compte sans email ou chargement en mode dégradé).
+                </p>
+              )}
+            </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
