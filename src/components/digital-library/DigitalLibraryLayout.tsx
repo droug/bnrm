@@ -1,4 +1,5 @@
 import { ReactNode, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useLanguage, Language } from "@/hooks/useLanguage";
 import { Link, useLocation } from "react-router-dom";
 import { Icon } from "@/components/ui/icon";
@@ -543,14 +544,14 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                       side="right"
                       variant="gold"
                     >
-                      <div className="block">
-                        <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group" onClick={() => setShowReproductionDialog(true)}>
+                      <Link to="/demande-reproduction?platform=bn" className="block">
+                        <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group">
                           <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-500/5 group-hover:from-purple-500/30 group-hover:to-purple-500/10 transition-all duration-200 group-hover:scale-110">
                             <Icon name="mdi:content-copy" className="h-5 w-5 text-purple-600" />
                           </div>
                           <span className="font-semibold text-foreground group-hover:text-purple-600 transition-colors">Demande de Reproduction</span>
                         </DropdownMenuItem>
-                      </div>
+                      </Link>
                     </FancyTooltip>
                   </DropdownMenuContent>
                 </DropdownMenu>

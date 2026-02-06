@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { CBNSearchWithSelection } from "@/components/cbn/CBNSearchWithSelection";
@@ -31,6 +32,10 @@ export default function DemandeReproduction() {
   const [showReproductionDialog, setShowReproductionDialog] = useState(false);
   const [currentDocument, setCurrentDocument] = useState<SelectedDocument | null>(null);
   const [prefilledDocument, setPrefilledDocument] = useState<SelectedDocument | null>(null);
+
+  // Déterminer si on utilise le layout BN
+  const platform = searchParams.get('platform');
+  const isBNPlatform = platform === 'bn';
 
   // Récupérer les paramètres de l'URL (documentId et documentTitle)
   const documentIdFromUrl = searchParams.get('documentId');
@@ -168,10 +173,9 @@ export default function DemandeReproduction() {
     setShowReproductionDialog(true);
   };
 
-  return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
+  // Contenu principal partagé
+  const mainContent = (
+    <>
       <main className="container mx-auto px-4 py-8">
         {/* Bouton retour */}
         <Button
@@ -181,7 +185,7 @@ export default function DemandeReproduction() {
             if (window.history.length > 1) {
               navigate(-1);
             } else {
-              navigate('/');
+              navigate(isBNPlatform ? '/digital-library' : '/');
             }
           }}
         >
@@ -360,8 +364,6 @@ export default function DemandeReproduction() {
         </Card>
       </main>
 
-      <Footer />
-
       {/* Dialog de demande de reproduction */}
       {showReproductionDialog && currentDocument && (
         <ReproductionRequestDialog
@@ -381,6 +383,24 @@ export default function DemandeReproduction() {
           }}
         />
       )}
+    </>
+  );
+
+  // Utiliser le layout BN si platform=bn
+  if (isBNPlatform) {
+    return (
+      <DigitalLibraryLayout>
+        {mainContent}
+      </DigitalLibraryLayout>
+    );
+  }
+
+  // Layout portail par défaut
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      {mainContent}
+      <Footer />
     </div>
   );
 }
