@@ -199,11 +199,12 @@ export function DepositValidationWorkflow() {
 
     if (activeTab === "pending") {
       // Demandes en attente de validation:
-      // 1. Status en cours de traitement (non finaux)
+      // 1. Status en cours de traitement (brouillon, soumis, en_attente_validation_b, en_cours)
       // 2. OU demandes approuvées par arbitrage qui n'ont pas encore été validées par le Département ABN
-      // 3. Exclure celles déjà validées par le département ABN
+      // 3. Exclure les statuts finaux (attribue, rejete, etc.)
       // 4. Exclure les demandes en attente de confirmation réciproque (pending_confirmation)
       query = query
+        .not('status', 'in', '(attribue,rejete,rejete_par_b,rejete_par_comite)')
         .or('status.in.(brouillon,soumis,en_attente_validation_b,en_cours),and(arbitration_status.eq.approved,validated_by_department.is.null)')
         .or('confirmation_status.is.null,confirmation_status.eq.confirmed,confirmation_status.eq.not_required')
         .neq('confirmation_status', 'pending_confirmation');
