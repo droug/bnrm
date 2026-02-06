@@ -1994,7 +1994,8 @@ export function DepositValidationWorkflow() {
                       </Badge>
                     )}
 
-                    {!selectedRequest.validated_by_committee && (
+                    {/* Boutons pour les demandes non validées par le comité ET non approuvées par arbitrage */}
+                    {!selectedRequest.validated_by_committee && selectedRequest.arbitration_status !== 'approved' && (
                       <>
                         <Button
                           variant="outline"
@@ -2017,7 +2018,8 @@ export function DepositValidationWorkflow() {
                       </>
                     )}
 
-                    {selectedRequest.validated_by_committee && !selectedRequest.validated_by_department && (
+                    {/* Boutons ABN: pour les demandes validées par comité OU approuvées par arbitrage (le validateur a joué le rôle du comité) */}
+                    {(selectedRequest.validated_by_committee || selectedRequest.arbitration_status === 'approved') && !selectedRequest.validated_by_department && (
                       <>
                         <Button
                           variant="outline"
