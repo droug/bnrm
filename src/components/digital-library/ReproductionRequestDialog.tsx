@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Copy, FileText } from "lucide-react";
+import { Copy, FileText, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { TitleAutocomplete } from "@/components/ui/title-autocomplete";
@@ -30,7 +30,8 @@ import { PortalSelect } from "@/components/ui/portal-select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/integrations/supabase/client";
-
+import { useReproductionFormConfig } from "@/hooks/useReproductionFormConfig";
+import { useLanguage } from "@/hooks/useLanguage";
 // Schéma de validation
 const reproductionRequestSchema = z.object({
   userName: z.string().min(2, "Le nom est requis"),
@@ -72,13 +73,7 @@ interface ReproductionRequestDialogProps {
   };
 }
 
-const REPRODUCTION_TYPES = [
-  { value: "numerique_mail", label: "Copie numérique par email (PDF)" },
-  { value: "numerique_espace", label: "Copie numérique (espace personnel)" },
-  { value: "papier", label: "Impression papier" },
-  { value: "support_physique", label: "Reproduction sur support physique" },
-];
-
+// Les types de reproduction sont maintenant chargés dynamiquement via useReproductionFormConfig
 
 const DELIVERY_METHOD_OPTIONS = [
   { value: "telecharger_espace", label: "À télécharger sur Mon espace" },
@@ -103,6 +98,16 @@ export function ReproductionRequestDialog({
   userProfile,
 }: ReproductionRequestDialogProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { reproductionTypes, loading: configLoading } = useReproductionFormConfig();
+  const { language } = useLanguage();
+
+  // Filtrer uniquement les types activés et formater pour le select
+  const enabledReproductionTypes = reproductionTypes
+    .filter(type => type.enabled)
+    .map(type => ({
+      value: type.value,
+      label: language === "ar" ? type.label_ar : type.label,
+    }));
 
   const form = useForm<ReproductionRequestFormData>({
     resolver: zodResolver(reproductionRequestSchema),
@@ -290,7 +295,7 @@ export function ReproductionRequestDialog({
                           value={field.value}
                           onChange={field.onChange}
                           placeholder="Sélectionner..."
-                          options={REPRODUCTION_TYPES}
+                          options={enabledReproductionTypes}
                         />
                         <FormMessage />
                       </FormItem>

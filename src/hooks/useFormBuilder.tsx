@@ -167,6 +167,15 @@ export function useFormBuilder() {
           { field_key: "bordereau_depot", field_type: "file", label_fr: "Bordereau de dépôt", label_ar: "وصل الإيداع" },
         ],
       },
+      reproduction_request_form: {
+        type_reproduction: [
+          { field_key: "numerique_mail", field_type: "boolean", label_fr: "Copie numérique par email (PDF)", label_ar: "نسخة رقمية عبر البريد الإلكتروني", is_visible: true },
+          { field_key: "numerique_espace", field_type: "boolean", label_fr: "Copie numérique (espace personnel)", label_ar: "نسخة رقمية (المساحة الشخصية)", is_visible: true },
+          { field_key: "papier", field_type: "boolean", label_fr: "Tirage papier", label_ar: "طباعة ورقية", is_visible: true },
+          { field_key: "microfilm", field_type: "boolean", label_fr: "Duplicata Microfilm", label_ar: "نسخة ميكروفيلم", is_visible: true },
+          { field_key: "support_physique", field_type: "boolean", label_fr: "Reproduction sur support physique", label_ar: "استنساخ على دعم مادي", is_visible: true },
+        ],
+      },
       // On peut ajouter d'autres formulaires ici
     };
     
@@ -454,6 +463,15 @@ export function useFormBuilder() {
           label_fr: "Pièces à fournir",
           label_ar: "الوثائق المطلوبة",
           order_index: 4,
+          fields: [],
+        },
+      ],
+      reproduction_request_form: [
+        {
+          key: "type_reproduction",
+          label_fr: "Type de reproduction",
+          label_ar: "نوع الاستنساخ",
+          order_index: 0,
           fields: [],
         },
       ],
