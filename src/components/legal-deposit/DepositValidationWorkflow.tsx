@@ -2291,7 +2291,7 @@ export function DepositValidationWorkflow() {
               className="bg-amber-600 hover:bg-amber-700"
             >
               <Scale className="h-4 w-4 mr-2" />
-              Envoyer l'arbitrage
+              Envoyer pour arbitrage
             </Button>
           </div>
         </DialogContent>
