@@ -199,10 +199,11 @@ export function DepositValidationWorkflow() {
 
     if (activeTab === "pending") {
       // Exclure les demandes en attente de confirmation réciproque (non confirmées par les 2 parties)
-      // Inclure aussi les demandes validées par arbitrage qui nécessitent la validation ABN finale
-      // Mais exclure celles déjà validées par le département ABN (validated_by_department != null)
+      // Exclure aussi les demandes déjà validées (valide_par_b, valide_par_comite, attribue)
+      // Exclure celles déjà validées par le département ABN (validated_by_department != null)
       query = query
-        .or('status.in.(brouillon,soumis,en_attente_validation_b,en_cours),and(arbitration_status.eq.approved,validated_by_department.is.null)')
+        .in("status", ["brouillon", "soumis", "en_attente_validation_b", "en_cours"])
+        .is("validated_by_department", null)
         .or('confirmation_status.is.null,confirmation_status.eq.confirmed,confirmation_status.eq.not_required');
     } else if (activeTab === "validated") {
       // Demandes validées par le workflow normal OU validées par le département ABN après arbitrage
