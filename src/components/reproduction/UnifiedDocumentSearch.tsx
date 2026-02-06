@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { Search, BookOpen, FileText, Scroll, Library, Plus, Check, Loader2 } from "lucide-react";
 import { useUnifiedDocumentIndex, UnifiedDocument } from "@/hooks/useUnifiedDocumentIndex";
+import { SearchPagination } from "@/components/ui/search-pagination";
 
 interface UnifiedDocumentSearchProps {
   onSelectDocument: (document: UnifiedDocument) => void;
@@ -26,26 +27,42 @@ export function UnifiedDocumentSearch({
   selectedDocumentIds = [],
   showDigitizedOnly = false 
 }: UnifiedDocumentSearchProps) {
-  const { loading, documents, searchDocuments } = useUnifiedDocumentIndex();
+  const { loading, documents, totalCount, searchDocuments } = useUnifiedDocumentIndex();
   const [searchQuery, setSearchQuery] = useState("");
   const [sourceFilter, setSourceFilter] = useState<string>("all");
   const [digitizedOnly, setDigitizedOnly] = useState(showDigitizedOnly);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(20);
 
   useEffect(() => {
     // Charger les documents initiaux
-    searchDocuments({
-      digitizedOnly: digitizedOnly || undefined,
-      limit: 20,
-    });
+    performSearch();
   }, []);
 
-  const handleSearch = () => {
+  const performSearch = (page = currentPage, perPage = itemsPerPage) => {
     searchDocuments({
       query: searchQuery || undefined,
       sourceFilter: sourceFilter !== "all" ? sourceFilter : undefined,
       digitizedOnly: digitizedOnly || undefined,
-      limit: 50,
+      limit: perPage,
+      offset: (page - 1) * perPage,
     });
+  };
+
+  const handleSearch = () => {
+    setCurrentPage(1);
+    performSearch(1, itemsPerPage);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    performSearch(page, itemsPerPage);
+  };
+
+  const handleItemsPerPageChange = (perPage: number) => {
+    setItemsPerPage(perPage);
+    setCurrentPage(1);
+    performSearch(1, perPage);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -55,6 +72,8 @@ export function UnifiedDocumentSearch({
   };
 
   const isSelected = (docId: string) => selectedDocumentIds.includes(docId);
+  
+  const totalPages = Math.ceil(totalCount / itemsPerPage);
 
   return (
     <div className="space-y-4">
@@ -98,6 +117,18 @@ export function UnifiedDocumentSearch({
           <span className="ml-2">Rechercher</span>
         </Button>
       </div>
+
+      {/* Pagination en haut */}
+      {documents.length > 0 && totalPages > 0 && (
+        <SearchPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalCount}
+          itemsPerPage={itemsPerPage}
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
+      )}
 
       {/* Résultats */}
       <div className="space-y-2">
@@ -188,10 +219,16 @@ export function UnifiedDocumentSearch({
         )}
       </div>
 
-      {documents.length > 0 && (
-        <p className="text-sm text-muted-foreground text-center">
-          {documents.length} document(s) trouvé(s)
-        </p>
+      {/* Pagination en bas */}
+      {documents.length > 0 && totalPages > 0 && (
+        <SearchPagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalCount}
+          itemsPerPage={itemsPerPage}
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
       )}
     </div>
   );
