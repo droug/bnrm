@@ -146,6 +146,10 @@ export default function FormBuilder() {
     setShowFieldDialog(true);
   };
 
+  const handleToggleVisibility = async (fieldId: string, isVisible: boolean) => {
+    await updateField(fieldId, { is_visible: isVisible });
+  };
+
   // Récupérer les sections réelles depuis la structure du formulaire
   const formSections = currentStructure?.structure?.sections || [];
 
@@ -319,6 +323,7 @@ export default function FormBuilder() {
                     formName={currentForm.form_name}
                     onEditField={handleEditField}
                     onDeleteField={deleteField}
+                    onToggleVisibility={handleToggleVisibility}
                   />
                 </SortableContext>
               </div>
