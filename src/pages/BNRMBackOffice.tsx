@@ -122,8 +122,12 @@ export default function BNRMBackOffice() {
   }
 
   // Utiliser useSecureRoles() pour vérifier les accès (sécurisé via user_roles table)
-  // Bloquer l'accès aux comptes professionnels, autoriser admin et librarian
-  if (!profile?.is_approved || (!isAdmin && !isLibrarian) || isProfessional) {
+  // Les administrateurs ont accès même sans profil approuvé
+  // Les bibliothécaires doivent avoir un profil approuvé
+  // Bloquer l'accès aux comptes professionnels
+  const hasAccess = isAdmin || (isLibrarian && profile?.is_approved);
+  
+  if (!hasAccess || isProfessional) {
     return <Navigate to="/dashboard" replace />;
   }
 
