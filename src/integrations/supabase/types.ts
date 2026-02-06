@@ -15106,6 +15106,7 @@ export type Database = {
             Returns: boolean
           }
       is_manuscript_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_validator: { Args: { user_uuid: string }; Returns: boolean }
       log_search: {
         Args: {
           p_filters?: Json
