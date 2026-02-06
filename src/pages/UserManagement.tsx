@@ -192,71 +192,108 @@ export default function UserManagement() {
 
   const fetchData = async () => {
     try {
-      // Fetch all users with email using secure admin function
-      const { data: profilesData, error: usersError } = await supabase
-        .rpc('get_admin_users_with_email');
+      // Fetch all users (prefer secure admin RPC that includes email; fallback to profiles)
+      let profilesData: any[] = [];
 
-      if (usersError) throw usersError;
-      
+      const { data: rpcData, error: usersError } = await supabase.rpc(
+        "get_admin_users_with_email"
+      );
+
+      if (usersError) {
+        console.error("RPC get_admin_users_with_email failed", usersError);
+
+        // Fallback: keep the admin page usable even if the RPC is unavailable
+        const { data: fallbackProfiles, error: fallbackError } = await supabase
+          .from("profiles")
+          .select("*")
+          .order("updated_at", { ascending: false });
+
+        if (fallbackError) throw fallbackError;
+
+        profilesData = (fallbackProfiles || []).map((p: any) => ({
+          ...p,
+          email: null,
+        }));
+
+        toast({
+          title: "Avertissement",
+          description:
+            "Chargement en mode dégradé (emails indisponibles). La liste des utilisateurs reste accessible.",
+        });
+      } else {
+        profilesData = (rpcData as any[]) || [];
+      }
+
       // Fetch roles for each user - check both user_roles (enum) and user_system_roles (dynamic)
       const usersWithRoles = await Promise.all(
-        (profilesData || []).map(async (profile: any) => {
-          let roleCode = 'visitor';
-          
+        profilesData.map(async (profile: any) => {
+          let roleCode = "visitor";
+
           // 1. Check user_roles (enum) for admin role
-          const { data: enumRoleData } = await supabase
-            .from('user_roles')
-            .select('role')
-            .eq('user_id', profile.user_id)
-            .order('granted_at', { ascending: false })
+          const { data: enumRoleData, error: enumRoleError } = await supabase
+            .from("user_roles")
+            .select("role")
+            .eq("user_id", profile.user_id)
+            .order("granted_at", { ascending: false })
             .limit(1)
             .maybeSingle();
-          
+
+          if (enumRoleError) {
+            console.error("Failed to fetch enum role", enumRoleError);
+          }
+
           if (enumRoleData?.role) {
             roleCode = enumRoleData.role;
           } else {
             // 2. Check user_system_roles (dynamic) with join to get role_code
-            const { data: systemRoleData } = await supabase
-              .from('user_system_roles')
-              .select('role_id, system_roles!inner(role_code, role_name)')
-              .eq('user_id', profile.user_id)
-              .order('granted_at', { ascending: false })
+            const { data: systemRoleData, error: systemRoleError } = await supabase
+              .from("user_system_roles")
+              .select("role_id, system_roles!inner(role_code, role_name)")
+              .eq("user_id", profile.user_id)
+              .order("granted_at", { ascending: false })
               .limit(1)
               .maybeSingle();
-            
+
+            if (systemRoleError) {
+              console.error("Failed to fetch system role", systemRoleError);
+            }
+
             if (systemRoleData?.system_roles) {
               // Access the nested system_roles data
               const sysRole = systemRoleData.system_roles as any;
-              roleCode = sysRole.role_code || 'visitor';
+              roleCode = sysRole.role_code || "visitor";
             }
           }
-          
+
           return {
             ...profile,
-            role: roleCode
+            role: roleCode,
           };
         })
       );
-      
+
       setUsers(usersWithRoles || []);
 
       // Fetch pending access requests
       const { data: requestsData, error: requestsError } = await supabase
-        .from('access_requests')
-        .select(`
+        .from("access_requests")
+        .select(
+          `
           *,
           manuscripts:manuscript_id (title, author),
           profiles:user_id (first_name, last_name, institution)
-        `)
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false });
+        `
+        )
+        .eq("status", "pending")
+        .order("created_at", { ascending: false });
 
       if (requestsError) throw requestsError;
       setPendingRequests((requestsData as any) || []);
     } catch (error: any) {
+      console.error("UserManagement fetchData failed", error);
       toast({
         title: "Erreur",
-        description: "Impossible de charger les données",
+        description: error?.message || "Impossible de charger les données",
         variant: "destructive",
       });
     } finally {
