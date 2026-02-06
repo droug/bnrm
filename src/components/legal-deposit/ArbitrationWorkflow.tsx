@@ -119,12 +119,13 @@ export function ArbitrationWorkflow() {
           arbitration_validated_at: new Date().toISOString(),
           arbitration_validated_by: user.id,
           arbitration_decision_reason: decisionReason,
-          // Si approuvé, on peut valider la demande
+          // Si approuvé par le validateur, cela équivaut à la validation du Comité
+          // La demande doit encore être validée par le Département ABN
           ...(approved ? {
-            validated_by_department: user.id,
-            department_validated_at: new Date().toISOString(),
-            department_validation_notes: `Validé par arbitrage. Motif: ${decisionReason}`,
-            status: "valide_par_b"
+            validated_by_committee: user.id,
+            committee_validated_at: new Date().toISOString(),
+            committee_validation_notes: `Approuvé par arbitrage. Motif: ${decisionReason}`,
+            status: "en_attente_validation_b" // En attente de validation par le Département ABN
           } : {
             rejected_by: user.id,
             rejected_at: new Date().toISOString(),
@@ -138,7 +139,9 @@ export function ArbitrationWorkflow() {
 
       toast({
         title: approved ? "Arbitrage approuvé" : "Arbitrage rejeté",
-        description: `La demande ${selectedRequest.request_number} a été ${approved ? "approuvée" : "rejetée"} par arbitrage.`
+        description: approved 
+          ? `La demande ${selectedRequest.request_number} a été approuvée par arbitrage. Elle doit maintenant être validée par le Département ABN.`
+          : `La demande ${selectedRequest.request_number} a été rejetée par arbitrage.`
       });
 
       setShowApproveModal(false);
