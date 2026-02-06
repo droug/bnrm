@@ -34,6 +34,20 @@ export function useUnifiedDocumentIndex() {
   const searchDocuments = async (params: SearchParams = {}) => {
     setLoading(true);
     try {
+      // D'abord compter le total
+      const { count, error: countError } = await supabase
+        .from('unified_document_index')
+        .select('*', { count: 'exact', head: true })
+        .or(
+          params.query 
+            ? `title.ilike.%${params.query}%,author.ilike.%${params.query}%,cote.ilike.%${params.query}%`
+            : 'id.not.is.null'
+        );
+      
+      if (!countError && count !== null) {
+        setTotalCount(count);
+      }
+
       const { data, error } = await supabase.rpc('search_unified_documents', {
         search_query: params.query || null,
         source_filter: params.sourceFilter || null,
