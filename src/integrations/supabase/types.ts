@@ -59,13 +59,6 @@ export type Database = {
             foreignKeyName: "access_requests_approved_by_fkey"
             columns: ["approved_by"]
             isOneToOne: false
-            referencedRelation: "admin_users_view"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "access_requests_approved_by_fkey"
-            columns: ["approved_by"]
-            isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
@@ -81,13 +74,6 @@ export type Database = {
             columns: ["manuscript_id"]
             isOneToOne: false
             referencedRelation: "manuscripts"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "access_requests_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "admin_users_view"
             referencedColumns: ["id"]
           },
           {
@@ -141,13 +127,6 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "activity_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "admin_users_view"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "activity_logs_user_id_fkey"
             columns: ["user_id"]
@@ -2842,13 +2821,6 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "collections_curator_id_fkey"
-            columns: ["curator_id"]
-            isOneToOne: false
-            referencedRelation: "admin_users_view"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "collections_curator_id_fkey"
             columns: ["curator_id"]
@@ -7908,13 +7880,6 @@ export type Database = {
             columns: ["collection_id"]
             isOneToOne: false
             referencedRelation: "collections"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "manuscripts_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "admin_users_view"
             referencedColumns: ["id"]
           },
           {
@@ -14730,27 +14695,6 @@ export type Database = {
       }
     }
     Views: {
-      admin_users_view: {
-        Row: {
-          access_level_details: Json | null
-          created_at: string | null
-          email: string | null
-          first_name: string | null
-          id: string | null
-          institution: string | null
-          is_approved: boolean | null
-          last_name: string | null
-          partner_organization: string | null
-          phone: string | null
-          profile_preferences: Json | null
-          research_field: string | null
-          research_specialization: string[] | null
-          subscription_type: string | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Relationships: []
-      }
       kitab_publications: {
         Row: {
           author_name: string | null
@@ -15000,6 +14944,27 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_admin_users_with_email: {
+        Args: never
+        Returns: {
+          access_level_details: Json
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          institution: string
+          is_approved: boolean
+          last_name: string
+          partner_organization: string
+          phone: string
+          profile_preferences: Json
+          research_field: string
+          research_specialization: string[]
+          subscription_type: string
+          updated_at: string
+          user_id: string
+        }[]
+      }
       get_booking_workflow_history: {
         Args: { p_booking_id: string }
         Returns: {
@@ -15154,7 +15119,6 @@ export type Database = {
         }
         Returns: string
       }
-      is_admin: { Args: never; Returns: boolean }
       is_admin_or_librarian: { Args: { user_uuid: string }; Returns: boolean }
       is_legal_deposit_initiator:
         | { Args: { p_initiator_id: string }; Returns: boolean }
