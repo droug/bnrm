@@ -44,16 +44,16 @@ export function ArbitrationWorkflow() {
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showRejectModal, setShowRejectModal] = useState(false);
 
-  // Gérer le paramètre URL ?arbitration=...
+  // Gérer le paramètre URL ?request=... (depuis My Space)
   useEffect(() => {
-    const arbitrationId = searchParams.get('arbitration');
-    if (arbitrationId && requests.length > 0) {
-      const request = requests.find(r => r.id === arbitrationId);
+    const requestId = searchParams.get('request');
+    if (requestId && requests.length > 0) {
+      const request = requests.find(r => r.id === requestId);
       if (request) {
         setSelectedRequest(request);
         setIsDetailsOpen(true);
         // Nettoyer l'URL
-        searchParams.delete('arbitration');
+        searchParams.delete('request');
         setSearchParams(searchParams, { replace: true });
       }
     }

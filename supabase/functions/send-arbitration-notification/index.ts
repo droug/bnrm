@@ -119,9 +119,9 @@ serve(async (req) => {
       throw new Error("Erreur lors de la mise à jour de la demande");
     }
 
-    // Générer le lien vers la page de validation
+    // Générer le lien vers Mon espace (pas admin)
     const siteUrl = (Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma").replace(/\/$/, '');
-    const arbitrationLink = `${siteUrl}/admin/depot-legal?arbitration=${request_id}`;
+    const arbitrationLink = `${siteUrl}/my-space?tab=arbitration&request=${request_id}`;
 
     // Créer les notifications système pour chaque validateur
     const systemNotifications = validatorIds.map(userId => ({

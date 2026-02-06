@@ -9,8 +9,7 @@ import {
   Database,
   Search,
   ChevronRight,
-  Shield,
-  Scale
+  Shield
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
@@ -32,14 +31,13 @@ interface AdminBackOfficeNavigationProps {
     pending: number;
     validated: number;
     toAttribute: number;
-    arbitration?: number;
   };
 }
 
 export function AdminBackOfficeNavigation({ activeTab, onTabChange, counts }: AdminBackOfficeNavigationProps) {
-  const { isValidator, isAdmin, isLibrarian } = useSecureRoles();
+  const { isAdmin, isLibrarian } = useSecureRoles();
   
-  // Éléments de base pour tous les utilisateurs autorisés
+  // Éléments de base pour admin/librarian
   const managementItems: NavigationItem[] = [
     {
       id: "dashboard",
@@ -49,17 +47,6 @@ export function AdminBackOfficeNavigation({ activeTab, onTabChange, counts }: Ad
       color: "text-slate-600",
       bgColor: "bg-slate-50 hover:bg-slate-100",
     },
-    // L'onglet Arbitrage est prioritaire pour les validateurs
-    ...(isValidator ? [{
-      id: "arbitration",
-      label: "Arbitrages",
-      description: "Demandes nécessitant un arbitrage",
-      icon: Scale,
-      count: counts.arbitration,
-      color: "text-amber-600",
-      bgColor: "bg-amber-50 hover:bg-amber-100",
-    }] : []),
-    // Les autres onglets ne sont visibles que pour admin/librarian
     ...(isAdmin || isLibrarian ? [
       {
         id: "requests",
