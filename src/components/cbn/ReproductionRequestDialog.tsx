@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { supabase } from "@/integrations/supabase/client";
 import { Separator } from "@/components/ui/separator";
+import { useReproductionFormConfig } from "@/hooks/useReproductionFormConfig";
 
 interface ReproductionRequestDialogProps {
   isOpen: boolean;
@@ -46,6 +47,34 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
     certifiedCost: 0,
     total: 0
   });
+  
+  // Charger la configuration dynamique des types de reproduction
+  const { reproductionTypes, loading: configLoading } = useReproductionFormConfig();
+  
+  // Mapper les types de reproduction activés pour le RadioGroup
+  const enabledReproductionTypes = useMemo(() => {
+    // Mapper les clés de la config vers les valeurs attendues par le formulaire
+    const typeMapping: Record<string, { value: string; label: string }> = {
+      numerique_mail: { value: "numerique", label: "Numérique" },
+      numerique_espace: { value: "numerique", label: "Numérique" },
+      papier: { value: "papier", label: "Tirage papier" },
+      microfilm: { value: "microfilm", label: "Duplicata Microfilm" },
+      support_physique: { value: "support_physique", label: "Support physique" },
+    };
+    
+    // Collecter les types uniques activés
+    const uniqueTypes = new Map<string, string>();
+    reproductionTypes
+      .filter(type => type.enabled)
+      .forEach(type => {
+        const mapped = typeMapping[type.value];
+        if (mapped && !uniqueTypes.has(mapped.value)) {
+          uniqueTypes.set(mapped.value, mapped.label);
+        }
+      });
+    
+    return Array.from(uniqueTypes.entries()).map(([value, label]) => ({ value, label }));
+  }, [reproductionTypes]);
   
   // Pour les manuscrits avec tirage papier, forcer A4
   const isManuscript = document.type === "Manuscrit" || document.supportType === "Manuscrit";
@@ -637,24 +666,27 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
             
             <div>
               <Label>Support souhaité *</Label>
-              <RadioGroup
-                value={formData.reproductionType}
-                onValueChange={(value) => setFormData({ ...formData, reproductionType: value })}
-                className="flex gap-4 mt-2"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="numerique" id="numerique" />
-                  <Label htmlFor="numerique" className="cursor-pointer">Numérique</Label>
+              {configLoading ? (
+                <div className="flex items-center gap-2 text-muted-foreground mt-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-sm">Chargement des options...</span>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="papier" id="papier" />
-                  <Label htmlFor="papier" className="cursor-pointer">Tirage papier</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="microfilm" id="microfilm" />
-                  <Label htmlFor="microfilm" className="cursor-pointer">Duplicata Microfilm</Label>
-                </div>
-              </RadioGroup>
+              ) : enabledReproductionTypes.length === 0 ? (
+                <p className="text-sm text-muted-foreground mt-2">Aucune option disponible</p>
+              ) : (
+                <RadioGroup
+                  value={formData.reproductionType}
+                  onValueChange={(value) => setFormData({ ...formData, reproductionType: value })}
+                  className="flex gap-4 mt-2"
+                >
+                  {enabledReproductionTypes.map((type) => (
+                    <div key={type.value} className="flex items-center space-x-2">
+                      <RadioGroupItem value={type.value} id={type.value} />
+                      <Label htmlFor={type.value} className="cursor-pointer">{type.label}</Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              )}
             </div>
 
             {formData.reproductionType === "numerique" && (
