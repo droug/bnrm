@@ -7189,6 +7189,14 @@ export type Database = {
       legal_deposit_requests: {
         Row: {
           amazon_link: string | null
+          arbitration_decision_reason: string | null
+          arbitration_reason: string | null
+          arbitration_requested: boolean | null
+          arbitration_requested_at: string | null
+          arbitration_requested_by: string | null
+          arbitration_status: string | null
+          arbitration_validated_at: string | null
+          arbitration_validated_by: string | null
           attribution_date: string | null
           author_name: string | null
           collaborator_id: string | null
@@ -7242,6 +7250,14 @@ export type Database = {
         }
         Insert: {
           amazon_link?: string | null
+          arbitration_decision_reason?: string | null
+          arbitration_reason?: string | null
+          arbitration_requested?: boolean | null
+          arbitration_requested_at?: string | null
+          arbitration_requested_by?: string | null
+          arbitration_status?: string | null
+          arbitration_validated_at?: string | null
+          arbitration_validated_by?: string | null
           attribution_date?: string | null
           author_name?: string | null
           collaborator_id?: string | null
@@ -7295,6 +7311,14 @@ export type Database = {
         }
         Update: {
           amazon_link?: string | null
+          arbitration_decision_reason?: string | null
+          arbitration_reason?: string | null
+          arbitration_requested?: boolean | null
+          arbitration_requested_at?: string | null
+          arbitration_requested_by?: string | null
+          arbitration_status?: string | null
+          arbitration_validated_at?: string | null
+          arbitration_validated_by?: string | null
           attribution_date?: string | null
           author_name?: string | null
           collaborator_id?: string | null
@@ -15316,6 +15340,7 @@ export type Database = {
         | "comptable"
         | "direction"
         | "read_only"
+        | "validateur"
       vexpo_hotspot_type: "artwork" | "text" | "media" | "navigation"
       vexpo_role: "super_admin" | "editor" | "reviewer"
       vexpo_status: "draft" | "in_review" | "published" | "archived"
@@ -15549,6 +15574,7 @@ export const Constants = {
         "comptable",
         "direction",
         "read_only",
+        "validateur",
       ],
       vexpo_hotspot_type: ["artwork", "text", "media", "navigation"],
       vexpo_role: ["super_admin", "editor", "reviewer"],

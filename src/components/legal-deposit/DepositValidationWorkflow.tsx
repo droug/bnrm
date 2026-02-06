@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Eye, Clock, FileText, Download, AlertCircle, CheckCheck, Archive, GitBranch, Info, Search, ChevronLeft, ChevronRight } from "lucide-react";
+import { CheckCircle, XCircle, Eye, Clock, FileText, Download, AlertCircle, CheckCheck, Archive, GitBranch, Info, Search, ChevronLeft, ChevronRight, Scale } from "lucide-react";
 import { DuplicateDetectionAlert } from "./DuplicateDetectionAlert";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -49,6 +49,11 @@ interface DepositRequest {
   confirmation_status?: string;
   editor_confirmed?: boolean;
   printer_confirmed?: boolean;
+  // Champs d'arbitrage
+  arbitration_requested?: boolean;
+  arbitration_requested_at?: string;
+  arbitration_status?: string;
+  arbitration_reason?: string;
 }
 
 export function DepositValidationWorkflow() {
@@ -64,6 +69,8 @@ export function DepositValidationWorkflow() {
   const [showPendingModal, setShowPendingModal] = useState(false);
   const [showRejectionModal, setShowRejectionModal] = useState(false);
   const [showCommitteeConfirmModal, setShowCommitteeConfirmModal] = useState(false);
+  const [showArbitrationModal, setShowArbitrationModal] = useState(false);
+  const [arbitrationReason, setArbitrationReason] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
   const [pendingRejection, setPendingRejection] = useState<{
     requestId: string;
@@ -138,7 +145,11 @@ export function DepositValidationWorkflow() {
         rejection_reason,
         confirmation_status,
         editor_confirmed,
-        printer_confirmed
+        printer_confirmed,
+        arbitration_requested,
+        arbitration_requested_at,
+        arbitration_status,
+        arbitration_reason
       `)
       .order("created_at", { ascending: false });
 
@@ -178,7 +189,11 @@ export function DepositValidationWorkflow() {
         rejection_reason,
         confirmation_status,
         editor_confirmed,
-        printer_confirmed
+        printer_confirmed,
+        arbitration_requested,
+        arbitration_requested_at,
+        arbitration_status,
+        arbitration_reason
       `)
       .order("created_at", { ascending: false });
 
@@ -705,6 +720,64 @@ export function DepositValidationWorkflow() {
       setShowRejectionModal(false);
       setPendingRejection(null);
       setRejectionReason("");
+    }
+  };
+
+  const handleArbitrationSubmit = async () => {
+    if (!arbitrationReason.trim()) {
+      toast({
+        title: "Motif requis",
+        description: "Veuillez saisir un motif pour l'arbitrage",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    if (!selectedRequest || !user) return;
+
+    setIsLoading(true);
+
+    try {
+      // Récupérer le nom de l'utilisateur depuis le profil
+      const { data: profileData } = await supabase
+        .from("profiles")
+        .select("first_name, last_name")
+        .eq("user_id", user.id)
+        .single();
+
+      const requestedByName = profileData 
+        ? `${profileData.first_name || ''} ${profileData.last_name || ''}`.trim() || user.email || "Utilisateur"
+        : user.email || "Utilisateur";
+
+      // Appeler l'Edge Function pour envoyer les notifications
+      const { data, error } = await supabase.functions.invoke("send-arbitration-notification", {
+        body: {
+          request_id: selectedRequest.id,
+          reason: arbitrationReason,
+          requested_by_name: requestedByName
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Arbitrage demandé",
+        description: `La demande d'arbitrage a été envoyée à ${data.validators_notified || 1} validateur(s)`,
+      });
+
+      setShowArbitrationModal(false);
+      setArbitrationReason("");
+      setSelectedRequest(null);
+      fetchRequests();
+    } catch (error: any) {
+      console.error("Error requesting arbitration:", error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible d'envoyer la demande d'arbitrage",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -1897,6 +1970,27 @@ export function DepositValidationWorkflow() {
                 
                 {!selectedRequest.rejected_by && (
                   <div className="flex flex-wrap gap-3 justify-end">
+                    {/* Bouton Arbitrage - disponible pour toutes les demandes non validées par le département */}
+                    {!selectedRequest.validated_by_department && !selectedRequest.arbitration_requested && (
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowArbitrationModal(true)}
+                        disabled={isLoading}
+                        className="border-amber-500 text-amber-600 hover:bg-amber-50"
+                      >
+                        <Scale className="h-4 w-4 mr-2" />
+                        Arbitrage
+                      </Button>
+                    )}
+
+                    {/* Badge si arbitrage en cours */}
+                    {selectedRequest.arbitration_requested && selectedRequest.arbitration_status === 'pending' && (
+                      <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-300 flex items-center">
+                        <Scale className="h-3 w-3 mr-1" />
+                        Arbitrage en cours
+                      </Badge>
+                    )}
+
                     {!selectedRequest.validated_by_committee && (
                       <>
                         <Button
@@ -2139,6 +2233,65 @@ export function DepositValidationWorkflow() {
             >
               <CheckCircle className="h-4 w-4 mr-2" />
               Confirmer l'approbation
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modale d'arbitrage */}
+      <Dialog open={showArbitrationModal} onOpenChange={setShowArbitrationModal}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-amber-600">
+              <Scale className="h-5 w-5" />
+              Demande d'Arbitrage
+            </DialogTitle>
+            <DialogDescription>
+              Soumettre cette demande à un Validateur pour arbitrage
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="bg-amber-50 p-4 rounded-lg border border-amber-200">
+              <p className="text-sm font-medium mb-2 text-amber-800">Demande concernée :</p>
+              <p className="text-sm text-amber-700">
+                N° {selectedRequest?.request_number}
+              </p>
+              <p className="text-sm font-medium mt-1 text-amber-900">{selectedRequest?.title}</p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="arbitration-reason">
+                Motif de l'arbitrage <span className="text-destructive">*</span>
+              </Label>
+              <Textarea
+                id="arbitration-reason"
+                value={arbitrationReason}
+                onChange={(e) => setArbitrationReason(e.target.value)}
+                placeholder="Décrivez la raison pour laquelle cette demande nécessite un arbitrage..."
+                className="min-h-[120px]"
+                required
+              />
+              <p className="text-xs text-muted-foreground">
+                Cette demande sera transmise à un Validateur qui pourra l'approuver ou la rejeter.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-3 justify-end">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowArbitrationModal(false);
+                setArbitrationReason("");
+              }}
+            >
+              Annuler
+            </Button>
+            <Button
+              onClick={handleArbitrationSubmit}
+              disabled={isLoading || !arbitrationReason.trim()}
+              className="bg-amber-600 hover:bg-amber-700"
+            >
+              <Scale className="h-4 w-4 mr-2" />
+              Envoyer l'arbitrage
             </Button>
           </div>
         </DialogContent>

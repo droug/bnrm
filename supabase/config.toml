@@ -135,3 +135,6 @@ verify_jwt = false
 
 [functions.generate-reproduction-payment-link]
 verify_jwt = false
+
+[functions.send-arbitration-notification]
+verify_jwt = true
