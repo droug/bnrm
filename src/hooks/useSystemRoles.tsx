@@ -235,6 +235,7 @@ export function useSystemRoles(targetUserId?: string) {
     getPrimaryRole,
     getRoleDetails,
     refetch: fetchRoles,
+    refetchAvailableRoles: fetchAvailableRoles,
     isAdmin,
   };
 }
