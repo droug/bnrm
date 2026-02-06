@@ -204,7 +204,7 @@ export function DepositValidationWorkflow() {
       // 3. Exclure les demandes déjà validées par le département ABN
       // 4. Exclure les demandes en attente de confirmation réciproque (pending_confirmation)
       query = query
-        .not('status', 'in', '(attribue,rejete,rejete_par_b,rejete_par_comite)')
+        .not('status', 'in', '(attribue,valide_par_b,rejete,rejete_par_b,rejete_par_comite)')
         .is('validated_by_department', null)
         .or('confirmation_status.is.null,confirmation_status.eq.confirmed,confirmation_status.eq.not_required')
         .neq('confirmation_status', 'pending_confirmation');
