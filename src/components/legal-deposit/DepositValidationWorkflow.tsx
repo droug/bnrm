@@ -199,12 +199,13 @@ export function DepositValidationWorkflow() {
 
     if (activeTab === "pending") {
       // Exclure les demandes en attente de confirmation réciproque (non confirmées par les 2 parties)
+      // Inclure aussi les demandes validées par arbitrage qui nécessitent la validation ABN finale
       query = query
-        .in("status", ["brouillon", "soumis", "en_attente_validation_b", "en_cours"])
+        .or('status.in.(brouillon,soumis,en_attente_validation_b,en_cours),arbitration_status.eq.approved')
         .or('confirmation_status.is.null,confirmation_status.eq.confirmed,confirmation_status.eq.not_required');
     } else if (activeTab === "validated") {
-      // Inclure les demandes validées normalement OU validées par arbitrage (nécessitant validation ABN finale)
-      query = query.or('status.in.(valide_par_b,valide_par_comite,attribue),arbitration_status.eq.approved');
+      // Uniquement les demandes validées par le workflow normal ET ayant reçu leur numéro
+      query = query.in("status", ["valide_par_b", "valide_par_comite", "attribue"]);
     } else if (activeTab === "rejected") {
       query = query.in("status", ["rejete", "rejete_par_b", "rejete_par_comite"]);
     }

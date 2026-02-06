@@ -76,12 +76,12 @@ export default function BNRMBackOffice() {
       if (error) throw error;
       
       const requests = data || [];
-      const pending = requests.filter(r => ['soumis', 'en_cours', 'en_attente_validation_b', 'en_attente_comite_validation'].includes(r.status || '')).length;
-      // Inclure les demandes validées par arbitrage dans le compteur des validées
-      const validated = requests.filter(r => 
-        ['valide_par_b', 'valide_par_comite', 'attribue'].includes(r.status || '') || 
+      // Les demandes validées par arbitrage sont en attente de validation ABN finale
+      const pending = requests.filter(r => 
+        ['soumis', 'en_cours', 'en_attente_validation_b', 'en_attente_comite_validation'].includes(r.status || '') ||
         r.arbitration_status === 'approved'
       ).length;
+      const validated = requests.filter(r => ['valide_par_b', 'valide_par_comite', 'attribue'].includes(r.status || '')).length;
       const rejected = requests.filter(r => ['rejete', 'rejete_par_b', 'rejete_par_comite'].includes(r.status || '')).length;
       const attributed = requests.filter(r => r.status === 'attribue').length;
       
@@ -106,14 +106,14 @@ export default function BNRMBackOffice() {
       
       const requests = data || [];
       return {
-        pending: requests.filter(r => ['soumis', 'en_cours', 'en_attente_validation_b'].includes(r.status || '')).length,
-        // Inclure les demandes validées par arbitrage
-        validated: requests.filter(r => 
-          ['valide_par_b', 'valide_par_comite'].includes(r.status || '') || 
+        // Inclure les demandes validées par arbitrage dans les demandes en attente
+        pending: requests.filter(r => 
+          ['soumis', 'en_cours', 'en_attente_validation_b'].includes(r.status || '') ||
           r.arbitration_status === 'approved'
         ).length,
+        validated: requests.filter(r => ['valide_par_b', 'valide_par_comite'].includes(r.status || '')).length,
         toAttribute: requests.filter(r => 
-          ['valide_par_b', 'valide_par_comite'].includes(r.status || '') || 
+          ['valide_par_b', 'valide_par_comite'].includes(r.status || '') ||
           r.arbitration_status === 'approved'
         ).length,
       };
