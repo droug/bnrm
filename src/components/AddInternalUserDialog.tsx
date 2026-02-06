@@ -95,22 +95,25 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
         throw new Error('Aucun utilisateur créé');
       }
 
-      // 2. Mettre à jour le profil avec les informations complètes
+      // 2. Créer ou mettre à jour le profil avec les informations complètes
+      // Note: le trigger handle_new_user peut échouer silencieusement, donc on fait un upsert explicite
       const { error: profileError } = await supabase
         .from('profiles')
-        .update({
+        .upsert({
+          user_id: authData.user.id,
           first_name: formData.firstName,
           last_name: formData.lastName,
           phone: formData.phone || null,
           institution: formData.institution || null,
           research_field: formData.researchField || null,
           is_approved: true, // Les utilisateurs internes sont automatiquement approuvés
+          created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
-        })
-        .eq('user_id', authData.user.id);
+        }, { onConflict: 'user_id' });
 
       if (profileError) {
-        console.warn('Erreur lors de la mise à jour du profil:', profileError);
+        console.error('Erreur lors de la création/mise à jour du profil:', profileError);
+        throw new Error(`Erreur profil: ${profileError.message}`);
       }
 
       // 3. Attribuer le rôle système sélectionné
