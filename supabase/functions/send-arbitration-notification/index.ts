@@ -39,24 +39,44 @@ serve(async (req) => {
       throw new Error("Demande de dépôt légal non trouvée");
     }
 
-    // Récupérer les utilisateurs avec le rôle "validateur"
-    const { data: validatorRoles, error: rolesError } = await supabaseAdmin
+    // Récupérer les utilisateurs avec le rôle "validateur" depuis les deux tables de rôles
+    // 1. Table user_roles (enum) - ancienne table
+    const { data: enumValidators, error: enumError } = await supabaseAdmin
       .from("user_roles")
       .select("user_id")
       .eq("role", "validateur");
 
-    if (rolesError) {
-      console.error("[ARBITRATION] Error fetching validators:", rolesError);
-      throw new Error("Erreur lors de la récupération des validateurs");
+    if (enumError) {
+      console.error("[ARBITRATION] Error fetching enum validators:", enumError);
     }
 
-    if (!validatorRoles || validatorRoles.length === 0) {
-      console.warn("[ARBITRATION] No validators found with 'validateur' role");
-      throw new Error("Aucun validateur configuré dans le système");
+    // 2. Table user_system_roles + system_roles (dynamique) - nouvelle table
+    const { data: systemValidators, error: systemError } = await supabaseAdmin
+      .from("user_system_roles")
+      .select(`
+        user_id,
+        system_roles!inner(role_code)
+      `)
+      .eq("system_roles.role_code", "validateur")
+      .eq("is_active", true);
+
+    if (systemError) {
+      console.error("[ARBITRATION] Error fetching system validators:", systemError);
     }
 
-    const validatorIds = validatorRoles.map(r => r.user_id);
-    console.log(`[ARBITRATION] Found ${validatorIds.length} validators`);
+    // Fusionner les deux listes en supprimant les doublons
+    const enumIds = (enumValidators || []).map(r => r.user_id);
+    const systemIds = (systemValidators || []).map(r => r.user_id);
+    const validatorIds = [...new Set([...enumIds, ...systemIds])];
+
+    console.log(`[ARBITRATION] Found ${enumIds.length} enum validators, ${systemIds.length} system validators`);
+
+    if (validatorIds.length === 0) {
+      console.warn("[ARBITRATION] No validators found in either table");
+      throw new Error("Aucun validateur configuré dans le système. Veuillez attribuer le rôle 'validateur' à au moins un utilisateur.");
+    }
+
+    console.log(`[ARBITRATION] Total unique validators: ${validatorIds.length}`);
 
     // Récupérer les emails des validateurs
     const { data: validatorProfiles, error: profilesError } = await supabaseAdmin
