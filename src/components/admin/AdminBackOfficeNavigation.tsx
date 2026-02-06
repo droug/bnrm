@@ -9,9 +9,11 @@ import {
   Database,
   Search,
   ChevronRight,
-  Shield
+  Shield,
+  Scale
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useSecureRoles } from "@/hooks/useSecureRoles";
 
 interface NavigationItem {
   id: string;
@@ -30,10 +32,14 @@ interface AdminBackOfficeNavigationProps {
     pending: number;
     validated: number;
     toAttribute: number;
+    arbitration?: number;
   };
 }
 
 export function AdminBackOfficeNavigation({ activeTab, onTabChange, counts }: AdminBackOfficeNavigationProps) {
+  const { isValidator, isAdmin, isLibrarian } = useSecureRoles();
+  
+  // Éléments de base pour tous les utilisateurs autorisés
   const managementItems: NavigationItem[] = [
     {
       id: "dashboard",
@@ -43,32 +49,45 @@ export function AdminBackOfficeNavigation({ activeTab, onTabChange, counts }: Ad
       color: "text-slate-600",
       bgColor: "bg-slate-50 hover:bg-slate-100",
     },
-    {
-      id: "requests",
-      label: "Gestion des Demandes",
-      description: "Traitement et validation des demandes",
-      icon: FileText,
-      count: counts.pending,
-      color: "text-blue-600",
-      bgColor: "bg-blue-50 hover:bg-blue-100",
-    },
-    {
-      id: "attribution",
-      label: "Gestion Attributions N°",
-      description: "Attribution des numéros ISBN/ISSN",
-      icon: Hash,
-      count: counts.toAttribute,
-      color: "text-purple-600",
-      bgColor: "bg-purple-50 hover:bg-purple-100",
-    },
-    {
-      id: "editorial-monitoring",
-      label: "Veille Éditoriale",
-      description: "Surveillance des publications",
-      icon: Search,
-      color: "text-orange-600",
-      bgColor: "bg-orange-50 hover:bg-orange-100",
-    },
+    // L'onglet Arbitrage est prioritaire pour les validateurs
+    ...(isValidator ? [{
+      id: "arbitration",
+      label: "Arbitrages",
+      description: "Demandes nécessitant un arbitrage",
+      icon: Scale,
+      count: counts.arbitration,
+      color: "text-amber-600",
+      bgColor: "bg-amber-50 hover:bg-amber-100",
+    }] : []),
+    // Les autres onglets ne sont visibles que pour admin/librarian
+    ...(isAdmin || isLibrarian ? [
+      {
+        id: "requests",
+        label: "Gestion des Demandes",
+        description: "Traitement et validation des demandes",
+        icon: FileText,
+        count: counts.pending,
+        color: "text-blue-600",
+        bgColor: "bg-blue-50 hover:bg-blue-100",
+      },
+      {
+        id: "attribution",
+        label: "Gestion Attributions N°",
+        description: "Attribution des numéros ISBN/ISSN",
+        icon: Hash,
+        count: counts.toAttribute,
+        color: "text-purple-600",
+        bgColor: "bg-purple-50 hover:bg-purple-100",
+      },
+      {
+        id: "editorial-monitoring",
+        label: "Veille Éditoriale",
+        description: "Surveillance des publications",
+        icon: Search,
+        color: "text-orange-600",
+        bgColor: "bg-orange-50 hover:bg-orange-100",
+      },
+    ] : []),
   ];
 
   const analyticsItems: NavigationItem[] = [
