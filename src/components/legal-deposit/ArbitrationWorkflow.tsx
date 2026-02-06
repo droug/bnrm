@@ -320,32 +320,8 @@ export function ArbitrationWorkflow() {
                 </CardContent>
               </Card>
 
-              {/* Détails de la demande */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-sm">Informations de la demande</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label className="text-xs text-muted-foreground">Titre</Label>
-                      <p className="font-medium">{selectedRequest.title}</p>
-                    </div>
-                    <div>
-                      <Label className="text-xs text-muted-foreground">Auteur</Label>
-                      <p className="font-medium">{selectedRequest.author_name}</p>
-                    </div>
-                    <div>
-                      <Label className="text-xs text-muted-foreground">Type de support</Label>
-                      <p className="font-medium">{selectedRequest.support_type}</p>
-                    </div>
-                    <div>
-                      <Label className="text-xs text-muted-foreground">Statut actuel</Label>
-                      <Badge variant="outline">{selectedRequest.status}</Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              {/* Détails complets de la demande */}
+              <LegalDepositDetailsView request={selectedRequest} />
 
               {/* Actions d'arbitrage */}
               {selectedRequest.arbitration_status === "pending" && (
