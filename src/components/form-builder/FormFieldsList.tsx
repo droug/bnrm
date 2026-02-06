@@ -1,6 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Edit, Trash2, GripVertical } from "lucide-react";
 import { CustomField, FormSection } from "@/types/formBuilder";
@@ -15,9 +16,10 @@ interface FormFieldsListProps {
   formName?: string;
   onEditField: (field: CustomField) => void;
   onDeleteField: (fieldId: string) => void;
+  onToggleVisibility?: (fieldId: string, isVisible: boolean) => void;
 }
 
-function SortableField({ field, language, onEdit, onDelete }: any) {
+function SortableField({ field, language, onEdit, onDelete, onToggleVisibility }: any) {
   const {
     attributes,
     listeners,
@@ -45,9 +47,20 @@ function SortableField({ field, language, onEdit, onDelete }: any) {
       <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing">
         <GripVertical className="w-5 h-5 text-muted-foreground" />
       </div>
+      
+      {/* Checkbox pour la visibilité */}
+      <div className="flex items-center">
+        <Checkbox
+          id={`visibility-${field.id}`}
+          checked={field.is_visible}
+          onCheckedChange={(checked) => onToggleVisibility?.(field.id, !!checked)}
+          className="h-5 w-5"
+        />
+      </div>
+      
       <div className="flex-1">
         <div className="flex items-center gap-2">
-          <span className="font-medium text-foreground">
+          <span className={`font-medium ${field.is_visible ? 'text-foreground' : 'text-muted-foreground line-through'}`}>
             {language === "fr" ? field.label_fr : field.label_ar || field.label_fr}
           </span>
           <Badge variant="outline" className="text-xs">
@@ -92,7 +105,7 @@ function SortableField({ field, language, onEdit, onDelete }: any) {
   );
 }
 
-function DroppableSection({ section, fields, language, onEdit, onDelete }: any) {
+function DroppableSection({ section, fields, language, onEdit, onDelete, onToggleVisibility }: any) {
   const { setNodeRef, isOver } = useDroppable({
     id: `section-${section.key}`,
     data: { sectionKey: section.key },
@@ -120,6 +133,7 @@ function DroppableSection({ section, fields, language, onEdit, onDelete }: any) 
               language={language}
               onEdit={onEdit}
               onDelete={onDelete}
+              onToggleVisibility={onToggleVisibility}
             />
           ))
         )}
@@ -135,12 +149,16 @@ export function FormFieldsList({
   formName,
   onEditField,
   onDeleteField,
+  onToggleVisibility,
 }: FormFieldsListProps) {
   return (
     <Card className="p-4 bg-background border-2 border-border">
       <h3 className="text-lg font-semibold mb-4 text-foreground">
         {formName ? `Les champs du formulaire : ${formName}` : "Les champs du formulaire"}
       </h3>
+      <p className="text-sm text-muted-foreground mb-4">
+        Cochez ou décochez les cases pour afficher ou masquer les options dans le formulaire.
+      </p>
       
       <Accordion type="multiple" className="space-y-2" defaultValue={sections.map((s) => s.key)}>
         {sections.map((section) => {
@@ -177,6 +195,7 @@ export function FormFieldsList({
                   language={language}
                   onEdit={onEditField}
                   onDelete={onDeleteField}
+                  onToggleVisibility={onToggleVisibility}
                 />
               </AccordionContent>
             </AccordionItem>
