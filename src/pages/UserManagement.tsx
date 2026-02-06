@@ -28,6 +28,7 @@ interface Profile {
   institution: string;
   research_field: string;
   role: string;
+  all_roles?: string[];
   is_approved: boolean;
   created_at: string;
   updated_at: string;
@@ -221,58 +222,12 @@ export default function UserManagement() {
             "Chargement en mode dégradé (emails indisponibles). La liste des utilisateurs reste accessible.",
         });
       } else {
+        // La RPC retourne maintenant tous les rôles dans all_roles
         profilesData = (rpcData as any[]) || [];
       }
 
-      // Fetch roles for each user - check both user_roles (enum) and user_system_roles (dynamic)
-      const usersWithRoles = await Promise.all(
-        profilesData.map(async (profile: any) => {
-          let roleCode = "visitor";
-
-          // 1. Check user_roles (enum) for admin role
-          const { data: enumRoleData, error: enumRoleError } = await supabase
-            .from("user_roles")
-            .select("role")
-            .eq("user_id", profile.user_id)
-            .order("granted_at", { ascending: false })
-            .limit(1)
-            .maybeSingle();
-
-          if (enumRoleError) {
-            console.error("Failed to fetch enum role", enumRoleError);
-          }
-
-          if (enumRoleData?.role) {
-            roleCode = enumRoleData.role;
-          } else {
-            // 2. Check user_system_roles (dynamic) with join to get role_code
-            const { data: systemRoleData, error: systemRoleError } = await supabase
-              .from("user_system_roles")
-              .select("role_id, system_roles!inner(role_code, role_name)")
-              .eq("user_id", profile.user_id)
-              .order("granted_at", { ascending: false })
-              .limit(1)
-              .maybeSingle();
-
-            if (systemRoleError) {
-              console.error("Failed to fetch system role", systemRoleError);
-            }
-
-            if (systemRoleData?.system_roles) {
-              // Access the nested system_roles data
-              const sysRole = systemRoleData.system_roles as any;
-              roleCode = sysRole.role_code || "visitor";
-            }
-          }
-
-          return {
-            ...profile,
-            role: roleCode,
-          };
-        })
-      );
-
-      setUsers(usersWithRoles || []);
+      // Les rôles sont déjà inclus dans les données RPC
+      setUsers(profilesData || []);
 
       // Fetch pending access requests
       const { data: requestsData, error: requestsError } = await supabase
@@ -770,21 +725,42 @@ export default function UserManagement() {
                             )}
                           </TableCell>
                           <TableCell>
-                            <SimpleSelect
-                              value={userProfile.role}
-                              onChange={(newRole) => updateUserRole(userProfile.id, newRole)}
-                              options={[
-                                {
-                                  value: 'admin',
-                                  label: 'Administrateur',
-                                },
-                                ...availableRoles.map(role => ({
-                                  value: role.role_code,
-                                  label: role.role_name,
-                                }))
-                              ]}
-                              className="w-full min-w-[200px]"
-                            />
+                            <div className="space-y-1">
+                              {/* Afficher tous les rôles si disponibles */}
+                              {userProfile.all_roles && userProfile.all_roles.length > 0 ? (
+                                <div className="flex flex-wrap gap-1">
+                                  {userProfile.all_roles.map((role: string) => (
+                                    <Badge 
+                                      key={role} 
+                                      variant={getRoleBadgeVariant(role)}
+                                      className="text-xs"
+                                    >
+                                      {ROLE_PERMISSIONS[role as keyof typeof ROLE_PERMISSIONS]?.name || role}
+                                    </Badge>
+                                  ))}
+                                </div>
+                              ) : (
+                                <Badge variant={getRoleBadgeVariant(userProfile.role)}>
+                                  {ROLE_PERMISSIONS[userProfile.role as keyof typeof ROLE_PERMISSIONS]?.name || userProfile.role}
+                                </Badge>
+                              )}
+                              {/* Sélecteur pour ajouter/modifier les rôles */}
+                              <SimpleSelect
+                                value={userProfile.role}
+                                onChange={(newRole) => updateUserRole(userProfile.id, newRole)}
+                                options={[
+                                  {
+                                    value: 'admin',
+                                    label: 'Administrateur',
+                                  },
+                                  ...availableRoles.map(role => ({
+                                    value: role.role_code,
+                                    label: role.role_name,
+                                  }))
+                                ]}
+                                className="w-full min-w-[180px] mt-1"
+                              />
+                            </div>
                           </TableCell>
                           <TableCell>
                             <Badge variant={userProfile.is_approved ? "default" : "secondary"}>
