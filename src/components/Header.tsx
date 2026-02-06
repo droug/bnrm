@@ -177,7 +177,7 @@ const Header = () => {
       }
     },
     mecenat: {
-      title: { fr: "Mécénat", ar: "الرعاية" },
+      title: { fr: "Mécénat & Partenaires", ar: "الرعاية والشراكات" },
       items: [
         {
           title: { fr: "Nos donateurs", ar: "متبرعونا" },
