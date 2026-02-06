@@ -671,6 +671,12 @@ export default function MyLibrarySpace() {
     </Card>
   );
 
+  // Génère l'URL de redirection pour l'auth avec le chemin actuel incluant les paramètres
+  const getCurrentPathWithParams = () => {
+    const currentPath = `/my-space${searchParams.toString() ? `?${searchParams.toString()}` : ''}`;
+    return `/auth?redirect=${encodeURIComponent(currentPath)}`;
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen bg-background">
@@ -685,7 +691,7 @@ export default function MyLibrarySpace() {
               <p className="text-muted-foreground mb-6">
                 Connectez-vous pour accéder à votre espace personnel
               </p>
-              <Button onClick={() => navigate('/auth')} size="lg" className="w-full">
+              <Button onClick={() => navigate(getCurrentPathWithParams())} size="lg" className="w-full">
                 Se connecter
               </Button>
             </CardContent>

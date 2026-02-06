@@ -232,12 +232,17 @@ function getArbitrationEmailHtml(
         .action-button { 
           display: inline-block; 
           background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); 
-          color: white; 
+          color: #ffffff !important; 
           padding: 15px 30px; 
           text-decoration: none; 
           border-radius: 8px; 
           font-weight: bold;
           margin: 20px 0;
+        }
+        .action-button:visited,
+        .action-button:hover,
+        .action-button:active {
+          color: #ffffff !important;
         }
         .badge { 
           display: inline-block; 
@@ -292,7 +297,7 @@ function getArbitrationEmailHtml(
           </ul>
           
           <div style="text-align: center;">
-            <a href="${arbitrationLink}" class="action-button">
+            <a href="${arbitrationLink}" class="action-button" style="color: #ffffff !important; text-decoration: none;">
               Traiter la demande d'arbitrage
             </a>
           </div>

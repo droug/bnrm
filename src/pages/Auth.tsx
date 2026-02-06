@@ -54,7 +54,9 @@ export default function Auth() {
   const authErrorDescription = hashParams.error_description?.replace(/\+/g, " ");
 
   const isResetFlow = searchParams.get("reset") === "true";
-  const redirectTo = searchParams.get("redirect") || "/";
+  // Si on vient avec un paramètre redirect, l'utiliser, sinon vérifier si on venait d'une page spécifique
+  const rawRedirect = searchParams.get("redirect");
+  const redirectTo = rawRedirect || (location.state as { from?: string })?.from || "/";
   const isExpiredLink = authErrorCode === "otp_expired" || authError === "access_denied";
 
   useEffect(() => {
