@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { Navigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -57,6 +58,7 @@ import { supabase } from "@/integrations/supabase/client";
 export default function BNRMBackOffice() {
   const { user, profile, loading } = useAuth();
   const { t } = useLanguage();
+  const { isAdmin, isLibrarian, isProfessional, loading: rolesLoading } = useSecureRoles();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [selectedDepositModal, setSelectedDepositModal] = useState<string | null>(null);
   const [selectedDepositData, setSelectedDepositData] = useState<any>(null);
@@ -107,7 +109,7 @@ export default function BNRMBackOffice() {
     }
   });
 
-  if (loading) {
+  if (loading || rolesLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
@@ -119,9 +121,9 @@ export default function BNRMBackOffice() {
     return <Navigate to="/auth" replace />;
   }
 
-  // Bloquer l'accès aux comptes professionnels
-  const professionalRoles = ['editor', 'printer', 'producer'];
-  if (!profile?.is_approved || (profile?.role !== 'admin' && profile?.role !== 'librarian') || professionalRoles.includes(profile?.role)) {
+  // Utiliser useSecureRoles() pour vérifier les accès (sécurisé via user_roles table)
+  // Bloquer l'accès aux comptes professionnels, autoriser admin et librarian
+  if (!profile?.is_approved || (!isAdmin && !isLibrarian) || isProfessional) {
     return <Navigate to="/dashboard" replace />;
   }
 
