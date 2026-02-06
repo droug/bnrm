@@ -71,18 +71,22 @@ export default function BNRMBackOffice() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('legal_deposit_requests')
-        .select('status', { count: 'exact' });
+        .select('status, arbitration_status', { count: 'exact' });
       
       if (error) throw error;
       
-      const statuses = data || [];
-      const pending = statuses.filter(r => ['soumis', 'en_cours', 'en_attente_validation_b', 'en_attente_comite_validation'].includes(r.status || '')).length;
-      const validated = statuses.filter(r => ['valide_par_b', 'valide_par_comite', 'attribue'].includes(r.status || '')).length;
-      const rejected = statuses.filter(r => ['rejete', 'rejete_par_b', 'rejete_par_comite'].includes(r.status || '')).length;
-      const attributed = statuses.filter(r => r.status === 'attribue').length;
+      const requests = data || [];
+      const pending = requests.filter(r => ['soumis', 'en_cours', 'en_attente_validation_b', 'en_attente_comite_validation'].includes(r.status || '')).length;
+      // Inclure les demandes validées par arbitrage dans le compteur des validées
+      const validated = requests.filter(r => 
+        ['valide_par_b', 'valide_par_comite', 'attribue'].includes(r.status || '') || 
+        r.arbitration_status === 'approved'
+      ).length;
+      const rejected = requests.filter(r => ['rejete', 'rejete_par_b', 'rejete_par_comite'].includes(r.status || '')).length;
+      const attributed = requests.filter(r => r.status === 'attribue').length;
       
       return {
-        totalRequests: statuses.length,
+        totalRequests: requests.length,
         pendingRequests: pending,
         validatedRequests: validated,
         rejectedRequests: rejected,
@@ -98,13 +102,20 @@ export default function BNRMBackOffice() {
     queryFn: async () => {
       const { data } = await supabase
         .from('legal_deposit_requests')
-        .select('status');
+        .select('status, arbitration_status');
       
-      const statuses = data || [];
+      const requests = data || [];
       return {
-        pending: statuses.filter(r => ['soumis', 'en_cours', 'en_attente_validation_b'].includes(r.status || '')).length,
-        validated: statuses.filter(r => ['valide_par_b', 'valide_par_comite'].includes(r.status || '')).length,
-        toAttribute: statuses.filter(r => ['valide_par_b', 'valide_par_comite'].includes(r.status || '')).length,
+        pending: requests.filter(r => ['soumis', 'en_cours', 'en_attente_validation_b'].includes(r.status || '')).length,
+        // Inclure les demandes validées par arbitrage
+        validated: requests.filter(r => 
+          ['valide_par_b', 'valide_par_comite'].includes(r.status || '') || 
+          r.arbitration_status === 'approved'
+        ).length,
+        toAttribute: requests.filter(r => 
+          ['valide_par_b', 'valide_par_comite'].includes(r.status || '') || 
+          r.arbitration_status === 'approved'
+        ).length,
       };
     }
   });

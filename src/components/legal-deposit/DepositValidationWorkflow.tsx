@@ -203,7 +203,8 @@ export function DepositValidationWorkflow() {
         .in("status", ["brouillon", "soumis", "en_attente_validation_b", "en_cours"])
         .or('confirmation_status.is.null,confirmation_status.eq.confirmed,confirmation_status.eq.not_required');
     } else if (activeTab === "validated") {
-      query = query.in("status", ["valide_par_b", "valide_par_comite", "attribue"]);
+      // Inclure les demandes validées normalement OU validées par arbitrage (nécessitant validation ABN finale)
+      query = query.or('status.in.(valide_par_b,valide_par_comite,attribue),arbitration_status.eq.approved');
     } else if (activeTab === "rejected") {
       query = query.in("status", ["rejete", "rejete_par_b", "rejete_par_comite"]);
     }
