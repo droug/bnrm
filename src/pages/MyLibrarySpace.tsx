@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { supabase } from "@/integrations/supabase/client";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -32,6 +33,7 @@ import { MySpaceHeader } from "@/components/my-space/MySpaceHeader";
 import { MySpaceStats } from "@/components/my-space/MySpaceStats";
 import { MySpaceNavigation } from "@/components/my-space/MySpaceNavigation";
 import { MyDonorSpace } from "@/components/my-space/MyDonorSpace";
+import { ArbitrationWorkflow } from "@/components/legal-deposit/ArbitrationWorkflow";
 
 interface ReadingHistoryItem {
   id: string;
@@ -87,9 +89,10 @@ interface Profile {
 
 export default function MyLibrarySpace() {
   const { user } = useAuth();
+  const { isValidator } = useSecureRoles();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const [profile, setProfile] = useState<Profile | null>(null);
   const [readingHistory, setReadingHistory] = useState<ReadingHistoryItem[]>([]);
@@ -97,7 +100,17 @@ export default function MyLibrarySpace() {
   const [bookmarks, setBookmarks] = useState<UserBookmark[]>([]);
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState(() => searchParams.get('tab') || "restoration");
+  const [arbitrationCount, setArbitrationCount] = useState(0);
+  
+  // Détermine l'onglet initial en fonction des paramètres URL ou du rôle
+  const getInitialTab = () => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam) return tabParam;
+    if (isValidator) return "arbitration";
+    return "restoration";
+  };
+  
+  const [activeTab, setActiveTab] = useState(getInitialTab);
 
   // Stats data
   const [stats, setStats] = useState({
@@ -114,11 +127,45 @@ export default function MyLibrarySpace() {
   const [userProfiles, setUserProfiles] = useState({
     isProfessional: false,
     isDonor: false,
+    isValidator: false,
     hasRestorations: false,
     hasReproductions: false,
     hasBookReservations: false,
     hasSpaceReservations: false,
   });
+
+  // Mettre à jour le tab si paramètre URL change
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam && tabParam !== activeTab) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams, activeTab]);
+
+  // Mettre à jour isValidator dans userProfiles
+  useEffect(() => {
+    setUserProfiles(prev => ({ ...prev, isValidator }));
+  }, [isValidator]);
+
+  // Fetch arbitration count for validators
+  useEffect(() => {
+    if (isValidator) {
+      fetchArbitrationCount();
+    }
+  }, [isValidator]);
+
+  const fetchArbitrationCount = async () => {
+    try {
+      const { count } = await supabase
+        .from("legal_deposit_requests")
+        .select("*", { count: "exact", head: true })
+        .eq("arbitration_requested", true)
+        .eq("arbitration_status", "pending");
+      setArbitrationCount(count || 0);
+    } catch (error) {
+      console.error("Error fetching arbitration count:", error);
+    }
+  };
 
   useEffect(() => {
     if (user) {
@@ -204,14 +251,15 @@ export default function MyLibrarySpace() {
       });
 
       // Set user profiles based on data
-      setUserProfiles({
+      setUserProfiles(prev => ({
+        ...prev,
         isProfessional: !!profData,
         isDonor: !!donorRes.data,
         hasRestorations: (restorationsRes.data?.length || 0) > 0,
         hasReproductions: (reproductionsRes.data?.length || 0) > 0,
         hasBookReservations: (reservationsRes.data?.length || 0) > 0,
         hasSpaceReservations: (bookingsRes.data?.length || 0) > 0,
-      });
+      }));
     } catch (error) {
       console.error('Error fetching stats:', error);
     }
@@ -359,6 +407,8 @@ export default function MyLibrarySpace() {
         return <MySpaceReservations />;
       case 'mecenat':
         return <MyDonorSpace />;
+      case 'arbitration':
+        return <ArbitrationWorkflow />;
       case 'history':
         return renderHistory();
       case 'favorites':
@@ -368,7 +418,7 @@ export default function MyLibrarySpace() {
       case 'reviews':
         return renderReviews();
       default:
-        return <MyRestorationRequests />;
+        return isValidator ? <ArbitrationWorkflow /> : <MyRestorationRequests />;
     }
   };
 
@@ -690,6 +740,7 @@ export default function MyLibrarySpace() {
                 bookmarks: bookmarks.length,
                 reviews: reviews.length,
                 mecenat: 0,
+                arbitration: arbitrationCount,
               }}
               userProfiles={userProfiles}
             />

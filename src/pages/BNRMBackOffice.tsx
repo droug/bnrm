@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/hooks/useLanguage";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
-import { Navigate, useSearchParams } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -49,7 +49,6 @@ import { BNRMPaymentNotificationSettings } from "@/components/bnrm/BNRMPaymentNo
 import { BNRMStatistics } from "@/components/bnrm/BNRMStatistics";
 import BNRMEditorialMonitoring from "@/components/bnrm/BNRMEditorialMonitoring";
 import { DepositValidationWorkflow } from "@/components/legal-deposit/DepositValidationWorkflow";
-import { ArbitrationWorkflow } from "@/components/legal-deposit/ArbitrationWorkflow";
 import { AdminBackOfficeHeader } from "@/components/admin/AdminBackOfficeHeader";
 import { AdminBackOfficeNavigation } from "@/components/admin/AdminBackOfficeNavigation";
 import { AdminBackOfficeStats } from "@/components/admin/AdminBackOfficeStats";
@@ -59,23 +58,12 @@ import { supabase } from "@/integrations/supabase/client";
 export default function BNRMBackOffice() {
   const { user, profile, loading } = useAuth();
   const { t } = useLanguage();
-  const { isAdmin, isLibrarian, isValidator, isProfessional, loading: rolesLoading } = useSecureRoles();
-  const [searchParams] = useSearchParams();
+  const { isAdmin, isLibrarian, isProfessional, loading: rolesLoading } = useSecureRoles();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [selectedDepositModal, setSelectedDepositModal] = useState<string | null>(null);
   const [selectedDepositData, setSelectedDepositData] = useState<any>(null);
   const [confirmAction, setConfirmAction] = useState<{type: string, data?: any} | null>(null);
   const [documentForm, setDocumentForm] = useState<{type: string, data?: any} | null>(null);
-
-  // Mettre à jour l'onglet si le paramètre URL change ou si c'est un validateur
-  useEffect(() => {
-    if (searchParams.get('arbitration')) {
-      setActiveTab('arbitration');
-    } else if (!rolesLoading && isValidator && !isAdmin && !isLibrarian) {
-      // Rediriger automatiquement les validateurs vers l'onglet arbitrage
-      setActiveTab('arbitration');
-    }
-  }, [searchParams, isValidator, isAdmin, isLibrarian, rolesLoading]);
 
   // Fetch stats for the header
   const { data: statsData } = useQuery({
@@ -110,14 +98,13 @@ export default function BNRMBackOffice() {
     queryFn: async () => {
       const { data } = await supabase
         .from('legal_deposit_requests')
-        .select('status, arbitration_requested, arbitration_status');
+        .select('status');
       
       const statuses = data || [];
       return {
         pending: statuses.filter(r => ['soumis', 'en_cours', 'en_attente_validation_b'].includes(r.status || '')).length,
         validated: statuses.filter(r => ['valide_par_b', 'valide_par_comite'].includes(r.status || '')).length,
         toAttribute: statuses.filter(r => ['valide_par_b', 'valide_par_comite'].includes(r.status || '')).length,
-        arbitration: statuses.filter(r => r.arbitration_requested === true && r.arbitration_status === 'pending').length,
       };
     }
   });
@@ -135,10 +122,11 @@ export default function BNRMBackOffice() {
   }
 
   // Utiliser useSecureRoles() pour vérifier les accès (sécurisé via user_roles table)
-  // Les administrateurs et validateurs ont accès même sans profil approuvé
+  // Les administrateurs ont accès même sans profil approuvé
   // Les bibliothécaires doivent avoir un profil approuvé
+  // Les validateurs utilisent /my-space pour l'arbitrage
   // Bloquer l'accès aux comptes professionnels
-  const hasAccess = isAdmin || isValidator || (isLibrarian && profile?.is_approved);
+  const hasAccess = isAdmin || (isLibrarian && profile?.is_approved);
   
   if (!hasAccess || isProfessional) {
     return <Navigate to="/dashboard" replace />;
@@ -148,8 +136,6 @@ export default function BNRMBackOffice() {
     switch (activeTab) {
       case 'dashboard':
         return <BNRMDashboard />;
-      case 'arbitration':
-        return <ArbitrationWorkflow />;
       case 'requests':
         return (
           <>

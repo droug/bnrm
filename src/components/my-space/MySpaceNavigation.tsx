@@ -11,7 +11,8 @@ import {
   Bookmark,
   MessageSquare,
   ChevronRight,
-  Gift
+  Gift,
+  Scale
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -28,6 +29,7 @@ interface NavigationItem {
 interface UserProfiles {
   isProfessional?: boolean;  // Dépôt légal
   isDonor?: boolean;         // Mécénat
+  isValidator?: boolean;     // Arbitrage
   hasRestorations?: boolean;
   hasReproductions?: boolean;
   hasBookReservations?: boolean;
@@ -48,6 +50,7 @@ interface MySpaceNavigationProps {
     bookmarks: number;
     reviews: number;
     mecenat?: number;
+    arbitration?: number;
   };
   userProfiles?: UserProfiles;
 }
@@ -131,6 +134,19 @@ export function MySpaceNavigation({ activeTab, onTabChange, counts, userProfiles
       count: counts.mecenat,
       color: "text-rose-600",
       bgColor: "bg-rose-50 hover:bg-rose-100",
+    });
+  }
+
+  // Show arbitration only for validators
+  if (userProfiles?.isValidator) {
+    requestsItems.push({
+      id: "arbitration",
+      label: "Arbitrages",
+      description: "Demandes d'arbitrage à traiter",
+      icon: Scale,
+      count: counts.arbitration,
+      color: "text-amber-600",
+      bgColor: "bg-amber-50 hover:bg-amber-100",
     });
   }
 
