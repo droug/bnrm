@@ -102,30 +102,31 @@ export const EditUserDialog: React.FC<EditUserDialogProps> = ({
     }
   }, [open]);
 
-  // Charger le rôle actuel de l'utilisateur depuis user_roles
+  // Charger le rôle actuel de l'utilisateur depuis user_roles ou profile.role
   useEffect(() => {
     const fetchUserRole = async () => {
-      if (!user?.user_id) return;
+      if (!user?.user_id || availableRoles.length === 0) return;
 
       try {
-        // Récupérer le rôle depuis user_roles (enum-based)
+        let foundRole: string | null = null;
+
+        // 1. D'abord chercher dans user_roles (enum-based)
         const { data: userRoleData, error: userRoleError } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', user.user_id)
           .maybeSingle();
 
-        if (userRoleError) throw userRoleError;
-
-        if (userRoleData?.role) {
+        if (!userRoleError && userRoleData?.role) {
           // Mapper le role enum vers l'ID du system_role correspondant
           const matchingRole = availableRoles.find(r => r.role_code === userRoleData.role);
           if (matchingRole) {
-            setCurrentUserRole(matchingRole.id);
-            setValue("role", matchingRole.id);
+            foundRole = matchingRole.id;
           }
-        } else {
-          // Fallback: chercher dans user_system_roles
+        }
+
+        // 2. Si pas trouvé, chercher dans user_system_roles
+        if (!foundRole) {
           const { data: systemRoleData, error: systemRoleError } = await supabase
             .from('user_system_roles')
             .select('role_id')
@@ -134,9 +135,26 @@ export const EditUserDialog: React.FC<EditUserDialogProps> = ({
             .maybeSingle();
 
           if (!systemRoleError && systemRoleData?.role_id) {
-            setCurrentUserRole(systemRoleData.role_id);
-            setValue("role", systemRoleData.role_id);
+            foundRole = systemRoleData.role_id;
           }
+        }
+
+        // 3. Si toujours pas trouvé, utiliser le profile.role comme fallback
+        if (!foundRole && user.role) {
+          const matchingRole = availableRoles.find(r => r.role_code === user.role);
+          if (matchingRole) {
+            foundRole = matchingRole.id;
+          }
+        }
+
+        // 4. Appliquer le rôle trouvé ou laisser vide
+        if (foundRole) {
+          setCurrentUserRole(foundRole);
+          setValue("role", foundRole);
+        } else {
+          // Pas de rôle trouvé - laisser vide pour forcer la sélection
+          setCurrentUserRole("");
+          setValue("role", "");
         }
       } catch (error) {
         console.error('Error fetching user role:', error);
@@ -148,7 +166,16 @@ export const EditUserDialog: React.FC<EditUserDialogProps> = ({
     }
   }, [user, availableRoles, open, setValue]);
 
-  // Reset form when user changes
+  // Réinitialiser le rôle quand l'utilisateur change
+  useEffect(() => {
+    if (user?.id) {
+      // Reset currentUserRole quand un nouvel utilisateur est sélectionné
+      setCurrentUserRole("");
+    }
+  }, [user?.id]);
+
+  // Reset form when user changes - mais ne pas inclure currentUserRole comme dépendance
+  // car il est mis à jour séparément par fetchUserRole
   useEffect(() => {
     if (user) {
       reset({
@@ -157,13 +184,13 @@ export const EditUserDialog: React.FC<EditUserDialogProps> = ({
         phone: user.phone || "",
         institution: user.institution || "",
         research_field: user.research_field || "",
-        role: currentUserRole,
+        role: "", // Sera mis à jour par fetchUserRole
         subscription_type: user.subscription_type || "",
         partner_organization: user.partner_organization || "",
         is_approved: user.is_approved || false,
       });
     }
-  }, [user, reset, currentUserRole]);
+  }, [user, reset]);
 
   const selectedRole = watch("role");
   const isApproved = watch("is_approved");
