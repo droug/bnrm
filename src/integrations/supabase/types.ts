@@ -14947,7 +14947,8 @@ export type Database = {
       get_admin_users_with_email: {
         Args: never
         Returns: {
-          access_level_details: Json
+          avatar_url: string
+          bio: string
           created_at: string
           email: string
           first_name: string
@@ -14957,10 +14958,8 @@ export type Database = {
           last_name: string
           partner_organization: string
           phone: string
-          profile_preferences: Json
           research_field: string
-          research_specialization: string[]
-          subscription_type: string
+          role: Database["public"]["Enums"]["user_role"]
           updated_at: string
           user_id: string
         }[]
