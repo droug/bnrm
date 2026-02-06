@@ -58,7 +58,7 @@ import { supabase } from "@/integrations/supabase/client";
 export default function BNRMBackOffice() {
   const { user, profile, loading } = useAuth();
   const { t } = useLanguage();
-  const { isAdmin, isLibrarian, isProfessional, loading: rolesLoading } = useSecureRoles();
+  const { isAdmin, isLibrarian, isValidator, isProfessional, loading: rolesLoading } = useSecureRoles();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [selectedDepositModal, setSelectedDepositModal] = useState<string | null>(null);
   const [selectedDepositData, setSelectedDepositData] = useState<any>(null);
@@ -122,10 +122,10 @@ export default function BNRMBackOffice() {
   }
 
   // Utiliser useSecureRoles() pour vérifier les accès (sécurisé via user_roles table)
-  // Les administrateurs ont accès même sans profil approuvé
+  // Les administrateurs et validateurs ont accès même sans profil approuvé
   // Les bibliothécaires doivent avoir un profil approuvé
   // Bloquer l'accès aux comptes professionnels
-  const hasAccess = isAdmin || (isLibrarian && profile?.is_approved);
+  const hasAccess = isAdmin || isValidator || (isLibrarian && profile?.is_approved);
   
   if (!hasAccess || isProfessional) {
     return <Navigate to="/dashboard" replace />;
