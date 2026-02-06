@@ -115,15 +115,37 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
 
       // 3. Attribuer le rôle système sélectionné
       if (selectedRoleInfo) {
-        const { error: roleError } = await supabase
+        // Insérer dans user_system_roles (nouveau système dynamique)
+        const { error: systemRoleError } = await supabase
           .from('user_system_roles')
           .insert({
             user_id: authData.user.id,
             role_id: selectedRoleInfo.id,
           });
 
-        if (roleError) {
-          console.warn('Erreur lors de l\'attribution du rôle:', roleError);
+        if (systemRoleError) {
+          console.warn('Erreur lors de l\'attribution du rôle système:', systemRoleError);
+        }
+
+        // Également insérer dans user_roles (ancien système enum) pour la compatibilité
+        // avec les vérifications de sécurité et les Edge Functions
+        const enumRoles = [
+          'admin', 'librarian', 'researcher', 'partner', 'subscriber', 'visitor',
+          'public_user', 'editor', 'printer', 'producer', 'distributor', 'author',
+          'validateur', 'direction', 'dac', 'comptable', 'read_only'
+        ];
+        
+        if (enumRoles.includes(selectedRoleInfo.role_code)) {
+          const { error: enumRoleError } = await supabase
+            .from('user_roles')
+            .insert({
+              user_id: authData.user.id,
+              role: selectedRoleInfo.role_code as any,
+            });
+
+          if (enumRoleError) {
+            console.warn('Erreur lors de l\'attribution du rôle enum:', enumRoleError);
+          }
         }
       }
 
