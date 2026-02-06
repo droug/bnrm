@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -32,50 +32,29 @@ export function useSystemRoles(targetUserId?: string) {
   // Vérifier si l'utilisateur est admin (reste dans user_roles)
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // Toujours charger les rôles disponibles (indépendamment de l'utilisateur)
-  useEffect(() => {
-    fetchAvailableRoles();
-  }, []);
-
-  // Charger les rôles de l'utilisateur seulement si userId existe
-  useEffect(() => {
-    if (!userId) {
-      setLoading(false);
-      return;
-    }
-    
-    fetchRoles();
-  }, [userId]);
-
-  useEffect(() => {
-    checkAdminStatus();
-  }, [user?.id]);
-
-  const checkAdminStatus = async () => {
-    if (!user?.id) {
-      setIsAdmin(false);
-      return;
-    }
-
+  /**
+   * Récupérer tous les rôles disponibles
+   */
+  const fetchAvailableRoles = useCallback(async () => {
     try {
       const { data, error } = await supabase
-        .from('user_roles')
-        .select('role')
-        .eq('user_id', user.id)
-        .eq('role', 'admin')
-        .maybeSingle();
+        .from('system_roles')
+        .select('*')
+        .eq('is_active', true)
+        .order('role_category', { ascending: true })
+        .order('role_name', { ascending: true });
 
-      setIsAdmin(!!data);
-    } catch (error) {
-      console.error('Error checking admin status:', error);
-      setIsAdmin(false);
+      if (error) throw error;
+      setAvailableRoles(data || []);
+    } catch (error: any) {
+      console.error('Error fetching available roles:', error);
     }
-  };
+  }, []);
 
   /**
    * Récupérer tous les rôles de l'utilisateur
    */
-  const fetchRoles = async () => {
+  const fetchRoles = useCallback(async () => {
     if (!userId) return;
     
     try {
@@ -96,26 +75,47 @@ export function useSystemRoles(targetUserId?: string) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userId]);
 
-  /**
-   * Récupérer tous les rôles disponibles
-   */
-  const fetchAvailableRoles = async () => {
+  const checkAdminStatus = useCallback(async () => {
+    if (!user?.id) {
+      setIsAdmin(false);
+      return;
+    }
+
     try {
       const { data, error } = await supabase
-        .from('system_roles')
-        .select('*')
-        .eq('is_active', true)
-        .order('role_category', { ascending: true })
-        .order('role_name', { ascending: true });
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
 
-      if (error) throw error;
-      setAvailableRoles(data || []);
-    } catch (error: any) {
-      console.error('Error fetching available roles:', error);
+      setIsAdmin(!!data);
+    } catch (error) {
+      console.error('Error checking admin status:', error);
+      setIsAdmin(false);
     }
-  };
+  }, [user?.id]);
+
+  // Toujours charger les rôles disponibles (indépendamment de l'utilisateur)
+  useEffect(() => {
+    fetchAvailableRoles();
+  }, [fetchAvailableRoles]);
+
+  // Charger les rôles de l'utilisateur seulement si userId existe
+  useEffect(() => {
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+    
+    fetchRoles();
+  }, [userId, fetchRoles]);
+
+  useEffect(() => {
+    checkAdminStatus();
+  }, [checkAdminStatus]);
 
   /**
    * Attribuer un rôle système (admin uniquement)
