@@ -10,7 +10,7 @@ import { SimpleRoleSelector } from "@/components/workflow/SimpleRoleSelector";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { User, Phone, Building, BookOpen, Shield } from "lucide-react";
+import { User, Phone, Building, BookOpen, Shield, Mail } from "lucide-react";
 import { Database } from "@/integrations/supabase/types";
 
 type UserRole = Database['public']['Enums']['user_role'];
@@ -20,6 +20,7 @@ interface Profile {
   user_id: string;
   first_name: string;
   last_name: string;
+  email?: string;
   phone: string | null;
   institution: string | null;
   research_field: string | null;
@@ -334,6 +335,22 @@ export const EditUserDialog: React.FC<EditUserDialogProps> = ({
                 />
               </div>
             </div>
+
+            {/* Email (lecture seule) */}
+            {user?.email && (
+              <div className="space-y-2">
+                <Label className="flex items-center gap-1">
+                  <Mail className="h-3 w-3" />
+                  Email
+                </Label>
+                <Input
+                  value={user.email}
+                  readOnly
+                  disabled
+                  className="bg-muted cursor-not-allowed"
+                />
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
