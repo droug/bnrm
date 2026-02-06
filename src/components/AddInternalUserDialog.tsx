@@ -1,44 +1,28 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PortalSelect } from "@/components/ui/portal-select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { UserPlus, User, Mail, Building, BookOpen } from "lucide-react";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { UserPlus, User, Mail, Building, BookOpen, Check, ChevronsUpDown } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useSystemRoles } from "@/hooks/useSystemRoles";
+import { cn } from "@/lib/utils";
 
 interface AddInternalUserDialogProps {
   onUserAdded: () => void;
 }
 
-const INTERNAL_ROLES = {
-  admin: {
-    name: 'Administrateur',
-    permissions: ['Gestion complète du système', 'Gestion des utilisateurs', 'Configuration'],
-    description: 'Accès complet à toutes les fonctionnalités administratives',
-    color: 'destructive' as const
-  },
-  librarian: {
-    name: 'Bibliothécaire',
-    permissions: ['Gestion des manuscrits', 'Approbation des demandes', 'Gestion des collections'],
-    description: 'Gestion des ressources documentaires et approbation des accès',
-    color: 'default' as const
-  },
-  partner: {
-    name: 'Partenaire Institutionnel',
-    permissions: ['Accès prioritaire', 'Collaboration inter-institutionnelle', 'Projets spéciaux'],
-    description: 'Accès privilégié pour les partenaires institutionnels',
-    color: 'secondary' as const
-  }
-};
-
 export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDialogProps) {
   const { toast } = useToast();
+  const { availableRoles, loading: rolesLoading } = useSystemRoles();
   const [open, setOpen] = useState(false);
+  const [rolePopoverOpen, setRolePopoverOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedRole, setSelectedRole] = useState<string>('');
   
@@ -53,6 +37,23 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
     role: '',
     notes: ''
   });
+
+  // Grouper les rôles par catégorie
+  const rolesByCategory = useMemo(() => {
+    const grouped: Record<string, typeof availableRoles> = {};
+    availableRoles.forEach(role => {
+      const category = role.role_category || 'Autre';
+      if (!grouped[category]) {
+        grouped[category] = [];
+      }
+      grouped[category].push(role);
+    });
+    return grouped;
+  }, [availableRoles]);
+
+  const selectedRoleInfo = useMemo(() => {
+    return availableRoles.find(r => r.role_code === selectedRole);
+  }, [availableRoles, selectedRole]);
 
   const resetForm = () => {
     setFormData({
@@ -103,7 +104,6 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
           phone: formData.phone || null,
           institution: formData.institution || null,
           research_field: formData.researchField || null,
-          role: formData.role as any,
           is_approved: true, // Les utilisateurs internes sont automatiquement approuvés
           updated_at: new Date().toISOString()
         })
@@ -111,10 +111,23 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
 
       if (profileError) {
         console.warn('Erreur lors de la mise à jour du profil:', profileError);
-        // On continue car le profil sera créé par le trigger
       }
 
-      // 3. Log de l'activité
+      // 3. Attribuer le rôle système sélectionné
+      if (selectedRoleInfo) {
+        const { error: roleError } = await supabase
+          .from('user_system_roles')
+          .insert({
+            user_id: authData.user.id,
+            role_id: selectedRoleInfo.id,
+          });
+
+        if (roleError) {
+          console.warn('Erreur lors de l\'attribution du rôle:', roleError);
+        }
+      }
+
+      // 4. Log de l'activité
       await supabase
         .from('activity_logs')
         .insert({
@@ -123,6 +136,7 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
           resource_id: authData.user.id,
           details: {
             role: formData.role,
+            role_name: selectedRoleInfo?.role_name,
             created_by_admin: true,
             notes: formData.notes
           }
@@ -130,7 +144,7 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
 
       toast({
         title: "Utilisateur créé avec succès",
-        description: `${formData.firstName} ${formData.lastName} a été ajouté avec le rôle ${INTERNAL_ROLES[formData.role as keyof typeof INTERNAL_ROLES]?.name}`,
+        description: `${formData.firstName} ${formData.lastName} a été ajouté avec le rôle ${selectedRoleInfo?.role_name || formData.role}`,
       });
 
       resetForm();
@@ -149,7 +163,24 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
     }
   };
 
-  const selectedRoleInfo = selectedRole ? INTERNAL_ROLES[selectedRole as keyof typeof INTERNAL_ROLES] : null;
+  const getCategoryLabel = (category: string): string => {
+    const labels: Record<string, string> = {
+      'Interne': 'Rôles Internes',
+      'Externe': 'Rôles Externes',
+      'Professionnel': 'Rôles Professionnels',
+      'Autre': 'Autres Rôles'
+    };
+    return labels[category] || category;
+  };
+
+  const getCategoryBadgeVariant = (category: string): "default" | "secondary" | "destructive" | "outline" => {
+    switch (category) {
+      case 'Interne': return 'destructive';
+      case 'Professionnel': return 'default';
+      case 'Externe': return 'secondary';
+      default: return 'outline';
+    }
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -272,41 +303,86 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
             <CardContent className="space-y-4">
               <div>
                 <Label htmlFor="role">Rôle *</Label>
-                <PortalSelect
-                  value={formData.role}
-                  onChange={(value) => {
-                    setFormData({ ...formData, role: value });
-                    setSelectedRole(value);
-                  }}
-                  placeholder="Sélectionner un rôle"
-                  options={Object.entries(INTERNAL_ROLES).map(([key, role]) => ({
-                    value: key,
-                    label: role.name
-                  }))}
-                />
+                <Popover open={rolePopoverOpen} onOpenChange={setRolePopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={rolePopoverOpen}
+                      className="w-full justify-between font-normal"
+                      disabled={rolesLoading}
+                    >
+                      {selectedRoleInfo ? (
+                        <span className="flex items-center gap-2">
+                          <Badge variant={getCategoryBadgeVariant(selectedRoleInfo.role_category)} className="text-xs">
+                            {selectedRoleInfo.role_category}
+                          </Badge>
+                          {selectedRoleInfo.role_name}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">
+                          {rolesLoading ? "Chargement des rôles..." : "Sélectionner un rôle"}
+                        </span>
+                      )}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-[400px] p-0" align="start">
+                    <Command>
+                      <CommandInput placeholder="Rechercher un rôle..." />
+                      <CommandList>
+                        <CommandEmpty>Aucun rôle trouvé.</CommandEmpty>
+                        {Object.entries(rolesByCategory).map(([category, roles]) => (
+                          <CommandGroup key={category} heading={getCategoryLabel(category)}>
+                            {roles.map((role) => (
+                              <CommandItem
+                                key={role.role_code}
+                                value={`${role.role_name} ${role.role_code} ${role.description}`}
+                                onSelect={() => {
+                                  setSelectedRole(role.role_code);
+                                  setFormData({ ...formData, role: role.role_code });
+                                  setRolePopoverOpen(false);
+                                }}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    selectedRole === role.role_code ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{role.role_name}</span>
+                                  {role.description && (
+                                    <span className="text-xs text-muted-foreground line-clamp-1">
+                                      {role.description}
+                                    </span>
+                                  )}
+                                </div>
+                              </CommandItem>
+                            ))}
+                          </CommandGroup>
+                        ))}
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
 
               {selectedRoleInfo && (
                 <div className="p-4 bg-muted rounded-lg space-y-3">
                   <div className="flex items-center gap-2">
-                    <Badge variant={selectedRoleInfo.color}>
-                      {selectedRoleInfo.name}
+                    <Badge variant={getCategoryBadgeVariant(selectedRoleInfo.role_category)}>
+                      {selectedRoleInfo.role_name}
                     </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      ({selectedRoleInfo.role_code})
+                    </span>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedRoleInfo.description}
-                  </p>
-                  <div>
-                    <h4 className="text-sm font-medium mb-2">Permissions incluses :</h4>
-                    <ul className="text-sm text-muted-foreground space-y-1">
-                      {selectedRoleInfo.permissions.map((permission, index) => (
-                        <li key={index} className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                          {permission}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  {selectedRoleInfo.description && (
+                    <p className="text-sm text-muted-foreground">
+                      {selectedRoleInfo.description}
+                    </p>
+                  )}
                 </div>
               )}
               
