@@ -32,6 +32,12 @@ export function useSystemRoles(targetUserId?: string) {
   // Vérifier si l'utilisateur est admin (reste dans user_roles)
   const [isAdmin, setIsAdmin] = useState(false);
 
+  // Toujours charger les rôles disponibles (indépendamment de l'utilisateur)
+  useEffect(() => {
+    fetchAvailableRoles();
+  }, []);
+
+  // Charger les rôles de l'utilisateur seulement si userId existe
   useEffect(() => {
     if (!userId) {
       setLoading(false);
@@ -39,7 +45,6 @@ export function useSystemRoles(targetUserId?: string) {
     }
     
     fetchRoles();
-    fetchAvailableRoles();
   }, [userId]);
 
   useEffect(() => {
