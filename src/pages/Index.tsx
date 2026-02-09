@@ -146,7 +146,7 @@ const Index = () => {
               </h1>
               
               {/* Text medium - Description */}
-              <p className="bnrm-body-text text-white/90 mb-4 sm:mb-6 md:mb-8 max-w-full sm:max-w-lg md:max-w-xl line-clamp-3 sm:line-clamp-none">
+              <p className="bnrm-hero-subtitle text-white/90 mb-4 sm:mb-6 md:mb-8 max-w-full sm:max-w-lg md:max-w-xl">
                 {heroSubtitle}
               </p>
               
