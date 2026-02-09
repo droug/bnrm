@@ -79,7 +79,7 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
         <div className="bg-[#1e3a8a] text-white px-8 py-8 rounded-lg mb-8">
           <div className="flex items-start justify-between">
             <div>
-              <p className="bnrm-caption uppercase tracking-widest mb-2" style={{ color: '#93C5FD' }}>
+              <p className="uppercase tracking-widest mb-2" style={{ fontFamily: 'Lato, sans-serif', fontSize: '14.17px', lineHeight: '150%', fontWeight: 600, color: '#93C5FD' }}>
                 BNRM
               </p>
               <h2 className="bnrm-section-title text-white mb-4">
