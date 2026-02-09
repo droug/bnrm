@@ -585,12 +585,13 @@ Enhanced Moroccan Heritage Design System
   /* === BNRM PORTAL - UNIFIED TYPOGRAPHY SYSTEM === */
   /* ============================================== */
   
-  /* Section Titles - Gilda Display, 32px, semibold */
+  /* Section Titles - Roboto Medium, Heading 2, 120% line-height */
   .bnrm-section-title {
-    font-family: 'Gilda Display', Georgia, serif;
+    font-family: 'Roboto', sans-serif;
     font-size: 1.75rem;
-    line-height: 1.3;
-    font-weight: 600;
+    line-height: 120%;
+    font-weight: 500;
+    letter-spacing: -0.01em;
     color: hsl(var(--foreground));
   }
   @media (min-width: 768px) {
