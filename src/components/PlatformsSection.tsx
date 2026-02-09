@@ -70,26 +70,26 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
   ];
 
   return (
-    <div className="relative py-20 my-12 overflow-hidden rounded-lg">
-      {/* Background image */}
+    <div className="relative py-20 overflow-hidden">
+      {/* Background image with blur */}
       <div 
-        className="absolute inset-0 bg-cover bg-center"
+        className="absolute inset-0 bg-cover bg-center blur-sm scale-105"
         style={{ 
           backgroundImage: `url(${platformsBg})`,
         }}
       />
       
-      {/* Light overlay for content readability */}
-      <div className="absolute inset-0 bg-black/20" />
+      {/* Overlay for content readability */}
+      <div className="absolute inset-0 bg-black/40" />
       <div className="container mx-auto px-4 relative z-10">
         <div className="mb-12">
-          <p className="bnrm-caption uppercase tracking-widest text-orange-500 mb-2">
+          <p className="bnrm-caption uppercase tracking-widest text-primary mb-2">
             BNRM
           </p>
           <h2 className="bnrm-section-title text-white mb-4">
             {language === 'ar' ? 'منصاتنا' : 'Nos Plateformes'}
           </h2>
-          <div className="w-24 h-1 bg-orange-500 mb-4"></div>
+          <div className="w-24 h-1 bg-primary mb-4"></div>
           <p className="bnrm-section-subtitle text-white/80">
             {language === 'ar' 
               ? 'اكتشف منصاتنا الرقمية'
@@ -110,12 +110,12 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
             <div className={`absolute -top-4 left-1/2 -translate-x-1/2 -translate-y-full z-50 transition-all duration-300 ${
               hoveredPlatform === 'main' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
             }`}>
-              <div className="relative bg-white rounded-2xl shadow-2xl p-5 max-w-[320px] border border-orange-100">
+              <div className="relative bg-white rounded-2xl shadow-2xl p-5 max-w-[320px] border border-gray-200">
                 {/* Arrow */}
-                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rotate-45 border-r border-b border-orange-100" />
+                <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-white rotate-45 border-r border-b border-gray-200" />
                 
                 <div className="flex items-start gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center flex-shrink-0 shadow-lg">
                     <span className="text-white font-bold text-lg">01</span>
                   </div>
                   <div>
@@ -125,13 +125,13 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                 </div>
                 
                 <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
-                  <span className="text-xs text-orange-600 font-medium">
+                  <span className="text-xs text-primary font-medium">
                     {language === 'ar' ? 'انقر للاستكشاف' : 'Cliquez pour explorer'}
                   </span>
                   <div className="flex gap-1">
-                    <span className="w-2 h-2 rounded-full bg-orange-400 animate-pulse" />
-                    <span className="w-2 h-2 rounded-full bg-orange-300 animate-pulse delay-75" />
-                    <span className="w-2 h-2 rounded-full bg-orange-200 animate-pulse delay-150" />
+                    <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                    <span className="w-2 h-2 rounded-full bg-primary/70 animate-pulse delay-75" />
+                    <span className="w-2 h-2 rounded-full bg-primary/40 animate-pulse delay-150" />
                   </div>
                 </div>
               </div>

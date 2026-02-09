@@ -174,6 +174,9 @@ const Index = () => {
             </div>
           </div>
         </section>
+
+        {/* Platforms Section - Right under hero */}
+        <PlatformsSection language={language} />
         
         {/* Main Content - Mobile First */}
         <main className="container mx-auto px-4 sm:px-6 py-4 sm:py-6 md:py-8">
@@ -203,9 +206,6 @@ const Index = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Platforms Section */}
-              <PlatformsSection language={language} />
 
               {/* Quick Links */}
               <div className="mb-8 sm:mb-10 md:mb-12">
