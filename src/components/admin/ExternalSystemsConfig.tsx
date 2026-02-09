@@ -376,7 +376,7 @@ export function ExternalSystemsConfig() {
           <TabsTrigger value="z3950">Z39.50 ({z3950Systems.length})</TabsTrigger>
           <TabsTrigger value="oai">OAI-PMH ({oaiSystems.length})</TabsTrigger>
           <TabsTrigger value="auth">Auth ({authSystems.length})</TabsTrigger>
-          <TabsTrigger value="cora">CORA ({coraSystems.length})</TabsTrigger>
+          <TabsTrigger value="cora">COHA ({coraSystems.length})</TabsTrigger>
         </TabsList>
 
         <TabsContent value="sigb" className="space-y-4">
