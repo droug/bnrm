@@ -1,0 +1,1 @@
+UPDATE cms_hero_settings SET hero_title_fr = 'Bibliothèque Nationale du Royaume du Maroc' WHERE platform = 'portal';
