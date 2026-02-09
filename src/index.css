@@ -703,13 +703,14 @@ Enhanced Moroccan Heritage Design System
     letter-spacing: 0.01em;
   }
 
-  /* Caption / Labels - Inter, 12px, medium */
+  /* Caption / Labels - Lato, 14.17px, SemiBold */
   .bnrm-caption {
-    font-family: 'Inter', system-ui, sans-serif;
-    font-size: 0.75rem;
-    line-height: 1.5;
-    font-weight: 500;
-    color: hsl(var(--muted-foreground));
+    font-family: 'Lato', sans-serif;
+    font-size: 14.17px;
+    line-height: 150%;
+    font-weight: 600;
+    letter-spacing: 0%;
+    color: #172554;
   }
 
   /* Page Title - Gilda Display, 32px, semibold */
