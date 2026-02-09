@@ -585,18 +585,18 @@ Enhanced Moroccan Heritage Design System
   /* === BNRM PORTAL - UNIFIED TYPOGRAPHY SYSTEM === */
   /* ============================================== */
   
-  /* Section Titles - Inter, 52px, 120% line-height */
+  /* Section Titles - Inter H2 Medium */
   .bnrm-section-title {
     font-family: 'Inter', system-ui, sans-serif;
-    font-size: 2rem;
+    font-size: 1.75rem;
     line-height: 120%;
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: -0.01em;
     color: hsl(var(--foreground));
   }
   @media (min-width: 768px) {
     .bnrm-section-title {
-      font-size: 3.25rem; /* 52px */
+      font-size: 1.875rem; /* 30px - H2 */
     }
   }
   
@@ -621,10 +621,10 @@ Enhanced Moroccan Heritage Design System
     border-radius: 9999px;
   }
 
-  /* Section Subtitle - Inter, 20px, regular */
+  /* Section Subtitle - Inter H6 Regular */
   .bnrm-section-subtitle {
     font-family: 'Inter', system-ui, sans-serif;
-    font-size: 20px;
+    font-size: 1rem;
     line-height: 140%;
     font-weight: 400;
     letter-spacing: -0.01em;
