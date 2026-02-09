@@ -1,0 +1,1 @@
+UPDATE cms_hero_settings SET hero_subtitle_fr = 'Préservation et valorisation du patrimoine manuscrit marocain. Découvrez des milliers de manuscrits anciens numérisés avec la technologie IIIF dans un cadre architectural exceptionnel.' WHERE platform = 'portal';
