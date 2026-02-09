@@ -83,7 +83,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
       <div className="absolute inset-0 bg-black/40" />
       <div className="container mx-auto px-4 relative z-10">
         <div className="mb-12">
-          <p className="bnrm-caption uppercase tracking-widest text-primary mb-2">
+          <p className="bnrm-caption uppercase tracking-widest text-black bg-[#BFDBFE] inline-block px-4 py-1.5 rounded-md mb-2">
             BNRM
           </p>
           <h2 className="bnrm-section-title text-white mb-4">
@@ -207,46 +207,22 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                 // Slightly varied heights for natural look
                 const heights = ['h-[545px]', 'h-[552px]', 'h-[550px]', 'h-[555px]'];
                 
-                // Natural tilt angles - books lean against each other realistically
-                const tiltAngles = ['3.5deg', '1.2deg', '-1.5deg', '2deg'];
-                
-                // Subtle vertical offsets for depth (index 2 fixed to sit on shelf)
-                const translateY = ['-3px', '2px', '0px', '0px'];
-                
-                // Books slightly pulled forward/back from shelf
-                const translateX = ['2px', '-1px', '1px', '-2px'];
-                
-                // Shadow depths for 3D effect
-                const shadowDepths = [
-                  '0 8px 25px -5px rgba(0,0,0,0.3), 0 4px 10px -5px rgba(0,0,0,0.2)',
-                  '0 4px 15px -3px rgba(0,0,0,0.25)',
-                  '0 12px 30px -8px rgba(0,0,0,0.35), 0 6px 12px -4px rgba(0,0,0,0.2)',
-                  '0 6px 20px -4px rgba(0,0,0,0.28)'
-                ];
-                
-                // Negative margins to make books touch/overlap slightly
-                const margins = index > 0 ? '-ml-0.5' : '';
-                
                 return (
                   <div
                     key={platform.number}
-                    className={`relative ${heights[index]} w-28 cursor-pointer group transition-all duration-300 hover:-translate-y-3 ${margins}`}
+                    className={`relative ${heights[index]} w-28 cursor-pointer group transition-all duration-300 hover:-translate-y-3`}
                     onClick={() => navigate(platform.path)}
                     onMouseEnter={() => setHoveredPlatform(platform.number)}
                     onMouseLeave={() => setHoveredPlatform(null)}
                     style={{ 
-                      transformStyle: 'preserve-3d',
-                      perspective: '1000px',
-                      transform: `rotate(${tiltAngles[index]}) translateY(${translateY[index]}) translateX(${translateX[index]})`,
-                      transformOrigin: 'bottom center',
                       zIndex: hoveredPlatform === platform.number ? 50 : 10 - index,
-                      boxShadow: shadowDepths[index]
+                      boxShadow: '0 8px 25px -5px rgba(0,0,0,0.3)',
                     }}
                   >
                     {/* Tooltip Bubble */}
                     <div className={`absolute -top-4 left-1/2 -translate-x-1/2 -translate-y-full z-[100] transition-all duration-300 ${
                       hoveredPlatform === platform.number ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
-                    }`} style={{ transform: `rotate(-${tiltAngles[index]}) translateX(-50%) translateY(-100%)` }}>
+                    }`}>
                       <div className="relative bg-white rounded-xl shadow-2xl p-4 w-[220px] border border-gray-100">
                         {/* Arrow */}
                         <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rotate-45 border-r border-b border-gray-100" />
@@ -300,10 +276,10 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                         </div>
                       </div>
                       
-                      {/* Book title - vertical on spine (kept inside book bounds) */}
-                      <div className="absolute bottom-24 left-1/2 -translate-x-1/2 flex items-center justify-center w-full px-2">
+                      {/* Book title - vertical centered on spine */}
+                      <div className="absolute inset-0 flex items-center justify-center px-2">
                         <div
-                          className={`max-h-[280px] overflow-hidden text-white font-bold text-sm leading-tight tracking-[0.14em] drop-shadow-xl ${
+                          className={`text-white font-bold text-sm leading-tight tracking-[0.14em] drop-shadow-xl text-center ${
                             language === 'ar' ? '' : 'uppercase'
                           }`}
                           style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
