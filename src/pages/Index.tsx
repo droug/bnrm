@@ -137,7 +137,7 @@ const Index = () => {
             <div className="max-w-full sm:max-w-xl md:max-w-2xl">
               {/* Tagline */}
               <span
-                className="inline-block uppercase tracking-widest text-white text-sm font-semibold mb-2 sm:mb-4"
+                className="inline-block uppercase tracking-widest text-white text-sm font-semibold mb-2 sm:mb-4 whitespace-nowrap"
                 style={{
                   width: 257,
                   height: 42,
