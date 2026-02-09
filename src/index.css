@@ -741,6 +741,16 @@ Enhanced Moroccan Heritage Design System
     }
   }
 
+  /* Hero Subtitle - Roboto, 16px, SemiBold */
+  .bnrm-hero-subtitle {
+    font-family: 'Roboto', sans-serif;
+    font-size: 1rem;
+    line-height: 150%;
+    font-weight: 600;
+    font-style: normal;
+    letter-spacing: 0;
+  }
+
   /* BNRM Official Icons - Material Symbols */
   .material-symbols-outlined {
     font-family: 'Material Symbols Outlined';
