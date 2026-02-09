@@ -7,7 +7,7 @@ import kitabBackground from "@/assets/kitab-book.jpg";
 import manuscritsBackground from "@/assets/manuscrits-background.jpg";
 import culturalActivitiesBackground from "@/assets/cultural-activities-background.jpg";
 import cbmBackground from "@/assets/cbm-background.jpg";
-import islamicPattern from "@/assets/islamic-calligraphy-pattern.jpg";
+import platformsBg from "@/assets/platforms-bg.jpg";
 
 interface PlatformsSectionProps {
   language: string;
@@ -75,7 +75,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
       <div 
         className="absolute inset-0 bg-cover bg-center"
         style={{ 
-          backgroundImage: `url(${islamicPattern})`,
+          backgroundImage: `url(${platformsBg})`,
         }}
       />
       
