@@ -157,8 +157,8 @@ const Index = () => {
                   className="px-6 py-0 text-sm font-semibold rounded-[5px] shadow-lg hover:shadow-xl transition-all sm:w-auto"
                   style={{ width: 204, height: 31, backgroundColor: '#93C5FD', color: '#fff', border: 'none' }}
                 >
-                  <HelpCircle className={`h-4 w-4 text-white ${isRTL ? 'ml-2' : 'mr-2'}`} />
-                  <span className="text-white">{t('portal.hero.helpBtn')}</span>
+                  <HelpCircle className={`h-4 w-4 text-black ${isRTL ? 'ml-2' : 'mr-2'}`} />
+                   <span className="text-black">{t('portal.hero.helpBtn')}</span>
                 </Button>
               </div>
             </div>
