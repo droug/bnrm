@@ -239,28 +239,36 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                         backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px)`
                       }} />
                       
-                      {/* Top decorative pattern tile */}
-                      <div className="absolute top-3 left-2 right-2 h-[100px] rounded-md overflow-hidden border border-[#C9984F]/40">
-                        <img 
-                          src={platform.image}
-                          alt=""
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#7B1E1E]/20" />
+                      {/* Top decorative panel */}
+                      <div className="absolute top-4 left-2 right-2 h-[110px] rounded-sm overflow-hidden border border-[#C9984F]/50">
+                        <div className="w-full h-full" style={{
+                          background: `
+                            radial-gradient(circle at 50% 50%, #C9984F 2px, transparent 2px),
+                            radial-gradient(circle at 0% 0%, #C9984F 2px, transparent 2px),
+                            radial-gradient(circle at 100% 0%, #C9984F 2px, transparent 2px),
+                            radial-gradient(circle at 0% 100%, #C9984F 2px, transparent 2px),
+                            radial-gradient(circle at 100% 100%, #C9984F 2px, transparent 2px),
+                            linear-gradient(45deg, #1e3a5f 25%, transparent 25%),
+                            linear-gradient(-45deg, #1e3a5f 25%, transparent 25%),
+                            linear-gradient(135deg, #1e3a5f 25%, transparent 25%),
+                            linear-gradient(-135deg, #1e3a5f 25%, transparent 25%)
+                          `,
+                          backgroundSize: '20px 20px',
+                          backgroundColor: '#1a4a6e',
+                        }} />
+                        <div className="absolute inset-0 border-2 border-[#C9984F]/30 rounded-sm" />
                       </div>
                       
-                      {/* Gold decorative corner accents below top tile */}
-                      <div className="absolute top-[110px] left-3 right-3 flex justify-between">
-                        <svg width="20" height="20" viewBox="0 0 20 20" className="text-[#C9984F] opacity-60">
-                          <path d="M0 20 Q0 0 20 0" fill="none" stroke="currentColor" strokeWidth="1.5"/>
-                        </svg>
-                        <svg width="20" height="20" viewBox="0 0 20 20" className="text-[#C9984F] opacity-60">
-                          <path d="M20 20 Q20 0 0 0" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+                      {/* Gold decorative flourish */}
+                      <div className="absolute top-[122px] left-3 right-3 flex justify-center">
+                        <svg width="80" height="24" viewBox="0 0 80 24" className="text-[#C9984F] opacity-70">
+                          <path d="M0 12 Q10 0 20 12 Q30 24 40 12 Q50 0 60 12 Q70 24 80 12" fill="none" stroke="currentColor" strokeWidth="1.2"/>
+                          <circle cx="40" cy="12" r="3" fill="currentColor" opacity="0.5"/>
                         </svg>
                       </div>
 
-                      {/* Title - centered vertically in middle section */}
-                      <div className="absolute top-[140px] bottom-[240px] left-0 right-0 flex items-center justify-center px-3">
+                      {/* Title - centered vertically in middle */}
+                      <div className="absolute top-[150px] bottom-[260px] left-0 right-0 flex items-center justify-center px-2">
                         <div
                           className={`text-white font-bold text-[11px] leading-tight tracking-[0.2em] drop-shadow-lg text-center ${
                             language === 'ar' ? '' : 'uppercase'
@@ -271,24 +279,44 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                         </div>
                       </div>
 
-                      {/* Middle decorative pattern tile */}
-                      <div className="absolute top-1/2 -translate-y-1/4 left-2 right-2 h-[100px] rounded-md overflow-hidden border border-[#C9984F]/40">
-                        <img 
-                          src={platform.image}
-                          alt=""
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-transparent to-[#7B1E1E]/20" />
+                      {/* Middle decorative panel */}
+                      <div className="absolute top-[48%] -translate-y-1/4 left-2 right-2 h-[110px] rounded-sm overflow-hidden border border-[#C9984F]/50">
+                        <div className="w-full h-full" style={{
+                          background: `
+                            radial-gradient(circle at 50% 50%, #C9984F 2px, transparent 2px),
+                            radial-gradient(circle at 0% 0%, #C9984F 2px, transparent 2px),
+                            radial-gradient(circle at 100% 0%, #C9984F 2px, transparent 2px),
+                            radial-gradient(circle at 0% 100%, #C9984F 2px, transparent 2px),
+                            radial-gradient(circle at 100% 100%, #C9984F 2px, transparent 2px),
+                            linear-gradient(45deg, #8B4513 25%, transparent 25%),
+                            linear-gradient(-45deg, #8B4513 25%, transparent 25%),
+                            linear-gradient(135deg, #8B4513 25%, transparent 25%),
+                            linear-gradient(-135deg, #8B4513 25%, transparent 25%)
+                          `,
+                          backgroundSize: '18px 18px',
+                          backgroundColor: '#1a4a6e',
+                        }} />
+                        <div className="absolute inset-0 border-2 border-[#C9984F]/30 rounded-sm" />
                       </div>
 
-                      {/* Bottom decorative pattern tile */}
-                      <div className="absolute bottom-3 left-2 right-2 h-[100px] rounded-md overflow-hidden border border-[#C9984F]/40">
-                        <img 
-                          src={platform.image}
-                          alt=""
-                          className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#7B1E1E]/20" />
+                      {/* Bottom decorative panel */}
+                      <div className="absolute bottom-4 left-2 right-2 h-[110px] rounded-sm overflow-hidden border border-[#C9984F]/50">
+                        <div className="w-full h-full" style={{
+                          background: `
+                            radial-gradient(circle at 50% 50%, #C9984F 2px, transparent 2px),
+                            radial-gradient(circle at 0% 0%, #C9984F 2px, transparent 2px),
+                            radial-gradient(circle at 100% 0%, #C9984F 2px, transparent 2px),
+                            radial-gradient(circle at 0% 100%, #C9984F 2px, transparent 2px),
+                            radial-gradient(circle at 100% 100%, #C9984F 2px, transparent 2px),
+                            linear-gradient(45deg, #1e3a5f 25%, transparent 25%),
+                            linear-gradient(-45deg, #1e3a5f 25%, transparent 25%),
+                            linear-gradient(135deg, #1e3a5f 25%, transparent 25%),
+                            linear-gradient(-135deg, #1e3a5f 25%, transparent 25%)
+                          `,
+                          backgroundSize: '20px 20px',
+                          backgroundColor: '#1a4a6e',
+                        }} />
+                        <div className="absolute inset-0 border-2 border-[#C9984F]/30 rounded-sm" />
                       </div>
 
                       {/* Spine binding lines */}
@@ -296,7 +324,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                       <div className="absolute top-0 right-0 w-[2px] h-full bg-gradient-to-l from-black/20 to-transparent" />
                       
                       {/* Inner gold border */}
-                      <div className="absolute inset-1 border border-[#C9984F]/30 rounded-[3px] pointer-events-none" />
+                      <div className="absolute inset-1.5 border border-[#C9984F]/25 rounded-[3px] pointer-events-none" />
                     </div>
                   </div>
                 );
