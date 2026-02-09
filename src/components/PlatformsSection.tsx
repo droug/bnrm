@@ -195,28 +195,20 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
           {/* Bookshelf - Secondary Platforms as Books */}
           <div className="relative h-[600px] flex flex-col justify-end">
             {/* Bookshelf */}
-            <div className="flex gap-0 items-end pb-0 relative">
+            <div className="flex gap-1 items-end pb-0 relative">
               {secondaryPlatforms.map((platform, index) => {
-                const bookColors = [
-                  'from-[#C9984F] to-[#8B6F47]', // Or ancien
-                  'from-[#1e3a5f] to-[#0d1b2a]', // Bleu nuit
-                  'from-[#B87333] to-[#8B5A2B]', // Cuivre
-                  'from-[#CD853F] to-[#8B5E3C]', // Bois doré
-                ];
-                
-                // Slightly varied heights for natural look
                 const heights = ['h-[545px]', 'h-[552px]', 'h-[550px]', 'h-[555px]'];
                 
                 return (
                   <div
                     key={platform.number}
-                    className={`relative ${heights[index]} w-28 cursor-pointer group transition-all duration-300 hover:-translate-y-3`}
+                    className={`relative ${heights[index]} w-[120px] cursor-pointer group transition-all duration-300 hover:-translate-y-3`}
                     onClick={() => navigate(platform.path)}
                     onMouseEnter={() => setHoveredPlatform(platform.number)}
                     onMouseLeave={() => setHoveredPlatform(null)}
                     style={{ 
                       zIndex: hoveredPlatform === platform.number ? 50 : 10 - index,
-                      boxShadow: '0 8px 25px -5px rgba(0,0,0,0.3)',
+                      boxShadow: '4px 4px 15px rgba(0,0,0,0.4)',
                     }}
                   >
                     {/* Tooltip Bubble */}
@@ -224,20 +216,14 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                       hoveredPlatform === platform.number ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2 pointer-events-none'
                     }`}>
                       <div className="relative bg-white rounded-xl shadow-2xl p-4 w-[220px] border border-gray-100">
-                        {/* Arrow */}
                         <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-3 h-3 bg-white rotate-45 border-r border-b border-gray-100" />
-                        
                         <div className="flex items-center gap-2 mb-2">
-                          <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${bookColors[index]} flex items-center justify-center flex-shrink-0 shadow-md`}>
+                          <div className="w-8 h-8 rounded-lg bg-[#7B1E1E] flex items-center justify-center flex-shrink-0 shadow-md">
                             <span className="text-white font-bold text-xs">{platform.number}</span>
                           </div>
                           <h4 className="font-bold text-gray-900 text-sm">{platform.title}</h4>
                         </div>
-                        
-                        <p className="text-gray-600 text-xs leading-relaxed mb-2">
-                          {platform.description}
-                        </p>
-                        
+                        <p className="text-gray-600 text-xs leading-relaxed mb-2">{platform.description}</p>
                         <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                           <span className="text-xs text-primary font-medium">
                             {language === 'ar' ? 'اكتشف المزيد →' : 'Découvrir →'}
@@ -246,55 +232,72 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                       </div>
                     </div>
 
-                    {/* Book spine */}
-                    <div className={`absolute inset-0 bg-gradient-to-b ${bookColors[index]} rounded-sm shadow-lg`}>
-                      {/* Book texture overlay */}
-                      <div className="absolute inset-0 opacity-20" style={{
-                        backgroundImage: `linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.1) 50%, transparent 100%)`
+                    {/* Book spine - dark red/maroon like reference */}
+                    <div className="absolute inset-0 rounded-[4px] overflow-hidden border-2 border-[#5A1010]" style={{ backgroundColor: '#7B1E1E' }}>
+                      {/* Subtle leather texture */}
+                      <div className="absolute inset-0 opacity-10" style={{
+                        backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.05) 2px, rgba(0,0,0,0.05) 4px)`
                       }} />
                       
-                      {/* Pattern overlay */}
-                      <img 
-                        src={platform.image}
-                        alt={platform.title}
-                        className={`absolute inset-0 w-full h-full object-cover ${index === 1 ? 'opacity-100' : index === 3 ? 'opacity-50 mix-blend-overlay' : 'opacity-10 mix-blend-overlay'}`}
-                      />
-                      
-                      {/* Book binding lines */}
-                      <div className="absolute top-0 left-0 w-1 h-full bg-black/20" />
-                      <div className="absolute top-0 right-0 w-1 h-full bg-white/10" />
-                      
-                      {/* Number badge on spine - Octagon shape */}
-                      <div className="absolute top-6 left-1/2 -translate-x-1/2">
-                        <div className="relative w-14 h-14">
-                          <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full drop-shadow-md">
-                            <polygon points="50,5 82,18 95,50 82,82 50,95 18,82 5,50 18,18" className="fill-white/95" />
-                          </svg>
-                          <div className="absolute inset-0 flex items-center justify-center text-gray-900 font-bold text-xl">
-                            {platform.number}
-                          </div>
-                        </div>
+                      {/* Top decorative pattern tile */}
+                      <div className="absolute top-3 left-2 right-2 h-[100px] rounded-md overflow-hidden border border-[#C9984F]/40">
+                        <img 
+                          src={platform.image}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#7B1E1E]/20" />
                       </div>
                       
-                      {/* Book title - vertical centered on spine */}
-                      <div className="absolute inset-0 flex items-center justify-center px-2">
+                      {/* Gold decorative corner accents below top tile */}
+                      <div className="absolute top-[110px] left-3 right-3 flex justify-between">
+                        <svg width="20" height="20" viewBox="0 0 20 20" className="text-[#C9984F] opacity-60">
+                          <path d="M0 20 Q0 0 20 0" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+                        </svg>
+                        <svg width="20" height="20" viewBox="0 0 20 20" className="text-[#C9984F] opacity-60">
+                          <path d="M20 20 Q20 0 0 0" fill="none" stroke="currentColor" strokeWidth="1.5"/>
+                        </svg>
+                      </div>
+
+                      {/* Title - centered vertically in middle section */}
+                      <div className="absolute top-[140px] bottom-[240px] left-0 right-0 flex items-center justify-center px-3">
                         <div
-                          className={`text-white font-bold text-sm leading-tight tracking-[0.14em] drop-shadow-xl text-center ${
+                          className={`text-white font-bold text-[11px] leading-tight tracking-[0.2em] drop-shadow-lg text-center ${
                             language === 'ar' ? '' : 'uppercase'
                           }`}
                           style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
-                          title={platform.title}
                         >
                           {platform.title}
                         </div>
                       </div>
+
+                      {/* Middle decorative pattern tile */}
+                      <div className="absolute top-1/2 -translate-y-1/4 left-2 right-2 h-[100px] rounded-md overflow-hidden border border-[#C9984F]/40">
+                        <img 
+                          src={platform.image}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-transparent to-[#7B1E1E]/20" />
+                      </div>
+
+                      {/* Bottom decorative pattern tile */}
+                      <div className="absolute bottom-3 left-2 right-2 h-[100px] rounded-md overflow-hidden border border-[#C9984F]/40">
+                        <img 
+                          src={platform.image}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#7B1E1E]/20" />
+                      </div>
+
+                      {/* Spine binding lines */}
+                      <div className="absolute top-0 left-0 w-[3px] h-full bg-gradient-to-r from-black/30 to-transparent" />
+                      <div className="absolute top-0 right-0 w-[2px] h-full bg-gradient-to-l from-black/20 to-transparent" />
                       
-                      {/* Book edge highlight */}
-                      <div className="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-black/30 to-transparent" />
+                      {/* Inner gold border */}
+                      <div className="absolute inset-1 border border-[#C9984F]/30 rounded-[3px] pointer-events-none" />
                     </div>
-                    
-                    {/* Book top edge (visible when hovering) */}
-                    <div className={`absolute -top-1 inset-x-0 h-2 bg-gradient-to-r ${bookColors[index]} opacity-0 group-hover:opacity-100 transition-opacity rounded-t-sm`} />
                   </div>
                 );
               })}
