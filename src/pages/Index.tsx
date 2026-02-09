@@ -156,7 +156,7 @@ const Index = () => {
               </h1>
               
               {/* Text medium - Description */}
-              <p className="bnrm-hero-subtitle text-white/90 mb-4 sm:mb-6 md:mb-8 max-w-full sm:max-w-lg md:max-w-xl">
+              <p className="text-white/90 mb-4 sm:mb-6 md:mb-8 max-w-full sm:max-w-lg md:max-w-xl" style={{ fontFamily: 'Roboto, sans-serif', fontWeight: 600, fontSize: 16, lineHeight: '150%' }}>
                 {heroSubtitle}
               </p>
               
