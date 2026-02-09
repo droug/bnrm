@@ -139,13 +139,12 @@ const Index = () => {
               <span
                 className="inline-block uppercase tracking-widest text-white text-sm font-semibold mb-2 sm:mb-4 whitespace-nowrap"
                 style={{
-                  width: 257,
+                  paddingInline: 20,
                   height: 42,
                   lineHeight: '42px',
                   borderRadius: 10,
                   background: 'rgba(30, 58, 138, 0.37)',
                   border: '1px solid rgba(30, 58, 138, 0.53)',
-                  textAlign: 'center',
                 }}
               >
                 {t('portal.hero.tagline')}
