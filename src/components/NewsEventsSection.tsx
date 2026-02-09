@@ -79,9 +79,9 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
         <div className="bg-[#1e3a8a] text-white px-8 py-8 rounded-lg mb-8">
           <div className="flex items-start justify-between">
             <div>
-              <p className="uppercase tracking-widest mb-2" style={{ fontFamily: 'Lato, sans-serif', fontSize: '14.17px', lineHeight: '150%', fontWeight: 600, color: '#93C5FD' }}>
+              <span className="inline-block uppercase tracking-widest mb-2" style={{ fontFamily: 'Lato, sans-serif', fontSize: '14.17px', lineHeight: '26.57px', fontWeight: 600, background: '#BFDBFE', borderRadius: 3, width: 88.56, height: 26.57, textAlign: 'center', color: '#172554' }}>
                 BNRM
-              </p>
+              </span>
               <h2 className="bnrm-section-title text-white mb-4">
                 {t('portal.newsEvents.title')}
               </h2>
