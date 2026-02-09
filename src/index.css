@@ -621,18 +621,14 @@ Enhanced Moroccan Heritage Design System
     border-radius: 9999px;
   }
 
-  /* Section Subtitle - Inter, 16px, regular */
+  /* Section Subtitle - Inter, 20px, regular */
   .bnrm-section-subtitle {
     font-family: 'Inter', system-ui, sans-serif;
-    font-size: 0.9375rem;
-    line-height: 1.6;
+    font-size: 20px;
+    line-height: 140%;
     font-weight: 400;
+    letter-spacing: -0.01em;
     color: hsl(var(--muted-foreground));
-  }
-  @media (min-width: 768px) {
-    .bnrm-section-subtitle {
-      font-size: 1rem;
-    }
   }
 
   /* Navigation Menu Items - Inter, 14px, medium */
