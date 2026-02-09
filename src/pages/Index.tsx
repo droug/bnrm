@@ -136,9 +136,20 @@ const Index = () => {
           <div className="relative z-10 container mx-auto px-4 sm:px-6 h-full flex items-center min-h-[50vh] sm:min-h-[60vh] md:min-h-[70vh]">
             <div className="max-w-full sm:max-w-xl md:max-w-2xl">
               {/* Tagline */}
-              <p className="bnrm-caption uppercase tracking-widest text-blue-primary-light mb-2 sm:mb-4">
+              <span
+                className="inline-block uppercase tracking-widest text-white text-sm font-semibold mb-2 sm:mb-4"
+                style={{
+                  width: 257,
+                  height: 42,
+                  lineHeight: '42px',
+                  borderRadius: 10,
+                  background: 'rgba(30, 58, 138, 0.37)',
+                  border: '1px solid rgba(30, 58, 138, 0.53)',
+                  textAlign: 'center',
+                }}
+              >
                 {t('portal.hero.tagline')}
-              </p>
+              </span>
               
               {/* Heading 2 - Main title - Responsive font sizes */}
               <h1 className="bnrm-hero-title text-white mb-3 sm:mb-4 md:mb-6 leading-tight">
