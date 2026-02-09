@@ -723,10 +723,10 @@ Enhanced Moroccan Heritage Design System
     }
   }
 
-  /* Hero Title - Inter, Semi Bold, Heading 2 */
+  /* Hero Title - Inter SemiBold 52px */
   .bnrm-hero-title {
     font-family: 'Inter', sans-serif;
-    font-size: 1.875rem;
+    font-size: 2rem;
     line-height: 120%;
     font-weight: 600;
     font-style: normal;
@@ -735,16 +735,16 @@ Enhanced Moroccan Heritage Design System
   }
   @media (min-width: 768px) {
     .bnrm-hero-title {
-      font-size: 2.25rem;
+      font-size: 3.25rem; /* 52px */
     }
   }
 
-  /* Hero Subtitle - Roboto, 16px, SemiBold */
+  /* Hero Subtitle - Inter Medium 16px */
   .bnrm-hero-subtitle {
-    font-family: 'Roboto', sans-serif;
-    font-size: 1rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem; /* 16px */
     line-height: 150%;
-    font-weight: 600;
+    font-weight: 500;
     font-style: normal;
     letter-spacing: 0;
   }
