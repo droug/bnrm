@@ -110,9 +110,9 @@ export const BNRMTooltip: React.FC<BNRMTooltipProps> = ({
   };
 
   const arrowVariantClasses = {
-    blue: "bg-blue-primary-dark border-l border-b border-blue-primary/30",
-    gold: "bg-gradient-to-br from-amber-50 to-orange-50 border-l-2 border-b-2 border-amber-400/30",
-    gradient: "bg-slate-900 border-l border-b border-blue-primary/20"
+    blue: "bg-blue-primary-dark",
+    gold: "bg-amber-50",
+    gradient: "bg-slate-900"
   };
 
   const iconBgClasses = {
@@ -142,21 +142,6 @@ export const BNRMTooltip: React.FC<BNRMTooltipProps> = ({
     }
   };
 
-  const getArrowStyle = () => {
-    switch (adjustedSide) {
-      case 'right':
-        return { left: '-6px', top: '50%', transform: 'translateY(-50%) rotate(45deg)' };
-      case 'left':
-        return { right: '-6px', top: '50%', transform: 'translateY(-50%) rotate(-135deg)' };
-      case 'top':
-        return { bottom: '-6px', left: '50%', transform: 'translateX(-50%) rotate(-45deg)' };
-      case 'bottom':
-        return { top: '-6px', left: '50%', transform: 'translateX(-50%) rotate(135deg)' };
-      default:
-        return {};
-    }
-  };
-
   const tooltipContent = isVisible && (
     <div
       onMouseEnter={showTooltip}
@@ -170,7 +155,7 @@ export const BNRMTooltip: React.FC<BNRMTooltipProps> = ({
       }}
       className={cn(
         "min-w-[240px] max-w-[320px] p-4 rounded-xl shadow-2xl",
-        "animate-in fade-in-0 zoom-in-95 duration-200",
+        "transition-opacity duration-150",
         variantClasses[variant]
       )}
     >
@@ -211,30 +196,6 @@ export const BNRMTooltip: React.FC<BNRMTooltipProps> = ({
           )}
         </div>
       </div>
-      
-      {/* Decorative sparkle for gold */}
-      {variant === 'gold' && (
-        <div className="absolute -top-1 -right-1 w-3 h-3">
-          <div className="absolute inset-0 bg-amber-500 rounded-full animate-ping opacity-40" />
-          <div className="absolute inset-0.5 bg-amber-500 rounded-full" />
-        </div>
-      )}
-      
-      {/* Decorative sparkle for blue */}
-      {variant === 'blue' && (
-        <div className="absolute -top-1 -right-1 w-2.5 h-2.5">
-          <div className="absolute inset-0 bg-white rounded-full animate-pulse opacity-60" />
-        </div>
-      )}
-      
-      {/* Arrow */}
-      <div
-        style={getArrowStyle()}
-        className={cn(
-          "absolute w-3 h-3",
-          arrowVariantClasses[variant]
-        )}
-      />
     </div>
   );
 
