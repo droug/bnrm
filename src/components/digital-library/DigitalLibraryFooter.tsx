@@ -22,6 +22,9 @@ import logoDigitalLibrary from "@/assets/FINAL_LOGO_3.png";
 interface FooterLink {
   title_fr: string;
   title_ar: string;
+  title_en?: string;
+  title_es?: string;
+  title_amz?: string;
   href: string;
   external?: boolean;
 }
@@ -69,11 +72,11 @@ const defaultSettings: FooterSettings = {
       title_fr: "Liens rapides",
       title_ar: "روابط سريعة",
       links: [
-        { title_fr: "Portail BNRM", title_ar: "بوابة المكتبة الوطنية", href: "/" },
-        { title_fr: "Plateforme Manuscrits", title_ar: "منصة المخطوطات", href: "/manuscripts" },
-        { title_fr: "Plateforme Kitab", title_ar: "منصة كتاب", href: "/kitab" },
-        { title_fr: "Plateforme Activités culturelles", title_ar: "منصة الأنشطة الثقافية", href: "/activites-culturelles" },
-        { title_fr: "Plateforme CBM", title_ar: "منصة الفهرس البيبليوغرافي", href: "/portail-cbm" }
+        { title_fr: "Portail BNRM", title_ar: "بوابة المكتبة الوطنية", title_en: "BNRM Portal", title_es: "Portal BNRM", title_amz: "ⴰⵖⵔⴰⴱ BNRM", href: "/" },
+        { title_fr: "Plateforme Manuscrits", title_ar: "منصة المخطوطات", title_en: "Manuscripts Platform", title_es: "Plataforma Manuscritos", title_amz: "ⴰⵙⵓⵔⵉⴼ ⵏ ⵉⵎⵙⴽⵜⴰⵢⵏ", href: "/manuscripts" },
+        { title_fr: "Plateforme Kitab", title_ar: "منصة كتاب", title_en: "Kitab Platform", title_es: "Plataforma Kitab", title_amz: "ⴰⵙⵓⵔⵉⴼ Kitab", href: "/kitab" },
+        { title_fr: "Plateforme Activités culturelles", title_ar: "منصة الأنشطة الثقافية", title_en: "Cultural Activities Platform", title_es: "Plataforma Actividades culturales", title_amz: "ⴰⵙⵓⵔⵉⴼ ⵏ ⵉⵎⵓⵙⵙⵓⵜⵏ ⵉⴷⵍⵙⴰⵏⵏ", href: "/activites-culturelles" },
+        { title_fr: "Plateforme CBM", title_ar: "منصة الفهرس البيبليوغرافي", title_en: "CBM Platform", title_es: "Plataforma CBM", title_amz: "ⴰⵙⵓⵔⵉⴼ CBM", href: "/portail-cbm" }
       ]
     },
     {
@@ -81,9 +84,9 @@ const defaultSettings: FooterSettings = {
       title_fr: "Réservoirs mondiaux",
       title_ar: "الخزانات العالمية",
       links: [
-        { title_fr: "Réseau Francophone Numérique", title_ar: "الشبكة الفرنكوفونية الرقمية", href: "https://rfnum.org", external: true },
-        { title_fr: "Patrimoine culturel numérique européen", title_ar: "التراث الثقافي الرقمي الأوروبي", href: "https://www.europeana.eu", external: true },
-        { title_fr: "World Digital Library", title_ar: "المكتبة الرقمية العالمية", href: "https://www.loc.gov/collections/world-digital-library", external: true }
+        { title_fr: "Réseau Francophone Numérique", title_ar: "الشبكة الفرنكوفونية الرقمية", title_en: "Francophone Digital Network", title_es: "Red Francófona Digital", title_amz: "ⴰⵥⴻⵟⵟⴰ ⴰⴼⵔⴰⵏⴽⵓⴼⵓⵏ ⴰⵏⵓⵎⴰⵏ", href: "https://rfnum.org", external: true },
+        { title_fr: "Patrimoine culturel numérique européen", title_ar: "التراث الثقافي الرقمي الأوروبي", title_en: "European Digital Cultural Heritage", title_es: "Patrimonio cultural digital europeo", title_amz: "ⴰⵢⴷⴰ ⴰⴷⵍⵙⴰⵏ ⴰⵏⵓⵎⴰⵏ ⴰⵡⵕⵓⴱⴱⵉ", href: "https://www.europeana.eu", external: true },
+        { title_fr: "World Digital Library", title_ar: "المكتبة الرقمية العالمية", title_en: "World Digital Library", title_es: "Biblioteca Digital Mundial", title_amz: "ⵜⴰⵙⴷⵍⵉⵙⵜ ⵜⴰⵏⵓⵎⴰⵏⵜ ⵜⴰⵎⴰⴹⵍⴰⵏⵜ", href: "https://www.loc.gov/collections/world-digital-library", external: true }
       ]
     },
     {
@@ -91,8 +94,8 @@ const defaultSettings: FooterSettings = {
       title_fr: "Aide et support",
       title_ar: "المساعدة والدعم",
       links: [
-        { title_fr: "Aide et FAQ", title_ar: "المساعدة والأسئلة الشائعة", href: "/digital-library/help" },
-        { title_fr: "Guide d'utilisation", title_ar: "دليل الاستخدام", href: "/digital-library/help#guide" }
+        { title_fr: "Aide et FAQ", title_ar: "المساعدة والأسئلة الشائعة", title_en: "Help & FAQ", title_es: "Ayuda y FAQ", title_amz: "ⵜⴰⵡⵉⵙⵉ ⴷ FAQ", href: "/digital-library/help" },
+        { title_fr: "Guide d'utilisation", title_ar: "دليل الاستخدام", title_en: "User Guide", title_es: "Guía de uso", title_amz: "ⴰⵎⵔⵙⵉ ⵏ ⵓⵙⵎⵔⵙ", href: "/digital-library/help#guide" }
       ]
     }
   ],
@@ -111,10 +114,10 @@ const defaultSettings: FooterSettings = {
     hours_ar: "الإثنين - الجمعة: 9:00 - 18:00 | السبت: 9:00 - 13:00"
   },
   legal_links: [
-    { title_fr: "Conditions d'utilisation", title_ar: "شروط الاستخدام", href: "#conditions" },
-    { title_fr: "Mentions légales", title_ar: "الإشعارات القانونية", href: "#mentions" },
-    { title_fr: "Politique de confidentialité", title_ar: "سياسة الخصوصية", href: "#confidentialite" },
-    { title_fr: "Accessibilité", title_ar: "إمكانية الوصول", href: "#accessibilite" }
+    { title_fr: "Conditions d'utilisation", title_ar: "شروط الاستخدام", title_en: "Terms of Use", title_es: "Condiciones de uso", title_amz: "ⵜⵉⵡⵜⵉⵍⵉⵏ ⵏ ⵓⵙⵎⵔⵙ", href: "#conditions" },
+    { title_fr: "Mentions légales", title_ar: "الإشعارات القانونية", title_en: "Legal Notice", title_es: "Aviso legal", title_amz: "ⵉⵏⵏⴰⵏ ⵉⵣⵔⴼⴰⵏⵏ", href: "#mentions" },
+    { title_fr: "Politique de confidentialité", title_ar: "سياسة الخصوصية", title_en: "Privacy Policy", title_es: "Política de privacidad", title_amz: "ⵜⴰⵙⵔⵜⵉⵜ ⵏ ⵜⵉⵏⵏⵓⵜⵍⴰ", href: "#confidentialite" },
+    { title_fr: "Accessibilité", title_ar: "إمكانية الوصول", title_en: "Accessibility", title_es: "Accesibilidad", title_amz: "ⴰⵏⴼⴰⴷ", href: "#accessibilite" }
   ],
   copyright_fr: "Bibliothèque Numérique du Maroc - Ibn Battuta",
   copyright_ar: "المكتبة الرقمية للمغرب - ابن بطوطة"
@@ -138,10 +141,16 @@ const DigitalLibraryFooter = () => {
     return map[language] || fr;
   };
 
-  // Helper for CMS link titles (only have fr/ar, fallback for other langs)
+  // Helper for link titles with full multilingual support
   const linkText = (link: FooterLink) => {
-    if (language === 'ar') return link.title_ar || link.title_fr;
-    return link.title_fr;
+    const map: Record<string, string | undefined> = {
+      fr: link.title_fr,
+      ar: link.title_ar,
+      en: link.title_en,
+      es: link.title_es,
+      amz: link.title_amz,
+    };
+    return map[language] || link.title_fr;
   };
 
   // Fetch footer settings from CMS
@@ -217,7 +226,13 @@ const DigitalLibraryFooter = () => {
             </div>
             
             <p className="text-sm opacity-90 leading-relaxed mb-4">
-              {ml(settings.description_fr, settings.description_ar, settings.description_fr, settings.description_fr)}
+              {ml(
+                settings.description_fr,
+                settings.description_ar,
+                "Digital Library of Morocco - Ibn Battuta. A digital platform providing access to Moroccan written heritage: manuscripts, periodicals and rare documents.",
+                "Biblioteca Digital de Marruecos - Ibn Battuta. Plataforma digital que da acceso al patrimonio escrito marroquí: manuscritos, periódicos y documentos raros.",
+                "ⵜⴰⵙⴷⵍⵉⵙⵜ ⵜⴰⵏⵓⵎⴰⵏⵜ ⵏ ⵍⵎⵖⵔⵉⴱ - ⵉⴱⵏ ⴱⴰⵟⵟⵓⵟⴰ. ⴰⵙⵓⵔⵉⴼ ⴰⵏⵓⵎⴰⵏ ⵏ ⵓⵢⴷⴰ ⴰⵎⵉⵔⴰ ⴰⵎⵖⵔⵉⴱⵉ."
+              )}
             </p>
             
             <div className="flex items-center space-x-3 mt-auto">
@@ -324,7 +339,7 @@ const DigitalLibraryFooter = () => {
               <div className="flex items-start space-x-3">
                 <MapPin className="h-4 w-4 mt-1 flex-shrink-0 text-gold-bn-primary" />
                 <p className="text-sm opacity-80 leading-relaxed">
-                  {ml(settings.contact.address_fr, settings.contact.address_ar, settings.contact.address_fr, settings.contact.address_fr)}
+                  {ml(settings.contact.address_fr, settings.contact.address_ar, "Ibn Battouta Avenue, Rabat, Morocco", "Avenida Ibn Battouta, Rabat, Marruecos", "ⴰⴱⵔⵉⴷ ⵏ ⵉⴱⵏ ⴱⴰⵟⵟⵓⵟⴰ, ⵕⵕⴱⴰⵟ, ⵍⵎⵖⵔⵉⴱ")}
                 </p>
               </div>
               <div className="flex items-center space-x-3">
@@ -338,7 +353,7 @@ const DigitalLibraryFooter = () => {
               <div className="flex items-start space-x-3">
                 <Clock className="h-4 w-4 mt-1 flex-shrink-0 text-gold-bn-primary" />
                 <p className="text-sm opacity-80">
-                  {ml(settings.contact.hours_fr, settings.contact.hours_ar, settings.contact.hours_fr, settings.contact.hours_fr)}
+                  {ml(settings.contact.hours_fr, settings.contact.hours_ar, "Mon - Fri: 9:00 AM - 6:00 PM | Sat: 9:00 AM - 1:00 PM", "Lun - Vie: 9:00 - 18:00 | Sáb: 9:00 - 13:00", "ⴰⵢⵏⴰⵙ - ⴰⵙⵉⵎⵡⴰⵙ: 9:00 - 18:00 | ⴰⵙⵉⴹⵢⴰⵙ: 9:00 - 13:00")}
                 </p>
               </div>
             </div>
@@ -408,7 +423,7 @@ const DigitalLibraryFooter = () => {
           {/* Copyright */}
           <div className="text-center">
             <p className="text-sm opacity-80">
-              © {currentYear} {ml(settings.copyright_fr, settings.copyright_ar, settings.copyright_fr, settings.copyright_fr)}. {ml('Tous droits réservés.', 'جميع الحقوق محفوظة.', 'All rights reserved.', 'Todos los derechos reservados.', 'ⵎⴰⵕⵕⴰ ⵉⵣⵔⴼⴰⵏ ⵜⵜⵓⵃⵟⵟⵓⵏ.')}
+              © {currentYear} {ml(settings.copyright_fr, settings.copyright_ar, "Digital Library of Morocco - Ibn Battuta", "Biblioteca Digital de Marruecos - Ibn Battuta", "ⵜⴰⵙⴷⵍⵉⵙⵜ ⵜⴰⵏⵓⵎⴰⵏⵜ ⵏ ⵍⵎⵖⵔⵉⴱ - ⵉⴱⵏ ⴱⴰⵟⵟⵓⵟⴰ")}. {ml('Tous droits réservés.', 'جميع الحقوق محفوظة.', 'All rights reserved.', 'Todos los derechos reservados.', 'ⵎⴰⵕⵕⴰ ⵉⵣⵔⴼⴰⵏ ⵜⵜⵓⵃⵟⵟⵓⵏ.')}
             </p>
           </div>
         </div>
