@@ -175,7 +175,10 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Platforms Section - Right under hero */}
+        {/* Spacer between Hero and Platforms */}
+        <div className="h-12 sm:h-16 md:h-20 bg-background" />
+
+        {/* Platforms Section */}
         <PlatformsSection language={language} />
         
         {/* Main Content - Mobile First */}
