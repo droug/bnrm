@@ -499,10 +499,28 @@ export default function DigitalLibraryHome() {
           {/* Hero Title & Subtitle */}
           <div className="text-center pt-16 pb-6">
             <h1 className="font-inter text-[36px] font-bold leading-[160%] tracking-normal text-center uppercase text-white mb-3 animate-fade-in drop-shadow-lg">
-              BIBLIOTHÈQUE NUMÉRIQUE MAROCAINE
+              {(() => {
+                const titles: Record<string, string> = {
+                  fr: 'BIBLIOTHÈQUE NUMÉRIQUE MAROCAINE',
+                  ar: 'المكتبة الرقمية المغربية',
+                  en: 'MOROCCAN DIGITAL LIBRARY',
+                  es: 'BIBLIOTECA DIGITAL MARROQUÍ',
+                  amz: 'ⵜⴰⵙⴷⵍⵉⵙⵜ ⵜⴰⵏⵓⵎⴰⵏⵜ ⵜⴰⵎⵖⵔⵉⴱⵉⵜ'
+                };
+                return titles[language] || titles.fr;
+              })()}
             </h1>
             <p className="text-base md:text-lg text-white/90 max-w-3xl mx-auto animate-fade-in drop-shadow-md">
-              Plongez dans nos collections riches et diversifiées de documents historiques
+              {(() => {
+                const subtitles: Record<string, string> = {
+                  fr: 'Plongez dans nos collections riches et diversifiées de documents historiques',
+                  ar: 'استكشف مجموعاتنا الغنية والمتنوعة من الوثائق التاريخية',
+                  en: 'Explore our rich and diverse collections of historical documents',
+                  es: 'Sumérjase en nuestras ricas y diversas colecciones de documentos históricos',
+                  amz: 'ⵙⵙⵓⴷⵓ ⵜⵉⴳⵔⴰⵡⵉⵏ ⵏⵏⵖ ⵜⵉⵖⵣⵣⵉⴼⵉⵏ ⵏ ⵉⵙⴽⴽⵉⵍⵏ ⵉⵎⵣⵔⵓⵢⵏ'
+                };
+                return subtitles[language] || subtitles.fr;
+              })()}
             </p>
           </div>
 
@@ -512,7 +530,7 @@ export default function DigitalLibraryHome() {
               <div className="flex items-center pl-5 text-gray-400">
                 <Icon name="mdi:magnify" className="w-5 h-5" />
               </div>
-              <input type="text" placeholder="Rechercher parmi 50,000+ documents..." className="flex-1 px-4 py-3.5 text-base bg-transparent outline-none text-gray-800 placeholder:text-gray-400" onKeyDown={e => {
+              <input type="text" placeholder={({ fr: 'Rechercher parmi 50,000+ documents...', ar: 'البحث في أكثر من 50,000 وثيقة...', en: 'Search among 50,000+ documents...', es: 'Buscar entre más de 50.000 documentos...', amz: 'ⵔⵣⵓ ⴳ ⵓⴳⴳⴰⵔ ⵏ 50,000 ⵏ ⵓⵙⴽⴽⵉⵍ...' } as Record<string, string>)[language] || 'Rechercher parmi 50,000+ documents...'} className="flex-1 px-4 py-3.5 text-base bg-transparent outline-none text-gray-800 placeholder:text-gray-400" onKeyDown={e => {
               if (e.key === 'Enter') {
                 const value = (e.target as HTMLInputElement).value;
                 if (value.trim()) {
@@ -526,7 +544,7 @@ export default function DigitalLibraryHome() {
                 navigate(`/digital-library/search?q=${encodeURIComponent(input.value.trim())}`);
               }
             }}>
-                Rechercher
+                {({ fr: 'Rechercher', ar: 'بحث', en: 'Search', es: 'Buscar', amz: 'ⵔⵣⵓ' } as Record<string, string>)[language] || 'Rechercher'}
               </button>
             </div>
           </div>
@@ -591,7 +609,7 @@ export default function DigitalLibraryHome() {
                                     }
                                   }}
                                 >
-                                  En savoir plus
+                                   {({ fr: 'En savoir plus', ar: 'اقرأ المزيد', en: 'Learn more', es: 'Saber más', amz: 'ⵉⵙⵉⵏ ⵓⴳⴳⴰⵔ' } as Record<string, string>)[language] || 'En savoir plus'}
                                   <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                                     <path d="M5 12h14M12 5l7 7-7 7" />
                                   </svg>
@@ -660,7 +678,7 @@ export default function DigitalLibraryHome() {
                               </p>
                               <div className="pt-3">
                                 <button className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded text-gold-bn-primary text-sm font-medium transition-all group" onClick={() => handleConsultDocument(item)}>
-                                  En savoir plus
+                                  {({ fr: 'En savoir plus', ar: 'اقرأ المزيد', en: 'Learn more', es: 'Saber más', amz: 'ⵉⵙⵉⵏ ⵓⴳⴳⴰⵔ' } as Record<string, string>)[language] || 'En savoir plus'}
                                   <Icon name="mdi:arrow-right" className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                 </button>
                               </div>
@@ -757,10 +775,18 @@ export default function DigitalLibraryHome() {
               </div>
               
               <h2 className="text-[48px] font-normal text-white font-gilda">
-                {language === 'ar' ? vexpoHeroSettings?.title_ar || 'معارض افتراضية' : vexpoHeroSettings?.title_fr || 'Expositions Virtuelles'}
+                {(() => {
+                  const fallbacks: Record<string, string> = { fr: 'Expositions Virtuelles', ar: 'معارض افتراضية', en: 'Virtual Exhibitions', es: 'Exposiciones Virtuales', amz: 'ⵜⵉⵙⵎⵖⵓⵔⵉⵏ ⵜⵉⵎⵙⵍⵉⵏ' };
+                  if (language === 'ar') return vexpoHeroSettings?.title_ar || fallbacks.ar;
+                  return vexpoHeroSettings?.title_fr || fallbacks[language] || fallbacks.fr;
+                })()}
               </h2>
               <p className="font-body text-regular text-white/80 max-w-2xl mx-auto mt-4">
-                {language === 'ar' ? vexpoHeroSettings?.subtitle_ar || 'استكشف تاريخ وتراث المغرب من خلال معارضنا التفاعلية' : vexpoHeroSettings?.subtitle_fr || 'Explorez l\'histoire et le patrimoine du Maroc à travers nos expositions interactives'}
+                {(() => {
+                  const fallbacks: Record<string, string> = { fr: "Explorez l'histoire et le patrimoine du Maroc à travers nos expositions interactives", ar: 'استكشف تاريخ وتراث المغرب من خلال معارضنا التفاعلية', en: 'Explore the history and heritage of Morocco through our interactive exhibitions', es: 'Explore la historia y el patrimonio de Marruecos a través de nuestras exposiciones interactivas', amz: 'ⵙⵙⵓⴷⵓ ⴰⵎⵣⵔⵓⵢ ⴷ ⵓⵢⴷⴰ ⵏ ⵍⵎⵖⵔⵉⴱ ⵙ ⵜⵙⵎⵖⵓⵔⵉⵏ ⵏⵏⵖ' };
+                  if (language === 'ar') return vexpoHeroSettings?.subtitle_ar || fallbacks.ar;
+                  return vexpoHeroSettings?.subtitle_fr || fallbacks[language] || fallbacks.fr;
+                })()}
               </p>
             </div>
 
@@ -815,7 +841,7 @@ export default function DigitalLibraryHome() {
                                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-4">
                                   <Button className="bg-gradient-to-r from-gold-bn-primary to-gold-bn-primary-dark hover:from-gold-bn-primary-dark hover:to-gold-bn-deep text-white shadow-lg shadow-gold-bn-primary/25 group-hover:shadow-gold-bn-primary/40 transition-all duration-300">
                                     <Eye className="h-4 w-4 mr-2" />
-                                    {language === 'ar' ? 'زيارة المعرض' : 'Visiter l\'exposition'}
+                                    {({ fr: "Visiter l'exposition", ar: 'زيارة المعرض', en: 'Visit exhibition', es: 'Visitar la exposición', amz: 'ⵔⵣⵓ ⵜⴰⵙⵎⵖⵓⵔⵜ' } as Record<string, string>)[language] || "Visiter l'exposition"}
                                   </Button>
                                 </div>
                               </div>
@@ -869,10 +895,10 @@ export default function DigitalLibraryHome() {
               </div>
 
               <h2 className="text-[48px] font-normal text-foreground font-gilda">
-                Ressources électroniques
+                {({ fr: 'Ressources électroniques', ar: 'الموارد الإلكترونية', en: 'Electronic Resources', es: 'Recursos electrónicos', amz: 'ⵜⵉⵖⴱⴰⵍⵓⵜⵉⵏ ⵜⵉⵍⵉⴽⵜⵕⵓⵏⵉⵢⵉⵏ' } as Record<string, string>)[language] || 'Ressources électroniques'}
               </h2>
               <p className="font-body text-regular text-foreground max-w-2xl mx-auto mt-4">
-                Ces ressources permettent la centralisation et le partage du patrimoine documentaire et culturel à l'échelle internationale
+                {({ fr: 'Ces ressources permettent la centralisation et le partage du patrimoine documentaire et culturel à l\'échelle internationale', ar: 'تتيح هذه الموارد مركزة ومشاركة التراث الوثائقي والثقافي على المستوى الدولي', en: 'These resources enable the centralization and sharing of documentary and cultural heritage internationally', es: 'Estos recursos permiten la centralización y el intercambio del patrimonio documental y cultural a escala internacional', amz: 'ⵜⵉⵖⴱⴰⵍⵓⵜⵉⵏ ⴰⴷ ⴰⵔ ⵜⵜⴰⵊⵊⴰⵏⵜ ⴰⵙⵎⵓⵏ ⴷ ⵓⴱⵟⵟⵓ ⵏ ⵓⵢⴷⴰ ⴰⵙⴽⴽⵉⵍⴰⵏ ⴷ ⵓⴷⵍⵙⴰⵏ ⴳ ⵓⵙⵡⵉⵔ ⴰⵎⴰⴹⵍⴰⵏ' } as Record<string, string>)[language] || 'Ces ressources permettent la centralisation et le partage du patrimoine documentaire et culturel à l\'échelle internationale'}
               </p>
             </div>
 
