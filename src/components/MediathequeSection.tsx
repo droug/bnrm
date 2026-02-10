@@ -108,6 +108,11 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
     setPlayingVideo(youtubeId);
   };
 
+  const ml = (fr: string, ar: string, en: string, es: string) => {
+    const map: Record<string, string> = { fr, ar, en, es };
+    return map[language] || fr;
+  };
+
   const getTitle = (video: MediathequeVideo) => {
     return language === 'ar' ? (video.title_ar || video.title_fr) : video.title_fr;
   };
@@ -125,7 +130,7 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
           
           {/* Title */}
           <h2 className="bnrm-section-title text-white mb-4">
-            {language === 'ar' ? 'الوسائط المتعددة' : 'Médiathèque'}
+            {ml('Médiathèque', 'الوسائط المتعددة', 'Media Library', 'Mediateca')}
           </h2>
           
           {/* Underline */}
@@ -133,10 +138,12 @@ export const MediathequeSection = ({ language }: MediathequeSectionProps) => {
           
           {/* Description */}
           <p className="bnrm-body-text text-white/80 max-w-2xl">
-            {language === 'ar' 
-              ? 'استكشف مجموعاتنا الصوتية والمرئية الغنية'
-              : 'Explorez nos riches collections audiovisuelles et multimédias'
-            }
+            {ml(
+              'Explorez nos riches collections audiovisuelles et multimédias',
+              'استكشف مجموعاتنا الصوتية والمرئية الغنية',
+              'Explore our rich audiovisual and multimedia collections',
+              'Explore nuestras ricas colecciones audiovisuales y multimedia'
+            )}
           </p>
         </div>
 
