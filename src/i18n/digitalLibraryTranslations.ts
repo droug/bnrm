@@ -48,7 +48,7 @@ export const digitalLibraryTranslations = {
     'dl.collections.periodicals.tooltip': 'Journaux historiques, revues scientifiques, magazines et bulletins officiels',
     'dl.collections.specialized': 'Collections spécialisées',
     'dl.collections.specialized.desc': 'Documents iconographiques',
-    'dl.collections.specialized.tooltip': 'Documents cartographiques, Documents iconographiques et Œuvres d\'art',
+    'dl.collections.specialized.tooltip': 'Documents cartographiques, iconographiques, Objets, Images fixes, Médailles et Antiques',
     'dl.collections.audiovisual': 'Documents Audio-visuels',
     'dl.collections.audiovisual.desc': 'Archives sonores et vidéos',
     'dl.collections.audiovisual.tooltip': 'Enregistrements sonores, films, vidéos et archives radiophoniques',
