@@ -31,8 +31,8 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
   const isKitabPage = location.pathname.startsWith('/kitab') || forceKitabStyle;
 
   // Multilingual helper
-  const ml = (fr: string, ar: string, en: string, es: string) => {
-    const map: Record<string, string> = { fr, ar, en, es };
+  const ml = (fr: string, ar: string, en: string, es: string, amz?: string) => {
+    const map: Record<string, string> = { fr, ar, en, es, amz: amz || fr };
     return map[language] || fr;
   };
 
@@ -44,7 +44,8 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
         "Veuillez entrer une adresse email valide",
         "يرجى إدخال عنوان بريد إلكتروني صالح",
         "Please enter a valid email address",
-        "Por favor, introduzca una dirección de correo electrónico válida"
+        "Por favor, introduzca una dirección de correo electrónico válida",
+        "ⵙⵙⴽⵜⵉ ⵢⴰⵜ ⵜⴰⵏⵙⴰ ⵏ ⵉⵎⴰⵢⵍ ⵉⵖⵓⴷⴰⵏ"
       ));
       return;
     }
@@ -62,7 +63,8 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
         "Merci pour votre abonnement !",
         "شكراً لاشتراكك!",
         "Thank you for subscribing!",
-        "¡Gracias por su suscripción!"
+        "¡Gracias por su suscripción!",
+        "ⵜⴰⵏⵎⵎⵉⵔⵜ ⵖⴼ ⵓⵎⵜⵜⴰⵡ ⵏⵏⴽ!"
       ));
       setEmail("");
     } catch (error) {
@@ -71,7 +73,8 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
         "Erreur lors de l'abonnement. Veuillez réessayer.",
         "خطأ أثناء الاشتراك. يرجى المحاولة مرة أخرى.",
         "Subscription error. Please try again.",
-        "Error durante la suscripción. Por favor, inténtelo de nuevo."
+        "Error durante la suscripción. Por favor, inténtelo de nuevo.",
+        "ⵜⴰⵣⴳⵍⵜ ⴳ ⵓⵎⵜⵜⴰⵡ. ⴰⵍⵙ ⵜⴰⵔⵎⵉⵜ."
       ));
     } finally {
       setIsSubscribing(false);
@@ -79,33 +82,33 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
   };
 
   const quickLinks = [
-    { label: ml("Catalogue", "الفهرس", "Catalogue", "Catálogo"), href: "#catalogue" },
-    { label: ml("Collections", "المجموعات", "Collections", "Colecciones"), href: "#collections" },
-    { label: ml("Horaires", "المواعيد", "Opening Hours", "Horarios"), href: "/practical-info" },
-    { label: ml("À propos", "حول", "About", "Acerca de"), href: "#inscription" },
-    { label: ml("Services", "الخدمات", "Services", "Servicios"), href: "#depot-legal" },
-    { label: ml("Contact", "اتصل بنا", "Contact", "Contacto"), href: "#contact" }
+    { label: ml("Catalogue", "الفهرس", "Catalogue", "Catálogo", "ⴰⴽⵜⴰⵍⵓⴳ"), href: "#catalogue" },
+    { label: ml("Collections", "المجموعات", "Collections", "Colecciones", "ⵜⵉⴳⵔⴰⵡⵉⵏ"), href: "#collections" },
+    { label: ml("Horaires", "المواعيد", "Opening Hours", "Horarios", "ⵜⵉⵙⵔⴰⴳⵉⵏ"), href: "/practical-info" },
+    { label: ml("À propos", "حول", "About", "Acerca de", "ⵖⴼ"), href: "#inscription" },
+    { label: ml("Services", "الخدمات", "Services", "Servicios", "ⵜⵉⵏⴰⴼⵓⵜⵉⵏ"), href: "#depot-legal" },
+    { label: ml("Contact", "اتصل بنا", "Contact", "Contacto", "ⴰⵎⵢⴰⵡⴰⴹ"), href: "#contact" }
   ];
 
   const legalLinks = [
-    { label: ml("Conditions d'utilisation", "شروط الاستخدام", "Terms of Use", "Condiciones de uso"), href: "#conditions" },
-    { label: ml("Mentions légales", "الإشعارات القانونية", "Legal Notice", "Aviso legal"), href: "#mentions" },
-    { label: ml("Flux RSS", "تغذية RSS", "RSS Feed", "Feed RSS"), href: "#rss" },
-    { label: ml("Confidentialité", "الخصوصية", "Privacy", "Privacidad"), href: "#confidentialite" }
+    { label: ml("Conditions d'utilisation", "شروط الاستخدام", "Terms of Use", "Condiciones de uso", "ⵜⵉⵡⵏⵏⴰⴹ ⵏ ⵓⵙⵎⵔⵙ"), href: "#conditions" },
+    { label: ml("Mentions légales", "الإشعارات القانونية", "Legal Notice", "Aviso legal", "ⵜⵉⵏⵏⴰⵢⵉⵏ ⵜⵉⵏⴰⵎⵓⵙⵉⵏ"), href: "#mentions" },
+    { label: ml("Flux RSS", "تغذية RSS", "RSS Feed", "Feed RSS", "ⴰⵙⵓⴷⴷⵓ RSS"), href: "#rss" },
+    { label: ml("Confidentialité", "الخصوصية", "Privacy", "Privacidad", "ⵜⵉⵏⵏⵓⵜⵍⴰ"), href: "#confidentialite" }
   ];
 
   const supportLinks = [
-    { label: ml("FAQ", "الأسئلة الشائعة", "FAQ", "Preguntas frecuentes"), href: "#faq" },
-    { label: ml("Règlements", "اللوائح", "Regulations", "Reglamentos"), href: "#reglements" },
-    { label: ml("Contacts", "الاتصالات", "Contacts", "Contactos"), href: "#contacts" },
-    { label: ml("Chatbot d'assistance", "روبوت المساعدة", "Support Chatbot", "Chatbot de asistencia"), href: "#chatbot" }
+    { label: ml("FAQ", "الأسئلة الشائعة", "FAQ", "Preguntas frecuentes", "ⵉⵙⵇⵙⵉⵜⵏ ⵉⵜⵜⵓⵙⵇⵙⴰⵏ"), href: "#faq" },
+    { label: ml("Règlements", "اللوائح", "Regulations", "Reglamentos", "ⵉⵙⵍⴳⵏ"), href: "#reglements" },
+    { label: ml("Contacts", "الاتصالات", "Contacts", "Contactos", "ⵉⵎⵢⴰⵡⴰⴹⵏ"), href: "#contacts" },
+    { label: ml("Chatbot d'assistance", "روبوت المساعدة", "Support Chatbot", "Chatbot de asistencia", "ⴰⵔⵓⴱⵓ ⵏ ⵜⵡⵉⵙⵉ"), href: "#chatbot" }
   ];
 
   const paymentLinks = [
-    { label: ml("e-Wallet BNRM", "المحفظة الإلكترونية", "e-Wallet BNRM", "e-Wallet BNRM"), href: "/wallet" },
-    { label: ml("Services BNRM", "خدمات المكتبة", "BNRM Services", "Servicios BNRM"), href: "/tarifs-bnrm" },
-    { label: ml("Reproduction", "النسخ", "Reproduction", "Reproducción"), href: "/reproduction" },
-    { label: ml("Dépôt légal", "الإيداع القانوني", "Legal Deposit", "Depósito legal"), href: "/depot-legal" }
+    { label: ml("e-Wallet BNRM", "المحفظة الإلكترونية", "e-Wallet BNRM", "e-Wallet BNRM", "ⵜⴰⵡⵏⵏⴰⴼⵜ ⵜⴰⵍⵉⴽⵜⵕⵓⵏⵉⵜ"), href: "/wallet" },
+    { label: ml("Services BNRM", "خدمات المكتبة", "BNRM Services", "Servicios BNRM", "ⵜⵉⵏⴰⴼⵓⵜⵉⵏ BNRM"), href: "/tarifs-bnrm" },
+    { label: ml("Reproduction", "النسخ", "Reproduction", "Reproducción", "ⴰⵙⵏⵖⵍ"), href: "/reproduction" },
+    { label: ml("Dépôt légal", "الإيداع القانوني", "Legal Deposit", "Depósito legal", "ⴰⵙⵔⵙ ⴰⵏⴰⵎⵓⵙ"), href: "/depot-legal" }
   ];
 
   const socialLinks = [
@@ -139,13 +142,15 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
                     "Kitab, la plateforme digitale dédiée à l'édition marocaine et à la promotion de l'industrie nationale du livre.",
                     "كتاب، المنصة الرقمية المخصصة للنشر المغربي وتعزيز الصناعة الوطنية للكتاب.",
                     "Kitab, the digital platform dedicated to Moroccan publishing and the promotion of the national book industry.",
-                    "Kitab, la plataforma digital dedicada a la edición marroquí y a la promoción de la industria nacional del libro."
+                    "Kitab, la plataforma digital dedicada a la edición marroquí y a la promoción de la industria nacional del libro.",
+                    "Kitab, ⴰⵎⵏⵉⵔ ⴰⵏⵓⵎⴰⵏ ⵉⵜⵜⵓⵙⴽⴰⵔⵏ ⵉ ⵜⵥⵕⵉⴳⵜ ⵜⴰⵎⵖⵔⵉⴱⵉⵜ."
                   )
                 : ml(
                     "La Bibliothèque Nationale du Royaume du Maroc, gardienne du patrimoine écrit et promotrice du savoir au service de tous.",
                     "المكتبة الوطنية للمملكة المغربية، حارسة التراث المكتوب ومروجة المعرفة في خدمة الجميع.",
                     "The National Library of the Kingdom of Morocco, guardian of written heritage and promoter of knowledge for all.",
-                    "La Biblioteca Nacional del Reino de Marruecos, guardiana del patrimonio escrito y promotora del saber al servicio de todos."
+                    "La Biblioteca Nacional del Reino de Marruecos, guardiana del patrimonio escrito y promotora del saber al servicio de todos.",
+                    "ⵜⴰⵙⴷⵍⵉⵙⵜ ⵜⴰⵏⴰⵎⵓⵔⵜ ⵏ ⵜⴳⵍⴷⵉⵜ ⵏ ⵍⵎⵖⵔⵉⴱ, ⵜⴰⵎⵃⴹⴰⵢⵜ ⵏ ⵓⵢⴷⴰ ⵉⵜⵜⵢⴰⵔⴰⵏ."
                   )
               }
             </p>
@@ -169,7 +174,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
           <div>
             <h4 className="text-lg font-semibold mb-6 flex items-center">
               <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-primary'}`}></span>
-              {ml('Liens Rapides', 'روابط سريعة', 'Quick Links', 'Enlaces Rápidos')}
+              {ml('Liens Rapides', 'روابط سريعة', 'Quick Links', 'Enlaces Rápidos', 'ⵉⵣⴷⴰⵢⵏ ⵉⵎⴰⵍⴰⵙⵏ')}
             </h4>
             <ul className="space-y-3">
               {quickLinks.map((link, index) => (
@@ -189,7 +194,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
           <div>
             <h4 className="text-lg font-semibold mb-6 flex items-center">
               <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-primary'}`}></span>
-              {ml('Aide et support', 'المساعدة والدعم', 'Help & Support', 'Ayuda y soporte')}
+              {ml('Aide et support', 'المساعدة والدعم', 'Help & Support', 'Ayuda y soporte', 'ⵜⴰⵡⵉⵙⵉ ⴷ ⵓⵙⵎⴽⵍ')}
             </h4>
             <ul className="space-y-3">
               {supportLinks.map((link, index) => (
@@ -209,7 +214,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
           <div>
             <h4 className="text-lg font-semibold mb-6 flex items-center">
               <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-primary'}`}></span>
-              {ml('Paiements', 'المدفوعات', 'Payments', 'Pagos')}
+              {ml('Paiements', 'المدفوعات', 'Payments', 'Pagos', 'ⵉⵅⵍⵍⵙⵏ')}
             </h4>
             <ul className="space-y-3">
               {paymentLinks.map((link, index) => (
@@ -229,7 +234,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
           <div>
             <h4 className="text-lg font-semibold mb-6 flex items-center">
               <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-primary'}`}></span>
-              {ml('Contacto', 'اتصل بنا', 'Contact', 'Contacto')}
+              {ml('Contact', 'اتصل بنا', 'Contact', 'Contacto', 'ⴰⵎⵢⴰⵡⴰⴹ')}
             </h4>
             <div className="space-y-4">
               <div className="flex items-start space-x-3">
@@ -239,7 +244,8 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
                     "Avenida Ibn Battuta, Rabat",
                     "شارع ابن بطوطة، الرباط",
                     "Ibn Battuta Avenue, Rabat",
-                    "Avenida Ibn Battuta, Rabat"
+                    "Avenida Ibn Battuta, Rabat",
+                    "ⴰⵙⴰⵔⵉⵡ ⵏ ⵉⴱⵏ ⴱⴰⵟⵟⵓⵟⴰ, ⵕⵕⴱⴰⵟ"
                   )}
                 </p>
               </div>
@@ -256,9 +262,9 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
               <div className="flex items-start space-x-3">
                 <Clock className={`h-4 w-4 mt-1 flex-shrink-0 ${isKitabPage ? 'text-[hsl(var(--kitab-accent))]' : 'text-primary'}`} />
                 <div className="text-sm opacity-80 space-y-1">
-                  <p>{ml('Lun-Ven: 9h - 18h', 'الإثنين-الجمعة: 9ص - 6م', 'Mon-Fri: 9am - 6pm', 'Lun-Vie: 9h - 18h')}</p>
-                  <p>{ml('Samedi: 9h - 13h', 'السبت: 9ص - 1م', 'Saturday: 9am - 1pm', 'Sábado: 9h - 13h')}</p>
-                  <p>{ml('Dimanche: Fermé', 'الأحد: مغلق', 'Sunday: Closed', 'Domingo: Cerrado')}</p>
+                  <p>{ml('Lun-Ven: 9h - 18h', 'الإثنين-الجمعة: 9ص - 6م', 'Mon-Fri: 9am - 6pm', 'Lun-Vie: 9h - 18h', 'ⵍⵜⵏⵉⵏ-ⵍⵊⵎⵄⴰ: 9ⵜ - 18ⵜ')}</p>
+                  <p>{ml('Samedi: 9h - 13h', 'السبت: 9ص - 1م', 'Saturday: 9am - 1pm', 'Sábado: 9h - 13h', 'ⴰⵙⵉⴹⵢⴰⵙ: 9ⵜ - 13ⵜ')}</p>
+                  <p>{ml('Dimanche: Fermé', 'الأحد: مغلق', 'Sunday: Closed', 'Domingo: Cerrado', 'ⴰⵙⴰⵎⴰⵙ: ⵉⵇⵇⵏ')}</p>
                 </div>
               </div>
             </div>
@@ -268,20 +274,21 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
           <div>
             <h4 className="text-lg font-semibold mb-6 flex items-center">
               <span className={`w-1 h-6 mr-3 rounded ${isKitabPage ? 'bg-[hsl(var(--kitab-accent))]' : 'bg-primary'}`}></span>
-              {ml('Nous suivre', 'تابعنا', 'Follow Us', 'Síguenos')}
+              {ml('Nous suivre', 'تابعنا', 'Follow Us', 'Síguenos', 'ⴹⴼⵓⵕⴰⵖ')}
             </h4>
             <p className="text-sm opacity-80 mb-4 leading-relaxed">
               {ml(
                 'Restez informé de nos actualités et nouvelles acquisitions.',
                 'ابق على اطلاع بأخبارنا والمقتنيات الجديدة.',
                 'Stay informed about our news and new acquisitions.',
-                'Manténgase informado de nuestras novedades y nuevas adquisiciones.'
+                'Manténgase informado de nuestras novedades y nuevas adquisiciones.',
+                'ⵇⵇⵉⵎ ⵙ ⵜⵎⵓⵙⵙⵏⴰ ⵖⴼ ⵉⵙⴰⵍⵏ ⵏⵏⵖ ⴷ ⵉⵙⵓⵜⴰⵔ ⵉⵎⴰⵢⵏⵓⵜⵏ.'
               )}
             </p>
             <form onSubmit={handleNewsletterSubscribe} className="space-y-3">
               <Input 
                 type="email" 
-                placeholder={ml('Votre email', 'بريدك الإلكتروني', 'Your email', 'Su correo electrónico')}
+                placeholder={ml('Votre email', 'بريدك الإلكتروني', 'Your email', 'Su correo electrónico', 'ⵉⵎⴰⵢⵍ ⵏⵏⴽ')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isSubscribing}
@@ -298,10 +305,10 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
                 {isSubscribing ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    {ml('Abonnement...', 'جارٍ الاشتراك...', 'Subscribing...', 'Suscribiendo...')}
+                    {ml('Abonnement...', 'جارٍ الاشتراك...', 'Subscribing...', 'Suscribiendo...', 'ⴰⵎⵜⵜⴰⵡ...')}
                   </>
                 ) : (
-                  ml("S'abonner", 'اشترك', 'Subscribe', 'Suscribirse')
+                  ml("S'abonner", 'اشترك', 'Subscribe', 'Suscribirse', 'ⵜⵜⴰⵡ')
                 )}
               </Button>
             </form>
@@ -310,7 +317,8 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
                 'En vous abonnant, vous acceptez de recevoir nos communications.',
                 'من خلال الاشتراك، فإنك توافق على تلقي اتصالاتنا.',
                 'By subscribing, you agree to receive our communications.',
-                'Al suscribirse, acepta recibir nuestras comunicaciones.'
+                'Al suscribirse, acepta recibir nuestras comunicaciones.',
+                'ⵙ ⵓⵎⵜⵜⴰⵡ, ⵜⵇⴱⵍⴷ ⴰⴷ ⵜⵜⴰⵡⵉⴷ ⵉⵎⵢⴰⵡⴰⴹⵏ ⵏⵏⵖ.'
               )}
             </p>
           </div>
@@ -334,7 +342,7 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
           
           <div className="text-center">
             <p className="text-sm opacity-80">
-              © {currentYear} {isKitabPage ? "Kitab - BNRM" : t('header.title')}. {ml('Tous droits réservés.', 'جميع الحقوق محفوظة.', 'All rights reserved.', 'Todos los derechos reservados.')}
+              © {currentYear} {isKitabPage ? "Kitab - BNRM" : t('header.title')}. {ml('Tous droits réservés.', 'جميع الحقوق محفوظة.', 'All rights reserved.', 'Todos los derechos reservados.', 'ⵎⴰⵕⵕⴰ ⵉⵣⵔⴼⴰⵏ ⵜⵜⵓⵃⵟⵟⵓⵏ.')}
             </p>
           </div>
         </div>
