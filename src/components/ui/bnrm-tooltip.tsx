@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@/lib/utils';
 import { Icon } from '@/components/ui/icon';
@@ -23,6 +23,27 @@ export const BNRMTooltip: React.FC<BNRMTooltipProps> = ({
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
   const triggerRef = useRef<HTMLDivElement>(null);
+  const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showTooltip = useCallback(() => {
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+    setIsVisible(true);
+  }, []);
+
+  const hideTooltip = useCallback(() => {
+    hideTimeoutRef.current = setTimeout(() => {
+      setIsVisible(false);
+    }, 150);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (isVisible && triggerRef.current) {
@@ -111,6 +132,8 @@ export const BNRMTooltip: React.FC<BNRMTooltipProps> = ({
 
   const tooltipContent = isVisible && (
     <div
+      onMouseEnter={showTooltip}
+      onMouseLeave={hideTooltip}
       style={{
         position: 'fixed',
         top: position.top,
@@ -119,7 +142,7 @@ export const BNRMTooltip: React.FC<BNRMTooltipProps> = ({
         zIndex: 99999,
       }}
       className={cn(
-        "min-w-[240px] max-w-[320px] p-4 rounded-xl shadow-2xl pointer-events-none",
+        "min-w-[240px] max-w-[320px] p-4 rounded-xl shadow-2xl",
         "animate-in fade-in-0 zoom-in-95 duration-200",
         variantClasses[variant]
       )}
@@ -192,8 +215,8 @@ export const BNRMTooltip: React.FC<BNRMTooltipProps> = ({
     <div 
       ref={triggerRef}
       className="relative inline-block"
-      onMouseEnter={() => setIsVisible(true)}
-      onMouseLeave={() => setIsVisible(false)}
+      onMouseEnter={showTooltip}
+      onMouseLeave={hideTooltip}
     >
       {children}
       {typeof document !== 'undefined' && createPortal(tooltipContent, document.body)}
