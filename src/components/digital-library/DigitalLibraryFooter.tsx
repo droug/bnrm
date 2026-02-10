@@ -138,6 +138,12 @@ const DigitalLibraryFooter = () => {
     return map[language] || fr;
   };
 
+  // Helper for CMS link titles (only have fr/ar, fallback for other langs)
+  const linkText = (link: FooterLink) => {
+    if (language === 'ar') return link.title_ar || link.title_fr;
+    return link.title_fr;
+  };
+
   // Fetch footer settings from CMS
   const { data: cmsSettings } = useQuery({
     queryKey: ['bn-footer-settings'],
@@ -252,7 +258,7 @@ const DigitalLibraryFooter = () => {
                       rel={link.external ? "noopener noreferrer" : undefined}
                       className="text-sm opacity-80 hover:opacity-100 hover:text-gold-bn-primary hover:translate-x-1 transition-all inline-block"
                     >
-                      {language === 'ar' ? link.title_ar : link.title_fr}
+                      {linkText(link)}
                     </a>
                   </li>
                 ))}
@@ -276,7 +282,7 @@ const DigitalLibraryFooter = () => {
                       rel={link.external ? "noopener noreferrer" : undefined}
                       className="text-sm opacity-80 hover:opacity-100 hover:text-gold-bn-primary hover:translate-x-1 transition-all inline-block"
                     >
-                      {language === 'ar' ? link.title_ar : link.title_fr}
+                      {linkText(link)}
                     </a>
                   </li>
                 ))}
@@ -300,7 +306,7 @@ const DigitalLibraryFooter = () => {
                       rel={link.external ? "noopener noreferrer" : undefined}
                       className="text-sm opacity-80 hover:opacity-100 hover:text-gold-bn-primary hover:translate-x-1 transition-all inline-block"
                     >
-                      {language === 'ar' ? link.title_ar : link.title_fr}
+                      {linkText(link)}
                     </a>
                   </li>
                 ))}
@@ -394,7 +400,7 @@ const DigitalLibraryFooter = () => {
                 href={link.href}
                 className="text-xs opacity-70 hover:opacity-100 hover:text-gold-bn-primary transition-opacity"
               >
-                {language === 'ar' ? link.title_ar : link.title_fr}
+                {linkText(link)}
               </a>
             ))}
           </div>
