@@ -1103,6 +1103,23 @@ const BookReader = () => {
                     <p className="text-sm text-muted-foreground">{bookInfo.description}</p>
                   </div>
 
+                  <Button 
+                    variant="default" 
+                    className="w-full justify-center font-semibold shadow-md" 
+                    size="default"
+                    onClick={() => {
+                      if (user) {
+                        const redirectUrl = `/demande-reproduction?documentId=${encodeURIComponent(id || '')}&documentTitle=${encodeURIComponent(documentData?.title || '')}`;
+                        navigate(redirectUrl);
+                      } else {
+                        setShowReproductionAuthModal(true);
+                      }
+                    }}
+                  >
+                    <FileImage className="h-4 w-4 mr-2" />
+                    Demande de reproduction
+                  </Button>
+
                   <Separator />
 
                   {/* Accordion pour les informations essentielles */}
@@ -1312,26 +1329,6 @@ const BookReader = () => {
                       {bookmarks.includes(currentPage) ? "Retirer marque-page" : "Ajouter marque-page"}
                     </Button>
 
-                    <Separator className="my-2" />
-
-                    <Button 
-                      variant="default" 
-                      className="w-full justify-start bg-amber-600 hover:bg-amber-700 text-white font-semibold shadow-md border-0" 
-                      size="default"
-                      onClick={() => {
-                        if (user) {
-                          // Utilisateur connecté: rediriger vers le formulaire de reproduction
-                          const redirectUrl = `/demande-reproduction?documentId=${encodeURIComponent(id || '')}&documentTitle=${encodeURIComponent(documentData?.title || '')}`;
-                          navigate(redirectUrl);
-                        } else {
-                          // Utilisateur non connecté: afficher la modale d'authentification
-                          setShowReproductionAuthModal(true);
-                        }
-                      }}
-                    >
-                      <FileImage className="h-4 w-4 mr-2" />
-                      Demande de reproduction
-                    </Button>
                   </div>
                 </TabsContent>
 
