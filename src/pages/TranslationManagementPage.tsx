@@ -232,7 +232,7 @@ function SectionGroup({ section, entries, onSave, onDelete, onAiSuggest, isAiLoa
   onAiSuggest: (entry: TranslationEntry, setEdited: (e: TranslationEntry) => void) => void;
   isAiLoading: boolean;
 }) {
-  const [isOpen, setIsOpen] = useState(true);
+  const [isOpen, setIsOpen] = useState(false);
   const sectionLabel = SECTION_OPTIONS.find(s => s.value === section)?.label || section;
   const missingCount = entries.filter(e => !e.fr || !e.ar || !e.en || !e.es || !e.amz).length;
 
