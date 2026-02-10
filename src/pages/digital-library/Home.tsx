@@ -969,7 +969,7 @@ export default function DigitalLibraryHome() {
                                 rel="noopener noreferrer" 
                                 className="mt-6 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
                               >
-                                Explorer <Icon name="mdi:chevron-right" className="h-4 w-4" />
+                                {({ fr: 'Explorer', ar: 'استكشاف', en: 'Explore', es: 'Explorar', amz: 'ⵙⵙⵓⴷⵓ' } as Record<string, string>)[language] || 'Explorer'} <Icon name="mdi:chevron-right" className="h-4 w-4" />
                               </a>
                             </CardContent>
                           </Card>
