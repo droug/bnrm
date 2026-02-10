@@ -9,19 +9,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { 
   Languages, RefreshCw, CheckCircle, XCircle, Loader2, FileText, Globe, Layout, 
-  Newspaper, Calendar, Search, Plus, Save, Trash2, Edit3, Filter, Download, Upload,
-  ChevronDown, ChevronUp, ArrowUpDown
+  Newspaper, Calendar, Search, Plus, Save, Trash2, Edit3, Download,
+  Sparkles, Wand2, FolderOpen, ChevronRight
 } from "lucide-react";
 import ContentTranslationManager from "@/components/ContentTranslationManager";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Progress } from "@/components/ui/progress";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useUITranslations, TranslationEntry } from "@/hooks/useUITranslations";
+import { useUITranslations, TranslationEntry, SECTION_OPTIONS } from "@/hooks/useUITranslations";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const LANGUAGES = [
   { code: 'fr', name: 'Français', flag: '🇫🇷', dir: 'ltr' },
@@ -31,11 +32,13 @@ const LANGUAGES = [
   { code: 'amz', name: 'ⵜⴰⵎⴰⵣⵉⵖⵜ', flag: 'ⵣ', dir: 'ltr' },
 ];
 
-// ─── Inline Edit Row ───
-function TranslationRow({ entry, onSave, onDelete }: { 
+// ─── Inline Edit Row with AI ───
+function TranslationRow({ entry, onSave, onDelete, onAiSuggest, isAiLoading }: { 
   entry: TranslationEntry; 
   onSave: (e: TranslationEntry) => void; 
   onDelete?: (id: string) => void;
+  onAiSuggest: (entry: TranslationEntry, setEdited: (e: TranslationEntry) => void) => void;
+  isAiLoading: boolean;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [edited, setEdited] = useState(entry);
@@ -45,75 +48,97 @@ function TranslationRow({ entry, onSave, onDelete }: {
     setIsEditing(false);
   };
 
-  const missingCount = [edited.fr, edited.ar, edited.en, edited.es, edited.amz].filter(v => !v).length;
+  const missingLangs = (['fr', 'ar', 'en', 'es', 'amz'] as const).filter(l => !edited[l]);
 
   if (!isEditing) {
     return (
       <TableRow className="group hover:bg-accent/30 transition-colors">
-        <TableCell className="font-mono text-xs max-w-[200px] truncate" title={entry.key}>
+        <TableCell className="font-mono text-xs max-w-[180px] truncate" title={entry.key}>
           {entry.key}
         </TableCell>
-        <TableCell className="max-w-[150px] truncate text-sm" title={entry.fr}>{entry.fr || <span className="text-destructive">—</span>}</TableCell>
-        <TableCell className="max-w-[150px] truncate text-sm" dir="rtl" title={entry.ar}>{entry.ar || <span className="text-destructive">—</span>}</TableCell>
-        <TableCell className="max-w-[150px] truncate text-sm" title={entry.en}>{entry.en || <span className="text-destructive">—</span>}</TableCell>
-        <TableCell className="max-w-[150px] truncate text-sm" title={entry.es}>{entry.es || <span className="text-destructive">—</span>}</TableCell>
-        <TableCell className="max-w-[150px] truncate text-sm" title={entry.amz}>{entry.amz || <span className="text-destructive">—</span>}</TableCell>
+        <TableCell className="max-w-[130px] truncate text-sm" title={entry.fr}>{entry.fr || <span className="text-destructive italic">—</span>}</TableCell>
+        <TableCell className="max-w-[130px] truncate text-sm" dir="rtl" title={entry.ar}>{entry.ar || <span className="text-destructive italic">—</span>}</TableCell>
+        <TableCell className="max-w-[130px] truncate text-sm" title={entry.en}>{entry.en || <span className="text-destructive italic">—</span>}</TableCell>
+        <TableCell className="max-w-[130px] truncate text-sm" title={entry.es}>{entry.es || <span className="text-destructive italic">—</span>}</TableCell>
+        <TableCell className="max-w-[130px] truncate text-sm" title={entry.amz}>{entry.amz || <span className="text-destructive italic">—</span>}</TableCell>
         <TableCell>
           <div className="flex items-center gap-1">
-            {missingCount > 0 ? (
-              <Badge variant="destructive" className="text-xs">{missingCount}</Badge>
+            {missingLangs.length > 0 ? (
+              <Badge variant="destructive" className="text-xs">{missingLangs.length}</Badge>
             ) : (
               <Badge variant="default" className="text-xs bg-green-600">✓</Badge>
             )}
-            <Badge variant="outline" className="text-xs">{entry.source === 'portal' ? 'Portail' : entry.source === 'digital_library' ? 'BN' : 'Perso'}</Badge>
           </div>
         </TableCell>
         <TableCell>
-          <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => setIsEditing(true)}>
-            <Edit3 className="h-3.5 w-3.5" />
-          </Button>
+          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+            {missingLangs.length > 0 && (
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-7 w-7 text-amber-500" 
+                      onClick={() => { setIsEditing(true); setTimeout(() => onAiSuggest(entry, setEdited), 100); }}
+                      disabled={isAiLoading}>
+                      {isAiLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Wand2 className="h-3.5 w-3.5" />}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Suggérer traductions IA</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            )}
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setIsEditing(true)}>
+              <Edit3 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
         </TableCell>
       </TableRow>
     );
   }
 
   return (
-    <>
-      <TableRow className="bg-primary/5 border-l-2 border-l-primary">
-        <TableCell className="font-mono text-xs">{entry.key}</TableCell>
-        <TableCell>
-          <Input className="h-8 text-sm" value={edited.fr} onChange={e => setEdited({...edited, fr: e.target.value})} placeholder="Français" />
-        </TableCell>
-        <TableCell>
-          <Input className="h-8 text-sm" dir="rtl" value={edited.ar} onChange={e => setEdited({...edited, ar: e.target.value})} placeholder="العربية" />
-        </TableCell>
-        <TableCell>
-          <Input className="h-8 text-sm" value={edited.en} onChange={e => setEdited({...edited, en: e.target.value})} placeholder="English" />
-        </TableCell>
-        <TableCell>
-          <Input className="h-8 text-sm" value={edited.es} onChange={e => setEdited({...edited, es: e.target.value})} placeholder="Español" />
-        </TableCell>
-        <TableCell>
-          <Input className="h-8 text-sm" value={edited.amz} onChange={e => setEdited({...edited, amz: e.target.value})} placeholder="ⵜⴰⵎⴰⵣⵉⵖⵜ" />
-        </TableCell>
-        <TableCell colSpan={2}>
-          <div className="flex gap-1">
-            <Button size="sm" className="h-7 text-xs" onClick={handleSave}><Save className="h-3 w-3 mr-1" />OK</Button>
-            <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setEdited(entry); setIsEditing(false); }}>✕</Button>
-            {entry.isFromDB && entry.dbId && onDelete && (
-              <Button size="sm" variant="destructive" className="h-7 text-xs" onClick={() => onDelete(entry.dbId!)}>
-                <Trash2 className="h-3 w-3" />
-              </Button>
-            )}
-          </div>
-        </TableCell>
-      </TableRow>
-    </>
+    <TableRow className="bg-primary/5 border-l-2 border-l-primary">
+      <TableCell className="font-mono text-xs">{entry.key}</TableCell>
+      <TableCell>
+        <Input className="h-8 text-sm" value={edited.fr} onChange={e => setEdited({...edited, fr: e.target.value})} placeholder="Français" />
+      </TableCell>
+      <TableCell>
+        <Input className="h-8 text-sm" dir="rtl" value={edited.ar} onChange={e => setEdited({...edited, ar: e.target.value})} placeholder="العربية" />
+      </TableCell>
+      <TableCell>
+        <Input className="h-8 text-sm" value={edited.en} onChange={e => setEdited({...edited, en: e.target.value})} placeholder="English" />
+      </TableCell>
+      <TableCell>
+        <Input className="h-8 text-sm" value={edited.es} onChange={e => setEdited({...edited, es: e.target.value})} placeholder="Español" />
+      </TableCell>
+      <TableCell>
+        <Input className="h-8 text-sm" value={edited.amz} onChange={e => setEdited({...edited, amz: e.target.value})} placeholder="ⵜⴰⵎⴰⵣⵉⵖⵜ" />
+      </TableCell>
+      <TableCell colSpan={2}>
+        <div className="flex gap-1 flex-wrap">
+          <Button size="sm" className="h-7 text-xs" onClick={handleSave}><Save className="h-3 w-3 mr-1" />OK</Button>
+          <Button size="sm" variant="outline" className="h-7 text-xs text-amber-600 border-amber-300 hover:bg-amber-50" 
+            onClick={() => onAiSuggest(edited, setEdited)} disabled={isAiLoading}>
+            {isAiLoading ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <Sparkles className="h-3 w-3 mr-1" />}
+            IA
+          </Button>
+          <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => { setEdited(entry); setIsEditing(false); }}>✕</Button>
+          {entry.isFromDB && entry.dbId && onDelete && (
+            <Button size="sm" variant="destructive" className="h-7 text-xs" onClick={() => onDelete(entry.dbId!)}>
+              <Trash2 className="h-3 w-3" />
+            </Button>
+          )}
+        </div>
+      </TableCell>
+    </TableRow>
   );
 }
 
 // ─── Add New Key Dialog ───
-function AddKeyDialog({ open, onClose, onSave }: { open: boolean; onClose: () => void; onSave: (e: any) => void }) {
+function AddKeyDialog({ open, onClose, onSave, onAiSuggest, isAiLoading }: { 
+  open: boolean; onClose: () => void; onSave: (e: any) => void; 
+  onAiSuggest: (text: string, sourceLang: string, setValues: (vals: Record<string, string>) => void) => void;
+  isAiLoading: boolean;
+}) {
   const [key, setKey] = useState('');
   const [fr, setFr] = useState('');
   const [ar, setAr] = useState('');
@@ -121,12 +146,26 @@ function AddKeyDialog({ open, onClose, onSave }: { open: boolean; onClose: () =>
   const [es, setEs] = useState('');
   const [amz, setAmz] = useState('');
   const [category, setCategory] = useState('general');
+  const [section, setSection] = useState('general');
 
   const handleSubmit = () => {
     if (!key.trim()) { toast.error('La clé est obligatoire'); return; }
-    onSave({ key: key.trim(), fr, ar, en, es, amz, source: 'custom', category });
+    onSave({ key: key.trim(), fr, ar, en, es, amz, source: 'custom', category, section });
     setKey(''); setFr(''); setAr(''); setEn(''); setEs(''); setAmz('');
     onClose();
+  };
+
+  const handleAiSuggest = () => {
+    const sourceText = fr || ar || en;
+    const sourceLang = fr ? 'fr' : ar ? 'ar' : 'en';
+    if (!sourceText) { toast.error('Entrez au moins une traduction source (FR, AR ou EN)'); return; }
+    onAiSuggest(sourceText, sourceLang, (vals) => {
+      if (vals.fr && !fr) setFr(vals.fr);
+      if (vals.ar && !ar) setAr(vals.ar);
+      if (vals.en && !en) setEn(vals.en);
+      if (vals.es && !es) setEs(vals.es);
+      if (vals.amz && !amz) setAmz(vals.amz);
+    });
   };
 
   return (
@@ -134,17 +173,26 @@ function AddKeyDialog({ open, onClose, onSave }: { open: boolean; onClose: () =>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2"><Plus className="h-5 w-5" /> Ajouter une clé de traduction</DialogTitle>
-          <DialogDescription>Ajoutez une nouvelle clé avec ses traductions dans les 5 langues</DialogDescription>
+          <DialogDescription>Ajoutez une nouvelle clé avec traductions. Utilisez l'IA pour compléter automatiquement.</DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div>
-              <Label>Clé de traduction *</Label>
-              <Input value={key} onChange={e => setKey(e.target.value)} placeholder="ex: portal.footer.newLink" />
+              <Label>Clé *</Label>
+              <Input value={key} onChange={e => setKey(e.target.value)} placeholder="ex: portal.footer.link" />
+            </div>
+            <div>
+              <Label>Section</Label>
+              <Select value={section} onValueChange={setSection}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {SECTION_OPTIONS.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <Label>Catégorie</Label>
-              <Input value={category} onChange={e => setCategory(e.target.value)} placeholder="ex: footer, nav, form..." />
+              <Input value={category} onChange={e => setCategory(e.target.value)} placeholder="ex: nav, form..." />
             </div>
           </div>
           <div className="grid grid-cols-1 gap-3">
@@ -161,6 +209,10 @@ function AddKeyDialog({ open, onClose, onSave }: { open: boolean; onClose: () =>
               </div>
             ))}
           </div>
+          <Button variant="outline" className="w-full border-amber-300 text-amber-700 hover:bg-amber-50" onClick={handleAiSuggest} disabled={isAiLoading}>
+            {isAiLoading ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Sparkles className="h-4 w-4 mr-2" />}
+            Compléter avec l'IA (depuis FR, AR ou EN)
+          </Button>
         </div>
         <DialogFooter>
           <Button variant="outline" onClick={onClose}>Annuler</Button>
@@ -171,19 +223,148 @@ function AddKeyDialog({ open, onClose, onSave }: { open: boolean; onClose: () =>
   );
 }
 
+// ─── Section Group Component ───
+function SectionGroup({ section, entries, onSave, onDelete, onAiSuggest, isAiLoading }: {
+  section: string;
+  entries: TranslationEntry[];
+  onSave: (e: TranslationEntry) => void;
+  onDelete: (id: string) => void;
+  onAiSuggest: (entry: TranslationEntry, setEdited: (e: TranslationEntry) => void) => void;
+  isAiLoading: boolean;
+}) {
+  const [isOpen, setIsOpen] = useState(true);
+  const sectionLabel = SECTION_OPTIONS.find(s => s.value === section)?.label || section;
+  const missingCount = entries.filter(e => !e.fr || !e.ar || !e.en || !e.es || !e.amz).length;
+
+  return (
+    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+      <CollapsibleTrigger className="flex items-center gap-2 w-full p-3 bg-muted/50 hover:bg-muted/80 rounded-t-lg transition-colors border border-b-0">
+        <ChevronRight className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-90' : ''}`} />
+        <FolderOpen className="h-4 w-4 text-primary" />
+        <span className="font-semibold text-sm">{sectionLabel}</span>
+        <Badge variant="secondary" className="text-xs ml-auto">{entries.length}</Badge>
+        {missingCount > 0 && <Badge variant="destructive" className="text-xs">{missingCount} incomplètes</Badge>}
+      </CollapsibleTrigger>
+      <CollapsibleContent>
+        <div className="border border-t-0 rounded-b-lg overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/30">
+                <TableHead className="w-[180px] text-xs font-semibold">Clé</TableHead>
+                <TableHead className="text-xs font-semibold">🇫🇷 FR</TableHead>
+                <TableHead className="text-xs font-semibold">🇲🇦 AR</TableHead>
+                <TableHead className="text-xs font-semibold">🇬🇧 EN</TableHead>
+                <TableHead className="text-xs font-semibold">🇪🇸 ES</TableHead>
+                <TableHead className="text-xs font-semibold">ⵣ AMZ</TableHead>
+                <TableHead className="text-xs font-semibold w-[80px]">Statut</TableHead>
+                <TableHead className="text-xs font-semibold w-[80px]"></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {entries.map(entry => (
+                <TranslationRow
+                  key={entry.key}
+                  entry={entry}
+                  onSave={onSave}
+                  onDelete={entry.isFromDB && entry.dbId ? (id) => onDelete(id) : undefined}
+                  onAiSuggest={onAiSuggest}
+                  isAiLoading={isAiLoading}
+                />
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+
 // ─── Main Page ───
 export default function TranslationManagementPage() {
   const [activeTab, setActiveTab] = useState('ui');
   const [searchKey, setSearchKey] = useState('');
   const [filterSource, setFilterSource] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [filterCategory, setFilterCategory] = useState<string>('all');
+  const [filterSection, setFilterSection] = useState<string>('all');
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedContentId, setSelectedContentId] = useState<string | null>(null);
   const [selectedContentTitle, setSelectedContentTitle] = useState('');
+  const [groupBySection, setGroupBySection] = useState(true);
   const queryClient = useQueryClient();
 
-  const { entries, isLoading: uiLoading, saveMutation, deleteMutation } = useUITranslations();
+  const { entries, isLoading: uiLoading, saveMutation, deleteMutation, aiTranslateMutation } = useUITranslations();
+
+  // ─── AI Suggest handler ───
+  const handleAiSuggest = (entry: TranslationEntry, setEdited: (e: TranslationEntry) => void) => {
+    // Find source text and missing langs
+    const sourceLang = entry.fr ? 'fr' : entry.ar ? 'ar' : entry.en ? 'en' : '';
+    const sourceText = entry[sourceLang as keyof TranslationEntry] as string;
+    if (!sourceLang || !sourceText) { toast.error('Aucun texte source disponible'); return; }
+
+    const missingLangs = (['fr', 'ar', 'en', 'es', 'amz'] as const).filter(l => !entry[l]);
+    if (missingLangs.length === 0) { toast.info('Toutes les langues sont déjà remplies'); return; }
+
+    aiTranslateMutation.mutate(
+      { text: sourceText, sourceLang, targetLangs: missingLangs, context: entry.section },
+      {
+        onSuccess: (translations) => {
+          const updated = { ...entry };
+          missingLangs.forEach(lang => {
+            if (translations[lang]) {
+              (updated as any)[lang] = translations[lang];
+            }
+          });
+          setEdited(updated);
+          toast.success(`${Object.keys(translations).length} traductions suggérées par l'IA`);
+        },
+        onError: (err) => {
+          toast.error(`Erreur IA: ${err instanceof Error ? err.message : 'Erreur inconnue'}`);
+        },
+      }
+    );
+  };
+
+  const handleAddDialogAiSuggest = (text: string, sourceLang: string, setValues: (vals: Record<string, string>) => void) => {
+    const targetLangs = (['fr', 'ar', 'en', 'es', 'amz'] as const).filter(l => l !== sourceLang);
+    aiTranslateMutation.mutate(
+      { text, sourceLang, targetLangs },
+      {
+        onSuccess: (translations) => {
+          setValues(translations);
+          toast.success(`Traductions IA générées`);
+        },
+        onError: (err) => toast.error(`Erreur IA: ${err instanceof Error ? err.message : 'Erreur inconnue'}`),
+      }
+    );
+  };
+
+  // Batch AI translate all missing
+  const [batchAiLoading, setBatchAiLoading] = useState(false);
+  const handleBatchAiTranslate = async () => {
+    const incomplete = filteredEntries.filter(e => e.fr && (!e.ar || !e.en || !e.es || !e.amz));
+    if (incomplete.length === 0) { toast.info('Aucune traduction incomplète avec texte FR'); return; }
+    
+    const batch = incomplete.slice(0, 10); // Limit to 10 at a time
+    setBatchAiLoading(true);
+    let successCount = 0;
+
+    for (const entry of batch) {
+      const missingLangs = (['ar', 'en', 'es', 'amz'] as const).filter(l => !entry[l]);
+      try {
+        const translations = await aiTranslateMutation.mutateAsync({
+          text: entry.fr, sourceLang: 'fr', targetLangs: missingLangs, context: entry.section,
+        });
+        const updated = { ...entry, ...translations };
+        saveMutation.mutate({
+          key: updated.key, fr: updated.fr, ar: updated.ar, en: updated.en, es: updated.es, amz: updated.amz,
+          source: updated.source, category: updated.category, section: updated.section,
+        });
+        successCount++;
+      } catch { /* continue */ }
+    }
+    setBatchAiLoading(false);
+    toast.success(`${successCount}/${batch.length} traductions générées par lot`);
+  };
 
   // ─── Filters + search ───
   const filteredEntries = useMemo(() => {
@@ -201,29 +382,34 @@ export default function TranslationManagementPage() {
       );
     }
 
-    if (filterSource !== 'all') {
-      result = result.filter(e => e.source === filterSource);
-    }
+    if (filterSource !== 'all') result = result.filter(e => e.source === filterSource);
+    if (filterSection !== 'all') result = result.filter(e => e.section === filterSection);
 
-    if (filterCategory !== 'all') {
-      result = result.filter(e => e.category === filterCategory);
-    }
-
-    if (filterStatus === 'missing') {
-      result = result.filter(e => !e.fr || !e.ar || !e.en || !e.es || !e.amz);
-    } else if (filterStatus === 'complete') {
-      result = result.filter(e => e.fr && e.ar && e.en && e.es && e.amz);
-    } else if (filterStatus === 'modified') {
-      result = result.filter(e => e.isFromDB);
-    }
+    if (filterStatus === 'missing') result = result.filter(e => !e.fr || !e.ar || !e.en || !e.es || !e.amz);
+    else if (filterStatus === 'complete') result = result.filter(e => e.fr && e.ar && e.en && e.es && e.amz);
+    else if (filterStatus === 'modified') result = result.filter(e => e.isFromDB);
 
     return result;
-  }, [entries, searchKey, filterSource, filterStatus, filterCategory]);
+  }, [entries, searchKey, filterSource, filterStatus, filterSection]);
 
-  // Get unique categories
-  const categories = useMemo(() => {
-    const cats = new Set(entries.map(e => e.category));
-    return Array.from(cats).sort();
+  // Group by section
+  const groupedEntries = useMemo(() => {
+    if (!groupBySection) return null;
+    const groups: Record<string, TranslationEntry[]> = {};
+    filteredEntries.forEach(e => {
+      const sec = e.section || 'general';
+      if (!groups[sec]) groups[sec] = [];
+      groups[sec].push(e);
+    });
+    // Sort sections by SECTION_OPTIONS order
+    const order = SECTION_OPTIONS.map(s => s.value);
+    return Object.entries(groups).sort(([a], [b]) => order.indexOf(a) - order.indexOf(b));
+  }, [filteredEntries, groupBySection]);
+
+  // Available sections from data
+  const availableSections = useMemo(() => {
+    const secs = new Set(entries.map(e => e.section || 'general'));
+    return SECTION_OPTIONS.filter(s => secs.has(s.value));
   }, [entries]);
 
   // Stats
@@ -295,28 +481,20 @@ export default function TranslationManagementPage() {
 
   const handleSaveTranslation = (entry: TranslationEntry) => {
     saveMutation.mutate({
-      key: entry.key,
-      fr: entry.fr,
-      ar: entry.ar,
-      en: entry.en,
-      es: entry.es,
-      amz: entry.amz,
-      source: entry.source,
-      category: entry.category,
+      key: entry.key, fr: entry.fr, ar: entry.ar, en: entry.en, es: entry.es, amz: entry.amz,
+      source: entry.source, category: entry.category, section: entry.section,
     });
   };
 
   const handleExportCSV = () => {
-    const header = 'key,source,category,fr,ar,en,es,amz\n';
+    const header = 'key,section,source,category,fr,ar,en,es,amz\n';
     const rows = filteredEntries.map(e =>
-      `"${e.key}","${e.source}","${e.category}","${(e.fr || '').replace(/"/g, '""')}","${(e.ar || '').replace(/"/g, '""')}","${(e.en || '').replace(/"/g, '""')}","${(e.es || '').replace(/"/g, '""')}","${(e.amz || '').replace(/"/g, '""')}"`
+      `"${e.key}","${e.section}","${e.source}","${e.category}","${(e.fr || '').replace(/"/g, '""')}","${(e.ar || '').replace(/"/g, '""')}","${(e.en || '').replace(/"/g, '""')}","${(e.es || '').replace(/"/g, '""')}","${(e.amz || '').replace(/"/g, '""')}"`
     ).join('\n');
     const blob = new Blob(['\uFEFF' + header + rows], { type: 'text/csv;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = 'traductions_bnrm.csv';
-    a.click();
+    a.href = url; a.download = 'traductions_bnrm.csv'; a.click();
     URL.revokeObjectURL(url);
     toast.success('Export CSV généré');
   };
@@ -332,43 +510,33 @@ export default function TranslationManagementPage() {
     <div className="min-h-screen bg-background">
       <AdminHeader
         title="Gestion des Traductions"
-        badgeText="5 langues"
-        subtitle="Gérez toutes les traductions du portail BNRM et de la bibliothèque numérique"
+        badgeText="5 langues · IA"
+        subtitle="Gérez toutes les traductions du portail BNRM et de la bibliothèque numérique avec suggestions IA"
       />
 
       <main className="container py-8 space-y-6">
         {/* ─── Stats Cards ─── */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <Card>
-            <CardContent className="pt-4 pb-3 text-center">
-              <div className="text-3xl font-bold">{stats.total}</div>
-              <p className="text-xs text-muted-foreground mt-1">Total clés</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-4 pb-3 text-center">
-              <div className="text-3xl font-bold text-green-600">{stats.complete}</div>
-              <p className="text-xs text-muted-foreground mt-1">Complètes (5 langues)</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-4 pb-3 text-center">
-              <div className="text-3xl font-bold text-orange-600">{stats.missing}</div>
-              <p className="text-xs text-muted-foreground mt-1">Incomplètes</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-4 pb-3 text-center">
-              <div className="text-3xl font-bold text-blue-600">{stats.modified}</div>
-              <p className="text-xs text-muted-foreground mt-1">Modifiées en BD</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-4 pb-3 text-center">
-              <div className="text-3xl font-bold text-purple-600">{categories.length}</div>
-              <p className="text-xs text-muted-foreground mt-1">Catégories</p>
-            </CardContent>
-          </Card>
+          <Card><CardContent className="pt-4 pb-3 text-center">
+            <div className="text-3xl font-bold">{stats.total}</div>
+            <p className="text-xs text-muted-foreground mt-1">Total clés</p>
+          </CardContent></Card>
+          <Card><CardContent className="pt-4 pb-3 text-center">
+            <div className="text-3xl font-bold text-green-600">{stats.complete}</div>
+            <p className="text-xs text-muted-foreground mt-1">Complètes (5 langues)</p>
+          </CardContent></Card>
+          <Card><CardContent className="pt-4 pb-3 text-center">
+            <div className="text-3xl font-bold text-orange-600">{stats.missing}</div>
+            <p className="text-xs text-muted-foreground mt-1">Incomplètes</p>
+          </CardContent></Card>
+          <Card><CardContent className="pt-4 pb-3 text-center">
+            <div className="text-3xl font-bold text-blue-600">{stats.modified}</div>
+            <p className="text-xs text-muted-foreground mt-1">Modifiées en BD</p>
+          </CardContent></Card>
+          <Card><CardContent className="pt-4 pb-3 text-center">
+            <div className="text-3xl font-bold text-purple-600">{availableSections.length}</div>
+            <p className="text-xs text-muted-foreground mt-1">Sections</p>
+          </CardContent></Card>
         </div>
 
         {/* ─── Language Progress ─── */}
@@ -418,19 +586,19 @@ export default function TranslationManagementPage() {
           <TabsContent value="ui" className="space-y-4 mt-4">
             {/* Toolbar */}
             <div className="flex flex-wrap items-center gap-3">
-              <div className="relative flex-1 min-w-[250px]">
+              <div className="relative flex-1 min-w-[200px]">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  className="pl-9"
-                  placeholder="Rechercher par clé ou texte..."
-                  value={searchKey}
-                  onChange={e => setSearchKey(e.target.value)}
-                />
+                <Input className="pl-9" placeholder="Rechercher par clé ou texte..." value={searchKey} onChange={e => setSearchKey(e.target.value)} />
               </div>
+              <Select value={filterSection} onValueChange={setFilterSection}>
+                <SelectTrigger className="w-[170px]"><SelectValue placeholder="Section" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Toutes sections</SelectItem>
+                  {availableSections.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
               <Select value={filterSource} onValueChange={setFilterSource}>
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="Source" />
-                </SelectTrigger>
+                <SelectTrigger className="w-[140px]"><SelectValue placeholder="Source" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Toutes sources</SelectItem>
                   <SelectItem value="portal">Portail BNRM</SelectItem>
@@ -438,21 +606,8 @@ export default function TranslationManagementPage() {
                   <SelectItem value="custom">Personnalisé</SelectItem>
                 </SelectContent>
               </Select>
-              <Select value={filterCategory} onValueChange={setFilterCategory}>
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="Catégorie" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Toutes catégories</SelectItem>
-                  {categories.map(cat => (
-                    <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
               <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger className="w-[150px]">
-                  <SelectValue placeholder="Statut" />
-                </SelectTrigger>
+                <SelectTrigger className="w-[140px]"><SelectValue placeholder="Statut" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Tous statuts</SelectItem>
                   <SelectItem value="complete">Complètes</SelectItem>
@@ -460,62 +615,82 @@ export default function TranslationManagementPage() {
                   <SelectItem value="modified">Modifiées (BD)</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex flex-wrap items-center gap-2">
               <Button onClick={() => setShowAddDialog(true)} size="sm">
                 <Plus className="h-4 w-4 mr-1" /> Ajouter
+              </Button>
+              <Button onClick={handleBatchAiTranslate} size="sm" variant="outline" className="border-amber-300 text-amber-700 hover:bg-amber-50"
+                disabled={batchAiLoading || aiTranslateMutation.isPending}>
+                {batchAiLoading ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1" />}
+                Traduire incomplètes (IA × 10)
+              </Button>
+              <Button onClick={() => setGroupBySection(!groupBySection)} size="sm" variant={groupBySection ? "default" : "outline"}>
+                <FolderOpen className="h-4 w-4 mr-1" /> {groupBySection ? 'Groupé par section' : 'Liste plate'}
               </Button>
               <Button onClick={handleExportCSV} variant="outline" size="sm">
                 <Download className="h-4 w-4 mr-1" /> CSV
               </Button>
+              <span className="text-sm text-muted-foreground ml-auto">
+                {filteredEntries.length} / {entries.length} traductions
+              </span>
             </div>
 
-            {/* Results count */}
-            <div className="text-sm text-muted-foreground">
-              {filteredEntries.length} traductions affichées sur {entries.length} total
-            </div>
-
-            {/* Table */}
-            <Card>
-              <ScrollArea className="h-[600px]">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="bg-muted/50">
-                      <TableHead className="w-[200px] text-xs font-semibold">Clé</TableHead>
-                      <TableHead className="text-xs font-semibold">🇫🇷 FR</TableHead>
-                      <TableHead className="text-xs font-semibold">🇲🇦 AR</TableHead>
-                      <TableHead className="text-xs font-semibold">🇬🇧 EN</TableHead>
-                      <TableHead className="text-xs font-semibold">🇪🇸 ES</TableHead>
-                      <TableHead className="text-xs font-semibold">ⵣ AMZ</TableHead>
-                      <TableHead className="text-xs font-semibold w-[120px]">Statut</TableHead>
-                      <TableHead className="text-xs font-semibold w-[50px]"></TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {uiLoading ? (
-                      <TableRow>
-                        <TableCell colSpan={8} className="text-center py-12">
-                          <Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" />
-                        </TableCell>
+            {/* Table / Grouped view */}
+            <ScrollArea className="h-[650px]">
+              {uiLoading ? (
+                <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+              ) : groupBySection && groupedEntries ? (
+                <div className="space-y-3">
+                  {groupedEntries.map(([section, sectionEntries]) => (
+                    <SectionGroup
+                      key={section}
+                      section={section}
+                      entries={sectionEntries}
+                      onSave={handleSaveTranslation}
+                      onDelete={(id) => deleteMutation.mutate(id)}
+                      onAiSuggest={handleAiSuggest}
+                      isAiLoading={aiTranslateMutation.isPending}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <Card>
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="bg-muted/50">
+                        <TableHead className="w-[180px] text-xs font-semibold">Clé</TableHead>
+                        <TableHead className="text-xs font-semibold">🇫🇷 FR</TableHead>
+                        <TableHead className="text-xs font-semibold">🇲🇦 AR</TableHead>
+                        <TableHead className="text-xs font-semibold">🇬🇧 EN</TableHead>
+                        <TableHead className="text-xs font-semibold">🇪🇸 ES</TableHead>
+                        <TableHead className="text-xs font-semibold">ⵣ AMZ</TableHead>
+                        <TableHead className="text-xs font-semibold w-[80px]">Statut</TableHead>
+                        <TableHead className="text-xs font-semibold w-[80px]"></TableHead>
                       </TableRow>
-                    ) : filteredEntries.length === 0 ? (
-                      <TableRow>
-                        <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
-                          Aucune traduction trouvée
-                        </TableCell>
-                      </TableRow>
-                    ) : (
-                      filteredEntries.map(entry => (
-                        <TranslationRow
-                          key={entry.key}
-                          entry={entry}
-                          onSave={handleSaveTranslation}
-                          onDelete={entry.isFromDB && entry.dbId ? (id) => deleteMutation.mutate(id) : undefined}
-                        />
-                      ))
-                    )}
-                  </TableBody>
-                </Table>
-              </ScrollArea>
-            </Card>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredEntries.length === 0 ? (
+                        <TableRow><TableCell colSpan={8} className="text-center py-12 text-muted-foreground">Aucune traduction trouvée</TableCell></TableRow>
+                      ) : (
+                        filteredEntries.map(entry => (
+                          <TranslationRow
+                            key={entry.key}
+                            entry={entry}
+                            onSave={handleSaveTranslation}
+                            onDelete={entry.isFromDB && entry.dbId ? (id) => deleteMutation.mutate(id) : undefined}
+                            onAiSuggest={handleAiSuggest}
+                            isAiLoading={aiTranslateMutation.isPending}
+                          />
+                        ))
+                      )}
+                    </TableBody>
+                  </Table>
+                </Card>
+              )}
+            </ScrollArea>
           </TabsContent>
 
           {/* ─── Content Tab ─── */}
@@ -629,6 +804,8 @@ export default function TranslationManagementPage() {
           open={showAddDialog}
           onClose={() => setShowAddDialog(false)}
           onSave={(e) => saveMutation.mutate(e)}
+          onAiSuggest={handleAddDialogAiSuggest}
+          isAiLoading={aiTranslateMutation.isPending}
         />
 
         {/* Content Translation Dialog */}
