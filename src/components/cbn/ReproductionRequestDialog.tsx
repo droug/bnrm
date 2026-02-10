@@ -974,6 +974,9 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
           <div className="space-y-3 p-4 bg-muted/50 rounded-lg border">
             <div className="space-y-3 text-sm">
               <p>
+                • Les liens de téléchargement des documents numériques seront valables pendant 2 mois.
+              </p>
+              <p>
                 • En cas de non-réception ou de perte de votre demande, et afin de pouvoir vous la renvoyer, veuillez transmettre le numéro du reçu de paiement à l'adresse électronique de l'institution : <a href="mailto:demande.numerisation@bnrm.ma" className="text-primary hover:underline">demande.numerisation@bnrm.ma</a>, dans un délai ne dépassant pas deux mois.
               </p>
               {isManuscript && (
