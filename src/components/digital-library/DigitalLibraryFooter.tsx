@@ -133,6 +133,11 @@ const DigitalLibraryFooter = () => {
   const [email, setEmail] = useState("");
   const [isSubscribing, setIsSubscribing] = useState(false);
 
+  const ml = (fr: string, ar: string, en: string, es: string, amz?: string) => {
+    const map: Record<string, string> = { fr, ar, en, es, amz: amz || fr };
+    return map[language] || fr;
+  };
+
   // Fetch footer settings from CMS
   const { data: cmsSettings } = useQuery({
     queryKey: ['bn-footer-settings'],
@@ -155,7 +160,7 @@ const DigitalLibraryFooter = () => {
     e.preventDefault();
     
     if (!email || !email.includes("@")) {
-      toast.error("Veuillez entrer une adresse email valide");
+      toast.error(ml("Veuillez entrer une adresse email valide", "يرجى إدخال عنوان بريد إلكتروني صالح", "Please enter a valid email address", "Por favor, introduzca un correo electrónico válido", "ⵙⵙⴽⵜⵉ ⵢⴰⵜ ⵜⴰⵏⵙⴰ ⵏ ⵉⵎⴰⵢⵍ ⵉⵖⵓⴷⴰⵏ"));
       return;
     }
 
@@ -168,11 +173,11 @@ const DigitalLibraryFooter = () => {
 
       if (error) throw error;
 
-      toast.success(data.message || "Merci pour votre abonnement !");
+      toast.success(data.message || ml("Merci pour votre abonnement !", "شكراً لاشتراكك!", "Thank you for subscribing!", "¡Gracias por su suscripción!", "ⵜⴰⵏⵎⵎⵉⵔⵜ ⵖⴼ ⵓⵎⵜⵜⴰⵡ ⵏⵏⴽ!"));
       setEmail("");
     } catch (error) {
       console.error("Newsletter subscription error:", error);
-      toast.error("Erreur lors de l'abonnement. Veuillez réessayer.");
+      toast.error(ml("Erreur lors de l'abonnement. Veuillez réessayer.", "خطأ أثناء الاشتراك. يرجى المحاولة مرة أخرى.", "Subscription error. Please try again.", "Error de suscripción. Inténtelo de nuevo.", "ⵜⴰⵣⴳⵍⵜ ⴳ ⵓⵎⵜⵜⴰⵡ. ⴰⵍⵙ ⵜⴰⵔⵎⵉⵜ."));
     } finally {
       setIsSubscribing(false);
     }
@@ -206,7 +211,7 @@ const DigitalLibraryFooter = () => {
             </div>
             
             <p className="text-sm opacity-90 leading-relaxed mb-4">
-              {language === 'ar' ? settings.description_ar : settings.description_fr}
+              {ml(settings.description_fr, settings.description_ar, settings.description_fr, settings.description_fr)}
             </p>
             
             <div className="flex items-center space-x-3 mt-auto">
@@ -236,7 +241,7 @@ const DigitalLibraryFooter = () => {
             <div className="flex flex-col">
               <h4 className="text-lg font-semibold mb-6 flex items-start text-bn-blue-primary min-h-[3.5rem]">
                 <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
-                {language === 'ar' ? quickLinks.title_ar : quickLinks.title_fr}
+                {ml(quickLinks.title_fr, quickLinks.title_ar, 'Quick Links', 'Enlaces rápidos', 'ⵉⵣⴷⴰⵢⵏ ⵉⵎⴰⵍⴰⵙⵏ')}
               </h4>
               <ul className="space-y-3">
                 {quickLinks.links.map((link, index) => (
@@ -260,7 +265,7 @@ const DigitalLibraryFooter = () => {
             <div className="flex flex-col">
               <h4 className="text-lg font-semibold mb-6 flex items-start text-bn-blue-primary min-h-[3.5rem]">
                 <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
-                {language === 'ar' ? worldReservoirs.title_ar : worldReservoirs.title_fr}
+                {ml(worldReservoirs.title_fr, worldReservoirs.title_ar, 'World Repositories', 'Repositorios mundiales', 'ⵉⵙⴰⴳⵎⵏ ⵉⵎⴰⴹⵍⴰⵏⵏ')}
               </h4>
               <ul className="space-y-3">
                 {worldReservoirs.links.map((link, index) => (
@@ -284,7 +289,7 @@ const DigitalLibraryFooter = () => {
             <div className="flex flex-col">
               <h4 className="text-lg font-semibold mb-6 flex items-start text-bn-blue-primary min-h-[3.5rem]">
                 <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
-                {language === 'ar' ? supportSection.title_ar : supportSection.title_fr}
+                {ml(supportSection.title_fr, supportSection.title_ar, 'Help & Support', 'Ayuda y soporte', 'ⵜⴰⵡⵉⵙⵉ ⴷ ⵓⵙⵎⴽⵍ')}
               </h4>
               <ul className="space-y-3">
                 {supportSection.links.map((link, index) => (
@@ -307,13 +312,13 @@ const DigitalLibraryFooter = () => {
           <div className="flex flex-col">
             <h4 className="text-lg font-semibold mb-6 flex items-start text-bn-blue-primary min-h-[3.5rem]">
               <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
-              {language === 'ar' ? 'اتصل بنا' : 'Contact'}
+              {ml('Contact', 'اتصل بنا', 'Contact', 'Contacto', 'ⴰⵎⵢⴰⵡⴰⴹ')}
             </h4>
             <div className="space-y-4">
               <div className="flex items-start space-x-3">
                 <MapPin className="h-4 w-4 mt-1 flex-shrink-0 text-gold-bn-primary" />
                 <p className="text-sm opacity-80 leading-relaxed">
-                  {language === 'ar' ? settings.contact.address_ar : settings.contact.address_fr}
+                  {ml(settings.contact.address_fr, settings.contact.address_ar, settings.contact.address_fr, settings.contact.address_fr)}
                 </p>
               </div>
               <div className="flex items-center space-x-3">
@@ -327,7 +332,7 @@ const DigitalLibraryFooter = () => {
               <div className="flex items-start space-x-3">
                 <Clock className="h-4 w-4 mt-1 flex-shrink-0 text-gold-bn-primary" />
                 <p className="text-sm opacity-80">
-                  {language === 'ar' ? settings.contact.hours_ar : settings.contact.hours_fr}
+                  {ml(settings.contact.hours_fr, settings.contact.hours_ar, settings.contact.hours_fr, settings.contact.hours_fr)}
                 </p>
               </div>
             </div>
@@ -337,19 +342,22 @@ const DigitalLibraryFooter = () => {
           <div className="flex flex-col">
             <h4 className="text-lg font-semibold mb-6 flex items-start text-bn-blue-primary min-h-[3.5rem]">
               <span className="w-1 h-6 mr-3 rounded bg-gold-bn-primary"></span>
-              {language === 'ar' ? 'النشرة الإخبارية' : 'Newsletter'}
+              {ml('Newsletter', 'النشرة الإخبارية', 'Newsletter', 'Boletín', 'ⵜⴰⴱⵔⴰⵜ ⵏ ⵉⵙⴰⵍⵏ')}
             </h4>
             <div>
               <p className="text-sm opacity-80 mb-4 leading-relaxed">
-                {language === 'ar'
-                  ? 'ابق على اطلاع بآخر المستجدات والمجموعات الجديدة.'
-                  : 'Restez informé des dernières actualités et nouvelles collections.'
-                }
+                {ml(
+                  'Restez informé des dernières actualités et nouvelles collections.',
+                  'ابق على اطلاع بآخر المستجدات والمجموعات الجديدة.',
+                  'Stay informed about the latest news and new collections.',
+                  'Manténgase informado de las últimas novedades y nuevas colecciones.',
+                  'ⵇⵇⵉⵎ ⵙ ⵜⵎⵓⵙⵙⵏⴰ ⵖⴼ ⵉⵙⴰⵍⵏ ⵉⵎⴳⴳⵓⵔⴰ ⴷ ⵜⵉⴳⵔⴰⵡⵉⵏ ⵜⵉⵎⴰⵢⵏⵓⵜⵉⵏ.'
+                )}
               </p>
               <form onSubmit={handleNewsletterSubscribe} className="space-y-3">
                 <Input 
                   type="email" 
-                  placeholder={language === 'ar' ? 'بريدك الإلكتروني' : 'Votre email'}
+                  placeholder={ml('Votre email', 'بريدك الإلكتروني', 'Your email', 'Su correo electrónico', 'ⵉⵎⴰⵢⵍ ⵏⵏⴽ')}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   disabled={isSubscribing}
@@ -363,10 +371,10 @@ const DigitalLibraryFooter = () => {
                   {isSubscribing ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      {language === 'ar' ? 'جارٍ الاشتراك...' : 'Abonnement...'}
+                      {ml('Abonnement...', 'جارٍ الاشتراك...', 'Subscribing...', 'Suscribiendo...', 'ⴰⵎⵜⵜⴰⵡ...')}
                     </>
                   ) : (
-                    language === 'ar' ? 'اشترك' : "S'abonner"
+                    ml("S'abonner", 'اشترك', 'Subscribe', 'Suscribirse', 'ⵜⵜⴰⵡ')
                   )}
                 </Button>
               </form>
@@ -394,7 +402,7 @@ const DigitalLibraryFooter = () => {
           {/* Copyright */}
           <div className="text-center">
             <p className="text-sm opacity-80">
-              © {currentYear} {language === 'ar' ? settings.copyright_ar : settings.copyright_fr}. {language === 'ar' ? 'جميع الحقوق محفوظة.' : 'Tous droits réservés.'}
+              © {currentYear} {ml(settings.copyright_fr, settings.copyright_ar, settings.copyright_fr, settings.copyright_fr)}. {ml('Tous droits réservés.', 'جميع الحقوق محفوظة.', 'All rights reserved.', 'Todos los derechos reservados.', 'ⵎⴰⵕⵕⴰ ⵉⵣⵔⴼⴰⵏ ⵜⵜⵓⵃⵟⵟⵓⵏ.')}
             </p>
           </div>
         </div>

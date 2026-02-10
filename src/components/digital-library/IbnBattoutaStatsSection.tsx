@@ -64,6 +64,16 @@ const defaultStats: StatItem[] = [
   }
 ];
 
+const labelTranslations: Record<string, Record<string, string>> = {
+  'Manuscrits': { fr: 'Manuscrits', ar: 'مخطوطات', en: 'Manuscripts', es: 'Manuscritos', amz: 'ⵉⵎⵙⴽⵜⴰⵢⵏ' },
+  'Revues': { fr: 'Revues', ar: 'مجلات', en: 'Journals', es: 'Revistas', amz: 'ⵜⵉⵎⵖⴰⵔⵉⵏ' },
+  'Lithographies': { fr: 'Lithographies', ar: 'مطبوعات حجرية', en: 'Lithographs', es: 'Litografías', amz: 'ⵜⵉⵍⵉⵜⵓⴳⵔⴰⴼⵉⵢⵉⵏ' },
+  'Livres': { fr: 'Livres', ar: 'كتب', en: 'Books', es: 'Libros', amz: 'ⵉⴷⵍⵉⵙⵏ' },
+  'Journaux': { fr: 'Journaux', ar: 'جرائد', en: 'Newspapers', es: 'Periódicos', amz: 'ⵜⵉⵖⵎⵉⵙⵉⵏ' },
+  'Collections spécialisées': { fr: 'Collections spécialisées', ar: 'مجموعات متخصصة', en: 'Specialized Collections', es: 'Colecciones especializadas', amz: 'ⵜⵉⴳⵔⴰⵡⵉⵏ ⵜⵉⵙⵏⵙⵉⵏ' },
+  'Audiovisuel': { fr: 'Audiovisuel', ar: 'مواد سمعية بصرية', en: 'Audiovisual', es: 'Audiovisual', amz: 'ⴰⵙⵍⵉ-ⴰⵡⴰⵍⴰⵏ' },
+};
+
 interface IbnBattoutaStatsSectionProps {
   stats?: StatItem[];
 }
@@ -88,12 +98,11 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
           </div>
           
           <h2 className="text-[48px] font-normal font-gilda text-slate-dark mb-6">
-            Ibn Battuta en chiffres
+            {({ fr: 'Ibn Battuta en chiffres', ar: 'ابن بطوطة بالأرقام', en: 'Ibn Battuta in Numbers', es: 'Ibn Battuta en cifras', amz: 'ⵉⴱⵏ ⴱⴰⵟⵟⵓⵟⴰ ⵙ ⵉⵎⴹⴰⵏ' } as Record<string, string>)[language] || 'Ibn Battuta en chiffres'}
           </h2>
           
           <p className="font-body text-lg text-slate-text max-w-2xl mx-auto">
-            Découvrez les documents récemment ajoutés à nos collections,
-            soigneusement sélectionnés pour enrichir votre expérience.
+            {({ fr: 'Découvrez les documents récemment ajoutés à nos collections, soigneusement sélectionnés pour enrichir votre expérience.', ar: 'اكتشف الوثائق المضافة حديثاً إلى مجموعاتنا، المختارة بعناية لإثراء تجربتك.', en: 'Discover the documents recently added to our collections, carefully selected to enrich your experience.', es: 'Descubra los documentos añadidos recientemente a nuestras colecciones, cuidadosamente seleccionados para enriquecer su experiencia.', amz: 'ⵙⵙⵓⴷⵓ ⵉⵙⴽⴽⵉⵍⵏ ⵉⵜⵜⵓⵔⵏⵓⵏ ⴰⵎⵉⵔⴰ ⵖⵔ ⵜⵉⴳⵔⴰⵡⵉⵏ ⵏⵏⵖ.' } as Record<string, string>)[language] || 'Découvrez les documents récemment ajoutés à nos collections, soigneusement sélectionnés pour enrichir votre expérience.'}
           </p>
         </div>
 
@@ -147,7 +156,12 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
                     
                     {/* Label */}
                     <div className="text-slate-text text-base font-medium">
-                      {language === 'ar' && stat.labelAr ? stat.labelAr : stat.label}
+                      {(() => {
+                        const translations = labelTranslations[stat.label];
+                        if (translations) return translations[language] || translations.fr;
+                        if (language === 'ar' && stat.labelAr) return stat.labelAr;
+                        return stat.label;
+                      })()}
                     </div>
                   </div>
                 </div>
@@ -177,7 +191,7 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
             <Button 
               className="bg-gold-bn-primary hover:bg-gold-bn-primary-dark text-white px-10 py-3 rounded-md shadow-md hover:shadow-lg transition-all font-semibold uppercase tracking-wide"
             >
-              Voir tous
+              {({ fr: 'Voir tous', ar: 'عرض الكل', en: 'View all', es: 'Ver todos', amz: 'ⵥⵕ ⴰⴽⴽⵯ' } as Record<string, string>)[language] || 'Voir tous'}
             </Button>
           </Link>
         </div>
