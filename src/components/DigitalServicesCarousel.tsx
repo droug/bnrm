@@ -112,95 +112,130 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
     );
   }
 
+  const ml = (fr: string, ar: string, en: string, es: string) => {
+    const map: Record<string, string> = { fr, ar, en, es };
+    return map[language] || fr;
+  };
+
   const allServices = [
     {
       id: 'depot-legal',
-      title: language === 'ar' ? 'الإيداع القانوني' : 'Dépôt Légal',
-      description: language === 'ar' 
-        ? 'قم بإيداع مطبوعاتك ووثائقك وفقاً للقانون. خدمة إلزامية للناشرين والمؤلفين.'
-        : 'Déposez vos publications et documents selon la loi. Service obligatoire pour les éditeurs et auteurs.',
-      category: language === 'ar' ? 'خدمة أساسية' : 'Service Essentiel',
+      title: ml('Dépôt Légal', 'الإيداع القانوني', 'Legal Deposit', 'Depósito Legal'),
+      description: ml(
+        'Déposez vos publications et documents selon la loi. Service obligatoire pour les éditeurs et auteurs.',
+        'قم بإيداع مطبوعاتك ووثائقك وفقاً للقانون. خدمة إلزامية للناشرين والمؤلفين.',
+        'Submit your publications and documents as required by law. Mandatory service for publishers and authors.',
+        'Deposite sus publicaciones y documentos según la ley. Servicio obligatorio para editores y autores.'
+      ),
+      category: ml('Service Essentiel', 'خدمة أساسية', 'Essential Service', 'Servicio Esencial'),
       onClick: () => navigate('/depot-legal')
     },
     {
       id: 'abonnements',
-      title: language === 'ar' ? 'الاشتراكات في المكتبة الوطنية' : 'Abonnements à la BNRM',
-      description: language === 'ar'
-        ? 'سجل للوصول إلى موارد وخدمات المكتبة.'
-        : 'Inscrivez-vous pour accéder aux ressources et services de la bibliothèque.',
-      category: language === 'ar' ? 'اشتراك' : 'Abonnement',
+      title: ml('Abonnements à la BNRM', 'الاشتراكات في المكتبة الوطنية', 'BNRM Subscriptions', 'Suscripciones a la BNRM'),
+      description: ml(
+        'Inscrivez-vous pour accéder aux ressources et services de la bibliothèque.',
+        'سجل للوصول إلى موارد وخدمات المكتبة.',
+        'Register to access the library\'s resources and services.',
+        'Inscríbase para acceder a los recursos y servicios de la biblioteca.'
+      ),
+      category: ml('Abonnement', 'اشتراك', 'Subscription', 'Suscripción'),
       onClick: () => navigate('/abonnements?platform=portal')
     },
     {
       id: 'espaces-culturels',
-      title: language === 'ar' ? 'حجز الفضاءات الثقافية' : 'Réservation des espaces culturels',
-      description: language === 'ar'
-        ? 'احجز فضاءاتنا لفعالياتك الثقافية والأكاديمية.'
-        : 'Réservez nos espaces pour vos événements culturels et académiques.',
-      category: language === 'ar' ? 'حجز' : 'Réservation',
+      title: ml('Réservation des espaces culturels', 'حجز الفضاءات الثقافية', 'Cultural Spaces Booking', 'Reserva de espacios culturales'),
+      description: ml(
+        'Réservez nos espaces pour vos événements culturels et académiques.',
+        'احجز فضاءاتنا لفعالياتك الثقافية والأكاديمية.',
+        'Book our spaces for your cultural and academic events.',
+        'Reserve nuestros espacios para sus eventos culturales y académicos.'
+      ),
+      category: ml('Réservation', 'حجز', 'Booking', 'Reserva'),
       onClick: () => navigate('/reservation-espaces')
     },
     {
       id: 'pass-journalier',
-      title: language === 'ar' ? 'بطاقة يومية' : 'Pass journalier',
-      description: language === 'ar'
-        ? 'دخول مجاني إلى المكتبة ليوم واحد.'
-        : services.find(s => s.nom_service === 'Pass journalier')?.description || 'Accès gratuit à la bibliothèque pour une journée.',
-      category: language === 'ar' ? 'وصول' : 'Accès',
+      title: ml('Pass journalier', 'بطاقة يومية', 'Day Pass', 'Pase diario'),
+      description: ml(
+        services.find(s => s.nom_service === 'Pass journalier')?.description || 'Accès gratuit à la bibliothèque pour une journée.',
+        'دخول مجاني إلى المكتبة ليوم واحد.',
+        'Free access to the library for one day.',
+        'Acceso gratuito a la biblioteca por un día.'
+      ),
+      category: ml('Accès', 'وصول', 'Access', 'Acceso'),
       onClick: () => navigate('/pass-journalier')
     },
     {
       id: 'reproduction',
-      title: language === 'ar' ? 'نسخ الوثائق' : 'Reproduction de documents',
-      description: language === 'ar'
-        ? 'خدمة نسخ ورقمنة الوثائق من المجموعة.'
-        : 'Service de reproduction et numérisation de documents de la collection.',
-      category: language === 'ar' ? 'خدمة حسب الطلب' : 'Service à la demande',
+      title: ml('Reproduction de documents', 'نسخ الوثائق', 'Document Reproduction', 'Reproducción de documentos'),
+      description: ml(
+        'Service de reproduction et numérisation de documents de la collection.',
+        'خدمة نسخ ورقمنة الوثائق من المجموعة.',
+        'Reproduction and digitization service for collection documents.',
+        'Servicio de reproducción y digitalización de documentos de la colección.'
+      ),
+      category: ml('Service à la demande', 'خدمة حسب الطلب', 'On-demand Service', 'Servicio bajo demanda'),
       onClick: () => navigate('/reproduction')
     },
     {
       id: 'restauration',
-      title: language === 'ar' ? 'طلب الترميم' : 'Demande de restauration',
-      description: language === 'ar'
-        ? 'خدمة ترميم وحفظ الوثائق القديمة.'
-        : services.find(s => s.nom_service === 'Restauration')?.description || 'Service de restauration et conservation de documents anciens.',
-      category: language === 'ar' ? 'ترميم' : 'Restauration',
+      title: ml('Demande de restauration', 'طلب الترميم', 'Restoration Request', 'Solicitud de restauración'),
+      description: ml(
+        services.find(s => s.nom_service === 'Restauration')?.description || 'Service de restauration et conservation de documents anciens.',
+        'خدمة ترميم وحفظ الوثائق القديمة.',
+        'Restoration and conservation service for ancient documents.',
+        'Servicio de restauración y conservación de documentos antiguos.'
+      ),
+      category: ml('Restauration', 'ترميم', 'Restoration', 'Restauración'),
       onClick: () => navigate('/demande-restauration')
     },
     {
       id: 'reservation-document',
-      title: language === 'ar' ? 'حجز وثيقة' : 'Réserver un document',
-      description: language === 'ar'
-        ? 'احجز الوثائق للاطلاع عليها في المكان.'
-        : 'Réservez des documents pour consultation sur place.',
-      category: language === 'ar' ? 'خدمة حسب الطلب' : 'Service à la demande',
+      title: ml('Réserver un document', 'حجز وثيقة', 'Reserve a Document', 'Reservar un documento'),
+      description: ml(
+        'Réservez des documents pour consultation sur place.',
+        'احجز الوثائق للاطلاع عليها في المكان.',
+        'Reserve documents for on-site consultation.',
+        'Reserve documentos para consulta in situ.'
+      ),
+      category: ml('Service à la demande', 'خدمة حسب الطلب', 'On-demand Service', 'Servicio bajo demanda'),
       onClick: () => navigate('/cbn/reserver-ouvrage')
     },
     {
       id: 'location',
-      title: language === 'ar' ? 'الإيجار حسب الطلب' : 'Location à la demande',
-      description: language === 'ar'
-        ? 'خدمة إيجار الوثائق والموارد.'
-        : 'Service de location de documents et ressources.',
-      category: language === 'ar' ? 'خدمة حسب الطلب' : 'Service à la demande',
+      title: ml('Location à la demande', 'الإيجار حسب الطلب', 'On-demand Rental', 'Alquiler bajo demanda'),
+      description: ml(
+        'Service de location de documents et ressources.',
+        'خدمة إيجار الوثائق والموارد.',
+        'Document and resource rental service.',
+        'Servicio de alquiler de documentos y recursos.'
+      ),
+      category: ml('Service à la demande', 'خدمة حسب الطلب', 'On-demand Service', 'Servicio bajo demanda'),
       onClick: () => navigate('/location-service')
     },
     {
       id: 'numerisation',
-      title: language === 'ar' ? 'طلب الرقمنة' : 'Demande de numérisation',
-      description: language === 'ar'
-        ? 'خدمة احترافية لرقمنة الوثائق.'
-        : services.find(s => s.nom_service === 'Numérisation documents rares')?.description || 'Service professionnel de numérisation de documents.',
-      category: language === 'ar' ? 'خدمة حسب الطلب' : 'Service à la demande',
+      title: ml('Demande de numérisation', 'طلب الرقمنة', 'Digitization Request', 'Solicitud de digitalización'),
+      description: ml(
+        services.find(s => s.nom_service === 'Numérisation documents rares')?.description || 'Service professionnel de numérisation de documents.',
+        'خدمة احترافية لرقمنة الوثائق.',
+        'Professional document digitization service.',
+        'Servicio profesional de digitalización de documentos.'
+      ),
+      category: ml('Service à la demande', 'خدمة حسب الطلب', 'On-demand Service', 'Servicio bajo demanda'),
       onClick: () => navigate('/demande-numerisation')
     },
     {
       id: 'ewallet',
-      title: language === 'ar' ? 'المحفظة الإلكترونية' : 'e-Wallet BNRM',
-      description: language === 'ar'
-        ? 'محفظة إلكترونية لإدارة مدفوعاتك ومعاملاتك.'
-        : 'Portefeuille électronique pour gérer vos paiements et transactions.',
-      category: language === 'ar' ? 'خدمة رقمية' : 'Service numérique',
+      title: ml('e-Wallet BNRM', 'المحفظة الإلكترونية', 'e-Wallet BNRM', 'e-Wallet BNRM'),
+      description: ml(
+        'Portefeuille électronique pour gérer vos paiements et transactions.',
+        'محفظة إلكترونية لإدارة مدفوعاتك ومعاملاتك.',
+        'Electronic wallet to manage your payments and transactions.',
+        'Monedero electrónico para gestionar sus pagos y transacciones.'
+      ),
+      category: ml('Service numérique', 'خدمة رقمية', 'Digital Service', 'Servicio digital'),
       onClick: () => navigate('/wallet')
     }
   ];
@@ -301,7 +336,7 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
           size="lg"
           className="bnrm-btn-primary px-8 py-6 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
         >
-          {language === 'ar' ? 'عرض جميع الخدمات' : 'Voir tous nos services'}
+          {ml('Voir tous nos services', 'عرض جميع الخدمات', 'View all our services', 'Ver todos nuestros servicios')}
           <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
         </Button>
       </div>
