@@ -1316,8 +1316,8 @@ const BookReader = () => {
 
                     <Button 
                       variant="default" 
-                      className="w-full justify-start" 
-                      size="sm"
+                      className="w-full justify-start bg-amber-600 hover:bg-amber-700 text-white font-semibold shadow-md border-0" 
+                      size="default"
                       onClick={() => {
                         if (user) {
                           // Utilisateur connecté: rediriger vers le formulaire de reproduction
