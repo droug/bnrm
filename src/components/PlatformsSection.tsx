@@ -288,7 +288,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                       </div>
 
                       {/* Title - centered horizontally on book */}
-                      <div className="absolute top-[140px] bottom-[260px] left-0 right-0 flex items-center justify-center px-1">
+                      <div className="absolute top-[100px] bottom-[260px] left-0 right-0 flex items-center justify-center px-1">
                         <div
                           className={`text-white font-bold text-[13px] leading-[1.3] tracking-wider drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] text-center ${
                             language === 'ar' ? '' : 'uppercase'
