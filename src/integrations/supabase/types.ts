@@ -12829,6 +12829,54 @@ export type Database = {
           },
         ]
       }
+      ui_translations: {
+        Row: {
+          amz: string | null
+          ar: string | null
+          category: string | null
+          created_at: string | null
+          created_by: string | null
+          en: string | null
+          es: string | null
+          fr: string | null
+          id: string
+          is_active: boolean | null
+          source: string
+          translation_key: string
+          updated_at: string | null
+        }
+        Insert: {
+          amz?: string | null
+          ar?: string | null
+          category?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          en?: string | null
+          es?: string | null
+          fr?: string | null
+          id?: string
+          is_active?: boolean | null
+          source?: string
+          translation_key: string
+          updated_at?: string | null
+        }
+        Update: {
+          amz?: string | null
+          ar?: string | null
+          category?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          en?: string | null
+          es?: string | null
+          fr?: string | null
+          id?: string
+          is_active?: boolean | null
+          source?: string
+          translation_key?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       unified_document_index: {
         Row: {
           access_level: string | null
