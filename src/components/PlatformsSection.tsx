@@ -287,13 +287,15 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                         </svg>
                       </div>
 
-                      {/* Title - centered vertically in middle */}
-                      <div className="absolute top-[150px] bottom-[260px] left-0 right-0 flex items-center justify-center px-2">
+                      {/* Title - centered horizontally on book */}
+                      <div className="absolute top-[140px] bottom-[260px] left-0 right-0 flex items-center justify-center px-1">
                         <div
-                          className={`text-white font-bold text-[11px] leading-tight tracking-[0.2em] drop-shadow-lg text-center ${
+                          className={`text-[#C9984F] font-bold text-[13px] leading-[1.3] tracking-wider drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] text-center ${
                             language === 'ar' ? '' : 'uppercase'
                           }`}
-                          style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
+                          style={{ 
+                            textShadow: '0 0 8px rgba(201,152,79,0.4), 0 1px 3px rgba(0,0,0,0.9)',
+                          }}
                         >
                           {platform.title}
                         </div>
