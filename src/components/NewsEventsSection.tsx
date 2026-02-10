@@ -105,7 +105,7 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
           {news.map((item) => (
             <div 
               key={item.id}
-              className="group cursor-pointer rounded-lg overflow-hidden bg-white shadow-md hover:shadow-xl transition-all"
+              className="group cursor-pointer rounded-lg overflow-hidden bg-white shadow-md hover:shadow-xl transition-all flex flex-col"
               onClick={() => navigate(`/news/${item.id}`)}
             >
               {/* Image */}
@@ -119,14 +119,14 @@ export function NewsEventsSection({ language }: NewsEventsSectionProps) {
               </div>
               
               {/* Content */}
-              <div className="p-6">
-                <Badge variant="outline" className="bnrm-tag mb-3">
+              <div className="p-6 flex flex-col flex-1">
+                <Badge variant="outline" className="bnrm-tag mb-3 w-fit">
                   {getText(item.tag)}
                 </Badge>
                 <h3 className="bnrm-card-title text-[#1e3a8a] mb-2 group-hover:text-blue-600 transition-colors">
                   {getText(item.title)}
                 </h3>
-                <p className="bnrm-body-text-sm mb-3">
+                <p className="bnrm-body-text-sm mb-3 flex-1">
                   {getText(item.excerpt)}
                 </p>
                 <Button variant="ghost" size="sm" className={`p-0 h-auto font-semibold group-hover:translate-x-1 transition-transform ${isRTL ? 'flex-row-reverse' : ''}`}>
