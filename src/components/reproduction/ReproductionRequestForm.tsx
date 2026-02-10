@@ -371,9 +371,6 @@ export function ReproductionRequestForm() {
           <div className="space-y-3 p-4 bg-muted/50 rounded-lg border">
             <div className="space-y-3 text-sm">
               <p>
-                • Votre demande sera satisfaite dans les plus brefs délais, à condition que le nombre de manuscrits demandés ne dépasse pas cinq manuscrits par demande et par jour.
-              </p>
-              <p>
                 • En cas de non-réception ou de perte de votre demande, et afin de pouvoir vous la renvoyer, veuillez transmettre le numéro du reçu de paiement à l'adresse électronique de l'institution : <a href="mailto:demande.numerisation@bnrm.ma" className="text-primary hover:underline">demande.numerisation@bnrm.ma</a>, dans un délai ne dépassant pas deux mois.
               </p>
               <p>
