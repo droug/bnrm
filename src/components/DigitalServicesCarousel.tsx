@@ -112,130 +112,140 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
     );
   }
 
-  const ml = (fr: string, ar: string, en: string, es: string) => {
-    const map: Record<string, string> = { fr, ar, en, es };
+  const ml = (fr: string, ar: string, en: string, es: string, amz?: string) => {
+    const map: Record<string, string> = { fr, ar, en, es, amz: amz || fr };
     return map[language] || fr;
   };
 
   const allServices = [
     {
       id: 'depot-legal',
-      title: ml('Dépôt Légal', 'الإيداع القانوني', 'Legal Deposit', 'Depósito Legal'),
+      title: ml('Dépôt Légal', 'الإيداع القانوني', 'Legal Deposit', 'Depósito Legal', 'ⴰⵙⵔⵙ ⴰⵏⴰⵎⵓⵙ'),
       description: ml(
         'Déposez vos publications et documents selon la loi. Service obligatoire pour les éditeurs et auteurs.',
         'قم بإيداع مطبوعاتك ووثائقك وفقاً للقانون. خدمة إلزامية للناشرين والمؤلفين.',
         'Submit your publications and documents as required by law. Mandatory service for publishers and authors.',
-        'Deposite sus publicaciones y documentos según la ley. Servicio obligatorio para editores y autores.'
+        'Deposite sus publicaciones y documentos según la ley. Servicio obligatorio para editores y autores.',
+        'ⵙⵔⵙ ⵜⵉⵥⵕⵉⴳⵉⵏ ⴷ ⵉⵙⴽⴽⵉⵍⵏ ⵏⵏⴽ ⵙ ⵓⵏⴰⵎⵓⵙ. ⵜⴰⵏⴰⴼⵓⵜ ⵜⵓⵙⵍⵉⴳⵜ ⵉ ⵉⵎⵥⵕⵉⴳⵏ.'
       ),
-      category: ml('Service Essentiel', 'خدمة أساسية', 'Essential Service', 'Servicio Esencial'),
+      category: ml('Service Essentiel', 'خدمة أساسية', 'Essential Service', 'Servicio Esencial', 'ⵜⴰⵏⴰⴼⵓⵜ ⵜⴰⴷⵙⵍⴰⵏⵜ'),
       onClick: () => navigate('/depot-legal')
     },
     {
       id: 'abonnements',
-      title: ml('Abonnements à la BNRM', 'الاشتراكات في المكتبة الوطنية', 'BNRM Subscriptions', 'Suscripciones a la BNRM'),
+      title: ml('Abonnements à la BNRM', 'الاشتراكات في المكتبة الوطنية', 'BNRM Subscriptions', 'Suscripciones a la BNRM', 'ⵉⵎⵜⵜⴰⵡⵏ ⵖⵔ ⵜⵙⴷⵍⵉⵙⵜ'),
       description: ml(
         'Inscrivez-vous pour accéder aux ressources et services de la bibliothèque.',
         'سجل للوصول إلى موارد وخدمات المكتبة.',
         'Register to access the library\'s resources and services.',
-        'Inscríbase para acceder a los recursos y servicios de la biblioteca.'
+        'Inscríbase para acceder a los recursos y servicios de la biblioteca.',
+        'ⵙⵊⵊⵍ ⴰⴷ ⵜⴽⵛⵎⴷ ⵖⵔ ⵜⵖⴱⴰⵍⵓⵜⵉⵏ ⴷ ⵜⵉⵏⴰⴼⵓⵜⵉⵏ ⵏ ⵜⵙⴷⵍⵉⵙⵜ.'
       ),
-      category: ml('Abonnement', 'اشتراك', 'Subscription', 'Suscripción'),
+      category: ml('Abonnement', 'اشتراك', 'Subscription', 'Suscripción', 'ⴰⵎⵜⵜⴰⵡ'),
       onClick: () => navigate('/abonnements?platform=portal')
     },
     {
       id: 'espaces-culturels',
-      title: ml('Réservation des espaces culturels', 'حجز الفضاءات الثقافية', 'Cultural Spaces Booking', 'Reserva de espacios culturales'),
+      title: ml('Réservation des espaces culturels', 'حجز الفضاءات الثقافية', 'Cultural Spaces Booking', 'Reserva de espacios culturales', 'ⴰⵙⵎⵔⵙ ⵏ ⵉⵙⴰⵢⵔⴰⵔⵏ ⵉⴷⵍⵙⴰⵏⵏ'),
       description: ml(
         'Réservez nos espaces pour vos événements culturels et académiques.',
         'احجز فضاءاتنا لفعالياتك الثقافية والأكاديمية.',
         'Book our spaces for your cultural and academic events.',
-        'Reserve nuestros espacios para sus eventos culturales y académicos.'
+        'Reserve nuestros espacios para sus eventos culturales y académicos.',
+        'ⵙⵎⵔⵙ ⵉⵙⴰⵢⵔⴰⵔⵏ ⵏⵏⵖ ⵉ ⵜⵎⵙⴽⴰⵔⵉⵏ ⵏⵏⴽ ⵜⵉⴷⵍⵙⴰⵏⵉⵏ.'
       ),
-      category: ml('Réservation', 'حجز', 'Booking', 'Reserva'),
+      category: ml('Réservation', 'حجز', 'Booking', 'Reserva', 'ⴰⵙⵎⵔⵙ'),
       onClick: () => navigate('/reservation-espaces')
     },
     {
       id: 'pass-journalier',
-      title: ml('Pass journalier', 'بطاقة يومية', 'Day Pass', 'Pase diario'),
+      title: ml('Pass journalier', 'بطاقة يومية', 'Day Pass', 'Pase diario', 'ⵜⴰⴽⴰⵕⴹⴰ ⵏ ⵡⴰⵙⵙ'),
       description: ml(
         services.find(s => s.nom_service === 'Pass journalier')?.description || 'Accès gratuit à la bibliothèque pour une journée.',
         'دخول مجاني إلى المكتبة ليوم واحد.',
         'Free access to the library for one day.',
-        'Acceso gratuito a la biblioteca por un día.'
+        'Acceso gratuito a la biblioteca por un día.',
+        'ⴰⴽⵛⵎ ⵏ ⵍⵅⴰⵟⵔ ⵖⵔ ⵜⵙⴷⵍⵉⵙⵜ ⵉ ⵢⴰⵏ ⵡⴰⵙⵙ.'
       ),
-      category: ml('Accès', 'وصول', 'Access', 'Acceso'),
+      category: ml('Accès', 'وصول', 'Access', 'Acceso', 'ⴰⴽⵛⵎ'),
       onClick: () => navigate('/pass-journalier')
     },
     {
       id: 'reproduction',
-      title: ml('Reproduction de documents', 'نسخ الوثائق', 'Document Reproduction', 'Reproducción de documentos'),
+      title: ml('Reproduction de documents', 'نسخ الوثائق', 'Document Reproduction', 'Reproducción de documentos', 'ⴰⵙⵏⵖⵍ ⵏ ⵉⵙⴽⴽⵉⵍⵏ'),
       description: ml(
         'Service de reproduction et numérisation de documents de la collection.',
         'خدمة نسخ ورقمنة الوثائق من المجموعة.',
         'Reproduction and digitization service for collection documents.',
-        'Servicio de reproducción y digitalización de documentos de la colección.'
+        'Servicio de reproducción y digitalización de documentos de la colección.',
+        'ⵜⴰⵏⴰⴼⵓⵜ ⵏ ⵓⵙⵏⵖⵍ ⴷ ⵜⵏⵓⵎⴰⵏⵜ ⵏ ⵉⵙⴽⴽⵉⵍⵏ.'
       ),
-      category: ml('Service à la demande', 'خدمة حسب الطلب', 'On-demand Service', 'Servicio bajo demanda'),
+      category: ml('Service à la demande', 'خدمة حسب الطلب', 'On-demand Service', 'Servicio bajo demanda', 'ⵜⴰⵏⴰⴼⵓⵜ ⵙ ⵓⵙⵓⵜⵔ'),
       onClick: () => navigate('/reproduction')
     },
     {
       id: 'restauration',
-      title: ml('Demande de restauration', 'طلب الترميم', 'Restoration Request', 'Solicitud de restauración'),
+      title: ml('Demande de restauration', 'طلب الترميم', 'Restoration Request', 'Solicitud de restauración', 'ⴰⵙⵓⵜⵔ ⵏ ⵓⵙⵖⵏⵓ'),
       description: ml(
         services.find(s => s.nom_service === 'Restauration')?.description || 'Service de restauration et conservation de documents anciens.',
         'خدمة ترميم وحفظ الوثائق القديمة.',
         'Restoration and conservation service for ancient documents.',
-        'Servicio de restauración y conservación de documentos antiguos.'
+        'Servicio de restauración y conservación de documentos antiguos.',
+        'ⵜⴰⵏⴰⴼⵓⵜ ⵏ ⵓⵙⵖⵏⵓ ⴷ ⵓⵃⵟⵟⵓ ⵏ ⵉⵙⴽⴽⵉⵍⵏ ⵉⵇⴱⵓⵔⵏ.'
       ),
-      category: ml('Restauration', 'ترميم', 'Restoration', 'Restauración'),
+      category: ml('Restauration', 'ترميم', 'Restoration', 'Restauración', 'ⴰⵙⵖⵏⵓ'),
       onClick: () => navigate('/demande-restauration')
     },
     {
       id: 'reservation-document',
-      title: ml('Réserver un document', 'حجز وثيقة', 'Reserve a Document', 'Reservar un documento'),
+      title: ml('Réserver un document', 'حجز وثيقة', 'Reserve a Document', 'Reservar un documento', 'ⵙⵎⵔⵙ ⵢⴰⵏ ⵓⵙⴽⴽⵉⵍ'),
       description: ml(
         'Réservez des documents pour consultation sur place.',
         'احجز الوثائق للاطلاع عليها في المكان.',
         'Reserve documents for on-site consultation.',
-        'Reserve documentos para consulta in situ.'
+        'Reserve documentos para consulta in situ.',
+        'ⵙⵎⵔⵙ ⵉⵙⴽⴽⵉⵍⵏ ⵉ ⵜⵖⵓⵔⵉ ⴳ ⵡⴰⵏⵙⴰ.'
       ),
-      category: ml('Service à la demande', 'خدمة حسب الطلب', 'On-demand Service', 'Servicio bajo demanda'),
+      category: ml('Service à la demande', 'خدمة حسب الطلب', 'On-demand Service', 'Servicio bajo demanda', 'ⵜⴰⵏⴰⴼⵓⵜ ⵙ ⵓⵙⵓⵜⵔ'),
       onClick: () => navigate('/cbn/reserver-ouvrage')
     },
     {
       id: 'location',
-      title: ml('Location à la demande', 'الإيجار حسب الطلب', 'On-demand Rental', 'Alquiler bajo demanda'),
+      title: ml('Location à la demande', 'الإيجار حسب الطلب', 'On-demand Rental', 'Alquiler bajo demanda', 'ⴰⴽⵔⴰⵢ ⵙ ⵓⵙⵓⵜⵔ'),
       description: ml(
         'Service de location de documents et ressources.',
         'خدمة إيجار الوثائق والموارد.',
         'Document and resource rental service.',
-        'Servicio de alquiler de documentos y recursos.'
+        'Servicio de alquiler de documentos y recursos.',
+        'ⵜⴰⵏⴰⴼⵓⵜ ⵏ ⵓⴽⵔⴰⵢ ⵏ ⵉⵙⴽⴽⵉⵍⵏ ⴷ ⵜⵖⴱⴰⵍⵓⵜⵉⵏ.'
       ),
-      category: ml('Service à la demande', 'خدمة حسب الطلب', 'On-demand Service', 'Servicio bajo demanda'),
+      category: ml('Service à la demande', 'خدمة حسب الطلب', 'On-demand Service', 'Servicio bajo demanda', 'ⵜⴰⵏⴰⴼⵓⵜ ⵙ ⵓⵙⵓⵜⵔ'),
       onClick: () => navigate('/location-service')
     },
     {
       id: 'numerisation',
-      title: ml('Demande de numérisation', 'طلب الرقمنة', 'Digitization Request', 'Solicitud de digitalización'),
+      title: ml('Demande de numérisation', 'طلب الرقمنة', 'Digitization Request', 'Solicitud de digitalización', 'ⴰⵙⵓⵜⵔ ⵏ ⵜⵏⵓⵎⴰⵏⵜ'),
       description: ml(
         services.find(s => s.nom_service === 'Numérisation documents rares')?.description || 'Service professionnel de numérisation de documents.',
         'خدمة احترافية لرقمنة الوثائق.',
         'Professional document digitization service.',
-        'Servicio profesional de digitalización de documentos.'
+        'Servicio profesional de digitalización de documentos.',
+        'ⵜⴰⵏⴰⴼⵓⵜ ⵜⴰⵥⵕⴼⴰⵏⵜ ⵏ ⵜⵏⵓⵎⴰⵏⵜ ⵏ ⵉⵙⴽⴽⵉⵍⵏ.'
       ),
-      category: ml('Service à la demande', 'خدمة حسب الطلب', 'On-demand Service', 'Servicio bajo demanda'),
+      category: ml('Service à la demande', 'خدمة حسب الطلب', 'On-demand Service', 'Servicio bajo demanda', 'ⵜⴰⵏⴰⴼⵓⵜ ⵙ ⵓⵙⵓⵜⵔ'),
       onClick: () => navigate('/demande-numerisation')
     },
     {
       id: 'ewallet',
-      title: ml('e-Wallet BNRM', 'المحفظة الإلكترونية', 'e-Wallet BNRM', 'e-Wallet BNRM'),
+      title: ml('e-Wallet BNRM', 'المحفظة الإلكترونية', 'e-Wallet BNRM', 'e-Wallet BNRM', 'ⵜⴰⵡⵏⵏⴰⴼⵜ ⵜⴰⵍⵉⴽⵜⵕⵓⵏⵉⵜ'),
       description: ml(
         'Portefeuille électronique pour gérer vos paiements et transactions.',
         'محفظة إلكترونية لإدارة مدفوعاتك ومعاملاتك.',
         'Electronic wallet to manage your payments and transactions.',
-        'Monedero electrónico para gestionar sus pagos y transacciones.'
+        'Monedero electrónico para gestionar sus pagos y transacciones.',
+        'ⵜⴰⵡⵏⵏⴰⴼⵜ ⵜⴰⵍⵉⴽⵜⵕⵓⵏⵉⵜ ⵉ ⵓⵙⵡⵓⴷⴷⵓ ⵏ ⵉⵅⵍⵍⵙⵏ ⵏⵏⴽ.'
       ),
-      category: ml('Service numérique', 'خدمة رقمية', 'Digital Service', 'Servicio digital'),
+      category: ml('Service numérique', 'خدمة رقمية', 'Digital Service', 'Servicio digital', 'ⵜⴰⵏⴰⴼⵓⵜ ⵜⴰⵏⵓⵎⴰⵏⵜ'),
       onClick: () => navigate('/wallet')
     }
   ];
@@ -336,7 +346,7 @@ export function DigitalServicesCarousel({ language }: DigitalServicesCarouselPro
           size="lg"
           className="bnrm-btn-primary px-8 py-6 text-base font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105 group"
         >
-          {ml('Voir tous nos services', 'عرض جميع الخدمات', 'View all our services', 'Ver todos nuestros servicios')}
+          {ml('Voir tous nos services', 'عرض جميع الخدمات', 'View all our services', 'Ver todos nuestros servicios', 'ⵥⵕ ⵜⵉⵏⴰⴼⵓⵜⵉⵏ ⵏⵏⵖ ⴰⴽⴽⵯ')}
           <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
         </Button>
       </div>

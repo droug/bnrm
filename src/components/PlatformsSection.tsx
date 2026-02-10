@@ -23,18 +23,20 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
   };
 
   const mainPlatform = {
-    title: ml('Bibliothèque Numérique', 'المكتبة الرقمية', 'Digital Library', 'Biblioteca Digital'),
+    title: ml('Bibliothèque Numérique', 'المكتبة الرقمية', 'Digital Library', 'Biblioteca Digital', 'ⵜⴰⵙⴷⵍⵉⵙⵜ ⵜⴰⵏⵓⵎⴰⵏⵜ'),
     description: ml(
       'Explorez nos riches collections numériques de livres, manuscrits et documents historiques disponibles en consultation en ligne',
       'استكشف مجموعاتنا الرقمية الغنية من الكتب والمخطوطات والوثائق التاريخية المتاحة للاستشارة عبر الإنترنت',
       'Explore our rich digital collections of books, manuscripts and historical documents available for online consultation',
-      'Explore nuestras ricas colecciones digitales de libros, manuscritos y documentos históricos disponibles en consulta en línea'
+      'Explore nuestras ricas colecciones digitales de libros, manuscritos y documentos históricos disponibles en consulta en línea',
+      'ⵙⵙⵓⴷⵓ ⵜⵉⴳⵔⴰⵡⵉⵏ ⵏⵏⵖ ⵜⵉⵏⵓⵎⴰⵏⵉⵏ ⵏ ⵉⴷⵍⵉⵙⵏ ⴷ ⵉⵎⵙⴽⵜⴰⵢⵏ ⴷ ⵉⵙⴽⴽⵉⵍⵏ ⵉⵎⵣⵔⵓⵢⵏ'
     ),
     tooltip: ml(
       'Plus de 50 000 documents numérisés • Accès gratuit 24h/24 • Recherche avancée',
       'أكثر من 50,000 وثيقة رقمية • وصول مجاني على مدار الساعة • بحث متقدم',
       'Over 50,000 digitized documents • Free 24/7 access • Advanced search',
-      'Más de 50.000 documentos digitalizados • Acceso gratuito 24h/24 • Búsqueda avanzada'
+      'Más de 50.000 documentos digitalizados • Acceso gratuito 24h/24 • Búsqueda avanzada',
+      'ⵓⴳⴳⴰⵔ ⵏ 50 000 ⵏ ⵓⵙⴽⴽⵉⵍ ⵉⵜⵜⵓⵏⵓⵎⴰⵏⵏ • ⴰⴽⵛⵎ ⵏ ⵍⵅⴰⵟⵔ • ⴰⵔⵣⵣⵓ ⴰⵎⵓⵟⵟⵓⵏ'
     ),
     path: '/digital-library',
     image: bibliothequeNumerique,
@@ -43,12 +45,13 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
 
   const secondaryPlatforms = [
     {
-      title: ml('Manuscrits', 'مخطوطات', 'Manuscripts', 'Manuscritos'),
+      title: ml('Manuscrits', 'مخطوطات', 'Manuscripts', 'Manuscritos', 'ⵉⵎⵙⴽⵜⴰⵢⵏ'),
       description: ml(
         'Découvrez les trésors des manuscrits arabes et amazighes rares',
         'اكتشف كنوز المخطوطات العربية والأمازيغية النادرة',
         'Discover the treasures of rare Arabic and Amazigh manuscripts',
-        'Descubra los tesoros de manuscritos árabes y amazighes raros'
+        'Descubra los tesoros de manuscritos árabes y amazighes raros',
+        'ⵙⵙⵓⴷⵓ ⵉⵙⴽⴽⵉⵏ ⵏ ⵉⵎⵙⴽⵜⴰⵢⵏ ⵉⵄⵔⴰⴱⵏ ⴷ ⵉⵎⴰⵣⵉⵖⵏ ⵉⵎⵥⵥⵉⵢⵏ'
       ),
       path: '/plateforme-manuscrits',
       image: manuscritsBackground,
@@ -60,19 +63,21 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
         'Le catalogue national unifié des bibliothèques marocaines',
         'الفهرس الوطني الموحد للمكتبات المغربية',
         'The unified national catalog of Moroccan libraries',
-        'El catálogo nacional unificado de las bibliotecas marroquíes'
+        'El catálogo nacional unificado de las bibliotecas marroquíes',
+        'ⴰⴽⵜⴰⵍⵓⴳ ⴰⵏⴰⵎⵓⵔ ⴰⵎⵢⵉⵡⵏ ⵏ ⵜⵙⴷⵍⵉⵙⵉⵏ ⵜⵉⵎⵖⵔⵉⴱⵉⵢⵉⵏ'
       ),
       path: '/kitab',
       image: kitabBackground,
       number: '03'
     },
     {
-      title: ml('Activités Culturelles', 'الأنشطة الثقافية', 'Cultural Activities', 'Actividades Culturales'),
+      title: ml('Activités Culturelles', 'الأنشطة الثقافية', 'Cultural Activities', 'Actividades Culturales', 'ⵜⵉⵎⵙⴽⴰⵔⵉⵏ ⵜⵉⴷⵍⵙⴰⵏⵉⵏ'),
       description: ml(
         'Expositions, conférences, ateliers et événements culturels variés',
         'معارض، محاضرات، ورشات عمل وفعاليات ثقافية متنوعة',
         'Exhibitions, conferences, workshops and various cultural events',
-        'Exposiciones, conferencias, talleres y eventos culturales variados'
+        'Exposiciones, conferencias, talleres y eventos culturales variados',
+        'ⵜⵉⵙⵎⵖⵓⵔⵉⵏ, ⵜⵉⵏⴰⵡⵉⵏ, ⵜⵉⵡⵓⵔⵉⵡⵉⵏ ⴷ ⵜⵉⵎⵙⴽⴰⵔⵉⵏ ⵜⵉⴷⵍⵙⴰⵏⵉⵏ'
       ),
       path: '/cultural-activities',
       image: culturalActivitiesBackground,
@@ -84,7 +89,8 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
         'Le Catalogue Bibliographique Marocain complet',
         'الفهرس الببليوغرافي المغربي الشامل',
         'The complete Moroccan Bibliographic Catalog',
-        'El Catálogo Bibliográfico Marroquí completo'
+        'El Catálogo Bibliográfico Marroquí completo',
+        'ⴰⴽⵜⴰⵍⵓⴳ ⴰⴱⵉⴱⵍⵢⵓⴳⵔⴰⴼⵉ ⴰⵎⵖⵔⵉⴱⵉ ⴰⴽⵎⵎⴰⵍ'
       ),
       path: '/cbm',
       image: cbmBackground,
@@ -110,11 +116,11 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
             BNRM
           </p>
           <h2 className="bnrm-section-title text-white mb-4">
-            {ml('Nos Plateformes', 'منصاتنا', 'Our Platforms', 'Nuestras Plataformas')}
+            {ml('Nos Plateformes', 'منصاتنا', 'Our Platforms', 'Nuestras Plataformas', 'ⵉⵎⵏⵉⵔⵏ ⵏⵏⵖ')}
           </h2>
           <div className="w-24 h-1 bg-primary mb-4"></div>
           <p className="bnrm-section-subtitle text-white/80">
-            {ml('Découvrez nos plateformes numériques', 'اكتشف منصاتنا الرقمية', 'Discover our digital platforms', 'Descubra nuestras plataformas digitales')}
+            {ml('Découvrez nos plateformes numériques', 'اكتشف منصاتنا الرقمية', 'Discover our digital platforms', 'Descubra nuestras plataformas digitales', 'ⵙⵙⵓⴷⵓ ⵉⵎⵏⵉⵔⵏ ⵏⵏⵖ ⵉⵏⵓⵎⴰⵏⵏ')}
           </p>
         </div>
 
