@@ -382,7 +382,7 @@ export default function AdvancedSearch() {
 
                   <Separator />
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className={`grid grid-cols-1 ${!isRareBookFilter ? 'md:grid-cols-2' : ''} gap-6`}>
                     <LanguageAutocomplete
                       label="Langue"
                       placeholder="Sélectionner une langue"
@@ -390,25 +390,27 @@ export default function AdvancedSearch() {
                       onChange={(value) => setFormData({ ...formData, language: value })}
                     />
 
-                    <div className="space-y-2">
-                      <Label htmlFor="documentType-all" className="text-base font-semibold">Type de document</Label>
-                      <Select
-                        value={formData.documentType}
-                        onValueChange={(value) => setFormData({ ...formData, documentType: value })}
-                      >
-                        <SelectTrigger id="documentType-all" className="h-11">
-                          <SelectValue placeholder="Tous les types" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-background z-50">
-                          <SelectItem value="manuscript">Manuscrits</SelectItem>
-                          <SelectItem value="lithography">Lithographies</SelectItem>
-                          <SelectItem value="book">Livres (Rares, Imprimés & E-Books)</SelectItem>
-                          <SelectItem value="periodical">Périodiques (Revues & Journaux)</SelectItem>
-                          <SelectItem value="specialized">Cartes, Plans, Photos & Affiches</SelectItem>
-                          <SelectItem value="audiovisual">Documents Audiovisuels</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                    {!isRareBookFilter && (
+                      <div className="space-y-2">
+                        <Label htmlFor="documentType-all" className="text-base font-semibold">Type de document</Label>
+                        <Select
+                          value={formData.documentType}
+                          onValueChange={(value) => setFormData({ ...formData, documentType: value })}
+                        >
+                          <SelectTrigger id="documentType-all" className="h-11">
+                            <SelectValue placeholder="Tous les types" />
+                          </SelectTrigger>
+                          <SelectContent className="bg-background z-50">
+                            <SelectItem value="manuscript">Manuscrits</SelectItem>
+                            <SelectItem value="lithography">Lithographies</SelectItem>
+                            <SelectItem value="book">Livres (Rares, Imprimés & E-Books)</SelectItem>
+                            <SelectItem value="periodical">Périodiques (Revues & Journaux)</SelectItem>
+                            <SelectItem value="specialized">Cartes, Plans, Photos & Affiches</SelectItem>
+                            <SelectItem value="audiovisual">Documents Audiovisuels</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
                   </div>
                   
                   <Separator />
