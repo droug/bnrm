@@ -96,6 +96,7 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
     
     // Détails de la reproduction
     reproductionScope: "partielle", // complete, partielle
+    pageNumberingType: "physique", // physique, numerique
     pages: "",
     sections: "",
     
@@ -418,6 +419,7 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
           quality: formData.quality,
           delivery_mode: formData.deliveryMode,
           reproduction_scope: formData.reproductionScope,
+          page_numbering_type: formData.pageNumberingType,
           pages: formData.pages || null,
           usage_type: formData.usageType,
           urgent_request: formData.urgentRequest,
@@ -793,6 +795,28 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
 
               {formData.reproductionScope === "partielle" && (
                 <div className="space-y-4 ml-6">
+                  {/* Type de numérotation des pages */}
+                  <div className="space-y-2">
+                    <Label className="font-medium">Type de numérotation des pages</Label>
+                    <p className="text-xs text-muted-foreground">
+                      Les numéros <strong>physiques</strong> correspondent à ceux imprimés dans le livre original, tandis que les numéros <strong>numériques</strong> correspondent à l'ordre des pages dans le fichier numérisé (qui peut différer si le document contient des pages non numérotées).
+                    </p>
+                    <RadioGroup
+                      value={formData.pageNumberingType}
+                      onValueChange={(value) => setFormData({ ...formData, pageNumberingType: value })}
+                      className="flex gap-6"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="physique" id="numbering-physique" />
+                        <Label htmlFor="numbering-physique" className="cursor-pointer">Pages physiques</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="numerique" id="numbering-numerique" />
+                        <Label htmlFor="numbering-numerique" className="cursor-pointer">Pages numériques</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+
                   <div>
                     <Label htmlFor="pages">Pages (ex: 10-25, 45, 67-89)</Label>
                     <Input
