@@ -52,6 +52,10 @@ interface DigitalLibraryLayoutProps {
 
 export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   const { t, language, setLanguage } = useLanguage();
+  const ml = (fr: string, ar: string, en: string, es: string, amz?: string) => {
+    const map: Record<string, string> = { fr, ar, en, es, amz: amz || fr };
+    return map[language] || fr;
+  };
   const { isAuthenticated, isLibrarian } = useAccessControl();
   const location = useLocation();
   const isHomePage = location.pathname === '/digital-library' || location.pathname === '/digital-library/';
@@ -104,16 +108,16 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   ];
 
   const themesSubmenu = [
-    { label: "Informatique, information et ouvrages généraux", href: "/digital-library/themes/informatique", iconName: "mdi:laptop" },
-    { label: "Philosophie et psychologie", href: "/digital-library/themes/philosophie", iconName: "mdi:head-cog-outline" },
-    { label: "Religion", href: "/digital-library/themes/religion", iconName: "mdi:mosque" },
-    { label: "Sciences sociales", href: "/digital-library/themes/sciences-sociales", iconName: "mdi:account-group-outline" },
-    { label: "Langues et linguistique", href: "/digital-library/themes/langues", iconName: "mdi:translate" },
-    { label: "Sciences pures", href: "/digital-library/themes/sciences-pures", iconName: "mdi:flask-outline" },
-    { label: "Techniques et sciences appliquées", href: "/digital-library/themes/techniques", iconName: "mdi:cog-outline" },
-    { label: "Arts, loisirs et sports", href: "/digital-library/themes/arts", iconName: "mdi:palette-outline" },
-    { label: "Littérature", href: "/digital-library/themes/litterature", iconName: "mdi:feather" },
-    { label: "Géographie et histoire", href: "/digital-library/themes/geographie-histoire", iconName: "mdi:earth" },
+    { label: ml("Informatique, information et ouvrages généraux", "المعلوماتية والمعلومات والمؤلفات العامة", "Computer science, information & general works", "Informática, información y obras generales", "ⵜⴰⵎⵙⵙⵓⵏⵜ, ⵜⴰⵏⴼⵓⵙⵜ ⴷ ⵉⴷⵍⵉⵙⵏ ⵉⵎⴰⵜⴰⵢⵏ"), href: "/digital-library/themes/informatique", iconName: "mdi:laptop" },
+    { label: ml("Philosophie et psychologie", "الفلسفة وعلم النفس", "Philosophy & psychology", "Filosofía y psicología", "ⵜⴰⴼⵍⵙⴰⴼⵜ ⴷ ⵜⴰⵏⴼⵙⵉⵜ"), href: "/digital-library/themes/philosophie", iconName: "mdi:head-cog-outline" },
+    { label: ml("Religion", "الدين", "Religion", "Religión", "ⴰⴷⵉⵏ"), href: "/digital-library/themes/religion", iconName: "mdi:mosque" },
+    { label: ml("Sciences sociales", "العلوم الاجتماعية", "Social sciences", "Ciencias sociales", "ⵜⵓⵙⵙⵏⵉⵡⵉⵏ ⵜⵉⵏⴰⵎⵓⵏⵉⵏ"), href: "/digital-library/themes/sciences-sociales", iconName: "mdi:account-group-outline" },
+    { label: ml("Langues et linguistique", "اللغات واللسانيات", "Languages & linguistics", "Lenguas y lingüística", "ⵜⵓⵜⵍⴰⵢⵉⵏ ⴷ ⵜⴰⵙⵏⵉⵍⵙⵜ"), href: "/digital-library/themes/langues", iconName: "mdi:translate" },
+    { label: ml("Sciences pures", "العلوم البحتة", "Pure sciences", "Ciencias puras", "ⵜⵓⵙⵙⵏⵉⵡⵉⵏ ⵜⵉⵙⵔⴼⴰⵏⵉⵏ"), href: "/digital-library/themes/sciences-pures", iconName: "mdi:flask-outline" },
+    { label: ml("Techniques et sciences appliquées", "التقنيات والعلوم التطبيقية", "Technology & applied sciences", "Técnicas y ciencias aplicadas", "ⵜⵉⵜⵉⵇⵏⵉⵢⵉⵏ ⴷ ⵜⵓⵙⵙⵏⵉⵡⵉⵏ ⵜⵉⵎⵙⴽⴰⵔⵉⵏ"), href: "/digital-library/themes/techniques", iconName: "mdi:cog-outline" },
+    { label: ml("Arts, loisirs et sports", "الفنون والترفيه والرياضة", "Arts, recreation & sports", "Artes, ocio y deportes", "ⵜⴰⵥⵓⵕⵉ, ⴰⵙⴼⵓⴳⵍⵓ ⴷ ⵓⴷⴷⵉⵙ"), href: "/digital-library/themes/arts", iconName: "mdi:palette-outline" },
+    { label: ml("Littérature", "الأدب", "Literature", "Literatura", "ⵜⴰⵙⴽⵍⴰ"), href: "/digital-library/themes/litterature", iconName: "mdi:feather" },
+    { label: ml("Géographie et histoire", "الجغرافيا والتاريخ", "Geography & history", "Geografía e historia", "ⵜⴰⴽⵔⴹⴰ ⴷ ⵓⵎⵣⵔⵓⵢ"), href: "/digital-library/themes/geographie-histoire", iconName: "mdi:earth" },
   ];
 
   const userMenu = isAuthenticated ? [
@@ -168,35 +172,35 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
             {/* Menu Portails */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-gold-bn-primary focus-visible:ring-offset-2" aria-label="Portails">
+                <Button variant="outline" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-gold-bn-primary focus-visible:ring-offset-2" aria-label={ml('Portails', 'البوابات', 'Portals', 'Portales', 'ⵉⵖⵔⴰⴱⵏ')}>
                   <Icon name="mdi:view-grid-outline" className="h-4 w-4" />
-                  <span className="hidden sm:inline">Portails</span>
+                  <span className="hidden sm:inline">{ml('Portails', 'البوابات', 'Portals', 'Portales', 'ⵉⵖⵔⴰⴱⵏ')}</span>
                   <Icon name="mdi:chevron-down" className="h-3 w-3" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="bg-card z-50" role="menu" aria-label="Portails">
+              <DropdownMenuContent align="start" className="bg-card z-50" role="menu" aria-label={ml('Portails', 'البوابات', 'Portals', 'Portales', 'ⵉⵖⵔⴰⴱⵏ')}>
                 <Link to="/">
                   <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
                     <Icon name="mdi:home-outline" className="h-4 w-4" />
-                    Portail Principal
+                    {ml('Portail Principal', 'البوابة الرئيسية', 'Main Portal', 'Portal Principal', 'ⴰⵖⵔⴰⴱ ⴰⵎⵇⵇⵔⴰⵏ')}
                   </DropdownMenuItem>
                 </Link>
                 <Link to="/digital-library">
                   <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
                     <Icon name="mdi:library" className="h-4 w-4" />
-                    Bibliothèque Numérique
+                    {ml('Bibliothèque Numérique', 'المكتبة الرقمية', 'Digital Library', 'Biblioteca Digital', 'ⵜⴰⵙⴷⵍⵉⵙⵜ ⵜⴰⵏⵓⵎⴰⵏⵜ')}
                   </DropdownMenuItem>
                 </Link>
                 <Link to="/manuscripts">
                   <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
                     <Icon name="mdi:scroll-text-outline" className="h-4 w-4" />
-                    Manuscrits Numérisés
+                    {ml('Manuscrits Numérisés', 'المخطوطات الرقمية', 'Digitized Manuscripts', 'Manuscritos Digitalizados', 'ⵉⵎⵙⴽⵜⴰⵢⵏ ⵉⵜⵜⵓⵙⵏⵓⵎⴰⵏⵏ')}
                   </DropdownMenuItem>
                 </Link>
                 <Link to="/portail-cbm">
                   <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
                     <Icon name="mdi:earth" className="h-4 w-4" />
-                    Portail CBM
+                    {ml('Portail CBM', 'بوابة الفهرس البيبليوغرافي', 'CBM Portal', 'Portal CBM', 'ⴰⵖⵔⴰⴱ CBM')}
                   </DropdownMenuItem>
                 </Link>
               </DropdownMenuContent>
@@ -310,9 +314,9 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
             </SimpleTooltip>
 
             <Link to="/digital-library/about" className="relative group pb-1">
-              <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" role="menuitem" aria-label="À propos">
+              <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" role="menuitem" aria-label={ml('À propos', 'حول', 'About', 'Acerca de', 'ⵖⴼ')}>
                 <Icon name="mdi:information-outline" className="h-4 w-4" />
-                À propos
+                {ml('À propos', 'حول', 'About', 'Acerca de', 'ⵖⴼ')}
               </Button>
               <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 ease-out group-hover:w-4/5 rounded-full" />
             </Link>
@@ -372,10 +376,10 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
             <div className="relative group pb-1">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label="Ressources électroniques" aria-haspopup="true">
-                    <Icon name="mdi:library" className="h-4 w-4" />
-                    Ressources électroniques
-                    <Icon name="mdi:chevron-down" className="h-3 w-3" />
+                    <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.electronicResources')} aria-haspopup="true">
+                      <Icon name="mdi:library" className="h-4 w-4" />
+                      {t('dl.electronicResources')}
+                      <Icon name="mdi:chevron-down" className="h-3 w-3" />
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="bg-card z-50 min-w-[320px] p-2">
@@ -439,9 +443,10 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                       };
                       
                       const defaultData = providerKey ? defaultDescriptions[providerKey] : null;
-                      const bundleDescription = language === 'ar' 
-                        ? (bundle.description_ar || defaultData?.ar || '')
-                        : (bundle.description || defaultData?.fr || '');
+                      const bundleDescription = (() => {
+                        if (language === 'ar') return bundle.description_ar || defaultData?.ar || '';
+                        return bundle.description || defaultData?.fr || '';
+                      })();
                       const bundleName = language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name;
                       const bundleIcon = defaultData?.icon || 'mdi:book-open-variant';
                       
@@ -458,7 +463,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                         <FancyTooltip 
                           key={bundle.id}
                           content={bundleName} 
-                          description={bundleDescription || "Accédez à cette ressource électronique"}
+                          description={bundleDescription || ml("Accédez à cette ressource électronique", "الوصول إلى هذا المورد الإلكتروني", "Access this electronic resource", "Acceda a este recurso electrónico", "ⴽⵛⵎ ⵖⵔ ⵜⵖⴱⵓⵍⵜ ⴰⴷ ⵜⴰⵍⵉⴽⵜⵕⵓⵏⵉⵜ")}
                           icon={bundleIcon}
                           side="right"
                           variant="gold"
@@ -495,7 +500,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                     })
                   ) : (
                     <DropdownMenuItem disabled className="text-muted-foreground text-sm">
-                      Aucune ressource disponible
+                      {ml('Aucune ressource disponible', 'لا توجد موارد متاحة', 'No resources available', 'No hay recursos disponibles', 'ⵓⵔ ⵍⵍⵉⵏ ⵜⵉⵖⴱⵓⵍⴰ')}
                     </DropdownMenuItem>
                   )}
                 </DropdownMenuContent>
@@ -540,7 +545,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                       </Link>
                     </FancyTooltip>
                     <FancyTooltip 
-                      content="Demande de Reproduction" 
+                      content={ml("Demande de Reproduction", "طلب استنساخ", "Reproduction Request", "Solicitud de Reproducción", "ⴰⵙⵓⵜⵔ ⵏ ⵓⵙⵏⵖⵍ")}
                       description={bnTooltips.services_reproduction}
                       icon="mdi:content-copy"
                       side="right"
@@ -551,7 +556,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                           <div className="p-2 rounded-xl bg-gradient-to-br from-purple-500/20 to-purple-500/5 group-hover:from-purple-500/30 group-hover:to-purple-500/10 transition-all duration-200 group-hover:scale-110">
                             <Icon name="mdi:content-copy" className="h-5 w-5 text-purple-600" />
                           </div>
-                          <span className="font-semibold text-foreground group-hover:text-purple-600 transition-colors">Demande de Reproduction</span>
+                          <span className="font-semibold text-foreground group-hover:text-purple-600 transition-colors">{ml("Demande de Reproduction", "طلب استنساخ", "Reproduction Request", "Solicitud de Reproducción", "ⴰⵙⵓⵜⵔ ⵏ ⵓⵙⵏⵖⵍ")}</span>
                         </DropdownMenuItem>
                       </Link>
                     </FancyTooltip>
