@@ -9,8 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { 
   Languages, RefreshCw, CheckCircle, XCircle, Loader2, FileText, Globe, Layout, 
-  Newspaper, Calendar, Search, Plus, Save, Trash2, Edit3, Download,
-  Sparkles, Wand2, FolderOpen, ChevronRight
+  Newspaper, Calendar, Search, Plus, Save, Trash2, Edit3, Download, ChevronLeft, ChevronRight,
+  Sparkles, Wand2, FolderOpen
 } from "lucide-react";
 import ContentTranslationManager from "@/components/ContentTranslationManager";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -290,6 +290,8 @@ export default function TranslationManagementPage() {
   const [selectedContentId, setSelectedContentId] = useState<string | null>(null);
   const [selectedContentTitle, setSelectedContentTitle] = useState('');
   const [groupBySection, setGroupBySection] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
   const queryClient = useQueryClient();
 
   const { entries, isLoading: uiLoading, saveMutation, deleteMutation, aiTranslateMutation } = useUITranslations();
@@ -391,6 +393,17 @@ export default function TranslationManagementPage() {
 
     return result;
   }, [entries, searchKey, filterSource, filterStatus, filterSection]);
+
+  // Reset page when filters change
+  const resetPage = () => setCurrentPage(1);
+
+  // Pagination for flat view
+  const totalPages = Math.ceil(filteredEntries.length / pageSize);
+  const paginatedEntries = useMemo(() => {
+    if (groupBySection) return filteredEntries;
+    const start = (currentPage - 1) * pageSize;
+    return filteredEntries.slice(start, start + pageSize);
+  }, [filteredEntries, currentPage, pageSize, groupBySection]);
 
   // Group by section
   const groupedEntries = useMemo(() => {
@@ -633,13 +646,26 @@ export default function TranslationManagementPage() {
               <Button onClick={handleExportCSV} variant="outline" size="sm">
                 <Download className="h-4 w-4 mr-1" /> CSV
               </Button>
-              <span className="text-sm text-muted-foreground ml-auto">
-                {filteredEntries.length} / {entries.length} traductions
-              </span>
+              <div className="flex items-center gap-2 ml-auto">
+                {!groupBySection && (
+                  <Select value={String(pageSize)} onValueChange={v => { setPageSize(Number(v)); setCurrentPage(1); }}>
+                    <SelectTrigger className="w-[90px] h-8 text-xs"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="25">25 / page</SelectItem>
+                      <SelectItem value="50">50 / page</SelectItem>
+                      <SelectItem value="100">100 / page</SelectItem>
+                      <SelectItem value="200">200 / page</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+                <span className="text-sm text-muted-foreground">
+                  {filteredEntries.length} / {entries.length} traductions
+                </span>
+              </div>
             </div>
 
             {/* Table / Grouped view */}
-            <ScrollArea className="h-[650px]">
+            <ScrollArea className="h-[600px]">
               {uiLoading ? (
                 <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
               ) : groupBySection && groupedEntries ? (
@@ -672,10 +698,10 @@ export default function TranslationManagementPage() {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {filteredEntries.length === 0 ? (
+                      {paginatedEntries.length === 0 ? (
                         <TableRow><TableCell colSpan={8} className="text-center py-12 text-muted-foreground">Aucune traduction trouvée</TableCell></TableRow>
                       ) : (
-                        filteredEntries.map(entry => (
+                        paginatedEntries.map(entry => (
                           <TranslationRow
                             key={entry.key}
                             entry={entry}
@@ -691,6 +717,42 @@ export default function TranslationManagementPage() {
                 </Card>
               )}
             </ScrollArea>
+
+            {/* Pagination controls (flat view only) */}
+            {!groupBySection && totalPages > 1 && (
+              <div className="flex items-center justify-between pt-2">
+                <p className="text-sm text-muted-foreground">
+                  Page {currentPage} sur {totalPages} — lignes {((currentPage - 1) * pageSize) + 1} à {Math.min(currentPage * pageSize, filteredEntries.length)}
+                </p>
+                <div className="flex items-center gap-1">
+                  <Button variant="outline" size="sm" disabled={currentPage <= 1} onClick={() => setCurrentPage(1)}>
+                    «
+                  </Button>
+                  <Button variant="outline" size="sm" disabled={currentPage <= 1} onClick={() => setCurrentPage(p => p - 1)}>
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let page: number;
+                    if (totalPages <= 5) { page = i + 1; }
+                    else if (currentPage <= 3) { page = i + 1; }
+                    else if (currentPage >= totalPages - 2) { page = totalPages - 4 + i; }
+                    else { page = currentPage - 2 + i; }
+                    return (
+                      <Button key={page} variant={currentPage === page ? "default" : "outline"} size="sm" className="w-8 h-8 p-0"
+                        onClick={() => setCurrentPage(page)}>
+                        {page}
+                      </Button>
+                    );
+                  })}
+                  <Button variant="outline" size="sm" disabled={currentPage >= totalPages} onClick={() => setCurrentPage(p => p + 1)}>
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="sm" disabled={currentPage >= totalPages} onClick={() => setCurrentPage(totalPages)}>
+                    »
+                  </Button>
+                </div>
+              </div>
+            )}
           </TabsContent>
 
           {/* ─── Content Tab ─── */}
