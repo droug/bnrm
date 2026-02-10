@@ -138,3 +138,6 @@ verify_jwt = false
 
 [functions.send-arbitration-notification]
 verify_jwt = true
+
+[functions.ai-translate]
+verify_jwt = false

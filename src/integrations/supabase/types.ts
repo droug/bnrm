@@ -12841,6 +12841,7 @@ export type Database = {
           fr: string | null
           id: string
           is_active: boolean | null
+          section: string | null
           source: string
           translation_key: string
           updated_at: string | null
@@ -12856,6 +12857,7 @@ export type Database = {
           fr?: string | null
           id?: string
           is_active?: boolean | null
+          section?: string | null
           source?: string
           translation_key: string
           updated_at?: string | null
@@ -12871,6 +12873,7 @@ export type Database = {
           fr?: string | null
           id?: string
           is_active?: boolean | null
+          section?: string | null
           source?: string
           translation_key?: string
           updated_at?: string | null
