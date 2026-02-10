@@ -289,7 +289,6 @@ export default function TranslationManagementPage() {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [selectedContentId, setSelectedContentId] = useState<string | null>(null);
   const [selectedContentTitle, setSelectedContentTitle] = useState('');
-  const [groupBySection, setGroupBySection] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(50);
   const queryClient = useQueryClient();
@@ -397,27 +396,17 @@ export default function TranslationManagementPage() {
   // Reset page when filters change
   const resetPage = () => setCurrentPage(1);
 
-  // Pagination for flat view
-  const totalPages = Math.ceil(filteredEntries.length / pageSize);
-  const paginatedEntries = useMemo(() => {
-    if (groupBySection) return filteredEntries;
-    const start = (currentPage - 1) * pageSize;
-    return filteredEntries.slice(start, start + pageSize);
-  }, [filteredEntries, currentPage, pageSize, groupBySection]);
-
-  // Group by section
+  // Group by section (always grouped)
   const groupedEntries = useMemo(() => {
-    if (!groupBySection) return null;
     const groups: Record<string, TranslationEntry[]> = {};
     filteredEntries.forEach(e => {
       const sec = e.section || 'general';
       if (!groups[sec]) groups[sec] = [];
       groups[sec].push(e);
     });
-    // Sort sections by SECTION_OPTIONS order
     const order = SECTION_OPTIONS.map(s => s.value);
     return Object.entries(groups).sort(([a], [b]) => order.indexOf(a) - order.indexOf(b));
-  }, [filteredEntries, groupBySection]);
+  }, [filteredEntries]);
 
   // Available sections from data
   const availableSections = useMemo(() => {
@@ -640,35 +629,19 @@ export default function TranslationManagementPage() {
                 {batchAiLoading ? <Loader2 className="h-4 w-4 mr-1 animate-spin" /> : <Sparkles className="h-4 w-4 mr-1" />}
                 Traduire incomplètes (IA × 10)
               </Button>
-              <Button onClick={() => setGroupBySection(!groupBySection)} size="sm" variant={groupBySection ? "default" : "outline"}>
-                <FolderOpen className="h-4 w-4 mr-1" /> {groupBySection ? 'Groupé par section' : 'Liste plate'}
-              </Button>
               <Button onClick={handleExportCSV} variant="outline" size="sm">
                 <Download className="h-4 w-4 mr-1" /> CSV
               </Button>
-              <div className="flex items-center gap-2 ml-auto">
-                {!groupBySection && (
-                  <Select value={String(pageSize)} onValueChange={v => { setPageSize(Number(v)); setCurrentPage(1); }}>
-                    <SelectTrigger className="w-[90px] h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="25">25 / page</SelectItem>
-                      <SelectItem value="50">50 / page</SelectItem>
-                      <SelectItem value="100">100 / page</SelectItem>
-                      <SelectItem value="200">200 / page</SelectItem>
-                    </SelectContent>
-                  </Select>
-                )}
-                <span className="text-sm text-muted-foreground">
-                  {filteredEntries.length} / {entries.length} traductions
-                </span>
-              </div>
+              <span className="text-sm text-muted-foreground ml-auto">
+                {filteredEntries.length} / {entries.length} traductions
+              </span>
             </div>
 
             {/* Table / Grouped view */}
             <ScrollArea className="h-[600px]">
               {uiLoading ? (
                 <div className="flex justify-center py-16"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
-              ) : groupBySection && groupedEntries ? (
+              ) : (
                 <div className="space-y-3">
                   {groupedEntries.map(([section, sectionEntries]) => (
                     <SectionGroup
@@ -681,78 +654,13 @@ export default function TranslationManagementPage() {
                       isAiLoading={aiTranslateMutation.isPending}
                     />
                   ))}
+                  {groupedEntries.length === 0 && (
+                    <div className="text-center py-12 text-muted-foreground">Aucune traduction trouvée</div>
+                  )}
                 </div>
-              ) : (
-                <Card>
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="bg-muted/50">
-                        <TableHead className="w-[180px] text-xs font-semibold">Clé</TableHead>
-                        <TableHead className="text-xs font-semibold">🇫🇷 FR</TableHead>
-                        <TableHead className="text-xs font-semibold">🇲🇦 AR</TableHead>
-                        <TableHead className="text-xs font-semibold">🇬🇧 EN</TableHead>
-                        <TableHead className="text-xs font-semibold">🇪🇸 ES</TableHead>
-                        <TableHead className="text-xs font-semibold">ⵣ AMZ</TableHead>
-                        <TableHead className="text-xs font-semibold w-[80px]">Statut</TableHead>
-                        <TableHead className="text-xs font-semibold w-[80px]"></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {paginatedEntries.length === 0 ? (
-                        <TableRow><TableCell colSpan={8} className="text-center py-12 text-muted-foreground">Aucune traduction trouvée</TableCell></TableRow>
-                      ) : (
-                        paginatedEntries.map(entry => (
-                          <TranslationRow
-                            key={entry.key}
-                            entry={entry}
-                            onSave={handleSaveTranslation}
-                            onDelete={entry.isFromDB && entry.dbId ? (id) => deleteMutation.mutate(id) : undefined}
-                            onAiSuggest={handleAiSuggest}
-                            isAiLoading={aiTranslateMutation.isPending}
-                          />
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
-                </Card>
               )}
             </ScrollArea>
 
-            {/* Pagination controls (flat view only) */}
-            {!groupBySection && totalPages > 1 && (
-              <div className="flex items-center justify-between pt-2">
-                <p className="text-sm text-muted-foreground">
-                  Page {currentPage} sur {totalPages} — lignes {((currentPage - 1) * pageSize) + 1} à {Math.min(currentPage * pageSize, filteredEntries.length)}
-                </p>
-                <div className="flex items-center gap-1">
-                  <Button variant="outline" size="sm" disabled={currentPage <= 1} onClick={() => setCurrentPage(1)}>
-                    «
-                  </Button>
-                  <Button variant="outline" size="sm" disabled={currentPage <= 1} onClick={() => setCurrentPage(p => p - 1)}>
-                    <ChevronLeft className="h-4 w-4" />
-                  </Button>
-                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                    let page: number;
-                    if (totalPages <= 5) { page = i + 1; }
-                    else if (currentPage <= 3) { page = i + 1; }
-                    else if (currentPage >= totalPages - 2) { page = totalPages - 4 + i; }
-                    else { page = currentPage - 2 + i; }
-                    return (
-                      <Button key={page} variant={currentPage === page ? "default" : "outline"} size="sm" className="w-8 h-8 p-0"
-                        onClick={() => setCurrentPage(page)}>
-                        {page}
-                      </Button>
-                    );
-                  })}
-                  <Button variant="outline" size="sm" disabled={currentPage >= totalPages} onClick={() => setCurrentPage(p => p + 1)}>
-                    <ChevronRight className="h-4 w-4" />
-                  </Button>
-                  <Button variant="outline" size="sm" disabled={currentPage >= totalPages} onClick={() => setCurrentPage(totalPages)}>
-                    »
-                  </Button>
-                </div>
-              </div>
-            )}
           </TabsContent>
 
           {/* ─── Content Tab ─── */}
