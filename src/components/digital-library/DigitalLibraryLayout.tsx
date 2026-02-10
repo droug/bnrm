@@ -392,48 +392,48 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                       // Description du bouquet (bilingue) avec fallback
                       const defaultDescriptions: Record<string, { fr: string; ar: string; icon: string }> = {
                         'cairn': { 
-                          fr: "Revues et ouvrages en sciences humaines et sociales francophones", 
-                          ar: "مجلات وكتب في العلوم الإنسانية والاجتماعية الفرنكوفونية",
+                          fr: "Plateforme contenant des revues et ouvrages en sciences humaines et sociales francophones", 
+                          ar: "منصة تحتوي على مجلات وكتب في العلوم الإنسانية والاجتماعية الفرنكوفونية",
                           icon: "mdi:book-open-page-variant"
                         },
                         'ebsco': { 
-                          fr: "Base de données multidisciplinaire avec des milliers de revues académiques", 
-                          ar: "قاعدة بيانات متعددة التخصصات مع آلاف المجلات الأكاديمية",
+                          fr: "Plateforme contenant des milliers de revues académiques internationales multidisciplinaires", 
+                          ar: "منصة تحتوي على آلاف المجلات الأكاديمية الدولية متعددة التخصصات",
                           icon: "mdi:database-search"
                         },
                         'brill': { 
-                          fr: "Éditeur académique spécialisé en études orientales, religion et histoire", 
-                          ar: "ناشر أكاديمي متخصص في الدراسات الشرقية والدين والتاريخ",
+                          fr: "Plateforme contenant des publications académiques en études orientales, religion et histoire", 
+                          ar: "منصة تحتوي على منشورات أكاديمية في الدراسات الشرقية والدين والتاريخ",
                           icon: "mdi:book-education"
                         },
                         'almanhal': { 
-                          fr: "Plateforme de ressources numériques en langue arabe", 
-                          ar: "منصة موارد رقمية باللغة العربية",
+                          fr: "Plateforme contenant des ressources numériques en langue arabe couvrant tous les domaines du savoir", 
+                          ar: "منصة تحتوي على موارد رقمية باللغة العربية تغطي جميع مجالات المعرفة",
                           icon: "mdi:library"
                         },
                         'eni-elearning': { 
-                          fr: "Formation en informatique et technologies numériques", 
-                          ar: "تدريب في تكنولوجيا المعلومات والتقنيات الرقمية",
+                          fr: "Plateforme contenant des cours interactifs en informatique et technologies numériques", 
+                          ar: "منصة تحتوي على دورات تفاعلية في تكنولوجيا المعلومات والتقنيات الرقمية",
                           icon: "mdi:laptop"
                         },
                         'eni': { 
-                          fr: "Formation en informatique et technologies numériques", 
-                          ar: "تدريب في تكنولوجيا المعلومات والتقنيات الرقمية",
+                          fr: "Plateforme contenant des cours interactifs en informatique et technologies numériques", 
+                          ar: "منصة تحتوي على دورات تفاعلية في تكنولوجيا المعلومات والتقنيات الرقمية",
                           icon: "mdi:laptop"
                         },
                         'europeana': { 
-                          fr: "Patrimoine culturel européen numérisé", 
-                          ar: "التراث الثقافي الأوروبي الرقمي",
+                          fr: "Plateforme contenant le patrimoine culturel européen numérisé", 
+                          ar: "منصة تحتوي على التراث الثقافي الأوروبي الرقمي",
                           icon: "mdi:castle"
                         },
                         'rfn': { 
-                          fr: "Réseau francophone numérique", 
-                          ar: "الشبكة الفرنكوفونية الرقمية",
+                          fr: "Plateforme contenant les ressources du réseau francophone numérique", 
+                          ar: "منصة تحتوي على موارد الشبكة الفرنكوفونية الرقمية",
                           icon: "mdi:earth"
                         },
                         'ifla': { 
-                          fr: "Fédération internationale des associations de bibliothèques", 
-                          ar: "الاتحاد الدولي لجمعيات المكتبات",
+                          fr: "Plateforme contenant les ressources de la fédération internationale des bibliothèques", 
+                          ar: "منصة تحتوي على موارد الاتحاد الدولي لجمعيات المكتبات",
                           icon: "mdi:account-group"
                         },
                       };
