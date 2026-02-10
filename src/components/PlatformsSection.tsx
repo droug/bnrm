@@ -17,14 +17,25 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
   const navigate = useNavigate();
   const [hoveredPlatform, setHoveredPlatform] = useState<string | null>(null);
 
+  const ml = (fr: string, ar: string, en: string, es: string, amz?: string) => {
+    const map: Record<string, string> = { fr, ar, en, es, amz: amz || fr };
+    return map[language] || fr;
+  };
+
   const mainPlatform = {
-    title: language === 'ar' ? 'المكتبة الرقمية' : 'Bibliothèque Numérique',
-    description: language === 'ar' 
-      ? 'استكشف مجموعاتنا الرقمية الغنية من الكتب والمخطوطات والوثائق التاريخية المتاحة للاستشارة عبر الإنترنت'
-      : 'Explorez nos riches collections numériques de livres, manuscrits et documents historiques disponibles en consultation en ligne',
-    tooltip: language === 'ar'
-      ? 'أكثر من 50,000 وثيقة رقمية • وصول مجاني على مدار الساعة • بحث متقدم'
-      : 'Plus de 50 000 documents numérisés • Accès gratuit 24h/24 • Recherche avancée',
+    title: ml('Bibliothèque Numérique', 'المكتبة الرقمية', 'Digital Library', 'Biblioteca Digital'),
+    description: ml(
+      'Explorez nos riches collections numériques de livres, manuscrits et documents historiques disponibles en consultation en ligne',
+      'استكشف مجموعاتنا الرقمية الغنية من الكتب والمخطوطات والوثائق التاريخية المتاحة للاستشارة عبر الإنترنت',
+      'Explore our rich digital collections of books, manuscripts and historical documents available for online consultation',
+      'Explore nuestras ricas colecciones digitales de libros, manuscritos y documentos históricos disponibles en consulta en línea'
+    ),
+    tooltip: ml(
+      'Plus de 50 000 documents numérisés • Accès gratuit 24h/24 • Recherche avancée',
+      'أكثر من 50,000 وثيقة رقمية • وصول مجاني على مدار الساعة • بحث متقدم',
+      'Over 50,000 digitized documents • Free 24/7 access • Advanced search',
+      'Más de 50.000 documentos digitalizados • Acceso gratuito 24h/24 • Búsqueda avanzada'
+    ),
     path: '/digital-library',
     image: bibliothequeNumerique,
     number: '01'
@@ -32,37 +43,49 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
 
   const secondaryPlatforms = [
     {
-      title: language === 'ar' ? 'مخطوطات' : 'Manuscrits',
-      description: language === 'ar' 
-        ? 'اكتشف كنوز المخطوطات العربية والأمازيغية النادرة'
-        : 'Découvrez les trésors des manuscrits arabes et amazighes rares',
+      title: ml('Manuscrits', 'مخطوطات', 'Manuscripts', 'Manuscritos'),
+      description: ml(
+        'Découvrez les trésors des manuscrits arabes et amazighes rares',
+        'اكتشف كنوز المخطوطات العربية والأمازيغية النادرة',
+        'Discover the treasures of rare Arabic and Amazigh manuscripts',
+        'Descubra los tesoros de manuscritos árabes y amazighes raros'
+      ),
       path: '/plateforme-manuscrits',
       image: manuscritsBackground,
       number: '02'
     },
     {
       title: 'Kitab',
-      description: language === 'ar'
-        ? 'الفهرس الوطني الموحد للمكتبات المغربية'
-        : 'Le catalogue national unifié des bibliothèques marocaines',
+      description: ml(
+        'Le catalogue national unifié des bibliothèques marocaines',
+        'الفهرس الوطني الموحد للمكتبات المغربية',
+        'The unified national catalog of Moroccan libraries',
+        'El catálogo nacional unificado de las bibliotecas marroquíes'
+      ),
       path: '/kitab',
       image: kitabBackground,
       number: '03'
     },
     {
-      title: language === 'ar' ? 'الأنشطة الثقافية' : 'Activités Culturelles',
-      description: language === 'ar'
-        ? 'معارض، محاضرات، ورشات عمل وفعاليات ثقافية متنوعة'
-        : 'Expositions, conférences, ateliers et événements culturels variés',
+      title: ml('Activités Culturelles', 'الأنشطة الثقافية', 'Cultural Activities', 'Actividades Culturales'),
+      description: ml(
+        'Expositions, conférences, ateliers et événements culturels variés',
+        'معارض، محاضرات، ورشات عمل وفعاليات ثقافية متنوعة',
+        'Exhibitions, conferences, workshops and various cultural events',
+        'Exposiciones, conferencias, talleres y eventos culturales variados'
+      ),
       path: '/cultural-activities',
       image: culturalActivitiesBackground,
       number: '04'
     },
     {
       title: 'CBM',
-      description: language === 'ar'
-        ? 'الفهرس الببليوغرافي المغربي الشامل'
-        : 'Le Catalogue Bibliographique Marocain complet',
+      description: ml(
+        'Le Catalogue Bibliographique Marocain complet',
+        'الفهرس الببليوغرافي المغربي الشامل',
+        'The complete Moroccan Bibliographic Catalog',
+        'El Catálogo Bibliográfico Marroquí completo'
+      ),
       path: '/cbm',
       image: cbmBackground,
       number: '05'
@@ -87,14 +110,11 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
             BNRM
           </p>
           <h2 className="bnrm-section-title text-white mb-4">
-            {language === 'ar' ? 'منصاتنا' : 'Nos Plateformes'}
+            {ml('Nos Plateformes', 'منصاتنا', 'Our Platforms', 'Nuestras Plataformas')}
           </h2>
           <div className="w-24 h-1 bg-primary mb-4"></div>
           <p className="bnrm-section-subtitle text-white/80">
-            {language === 'ar' 
-              ? 'اكتشف منصاتنا الرقمية'
-              : 'Découvrez nos plateformes numériques'
-            }
+            {ml('Découvrez nos plateformes numériques', 'اكتشف منصاتنا الرقمية', 'Discover our digital platforms', 'Descubra nuestras plataformas digitales')}
           </p>
         </div>
 
@@ -126,7 +146,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                 
                 <div className="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
                   <span className="text-xs text-primary font-medium">
-                    {language === 'ar' ? 'انقر للاستكشاف' : 'Cliquez pour explorer'}
+                    {ml('Cliquez pour explorer', 'انقر للاستكشاف', 'Click to explore', 'Haga clic para explorar')}
                   </span>
                   <div className="flex gap-1">
                     <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
@@ -226,7 +246,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                         <p className="text-gray-600 text-xs leading-relaxed mb-2">{platform.description}</p>
                         <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                           <span className="text-xs text-primary font-medium">
-                            {language === 'ar' ? 'اكتشف المزيد →' : 'Découvrir →'}
+                            {ml('Découvrir →', 'اكتشف المزيد →', 'Discover →', 'Descubrir →')}
                           </span>
                         </div>
                       </div>
