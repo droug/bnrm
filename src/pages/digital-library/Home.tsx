@@ -778,14 +778,16 @@ export default function DigitalLibraryHome() {
                 {(() => {
                   const fallbacks: Record<string, string> = { fr: 'Expositions Virtuelles', ar: 'معارض افتراضية', en: 'Virtual Exhibitions', es: 'Exposiciones Virtuales', amz: 'ⵜⵉⵙⵎⵖⵓⵔⵉⵏ ⵜⵉⵎⵙⵍⵉⵏ' };
                   if (language === 'ar') return vexpoHeroSettings?.title_ar || fallbacks.ar;
-                  return vexpoHeroSettings?.title_fr || fallbacks[language] || fallbacks.fr;
+                  if (language === 'fr') return vexpoHeroSettings?.title_fr || fallbacks.fr;
+                  return fallbacks[language] || vexpoHeroSettings?.title_fr || fallbacks.fr;
                 })()}
               </h2>
               <p className="font-body text-regular text-white/80 max-w-2xl mx-auto mt-4">
                 {(() => {
                   const fallbacks: Record<string, string> = { fr: "Explorez l'histoire et le patrimoine du Maroc à travers nos expositions interactives", ar: 'استكشف تاريخ وتراث المغرب من خلال معارضنا التفاعلية', en: 'Explore the history and heritage of Morocco through our interactive exhibitions', es: 'Explore la historia y el patrimonio de Marruecos a través de nuestras exposiciones interactivas', amz: 'ⵙⵙⵓⴷⵓ ⴰⵎⵣⵔⵓⵢ ⴷ ⵓⵢⴷⴰ ⵏ ⵍⵎⵖⵔⵉⴱ ⵙ ⵜⵙⵎⵖⵓⵔⵉⵏ ⵏⵏⵖ' };
                   if (language === 'ar') return vexpoHeroSettings?.subtitle_ar || fallbacks.ar;
-                  return vexpoHeroSettings?.subtitle_fr || fallbacks[language] || fallbacks.fr;
+                  if (language === 'fr') return vexpoHeroSettings?.subtitle_fr || fallbacks.fr;
+                  return fallbacks[language] || vexpoHeroSettings?.subtitle_fr || fallbacks.fr;
                 })()}
               </p>
             </div>
