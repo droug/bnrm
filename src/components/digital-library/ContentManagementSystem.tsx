@@ -17,6 +17,7 @@ import CmsVExpo360HeroManager from "@/components/cms/CmsVExpo360HeroManager";
 import CmsSectionIconsManager from "@/components/cms/CmsSectionIconsManager";
 import CmsAboutManagerBN from "@/components/cms/CmsAboutManagerBN";
 import CmsHelpManagerBN from "@/components/cms/CmsHelpManagerBN";
+import CmsTooltipsManagerBN from "@/components/cms/CmsTooltipsManagerBN";
 import FeaturedWorksManager from "@/components/admin/FeaturedWorksManager";
 import { Icon } from "@/components/ui/icon";
 import { 
@@ -211,6 +212,18 @@ const tabs = [
     description: "Pied de page de la BN",
     category: "design"
   },
+  { 
+    id: "tooltips", 
+    label: "Infobulles", 
+    icon: null,
+    iconMdi: "mdi:tooltip-text-outline",
+    color: "text-emerald-500",
+    bgColor: "bg-emerald-500/10",
+    borderColor: "border-emerald-500/30",
+    gradient: "from-emerald-500/20 to-emerald-600/5",
+    description: "Textes descriptifs au survol des menus",
+    category: "design"
+  },
   // === MÉDIAS & TECHNIQUE ===
   { 
     id: "media", 
@@ -399,6 +412,8 @@ export default function ContentManagementSystem() {
         return <CmsAboutManagerBN />;
       case "help":
         return <CmsHelpManagerBN />;
+      case "tooltips":
+        return <CmsTooltipsManagerBN />;
       default:
         return null;
     }

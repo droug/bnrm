@@ -6,6 +6,7 @@ import { Icon } from "@/components/ui/icon";
 import { Button } from "@/components/ui/button";
 import { SimpleTooltip } from "@/components/ui/simple-tooltip";
 import { FancyTooltip } from "@/components/ui/fancy-tooltip";
+import { useBNTooltips } from "@/hooks/useBNTooltips";
 import { useAccessControl } from "@/hooks/useAccessControl";
 import { useAuth } from "@/hooks/useAuth";
 import GlobalSearchBar from "@/components/GlobalSearchBar";
@@ -55,6 +56,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   const location = useLocation();
   const isHomePage = location.pathname === '/digital-library' || location.pathname === '/digital-library/';
   const { session, profile } = useAuth();
+  const { tooltips: bnTooltips } = useBNTooltips();
   
   const canManageLibrary = isLibrarian || profile?.role === 'admin' || profile?.role === 'librarian';
   const [showReproductionDialog, setShowReproductionDialog] = useState(false);
@@ -93,12 +95,12 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   }, [session, isAuthenticated]);
 
   const collectionsSubmenu = [
-    { labelKey: "dl.collections.manuscripts", descKey: "dl.collections.manuscripts.desc", tooltipKey: "dl.collections.manuscripts.tooltip", href: "/digital-library/collections/manuscripts", iconName: "mdi:scroll-text-outline", count: "+12 000" },
-    { labelKey: "dl.collections.lithography", descKey: "dl.collections.lithography.desc", tooltipKey: "dl.collections.lithography.tooltip", href: "/digital-library/collections/lithography", iconName: "mdi:file-document-outline", count: "+30" },
-    { labelKey: "dl.collections.books", descKey: "Livres rares, Imprimés et E-Books", tooltipKey: "dl.collections.books.tooltip", href: "/digital-library/collections/books", iconName: "mdi:book-outline", count: "+400", customDesc: true },
-    { labelKey: "dl.collections.periodicals", descKey: "dl.collections.periodicals.desc", tooltipKey: "dl.collections.periodicals.tooltip", href: "/digital-library/collections/periodicals", iconName: "mdi:newspaper-variant-outline", count: "+70" },
-    { labelKey: "dl.collections.specialized", descKey: "dl.collections.specialized.desc", tooltipKey: "dl.collections.specialized.tooltip", href: "/digital-library/collections/photos", iconName: "mdi:map-outline", count: "+2 000" },
-    { labelKey: "dl.collections.audiovisual", descKey: "dl.collections.audiovisual.desc", tooltipKey: "dl.collections.audiovisual.tooltip", href: "/digital-library/collections/audiovisual", iconName: "mdi:music-note-outline", count: "+100" },
+    { labelKey: "dl.collections.manuscripts", descKey: "dl.collections.manuscripts.desc", tooltipKey: "collections_manuscripts" as const, href: "/digital-library/collections/manuscripts", iconName: "mdi:scroll-text-outline", count: "+12 000" },
+    { labelKey: "dl.collections.lithography", descKey: "dl.collections.lithography.desc", tooltipKey: "collections_lithography" as const, href: "/digital-library/collections/lithography", iconName: "mdi:file-document-outline", count: "+30" },
+    { labelKey: "dl.collections.books", descKey: "Livres rares, Imprimés et E-Books", tooltipKey: "collections_books" as const, href: "/digital-library/collections/books", iconName: "mdi:book-outline", count: "+400", customDesc: true },
+    { labelKey: "dl.collections.periodicals", descKey: "dl.collections.periodicals.desc", tooltipKey: "collections_periodicals" as const, href: "/digital-library/collections/periodicals", iconName: "mdi:newspaper-variant-outline", count: "+70" },
+    { labelKey: "dl.collections.specialized", descKey: "dl.collections.specialized.desc", tooltipKey: "collections_specialized" as const, href: "/digital-library/collections/photos", iconName: "mdi:map-outline", count: "+2 000" },
+    { labelKey: "dl.collections.audiovisual", descKey: "dl.collections.audiovisual.desc", tooltipKey: "collections_audiovisual" as const, href: "/digital-library/collections/audiovisual", iconName: "mdi:music-note-outline", count: "+100" },
   ];
 
   const themesSubmenu = [
@@ -340,7 +342,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                       <FancyTooltip 
                         key={item.href}
                         content={t(item.labelKey)} 
-                        description={t(item.tooltipKey)}
+                        description={bnTooltips[item.tooltipKey]}
                         icon={item.iconName}
                         side="right"
                         variant="gold"
@@ -523,7 +525,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                   <DropdownMenuContent align="start" className="bg-card z-50 min-w-[280px] p-2" role="menu" aria-label={t('dl.readerServices')}>
                     <FancyTooltip 
                       content={t('dl.membership')} 
-                      description="Abonnez-vous pour accéder à l'ensemble des ressources numériques"
+                      description={bnTooltips.services_membership}
                       icon="mdi:account-plus-outline"
                       side="right"
                       variant="gold"
@@ -539,7 +541,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                     </FancyTooltip>
                     <FancyTooltip 
                       content="Demande de Reproduction" 
-                      description="Demandez une copie numérique ou papier d'un document patrimonial"
+                      description={bnTooltips.services_reproduction}
                       icon="mdi:content-copy"
                       side="right"
                       variant="gold"
