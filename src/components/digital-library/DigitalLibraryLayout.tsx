@@ -340,7 +340,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                       <FancyTooltip 
                         key={item.href}
                         content={t(item.labelKey)} 
-                        description={(item as any).customDesc ? item.descKey : t(item.descKey)}
+                        description={t(item.tooltipKey)}
                         icon={item.iconName}
                         side="right"
                         variant="gold"
