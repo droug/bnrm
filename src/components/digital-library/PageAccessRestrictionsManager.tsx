@@ -407,7 +407,7 @@ export function PageAccessRestrictionsManager() {
                   <Switch
                     checked={isRestricted}
                     onCheckedChange={setIsRestricted}
-                    className="ml-4"
+                    className="ml-4 data-[state=unchecked]:bg-gray-300 data-[state=checked]:bg-primary border-2 border-gray-300 data-[state=checked]:border-primary"
                   />
                 </div>
               </CardContent>
