@@ -11,8 +11,9 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
-import { Plus, Edit, Trash2, Loader2, LayoutTemplate, Eye, EyeOff, GripVertical } from "lucide-react";
+import { Plus, Edit, Trash2, Loader2, LayoutTemplate, Eye, EyeOff, GripVertical, ExternalLink } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import RichTextEditor from "./RichTextEditor";
 
 interface Section {
@@ -37,20 +38,21 @@ interface Page {
 
 const sectionTypes = [
   { value: "hero", label: "Hero Banner" },
-  { value: "text", label: "Texte simple" },
   { value: "richtext", label: "Texte enrichi" },
-  { value: "image", label: "Image" },
-  { value: "gallery", label: "Galerie d'images" },
-  { value: "video", label: "Vidéo" },
+  { value: "grid", label: "Grille" },
+  { value: "cardList", label: "Liste de cartes" },
   { value: "cards", label: "Cartes" },
-  { value: "cta", label: "Appel à l'action" },
-  { value: "accordion", label: "Accordéon FAQ" },
-  { value: "timeline", label: "Timeline" },
+  { value: "carousel", label: "Carrousel" },
+  { value: "banner", label: "Bannière" },
+  { value: "faq", label: "Accordéon FAQ" },
+  { value: "eventList", label: "Liste d'événements" },
+  { value: "image", label: "Image" },
+  { value: "video", label: "Vidéo" },
+  { value: "callout", label: "Appel à l'action" },
+  { value: "statBlocks", label: "Blocs statistiques" },
   { value: "stats", label: "Statistiques" },
-  { value: "team", label: "Équipe" },
-  { value: "contact", label: "Contact" },
-  { value: "map", label: "Carte" },
   { value: "custom", label: "Personnalisé" },
+  { value: "timeline", label: "Timeline" },
 ];
 
 export default function CmsSectionsManager() {
@@ -364,6 +366,7 @@ export default function CmsSectionsManager() {
                 <TableHead>Titre</TableHead>
                 <TableHead>Type</TableHead>
                 <TableHead>Page</TableHead>
+                <TableHead>Gestion</TableHead>
                 <TableHead>Visible</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
@@ -384,6 +387,18 @@ export default function CmsSectionsManager() {
                     <Badge variant="outline">{getSectionTypeLabel(item.section_type)}</Badge>
                   </TableCell>
                   <TableCell>{getPageTitle(item.page_id)}</TableCell>
+                  <TableCell>
+                    {item.props && (item.props as any).admin_route ? (
+                      <Link to={(item.props as any).admin_route} className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+                        <ExternalLink className="h-3 w-3" />
+                        Gérer
+                      </Link>
+                    ) : (
+                      <span className="text-xs text-muted-foreground italic">
+                        {item.props && (item.props as any).description ? (item.props as any).description : '—'}
+                      </span>
+                    )}
+                  </TableCell>
                   <TableCell>
                     <Button
                       variant="ghost"
