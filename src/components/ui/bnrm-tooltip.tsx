@@ -22,7 +22,9 @@ export const BNRMTooltip: React.FC<BNRMTooltipProps> = ({
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState({ top: 0, left: 0 });
+  const [adjustedSide, setAdjustedSide] = useState(side);
   const triggerRef = useRef<HTMLDivElement>(null);
+  const tooltipRef = useRef<HTMLDivElement>(null);
   const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const showTooltip = useCallback(() => {
@@ -49,11 +51,24 @@ export const BNRMTooltip: React.FC<BNRMTooltipProps> = ({
     if (isVisible && triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
       const offset = 12;
+      const tooltipWidth = 320; // max-w-[320px]
+      const tooltipHeight = 100; // estimated height
+      const padding = 8; // viewport edge padding
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+
+      let resolvedSide = side;
       
+      // Auto-flip if tooltip would overflow viewport
+      if (side === 'bottom' && rect.bottom + offset + tooltipHeight > vh) resolvedSide = 'top';
+      if (side === 'top' && rect.top - offset - tooltipHeight < 0) resolvedSide = 'bottom';
+      if (side === 'right' && rect.right + offset + tooltipWidth > vw) resolvedSide = 'left';
+      if (side === 'left' && rect.left - offset - tooltipWidth < 0) resolvedSide = 'right';
+
       let top = 0;
       let left = 0;
 
-      switch (side) {
+      switch (resolvedSide) {
         case 'right':
           top = rect.top + rect.height / 2;
           left = rect.right + offset;
@@ -72,6 +87,18 @@ export const BNRMTooltip: React.FC<BNRMTooltipProps> = ({
           break;
       }
 
+      // Clamp left so tooltip doesn't overflow horizontally
+      const halfWidth = tooltipWidth / 2;
+      if (resolvedSide === 'top' || resolvedSide === 'bottom') {
+        if (left - halfWidth < padding) left = halfWidth + padding;
+        if (left + halfWidth > vw - padding) left = vw - halfWidth - padding;
+      } else {
+        // For left/right sides, clamp top vertically
+        if (top - tooltipHeight / 2 < padding) top = tooltipHeight / 2 + padding;
+        if (top + tooltipHeight / 2 > vh - padding) top = vh - tooltipHeight / 2 - padding;
+      }
+
+      setAdjustedSide(resolvedSide);
       setPosition({ top, left });
     }
   }, [isVisible, side]);
@@ -101,7 +128,7 @@ export const BNRMTooltip: React.FC<BNRMTooltipProps> = ({
   };
 
   const getTransformStyle = () => {
-    switch (side) {
+    switch (adjustedSide) {
       case 'right':
         return 'translateY(-50%)';
       case 'left':
@@ -116,7 +143,7 @@ export const BNRMTooltip: React.FC<BNRMTooltipProps> = ({
   };
 
   const getArrowStyle = () => {
-    switch (side) {
+    switch (adjustedSide) {
       case 'right':
         return { left: '-6px', top: '50%', transform: 'translateY(-50%) rotate(45deg)' };
       case 'left':
