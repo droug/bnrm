@@ -6808,10 +6808,12 @@ export type Database = {
           country_code: string
           created_at: string
           discipline: string
+          email: string | null
           frequency: string
           id: string
           justification_file_url: string | null
           language_code: string
+          phone: string | null
           publisher: string
           rejection_reason: string | null
           request_number: string | null
@@ -6832,10 +6834,12 @@ export type Database = {
           country_code: string
           created_at?: string
           discipline: string
+          email?: string | null
           frequency: string
           id?: string
           justification_file_url?: string | null
           language_code: string
+          phone?: string | null
           publisher: string
           rejection_reason?: string | null
           request_number?: string | null
@@ -6856,10 +6860,12 @@ export type Database = {
           country_code?: string
           created_at?: string
           discipline?: string
+          email?: string | null
           frequency?: string
           id?: string
           justification_file_url?: string | null
           language_code?: string
+          phone?: string | null
           publisher?: string
           rejection_reason?: string | null
           request_number?: string | null
