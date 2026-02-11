@@ -36,10 +36,21 @@ serve(async (req) => {
 
     const token = authHeader.replace("Bearer ", "");
 
-    // Use service role client with explicit token to validate user
-    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
+    // Decode JWT payload to extract user ID (avoids SDK session issues)
+    let jwtPayload: any;
+    try {
+      jwtPayload = JSON.parse(atob(token.split('.')[1]));
+    } catch (e) {
+      console.error("[USER-SERVICE] JWT decode error:", e);
+      throw new Error("Invalid token");
+    }
+
+    if (!jwtPayload.sub) throw new Error("Invalid token: no sub claim");
+
+    // Validate user exists via admin API (service role)
+    const { data: userData, error: userError } = await supabaseClient.auth.admin.getUserById(jwtPayload.sub);
     if (userError || !userData.user) {
-      console.error("[USER-SERVICE] Auth error:", userError);
+      console.error("[USER-SERVICE] Admin getUserById error:", userError);
       throw new Error("User not authenticated");
     }
     const currentUser = userData.user;
