@@ -259,7 +259,7 @@ export const ReservedRangesManager = () => {
       const { error } = await supabase
         .from('reserved_number_ranges')
         .insert([{
-          deposit_type: formData.deposit_type,
+          deposit_type: activeProType,
           number_type: formData.number_type,
           range_start,
           range_end,
