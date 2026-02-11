@@ -14,6 +14,68 @@ import { Eye, CheckCircle, XCircle, Search, Filter, Loader2, Hash, Shuffle, Book
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
+
+function generateIssnEmailHtml(params: {
+  type: 'attribution' | 'rejection';
+  requestNumber: string;
+  title: string;
+  requesterName: string;
+  issn?: string;
+  rejectionReason?: string;
+}): string {
+  const { type, requestNumber, title, requesterName, issn, rejectionReason } = params;
+  const isAttribution = type === 'attribution';
+
+  const badgeHtml = isAttribution
+    ? `<span style="display:inline-block;background:linear-gradient(135deg,#10b981,#059669);color:#fff;padding:10px 25px;border-radius:25px;font-weight:600;font-size:14px;box-shadow:0 2px 8px rgba(16,185,129,.3);">✓ ISSN ATTRIBUÉ</span>`
+    : `<span style="display:inline-block;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;padding:10px 25px;border-radius:25px;font-weight:600;font-size:14px;box-shadow:0 2px 8px rgba(239,68,68,.3);">✗ DEMANDE REFUSÉE</span>`;
+
+  const bodyHtml = isAttribution
+    ? `<p style="font-size:15px;color:#4b5563;">Nous avons le plaisir de vous informer que votre demande ISSN a été <strong style="color:#10b981;">validée</strong>.</p>
+       <div style="background:linear-gradient(135deg,#ecfdf5,#d1fae5);border-radius:12px;padding:25px;margin:25px 0;border:2px solid #10b981;text-align:center;">
+         <h3 style="margin:0 0 10px;color:#065f46;font-size:16px;">🏆 ISSN Attribué</h3>
+         <p style="font-family:monospace;font-size:28px;font-weight:bold;color:#10b981;margin:0;">${issn}</p>
+         <p style="font-size:13px;color:#065f46;margin:10px 0 0;">Conservez précieusement ce numéro pour votre publication.</p>
+       </div>`
+    : `<p style="font-size:15px;color:#4b5563;">Nous regrettons de vous informer que votre demande ISSN a été <strong style="color:#ef4444;">refusée</strong>.</p>
+       <div style="background:#fef2f2;border-radius:12px;padding:20px;margin:25px 0;border-left:4px solid #ef4444;">
+         <h4 style="margin:0 0 8px;color:#991b1b;font-size:14px;">Motif du refus :</h4>
+         <p style="margin:0;color:#7f1d1d;">${rejectionReason || 'Non spécifié'}</p>
+       </div>
+       <p style="font-size:14px;color:#6b7280;">Vous pouvez soumettre une nouvelle demande en corrigeant les éléments mentionnés ci-dessus.</p>`;
+
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"></head>
+  <body style="font-family:'Segoe UI',Arial,sans-serif;line-height:1.6;color:#333;margin:0;padding:0;background:#f5f5f5;">
+    <div style="max-width:650px;margin:0 auto;background:#fff;">
+      <div style="background:linear-gradient(135deg,#002B45,#004d7a);color:#fff;padding:35px 30px;text-align:center;">
+        <h1 style="margin:0;font-size:22px;">المكتبة الوطنية للمملكة المغربية</h1>
+        <h1 style="margin:5px 0 0;font-size:22px;">Bibliothèque Nationale du Royaume du Maroc</h1>
+        <p style="margin:8px 0 0;opacity:.9;font-size:14px;">Département du Dépôt Légal - ISSN</p>
+      </div>
+      <div style="padding:35px 30px;">
+        <div style="text-align:center;margin-bottom:25px;">${badgeHtml}</div>
+        <h2 style="margin:0 0 20px;color:#1f2937;">Bonjour ${requesterName},</h2>
+        <div style="background:#f8fafc;border-radius:12px;padding:25px;margin:25px 0;border:1px solid #e2e8f0;">
+          <h3 style="margin:0 0 15px;color:#002B45;font-size:16px;">📄 Informations de la demande</h3>
+          <table style="width:100%;border-collapse:collapse;">
+            <tr><td style="padding:8px 0;color:#666;width:40%;">N° de demande</td><td style="padding:8px 0;"><span style="background:#e0e7ff;color:#3730a3;padding:4px 12px;border-radius:4px;font-size:12px;font-weight:600;">${requestNumber}</span></td></tr>
+            <tr><td style="padding:8px 0;color:#666;">Titre</td><td style="padding:8px 0;font-weight:600;color:#1f2937;">${title}</td></tr>
+          </table>
+        </div>
+        ${bodyHtml}
+        <div style="height:1px;background:#e5e7eb;margin:25px 0;"></div>
+        <p style="font-size:14px;color:#6b7280;">Pour toute question, contactez-nous par email ou téléphone.</p>
+        <p style="margin-top:20px;">Cordialement,<br><strong style="color:#002B45;">L'équipe du Dépôt Légal - BNRM</strong></p>
+      </div>
+      <div style="background:#f8f9fa;padding:25px 30px;text-align:center;border-top:1px solid #e9ecef;">
+        <p style="margin:5px 0;font-size:13px;font-weight:600;color:#333;">Bibliothèque Nationale du Royaume du Maroc</p>
+        <p style="margin:5px 0;font-size:12px;color:#666;">Avenue Ibn Khaldoun, Agdal - Rabat, Maroc</p>
+        <p style="margin:5px 0;font-size:12px;color:#666;">📞 +212 537 77 18 33 | ✉️ depot.legal@bnrm.ma</p>
+        <p style="margin:15px 0 0;font-size:11px;color:#999;">Ce message a été envoyé automatiquement. Merci de ne pas répondre directement.</p>
+      </div>
+    </div>
+  </body></html>`;
+}
 import { useAuth } from "@/hooks/useAuth";
 
 interface IssnRequest {
@@ -184,8 +246,20 @@ export default function IssnRequestsManager() {
 
       if (selectedRequest.requester_email) {
         try {
-          await supabase.functions.invoke('send-workflow-notification', {
-            body: { request_type: 'issn_request', request_id: selectedRequest.id, notification_type: 'refusee', recipient_email: selectedRequest.requester_email, additional_data: { reason: rejectionReason } }
+          const rejectHtml = generateIssnEmailHtml({
+            type: 'rejection',
+            requestNumber: selectedRequest.request_number,
+            title: selectedRequest.title,
+            requesterName: selectedRequest.publisher || 'Demandeur',
+            rejectionReason,
+          });
+          await supabase.functions.invoke('notification-service', {
+            body: {
+              action: 'send_email',
+              recipient_email: selectedRequest.requester_email,
+              subject: `Demande ISSN ${selectedRequest.request_number} - Refusée`,
+              html_content: rejectHtml,
+            }
           });
         } catch (notifError) { console.warn('Notification email failed:', notifError); }
       }
@@ -280,8 +354,20 @@ export default function IssnRequestsManager() {
 
       if (selectedRequest.requester_email) {
         try {
-          await supabase.functions.invoke('send-workflow-notification', {
-            body: { request_type: 'issn_request', request_id: selectedRequest.id, notification_type: 'issn_attributed', recipient_email: selectedRequest.requester_email, additional_data: { issn: issnNumber.trim().toUpperCase() } }
+          const attrHtml = generateIssnEmailHtml({
+            type: 'attribution',
+            requestNumber: selectedRequest.request_number,
+            title: selectedRequest.title,
+            requesterName: selectedRequest.publisher || 'Demandeur',
+            issn: issnNumber.trim().toUpperCase(),
+          });
+          await supabase.functions.invoke('notification-service', {
+            body: {
+              action: 'send_email',
+              recipient_email: selectedRequest.requester_email,
+              subject: `Attribution ISSN - ${selectedRequest.request_number} - Demande Validée`,
+              html_content: attrHtml,
+            }
           });
         } catch (notifError) { console.warn('Notification email failed:', notifError); }
       }
