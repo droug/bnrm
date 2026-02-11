@@ -10,7 +10,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Eye, CheckCircle, XCircle, Search, Filter, Loader2, Hash, Shuffle, BookOpen, ArrowRight } from "lucide-react";
+import { Eye, CheckCircle, XCircle, Search, Filter, Loader2, Hash, Shuffle, BookOpen, ArrowRight, Paperclip, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
@@ -37,6 +37,7 @@ interface IssnRequest {
   assigned_issn: string | null;
   assigned_at: string | null;
   assigned_by: string | null;
+  justification_file_url: string | null;
 }
 
 interface IssnRange {
@@ -552,6 +553,32 @@ export default function IssnRequestsManager() {
                     )}
                   </div>
                 </div>
+
+                {/* Fichiers joints */}
+                {selectedRequest.justification_file_url && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h3 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide mb-3">
+                        <Paperclip className="h-3.5 w-3.5 inline mr-1.5" />
+                        Fichiers joints
+                      </h3>
+                      <a
+                        href={selectedRequest.justification_file_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 p-3 rounded-lg border hover:bg-muted/50 transition-colors group"
+                      >
+                        <Paperclip className="h-4 w-4 text-muted-foreground" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">Justificatif</p>
+                          <p className="text-xs text-muted-foreground truncate">{selectedRequest.justification_file_url.split('/').pop()}</p>
+                        </div>
+                        <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </a>
+                    </div>
+                  </>
+                )}
 
                 {/* Motif de refus */}
                 {selectedRequest.rejection_reason && (
