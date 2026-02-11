@@ -1,0 +1,1 @@
+UPDATE publishers SET deleted_at = now(), is_validated = false WHERE id = '54f8fe8a-c3ca-4dec-a624-1fd631dd9971';
