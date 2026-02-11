@@ -337,20 +337,42 @@ serve(async (req) => {
         }
 
         // Annuler les tranches réservées pour ce professionnel supprimé
+        // On annule par email ET par nom séparément pour couvrir tous les cas
         try {
-          if (professionalEmail || companyName) {
-            const identifier = professionalEmail || companyName;
-            const field = professionalEmail ? 'requester_email' : 'requester_name';
-            const { error: rangeError } = await supabaseClient
+          if (professionalEmail) {
+            const { error: rangeError1 } = await supabaseClient
               .from('reserved_number_ranges')
               .update({ status: 'cancelled' })
               .eq('status', 'active')
-              .eq(field, identifier);
-            if (rangeError) {
-              console.warn(`[USER-SERVICE] Warning cancelling reserved ranges: ${rangeError.message}`);
+              .eq('requester_email', professionalEmail);
+            if (rangeError1) {
+              console.warn(`[USER-SERVICE] Warning cancelling ranges by email: ${rangeError1.message}`);
             } else {
-              console.log(`[USER-SERVICE] Cancelled reserved ranges for ${identifier}`);
+              console.log(`[USER-SERVICE] Cancelled reserved ranges by email for ${professionalEmail}`);
             }
+          }
+          if (companyName) {
+            const { error: rangeError2 } = await supabaseClient
+              .from('reserved_number_ranges')
+              .update({ status: 'cancelled' })
+              .eq('status', 'active')
+              .eq('requester_name', companyName);
+            if (rangeError2) {
+              console.warn(`[USER-SERVICE] Warning cancelling ranges by name: ${rangeError2.message}`);
+            } else {
+              console.log(`[USER-SERVICE] Cancelled reserved ranges by name for ${companyName}`);
+            }
+          }
+          // Also cancel by requester_id if available
+          const { error: rangeError3 } = await supabaseClient
+            .from('reserved_number_ranges')
+            .update({ status: 'cancelled' })
+            .eq('status', 'active')
+            .eq('requester_id', user_id);
+          if (rangeError3) {
+            console.warn(`[USER-SERVICE] Warning cancelling ranges by id: ${rangeError3.message}`);
+          } else {
+            console.log(`[USER-SERVICE] Cancelled reserved ranges by id for ${user_id}`);
           }
         } catch (e) {
           console.warn(`[USER-SERVICE] Error cancelling reserved ranges:`, e);
