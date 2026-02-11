@@ -935,8 +935,13 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
     // Validation
     if (!issnFormData.title || !issnFormData.discipline || !issnFormData.language || 
         !issnFormData.country || !issnFormData.publisher || !issnFormData.support || 
-        !issnFormData.frequency || !issnFormData.contactAddress) {
+        !issnFormData.frequency || !issnFormData.contactAddress || !issnFormData.email) {
       toast.error("Veuillez remplir tous les champs obligatoires");
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(issnFormData.email.trim())) {
+      toast.error("Veuillez saisir un e-mail valide");
       return;
     }
 
@@ -955,8 +960,10 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         support: issnFormData.support,
         frequency: issnFormData.frequency,
         contact_address: issnFormData.contactAddress,
+        email: issnFormData.email.trim(),
+        phone: issnFormData.phone.trim() || null,
         user_id: user.id,
-        requester_email: user.email
+        requester_email: issnFormData.email.trim() || user.email
       });
 
       if (error) throw error;
@@ -4955,6 +4962,27 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                     onChange={(e) => setIssnFormData({ ...issnFormData, contactAddress: e.target.value })}
                     className="min-h-[80px]"
                   />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>E-mail <span className="text-destructive">*</span></Label>
+                    <Input
+                      type="email"
+                      placeholder="exemple@domaine.com"
+                      value={issnFormData.email}
+                      onChange={(e) => setIssnFormData({ ...issnFormData, email: e.target.value })}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Téléphone</Label>
+                    <Input
+                      type="tel"
+                      placeholder="+212 6XX XXX XXX"
+                      value={issnFormData.phone}
+                      onChange={(e) => setIssnFormData({ ...issnFormData, phone: e.target.value })}
+                    />
+                  </div>
                 </div>
 
                 <div className="space-y-2">
