@@ -951,6 +951,30 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
     }
 
     try {
+      let justificationFileUrl: string | null = null;
+
+      if (issnFormData.justificationFile) {
+        const file = issnFormData.justificationFile;
+        const fileExt = file.name.split('.').pop();
+        const filePath = `${user.id}/issn-justification-${Date.now()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('legal-deposit-documents')
+          .upload(filePath, file);
+
+        if (uploadError) {
+          console.error("Error uploading justification file:", uploadError);
+          toast.error("Erreur lors de l'upload du fichier justificatif");
+          return;
+        }
+
+        const { data: signedData } = await supabase.storage
+          .from('legal-deposit-documents')
+          .createSignedUrl(filePath, 60 * 60 * 24 * 365);
+
+        justificationFileUrl = signedData?.signedUrl || null;
+      }
+
       const { error } = await supabase.from('issn_requests').insert({
         title: issnFormData.title,
         discipline: issnFormData.discipline,
@@ -963,7 +987,8 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         email: issnFormData.email.trim(),
         phone: issnFormData.phone.trim() || null,
         user_id: user.id,
-        requester_email: issnFormData.email.trim() || user.email
+        requester_email: issnFormData.email.trim() || user.email,
+        justification_file_url: justificationFileUrl
       });
 
       if (error) throw error;
