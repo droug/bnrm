@@ -32,9 +32,23 @@ serve(async (req) => {
     if (!authHeader) throw new Error("No authorization header");
 
     const token = authHeader.replace("Bearer ", "");
-    const { data: userData } = await supabaseClient.auth.getUser(token);
-    const currentUser = userData.user;
-    if (!currentUser) throw new Error("User not authenticated");
+    
+    // Use getClaims for signing-keys compatibility
+    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      console.error("[USER-SERVICE] getClaims error:", claimsError);
+      // Fallback to getUser
+      const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
+      if (userError) {
+        console.error("[USER-SERVICE] getUser error:", userError);
+        throw new Error("User not authenticated");
+      }
+      if (!userData.user) throw new Error("User not authenticated");
+      var currentUser = userData.user;
+    } else {
+      // Build a minimal user object from claims
+      var currentUser = { id: claimsData.claims.sub, email: claimsData.claims.email } as any;
+    }
 
     const { action, user_id, profile_data, role, filters, deleted_reason }: UserRequest = await req.json();
 
