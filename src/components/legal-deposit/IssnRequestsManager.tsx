@@ -96,6 +96,8 @@ interface IssnRequest {
   rejection_reason: string | null;
   user_id: string | null;
   requester_email: string | null;
+  email: string | null;
+  phone: string | null;
   assigned_issn: string | null;
   assigned_at: string | null;
   assigned_by: string | null;
@@ -631,10 +633,16 @@ export default function IssnRequestsManager() {
                       <Label className="text-xs text-muted-foreground">Adresse</Label>
                       <p className="font-medium text-sm">{selectedRequest.contact_address}</p>
                     </div>
-                    {selectedRequest.requester_email && (
+                    {(selectedRequest.email || selectedRequest.requester_email) && (
                       <div>
                         <Label className="text-xs text-muted-foreground">Email</Label>
-                        <p className="font-medium text-sm">{selectedRequest.requester_email}</p>
+                        <p className="font-medium text-sm">{selectedRequest.email || selectedRequest.requester_email}</p>
+                      </div>
+                    )}
+                    {selectedRequest.phone && (
+                      <div>
+                        <Label className="text-xs text-muted-foreground">Téléphone</Label>
+                        <p className="font-medium text-sm">{selectedRequest.phone}</p>
                       </div>
                     )}
                   </div>
@@ -823,16 +831,9 @@ export default function IssnRequestsManager() {
                 )}
               </div>
 
-              {/* Footer actions */}
+              {/* Footer actions - Refuser uniquement (Attribuer l'ISSN fait office de validation) */}
               {selectedRequest.status === "en_attente" && !selectedRequest.assigned_issn && (
                 <div className="p-4 border-t bg-muted/20 flex gap-2">
-                  <Button
-                    className="flex-1 bg-green-600 hover:bg-green-700"
-                    onClick={() => handleValidate(selectedRequest)}
-                  >
-                    <CheckCircle className="h-4 w-4 mr-2" />
-                    Valider
-                  </Button>
                   <Button
                     variant="destructive"
                     className="flex-1"
