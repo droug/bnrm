@@ -375,7 +375,7 @@ export const ReservedRangesManager = () => {
   const filteredRanges = useMemo(() => {
     return reservedRanges.filter((range) => {
       // Filter by professional type (deposit_type field stores this)
-      const typeMatch = range.deposit_type?.toLowerCase().includes(activeProType);
+      const typeMatch = range.deposit_type?.toLowerCase().includes(activeProType) && range.status !== 'cancelled';
       
       // Filter by name
       const nameMatch = !nameSearch || 
