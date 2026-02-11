@@ -95,13 +95,18 @@ export const ReservedRangesManager = () => {
       if (rangesError) throw rangesError;
 
       // Fetch publishers, printers and producers in parallel (exclude deleted)
-      const fetchDir = async (table: string) => {
+      const fetchValidated = async (table: string) => {
         const { data, error } = await (supabase as any).from(table).select('id, name, city, country, address, phone, email').is('deleted_at', null).eq('is_validated', true).order('name');
         if (error) throw error;
         return data || [];
       };
+      const fetchAll = async (table: string) => {
+        const { data, error } = await (supabase as any).from(table).select('id, name, city, country, address, phone, email').order('name');
+        if (error) throw error;
+        return data || [];
+      };
       const [publishersData, printersData, producersData] = await Promise.all([
-        fetchDir('publishers'), fetchDir('printers'), fetchDir('producers')
+        fetchValidated('publishers'), fetchValidated('printers'), fetchAll('producers')
       ]);
 
       // Mock data for demonstration if no real data
