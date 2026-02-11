@@ -59,6 +59,8 @@ export const ReservedRangesManager = () => {
   const { toast } = useToast();
   const [reservedRanges, setReservedRanges] = useState<ReservedRange[]>([]);
   const [publishers, setPublishers] = useState<Publisher[]>([]);
+  const [allPrinters, setAllPrinters] = useState<Publisher[]>([]);
+  const [allProducers, setAllProducers] = useState<Publisher[]>([]);
   const [publisherSearch, setPublisherSearch] = useState<string>("");
   const [selectedPublisher, setSelectedPublisher] = useState<Publisher | null>(null);
   const [loading, setLoading] = useState(true);
@@ -91,13 +93,17 @@ export const ReservedRangesManager = () => {
 
       if (rangesError) throw rangesError;
 
-      // Fetch publishers
-      const { data: publishersData, error: publishersError } = await supabase
-        .from('publishers')
-        .select('id, name, city, country, address, phone, email')
-        .order('name');
+      // Fetch publishers, printers and producers in parallel
+      const [publishersRes, printersRes, producersRes] = await Promise.all([
+        supabase.from('publishers').select('id, name, city, country, address, phone, email').order('name'),
+        supabase.from('printers').select('id, name, city, country, address, phone, email').order('name'),
+        supabase.from('producers').select('id, name, city, country, address, phone, email').order('name'),
+      ]);
 
-      if (publishersError) throw publishersError;
+      if (publishersRes.error) throw publishersRes.error;
+      const publishersData = publishersRes.data;
+      const printersData = printersRes.data || [];
+      const producersData = producersRes.data || [];
 
       // Mock data for demonstration if no real data
       const mockPublishers = [
@@ -194,6 +200,8 @@ export const ReservedRangesManager = () => {
 
       setReservedRanges(rangesWithNames);
       setPublishers(finalPublishers);
+      setAllPrinters(printersData);
+      setAllProducers(producersData);
 
     } catch (error) {
       console.error('Erreur lors du chargement:', error);
@@ -383,6 +391,13 @@ export const ReservedRangesManager = () => {
       return typeMatch && nameMatch && kwMatch;
     });
   }, [reservedRanges, activeProType, nameSearch, keywordSearch]);
+
+  // Get the right professional list based on active tab
+  const activeProfessionals = useMemo(() => {
+    if (activeProType === 'imprimeur') return allPrinters;
+    if (activeProType === 'producteur') return allProducers;
+    return publishers;
+  }, [activeProType, publishers, allPrinters, allProducers]);
 
   const countByType = useMemo(() => {
     const counts: Record<string, number> = { editeur: 0, imprimeur: 0, producteur: 0 };
@@ -599,7 +614,7 @@ export const ReservedRangesManager = () => {
                     />
                     {publisherSearch && (
                       <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-64 overflow-y-auto">
-                        {publishers
+                        {activeProfessionals
                           .filter(pub => 
                             pub.name.toLowerCase().includes(publisherSearch.toLowerCase()) ||
                             pub.city?.toLowerCase().includes(publisherSearch.toLowerCase())
@@ -625,7 +640,7 @@ export const ReservedRangesManager = () => {
                               </div>
                             </button>
                           ))}
-                        {publishers.filter(pub => 
+                        {activeProfessionals.filter(pub => 
                           pub.name.toLowerCase().includes(publisherSearch.toLowerCase()) ||
                           pub.city?.toLowerCase().includes(publisherSearch.toLowerCase())
                         ).length === 0 && (
