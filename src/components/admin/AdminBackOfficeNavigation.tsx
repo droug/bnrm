@@ -9,7 +9,8 @@ import {
   Database,
   Search,
   ChevronRight,
-  Shield
+  Shield,
+  History
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
@@ -101,6 +102,14 @@ export function AdminBackOfficeNavigation({ activeTab, onTabChange, counts }: Ad
       icon: Database,
       color: "text-indigo-600",
       bgColor: "bg-indigo-50 hover:bg-indigo-100",
+    },
+    {
+      id: "history",
+      label: "Historique",
+      description: "Tranches annulées et archivées",
+      icon: History,
+      color: "text-gray-600",
+      bgColor: "bg-gray-50 hover:bg-gray-100",
     },
   ];
 
