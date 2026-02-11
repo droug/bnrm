@@ -404,6 +404,7 @@ export const ReservedRangesManager = () => {
   const countByType = useMemo(() => {
     const counts: Record<string, number> = { editeur: 0, imprimeur: 0, producteur: 0 };
     reservedRanges.forEach((r) => {
+      if (r.status === 'cancelled') return;
       const dt = (r.deposit_type || '').toLowerCase();
       if (dt.includes('editeur')) counts.editeur++;
       else if (dt.includes('imprimeur')) counts.imprimeur++;
