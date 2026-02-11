@@ -174,6 +174,7 @@ const EditorSignupForm = ({ prefillEmail, prefillName }: EditorSignupFormProps) 
   const [showEditorDropdown, setShowEditorDropdown] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   useEffect(() => {
     fetchEditors();
@@ -293,10 +294,7 @@ const EditorSignupForm = ({ prefillEmail, prefillName }: EditorSignupFormProps) 
 
       if (error) throw error;
 
-      toast({
-        title: "Demande soumise",
-        description: "Votre demande d'inscription éditeur a été soumise avec succès. Vous recevrez une notification après validation par la BNRM.",
-      });
+      setIsSubmitted(true);
     } catch (error: any) {
       console.error("Erreur lors de la soumission:", error);
       toast({
@@ -312,6 +310,28 @@ const EditorSignupForm = ({ prefillEmail, prefillName }: EditorSignupFormProps) 
   const filteredEditors = editors.filter(editor =>
     editor.name.toLowerCase().includes(editorSearch.toLowerCase())
   );
+
+  if (isSubmitted) {
+    return (
+      <Card className="w-full max-w-4xl mx-auto">
+        <CardContent className="flex flex-col items-center justify-center py-16 space-y-4">
+          <div className="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center">
+            <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-center">Demande envoyée avec succès</h2>
+          <p className="text-muted-foreground text-center max-w-md">
+            Votre demande d'inscription a été envoyée pour validation par la BNRM. 
+            Vous recevrez une notification par email une fois votre compte validé.
+          </p>
+          <p className="text-sm text-muted-foreground text-center">
+            Le délai de traitement est de 10 jours ouvrables.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full max-w-4xl mx-auto">
