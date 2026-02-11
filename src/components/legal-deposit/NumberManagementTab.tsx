@@ -27,9 +27,11 @@ import {
   CheckCircle,
   AlertCircle,
   Loader2,
-  Library
+  Library,
+  History
 } from "lucide-react";
 import { ReservedRangesManager } from "./ReservedRangesManager";
+import { HistoryRangesView } from "./HistoryRangesView";
 
 interface ImportedNumber {
   number_type: 'isbn' | 'issn' | 'ismn' | 'dl';
@@ -502,16 +504,25 @@ export const NumberManagementTab = () => {
   return (
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="assign">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="assign" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             Attribution Plages
+          </TabsTrigger>
+          <TabsTrigger value="history" className="flex items-center gap-2">
+            <History className="h-4 w-4" />
+            Historique
           </TabsTrigger>
           <TabsTrigger value="import" className="flex items-center gap-2">
             <Upload className="h-4 w-4" />
             Import Excel
           </TabsTrigger>
         </TabsList>
+
+        {/* History Tab */}
+        <TabsContent value="history" className="space-y-4">
+          <HistoryRangesView />
+        </TabsContent>
 
         {/* Import Excel Tab */}
         <TabsContent value="import" className="space-y-4">
