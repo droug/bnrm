@@ -153,12 +153,40 @@ serve(async (req) => {
         })
         .eq("id", request_id);
 
-      // Récupérer le numéro de demande
+      // Récupérer les détails complets de la demande
       const { data: requestData } = await supabase
         .from("legal_deposit_requests")
-        .select("request_number")
+        .select("request_number, title, subtitle, author_name, language, page_count, support_type, monograph_type, metadata, publication_date")
         .eq("id", request_id)
         .single();
+
+      // Extraire les infos supplémentaires des métadonnées
+      const meta = requestData?.metadata as Record<string, any> || {};
+      const authorName = requestData?.author_name || meta?.author_name || meta?.author || '';
+      const subtitle = requestData?.subtitle || '';
+      const lang = requestData?.language || meta?.language || '';
+      const pageCount = requestData?.page_count || meta?.page_count || '';
+      const pubDate = requestData?.publication_date || meta?.publication_date || '';
+      const supportType = requestData?.support_type || '';
+      
+      // Map support_type to French label
+      const supportTypeLabels: Record<string, string> = {
+        'papier': 'Papier', 'numerique': 'Numérique', 'audio': 'Audio', 'video': 'Vidéo',
+        'multimedia': 'Multimédia', 'autre': 'Autre'
+      };
+      const supportLabel = supportTypeLabels[supportType] || supportType;
+
+      // Build extra details rows for emails
+      const extraDetailsRows = [
+        authorName ? `<tr><td style="padding: 8px 0; color: #718096;">Auteur:</td><td style="padding: 8px 0; color: #2d3748; font-weight: 600;">${authorName}</td></tr>` : '',
+        subtitle ? `<tr><td style="padding: 8px 0; color: #718096;">Sous-titre:</td><td style="padding: 8px 0; color: #2d3748; font-weight: 600;">${subtitle}</td></tr>` : '',
+        lang ? `<tr><td style="padding: 8px 0; color: #718096;">Langue:</td><td style="padding: 8px 0; color: #2d3748; font-weight: 600;">${lang}</td></tr>` : '',
+        supportLabel ? `<tr><td style="padding: 8px 0; color: #718096;">Support:</td><td style="padding: 8px 0; color: #2d3748; font-weight: 600;">${supportLabel}</td></tr>` : '',
+        pageCount ? `<tr><td style="padding: 8px 0; color: #718096;">Nombre de pages:</td><td style="padding: 8px 0; color: #2d3748; font-weight: 600;">${pageCount}</td></tr>` : '',
+        pubDate ? `<tr><td style="padding: 8px 0; color: #718096;">Date de publication:</td><td style="padding: 8px 0; color: #2d3748; font-weight: 600;">${pubDate}</td></tr>` : '',
+        `<tr><td style="padding: 8px 0; color: #718096;">Éditeur:</td><td style="padding: 8px 0; color: #2d3748; font-weight: 600;">${editor_name || 'Non spécifié'}</td></tr>`,
+        `<tr><td style="padding: 8px 0; color: #718096;">Imprimeur:</td><td style="padding: 8px 0; color: #2d3748; font-weight: 600;">${printer_name || 'Non spécifié'}</td></tr>`,
+      ].filter(Boolean).join('\n                    ');
 
       // Envoyer l'email à la partie non-initiatrice
       const pendingToken = createdTokens?.find(t => t.status === "pending");
@@ -206,6 +234,7 @@ serve(async (req) => {
                       <td style="padding: 8px 0; color: #718096;">Type:</td>
                       <td style="padding: 8px 0; color: #2d3748; font-weight: 600;">${deposit_type || "Dépôt légal"}</td>
                     </tr>
+                    ${extraDetailsRows}
                     <tr>
                       <td style="padding: 8px 0; color: #718096;">Délai de confirmation:</td>
                       <td style="padding: 8px 0; color: #e53e3e; font-weight: 600;">15 jours</td>
@@ -304,6 +333,7 @@ serve(async (req) => {
                       <td style="padding: 8px 0; color: #718096;">Type:</td>
                       <td style="padding: 8px 0; color: #2d3748; font-weight: 600;">${deposit_type || "Dépôt légal"}</td>
                     </tr>
+                    ${extraDetailsRows}
                   </table>
                 </div>
                 
