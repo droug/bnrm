@@ -88,21 +88,50 @@ export function MyLegalDeposits() {
         }
       }
 
-      if (!professionalId) {
-        console.log('[MyLegalDeposits] No professional ID found for user');
-        setLoading(false);
-        return;
+      // Fetch deposits as initiator
+      let initiatorDeposits: LegalDepositRequest[] = [];
+      if (professionalId) {
+        const { data, error } = await supabase
+          .from('legal_deposit_requests')
+          .select('*')
+          .eq('initiator_id', professionalId)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        initiatorDeposits = data || [];
       }
 
-      const { data, error } = await supabase
-        .from('legal_deposit_requests')
-        .select('*')
-        .eq('initiator_id', professionalId)
-        .order('created_at', { ascending: false });
+      // Fetch deposits where user is a party (e.g., printer, editor invited)
+      const { data: partyData } = await supabase
+        .from('legal_deposit_parties')
+        .select('request_id')
+        .eq('user_id', user.id);
 
-      if (error) throw error;
-      console.log('[MyLegalDeposits] Fetched deposits:', data?.length || 0);
-      if (data) setDeposits(data);
+      let partyDeposits: LegalDepositRequest[] = [];
+      if (partyData && partyData.length > 0) {
+        const partyRequestIds = partyData.map(p => p.request_id).filter(Boolean);
+        // Exclude ones already fetched as initiator
+        const initiatorIds = new Set(initiatorDeposits.map(d => d.id));
+        const uniquePartyIds = partyRequestIds.filter(id => !initiatorIds.has(id));
+
+        if (uniquePartyIds.length > 0) {
+          const { data: partyDepositsData, error: partyError } = await supabase
+            .from('legal_deposit_requests')
+            .select('*')
+            .in('id', uniquePartyIds)
+            .order('created_at', { ascending: false });
+
+          if (!partyError && partyDepositsData) {
+            partyDeposits = partyDepositsData;
+          }
+        }
+      }
+
+      const allDeposits = [...initiatorDeposits, ...partyDeposits]
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
+      console.log('[MyLegalDeposits] Total deposits (initiator + party):', allDeposits.length);
+      setDeposits(allDeposits);
     } catch (error) {
       console.error('Error fetching legal deposits:', error);
       toast({
