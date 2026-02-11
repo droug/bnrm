@@ -80,6 +80,16 @@ serve(async (req) => {
       message: `Vous avez été invité en tant que ${roleLabel} pour la demande de dépôt légal "${party.request.title}" (${party.request.request_number}).`,
     });
 
+    // Récupérer l'email de l'auteur depuis la demande de dépôt légal
+    const { data: depositRequest } = await supabaseAdmin
+      .from("legal_deposit_requests")
+      .select("metadata")
+      .eq("id", requestId)
+      .single();
+    
+    const authorEmail = (depositRequest?.metadata as any)?.customFields?.author_email;
+    const authorName = (depositRequest?.metadata as any)?.customFields?.author_name || "Auteur";
+
     // Préparer l'email HTML
     const emailHtml = `
       <!DOCTYPE html>
@@ -148,6 +158,67 @@ serve(async (req) => {
       .from("legal_deposit_parties")
       .update({ notified_at: new Date().toISOString() })
       .eq("id", partyId);
+
+    // Notifier l'auteur par e-mail si disponible et différent du destinataire
+    if (authorEmail && authorEmail !== userEmail) {
+      console.log(`[NOTIFY-PARTY] Also notifying author: ${authorEmail}`);
+      
+      const authorEmailHtml = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+            .header { background: linear-gradient(135deg, #002B45 0%, #004d7a 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+            .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
+            .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
+            .info-box { background: white; padding: 20px; margin: 20px 0; border-left: 4px solid #002B45; border-radius: 4px; }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <div class="header">
+              <h1>Bibliothèque Nationale du Royaume du Maroc</h1>
+            </div>
+            <div class="content">
+              <h2>Bonjour ${authorName},</h2>
+              
+              <p>Une demande de dépôt légal concernant votre œuvre a été initiée.</p>
+              
+              <div class="info-box">
+                <p><strong>Titre de l'œuvre:</strong> ${party.request.title}</p>
+                <p><strong>Numéro de demande:</strong> ${party.request.request_number}</p>
+                <p><strong>Rôle désigné:</strong> ${roleLabel} (${userName})</p>
+              </div>
+              
+              <p>Vous serez informé de l'avancement de cette demande.</p>
+              
+              <p>Cordialement,<br><strong>L'équipe du Dépôt Légal - BNRM</strong></p>
+            </div>
+            <div class="footer">
+              <p>Bibliothèque Nationale du Royaume du Maroc<br>
+              Avenue Ibn Khaldoun, Rabat, Maroc<br>
+              Tél: +212 537 77 18 33 | Email: depot.legal@bnrm.ma</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      const authorResult = await sendEmail({
+        to: authorEmail,
+        subject: `Dépôt Légal - ${party.request.request_number} - Votre œuvre`,
+        html: authorEmailHtml,
+      });
+
+      if (authorResult.success) {
+        console.log(`[NOTIFY-PARTY] Author email sent to ${authorEmail}`);
+      } else {
+        console.warn(`[NOTIFY-PARTY] Author email failed: ${authorResult.error}`);
+      }
+    }
 
     console.log(`[NOTIFY-PARTY] Notification sent to ${userEmail} for party ${partyId}`);
 

@@ -348,6 +348,27 @@ serve(async (req) => {
       html: emailHtml,
     });
 
+    // Envoyer également à l'auteur si disponible et différent du destinataire principal
+    const authorEmail = metadata?.customFields?.author_email;
+    const authorName = metadata?.customFields?.author_name || "Auteur";
+    if (authorEmail && authorEmail !== userEmail) {
+      console.log(`[NOTIFY-ATTRIBUTION] Also sending to author: ${authorEmail}`);
+      const authorEmailHtml = emailHtml.replace(
+        `Bonjour ${userName},`,
+        `Bonjour ${authorName},`
+      );
+      const authorResult = await sendEmail({
+        to: authorEmail,
+        subject: `Attribution Dépôt Légal - ${request.request_number} - Demande Validée`,
+        html: authorEmailHtml,
+      });
+      if (authorResult.success) {
+        console.log(`[NOTIFY-ATTRIBUTION] Author email sent successfully to ${authorEmail}`);
+      } else {
+        console.warn(`[NOTIFY-ATTRIBUTION] Author email failed: ${authorResult.error}`);
+      }
+    }
+
     if (emailResult.success) {
       console.log(`[NOTIFY-ATTRIBUTION] Email sent successfully via ${emailResult.method} to ${userEmail}, messageId: ${emailResult.messageId}`);
 
@@ -357,6 +378,7 @@ serve(async (req) => {
           emailSent: true,
           message: `Notification envoyée avec succès via ${emailResult.method === 'smtp' ? 'SMTP' : 'Resend'}`,
           recipient: userEmail,
+          authorNotified: !!(authorEmail && authorEmail !== userEmail),
           method: emailResult.method,
         }),
         {
