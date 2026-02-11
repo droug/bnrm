@@ -112,9 +112,9 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
         </div>
 
         {/* Interactive Container */}
-        <div className="flex flex-col lg:flex-row gap-0 items-stretch max-w-6xl mx-auto">
+        <div className="flex flex-col gap-0 items-stretch max-w-6xl mx-auto">
           {/* LEFT: Active Content Card */}
-          <div className="relative flex-1 bg-white rounded-l-xl lg:rounded-l-xl rounded-t-xl lg:rounded-tr-none shadow-2xl overflow-hidden min-h-[520px] flex">
+          <div className="relative flex-1 bg-white rounded-t-xl shadow-2xl overflow-hidden min-h-[520px] flex">
             {/* Vertical rotated label on left border */}
             <div className="hidden lg:flex w-12 bg-gradient-to-b from-[#1E3A8A] to-[#1E40AF] items-center justify-center flex-shrink-0 relative">
               <span
@@ -186,20 +186,19 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
             </div>
           </div>
 
-          {/* RIGHT: Vertical Book Spine Navigation */}
-          <div className="flex lg:flex-col flex-row lg:w-auto w-full overflow-x-auto lg:overflow-visible">
+          {/* RIGHT: Horizontal Book Spine Navigation */}
+          <div className="flex flex-row w-full lg:w-auto overflow-x-auto lg:overflow-visible">
             {platforms.map((platform, index) => {
               const isActive = activeIndex === index;
               return (
                 <button
                   key={index}
                   onClick={() => handleSpineClick(index)}
-                  className={`relative group transition-all duration-300 flex-shrink-0
-                    ${isActive ? 'lg:w-[100px] w-full lg:h-auto h-[90px]' : 'lg:w-[80px] w-full lg:h-auto h-[80px]'}
-                    lg:flex-1
+                  className={`relative group transition-all duration-300 flex-1
+                    ${isActive ? 'h-[120px]' : 'h-[100px]'}
                   `}
                   style={{
-                    minHeight: '160px',
+                    minWidth: '120px',
                   }}
                 >
                   {/* Spine body */}
@@ -219,37 +218,22 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                       backgroundImage: `repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.1) 3px, rgba(0,0,0,0.1) 4px)`
                     }} />
 
-                    {/* Top ornament */}
-                    <div className="absolute top-2 left-1/2 -translate-x-1/2 w-[60px] h-[60px] opacity-40 hidden lg:block">
+                    {/* Left ornament */}
+                    <div className="absolute left-2 top-1/2 -translate-y-1/2 w-[40px] h-[40px] opacity-40">
                       <img src={ornamentGold} alt="" className="w-full h-full object-contain mix-blend-screen" />
                     </div>
 
                     {/* Gold border frame */}
-                    <div className="absolute inset-2 border border-[#C9984F]/30 rounded-sm pointer-events-none hidden lg:block" />
+                    <div className="absolute inset-2 border border-[#C9984F]/30 rounded-sm pointer-events-none" />
 
                     {/* Gold decorative lines */}
-                    <div className="absolute top-[65px] left-3 right-3 h-[1px] bg-[#C9984F]/40 hidden lg:block" />
-                    <div className="absolute bottom-[65px] left-3 right-3 h-[1px] bg-[#C9984F]/40 hidden lg:block" />
+                    <div className="absolute left-[50px] top-3 bottom-3 w-[1px] bg-[#C9984F]/40" />
+                    <div className="absolute right-[50px] top-3 bottom-3 w-[1px] bg-[#C9984F]/40" />
 
-                    {/* Title - vertical on desktop, horizontal on mobile */}
+                    {/* Title - horizontal */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                      {/* Desktop: vertical text */}
                       <span
-                        className="hidden lg:block text-white font-bold text-[11px] tracking-[0.2em] text-center leading-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
-                        style={{
-                          writingMode: 'vertical-rl',
-                          transform: 'rotate(180deg)',
-                          fontFamily: "'Georgia', 'Times New Roman', serif",
-                          textShadow: '0 0 10px rgba(0,0,0,0.9)',
-                          maxHeight: 'calc(100% - 140px)',
-                        }}
-                      >
-                        {platform.spineLabel}
-                      </span>
-
-                      {/* Mobile: horizontal text */}
-                      <span
-                        className="lg:hidden text-white font-bold text-[11px] tracking-[0.15em] text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] px-2"
+                        className="text-white font-bold text-[11px] sm:text-[13px] tracking-[0.15em] text-center drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] px-12"
                         style={{
                           fontFamily: "'Georgia', 'Times New Roman', serif",
                           textShadow: '0 0 10px rgba(0,0,0,0.9)',
@@ -259,8 +243,8 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                       </span>
                     </div>
 
-                    {/* Bottom ornament */}
-                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 w-[60px] h-[60px] opacity-40 rotate-180 hidden lg:block">
+                    {/* Right ornament */}
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 w-[40px] h-[40px] opacity-40 rotate-180">
                       <img src={ornamentGold} alt="" className="w-full h-full object-contain mix-blend-screen" />
                     </div>
 
@@ -272,7 +256,7 @@ export const PlatformsSection = ({ language }: PlatformsSectionProps) => {
                     )}
 
                     {/* Spine edge highlight */}
-                    <div className="absolute top-0 left-0 lg:w-[3px] lg:h-full w-full h-[2px] bg-gradient-to-r lg:bg-gradient-to-b from-white/20 via-white/5 to-white/20" />
+                    <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-white/20 via-white/5 to-white/20" />
                   </div>
                 </button>
               );
