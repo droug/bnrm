@@ -336,6 +336,26 @@ serve(async (req) => {
           }
         }
 
+        // Annuler les tranches réservées pour ce professionnel supprimé
+        try {
+          if (professionalEmail || companyName) {
+            const identifier = professionalEmail || companyName;
+            const field = professionalEmail ? 'requester_email' : 'requester_name';
+            const { error: rangeError } = await supabaseClient
+              .from('reserved_number_ranges')
+              .update({ status: 'cancelled' })
+              .eq('status', 'active')
+              .eq(field, identifier);
+            if (rangeError) {
+              console.warn(`[USER-SERVICE] Warning cancelling reserved ranges: ${rangeError.message}`);
+            } else {
+              console.log(`[USER-SERVICE] Cancelled reserved ranges for ${identifier}`);
+            }
+          }
+        } catch (e) {
+          console.warn(`[USER-SERVICE] Error cancelling reserved ranges:`, e);
+        }
+
         console.log(`[USER-SERVICE] Data cleanup completed, now deleting Auth user: ${user_id}`);
 
         // Supprimer l'utilisateur de auth.users
