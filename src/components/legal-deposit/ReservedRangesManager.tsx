@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -20,7 +21,11 @@ import {
   User,
   AlertCircle,
   CheckCircle,
-  Ban
+  Ban,
+  Search,
+  Printer,
+  Factory,
+  X
 } from "lucide-react";
 
 interface Publisher {
@@ -323,11 +328,11 @@ export const ReservedRangesManager = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'active':
-        return <Badge className="bg-green-100 text-green-800"><CheckCircle className="w-3 h-3 mr-1" />Actif</Badge>;
+        return <Badge className="bg-primary/10 text-primary"><CheckCircle className="w-3 h-3 mr-1" />Actif</Badge>;
       case 'exhausted':
-        return <Badge className="bg-yellow-100 text-yellow-800"><AlertCircle className="w-3 h-3 mr-1" />Épuisé</Badge>;
+        return <Badge className="bg-accent text-accent-foreground"><AlertCircle className="w-3 h-3 mr-1" />Épuisé</Badge>;
       case 'cancelled':
-        return <Badge className="bg-red-100 text-red-800"><Ban className="w-3 h-3 mr-1" />Annulé</Badge>;
+        return <Badge className="bg-destructive/10 text-destructive"><Ban className="w-3 h-3 mr-1" />Annulé</Badge>;
       default:
         return <Badge>{status}</Badge>;
     }
@@ -346,13 +351,58 @@ export const ReservedRangesManager = () => {
     return (range.used_numbers / range.total_numbers) * 100;
   };
 
+  // Filter state
+  const [activeProType, setActiveProType] = useState<string>("editeur");
+  const [nameSearch, setNameSearch] = useState("");
+  const [keywordSearch, setKeywordSearch] = useState("");
+
+  const proTypeTabs = [
+    { value: "editeur", label: "Éditeurs", icon: BookOpen, color: "text-blue-600" },
+    { value: "imprimeur", label: "Imprimeurs", icon: Printer, color: "text-amber-600" },
+    { value: "producteur", label: "Producteurs", icon: Factory, color: "text-violet-600" },
+  ];
+
+  const filteredRanges = useMemo(() => {
+    return reservedRanges.filter((range) => {
+      // Filter by professional type (deposit_type field stores this)
+      const typeMatch = range.deposit_type?.toLowerCase().includes(activeProType);
+      
+      // Filter by name
+      const nameMatch = !nameSearch || 
+        (range.requester_name || '').toLowerCase().includes(nameSearch.toLowerCase()) ||
+        (range.requester_email || '').toLowerCase().includes(nameSearch.toLowerCase());
+      
+      // Filter by keyword (search in notes, number_type, range values)
+      const kwMatch = !keywordSearch ||
+        (range.notes || '').toLowerCase().includes(keywordSearch.toLowerCase()) ||
+        range.number_type?.toLowerCase().includes(keywordSearch.toLowerCase()) ||
+        range.range_start?.toLowerCase().includes(keywordSearch.toLowerCase()) ||
+        range.range_end?.toLowerCase().includes(keywordSearch.toLowerCase()) ||
+        (range.requester_name || '').toLowerCase().includes(keywordSearch.toLowerCase());
+      
+      return typeMatch && nameMatch && kwMatch;
+    });
+  }, [reservedRanges, activeProType, nameSearch, keywordSearch]);
+
+  const countByType = useMemo(() => {
+    const counts: Record<string, number> = { editeur: 0, imprimeur: 0, producteur: 0 };
+    reservedRanges.forEach((r) => {
+      const dt = (r.deposit_type || '').toLowerCase();
+      if (dt.includes('editeur')) counts.editeur++;
+      else if (dt.includes('imprimeur')) counts.imprimeur++;
+      else if (dt.includes('producteur')) counts.producteur++;
+    });
+    return counts;
+  }, [reservedRanges]);
+
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Tranches Réservées par Éditeur</h2>
+          <h2 className="text-2xl font-bold">Tranches Réservées</h2>
           <p className="text-muted-foreground">
-            Gestion des plages de numéros réservées pour des éditeurs spécifiques
+            Gestion des plages de numéros réservées par type de professionnel
           </p>
         </div>
         <Button onClick={() => setIsAddDialogOpen(true)}>
@@ -361,101 +411,173 @@ export const ReservedRangesManager = () => {
         </Button>
       </div>
 
-      {loading ? (
-        <div className="flex items-center justify-center h-32">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </div>
-      ) : (
-        <div className="grid gap-4">
-          {reservedRanges.length === 0 ? (
-            <Card>
-              <CardContent className="flex flex-col items-center justify-center h-32">
-                <p className="text-muted-foreground">Aucune tranche réservée</p>
-              </CardContent>
-            </Card>
-          ) : (
-            reservedRanges.map((range) => {
-              const Icon = getNumberTypeIcon(range.number_type);
-              return (
-                <Card key={range.id}>
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <Icon className="h-6 w-6 text-primary" />
-                        <div>
-                          <CardTitle className="text-lg flex items-center gap-2">
-                            {range.number_type.toUpperCase()}
-                            <Badge variant="outline">{range.deposit_type}</Badge>
-                          </CardTitle>
-                          <CardDescription className="flex items-center gap-2 mt-1">
-                            <User className="h-3 w-3" />
-                            {range.requester_name || range.requester_email}
-                          </CardDescription>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {getStatusBadge(range.status)}
-                        {range.status === 'active' && (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleCancelRange(range.id)}
-                          >
-                            <Ban className="h-4 w-4 text-red-600" />
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-3 gap-4 text-sm">
-                      <div>
-                        <p className="text-muted-foreground">Début de plage</p>
-                        <p className="font-medium font-mono">{range.range_start}</p>
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground">Fin de plage</p>
-                        <p className="font-medium font-mono">{range.range_end}</p>
-                      </div>
-                      <div>
-                        <p className="text-muted-foreground">Position actuelle</p>
-                        <p className="font-medium font-mono">{range.current_position}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between text-sm">
-                        <span>Utilisation</span>
-                        <span className="font-medium">
-                          {range.used_numbers} / {range.total_numbers} numéros
-                        </span>
-                      </div>
-                      <Progress value={getProgressPercentage(range)} className="h-2" />
-                    </div>
+      {/* Tabs by professional type */}
+      <Tabs value={activeProType} onValueChange={setActiveProType}>
+        <TabsList className="grid w-full grid-cols-3 h-12">
+          {proTypeTabs.map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <TabsTrigger key={tab.value} value={tab.value} className="flex items-center gap-2 data-[state=active]:shadow-sm">
+                <Icon className="h-4 w-4" />
+                <span>{tab.label}</span>
+                <Badge variant="secondary" className="ml-1 h-5 min-w-[20px] px-1.5 text-xs">
+                  {countByType[tab.value] || 0}
+                </Badge>
+              </TabsTrigger>
+            );
+          })}
+        </TabsList>
 
-                    {range.notes && (
-                      <div className="text-sm p-3 bg-muted rounded-md">
-                        <p className="font-medium mb-1">Notes:</p>
-                        <p className="text-muted-foreground">{range.notes}</p>
-                      </div>
-                    )}
-
-                    <div className="text-xs text-muted-foreground">
-                      Créé le {new Date(range.created_at).toLocaleDateString('fr-FR', {
-                        day: 'numeric',
-                        month: 'long',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })
+        {/* Search filters bar */}
+        <div className="flex items-center gap-3 mt-4">
+          <div className="relative flex-1 max-w-xs">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Rechercher par nom..."
+              value={nameSearch}
+              onChange={(e) => setNameSearch(e.target.value)}
+              className="pl-9 h-10"
+            />
+            {nameSearch && (
+              <button onClick={() => setNameSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2">
+                <X className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
+              </button>
+            )}
+          </div>
+          <div className="relative flex-1 max-w-xs">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Mot-clé (n°, notes...)"
+              value={keywordSearch}
+              onChange={(e) => setKeywordSearch(e.target.value)}
+              className="pl-9 h-10"
+            />
+            {keywordSearch && (
+              <button onClick={() => setKeywordSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2">
+                <X className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
+              </button>
+            )}
+          </div>
+          {(nameSearch || keywordSearch) && (
+            <Button variant="ghost" size="sm" onClick={() => { setNameSearch(""); setKeywordSearch(""); }}>
+              Réinitialiser
+            </Button>
           )}
         </div>
-      )}
+
+        {/* Results count */}
+        <div className="text-sm text-muted-foreground mt-2">
+          {filteredRanges.length} tranche{filteredRanges.length !== 1 ? 's' : ''} trouvée{filteredRanges.length !== 1 ? 's' : ''}
+        </div>
+
+        {/* Content for each tab (same layout, data filtered) */}
+        {proTypeTabs.map((tab) => (
+          <TabsContent key={tab.value} value={tab.value} className="mt-4">
+            {loading ? (
+              <div className="flex items-center justify-center h-32">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+              </div>
+            ) : filteredRanges.length === 0 ? (
+              <Card>
+                <CardContent className="flex flex-col items-center justify-center h-32 gap-2">
+                  <p className="text-muted-foreground">
+                    {nameSearch || keywordSearch
+                      ? "Aucune tranche ne correspond à votre recherche"
+                      : `Aucune tranche réservée pour les ${tab.label.toLowerCase()}`}
+                  </p>
+                  {(nameSearch || keywordSearch) && (
+                    <Button variant="link" size="sm" onClick={() => { setNameSearch(""); setKeywordSearch(""); }}>
+                      Effacer les filtres
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-4">
+                {filteredRanges.map((range) => {
+                  const Icon = getNumberTypeIcon(range.number_type);
+                  return (
+                    <Card key={range.id} className="border-l-4" style={{ borderLeftColor: tab.value === 'editeur' ? 'hsl(var(--primary))' : tab.value === 'imprimeur' ? 'hsl(38, 92%, 50%)' : 'hsl(263, 70%, 50%)' }}>
+                      <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <Icon className="h-6 w-6 text-primary" />
+                            <div>
+                              <CardTitle className="text-lg flex items-center gap-2">
+                                {range.number_type.toUpperCase()}
+                                <Badge variant="outline">{range.deposit_type}</Badge>
+                              </CardTitle>
+                              <CardDescription className="flex items-center gap-2 mt-1">
+                                <User className="h-3 w-3" />
+                                {range.requester_name || range.requester_email}
+                              </CardDescription>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {getStatusBadge(range.status)}
+                            {range.status === 'active' && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleCancelRange(range.id)}
+                              >
+                                <Ban className="h-4 w-4 text-destructive" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-3 gap-4 text-sm">
+                          <div>
+                            <p className="text-muted-foreground">Début de plage</p>
+                            <p className="font-medium font-mono">{range.range_start}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Fin de plage</p>
+                            <p className="font-medium font-mono">{range.range_end}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Position actuelle</p>
+                            <p className="font-medium font-mono">{range.current_position}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span>Utilisation</span>
+                            <span className="font-medium">
+                              {range.used_numbers} / {range.total_numbers} numéros
+                            </span>
+                          </div>
+                          <Progress value={getProgressPercentage(range)} className="h-2" />
+                        </div>
+
+                        {range.notes && (
+                          <div className="text-sm p-3 bg-muted rounded-md">
+                            <p className="font-medium mb-1">Notes:</p>
+                            <p className="text-muted-foreground">{range.notes}</p>
+                          </div>
+                        )}
+
+                        <div className="text-xs text-muted-foreground">
+                          Créé le {new Date(range.created_at).toLocaleDateString('fr-FR', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </TabsContent>
+        ))}
+      </Tabs>
 
       {/* Dialog pour réserver une tranche */}
       <ScrollableDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -466,11 +588,11 @@ export const ReservedRangesManager = () => {
           <div className="space-y-4 p-6">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Éditeur *</Label>
+                <Label>Professionnel *</Label>
                 {!selectedPublisher ? (
                   <div className="relative">
                     <Input
-                      placeholder="Rechercher un éditeur..."
+                      placeholder="Rechercher un professionnel..."
                       value={publisherSearch}
                       onChange={(e) => setPublisherSearch(e.target.value)}
                       className="pr-10"
@@ -508,7 +630,7 @@ export const ReservedRangesManager = () => {
                           pub.city?.toLowerCase().includes(publisherSearch.toLowerCase())
                         ).length === 0 && (
                           <div className="px-4 py-2 text-sm text-muted-foreground">
-                            Aucun éditeur trouvé
+                            Aucun professionnel trouvé
                           </div>
                         )}
                       </div>
@@ -650,10 +772,10 @@ export const ReservedRangesManager = () => {
               />
             </div>
 
-            <div className="bg-blue-50 p-4 rounded-md">
-              <p className="text-sm font-medium text-blue-900 mb-2">Information importante:</p>
-              <ul className="text-sm text-blue-700 space-y-1 list-disc list-inside">
-                <li>Cette tranche sera réservée exclusivement pour cet éditeur</li>
+            <div className="bg-muted p-4 rounded-md border">
+              <p className="text-sm font-medium mb-2">Information importante:</p>
+              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                <li>Cette tranche sera réservée exclusivement pour ce professionnel</li>
                 <li>Elle ne pourra pas être utilisée pour d'autres demandes</li>
                 <li>La plage sera générée automatiquement selon le type de numéro</li>
               </ul>
