@@ -1,0 +1,1 @@
+UPDATE printers SET deleted_at = now(), is_validated = false WHERE id = 'f88b0dc0-bf32-4fe4-a70a-81823141b095';
