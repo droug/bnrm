@@ -25,8 +25,7 @@ import {
   Search,
   Printer,
   Factory,
-  X,
-  History
+  X
 } from "lucide-react";
 
 interface Publisher {
@@ -369,7 +368,7 @@ export const ReservedRangesManager = () => {
   const [activeProType, setActiveProType] = useState<string>("editeur");
   const [nameSearch, setNameSearch] = useState("");
   const [keywordSearch, setKeywordSearch] = useState("");
-  const [showHistory, setShowHistory] = useState(false);
+  
 
   const proTypeTabs = [
     { value: "editeur", label: "Éditeurs", icon: BookOpen, color: "text-blue-600" },
@@ -382,8 +381,8 @@ export const ReservedRangesManager = () => {
       // Filter by professional type (deposit_type field stores this)
       const typeMatch = range.deposit_type?.toLowerCase().includes(activeProType);
       
-      // In normal view, hide cancelled; in history view, show only cancelled
-      const statusMatch = showHistory ? range.status === 'cancelled' : range.status !== 'cancelled';
+      // Hide cancelled ranges (history is in separate tab now)
+      const statusMatch = range.status !== 'cancelled';
       
       // Filter by name
       const nameMatch = !nameSearch || 
@@ -400,7 +399,7 @@ export const ReservedRangesManager = () => {
       
       return typeMatch && statusMatch && nameMatch && kwMatch;
     });
-  }, [reservedRanges, activeProType, nameSearch, keywordSearch, showHistory]);
+  }, [reservedRanges, activeProType, nameSearch, keywordSearch]);
 
   // Get the right professional list based on active tab
   const activeProfessionals = useMemo(() => {
@@ -421,43 +420,22 @@ export const ReservedRangesManager = () => {
     return counts;
   }, [reservedRanges]);
 
-  const cancelledCount = useMemo(() => {
-    return reservedRanges.filter(r => r.status === 'cancelled' && r.deposit_type?.toLowerCase().includes(activeProType)).length;
-  }, [reservedRanges, activeProType]);
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">
-            {showHistory ? 'Historique des tranches' : 'Tranches Réservées'}
-          </h2>
+          <h2 className="text-2xl font-bold">Tranches Réservées</h2>
           <p className="text-muted-foreground">
-            {showHistory 
-              ? 'Tranches annulées et archivées' 
-              : 'Gestion des plages de numéros réservées par type de professionnel'}
+            Gestion des plages de numéros réservées par type de professionnel
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button 
-            variant={showHistory ? "default" : "outline"} 
-            onClick={() => setShowHistory(!showHistory)}
-          >
-            <History className="h-4 w-4 mr-2" />
-            Historique
-            {cancelledCount > 0 && (
-              <Badge variant="secondary" className="ml-2 h-5 min-w-[20px] px-1.5 text-xs">
-                {cancelledCount}
-              </Badge>
-            )}
+          <Button onClick={() => setIsAddDialogOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Réserver une tranche
           </Button>
-          {!showHistory && (
-            <Button onClick={() => setIsAddDialogOpen(true)}>
-              <Plus className="h-4 w-4 mr-2" />
-              Réserver une tranche
-            </Button>
-          )}
         </div>
       </div>
 
