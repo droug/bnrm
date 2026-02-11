@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Eye, CheckCircle, XCircle, Search, Filter, Loader2 } from "lucide-react";
+import { Eye, CheckCircle, XCircle, Search, Filter, Loader2, Hash } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,6 +32,9 @@ interface IssnRequest {
   rejection_reason: string | null;
   user_id: string | null;
   requester_email: string | null;
+  assigned_issn: string | null;
+  assigned_at: string | null;
+  assigned_by: string | null;
 }
 
 export default function IssnRequestsManager() {
@@ -45,8 +48,10 @@ export default function IssnRequestsManager() {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
+  const [isAttributeDialogOpen, setIsAttributeDialogOpen] = useState(false);
+  const [issnNumber, setIssnNumber] = useState("");
+  const [attributing, setAttributing] = useState(false);
 
-  // Fetch requests from database
   useEffect(() => {
     fetchRequests();
   }, []);
@@ -69,13 +74,16 @@ export default function IssnRequestsManager() {
     }
   };
 
-  const getStatusBadge = (status: IssnRequest["status"]) => {
+  const getStatusBadge = (request: IssnRequest) => {
+    if (request.assigned_issn) {
+      return <Badge className="bg-[#E3F2FD] text-[#1565C0] hover:bg-[#E3F2FD]">Attribué</Badge>;
+    }
     const variants = {
       en_attente: { label: "En attente", className: "bg-[#FFF8E1] text-[#F57C00] hover:bg-[#FFF8E1]" },
       validee: { label: "Validée", className: "bg-[#E7F5EC] text-[#2E7D32] hover:bg-[#E7F5EC]" },
       refusee: { label: "Refusée", className: "bg-[#FDEAEA] text-[#C62828] hover:bg-[#FDEAEA]" },
     };
-    const variant = variants[status] || variants.en_attente;
+    const variant = variants[request.status] || variants.en_attente;
     return <Badge className={variant.className}>{variant.label}</Badge>;
   };
 
@@ -122,8 +130,6 @@ export default function IssnRequestsManager() {
 
       if (error) throw error;
 
-      // Try to send notification email via edge function
-      // Use requester_email if available
       if (request.requester_email) {
         try {
           await supabase.functions.invoke('send-workflow-notification', {
@@ -170,8 +176,6 @@ export default function IssnRequestsManager() {
 
       if (error) throw error;
 
-      // Try to send notification email via edge function
-      // Use requester_email if available
       if (selectedRequest.requester_email) {
         try {
           await supabase.functions.invoke('send-workflow-notification', {
@@ -210,6 +214,81 @@ export default function IssnRequestsManager() {
   const openDetailsDialog = (request: IssnRequest) => {
     setSelectedRequest(request);
     setIsDetailsOpen(true);
+  };
+
+  const openAttributeDialog = (request: IssnRequest) => {
+    setSelectedRequest(request);
+    setIssnNumber("");
+    setIsAttributeDialogOpen(true);
+  };
+
+  const handleAttributeIssn = async () => {
+    if (!selectedRequest || !issnNumber.trim()) {
+      toast.error("Veuillez saisir un numéro ISSN");
+      return;
+    }
+
+    // Basic ISSN format validation (XXXX-XXXX)
+    const issnPattern = /^\d{4}-\d{3}[\dXx]$/;
+    if (!issnPattern.test(issnNumber.trim())) {
+      toast.error("Format ISSN invalide. Format attendu : XXXX-XXXX (ex: 1234-5678)");
+      return;
+    }
+
+    setAttributing(true);
+    try {
+      const { error } = await supabase
+        .from('issn_requests')
+        .update({
+          assigned_issn: issnNumber.trim().toUpperCase(),
+          assigned_at: new Date().toISOString(),
+          assigned_by: user?.id,
+          status: 'validee',
+          reviewed_at: selectedRequest.reviewed_at || new Date().toISOString(),
+          reviewed_by: selectedRequest.reviewed_by || user?.id
+        })
+        .eq('id', selectedRequest.id);
+
+      if (error) throw error;
+
+      // Notify requester
+      if (selectedRequest.requester_email) {
+        try {
+          await supabase.functions.invoke('send-workflow-notification', {
+            body: {
+              request_type: 'issn_request',
+              request_id: selectedRequest.id,
+              notification_type: 'issn_attributed',
+              recipient_email: selectedRequest.requester_email,
+              additional_data: { issn: issnNumber.trim().toUpperCase() }
+            }
+          });
+        } catch (notifError) {
+          console.warn('Notification email failed:', notifError);
+        }
+      }
+
+      setRequests(requests.map(r => 
+        r.id === selectedRequest.id 
+          ? { 
+              ...r, 
+              assigned_issn: issnNumber.trim().toUpperCase(), 
+              assigned_at: new Date().toISOString(),
+              assigned_by: user?.id || null,
+              status: "validee" as const
+            }
+          : r
+      ));
+      toast.success(`ISSN ${issnNumber.trim().toUpperCase()} attribué à "${selectedRequest.title}"`);
+      setIsAttributeDialogOpen(false);
+      setIssnNumber("");
+      setSelectedRequest(null);
+    } catch (error) {
+      console.error('Error attributing ISSN:', error);
+      toast.error("Erreur lors de l'attribution du numéro ISSN");
+    } finally {
+      setAttributing(false);
+    }
   };
 
   if (loading) {
@@ -274,7 +353,7 @@ export default function IssnRequestsManager() {
           </div>
 
           {/* Statistiques rapides */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card className="bg-[#FFF8E1] border-[#F57C00]">
               <CardContent className="pt-6">
                 <div className="text-2xl font-bold text-[#F57C00]">
@@ -286,9 +365,17 @@ export default function IssnRequestsManager() {
             <Card className="bg-[#E7F5EC] border-[#2E7D32]">
               <CardContent className="pt-6">
                 <div className="text-2xl font-bold text-[#2E7D32]">
-                  {requests.filter(r => r.status === "validee").length}
+                  {requests.filter(r => r.status === "validee" && !r.assigned_issn).length}
                 </div>
-                <div className="text-sm text-muted-foreground">Validées</div>
+                <div className="text-sm text-muted-foreground">Validées (sans ISSN)</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-[#E3F2FD] border-[#1565C0]">
+              <CardContent className="pt-6">
+                <div className="text-2xl font-bold text-[#1565C0]">
+                  {requests.filter(r => r.assigned_issn).length}
+                </div>
+                <div className="text-sm text-muted-foreground">ISSN attribués</div>
               </CardContent>
             </Card>
             <Card className="bg-[#FDEAEA] border-[#C62828]">
@@ -309,6 +396,7 @@ export default function IssnRequestsManager() {
                   <TableHead className="text-[#2E2E2E]">N° de demande</TableHead>
                   <TableHead className="text-[#2E2E2E]">Titre de la publication</TableHead>
                   <TableHead className="text-[#2E2E2E]">Type de support</TableHead>
+                  <TableHead className="text-[#2E2E2E]">ISSN attribué</TableHead>
                   <TableHead className="text-[#2E2E2E]">Date de soumission</TableHead>
                   <TableHead className="text-[#2E2E2E]">Statut</TableHead>
                   <TableHead className="text-[#2E2E2E] text-right">Actions</TableHead>
@@ -317,7 +405,7 @@ export default function IssnRequestsManager() {
               <TableBody>
                 {filteredRequests.length === 0 ? (
                   <TableRow>
-                    <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
+                    <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
                       Aucune demande trouvée
                     </TableCell>
                   </TableRow>
@@ -327,17 +415,37 @@ export default function IssnRequestsManager() {
                       <TableCell className="font-medium">{request.request_number}</TableCell>
                       <TableCell>{request.title}</TableCell>
                       <TableCell>{getSupportLabel(request.support)}</TableCell>
+                      <TableCell>
+                        {request.assigned_issn ? (
+                          <span className="font-mono font-semibold text-[#1565C0]">{request.assigned_issn}</span>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </TableCell>
                       <TableCell>{format(new Date(request.created_at), "dd/MM/yyyy")}</TableCell>
-                      <TableCell>{getStatusBadge(request.status)}</TableCell>
+                      <TableCell>{getStatusBadge(request)}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex gap-2 justify-end">
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => openDetailsDialog(request)}
+                            title="Voir les détails"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
+                          {/* Attribution ISSN: disponible pour les demandes validées ou en attente sans ISSN */}
+                          {!request.assigned_issn && request.status !== "refusee" && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => openAttributeDialog(request)}
+                              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                              title="Attribuer un numéro ISSN"
+                            >
+                              <Hash className="h-4 w-4" />
+                            </Button>
+                          )}
                           {request.status === "en_attente" && (
                             <>
                               <Button
@@ -345,6 +453,7 @@ export default function IssnRequestsManager() {
                                 size="sm"
                                 onClick={() => handleValidate(request)}
                                 className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                                title="Valider la demande"
                               >
                                 <CheckCircle className="h-4 w-4" />
                               </Button>
@@ -353,6 +462,7 @@ export default function IssnRequestsManager() {
                                 size="sm"
                                 onClick={() => openRejectDialog(request)}
                                 className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                title="Refuser la demande"
                               >
                                 <XCircle className="h-4 w-4" />
                               </Button>
@@ -411,9 +521,20 @@ export default function IssnRequestsManager() {
                 </div>
                 <div>
                   <Label className="text-muted-foreground">Statut</Label>
-                  <div className="mt-1">{getStatusBadge(selectedRequest.status)}</div>
+                  <div className="mt-1">{getStatusBadge(selectedRequest)}</div>
                 </div>
               </div>
+              {selectedRequest.assigned_issn && (
+                <div className="p-3 bg-[#E3F2FD] rounded-lg">
+                  <Label className="text-[#1565C0]">ISSN attribué</Label>
+                  <p className="font-mono font-bold text-lg text-[#1565C0]">{selectedRequest.assigned_issn}</p>
+                  {selectedRequest.assigned_at && (
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Attribué le {format(new Date(selectedRequest.assigned_at), "dd/MM/yyyy à HH:mm")}
+                    </p>
+                  )}
+                </div>
+              )}
               <div>
                 <Label className="text-muted-foreground">Adresse de contact</Label>
                 <p className="font-medium">{selectedRequest.contact_address}</p>
@@ -458,6 +579,62 @@ export default function IssnRequestsManager() {
             </Button>
             <Button variant="destructive" onClick={handleReject}>
               Confirmer le refus
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog d'attribution ISSN */}
+      <Dialog open={isAttributeDialogOpen} onOpenChange={setIsAttributeDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Hash className="h-5 w-5 text-[#1565C0]" />
+              Attribuer un numéro ISSN
+            </DialogTitle>
+            <DialogDescription>
+              Attribuer un ISSN à la publication « {selectedRequest?.title} » ({selectedRequest?.request_number})
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Numéro ISSN <span className="text-destructive">*</span></Label>
+              <Input
+                placeholder="ex: 1234-5678"
+                value={issnNumber}
+                onChange={(e) => setIssnNumber(e.target.value)}
+                className="font-mono text-lg"
+                maxLength={9}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Format : XXXX-XXXX (8 chiffres séparés par un tiret)
+              </p>
+            </div>
+            {selectedRequest && (
+              <div className="bg-muted/50 p-3 rounded-lg text-sm space-y-1">
+                <p><span className="text-muted-foreground">Publication :</span> {selectedRequest.title}</p>
+                <p><span className="text-muted-foreground">Éditeur :</span> {selectedRequest.publisher}</p>
+                <p><span className="text-muted-foreground">Support :</span> {getSupportLabel(selectedRequest.support)}</p>
+              </div>
+            )}
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAttributeDialogOpen(false)}>
+              Annuler
+            </Button>
+            <Button 
+              onClick={handleAttributeIssn} 
+              disabled={attributing || !issnNumber.trim()}
+              className="bg-[#1565C0] hover:bg-[#0D47A1]"
+            >
+              {attributing ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Attribution...
+                </>
+              ) : (
+                "Attribuer l'ISSN"
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>

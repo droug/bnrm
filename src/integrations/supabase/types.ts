@@ -6801,6 +6801,9 @@ export type Database = {
       }
       issn_requests: {
         Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          assigned_issn: string | null
           contact_address: string
           country_code: string
           created_at: string
@@ -6822,6 +6825,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          assigned_issn?: string | null
           contact_address: string
           country_code: string
           created_at?: string
@@ -6843,6 +6849,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          assigned_issn?: string | null
           contact_address?: string
           country_code?: string
           created_at?: string
