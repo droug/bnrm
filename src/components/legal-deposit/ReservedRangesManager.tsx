@@ -25,7 +25,8 @@ import {
   Search,
   Printer,
   Factory,
-  X
+  X,
+  History
 } from "lucide-react";
 
 interface Publisher {
@@ -93,17 +94,15 @@ export const ReservedRangesManager = () => {
 
       if (rangesError) throw rangesError;
 
-      // Fetch publishers, printers and producers in parallel
-      const [publishersRes, printersRes, producersRes] = await Promise.all([
-        supabase.from('publishers').select('id, name, city, country, address, phone, email').order('name'),
-        supabase.from('printers').select('id, name, city, country, address, phone, email').order('name'),
-        supabase.from('producers').select('id, name, city, country, address, phone, email').order('name'),
+      // Fetch publishers, printers and producers in parallel (exclude deleted)
+      const fetchDir = async (table: string) => {
+        const { data, error } = await (supabase as any).from(table).select('id, name, city, country, address, phone, email').is('deleted_at', null).eq('is_validated', true).order('name');
+        if (error) throw error;
+        return data || [];
+      };
+      const [publishersData, printersData, producersData] = await Promise.all([
+        fetchDir('publishers'), fetchDir('printers'), fetchDir('producers')
       ]);
-
-      if (publishersRes.error) throw publishersRes.error;
-      const publishersData = publishersRes.data;
-      const printersData = printersRes.data || [];
-      const producersData = producersRes.data || [];
 
       // Mock data for demonstration if no real data
       const mockPublishers = [
@@ -365,6 +364,7 @@ export const ReservedRangesManager = () => {
   const [activeProType, setActiveProType] = useState<string>("editeur");
   const [nameSearch, setNameSearch] = useState("");
   const [keywordSearch, setKeywordSearch] = useState("");
+  const [showHistory, setShowHistory] = useState(false);
 
   const proTypeTabs = [
     { value: "editeur", label: "Éditeurs", icon: BookOpen, color: "text-blue-600" },
@@ -375,7 +375,10 @@ export const ReservedRangesManager = () => {
   const filteredRanges = useMemo(() => {
     return reservedRanges.filter((range) => {
       // Filter by professional type (deposit_type field stores this)
-      const typeMatch = range.deposit_type?.toLowerCase().includes(activeProType) && range.status !== 'cancelled';
+      const typeMatch = range.deposit_type?.toLowerCase().includes(activeProType);
+      
+      // In normal view, hide cancelled; in history view, show only cancelled
+      const statusMatch = showHistory ? range.status === 'cancelled' : range.status !== 'cancelled';
       
       // Filter by name
       const nameMatch = !nameSearch || 
@@ -390,9 +393,9 @@ export const ReservedRangesManager = () => {
         range.range_end?.toLowerCase().includes(keywordSearch.toLowerCase()) ||
         (range.requester_name || '').toLowerCase().includes(keywordSearch.toLowerCase());
       
-      return typeMatch && nameMatch && kwMatch;
+      return typeMatch && statusMatch && nameMatch && kwMatch;
     });
-  }, [reservedRanges, activeProType, nameSearch, keywordSearch]);
+  }, [reservedRanges, activeProType, nameSearch, keywordSearch, showHistory]);
 
   // Get the right professional list based on active tab
   const activeProfessionals = useMemo(() => {
@@ -413,20 +416,44 @@ export const ReservedRangesManager = () => {
     return counts;
   }, [reservedRanges]);
 
+  const cancelledCount = useMemo(() => {
+    return reservedRanges.filter(r => r.status === 'cancelled' && r.deposit_type?.toLowerCase().includes(activeProType)).length;
+  }, [reservedRanges, activeProType]);
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Tranches Réservées</h2>
+          <h2 className="text-2xl font-bold">
+            {showHistory ? 'Historique des tranches' : 'Tranches Réservées'}
+          </h2>
           <p className="text-muted-foreground">
-            Gestion des plages de numéros réservées par type de professionnel
+            {showHistory 
+              ? 'Tranches annulées et archivées' 
+              : 'Gestion des plages de numéros réservées par type de professionnel'}
           </p>
         </div>
-        <Button onClick={() => setIsAddDialogOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Réserver une tranche
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button 
+            variant={showHistory ? "default" : "outline"} 
+            onClick={() => setShowHistory(!showHistory)}
+          >
+            <History className="h-4 w-4 mr-2" />
+            Historique
+            {cancelledCount > 0 && (
+              <Badge variant="secondary" className="ml-2 h-5 min-w-[20px] px-1.5 text-xs">
+                {cancelledCount}
+              </Badge>
+            )}
+          </Button>
+          {!showHistory && (
+            <Button onClick={() => setIsAddDialogOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Réserver une tranche
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Tabs by professional type */}
