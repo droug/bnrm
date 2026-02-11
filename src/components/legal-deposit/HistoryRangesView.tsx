@@ -58,21 +58,25 @@ export const HistoryRangesView = () => {
 
       if (rangesError) throw rangesError;
 
-      // Fetch deleted professional IDs from publishers and printers
-      const fetchDeletedIds = async (table: string) => {
-        const { data, error } = await (supabase as any).from(table).select('id').not('deleted_at', 'is', null);
+      // Fetch deleted professionals (ID + name) from publishers and printers
+      const fetchDeleted = async (table: string) => {
+        const { data, error } = await (supabase as any).from(table).select('id, name').not('deleted_at', 'is', null);
         if (error) return [];
-        return (data || []).map((d: any) => d.id);
+        return data || [];
       };
-      const [deletedPubIds, deletedPrintIds] = await Promise.all([
-        fetchDeletedIds('publishers'), fetchDeletedIds('printers')
+      const [deletedPubs, deletedPrints] = await Promise.all([
+        fetchDeleted('publishers'), fetchDeleted('printers')
       ]);
-      const deletedProfessionalIds = new Set([...deletedPubIds, ...deletedPrintIds]);
+      const deletedProfessionalIds = new Set([...deletedPubs, ...deletedPrints].map((d: any) => d.id));
+      const deletedProfessionalNames = new Set([...deletedPubs, ...deletedPrints].map((d: any) => d.name?.toLowerCase()));
 
-      // Show in history: cancelled ranges OR ranges belonging to deleted professionals
-      const historyRanges = (allRanges || []).filter((r: any) => 
-        r.status === 'cancelled' || deletedProfessionalIds.has(r.requester_id)
-      );
+      // Show in history: cancelled ranges OR ranges belonging to deleted professionals (by ID or name)
+      const historyRanges = (allRanges || []).filter((r: any) => {
+        if (r.status === 'cancelled') return true;
+        if (r.requester_id && deletedProfessionalIds.has(r.requester_id)) return true;
+        if (!r.requester_id && r.requester_name && deletedProfessionalNames.has(r.requester_name.toLowerCase())) return true;
+        return false;
+      });
 
       setRanges(historyRanges as ReservedRange[]);
     } catch (error) {

@@ -105,18 +105,19 @@ export const ReservedRangesManager = () => {
         return data || [];
       };
       // Also fetch deleted professionals to filter their ranges out
-      const fetchDeletedIds = async (table: string) => {
-        const { data, error } = await (supabase as any).from(table).select('id').not('deleted_at', 'is', null);
+      const fetchDeletedNames = async (table: string) => {
+        const { data, error } = await (supabase as any).from(table).select('id, name').not('deleted_at', 'is', null);
         if (error) return [];
-        return (data || []).map((d: any) => d.id);
+        return data || [];
       };
-      const [publishersData, printersData, producersData, deletedPubIds, deletedPrintIds] = await Promise.all([
+      const [publishersData, printersData, producersData, deletedPubs, deletedPrints] = await Promise.all([
         fetchValidated('publishers'), fetchValidated('printers'), fetchAll('producers'),
-        fetchDeletedIds('publishers'), fetchDeletedIds('printers')
+        fetchDeletedNames('publishers'), fetchDeletedNames('printers')
       ]);
 
-      // Set of all deleted professional IDs
-      const deletedProfessionalIds = new Set([...deletedPubIds, ...deletedPrintIds]);
+      // Set of all deleted professional IDs and names
+      const deletedProfessionalIds = new Set([...deletedPubs, ...deletedPrints].map((d: any) => d.id));
+      const deletedProfessionalNames = new Set([...deletedPubs, ...deletedPrints].map((d: any) => d.name?.toLowerCase()));
 
       // Mock data for demonstration if no real data
       const mockPublishers = [
@@ -133,10 +134,16 @@ export const ReservedRangesManager = () => {
       const finalPublishers = (publishersData && publishersData.length > 0) ? publishersData : mockPublishers;
       const finalRanges = (rangesData && rangesData.length > 0) ? rangesData : mockRanges;
 
-      // Map ranges with publisher names - use stored name first, then lookup
+      // Map ranges with publisher names - filter out deleted professionals by ID or name
       const allProfessionals = [...finalPublishers, ...printersData, ...producersData];
       const rangesWithNames = finalRanges
-        .filter((range: any) => !deletedProfessionalIds.has(range.requester_id))
+        .filter((range: any) => {
+          // Filter by requester_id if present
+          if (range.requester_id && deletedProfessionalIds.has(range.requester_id)) return false;
+          // Filter by requester_name for ranges without requester_id
+          if (!range.requester_id && range.requester_name && deletedProfessionalNames.has(range.requester_name.toLowerCase())) return false;
+          return true;
+        })
         .map((range: any) => ({
           ...range,
           requester_email: range.requester_email || range.requester?.email,
