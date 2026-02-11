@@ -350,12 +350,12 @@ serve(async (req) => {
 
     // Envoyer également à l'auteur si disponible et différent du destinataire principal
     const authorEmail = metadata?.customFields?.author_email;
-    const authorName = metadata?.customFields?.author_name || "Auteur";
+    const authorDisplayName = metadata?.customFields?.author_name || "Auteur";
     if (authorEmail && authorEmail !== userEmail) {
       console.log(`[NOTIFY-ATTRIBUTION] Also sending to author: ${authorEmail}`);
       const authorEmailHtml = emailHtml.replace(
         `Bonjour ${userName},`,
-        `Bonjour ${authorName},`
+        `Bonjour ${authorDisplayName},`
       );
       const authorResult = await sendEmail({
         to: authorEmail,
