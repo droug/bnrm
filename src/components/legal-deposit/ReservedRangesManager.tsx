@@ -605,7 +605,7 @@ export const ReservedRangesManager = () => {
           <div className="space-y-4 p-6">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Professionnel *</Label>
+                <Label>{activeProType === 'imprimeur' ? 'Imprimeur' : activeProType === 'producteur' ? 'Producteur' : 'Éditeur'} *</Label>
                 {!selectedPublisher ? (
                   <div className="relative">
                     <Input
