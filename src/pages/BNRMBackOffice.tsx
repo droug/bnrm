@@ -48,6 +48,7 @@ import { BNRMNumberAttribution } from "@/components/bnrm/BNRMNumberAttribution";
 import { BNRMPaymentNotificationSettings } from "@/components/bnrm/BNRMPaymentNotificationSettings";
 import { BNRMStatistics } from "@/components/bnrm/BNRMStatistics";
 import BNRMEditorialMonitoring from "@/components/bnrm/BNRMEditorialMonitoring";
+import { HistoryRangesView } from "@/components/legal-deposit/HistoryRangesView";
 import { DepositValidationWorkflow } from "@/components/legal-deposit/DepositValidationWorkflow";
 import { AdminBackOfficeHeader } from "@/components/admin/AdminBackOfficeHeader";
 import { AdminBackOfficeNavigation } from "@/components/admin/AdminBackOfficeNavigation";
@@ -172,6 +173,8 @@ export default function BNRMBackOffice() {
         return <BNRMPaymentNotificationSettings />;
       case 'statistics':
         return <BNRMStatistics />;
+      case 'history':
+        return <HistoryRangesView />;
       case 'reports':
         return (
           <div className="space-y-6">
