@@ -208,23 +208,66 @@ export default function MyLibrarySpace() {
       ]);
 
       // Get professional registry for legal deposits
+      let profId: string | null = null;
       const { data: profData } = await supabase
         .from('professional_registry')
         .select('id')
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
+
+      if (profData) {
+        profId = profData.id;
+      } else {
+        const { data: profReqData } = await supabase
+          .from('professional_registration_requests')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('status', 'approved')
+          .maybeSingle();
+        if (profReqData) profId = profReqData.id;
+      }
 
       let legalDeposits = 0;
       let ldPending = 0;
       let ldCompleted = 0;
-      if (profData) {
+
+      // Deposits as initiator
+      const initiatorIds = new Set<string>();
+      if (profId) {
         const { data: ldData } = await supabase
           .from('legal_deposit_requests')
           .select('id, status')
-          .eq('initiator_id', profData.id);
-        legalDeposits = ldData?.length || 0;
-        ldPending = ldData?.filter(d => ['soumis', 'en_attente_validation_b', 'en_attente_comite_validation'].includes(d.status))?.length || 0;
-        ldCompleted = ldData?.filter(d => ['attribue', 'termine'].includes(d.status))?.length || 0;
+          .eq('initiator_id', profId);
+        if (ldData) {
+          ldData.forEach(d => initiatorIds.add(d.id));
+          legalDeposits += ldData.length;
+          ldPending += ldData.filter(d => ['soumis', 'en_attente_validation_b', 'en_attente_comite_validation'].includes(d.status)).length;
+          ldCompleted += ldData.filter(d => ['attribue', 'termine'].includes(d.status)).length;
+        }
+      }
+
+      // Deposits as party (printer, editor, etc.)
+      const { data: partyData } = await supabase
+        .from('legal_deposit_parties')
+        .select('request_id')
+        .eq('user_id', user.id);
+
+      if (partyData && partyData.length > 0) {
+        const uniquePartyIds = partyData
+          .map(p => p.request_id)
+          .filter((id): id is string => !!id && !initiatorIds.has(id));
+
+        if (uniquePartyIds.length > 0) {
+          const { data: partyLdData } = await supabase
+            .from('legal_deposit_requests')
+            .select('id, status')
+            .in('id', uniquePartyIds);
+          if (partyLdData) {
+            legalDeposits += partyLdData.length;
+            ldPending += partyLdData.filter(d => ['soumis', 'en_attente_validation_b', 'en_attente_comite_validation'].includes(d.status)).length;
+            ldCompleted += partyLdData.filter(d => ['attribue', 'termine'].includes(d.status)).length;
+          }
+        }
       }
 
       // Calculate pending and completed
@@ -251,9 +294,10 @@ export default function MyLibrarySpace() {
       });
 
       // Set user profiles based on data
+      const hasProfessionalAccess = !!profId;
       setUserProfiles(prev => ({
         ...prev,
-        isProfessional: !!profData,
+        isProfessional: hasProfessionalAccess,
         isDonor: !!donorRes.data,
         hasRestorations: (restorationsRes.data?.length || 0) > 0,
         hasReproductions: (reproductionsRes.data?.length || 0) > 0,
