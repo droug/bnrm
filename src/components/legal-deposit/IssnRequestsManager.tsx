@@ -678,7 +678,7 @@ export default function IssnRequestsManager() {
                 )}
 
                 {/* Section Attribution ISSN */}
-                {!selectedRequest.assigned_issn && selectedRequest.status !== "refusee" && (
+                {!selectedRequest.assigned_issn && selectedRequest.status === "en_attente" && (
                   <>
                     <Separator />
                     <div>
