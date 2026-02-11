@@ -1,0 +1,1 @@
+UPDATE reserved_number_ranges SET deposit_type = 'imprimeur' WHERE id = 'eb930349-3747-4249-8cc3-ee059d96caf0';
