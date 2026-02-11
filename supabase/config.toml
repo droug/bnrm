@@ -64,7 +64,7 @@ verify_jwt = true
 verify_jwt = true
 
 [functions.user-service]
-verify_jwt = true
+verify_jwt = false
 
 [functions.inject-professional-data]
 verify_jwt = true
