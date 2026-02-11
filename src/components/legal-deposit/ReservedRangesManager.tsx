@@ -241,7 +241,7 @@ export const ReservedRangesManager = () => {
   const handleAddRange = async () => {
     try {
       const quantity = parseInt(formData.quantity);
-      if (!formData.requester_id || !formData.deposit_type || !quantity) {
+      if (!selectedPublisher || !formData.deposit_type || !quantity) {
         toast({
           title: "Erreur",
           description: "Veuillez remplir tous les champs obligatoires",
@@ -259,7 +259,6 @@ export const ReservedRangesManager = () => {
       const { error } = await supabase
         .from('reserved_number_ranges')
         .insert([{
-          requester_id: formData.requester_id,
           deposit_type: formData.deposit_type,
           number_type: formData.number_type,
           range_start,
@@ -269,6 +268,8 @@ export const ReservedRangesManager = () => {
           used_numbers: 0,
           status: 'active',
           notes: formData.notes,
+          requester_name: selectedPublisher?.name || '',
+          requester_email: selectedPublisher?.email || '',
           reserved_by: (await supabase.auth.getUser()).data.user?.id
         }]);
 
