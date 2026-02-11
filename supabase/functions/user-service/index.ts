@@ -34,13 +34,10 @@ serve(async (req) => {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No authorization header");
 
-    // Create an anon client with the user's auth header to validate identity
-    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } },
-      auth: { persistSession: false },
-    });
+    const token = authHeader.replace("Bearer ", "");
 
-    const { data: userData, error: userError } = await supabaseAuth.auth.getUser();
+    // Use service role client with explicit token to validate user
+    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError || !userData.user) {
       console.error("[USER-SERVICE] Auth error:", userError);
       throw new Error("User not authenticated");
