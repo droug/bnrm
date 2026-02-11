@@ -36,10 +36,15 @@ serve(async (req) => {
 
     const token = authHeader.replace("Bearer ", "");
 
-    // Decode JWT payload to extract user ID (avoids SDK session issues)
+    // Decode JWT payload - handle URL-safe base64
     let jwtPayload: any;
     try {
-      jwtPayload = JSON.parse(atob(token.split('.')[1]));
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const pad = base64.length % 4;
+      const padded = pad ? base64 + '='.repeat(4 - pad) : base64;
+      jwtPayload = JSON.parse(atob(padded));
+      console.log("[USER-SERVICE] JWT decoded, sub:", jwtPayload.sub, "role:", jwtPayload.role);
     } catch (e) {
       console.error("[USER-SERVICE] JWT decode error:", e);
       throw new Error("Invalid token");
