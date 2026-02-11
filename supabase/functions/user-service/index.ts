@@ -307,6 +307,35 @@ serve(async (req) => {
           }
         }
 
+        // Marquer les enregistrements dans les tables de répertoire comme supprimés
+        // pour qu'ils n'apparaissent plus dans l'autocomplétion
+        const directoryTables = ['publishers', 'printers', 'producers'];
+        const professionalEmail = profileToDelete?.email || registrationRequest?.registration_data?.email;
+        const companyName = registrationRequest?.company_name;
+
+        for (const dirTable of directoryTables) {
+          try {
+            let query = supabaseClient.from(dirTable).update({ deleted_at: new Date().toISOString(), is_validated: false });
+            
+            if (professionalEmail) {
+              query = query.eq('email', professionalEmail);
+            } else if (companyName) {
+              query = query.eq('name', companyName);
+            } else {
+              continue;
+            }
+
+            const { error: dirError } = await query;
+            if (dirError) {
+              console.warn(`[USER-SERVICE] Warning updating ${dirTable}: ${dirError.message}`);
+            } else {
+              console.log(`[USER-SERVICE] Marked ${dirTable} records as deleted for ${professionalEmail || companyName}`);
+            }
+          } catch (e) {
+            console.warn(`[USER-SERVICE] Error updating ${dirTable}:`, e);
+          }
+        }
+
         console.log(`[USER-SERVICE] Data cleanup completed, now deleting Auth user: ${user_id}`);
 
         // Supprimer l'utilisateur de auth.users
