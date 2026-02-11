@@ -191,11 +191,12 @@ export const ReservedRangesManager = () => {
       const finalPublishers = (publishersData && publishersData.length > 0) ? publishersData : mockPublishers;
       const finalRanges = (rangesData && rangesData.length > 0) ? rangesData : mockRanges;
 
-      // Map ranges with publisher names
+      // Map ranges with publisher names - use stored name first, then lookup
+      const allProfessionals = [...finalPublishers, ...printersData, ...producersData];
       const rangesWithNames = finalRanges.map((range: any) => ({
         ...range,
-        requester_email: range.requester?.email,
-        requester_name: finalPublishers.find(p => p.id === range.requester_id)?.name || 'Éditeur inconnu'
+        requester_email: range.requester_email || range.requester?.email,
+        requester_name: range.requester_name || allProfessionals.find(p => p.id === range.requester_id)?.name || 'Professionnel inconnu'
       }));
 
       setReservedRanges(rangesWithNames);
