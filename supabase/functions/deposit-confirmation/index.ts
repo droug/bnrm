@@ -368,6 +368,90 @@ serve(async (req) => {
         console.log(`[DEPOSIT-CONFIRMATION] Acknowledgment email sent to initiator ${confirmedToken.email}:`, ackEmailResult);
       }
 
+      // === NOTIFICATION AUTEUR ===
+      // Extraire l'email de l'auteur depuis les métadonnées
+      const authorEmail = meta?.customFields?.author_email || meta?.author_email || '';
+      const authorFullName = authorName || meta?.customFields?.author_name || requestData?.author_name || '';
+      
+      if (authorEmail && authorEmail !== editor_email && authorEmail !== printer_email) {
+        console.log(`[DEPOSIT-CONFIRMATION] Sending author notification to: ${authorEmail}`);
+        
+        const siteUrl = resolvePublicSiteUrl();
+        const authorEmailHtml = `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          </head>
+          <body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f7fa;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+              <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); padding: 30px; text-align: center;">
+                <h1 style="color: #ffffff; margin: 0; font-size: 24px;">🏛️ BNRM - Dépôt Légal</h1>
+                <p style="color: #e2e8f0; margin: 10px 0 0;">Notification à l'Auteur</p>
+              </div>
+              
+              <div style="padding: 30px;">
+                <p style="color: #2d3748; font-size: 16px;">Bonjour ${authorFullName || 'Cher(e) Auteur'},</p>
+                
+                <p style="color: #4a5568; line-height: 1.6;">
+                  Nous vous informons qu'une demande de dépôt légal a été initiée pour votre œuvre. Voici les détails :
+                </p>
+                
+                <div style="background-color: #edf2f7; border-radius: 8px; padding: 20px; margin: 20px 0;">
+                  <h3 style="color: #2d3748; margin: 0 0 15px;">📋 Détails de la demande</h3>
+                  <table style="width: 100%; border-collapse: collapse;">
+                    <tr>
+                      <td style="padding: 8px 0; color: #718096;">N° de demande:</td>
+                      <td style="padding: 8px 0; color: #2d3748; font-weight: 600;">${requestData?.request_number || "N/A"}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0; color: #718096;">Titre:</td>
+                      <td style="padding: 8px 0; color: #2d3748; font-weight: 600;">${title || "Non spécifié"}</td>
+                    </tr>
+                    <tr>
+                      <td style="padding: 8px 0; color: #718096;">Type:</td>
+                      <td style="padding: 8px 0; color: #2d3748; font-weight: 600;">${deposit_type || "Dépôt légal"}</td>
+                    </tr>
+                    ${extraDetailsRows}
+                  </table>
+                </div>
+                
+                <div style="background-color: #ebf8ff; border-left: 4px solid #3182ce; padding: 15px; margin: 20px 0; border-radius: 0 8px 8px 0;">
+                  <p style="color: #2a4365; margin: 0; font-size: 14px;">
+                    <strong>ℹ️ Information:</strong> La demande est en attente de confirmation des deux parties (éditeur et imprimeur). Vous serez notifié(e) de l'avancement du dossier.
+                  </p>
+                </div>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${siteUrl}/my-space" style="display: inline-block; background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); color: #ffffff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 16px;">
+                    📂 Accéder à Mon Espace
+                  </a>
+                </div>
+              </div>
+              
+              <div style="background-color: #edf2f7; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0;">
+                <p style="color: #718096; font-size: 12px; margin: 0;">
+                  © ${new Date().getFullYear()} Bibliothèque Nationale du Royaume du Maroc<br>
+                  Cet email a été envoyé automatiquement, merci de ne pas y répondre.
+                </p>
+              </div>
+            </div>
+          </body>
+          </html>
+        `;
+
+        const authorEmailResult = await sendEmail({
+          to: authorEmail,
+          subject: `[BNRM] Dépôt Légal - Votre œuvre "${title || 'Sans titre'}" - ${requestData?.request_number || ""}`,
+          html: authorEmailHtml,
+        });
+
+        console.log(`[DEPOSIT-CONFIRMATION] Author notification sent to ${authorEmail}:`, authorEmailResult);
+      } else {
+        console.log(`[DEPOSIT-CONFIRMATION] No author email found or author is same as editor/printer, skipping author notification`);
+      }
+
       return new Response(
         JSON.stringify({ 
           success: true, 
