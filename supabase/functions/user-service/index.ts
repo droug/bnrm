@@ -21,34 +21,31 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const supabaseClient = createClient(
-    Deno.env.get("SUPABASE_URL") ?? "",
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-    { auth: { persistSession: false } }
-  );
+  const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+  const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+  const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+
+  // Service role client for admin operations
+  const supabaseClient = createClient(supabaseUrl, supabaseServiceKey, {
+    auth: { persistSession: false },
+  });
 
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("No authorization header");
 
-    const token = authHeader.replace("Bearer ", "");
-    
-    // Use getClaims for signing-keys compatibility
-    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
-      console.error("[USER-SERVICE] getClaims error:", claimsError);
-      // Fallback to getUser
-      const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-      if (userError) {
-        console.error("[USER-SERVICE] getUser error:", userError);
-        throw new Error("User not authenticated");
-      }
-      if (!userData.user) throw new Error("User not authenticated");
-      var currentUser = userData.user;
-    } else {
-      // Build a minimal user object from claims
-      var currentUser = { id: claimsData.claims.sub, email: claimsData.claims.email } as any;
+    // Create an anon client with the user's auth header to validate identity
+    const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+      auth: { persistSession: false },
+    });
+
+    const { data: userData, error: userError } = await supabaseAuth.auth.getUser();
+    if (userError || !userData.user) {
+      console.error("[USER-SERVICE] Auth error:", userError);
+      throw new Error("User not authenticated");
     }
+    const currentUser = userData.user;
 
     const { action, user_id, profile_data, role, filters, deleted_reason }: UserRequest = await req.json();
 
