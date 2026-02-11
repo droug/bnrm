@@ -104,9 +104,19 @@ export const ReservedRangesManager = () => {
         if (error) throw error;
         return data || [];
       };
-      const [publishersData, printersData, producersData] = await Promise.all([
-        fetchValidated('publishers'), fetchValidated('printers'), fetchAll('producers')
+      // Also fetch deleted professionals to filter their ranges out
+      const fetchDeletedIds = async (table: string) => {
+        const { data, error } = await (supabase as any).from(table).select('id').not('deleted_at', 'is', null);
+        if (error) return [];
+        return (data || []).map((d: any) => d.id);
+      };
+      const [publishersData, printersData, producersData, deletedPubIds, deletedPrintIds] = await Promise.all([
+        fetchValidated('publishers'), fetchValidated('printers'), fetchAll('producers'),
+        fetchDeletedIds('publishers'), fetchDeletedIds('printers')
       ]);
+
+      // Set of all deleted professional IDs
+      const deletedProfessionalIds = new Set([...deletedPubIds, ...deletedPrintIds]);
 
       // Mock data for demonstration if no real data
       const mockPublishers = [
@@ -117,78 +127,7 @@ export const ReservedRangesManager = () => {
         { id: '5', name: 'Imprimerie Royale', city: 'Rabat', country: 'Maroc' },
       ];
 
-      const mockRanges = [
-        {
-          id: '1',
-          requester_id: '1',
-          deposit_type: 'monographie',
-          number_type: 'isbn' as const,
-          range_start: '978-9981-100-00-0',
-          range_end: '978-9981-100-99-9',
-          current_position: '978-9981-100-23-4',
-          total_numbers: 100,
-          used_numbers: 23,
-          status: 'active' as const,
-          notes: 'Collection de livres d\'histoire du Maroc',
-          created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
-        },
-        {
-          id: '2',
-          requester_id: '2',
-          deposit_type: 'periodique',
-          number_type: 'issn' as const,
-          range_start: '2550-1000',
-          range_end: '2550-1049',
-          current_position: '2550-1012',
-          total_numbers: 50,
-          used_numbers: 12,
-          status: 'active' as const,
-          notes: 'Revue scientifique trimestrielle',
-          created_at: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000).toISOString(),
-        },
-        {
-          id: '3',
-          requester_id: '3',
-          deposit_type: 'monographie',
-          number_type: 'isbn' as const,
-          range_start: '978-9981-200-00-0',
-          range_end: '978-9981-200-49-9',
-          current_position: '978-9981-200-47-5',
-          total_numbers: 50,
-          used_numbers: 47,
-          status: 'active' as const,
-          notes: 'Éditions littéraires - Romans et poésie',
-          created_at: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000).toISOString(),
-        },
-        {
-          id: '4',
-          requester_id: '4',
-          deposit_type: 'numerique',
-          number_type: 'dl' as const,
-          range_start: 'DL-2025-010000',
-          range_end: 'DL-2025-010199',
-          current_position: 'DL-2025-010078',
-          total_numbers: 200,
-          used_numbers: 78,
-          status: 'active' as const,
-          notes: 'Publications numériques - Livres électroniques',
-          created_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
-        },
-        {
-          id: '5',
-          requester_id: '5',
-          deposit_type: 'monographie',
-          number_type: 'isbn' as const,
-          range_start: '978-9981-300-00-0',
-          range_end: '978-9981-300-24-9',
-          current_position: '978-9981-300-24-9',
-          total_numbers: 25,
-          used_numbers: 25,
-          status: 'exhausted' as const,
-          notes: 'Collection épuisée - Demander renouvellement',
-          created_at: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString(),
-        },
-      ];
+      const mockRanges: any[] = [];
 
       // Use real data if available, otherwise use mock data
       const finalPublishers = (publishersData && publishersData.length > 0) ? publishersData : mockPublishers;
@@ -196,11 +135,13 @@ export const ReservedRangesManager = () => {
 
       // Map ranges with publisher names - use stored name first, then lookup
       const allProfessionals = [...finalPublishers, ...printersData, ...producersData];
-      const rangesWithNames = finalRanges.map((range: any) => ({
-        ...range,
-        requester_email: range.requester_email || range.requester?.email,
-        requester_name: range.requester_name || allProfessionals.find(p => p.id === range.requester_id)?.name || 'Professionnel inconnu'
-      }));
+      const rangesWithNames = finalRanges
+        .filter((range: any) => !deletedProfessionalIds.has(range.requester_id))
+        .map((range: any) => ({
+          ...range,
+          requester_email: range.requester_email || range.requester?.email,
+          requester_name: range.requester_name || allProfessionals.find(p => p.id === range.requester_id)?.name || 'Professionnel inconnu'
+        }));
 
       setReservedRanges(rangesWithNames);
       setPublishers(finalPublishers);

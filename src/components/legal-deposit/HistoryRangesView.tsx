@@ -49,14 +49,32 @@ export const HistoryRangesView = () => {
   const fetchCancelledRanges = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
+      
+      // Fetch all ranges (we'll filter client-side)
+      const { data: allRanges, error: rangesError } = await supabase
         .from('reserved_number_ranges')
         .select('*')
-        .eq('status', 'cancelled')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setRanges((data || []) as ReservedRange[]);
+      if (rangesError) throw rangesError;
+
+      // Fetch deleted professional IDs from publishers and printers
+      const fetchDeletedIds = async (table: string) => {
+        const { data, error } = await (supabase as any).from(table).select('id').not('deleted_at', 'is', null);
+        if (error) return [];
+        return (data || []).map((d: any) => d.id);
+      };
+      const [deletedPubIds, deletedPrintIds] = await Promise.all([
+        fetchDeletedIds('publishers'), fetchDeletedIds('printers')
+      ]);
+      const deletedProfessionalIds = new Set([...deletedPubIds, ...deletedPrintIds]);
+
+      // Show in history: cancelled ranges OR ranges belonging to deleted professionals
+      const historyRanges = (allRanges || []).filter((r: any) => 
+        r.status === 'cancelled' || deletedProfessionalIds.has(r.requester_id)
+      );
+
+      setRanges(historyRanges as ReservedRange[]);
     } catch (error) {
       console.error('Erreur:', error);
       toast({ title: "Erreur", description: "Impossible de charger l'historique", variant: "destructive" });
