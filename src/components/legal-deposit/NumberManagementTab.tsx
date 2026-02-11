@@ -30,6 +30,7 @@ import {
   Library,
 } from "lucide-react";
 import { ReservedRangesManager } from "./ReservedRangesManager";
+import { NumberImportTab } from "./NumberImportTab";
 
 interface ImportedNumber {
   number_type: 'isbn' | 'issn' | 'ismn' | 'dl';
@@ -502,10 +503,14 @@ export const NumberManagementTab = () => {
   return (
     <div className="space-y-6">
       <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="assign">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="assign" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             Attribution Plages
+          </TabsTrigger>
+          <TabsTrigger value="import-numbers" className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Imports N°
           </TabsTrigger>
           <TabsTrigger value="import" className="flex items-center gap-2">
             <Upload className="h-4 w-4" />
@@ -642,6 +647,11 @@ export const NumberManagementTab = () => {
               </div>
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Import Numbers Tab */}
+        <TabsContent value="import-numbers" className="space-y-4">
+          <NumberImportTab />
         </TabsContent>
 
         {/* Range Assignment Tab */}
