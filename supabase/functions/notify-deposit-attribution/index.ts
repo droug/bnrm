@@ -348,24 +348,108 @@ serve(async (req) => {
       html: emailHtml,
     });
 
-    // Envoyer également à l'auteur si disponible et différent du destinataire principal
+    // Collecter tous les emails supplémentaires à notifier (éditeur, imprimeur, producteur, auteur)
+    const additionalRecipients: { email: string; name: string; role: string }[] = [];
+    
+    // Ajouter l'éditeur s'il a un email différent du destinataire principal
+    const editorEmail = metadata?.editor?.email || metadata?.publisher?.email;
+    if (editorEmail && editorEmail !== userEmail) {
+      additionalRecipients.push({
+        email: editorEmail,
+        name: metadata?.editor?.name || metadata?.publisher?.name || "Éditeur",
+        role: "Éditeur"
+      });
+    }
+    
+    // Ajouter l'imprimeur s'il a un email différent
+    const printerEmail = metadata?.printer?.email;
+    if (printerEmail && printerEmail !== userEmail && printerEmail !== editorEmail) {
+      additionalRecipients.push({
+        email: printerEmail,
+        name: metadata?.printer?.name || "Imprimeur",
+        role: "Imprimeur"
+      });
+    }
+    
+    // Ajouter le producteur s'il a un email différent
+    const producerEmail = metadata?.producer?.email;
+    if (producerEmail && producerEmail !== userEmail && producerEmail !== editorEmail && producerEmail !== printerEmail) {
+      additionalRecipients.push({
+        email: producerEmail,
+        name: metadata?.producer?.name || "Producteur",
+        role: "Producteur"
+      });
+    }
+    
+    // Ajouter l'auteur s'il a un email différent
     const authorEmail = metadata?.customFields?.author_email;
     const authorDisplayName = metadata?.customFields?.author_name || "Auteur";
-    if (authorEmail && authorEmail !== userEmail) {
-      console.log(`[NOTIFY-ATTRIBUTION] Also sending to author: ${authorEmail}`);
-      const authorEmailHtml = emailHtml.replace(
-        `Bonjour ${userName},`,
-        `Bonjour ${authorDisplayName},`
-      );
-      const authorResult = await sendEmail({
-        to: authorEmail,
-        subject: `Attribution Dépôt Légal - ${request.request_number} - Demande Validée`,
-        html: authorEmailHtml,
+    if (authorEmail && authorEmail !== userEmail && !additionalRecipients.find(r => r.email === authorEmail)) {
+      additionalRecipients.push({
+        email: authorEmail,
+        name: authorDisplayName,
+        role: "Auteur"
       });
-      if (authorResult.success) {
-        console.log(`[NOTIFY-ATTRIBUTION] Author email sent successfully to ${authorEmail}`);
+    }
+
+    // Aussi récupérer les parties depuis legal_deposit_parties pour ne manquer personne
+    try {
+      const { data: parties } = await supabaseAdmin
+        .from("legal_deposit_parties")
+        .select("user_id, role, approval_status")
+        .eq("request_id", requestId);
+
+      if (parties && parties.length > 0) {
+        for (const party of parties) {
+          if (party.user_id) {
+            try {
+              const { data: partyAuth } = await supabaseAdmin.auth.admin.getUserById(party.user_id);
+              if (partyAuth?.user?.email) {
+                const partyEmail = partyAuth.user.email;
+                if (partyEmail !== userEmail && !additionalRecipients.find(r => r.email === partyEmail)) {
+                  const { data: partyProfile } = await supabaseAdmin
+                    .from("profiles")
+                    .select("first_name, last_name")
+                    .eq("id", party.user_id)
+                    .single();
+                  const partyName = partyProfile?.first_name && partyProfile?.last_name
+                    ? `${partyProfile.first_name} ${partyProfile.last_name}`
+                    : party.role || "Participant";
+                  additionalRecipients.push({
+                    email: partyEmail,
+                    name: partyName,
+                    role: party.role || "Participant"
+                  });
+                }
+              }
+            } catch (err) {
+              console.warn(`[NOTIFY-ATTRIBUTION] Could not resolve party user ${party.user_id}:`, err);
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("[NOTIFY-ATTRIBUTION] Could not fetch parties:", err);
+    }
+
+    // Envoyer à tous les destinataires supplémentaires
+    const notifiedRecipients: string[] = [];
+    for (const recipient of additionalRecipients) {
+      console.log(`[NOTIFY-ATTRIBUTION] Sending to ${recipient.role}: ${recipient.email}`);
+      const recipientEmailHtml = emailHtml.replace(
+        `Bonjour ${userName},`,
+        `Bonjour ${recipient.name},`
+      );
+      const recipientResult = await sendEmail({
+        to: recipient.email,
+        subject: `Attribution Dépôt Légal - ${request.request_number} - Demande Validée`,
+        html: recipientEmailHtml,
+      });
+      if (recipientResult.success) {
+        console.log(`[NOTIFY-ATTRIBUTION] ${recipient.role} email sent successfully to ${recipient.email}`);
+        notifiedRecipients.push(recipient.email);
       } else {
-        console.warn(`[NOTIFY-ATTRIBUTION] Author email failed: ${authorResult.error}`);
+        console.warn(`[NOTIFY-ATTRIBUTION] ${recipient.role} email failed: ${recipientResult.error}`);
       }
     }
 
@@ -378,7 +462,8 @@ serve(async (req) => {
           emailSent: true,
           message: `Notification envoyée avec succès via ${emailResult.method === 'smtp' ? 'SMTP' : 'Resend'}`,
           recipient: userEmail,
-          authorNotified: !!(authorEmail && authorEmail !== userEmail),
+          additionalRecipients: notifiedRecipients,
+          totalNotified: 1 + notifiedRecipients.length,
           method: emailResult.method,
         }),
         {
