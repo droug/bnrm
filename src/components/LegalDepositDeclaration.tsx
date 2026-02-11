@@ -284,6 +284,8 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
     support: "",
     frequency: "",
     contactAddress: "",
+    email: "",
+    phone: "",
     justificationFile: null as File | null
   });
   const [printerCountry, setPrinterCountry] = useState<string>("");
