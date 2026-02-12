@@ -637,6 +637,9 @@ export const ReservedRangesManager = () => {
 
               <div className="space-y-2">
                 <Label>Type de dépôt *</Label>
+                {activeProType === 'editeur' ? (
+                  <Input value="Monographie" disabled className="bg-muted cursor-not-allowed" />
+                ) : (
                 <div className="relative">
                   <button
                     type="button"
@@ -677,12 +680,16 @@ export const ReservedRangesManager = () => {
                     </div>
                   )}
                 </div>
+                )}
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Type de numéro *</Label>
+                {activeProType === 'editeur' ? (
+                  <Input value="ISBN" disabled className="bg-muted cursor-not-allowed" />
+                ) : (
                 <div className="relative">
                   <button
                     type="button"
@@ -723,6 +730,7 @@ export const ReservedRangesManager = () => {
                     </div>
                   )}
                 </div>
+                )}
               </div>
 
               <div className="space-y-2">
