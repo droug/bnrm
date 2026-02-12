@@ -10,6 +10,7 @@ import { ActivityTimeline } from "./ActivityTimeline";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
+import { AttachmentsSection } from "./AttachmentsSection";
 
 interface BookReservation {
   id: string;
@@ -23,6 +24,7 @@ interface BookReservation {
   created_at: string;
   user_name: string;
   user_email: string;
+  pfe_proof_url?: string | null;
 }
 
 export function MyBookReservations() {
@@ -290,6 +292,13 @@ export function MyBookReservations() {
                   </div>
                 </div>
               </div>
+
+              {/* Pièces jointes */}
+              <AttachmentsSection
+                attachments={[
+                  { label: "Justificatif PFE", url: selectedReservation.pfe_proof_url },
+                ]}
+              />
 
               <Separator />
 
