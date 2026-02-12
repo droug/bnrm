@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { UserPlus, User, Mail, Building, BookOpen, Check, ChevronsUpDown } from "lucide-react";
+import { UserPlus, User, Mail, Building, BookOpen, Check, ChevronsUpDown, X } from "lucide-react";
 import { PasswordStrengthIndicator } from "@/components/ui/password-strength-indicator";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,7 +25,7 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
   const [open, setOpen] = useState(false);
   const [rolePopoverOpen, setRolePopoverOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<string>('');
+  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
   
   const [formData, setFormData] = useState({
     email: '',
@@ -35,7 +35,6 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
     phone: '',
     institution: '',
     researchField: '',
-    role: '',
     notes: ''
   });
 
@@ -52,9 +51,21 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
     return grouped;
   }, [availableRoles]);
 
-  const selectedRoleInfo = useMemo(() => {
-    return availableRoles.find(r => r.role_code === selectedRole);
-  }, [availableRoles, selectedRole]);
+  const selectedRolesInfo = useMemo(() => {
+    return availableRoles.filter(r => selectedRoles.includes(r.role_code));
+  }, [availableRoles, selectedRoles]);
+
+  const toggleRole = (roleCode: string) => {
+    setSelectedRoles(prev => 
+      prev.includes(roleCode) 
+        ? prev.filter(r => r !== roleCode)
+        : [...prev, roleCode]
+    );
+  };
+
+  const removeRole = (roleCode: string) => {
+    setSelectedRoles(prev => prev.filter(r => r !== roleCode));
+  };
 
   const resetForm = () => {
     setFormData({
@@ -65,10 +76,9 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
       phone: '',
       institution: '',
       researchField: '',
-      role: '',
       notes: ''
     });
-    setSelectedRole('');
+    setSelectedRoles([]);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -96,6 +106,8 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
         throw new Error("Vous devez être connecté pour créer un utilisateur");
       }
 
+      const roles = selectedRolesInfo.map(r => ({ role_code: r.role_code, role_id: r.id }));
+
       const response = await supabase.functions.invoke('user-service', {
         body: {
           action: 'create_internal_user',
@@ -106,8 +118,7 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
           phone: formData.phone || null,
           institution: formData.institution || null,
           research_field: formData.researchField || null,
-          role_code: selectedRoleInfo?.role_code || null,
-          role_id: selectedRoleInfo?.id || null,
+          roles,
           notes: formData.notes || null,
         }
       });
@@ -126,9 +137,10 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
         throw new Error(errorMsg);
       }
 
+      const roleNames = selectedRolesInfo.map(r => r.role_name).join(', ');
       toast({
         title: "Utilisateur créé avec succès",
-        description: `${formData.firstName} ${formData.lastName} a été ajouté avec le rôle ${selectedRoleInfo?.role_name || formData.role}`,
+        description: `${formData.firstName} ${formData.lastName} a été ajouté avec ${selectedRolesInfo.length > 1 ? 'les rôles' : 'le rôle'} ${roleNames}`,
       });
 
       resetForm();
@@ -287,7 +299,26 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <Label htmlFor="role">Rôle *</Label>
+                <Label htmlFor="role">Rôles *</Label>
+                
+                {/* Selected roles badges */}
+                {selectedRolesInfo.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-2 mt-1">
+                    {selectedRolesInfo.map(role => (
+                      <Badge key={role.role_code} variant={getCategoryBadgeVariant(role.role_category)} className="gap-1 pr-1">
+                        {role.role_name}
+                        <button
+                          type="button"
+                          onClick={() => removeRole(role.role_code)}
+                          className="ml-1 hover:bg-destructive/20 rounded-sm p-0.5"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+
                 <Popover open={rolePopoverOpen} onOpenChange={setRolePopoverOpen}>
                   <PopoverTrigger asChild>
                     <Button
@@ -297,18 +328,9 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
                       className="w-full justify-between font-normal"
                       disabled={rolesLoading}
                     >
-                      {selectedRoleInfo ? (
-                        <span className="flex items-center gap-2">
-                          <Badge variant={getCategoryBadgeVariant(selectedRoleInfo.role_category)} className="text-xs">
-                            {selectedRoleInfo.role_category}
-                          </Badge>
-                          {selectedRoleInfo.role_name}
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground">
-                          {rolesLoading ? "Chargement des rôles..." : "Sélectionner un rôle"}
-                        </span>
-                      )}
+                      <span className="text-muted-foreground">
+                        {rolesLoading ? "Chargement des rôles..." : `Ajouter un rôle (${selectedRoles.length} sélectionné${selectedRoles.length > 1 ? 's' : ''})`}
+                      </span>
                       <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                     </Button>
                   </PopoverTrigger>
@@ -324,15 +346,13 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
                                 key={role.role_code}
                                 value={`${role.role_name} ${role.role_code} ${role.description}`}
                                 onSelect={() => {
-                                  setSelectedRole(role.role_code);
-                                  setFormData({ ...formData, role: role.role_code });
-                                  setRolePopoverOpen(false);
+                                  toggleRole(role.role_code);
                                 }}
                               >
                                 <Check
                                   className={cn(
                                     "mr-2 h-4 w-4",
-                                    selectedRole === role.role_code ? "opacity-100" : "opacity-0"
+                                    selectedRoles.includes(role.role_code) ? "opacity-100" : "opacity-0"
                                   )}
                                 />
                                 <div className="flex flex-col">
@@ -352,24 +372,6 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
                   </PopoverContent>
                 </Popover>
               </div>
-
-              {selectedRoleInfo && (
-                <div className="p-4 bg-muted rounded-lg space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Badge variant={getCategoryBadgeVariant(selectedRoleInfo.role_category)}>
-                      {selectedRoleInfo.role_name}
-                    </Badge>
-                    <span className="text-xs text-muted-foreground">
-                      ({selectedRoleInfo.role_code})
-                    </span>
-                  </div>
-                  {selectedRoleInfo.description && (
-                    <p className="text-sm text-muted-foreground">
-                      {selectedRoleInfo.description}
-                    </p>
-                  )}
-                </div>
-              )}
               
               <div>
                 <Label htmlFor="notes">Notes internes</Label>
@@ -394,7 +396,7 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
             </Button>
             <Button
               type="submit"
-              disabled={isLoading || !formData.email || !formData.password || !formData.firstName || !formData.lastName || !formData.role}
+              disabled={isLoading || !formData.email || !formData.password || !formData.firstName || !formData.lastName || selectedRoles.length === 0}
             >
               {isLoading ? (
                 <div className="flex items-center gap-2">

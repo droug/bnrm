@@ -23,6 +23,7 @@ interface UserRequest {
   research_field?: string;
   role_code?: string;
   role_id?: string;
+  roles?: Array<{ role_code: string; role_id: string }>;
   notes?: string;
 }
 
@@ -70,7 +71,7 @@ serve(async (req) => {
     }
     const currentUser = userData.user;
 
-    const { action, user_id, profile_data, role, filters, deleted_reason, email, password, first_name, last_name, phone, institution, research_field, role_code, role_id, notes }: UserRequest = await req.json();
+    const { action, user_id, profile_data, role, filters, deleted_reason, email, password, first_name, last_name, phone, institution, research_field, role_code, role_id, roles, notes }: UserRequest = await req.json();
 
     console.log(`[USER-SERVICE] Action: ${action}`);
 
@@ -562,31 +563,35 @@ serve(async (req) => {
           // Don't throw - user is created, profile might be created by trigger
         }
 
-        // 3. Assign roles
-        if (role_id) {
-          const { error: systemRoleError } = await supabaseClient
-            .from('user_system_roles')
-            .insert({ user_id: newUserId, role_id });
+        // 3. Assign roles (support both single role and array of roles)
+        const rolesToAssign = roles && roles.length > 0 
+          ? roles 
+          : (role_code ? [{ role_code, role_id: role_id || '' }] : []);
 
-          if (systemRoleError) {
-            console.warn('[USER-SERVICE] Error assigning system role:', systemRoleError);
+        const enumRoles = [
+          'admin', 'librarian', 'researcher', 'partner', 'subscriber', 'visitor',
+          'public_user', 'editor', 'printer', 'producer', 'distributor', 'author',
+          'validateur', 'direction', 'dac', 'comptable', 'read_only'
+        ];
+
+        for (const r of rolesToAssign) {
+          if (r.role_id) {
+            const { error: systemRoleError } = await supabaseClient
+              .from('user_system_roles')
+              .insert({ user_id: newUserId, role_id: r.role_id });
+
+            if (systemRoleError) {
+              console.warn(`[USER-SERVICE] Error assigning system role ${r.role_id}:`, systemRoleError);
+            }
           }
-        }
 
-        if (role_code) {
-          const enumRoles = [
-            'admin', 'librarian', 'researcher', 'partner', 'subscriber', 'visitor',
-            'public_user', 'editor', 'printer', 'producer', 'distributor', 'author',
-            'validateur', 'direction', 'dac', 'comptable', 'read_only'
-          ];
-          
-          if (enumRoles.includes(role_code)) {
+          if (r.role_code && enumRoles.includes(r.role_code)) {
             const { error: enumRoleError } = await supabaseClient
               .from('user_roles')
-              .insert({ user_id: newUserId, role: role_code });
+              .insert({ user_id: newUserId, role: r.role_code });
 
             if (enumRoleError) {
-              console.warn('[USER-SERVICE] Error assigning enum role:', enumRoleError);
+              console.warn(`[USER-SERVICE] Error assigning enum role ${r.role_code}:`, enumRoleError);
             }
           }
         }
@@ -600,7 +605,7 @@ serve(async (req) => {
             resource_type: 'user',
             resource_id: newUserId,
             details: {
-              role_code,
+              roles: rolesToAssign.map(r => r.role_code),
               created_by_admin: true,
               notes: notes || null
             }
