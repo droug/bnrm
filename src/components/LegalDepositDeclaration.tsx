@@ -1852,7 +1852,13 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                 {/* Informations de contact */}
                 <div className="space-y-2">
                   <Label>Email <span className="text-destructive">*</span></Label>
-                  <Input type="email" placeholder="Email" required />
+                  <Input 
+                    type="email" 
+                    placeholder="Email" 
+                    required 
+                    value={formData.directorEmail || ""}
+                    onChange={(e) => setFormData({ ...formData, directorEmail: e.target.value })}
+                  />
                 </div>
 
                 <div className="space-y-2">
