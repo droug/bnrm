@@ -1116,6 +1116,15 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                 </div>
 
                 <div className="space-y-2">
+                  <Label>Complément de titre</Label>
+                  <Input 
+                    placeholder="Complément de titre" 
+                    value={formData.subtitleComplement || ""}
+                    onChange={(e) => setFormData({ ...formData, subtitleComplement: e.target.value })}
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label>Titre parallèle</Label>
                   <Input 
                     placeholder="Titre parallèle (titre dans une autre langue)" 
