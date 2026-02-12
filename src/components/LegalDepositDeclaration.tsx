@@ -203,6 +203,17 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         if (metadata.directorRegion) setDirectorRegion(metadata.directorRegion);
         if (metadata.directorCity) setDirectorCity(metadata.directorCity);
         
+        // Charger les documents déjà uploadés
+        if (data.documents_urls && typeof data.documents_urls === 'object' && !Array.isArray(data.documents_urls)) {
+          const docs: Record<string, { url: string; fileName: string; size?: number }> = {};
+          Object.entries(data.documents_urls).forEach(([key, val]: [string, any]) => {
+            if (val && typeof val === 'object' && val.url) {
+              docs[key] = { url: val.url, fileName: val.fileName || key, size: val.size };
+            }
+          });
+          setSavedDocuments(docs);
+        }
+        
         // Aller directement au formulaire
         setCurrentStep("form_filling");
         
@@ -234,6 +245,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
   const [formData, setFormData] = useState<any>({});
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
   const [uploadedFiles, setUploadedFiles] = useState<Record<string, File>>({});
+  const [savedDocuments, setSavedDocuments] = useState<Record<string, { url: string; fileName: string; size?: number }>>({});
   const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const [naturePublication, setNaturePublication] = useState<string>("");
   const [authorType, setAuthorType] = useState<string>("");
@@ -872,6 +884,11 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
       delete newFiles[documentType];
       return newFiles;
     });
+    setSavedDocuments(prev => {
+      const newDocs = { ...prev };
+      delete newDocs[documentType];
+      return newDocs;
+    });
 
     // Reset the file input
     if (fileInputRefs.current[documentType]) {
@@ -883,6 +900,8 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
 
   const renderFileUpload = (documentType: string, label: string, required: boolean = false, acceptedTypes: string = "*") => {
     const uploadedFile = uploadedFiles[documentType];
+    const savedDoc = savedDocuments[documentType];
+    const hasFile = !!uploadedFile || !!savedDoc;
 
     return (
       <div className="space-y-2">
@@ -890,14 +909,14 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           <div className="flex items-center space-x-2">
             <Checkbox 
               id={documentType} 
-              checked={!!uploadedFile}
-              disabled={!!uploadedFile}
+              checked={hasFile}
+              disabled={hasFile}
             />
             <Label htmlFor={documentType} className={required ? "font-medium" : ""}>
               {label} {required && <span className="text-red-500">*</span>}
             </Label>
           </div>
-          {!uploadedFile && (
+          {!hasFile && (
             <div>
               <input
                 ref={(el) => {
@@ -943,6 +962,44 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
             >
               <X className="w-3 h-3" />
             </Button>
+          </div>
+        )}
+
+        {!uploadedFile && savedDoc && (
+          <div className="flex items-center justify-between bg-blue-50 p-2 rounded border border-blue-200">
+            <div className="flex items-center space-x-2 text-sm text-blue-700">
+              <File className="w-4 h-4" />
+              <span className="truncate max-w-[200px]">{savedDoc.fileName}</span>
+              {savedDoc.size && (
+                <span className="text-xs text-blue-600">
+                  ({Math.round(savedDoc.size / 1024)}KB)
+                </span>
+              )}
+              <span className="text-xs text-blue-500 italic">
+                (déjà uploadé)
+              </span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => window.open(savedDoc.url, '_blank')}
+                className="text-blue-500 hover:text-blue-700 h-6 w-6 p-0"
+                title="Voir le fichier"
+              >
+                <ExternalLink className="w-3 h-3" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => handleRemoveFile(documentType)}
+                className="text-red-500 hover:text-red-700 h-6 w-6 p-0"
+              >
+                <X className="w-3 h-3" />
+              </Button>
+            </div>
           </div>
         )}
       </div>
@@ -3566,7 +3623,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           </div>
 
           {/* Résumé des fichiers joints */}
-          {Object.keys(uploadedFiles).length > 0 && (
+          {(Object.keys(uploadedFiles).length > 0 || Object.keys(savedDocuments).length > 0) && (
             <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
               <h4 className="font-medium text-green-800 mb-2">Documents joints :</h4>
               <div className="space-y-1">
@@ -3575,6 +3632,13 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                     <CheckCircle className="w-3 h-3 mr-2" />
                     <span className="font-medium">{type}:</span>
                     <span className="ml-1">{file.name}</span>
+                  </div>
+                ))}
+                {Object.entries(savedDocuments).filter(([key]) => !uploadedFiles[key]).map(([type, doc]) => (
+                  <div key={type} className="flex items-center text-sm text-blue-700">
+                    <CheckCircle className="w-3 h-3 mr-2" />
+                    <span className="font-medium">{type}:</span>
+                    <span className="ml-1">{doc.fileName} (déjà uploadé)</span>
                   </div>
                 ))}
               </div>
@@ -4032,6 +4096,35 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         initiatorId = user.id;
       }
 
+      // Upload des fichiers joints si présents
+      let documentsUrls: any = {};
+      
+      // Récupérer les documents existants si on met à jour
+      if (existingRequestId) {
+        const { data: existingData } = await supabase
+          .from('legal_deposit_requests')
+          .select('documents_urls')
+          .eq('id', existingRequestId)
+          .maybeSingle();
+        if (existingData?.documents_urls && typeof existingData.documents_urls === 'object' && !Array.isArray(existingData.documents_urls)) {
+          documentsUrls = { ...existingData.documents_urls };
+        }
+      }
+
+      if (Object.keys(uploadedFiles).length > 0) {
+        console.log('[DRAFT] Uploading documents...', Object.keys(uploadedFiles));
+        const uploadedDocuments = await uploadMultipleDocuments(uploadedFiles, user.id);
+        Object.entries(uploadedDocuments).forEach(([key, doc]) => {
+          documentsUrls[key] = {
+            url: doc.url,
+            path: doc.path,
+            fileName: doc.fileName,
+            size: doc.size,
+            type: doc.type
+          };
+        });
+      }
+
       // Préparer les données du brouillon
       const draftData = {
         initiator_id: initiatorId,
@@ -4051,6 +4144,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         issn: formData.issn || null,
         ismn: formData.ismn || null,
         amazon_link: formData.amazon_link || null,
+        documents_urls: documentsUrls,
         metadata: {
           depositType,
           editor: editorData,
@@ -4140,7 +4234,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
       requiredDocs.push('summary');
     }
 
-    const missingDocs = requiredDocs.filter(doc => !uploadedFiles[doc]);
+    const missingDocs = requiredDocs.filter(doc => !uploadedFiles[doc] && !savedDocuments[doc]);
     if (missingDocs.length > 0) {
       toast.error(`Documents manquants requis: ${missingDocs.join(', ')}`);
       return;
@@ -4154,8 +4248,8 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
       const uploadedDocuments = await uploadMultipleDocuments(uploadedFiles, user.id);
       console.log('Documents uploaded:', uploadedDocuments);
       
-      // Préparer l'objet documents_urls avec les URLs réelles
-      const documentsUrls: any = {};
+      // Préparer l'objet documents_urls - inclure les docs déjà sauvegardés + nouveaux
+      const documentsUrls: any = { ...savedDocuments };
       Object.entries(uploadedDocuments).forEach(([key, doc]) => {
         documentsUrls[key] = {
           url: doc.url,
@@ -5155,7 +5249,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
               {language === 'ar' ? 'نوع الإيداع' : 'Type de dépôt'}: {depositTypeLabels[depositType]}
             </Badge>
             <Badge variant="secondary">
-              {language === 'ar' ? 'الوثائق المرفقة' : 'Documents joints'}: {Object.keys(uploadedFiles).length}
+              {language === 'ar' ? 'الوثائق المرفقة' : 'Documents joints'}: {Object.keys(uploadedFiles).length + Object.keys(savedDocuments).filter(k => !uploadedFiles[k]).length}
             </Badge>
           </div>
         </CardContent>
