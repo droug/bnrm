@@ -68,6 +68,9 @@ export const ReservedRangesManager = () => {
   const [selectedRange, setSelectedRange] = useState<ReservedRange | null>(null);
   const [showDepositTypeDropdown, setShowDepositTypeDropdown] = useState(false);
   const [showNumberTypeDropdown, setShowNumberTypeDropdown] = useState(false);
+  const [showQuantityDropdown, setShowQuantityDropdown] = useState(false);
+  const [showSourceRangeDropdown, setShowSourceRangeDropdown] = useState(false);
+  const [selectedSourceRange, setSelectedSourceRange] = useState<ReservedRange | null>(null);
 
   const [formData, setFormData] = useState({
     requester_id: '',
@@ -275,7 +278,7 @@ export const ReservedRangesManager = () => {
   const resetForm = () => {
     setFormData({
       requester_id: '',
-      deposit_type: '',
+      deposit_type: 'monographie',
       number_type: 'isbn',
       quantity: '',
       notes: ''
@@ -284,6 +287,9 @@ export const ReservedRangesManager = () => {
     setPublisherSearch('');
     setShowDepositTypeDropdown(false);
     setShowNumberTypeDropdown(false);
+    setShowQuantityDropdown(false);
+    setShowSourceRangeDropdown(false);
+    setSelectedSourceRange(null);
   };
 
   const getStatusBadge = (status: string) => {
@@ -734,14 +740,90 @@ export const ReservedRangesManager = () => {
               </div>
 
               <div className="space-y-2">
-                <Label>Nombre de numéros à réserver *</Label>
-                <Input
-                  type="number"
-                  min="1"
-                  placeholder="Ex: 100"
-                  value={formData.quantity}
-                  onChange={(e) => setFormData({ ...formData, quantity: e.target.value })}
-                />
+                <Label>Nombre de numéros *</Label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    className="w-full flex items-center justify-between px-3 py-2 border rounded-md bg-background hover:bg-accent transition-colors"
+                    onClick={() => setShowQuantityDropdown(!showQuantityDropdown)}
+                  >
+                    <span className={formData.quantity ? "" : "text-muted-foreground"}>
+                      {formData.quantity === '10' ? '10 numéros' :
+                       formData.quantity === '100' ? '100 numéros' :
+                       'Sélectionner'}
+                    </span>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </button>
+                  {showQuantityDropdown && (
+                    <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg">
+                      {[
+                        { value: "10", label: "10 numéros" },
+                        { value: "100", label: "100 numéros" },
+                      ].map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          className="w-full text-left px-3 py-2 hover:bg-accent transition-colors"
+                          onClick={() => {
+                            setFormData({ ...formData, quantity: option.value });
+                            setShowQuantityDropdown(false);
+                          }}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Plage source (attribution depuis les numéros importés) *</Label>
+              <div className="relative">
+                <button
+                  type="button"
+                  className="w-full flex items-center justify-between px-3 py-2 border rounded-md bg-background hover:bg-accent transition-colors"
+                  onClick={() => setShowSourceRangeDropdown(!showSourceRangeDropdown)}
+                >
+                  <span className={selectedSourceRange ? "" : "text-muted-foreground"}>
+                    {selectedSourceRange
+                      ? `${selectedSourceRange.range_start} → ${selectedSourceRange.range_end} (${selectedSourceRange.total_numbers - selectedSourceRange.used_numbers} disponibles)`
+                      : 'Sélectionner une plage source'}
+                  </span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {showSourceRangeDropdown && (
+                  <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto">
+                    {reservedRanges
+                      .filter(r => r.number_type === formData.number_type && r.status === 'active' && (r.total_numbers - r.used_numbers) > 0 && !r.requester_name?.includes('Professionnel'))
+                      .map((range) => (
+                        <button
+                          key={range.id}
+                          type="button"
+                          className="w-full text-left px-3 py-2 hover:bg-accent transition-colors border-b last:border-b-0"
+                          onClick={() => {
+                            setSelectedSourceRange(range);
+                            setShowSourceRangeDropdown(false);
+                          }}
+                        >
+                          <div className="flex flex-col">
+                            <span className="font-medium text-sm">{range.range_start} → {range.range_end}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {range.total_numbers - range.used_numbers} numéros disponibles sur {range.total_numbers} • {range.notes}
+                            </span>
+                          </div>
+                        </button>
+                      ))}
+                    {reservedRanges.filter(r => r.number_type === formData.number_type && r.status === 'active' && (r.total_numbers - r.used_numbers) > 0).length === 0 && (
+                      <div className="px-3 py-2 text-sm text-muted-foreground">Aucune plage disponible pour ce type de numéro</div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
