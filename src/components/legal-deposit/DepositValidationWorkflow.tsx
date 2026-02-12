@@ -1622,11 +1622,11 @@ export function DepositValidationWorkflow() {
                         <Table className="w-full table-fixed">
                           <TableHeader>
                             <TableRow>
-                              <TableHead className="w-[30%]">Titre</TableHead>
-                              <TableHead className="w-[12%]">Support</TableHead>
-                              <TableHead className="w-[15%]">Statut</TableHead>
-                              <TableHead className="w-[13%]">Date</TableHead>
-                              <TableHead className="w-[30%]">Actions</TableHead>
+                              <TableHead className="w-[35%]">Titre</TableHead>
+                              <TableHead className="w-[10%]">Support</TableHead>
+                              <TableHead className="w-[13%]">Statut</TableHead>
+                              <TableHead className="w-[12%]">Date</TableHead>
+                              <TableHead className="w-[30%] text-center">Actions</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -1644,27 +1644,26 @@ export function DepositValidationWorkflow() {
                                 </TableCell>
                                 <TableCell>{request.support_type}</TableCell>
                                 <TableCell>{getStatusBadge(request.status, request)}</TableCell>
-                                <TableCell>
-                                  {format(new Date(request.created_at), "dd/MM/yyyy")}
+                                <TableCell className="text-sm">
+                                  {format(new Date(request.created_at), "dd/MM/yy")}
                                 </TableCell>
                                 <TableCell>
-                                  <div className="flex items-center gap-2">
+                                  <div className="flex items-center justify-center gap-1">
                                     <Button
                                       size="sm"
                                       variant="outline"
                                       onClick={() => {
                                         setSelectedRequest(request);
                                         setEditTitle(request.title || "");
-                                        // Récupérer le nom de l'imprimeur depuis metadata.printer.name ou autres sources
                                         const printerName = request.metadata?.printer?.name || 
                                                            request.metadata?.printer_name || 
                                                            request.metadata?.customFields?.printer_name || "";
                                         setEditPrinter(printerName);
                                         setEditPageCount(request.metadata?.page_count?.toString() || request.metadata?.customFields?.page_count?.toString() || "");
                                       }}
+                                      title="Examiner"
                                     >
-                                      <GitBranch className="h-4 w-4 mr-2" />
-                                      Examiner
+                                      <GitBranch className="h-4 w-4" />
                                     </Button>
                                     <Button
                                       size="sm"
@@ -1689,10 +1688,10 @@ export function DepositValidationWorkflow() {
                                             title="Attribuer un numéro"
                                           >
                                             <Hash className="h-4 w-4 mr-1" />
-                                            Attribuer N°
+                                            Attribuer
                                           </Button>
                                         ) : (
-                                          <Badge variant="secondary" className="bg-green-100 text-green-800">
+                                          <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
                                             <CheckCircle className="h-3 w-3 mr-1" />
                                             Attribué
                                           </Badge>
