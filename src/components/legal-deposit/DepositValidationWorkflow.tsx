@@ -1496,24 +1496,20 @@ export function DepositValidationWorkflow() {
                         <div className="mb-4 text-sm text-muted-foreground">
                           {filteredRequests.length} demande(s) trouvée(s)
                         </div>
-                        <Table>
+                        <Table className="w-full table-fixed">
                           <TableHeader>
                             <TableRow>
-                              <TableHead>N° Demande</TableHead>
-                              <TableHead>Titre</TableHead>
-                              <TableHead>Support</TableHead>
-                              <TableHead>Statut</TableHead>
-                              <TableHead>Étape Actuelle</TableHead>
-                              <TableHead>Date</TableHead>
-                              <TableHead>Actions</TableHead>
+                              <TableHead className="w-[30%]">Titre</TableHead>
+                              <TableHead className="w-[12%]">Support</TableHead>
+                              <TableHead className="w-[15%]">Statut</TableHead>
+                              <TableHead className="w-[18%]">Étape Actuelle</TableHead>
+                              <TableHead className="w-[12%]">Date</TableHead>
+                              <TableHead className="w-[13%]">Actions</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
                             {paginatedRequests.map((request) => (
                               <TableRow key={request.id}>
-                                <TableCell className="font-medium">
-                                  {request.request_number}
-                                </TableCell>
                                 <TableCell>
                                   <div>
                                     <div className="font-medium">{request.title}</div>
