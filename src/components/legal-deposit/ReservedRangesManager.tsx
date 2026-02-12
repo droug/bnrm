@@ -320,7 +320,6 @@ export const ReservedRangesManager = () => {
 
   const proTypeTabs = [
     { value: "editeur", label: "Éditeurs", icon: BookOpen, color: "text-blue-600" },
-    { value: "imprimeur", label: "Imprimeurs", icon: Printer, color: "text-amber-600" },
     { value: "producteur", label: "Producteurs", icon: Factory, color: "text-violet-600" },
   ];
 
