@@ -410,9 +410,28 @@ serve(async (req) => {
         let newUserId: string;
         let isReactivation = false;
 
-        // Look up existing auth user by email
-        const { data: existingUsers } = await supabaseClient.auth.admin.listUsers();
-        const existingAuthUser = existingUsers?.users?.find((u: any) => u.email === email);
+        // Look up existing auth user by email - use paginated search to avoid missing users beyond page 1
+        let existingAuthUser: any = null;
+        let page = 1;
+        const perPage = 1000;
+        let found = false;
+        
+        while (!found) {
+          const { data: pageData, error: listError } = await supabaseClient.auth.admin.listUsers({ page, perPage });
+          if (listError || !pageData?.users?.length) break;
+          
+          const match = pageData.users.find((u: any) => u.email === email);
+          if (match) {
+            existingAuthUser = match;
+            found = true;
+          } else if (pageData.users.length < perPage) {
+            break; // Last page
+          } else {
+            page++;
+          }
+        }
+        
+        console.log(`[USER-SERVICE] Auth lookup for ${email}: ${existingAuthUser ? 'found (id: ' + existingAuthUser.id + ')' : 'not found'} (scanned ${page} page(s))`);
 
         if (existingAuthUser) {
           // Check if this user has a deleted profile
