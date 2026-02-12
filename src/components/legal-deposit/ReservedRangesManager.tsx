@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -819,9 +820,9 @@ export const ReservedRangesManager = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
-                {showSourceRangeDropdown && (
+                {showSourceRangeDropdown && createPortal(
                   <div 
-                    className="bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto"
+                    className="bg-popover text-popover-foreground border rounded-md shadow-lg max-h-48 overflow-y-auto"
                     style={{ position: 'fixed', top: sourceRangeDropdownPos.top, left: sourceRangeDropdownPos.left, width: sourceRangeDropdownPos.width, zIndex: 100001 }}
                   >
                     {(() => {
@@ -858,7 +859,8 @@ export const ReservedRangesManager = () => {
                         </div>
                       );
                     })()}
-                  </div>
+                  </div>,
+                  document.body
                 )}
               </div>
             </div>
