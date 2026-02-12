@@ -184,6 +184,10 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         if (metadata.hasScale) setHasScale(metadata.hasScale);
         if (metadata.hasLegend) setHasLegend(metadata.hasLegend);
         if (metadata.collectionTitle) setCollectionTitle(metadata.collectionTitle);
+        if (metadata.authors && Array.isArray(metadata.authors)) setAuthors(metadata.authors);
+        if (metadata.declarationNature) setDeclarationNature(metadata.declarationNature);
+        if (metadata.authorStatus) setAuthorStatus(metadata.authorStatus);
+        if (metadata.selectedDiscipline) setSelectedDiscipline(metadata.selectedDiscipline);
         
         // Aller directement au formulaire
         setCurrentStep("form_filling");
@@ -4048,6 +4052,10 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           hasScale,
           hasLegend,
           collectionTitle,
+          authors,
+          declarationNature,
+          authorStatus,
+          selectedDiscipline,
           ...formData
         }
       };
