@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
 import { supabase } from "@/integrations/supabase/client";
@@ -62,112 +62,22 @@ interface AccessRequest {
   } | null;
 }
 
-const ROLE_PERMISSIONS = {
-  public_user: {
-    name: 'Grand Public',
-    permissions: ['Consultation publique', 'Demandes limitées (5/mois)'],
-    description: 'Accès de base aux ressources publiques',
-    maxRequests: 5,
-    accessLevel: 'basic'
-  },
-  subscriber: {
-    name: 'Abonné Premium',
-    permissions: ['Recherche avancée', 'Téléchargements illimités', 'Support prioritaire'],
-    description: 'Accès premium avec fonctionnalités avancées',
-    maxRequests: 100,
-    accessLevel: 'premium'
-  },
-  researcher: {
-    name: 'Chercheur',
-    permissions: ['Demandes d\'accès étendues (50/mois)', 'Téléchargement', 'Recherche avancée'],
-    description: 'Accès privilégié pour la recherche académique',
-    maxRequests: 50,
-    accessLevel: 'academic'
-  },
-  partner: {
-    name: 'Partenaire Institutionnel',
-    permissions: ['Accès prioritaire (200/mois)', 'Collaboration inter-institutionnelle', 'Projets spéciaux'],
-    description: 'Accès privilégié pour les partenaires institutionnels',
-    maxRequests: 200,
-    accessLevel: 'institutional'
-  },
-  editor: {
-    name: 'Éditeur',
-    permissions: ['Dépôt légal éditions', 'Gestion catalogue éditions', 'Services dédiés'],
-    description: 'Accès pour les éditeurs de contenus éditoriaux',
-    maxRequests: 150,
-    accessLevel: 'professional'
-  },
-  printer: {
-    name: 'Imprimeur',
-    permissions: ['Dépôt légal impressions', 'Gestion catalogue impressions', 'Services dédiés'],
-    description: 'Accès pour les imprimeurs',
-    maxRequests: 150,
-    accessLevel: 'professional'
-  },
-  producer: {
-    name: 'Producteur',
-    permissions: ['Dépôt légal productions', 'Gestion catalogue productions', 'Services dédiés'],
-    description: 'Accès pour les producteurs de contenus éditoriaux',
-    maxRequests: 150,
-    accessLevel: 'professional'
-  },
-  distributor: {
-    name: 'Distributeur',
-    permissions: ['Dépôt légal distributions', 'Gestion catalogue distributions', 'Services dédiés'],
-    description: 'Accès pour les distributeurs',
-    maxRequests: 150,
-    accessLevel: 'professional'
-  },
-  librarian: {
-    name: 'Bibliothécaire',
-    permissions: ['Gestion des manuscrits', 'Approbation des demandes', 'Gestion des collections'],
-    description: 'Gestion des ressources et approbation des accès',
-    maxRequests: 999,
-    accessLevel: 'extended'
-  },
-  dac: {
-    name: 'DAC',
-    permissions: ['Gestion activités culturelles', 'Validation événements', 'Gestion espaces'],
-    description: 'Direction des Activités Culturelles',
-    maxRequests: 999,
-    accessLevel: 'extended'
-  },
-  comptable: {
-    name: 'Comptable',
-    permissions: ['Gestion financière', 'Validation paiements', 'Rapports comptables'],
-    description: 'Gestion comptable et financière',
-    maxRequests: 999,
-    accessLevel: 'extended'
-  },
-  direction: {
-    name: 'Direction',
-    permissions: ['Supervision générale', 'Validation stratégique', 'Rapports direction'],
-    description: 'Direction générale',
-    maxRequests: 999,
-    accessLevel: 'extended'
-  },
-  read_only: {
-    name: 'Lecture seule',
-    permissions: ['Consultation uniquement', 'Pas de modifications'],
-    description: 'Accès en lecture seule',
-    maxRequests: 0,
-    accessLevel: 'basic'
-  },
-  admin: {
-    name: 'Administrateur',
-    permissions: ['Gestion complète', 'Gestion des utilisateurs', 'Approbation des demandes'],
-    description: 'Accès complet à toutes les fonctionnalités',
-    maxRequests: 999,
-    accessLevel: 'full'
-  },
-  visitor: {
-    name: 'Visiteur (Legacy)',
-    permissions: ['Consultation publique', 'Demandes basiques'],
-    description: 'Ancien rôle - migrer vers Grand Public',
-    maxRequests: 5,
-    accessLevel: 'basic'
-  }
+interface SystemRoleData {
+  role_code: string;
+  role_name: string;
+  role_category: string;
+  description: string;
+  permissions: string[];
+  limits: Record<string, any>;
+  is_active: boolean;
+}
+
+// Mapping catégories DB → onglets UI
+const CATEGORY_TO_TAB: Record<string, string> = {
+  administration: 'internal',
+  internal: 'internal',
+  professional: 'professional',
+  user: 'subscriber',
 };
 
 export default function UserManagement() {
@@ -185,12 +95,65 @@ export default function UserManagement() {
   const [selectedTab, setSelectedTab] = useState("internal");
   const [editingUser, setEditingUser] = useState<Profile | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [systemRolesData, setSystemRolesData] = useState<SystemRoleData[]>([]);
 
   useEffect(() => {
     if (user && isAdmin) {
+      fetchSystemRoles();
       fetchData();
     }
   }, [user, isAdmin]);
+
+  const fetchSystemRoles = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('system_roles')
+        .select('*')
+        .eq('is_active', true)
+        .order('role_code');
+      if (error) throw error;
+      setSystemRolesData((data || []).map((r: any) => ({
+        role_code: r.role_code,
+        role_name: r.role_name,
+        role_category: r.role_category || 'user',
+        description: r.description || '',
+        permissions: Array.isArray(r.permissions) ? r.permissions : [],
+        limits: r.limits || {},
+        is_active: r.is_active,
+      })));
+    } catch (e) {
+      console.error('Failed to fetch system_roles', e);
+    }
+  };
+
+  // Construire rolePermissions depuis les données DB
+  const rolePermissions = useMemo(() => {
+    const map: Record<string, { name: string; description: string; permissions: string[]; maxRequests: number; accessLevel: string }> = {};
+    for (const r of systemRolesData) {
+      map[r.role_code] = {
+        name: r.role_name,
+        description: r.description,
+        permissions: r.permissions,
+        maxRequests: r.limits?.maxRequests ?? 0,
+        accessLevel: r.role_category,
+      };
+    }
+    return map;
+  }, [systemRolesData]);
+
+  // Catégories de rôles dynamiques depuis la DB
+  const rolesByCategory = useMemo(() => {
+    const internal: string[] = [];
+    const professional: string[] = [];
+    const subscriber: string[] = [];
+    for (const r of systemRolesData) {
+      const tab = CATEGORY_TO_TAB[r.role_category] || 'subscriber';
+      if (tab === 'internal') internal.push(r.role_code);
+      else if (tab === 'professional') professional.push(r.role_code);
+      else subscriber.push(r.role_code);
+    }
+    return { internal, professional, subscriber };
+  }, [systemRolesData]);
 
   const fetchData = async () => {
     try {
@@ -480,10 +443,10 @@ export default function UserManagement() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // Définir les catégories de rôles
-  const INTERNAL_ROLES = ['admin', 'librarian', 'dac', 'comptable', 'direction', 'validateur', 'read_only'];
-  const PROFESSIONAL_ROLES = ['editor', 'printer', 'producer', 'distributor'];
-  const SUBSCRIBER_ROLES = ['public_user', 'subscriber', 'researcher', 'partner', 'visitor'];
+  // Catégories dynamiques depuis la DB
+  const INTERNAL_ROLES = rolesByCategory.internal;
+  const PROFESSIONAL_ROLES = rolesByCategory.professional;
+  const SUBSCRIBER_ROLES = rolesByCategory.subscriber;
 
   // Fonction pour vérifier si un utilisateur appartient à une catégorie
   const hasRoleInCategory = (userProfile: Profile, categoryRoles: string[]) => {
@@ -653,7 +616,7 @@ export default function UserManagement() {
                 <CardContent>
                   <UserCategoryTable
                     users={internalUsers}
-                    rolePermissions={ROLE_PERMISSIONS}
+                    rolePermissions={rolePermissions}
                     availableRoleOptions={[
                       { value: 'admin', label: 'Administrateur' },
                       ...availableRoles.map(role => ({
@@ -691,7 +654,7 @@ export default function UserManagement() {
                 <CardContent>
                   <UserCategoryTable
                     users={professionalUsers}
-                    rolePermissions={ROLE_PERMISSIONS}
+                    rolePermissions={rolePermissions}
                     availableRoleOptions={[
                       { value: 'admin', label: 'Administrateur' },
                       ...availableRoles.map(role => ({
@@ -729,7 +692,7 @@ export default function UserManagement() {
                 <CardContent>
                   <UserCategoryTable
                     users={subscriberUsers}
-                    rolePermissions={ROLE_PERMISSIONS}
+                    rolePermissions={rolePermissions}
                     availableRoleOptions={[
                       { value: 'admin', label: 'Administrateur' },
                       ...availableRoles.map(role => ({
@@ -755,7 +718,7 @@ export default function UserManagement() {
           {/* Gestion des permissions */}
           <TabsContent value="permissions" className="space-y-6">
             <div className="grid gap-6 md:grid-cols-2">
-              {Object.entries(ROLE_PERMISSIONS).map(([roleKey, roleData]) => (
+              {Object.entries(rolePermissions).map(([roleKey, roleData]) => (
                 <Card key={roleKey}>
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
