@@ -235,9 +235,25 @@ export function MyLegalDeposits() {
             ) : (
               <div className="space-y-4">
                 {deposits.map((deposit) => (
-                  <Card key={deposit.id} className="hover:shadow-md transition-shadow">
+                  <Card key={deposit.id} className={`hover:shadow-md transition-shadow ${deposit.status === 'brouillon' ? 'border-amber-400 bg-amber-50/50 border-2' : ''}`}>
                     <CardContent className="p-4">
                       <div className="space-y-3">
+                        {/* Bandeau brouillon */}
+                        {deposit.status === 'brouillon' && (
+                          <div className="bg-amber-100 border border-amber-300 rounded-lg p-3 flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-2">
+                              <Edit className="h-5 w-5 text-amber-700 flex-shrink-0" />
+                              <div>
+                                <p className="text-sm font-semibold text-amber-900">Brouillon en cours</p>
+                                <p className="text-xs text-amber-700">Cette demande n'est pas encore soumise. Cliquez pour la compléter.</p>
+                              </div>
+                            </div>
+                            <Button size="sm" onClick={() => handleEditDraft(deposit)} className="flex-shrink-0">
+                              <Edit className="h-4 w-4 mr-1" />
+                              Terminer la demande
+                            </Button>
+                          </div>
+                        )}
                         {/* En-tête avec titre et statut */}
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1">
