@@ -227,7 +227,7 @@ export function UserCategoryTable({
                       <AlertDialogFooter>
                         <AlertDialogCancel>Annuler</AlertDialogCancel>
                         <AlertDialogAction
-                          onClick={() => onDeleteUser(userProfile.id)}
+                          onClick={() => onDeleteUser(userProfile.user_id)}
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                         >
                           Supprimer

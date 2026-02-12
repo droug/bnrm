@@ -274,6 +274,19 @@ serve(async (req) => {
           { table: 'user_reviews', column: 'user_id' },
           { table: 'reproduction_requests', column: 'user_id' },
           { table: 'professional_registry', column: 'user_id' },
+          { table: 'user_system_roles', column: 'user_id' },
+          { table: 'notifications', column: 'user_id' },
+          { table: 'bnrm_wallets', column: 'user_id' },
+          { table: 'legal_deposit_parties', column: 'user_id' },
+          { table: 'analytics_events', column: 'user_id' },
+          { table: 'access_requests', column: 'user_id' },
+          { table: 'digitization_requests', column: 'user_id' },
+          { table: 'cbm_adhesions', column: 'user_id' },
+          { table: 'cbm_adhesions_catalogue', column: 'user_id' },
+          { table: 'cbm_adhesions_reseau', column: 'user_id' },
+          { table: 'visits_bookings', column: 'user_id' },
+          { table: 'daily_pass_usage', column: 'user_id' },
+          { table: 'search_logs', column: 'user_id' },
         ];
 
         for (const { table, column } of cleanupTables) {
