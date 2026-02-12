@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { generateQuoteDocument } from "@/lib/restorationPdfGenerator";
 import { ActivityTimeline } from "@/components/my-space/ActivityTimeline";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
+import { AttachmentsSection } from "@/components/my-space/AttachmentsSection";
 
 interface RestorationRequest {
   id: string;
@@ -34,6 +35,15 @@ interface RestorationRequest {
   restoration_report?: string;
   signed_quote_url?: string;
   payment_method?: string;
+  authorization_document_url?: string | null;
+  diagnosis_document_url?: string | null;
+  diagnosis_photos_before?: string[] | null;
+  quote_document_url?: string | null;
+  invoice_document_url?: string | null;
+  restoration_report_document_url?: string | null;
+  restoration_photos_after?: string[] | null;
+  reception_document_url?: string | null;
+  return_document_url?: string | null;
 }
 
 export function MyRestorationRequests() {
@@ -990,6 +1000,28 @@ export function MyRestorationRequests() {
                   </div>
                 </div>
               </div>
+
+              {/* Pièces jointes */}
+              <AttachmentsSection
+                attachments={[
+                  { label: "Document d'autorisation", url: detailsRequest.authorization_document_url },
+                  { label: "Document de diagnostic", url: detailsRequest.diagnosis_document_url },
+                  ...(detailsRequest.diagnosis_photos_before || []).map((url: string, i: number) => ({
+                    label: `Photo avant restauration ${i + 1}`,
+                    url,
+                  })),
+                  { label: "Document du devis", url: detailsRequest.quote_document_url },
+                  { label: "Devis signé", url: detailsRequest.signed_quote_url },
+                  { label: "Facture", url: detailsRequest.invoice_document_url },
+                  { label: "Rapport de restauration (document)", url: detailsRequest.restoration_report_document_url },
+                  ...(detailsRequest.restoration_photos_after || []).map((url: string, i: number) => ({
+                    label: `Photo après restauration ${i + 1}`,
+                    url,
+                  })),
+                  { label: "Document de réception", url: detailsRequest.reception_document_url },
+                  { label: "Document de restitution", url: detailsRequest.return_document_url },
+                ]}
+              />
 
               <Separator />
 

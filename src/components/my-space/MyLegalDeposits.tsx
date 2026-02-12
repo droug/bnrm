@@ -12,6 +12,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "
 import { Separator } from "@/components/ui/separator";
 import { ActivityTimeline } from "./ActivityTimeline";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
+import { AttachmentsSection } from "./AttachmentsSection";
 
 interface LegalDepositRequest {
   id: string;
@@ -27,6 +28,7 @@ interface LegalDepositRequest {
   rejection_reason?: string | null;
   validation_comments?: string | null;
   metadata?: any;
+  documents_urls?: any;
 }
 
 export function MyLegalDeposits() {
@@ -607,6 +609,16 @@ export function MyLegalDeposits() {
                   </div>
                 </>
               )}
+
+              {/* Pièces jointes */}
+              <AttachmentsSection
+                attachments={[
+                  ...(selectedDeposit.documents_urls || []).map((url: string, i: number) => ({
+                    label: `Document ${i + 1}`,
+                    url,
+                  })),
+                ]}
+              />
 
               <Separator />
 

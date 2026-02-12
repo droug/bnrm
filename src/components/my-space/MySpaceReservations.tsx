@@ -10,6 +10,7 @@ import { ActivityTimeline } from "./ActivityTimeline";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
+import { AttachmentsSection } from "./AttachmentsSection";
 
 interface SpaceReservation {
   id: string;
@@ -29,6 +30,10 @@ interface SpaceReservation {
   total_amount?: number;
   rejection_reason?: string;
   admin_notes?: string;
+  authorization_document_url?: string | null;
+  justification_document_url?: string | null;
+  program_document_url?: string | null;
+  status_document_url?: string | null;
 }
 
 export function MySpaceReservations() {
@@ -351,6 +356,16 @@ export function MySpaceReservations() {
                   </div>
                 </>
               )}
+
+              {/* Pièces jointes */}
+              <AttachmentsSection
+                attachments={[
+                  { label: "Document d'autorisation", url: selectedReservation.authorization_document_url },
+                  { label: "Justificatif", url: selectedReservation.justification_document_url },
+                  { label: "Programme", url: selectedReservation.program_document_url },
+                  { label: "Statut juridique", url: selectedReservation.status_document_url },
+                ]}
+              />
 
               <Separator />
 
