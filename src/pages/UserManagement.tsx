@@ -32,6 +32,7 @@ interface Profile {
   is_approved: boolean;
   created_at: string;
   updated_at: string;
+  account_status?: string;
   subscription_type?: string;
   partner_organization?: string;
   research_specialization?: string[];
