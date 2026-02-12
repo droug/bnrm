@@ -88,97 +88,38 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
     setIsLoading(true);
 
     try {
-      // 1. Créer l'utilisateur avec Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-          }
-        }
-      });
-
-      if (authError) {
-        throw new Error(`Erreur lors de la création du compte : ${authError.message}`);
+      // Appel à l'Edge Function pour créer l'utilisateur côté serveur (admin API)
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData?.session?.access_token;
+      
+      if (!accessToken) {
+        throw new Error("Vous devez être connecté pour créer un utilisateur");
       }
 
-      if (!authData.user) {
-        throw new Error('Aucun utilisateur créé');
-      }
-
-      // 2. Créer ou mettre à jour le profil avec les informations complètes
-      // Note: le trigger handle_new_user peut échouer silencieusement, donc on fait un upsert explicite
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert({
-          user_id: authData.user.id,
+      const response = await supabase.functions.invoke('user-service', {
+        body: {
+          action: 'create_internal_user',
+          email: formData.email,
+          password: formData.password,
           first_name: formData.firstName,
           last_name: formData.lastName,
           phone: formData.phone || null,
           institution: formData.institution || null,
           research_field: formData.researchField || null,
-          is_approved: true, // Les utilisateurs internes sont automatiquement approuvés
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'user_id' });
+          role_code: selectedRoleInfo?.role_code || null,
+          role_id: selectedRoleInfo?.id || null,
+          notes: formData.notes || null,
+        }
+      });
 
-      if (profileError) {
-        console.error('Erreur lors de la création/mise à jour du profil:', profileError);
-        throw new Error(`Erreur profil: ${profileError.message}`);
+      if (response.error) {
+        throw new Error(response.error.message || "Erreur lors de la création de l'utilisateur");
       }
 
-      // 3. Attribuer le rôle système sélectionné
-      if (selectedRoleInfo) {
-        // Insérer dans user_system_roles (nouveau système dynamique)
-        const { error: systemRoleError } = await supabase
-          .from('user_system_roles')
-          .insert({
-            user_id: authData.user.id,
-            role_id: selectedRoleInfo.id,
-          });
-
-        if (systemRoleError) {
-          console.warn('Erreur lors de l\'attribution du rôle système:', systemRoleError);
-        }
-
-        // Également insérer dans user_roles (ancien système enum) pour la compatibilité
-        // avec les vérifications de sécurité et les Edge Functions
-        const enumRoles = [
-          'admin', 'librarian', 'researcher', 'partner', 'subscriber', 'visitor',
-          'public_user', 'editor', 'printer', 'producer', 'distributor', 'author',
-          'validateur', 'direction', 'dac', 'comptable', 'read_only'
-        ];
-        
-        if (enumRoles.includes(selectedRoleInfo.role_code)) {
-          const { error: enumRoleError } = await supabase
-            .from('user_roles')
-            .insert({
-              user_id: authData.user.id,
-              role: selectedRoleInfo.role_code as any,
-            });
-
-          if (enumRoleError) {
-            console.warn('Erreur lors de l\'attribution du rôle enum:', enumRoleError);
-          }
-        }
+      const result = response.data;
+      if (result?.error) {
+        throw new Error(result.error);
       }
-
-      // 4. Log de l'activité
-      await supabase
-        .from('activity_logs')
-        .insert({
-          action: 'create_internal_user',
-          resource_type: 'user',
-          resource_id: authData.user.id,
-          details: {
-            role: formData.role,
-            role_name: selectedRoleInfo?.role_name,
-            created_by_admin: true,
-            notes: formData.notes
-          }
-        });
 
       toast({
         title: "Utilisateur créé avec succès",

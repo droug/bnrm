@@ -7,13 +7,23 @@ const corsHeaders = {
 };
 
 interface UserRequest {
-  action: 'get_profile' | 'update_profile' | 'get_roles' | 'assign_role' | 'get_permissions' | 'list_users' | 'delete_professional';
+  action: 'get_profile' | 'update_profile' | 'get_roles' | 'assign_role' | 'get_permissions' | 'list_users' | 'delete_professional' | 'create_internal_user';
   user_id?: string;
   profile_data?: Record<string, any>;
   role?: string;
   filters?: Record<string, any>;
   reason?: string;
   deleted_reason?: string;
+  email?: string;
+  password?: string;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  institution?: string;
+  research_field?: string;
+  role_code?: string;
+  role_id?: string;
+  notes?: string;
 }
 
 serve(async (req) => {
@@ -60,7 +70,7 @@ serve(async (req) => {
     }
     const currentUser = userData.user;
 
-    const { action, user_id, profile_data, role, filters, deleted_reason }: UserRequest = await req.json();
+    const { action, user_id, profile_data, role, filters, deleted_reason, email, password, first_name, last_name, phone, institution, research_field, role_code, role_id, notes }: UserRequest = await req.json();
 
     console.log(`[USER-SERVICE] Action: ${action}`);
 
@@ -488,6 +498,120 @@ serve(async (req) => {
           success: true, 
           message: "Compte professionnel supprimé avec succès",
           deleted_user_id: user_id
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+
+      case 'create_internal_user': {
+        // Vérifier que l'utilisateur est admin ou librarian
+        const { data: isAdminOrLib } = await supabaseClient
+          .rpc('is_admin_or_librarian', { user_uuid: currentUser.id });
+
+        if (!isAdminOrLib) {
+          throw new Error("Seuls les administrateurs et bibliothécaires peuvent créer des utilisateurs internes");
+        }
+        
+        if (!email || !password || !first_name || !last_name) {
+          throw new Error("Email, mot de passe, prénom et nom sont requis");
+        }
+
+        console.log(`[USER-SERVICE] Creating internal user: ${email}`);
+
+        // 1. Create user with admin API (no email confirmation needed)
+        const { data: newUser, error: createError } = await supabaseClient.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: true, // Auto-confirm
+          user_metadata: {
+            first_name,
+            last_name,
+          }
+        });
+
+        if (createError) {
+          console.error('[USER-SERVICE] Error creating user:', createError);
+          throw new Error(`Erreur lors de la création du compte: ${createError.message}`);
+        }
+
+        if (!newUser.user) {
+          throw new Error('Aucun utilisateur créé');
+        }
+
+        const newUserId = newUser.user.id;
+        console.log(`[USER-SERVICE] User created: ${newUserId}`);
+
+        // 2. Create/update profile
+        const { error: profileError } = await supabaseClient
+          .from('profiles')
+          .upsert({
+            user_id: newUserId,
+            first_name,
+            last_name,
+            phone: phone || null,
+            institution: institution || null,
+            research_field: research_field || null,
+            is_approved: true,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id' });
+
+        if (profileError) {
+          console.error('[USER-SERVICE] Error creating profile:', profileError);
+          // Don't throw - user is created, profile might be created by trigger
+        }
+
+        // 3. Assign roles
+        if (role_id) {
+          const { error: systemRoleError } = await supabaseClient
+            .from('user_system_roles')
+            .insert({ user_id: newUserId, role_id });
+
+          if (systemRoleError) {
+            console.warn('[USER-SERVICE] Error assigning system role:', systemRoleError);
+          }
+        }
+
+        if (role_code) {
+          const enumRoles = [
+            'admin', 'librarian', 'researcher', 'partner', 'subscriber', 'visitor',
+            'public_user', 'editor', 'printer', 'producer', 'distributor', 'author',
+            'validateur', 'direction', 'dac', 'comptable', 'read_only'
+          ];
+          
+          if (enumRoles.includes(role_code)) {
+            const { error: enumRoleError } = await supabaseClient
+              .from('user_roles')
+              .insert({ user_id: newUserId, role: role_code });
+
+            if (enumRoleError) {
+              console.warn('[USER-SERVICE] Error assigning enum role:', enumRoleError);
+            }
+          }
+        }
+
+        // 4. Activity log
+        await supabaseClient
+          .from('activity_logs')
+          .insert({
+            user_id: currentUser.id,
+            action: 'create_internal_user',
+            resource_type: 'user',
+            resource_id: newUserId,
+            details: {
+              role_code,
+              created_by_admin: true,
+              notes: notes || null
+            }
+          });
+
+        console.log(`[USER-SERVICE] Internal user created successfully: ${newUserId}`);
+
+        return new Response(JSON.stringify({ 
+          success: true, 
+          user_id: newUserId,
+          email 
         }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
           status: 200,
