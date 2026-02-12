@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -70,6 +70,8 @@ export const ReservedRangesManager = () => {
   const [showNumberTypeDropdown, setShowNumberTypeDropdown] = useState(false);
   const [showQuantityDropdown, setShowQuantityDropdown] = useState(false);
   const [showSourceRangeDropdown, setShowSourceRangeDropdown] = useState(false);
+  const [sourceRangeDropdownPos, setSourceRangeDropdownPos] = useState<{ top: number; left: number; width: number }>({ top: 0, left: 0, width: 0 });
+  const sourceRangeBtnRef = useRef<HTMLButtonElement>(null);
   const [selectedSourceRange, setSelectedSourceRange] = useState<ReservedRange | null>(null);
 
   const [formData, setFormData] = useState({
@@ -797,9 +799,16 @@ export const ReservedRangesManager = () => {
               <Label>Plage source (attribution depuis les numéros importés) *</Label>
               <div className="relative">
                 <button
+                  ref={sourceRangeBtnRef}
                   type="button"
                   className="w-full flex items-center justify-between px-3 py-2 border rounded-md bg-background hover:bg-accent transition-colors"
-                  onClick={() => setShowSourceRangeDropdown(!showSourceRangeDropdown)}
+                  onClick={() => {
+                    if (sourceRangeBtnRef.current) {
+                      const rect = sourceRangeBtnRef.current.getBoundingClientRect();
+                      setSourceRangeDropdownPos({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+                    }
+                    setShowSourceRangeDropdown(!showSourceRangeDropdown);
+                  }}
                 >
                   <span className={selectedSourceRange ? "" : "text-muted-foreground"}>
                     {selectedSourceRange
@@ -811,7 +820,10 @@ export const ReservedRangesManager = () => {
                   </svg>
                 </button>
                 {showSourceRangeDropdown && (
-                  <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto">
+                  <div 
+                    className="bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto"
+                    style={{ position: 'fixed', top: sourceRangeDropdownPos.top, left: sourceRangeDropdownPos.left, width: sourceRangeDropdownPos.width, zIndex: 100001 }}
+                  >
                     {(() => {
                       const selectedQty = parseInt(formData.quantity) || 0;
                       const filtered = reservedRanges.filter(r => 
