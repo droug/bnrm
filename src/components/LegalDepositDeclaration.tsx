@@ -190,6 +190,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         if (metadata.selectedDiscipline) { setSelectedDiscipline(metadata.selectedDiscipline); setDisciplineSearch(metadata.selectedDiscipline); }
         if (metadata.collectionNumber) setCollectionNumber(metadata.collectionNumber);
         if (metadata.numberOfPages) setNumberOfPages(metadata.numberOfPages);
+        if (metadata.isPeriodic) setIsPeriodic(metadata.isPeriodic);
         if (metadata.targetAudience) setTargetAudience(metadata.targetAudience);
         if (metadata.targetAudienceOther) setTargetAudienceOther(metadata.targetAudienceOther);
         if (metadata.selectedLanguages && Array.isArray(metadata.selectedLanguages)) setSelectedLanguages(metadata.selectedLanguages);
@@ -4166,6 +4167,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           collectionTitle,
           collectionNumber,
           numberOfPages,
+          isPeriodic,
           authors,
           declarationNature,
           authorStatus,
