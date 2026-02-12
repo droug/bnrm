@@ -781,6 +781,7 @@ export const ReservedRangesManager = () => {
                           onClick={() => {
                             setFormData({ ...formData, quantity: option.value });
                             setShowQuantityDropdown(false);
+                            setSelectedSourceRange(null);
                           }}
                         >
                           {option.label}
@@ -811,9 +812,16 @@ export const ReservedRangesManager = () => {
                 </button>
                 {showSourceRangeDropdown && (
                   <div className="absolute z-50 w-full mt-1 bg-background border rounded-md shadow-lg max-h-48 overflow-y-auto">
-                    {reservedRanges
-                      .filter(r => r.number_type === formData.number_type && r.status === 'active' && (r.total_numbers - r.used_numbers) > 0 && !r.requester_name?.includes('Professionnel'))
-                      .map((range) => (
+                    {(() => {
+                      const selectedQty = parseInt(formData.quantity) || 0;
+                      const filtered = reservedRanges.filter(r => 
+                        r.number_type === formData.number_type && 
+                        r.status === 'active' && 
+                        (r.total_numbers - r.used_numbers) >= selectedQty &&
+                        selectedQty > 0 &&
+                        !r.requester_name?.includes('Professionnel')
+                      );
+                      return filtered.length > 0 ? filtered.map((range) => (
                         <button
                           key={range.id}
                           type="button"
@@ -830,10 +838,14 @@ export const ReservedRangesManager = () => {
                             </span>
                           </div>
                         </button>
-                      ))}
-                    {reservedRanges.filter(r => r.number_type === formData.number_type && r.status === 'active' && (r.total_numbers - r.used_numbers) > 0).length === 0 && (
-                      <div className="px-3 py-2 text-sm text-muted-foreground">Aucune plage disponible pour ce type de numéro</div>
-                    )}
+                      )) : (
+                        <div className="px-3 py-2 text-sm text-muted-foreground">
+                          {selectedQty === 0 
+                            ? "Veuillez d'abord sélectionner le nombre de numéros"
+                            : `Aucune plage disponible avec au moins ${selectedQty} numéros pour ce type`}
+                        </div>
+                      );
+                    })()}
                   </div>
                 )}
               </div>
