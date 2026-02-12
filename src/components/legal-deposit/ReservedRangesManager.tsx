@@ -825,11 +825,16 @@ export const ReservedRangesManager = () => {
                     <div 
                       className="fixed inset-0" 
                       style={{ zIndex: 100000 }}
-                      onClick={() => setShowSourceRangeDropdown(false)}
+                      onPointerDown={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        setShowSourceRangeDropdown(false);
+                      }}
                     />
                     <div 
                       className="bg-popover text-popover-foreground border rounded-md shadow-lg max-h-60 overflow-y-auto"
                       style={{ position: 'fixed', top: sourceRangeDropdownPos.top, left: sourceRangeDropdownPos.left, width: sourceRangeDropdownPos.width, zIndex: 100001 }}
+                      onPointerDown={(e) => e.stopPropagation()}
                       onMouseDown={(e) => e.stopPropagation()}
                     >
                       {(() => {
@@ -846,6 +851,7 @@ export const ReservedRangesManager = () => {
                             key={range.id}
                             type="button"
                             className="w-full text-left px-3 py-2 hover:bg-accent transition-colors border-b last:border-b-0"
+                            onPointerDown={(e) => e.stopPropagation()}
                             onClick={(e) => {
                               e.stopPropagation();
                               e.preventDefault();
@@ -853,7 +859,7 @@ export const ReservedRangesManager = () => {
                               setShowSourceRangeDropdown(false);
                             }}
                           >
-                            <div className="flex flex-col">
+                            <div className="flex flex-col pointer-events-none">
                               <span className="font-medium text-sm">{range.range_start} → {range.range_end}</span>
                               <span className="text-xs text-muted-foreground">
                                 {range.total_numbers - range.used_numbers} numéros disponibles sur {range.total_numbers} • {range.notes}
