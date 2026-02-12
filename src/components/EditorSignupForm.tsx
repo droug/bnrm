@@ -13,6 +13,7 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { ArabicInputWithKeyboard } from "@/components/ui/arabic-keyboard";
 import { uploadProfessionalDocuments } from "@/lib/professionalFileUpload";
+import { checkProfessionalEmailUniqueness } from "@/lib/checkProfessionalEmailUniqueness";
 
 // Mapping des régions vers leurs villes
 const citiesByRegion: Record<string, Array<{ value: string; label: string }>> = {
@@ -235,6 +236,18 @@ const EditorSignupForm = ({ prefillEmail, prefillName }: EditorSignupFormProps) 
 
     try {
       setIsSubmitting(true);
+
+      // Vérifier l'unicité de l'email
+      const emailCheck = await checkProfessionalEmailUniqueness(formData.email, 'editor');
+      if (!emailCheck.allowed) {
+        toast({
+          title: "Email déjà utilisé",
+          description: emailCheck.message,
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
 
       // Generate a temporary reference number
       const tempRefNumber = `REQ-ED-${Date.now().toString(36).toUpperCase()}`;

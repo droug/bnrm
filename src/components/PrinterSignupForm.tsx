@@ -11,6 +11,7 @@ import { ArabicInputWithKeyboard } from "@/components/ui/arabic-keyboard";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadProfessionalDocuments } from "@/lib/professionalFileUpload";
+import { checkProfessionalEmailUniqueness } from "@/lib/checkProfessionalEmailUniqueness";
 
 // Mapping des régions vers leurs villes
 const citiesByRegion: Record<string, Array<{ value: string; label: string }>> = {
@@ -202,6 +203,18 @@ const PrinterSignupForm = ({ prefillEmail, prefillName }: PrinterSignupFormProps
     
     try {
       setIsSubmitting(true);
+
+      // Vérifier l'unicité de l'email
+      const emailCheck = await checkProfessionalEmailUniqueness(formData.email, 'printer');
+      if (!emailCheck.allowed) {
+        toast({
+          title: "Email déjà utilisé",
+          description: emailCheck.message,
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
 
       // Generate a temporary reference number
       const tempRefNumber = `REQ-PR-${Date.now().toString(36).toUpperCase()}`;

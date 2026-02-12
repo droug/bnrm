@@ -13,6 +13,7 @@ import { PhoneInput } from "@/components/ui/phone-input";
 import { AlertCircle } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { supabase } from "@/integrations/supabase/client";
+import { checkProfessionalEmailUniqueness } from "@/lib/checkProfessionalEmailUniqueness";
 
 const producerSchema = z.object({
   firstName: z.string().min(2, "Le prénom doit contenir au moins 2 caractères"),
@@ -53,6 +54,17 @@ const ProducerSignupForm = () => {
     setValidationErrors([]);
     setIsSubmitting(true);
     try {
+      // Vérifier l'unicité de l'email
+      const emailCheck = await checkProfessionalEmailUniqueness(data.email, 'producer');
+      if (!emailCheck.allowed) {
+        toast({
+          title: "Email déjà utilisé",
+          description: emailCheck.message,
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
       // Prepare registration data
       const registrationData = {
         first_name: data.firstName,
