@@ -1499,12 +1499,11 @@ export function DepositValidationWorkflow() {
                         <Table className="w-full table-fixed">
                           <TableHeader>
                             <TableRow>
-                              <TableHead className="w-[30%]">Titre</TableHead>
-                              <TableHead className="w-[12%]">Support</TableHead>
-                              <TableHead className="w-[15%]">Statut</TableHead>
-                              <TableHead className="w-[18%]">Étape Actuelle</TableHead>
-                              <TableHead className="w-[12%]">Date</TableHead>
-                              <TableHead className="w-[13%]">Actions</TableHead>
+                              <TableHead className="w-[35%]">Titre</TableHead>
+                              <TableHead className="w-[15%]">Support</TableHead>
+                              <TableHead className="w-[20%]">Statut</TableHead>
+                              <TableHead className="w-[15%]">Date</TableHead>
+                              <TableHead className="w-[15%]">Actions</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
@@ -1522,11 +1521,6 @@ export function DepositValidationWorkflow() {
                                 </TableCell>
                                 <TableCell>{request.support_type}</TableCell>
                                 <TableCell>{getStatusBadge(request.status, request)}</TableCell>
-                                <TableCell>
-                                  <Badge variant="outline">
-                                    {getCurrentValidator(request)}
-                                  </Badge>
-                                </TableCell>
                                 <TableCell>
                                   {format(new Date(request.created_at), "dd/MM/yyyy")}
                                 </TableCell>
