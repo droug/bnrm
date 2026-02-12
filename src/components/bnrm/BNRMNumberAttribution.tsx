@@ -1144,41 +1144,37 @@ export const BNRMNumberAttribution = () => {
                 }
                 
                 return (
-                <Table>
+                <Table className="table-fixed w-full">
                   <TableHeader>
                     <TableRow>
-                      <TableHead>N° Demande</TableHead>
-                      <TableHead>Publication</TableHead>
-                      <TableHead>Type</TableHead>
-                      <TableHead>Déclarant</TableHead>
-                      <TableHead>Date validation</TableHead>
-                      <TableHead className="text-center">Actions</TableHead>
+                      <TableHead className="w-[35%]">Publication</TableHead>
+                      <TableHead className="w-[12%]">Type</TableHead>
+                      <TableHead className="w-[20%]">Déclarant</TableHead>
+                      <TableHead className="w-[13%]">Date</TableHead>
+                      <TableHead className="w-[20%] text-center">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredPendingRequests.map((request) => (
                       <TableRow key={request.id}>
-                        <TableCell className="font-mono font-medium">
-                          {request.request_number || request.dl_number}
-                        </TableCell>
-                        <TableCell className="max-w-xs">
+                        <TableCell>
                           <div className="font-medium truncate">{request.title || request.metadata?.publication?.title}</div>
                         </TableCell>
                         <TableCell>
-                          <Badge variant="outline">
+                          <Badge variant="outline" className="text-xs">
                             {getDepositTypeLabel(request.deposit_type)}
                           </Badge>
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="truncate">
                           {request.author_name || request.metadata?.declarant?.name}
                         </TableCell>
-                        <TableCell>
+                        <TableCell className="text-sm">
                           {request.updated_at 
-                            ? format(new Date(request.updated_at), "dd/MM/yyyy", { locale: fr })
+                            ? format(new Date(request.updated_at), "dd/MM/yy", { locale: fr })
                             : '-'}
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center justify-center gap-2">
+                          <div className="flex items-center justify-center gap-1">
                             <Button
                               variant="outline"
                               size="sm"
@@ -1187,10 +1183,8 @@ export const BNRMNumberAttribution = () => {
                                 setIsViewRequestDialogOpen(true);
                               }}
                             >
-                              <Eye className="h-4 w-4 mr-1" />
-                              Voir
+                              <Eye className="h-4 w-4" />
                             </Button>
-                            {/* Hide attribution button if number already assigned */}
                             {!hasAnyAttributedNumber(request) ? (
                               <Button
                                 size="sm"
@@ -1200,7 +1194,7 @@ export const BNRMNumberAttribution = () => {
                                 }}
                               >
                                 <Hash className="h-4 w-4 mr-1" />
-                                Attribuer N°
+                                Attribuer
                               </Button>
                             ) : (
                               <Badge variant="secondary" className="bg-green-100 text-green-800">
