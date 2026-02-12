@@ -1486,6 +1486,40 @@ export function DepositValidationWorkflow() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {/* Résumé statistiques */}
+          <div className="grid grid-cols-5 gap-3 mb-6">
+            <div className="flex items-center gap-2 p-3 rounded-lg border border-blue-200 bg-blue-50">
+              <div className="text-2xl font-bold text-blue-800">
+                {allRequests.filter(r => ['brouillon', 'soumis'].includes(r.status) && !r.validated_by_committee).length}
+              </div>
+              <span className="text-xs text-blue-700">Soumises</span>
+            </div>
+            <div className="flex items-center gap-2 p-3 rounded-lg border border-yellow-200 bg-yellow-50">
+              <div className="text-2xl font-bold text-yellow-800">
+                {allRequests.filter(r => r.status === 'en_cours').length}
+              </div>
+              <span className="text-xs text-yellow-700">En cours</span>
+            </div>
+            <div className="flex items-center gap-2 p-3 rounded-lg border border-orange-200 bg-orange-50">
+              <div className="text-2xl font-bold text-orange-800">
+                {allRequests.filter(r => ['en_attente', 'en_attente_validation_b'].includes(r.status) || (r.validated_by_committee && !r.validated_by_department && !r.rejected_by)).length}
+              </div>
+              <span className="text-xs text-orange-700">En attente</span>
+            </div>
+            <div className="flex items-center gap-2 p-3 rounded-lg border border-red-200 bg-red-50">
+              <div className="text-2xl font-bold text-red-800">
+                {allRequests.filter(r => ['rejete', 'rejete_par_b', 'rejete_par_comite'].includes(r.status)).length}
+              </div>
+              <span className="text-xs text-red-700">Rejetées</span>
+            </div>
+            <div className="flex items-center gap-2 p-3 rounded-lg border border-green-200 bg-green-50">
+              <div className="text-2xl font-bold text-green-800">
+                {allRequests.filter(r => ['valide_par_b', 'attribue'].includes(r.status)).length}
+              </div>
+              <span className="text-xs text-green-700">Attribuées</span>
+            </div>
+          </div>
+
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="pending">En Attente</TabsTrigger>
