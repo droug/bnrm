@@ -851,29 +851,10 @@ export const ReservedRangesManager = () => {
               </div>
             </div>
 
-            <div className="space-y-2">
-              <Label>Notes (optionnel)</Label>
-              <Textarea
-                placeholder="Informations complémentaires sur cette réservation..."
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                rows={3}
-              />
-            </div>
-
-            <div className="bg-muted p-4 rounded-md border">
-              <p className="text-sm font-medium mb-2">Information importante:</p>
-              <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-                <li>Cette tranche sera réservée exclusivement pour ce professionnel</li>
-                <li>Elle ne pourra pas être utilisée pour d'autres demandes</li>
-                <li>La plage sera générée automatiquement selon le type de numéro</li>
-              </ul>
-            </div>
-
             <div className="flex gap-2">
               <Button onClick={handleAddRange} className="flex-1">
                 <Plus className="h-4 w-4 mr-2" />
-                Réserver
+                Attribuer
               </Button>
               <Button 
                 variant="outline" 
