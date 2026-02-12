@@ -310,7 +310,7 @@ export default function BNRMBackOffice() {
         opacity: 0.02
       }}
     >
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-background to-blue-50/30">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-background to-blue-50/30 overflow-x-hidden">
         {/* Header standardisé */}
         <AdminHeader 
           title="BNRM - Système BNRM"
