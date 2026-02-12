@@ -71,7 +71,7 @@ export const ReservedRangesManager = () => {
 
   const [formData, setFormData] = useState({
     requester_id: '',
-    deposit_type: '',
+    deposit_type: 'monographie',
     number_type: 'isbn' as 'isbn' | 'issn' | 'ismn' | 'dl',
     quantity: '',
     notes: ''
