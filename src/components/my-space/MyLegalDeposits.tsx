@@ -88,8 +88,11 @@ export function MyLegalDeposits() {
         }
       }
 
-      // Fetch deposits as initiator
+      // Fetch deposits as initiator (by professional ID or directly by user ID for admin-created drafts)
       let initiatorDeposits: LegalDepositRequest[] = [];
+      const initiatorIds = new Set<string>();
+      
+      // Fetch by professional ID
       if (professionalId) {
         const { data, error } = await supabase
           .from('legal_deposit_requests')
@@ -97,8 +100,25 @@ export function MyLegalDeposits() {
           .eq('initiator_id', professionalId)
           .order('created_at', { ascending: false });
 
-        if (error) throw error;
-        initiatorDeposits = data || [];
+        if (!error && data) {
+          initiatorDeposits = data;
+          data.forEach(d => initiatorIds.add(d.id));
+        }
+      }
+
+      // Also fetch deposits where initiator_id = user.id (admin or fallback drafts)
+      if (user.id !== professionalId) {
+        const { data: userIdDeposits } = await supabase
+          .from('legal_deposit_requests')
+          .select('*')
+          .eq('initiator_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (userIdDeposits) {
+          const newDeposits = userIdDeposits.filter(d => !initiatorIds.has(d.id));
+          initiatorDeposits = [...initiatorDeposits, ...newDeposits];
+          newDeposits.forEach(d => initiatorIds.add(d.id));
+        }
       }
 
       // Fetch deposits where user is a party (e.g., printer, editor invited)
@@ -111,7 +131,6 @@ export function MyLegalDeposits() {
       if (partyData && partyData.length > 0) {
         const partyRequestIds = partyData.map(p => p.request_id).filter(Boolean);
         // Exclude ones already fetched as initiator
-        const initiatorIds = new Set(initiatorDeposits.map(d => d.id));
         const uniquePartyIds = partyRequestIds.filter(id => !initiatorIds.has(id));
 
         if (uniquePartyIds.length > 0) {

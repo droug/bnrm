@@ -246,6 +246,21 @@ export default function MyLibrarySpace() {
         }
       }
 
+      // Also fetch deposits where initiator_id = user.id (admin-created or fallback drafts)
+      if (user.id !== profId) {
+        const { data: userIdLdData } = await supabase
+          .from('legal_deposit_requests')
+          .select('id, status')
+          .eq('initiator_id', user.id);
+        if (userIdLdData) {
+          const newEntries = userIdLdData.filter(d => !initiatorIds.has(d.id));
+          newEntries.forEach(d => initiatorIds.add(d.id));
+          legalDeposits += newEntries.length;
+          ldPending += newEntries.filter(d => ['brouillon', 'soumis', 'en_attente_validation_b', 'en_attente_comite_validation'].includes(d.status)).length;
+          ldCompleted += newEntries.filter(d => ['attribue', 'termine'].includes(d.status)).length;
+        }
+      }
+
       // Deposits as party (printer, editor, etc.)
       const { data: partyData } = await supabase
         .from('legal_deposit_parties')
