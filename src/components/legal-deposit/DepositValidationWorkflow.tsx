@@ -1496,24 +1496,25 @@ export function DepositValidationWorkflow() {
                         <div className="mb-4 text-sm text-muted-foreground">
                           {filteredRequests.length} demande(s) trouvée(s)
                         </div>
+                        <div className="overflow-hidden">
                         <Table className="w-full table-fixed">
                           <TableHeader>
                             <TableRow>
-                              <TableHead className="w-[35%]">Titre</TableHead>
-                              <TableHead className="w-[15%]">Support</TableHead>
-                              <TableHead className="w-[20%]">Statut</TableHead>
-                              <TableHead className="w-[15%]">Date</TableHead>
-                              <TableHead className="w-[15%]">Actions</TableHead>
+                              <TableHead className="w-[40%]">Titre</TableHead>
+                              <TableHead className="w-[12%]">Support</TableHead>
+                              <TableHead className="w-[15%]">Statut</TableHead>
+                              <TableHead className="w-[13%]">Date</TableHead>
+                              <TableHead className="w-[20%]">Actions</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
                             {paginatedRequests.map((request) => (
                               <TableRow key={request.id}>
-                                <TableCell>
-                                  <div>
-                                    <div className="font-medium">{request.title}</div>
+                                <TableCell className="truncate">
+                                  <div className="truncate">
+                                    <div className="font-medium truncate">{request.title}</div>
                                     {request.subtitle && (
-                                      <div className="text-sm text-muted-foreground">
+                                      <div className="text-sm text-muted-foreground truncate">
                                         {request.subtitle}
                                       </div>
                                     )}
@@ -1599,6 +1600,7 @@ export function DepositValidationWorkflow() {
                             </div>
                           </div>
                         )}
+                        </div>
                       </>
                     )}
                   </>
