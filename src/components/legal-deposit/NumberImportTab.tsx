@@ -314,20 +314,21 @@ export const NumberImportTab = () => {
                 </p>
               </div>
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Button onClick={addEntry} disabled={!quantity || !pastedNumbers.trim()}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Ajouter la tranche
-                  </Button>
-                  {entries.length > 0 && (
-                    <Badge variant="secondary">
-                      {entries.length} tranche(s) ajoutée(s) — {totalNumbers} numéros
-                    </Badge>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  {entries.length > 0 && (
-                    <>
+                <Button onClick={addEntry} disabled={!quantity || !pastedNumbers.trim()}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Ajouter la tranche
+                </Button>
+              </div>
+
+              {entries.length > 0 && (
+                <div className="mt-4 space-y-3 border-t pt-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary">
+                        {entries.length} tranche(s) ajoutée(s) — {totalNumbers} numéros
+                      </Badge>
+                    </div>
+                    <div className="flex items-center gap-2">
                       <Button
                         variant="outline"
                         size="sm"
@@ -337,26 +338,47 @@ export const NumberImportTab = () => {
                         <Trash2 className="h-4 w-4 mr-2" />
                         Tout effacer
                       </Button>
-                      <Button
-                        onClick={handleSaveAll}
-                        disabled={saving}
-                      >
-                        {saving ? (
-                          <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Enregistrement...
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            Enregistrer {entries.length} tranche(s)
-                          </>
-                        )}
-                      </Button>
-                    </>
-                  )}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    {entries.map((entry, idx) => (
+                      <div key={entry.id} className="flex items-center justify-between p-2 border rounded-md bg-background">
+                        <div className="flex items-center gap-3">
+                          <Badge variant="outline" className="font-mono text-xs">{getNumberTypeLabel(entry.number_type)}</Badge>
+                          <span className="text-sm font-mono">{entry.range_start} → {entry.range_end}</span>
+                          <Badge variant="secondary">{entry.quantity} n°</Badge>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => removeEntry(entry.id)}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex justify-end pt-2">
+                    <Button
+                      onClick={handleSaveAll}
+                      disabled={saving}
+                    >
+                      {saving ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Enregistrement...
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="h-4 w-4 mr-2" />
+                          Enregistrer {entries.length} tranche(s)
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </CardContent>
