@@ -442,7 +442,13 @@ serve(async (req) => {
             }
           } else {
             // Account exists and is active - cannot create
-            throw new Error("Un utilisateur avec cette adresse e-mail existe déjà et est actif.");
+            return new Response(JSON.stringify({ 
+              success: false, 
+              error: "Un utilisateur avec cette adresse e-mail existe déjà et est actif." 
+            }), {
+              headers: { ...corsHeaders, "Content-Type": "application/json" },
+              status: 200,
+            });
           }
         } else {
           // No existing auth user - create new
