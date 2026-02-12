@@ -198,6 +198,22 @@ export function MultipleAuthorsSection({
                         />
                       </div>
 
+                      {/* Genre - only for Personne Physique (moved here so Nom/Prénom align on same row) */}
+                      {isPersonnePhysique && (
+                        <div className="space-y-2">
+                          <Label>Genre</Label>
+                          <SimpleEntitySelect
+                            placeholder="Sélectionner le genre"
+                            value={author.gender}
+                            onChange={(value) => updateAuthor(author.id, { gender: value })}
+                            options={[
+                              { value: "homme", label: "Homme" },
+                              { value: "femme", label: "Femme" },
+                            ]}
+                          />
+                        </div>
+                      )}
+
                       {/* Représentant - only for Personne Morale */}
                       {isPersonneMorale && (
                         <div className="space-y-2">
@@ -243,22 +259,6 @@ export function MultipleAuthorsSection({
                               authorFirstName: e.target.value,
                               authorName: `${author.authorLastName} ${e.target.value}`.trim()
                             })}
-                          />
-                        </div>
-                      )}
-
-                      {/* Genre - only for Personne Physique */}
-                      {isPersonnePhysique && (
-                        <div className="space-y-2">
-                          <Label>Genre</Label>
-                          <SimpleEntitySelect
-                            placeholder="Sélectionner le genre"
-                            value={author.gender}
-                            onChange={(value) => updateAuthor(author.id, { gender: value })}
-                            options={[
-                              { value: "homme", label: "Homme" },
-                              { value: "femme", label: "Femme" },
-                            ]}
                           />
                         </div>
                       )}
