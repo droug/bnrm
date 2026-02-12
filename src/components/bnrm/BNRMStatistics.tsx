@@ -479,18 +479,208 @@ export const BNRMStatistics = () => {
       yGender += 7;
     });
 
-    // --- Footer ---
-    doc.setDrawColor(139, 0, 0);
-    doc.setLineWidth(0.5);
-    doc.line(15, pageHeight - 25, pageWidth - 15, pageHeight - 25);
-    doc.setFontSize(7);
-    doc.setFont(undefined, 'normal');
-    doc.setTextColor(100, 100, 100);
-    doc.text("Bibliothèque Nationale du Royaume du Maroc - Avenue Ibn Battouta, BP 1003, Rabat-Agdal", pageWidth / 2, pageHeight - 20, { align: 'center' });
-    doc.text("Tél: +212 (0)5 37 77 18 74 | Email: contact@bnrm.ma | www.bnrm.ma", pageWidth / 2, pageHeight - 15, { align: 'center' });
-    doc.setFont(undefined, 'italic');
-    doc.setFontSize(6);
-    doc.text("Document généré automatiquement par le système de gestion du dépôt légal", pageWidth / 2, pageHeight - 10, { align: 'center' });
+    // --- Helper: check page break ---
+    const checkPageBreak = (needed: number) => {
+      if (y > pageHeight - needed) {
+        addFooter(doc, pageWidth, pageHeight);
+        doc.addPage();
+        y = 20;
+      }
+    };
+
+    const addFooter = (d: jsPDF, pw: number, ph: number) => {
+      d.setDrawColor(139, 0, 0);
+      d.setLineWidth(0.5);
+      d.line(15, ph - 25, pw - 15, ph - 25);
+      d.setFontSize(7);
+      d.setFont(undefined, 'normal');
+      d.setTextColor(100, 100, 100);
+      d.text("Bibliothèque Nationale du Royaume du Maroc - Avenue Ibn Battouta, BP 1003, Rabat-Agdal", pw / 2, ph - 20, { align: 'center' });
+      d.text("Tél: +212 (0)5 37 77 18 74 | Email: contact@bnrm.ma | www.bnrm.ma", pw / 2, ph - 15, { align: 'center' });
+      d.setFont(undefined, 'italic');
+      d.setFontSize(6);
+      d.text("Document généré automatiquement par le système de gestion du dépôt légal", pw / 2, ph - 10, { align: 'center' });
+    };
+
+    // Helper: draw a section title
+    const drawSectionTitle = (title: string) => {
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(0, 51, 102);
+      doc.text(title, 15, y);
+      y += 2;
+      doc.setDrawColor(0, 51, 102);
+      doc.setLineWidth(0.8);
+      doc.line(15, y, 15 + title.length * 3.5, y);
+      y += 8;
+    };
+
+    // Helper: draw table header row
+    const drawTableHeader = (cols: { label: string; x: number; width: number }[]) => {
+      doc.setFillColor(0, 51, 102);
+      doc.rect(15, y, pageWidth - 30, 8, 'F');
+      doc.setFontSize(8);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(255, 255, 255);
+      cols.forEach(col => {
+        doc.text(col.label, col.x, y + 5.5);
+      });
+      y += 8;
+    };
+
+    // Helper: draw table row
+    const drawTableRow = (cols: { text: string; x: number; bold?: boolean; color?: number[] }[], idx: number) => {
+      const bgColor = idx % 2 === 0 ? [248, 250, 252] : [255, 255, 255];
+      doc.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
+      doc.rect(15, y, pageWidth - 30, 7, 'F');
+      doc.setFontSize(8);
+      cols.forEach(col => {
+        doc.setFont(undefined, col.bold ? 'bold' : 'normal');
+        if (col.color) doc.setTextColor(col.color[0], col.color[1], col.color[2]);
+        else doc.setTextColor(60, 60, 60);
+        doc.text(col.text, col.x, y + 5);
+      });
+      y += 7;
+    };
+
+    // --- Section: Tendances mensuelles ---
+    y += 10;
+    checkPageBreak(60);
+    drawSectionTitle("Tendances mensuelles");
+
+    drawTableHeader([
+      { label: "Mois", x: 20, width: 60 },
+      { label: "Soumises", x: 90, width: 40 },
+      { label: "Traitées", x: 130, width: 40 },
+      { label: "Taux", x: pageWidth - 25, width: 30 }
+    ]);
+
+    stats.monthlyTrends.forEach((trend, idx) => {
+      const rate = trend.submitted > 0 ? Math.round((trend.processed / trend.submitted) * 100) : 0;
+      const rateColor = rate >= 80 ? [16, 185, 129] : rate >= 50 ? [245, 158, 11] : [239, 68, 68];
+      drawTableRow([
+        { text: trend.month, x: 20 },
+        { text: trend.submitted.toString(), x: 90, bold: true, color: [59, 130, 246] },
+        { text: trend.processed.toString(), x: 130, bold: true, color: [16, 185, 129] },
+        { text: `${rate}%`, x: pageWidth - 25, bold: true, color: rateColor }
+      ], idx);
+    });
+
+    // --- Section: Prévisions d'édition ---
+    y += 10;
+    checkPageBreak(60);
+    drawSectionTitle("Prévisions d'édition par année");
+
+    drawTableHeader([
+      { label: "Année", x: 20, width: 60 },
+      { label: "Nombre de publications", x: 90, width: 80 }
+    ]);
+
+    stats.editionForecasts.forEach((forecast, idx) => {
+      drawTableRow([
+        { text: forecast.year.toString(), x: 20, bold: true },
+        { text: forecast.count.toString(), x: 90, bold: true, color: [139, 92, 246] }
+      ], idx);
+    });
+
+    // --- Section: Nationalité des auteurs ---
+    y += 10;
+    checkPageBreak(60);
+    drawSectionTitle("Nationalité des auteurs");
+
+    const totalAuthors = Object.values(stats.byAuthorNationality).reduce((a, b) => a + b, 0);
+    drawTableHeader([
+      { label: "Nationalité", x: 20, width: 60 },
+      { label: "Nombre", x: 100, width: 40 },
+      { label: "Pourcentage", x: pageWidth - 30, width: 40 }
+    ]);
+
+    Object.entries(stats.byAuthorNationality).forEach(([nat, count], idx) => {
+      const pct = totalAuthors > 0 ? Math.round((count / totalAuthors) * 100) : 0;
+      const nc = natColors[idx % 4];
+      drawTableRow([
+        { text: nat, x: 20, bold: true, color: nc },
+        { text: count.toString(), x: 100 },
+        { text: `${pct}%`, x: pageWidth - 30, bold: true }
+      ], idx);
+    });
+
+    // --- Section: Genre des auteurs ---
+    y += 10;
+    checkPageBreak(50);
+    drawSectionTitle("Genre des auteurs");
+
+    const totalGender = Object.values(stats.byAuthorGender).reduce((a, b) => a + b, 0);
+    drawTableHeader([
+      { label: "Genre", x: 20, width: 60 },
+      { label: "Nombre", x: 100, width: 40 },
+      { label: "Pourcentage", x: pageWidth - 30, width: 40 }
+    ]);
+
+    Object.entries(stats.byAuthorGender).forEach(([genre, count], idx) => {
+      const pct = totalGender > 0 ? Math.round((count / totalGender) * 100) : 0;
+      const gc = genderColors[idx % 2];
+      drawTableRow([
+        { text: genre, x: 20, bold: true, color: gc },
+        { text: count.toString(), x: 100 },
+        { text: `${pct}%`, x: pageWidth - 30, bold: true }
+      ], idx);
+    });
+
+    // --- Section: Validations réciproques ---
+    y += 10;
+    checkPageBreak(60);
+    drawSectionTitle("Validations réciproques éditeur-imprimeur");
+
+    drawTableHeader([
+      { label: "Éditeur", x: 20, width: 55 },
+      { label: "Imprimeur", x: 75, width: 50 },
+      { label: "Date", x: 130, width: 30 },
+      { label: "Statut", x: pageWidth - 30, width: 25 }
+    ]);
+
+    stats.reciprocalValidations.forEach((v, idx) => {
+      const statusColor = v.validated ? [16, 185, 129] : [245, 158, 11];
+      drawTableRow([
+        { text: v.editor.length > 28 ? v.editor.substring(0, 26) + '...' : v.editor, x: 20 },
+        { text: v.printer.length > 22 ? v.printer.substring(0, 20) + '...' : v.printer, x: 75 },
+        { text: format(new Date(v.date), 'dd/MM/yyyy'), x: 130 },
+        { text: v.validated ? 'Validé' : 'En attente', x: pageWidth - 30, bold: true, color: statusColor }
+      ], idx);
+    });
+
+    // --- Section: Résumé de la période ---
+    y += 10;
+    checkPageBreak(45);
+    drawSectionTitle("Résumé de la période");
+
+    const treatmentRate = stats.totalRequests > 0 ? Math.round(((stats.byStatus['traite'] || 0) / stats.totalRequests) * 100) : 0;
+    const summaryItems = [
+      { label: "Taux de traitement", value: `${treatmentRate}%` },
+      { label: "Type le plus demandé", value: "Monographie" },
+      { label: "Temps de réponse moyen", value: `${stats.averageProcessingTime} jours (objectif: 5 jours)` }
+    ];
+
+    doc.setFillColor(240, 245, 255);
+    doc.roundedRect(15, y, pageWidth - 30, summaryItems.length * 10 + 6, 2, 2, 'F');
+    doc.setDrawColor(0, 51, 102);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(15, y, pageWidth - 30, summaryItems.length * 10 + 6, 2, 2, 'S');
+    y += 6;
+
+    summaryItems.forEach(item => {
+      doc.setFontSize(9);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(100, 100, 100);
+      doc.text(item.label + " :", 22, y + 3);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(0, 51, 102);
+      doc.text(item.value, 85, y + 3);
+      y += 10;
+    });
+
+    // --- Footer on last page ---
+    addFooter(doc, pageWidth, pageHeight);
 
     doc.save(`Statistiques_BNRM_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
   };
