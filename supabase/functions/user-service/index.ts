@@ -422,9 +422,9 @@ serve(async (req) => {
             .eq('user_id', existingAuthUser.id)
             .single();
 
-          if (existingProfile?.account_status === 'deleted') {
-            // Reactivate the deleted account
-            console.log(`[USER-SERVICE] Reactivating deleted account: ${existingAuthUser.id}`);
+          if (existingProfile?.account_status === 'deleted' || !existingProfile) {
+            // Reactivate the deleted account or recover orphan auth user (no profile)
+            console.log(`[USER-SERVICE] ${existingProfile ? 'Reactivating deleted' : 'Recovering orphan'} account: ${existingAuthUser.id}`);
             isReactivation = true;
             newUserId = existingAuthUser.id;
 
