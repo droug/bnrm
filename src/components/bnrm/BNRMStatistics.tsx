@@ -367,7 +367,6 @@ export const BNRMStatistics = () => {
       doc.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
       doc.rect(15, y, pageWidth - 30, 7, 'F');
       
-      // Color indicator
       const mc = mainColors[status.main] || [107, 114, 128];
       doc.setFillColor(mc[0], mc[1], mc[2]);
       doc.roundedRect(17, y + 1.5, 3, 4, 1, 1, 'F');
@@ -384,12 +383,52 @@ export const BNRMStatistics = () => {
       y += 7;
     });
 
+    // --- GRAPHIQUE: Bar chart horizontal par statut principal ---
+    y += 8;
+    if (y > pageHeight - 85) { doc.addPage(); y = 20; }
+    
+    const mainStatusCounts: Record<string, number> = {};
+    stats.byStatusTwoLevels.forEach(s => {
+      mainStatusCounts[s.main] = (mainStatusCounts[s.main] || 0) + s.count;
+    });
+    const maxStatusCount = Math.max(...Object.values(mainStatusCounts), 1);
+    const chartLeft = 45;
+    const chartWidth = pageWidth - 75;
+    const barHeight = 10;
+
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(0, 51, 102);
+    doc.text("Graphique - Répartition par statut", 15, y);
+    y += 8;
+
+    mainStatuses.forEach(status => {
+      const count = mainStatusCounts[status] || 0;
+      const mc = mainColors[status] || [107, 114, 128];
+      const bw = (count / maxStatusCount) * chartWidth;
+
+      doc.setFontSize(8);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(60, 60, 60);
+      doc.text(status, 17, y + barHeight / 2 + 1);
+
+      doc.setFillColor(235, 238, 245);
+      doc.roundedRect(chartLeft, y, chartWidth, barHeight - 2, 2, 2, 'F');
+      if (bw > 0) {
+        doc.setFillColor(mc[0], mc[1], mc[2]);
+        doc.roundedRect(chartLeft, y, Math.max(bw, 4), barHeight - 2, 2, 2, 'F');
+      }
+      doc.setFontSize(8);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(mc[0], mc[1], mc[2]);
+      doc.text(count.toString(), chartLeft + Math.max(bw, 4) + 3, y + barHeight / 2 + 1);
+
+      y += barHeight + 2;
+    });
+
     // --- Section Répartition par type ---
     y += 10;
-    if (y > pageHeight - 80) {
-      doc.addPage();
-      y = 20;
-    }
+    if (y > pageHeight - 80) { doc.addPage(); y = 20; }
     doc.setFontSize(12);
     doc.setFont(undefined, 'bold');
     doc.setTextColor(0, 51, 102);
@@ -407,7 +446,7 @@ export const BNRMStatistics = () => {
       'Numérique': [16, 185, 129]
     };
 
-    typeData.forEach((td, idx) => {
+    typeData.forEach((td) => {
       const barWidth = Math.min((td.value / (stats.totalRequests || 1)) * (pageWidth - 100), pageWidth - 100);
       const tc = typeColors[td.name] || [107, 114, 128];
       
@@ -416,10 +455,8 @@ export const BNRMStatistics = () => {
       doc.setTextColor(60, 60, 60);
       doc.text(td.name, 20, y + 4);
       
-      // Bar background
       doc.setFillColor(240, 240, 240);
       doc.roundedRect(65, y, pageWidth - 100, 6, 2, 2, 'F');
-      // Bar fill
       if (barWidth > 0) {
         doc.setFillColor(tc[0], tc[1], tc[2]);
         doc.roundedRect(65, y, Math.max(barWidth, 4), 6, 2, 2, 'F');
@@ -431,12 +468,53 @@ export const BNRMStatistics = () => {
       y += 10;
     });
 
-    // --- Section Nationalité & Genre ---
-    y += 8;
-    if (y > pageHeight - 60) {
-      doc.addPage();
-      y = 20;
+    // --- GRAPHIQUE: Pie chart pour types de documents ---
+    y += 5;
+    if (y > pageHeight - 70) { doc.addPage(); y = 20; }
+
+    const pieRadius = 22;
+    const pieCenterX = 50;
+    const totalType = typeData.reduce((a, b) => a + b.value, 0);
+
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(0, 51, 102);
+    doc.text("Graphique - Types de documents", 15, y);
+    y += 5;
+    const pieCenterY = y + pieRadius + 2;
+
+    if (totalType > 0) {
+      let startAngle = 0;
+      typeData.forEach(td => {
+        const tc = typeColors[td.name] || [107, 114, 128];
+        const sliceAngle = (td.value / totalType) * 2 * Math.PI;
+        const segments = Math.max(Math.ceil(sliceAngle / 0.05), 2);
+        doc.setFillColor(tc[0], tc[1], tc[2]);
+        for (let s = 0; s < segments; s++) {
+          const a1 = startAngle + (s / segments) * sliceAngle;
+          const a2 = startAngle + ((s + 1) / segments) * sliceAngle;
+          doc.triangle(pieCenterX, pieCenterY, pieCenterX + pieRadius * Math.cos(a1), pieCenterY + pieRadius * Math.sin(a1), pieCenterX + pieRadius * Math.cos(a2), pieCenterY + pieRadius * Math.sin(a2), 'F');
+        }
+        startAngle += sliceAngle;
+      });
+      let legendY = pieCenterY - (typeData.length * 8) / 2;
+      typeData.forEach(td => {
+        const tc = typeColors[td.name] || [107, 114, 128];
+        const pct = Math.round((td.value / totalType) * 100);
+        doc.setFillColor(tc[0], tc[1], tc[2]);
+        doc.roundedRect(pieCenterX + pieRadius + 12, legendY, 4, 4, 1, 1, 'F');
+        doc.setFontSize(8);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(60, 60, 60);
+        doc.text(`${td.name} - ${pct}% (${td.value})`, pieCenterX + pieRadius + 19, legendY + 3.5);
+        legendY += 8;
+      });
     }
+    y = pieCenterY + pieRadius + 8;
+
+    // --- Section Profil des auteurs avec PIE CHARTS ---
+    y += 8;
+    if (y > pageHeight - 80) { doc.addPage(); y = 20; }
     doc.setFontSize(12);
     doc.setFont(undefined, 'bold');
     doc.setTextColor(0, 51, 102);
@@ -447,37 +525,86 @@ export const BNRMStatistics = () => {
     doc.line(15, y, 70, y);
     y += 8;
 
-    // Nationalités
-    doc.setFontSize(10);
+    const natColors = [[59, 130, 246], [16, 185, 129], [245, 158, 11], [239, 68, 68]];
+    const genderColors = [[99, 102, 241], [236, 72, 153]];
+    const totalNat = Object.values(stats.byAuthorNationality).reduce((a, b) => a + b, 0);
+    const natPieCX = 40;
+    const natPieCY = y + 22;
+    const natR = 18;
+
+    doc.setFontSize(9);
     doc.setFont(undefined, 'bold');
     doc.setTextColor(60, 60, 60);
-    doc.text("Nationalité", 20, y);
-    doc.text("Genre", pageWidth / 2 + 10, y);
-    y += 6;
+    doc.text("Nationalité", 15, y);
 
-    const natColors = [[59, 130, 246], [16, 185, 129], [245, 158, 11], [239, 68, 68]];
-    Object.entries(stats.byAuthorNationality).forEach(([nat, count], idx) => {
-      doc.setFillColor(natColors[idx % 4][0], natColors[idx % 4][1], natColors[idx % 4][2]);
-      doc.circle(22, y + 1.5, 2, 'F');
-      doc.setFontSize(9);
-      doc.setFont(undefined, 'normal');
-      doc.setTextColor(60, 60, 60);
-      doc.text(`${nat}: ${count}`, 27, y + 3);
-      y += 7;
-    });
+    if (totalNat > 0) {
+      let natStartAngle = 0;
+      Object.entries(stats.byAuthorNationality).forEach(([, count], idx) => {
+        const nc = natColors[idx % 4];
+        const sliceAngle = (count / totalNat) * 2 * Math.PI;
+        const segments = Math.max(Math.ceil(sliceAngle / 0.05), 2);
+        doc.setFillColor(nc[0], nc[1], nc[2]);
+        for (let s = 0; s < segments; s++) {
+          const a1 = natStartAngle + (s / segments) * sliceAngle;
+          const a2 = natStartAngle + ((s + 1) / segments) * sliceAngle;
+          doc.triangle(natPieCX, natPieCY, natPieCX + natR * Math.cos(a1), natPieCY + natR * Math.sin(a1), natPieCX + natR * Math.cos(a2), natPieCY + natR * Math.sin(a2), 'F');
+        }
+        natStartAngle += sliceAngle;
+      });
+      let natLegY = natPieCY - 12;
+      Object.entries(stats.byAuthorNationality).forEach(([nat, count], idx) => {
+        const nc = natColors[idx % 4];
+        const pct = Math.round((count / totalNat) * 100);
+        doc.setFillColor(nc[0], nc[1], nc[2]);
+        doc.roundedRect(natPieCX + natR + 8, natLegY, 3, 3, 0.5, 0.5, 'F');
+        doc.setFontSize(7);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(60, 60, 60);
+        doc.text(`${nat}: ${count} (${pct}%)`, natPieCX + natR + 13, natLegY + 2.5);
+        natLegY += 6;
+      });
+    }
 
-    // Genre (à droite)
-    let yGender = y - Object.keys(stats.byAuthorNationality).length * 7;
-    const genderColors = [[99, 102, 241], [236, 72, 153]];
-    Object.entries(stats.byAuthorGender).forEach(([genre, count], idx) => {
-      doc.setFillColor(genderColors[idx % 2][0], genderColors[idx % 2][1], genderColors[idx % 2][2]);
-      doc.circle(pageWidth / 2 + 12, yGender + 1.5, 2, 'F');
-      doc.setFontSize(9);
-      doc.setFont(undefined, 'normal');
-      doc.setTextColor(60, 60, 60);
-      doc.text(`${genre}: ${count}`, pageWidth / 2 + 17, yGender + 3);
-      yGender += 7;
-    });
+    // Genre pie chart (right side)
+    const totalGen = Object.values(stats.byAuthorGender).reduce((a, b) => a + b, 0);
+    const genPieCX = pageWidth / 2 + 30;
+    const genPieCY = natPieCY;
+    const genR = 18;
+
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(60, 60, 60);
+    doc.text("Genre", pageWidth / 2 + 5, y);
+
+    if (totalGen > 0) {
+      let genStartAngle = 0;
+      Object.entries(stats.byAuthorGender).forEach(([, count], idx) => {
+        const gc = genderColors[idx % 2];
+        const sliceAngle = (count / totalGen) * 2 * Math.PI;
+        const segments = Math.max(Math.ceil(sliceAngle / 0.05), 2);
+        doc.setFillColor(gc[0], gc[1], gc[2]);
+        for (let s = 0; s < segments; s++) {
+          const a1 = genStartAngle + (s / segments) * sliceAngle;
+          const a2 = genStartAngle + ((s + 1) / segments) * sliceAngle;
+          doc.triangle(genPieCX, genPieCY, genPieCX + genR * Math.cos(a1), genPieCY + genR * Math.sin(a1), genPieCX + genR * Math.cos(a2), genPieCY + genR * Math.sin(a2), 'F');
+        }
+        genStartAngle += sliceAngle;
+      });
+      let genLegY = genPieCY - 6;
+      Object.entries(stats.byAuthorGender).forEach(([genre, count], idx) => {
+        const gc = genderColors[idx % 2];
+        const pct = Math.round((count / totalGen) * 100);
+        doc.setFillColor(gc[0], gc[1], gc[2]);
+        doc.roundedRect(genPieCX + genR + 8, genLegY, 3, 3, 0.5, 0.5, 'F');
+        doc.setFontSize(7);
+        doc.setFont(undefined, 'normal');
+        doc.setTextColor(60, 60, 60);
+        doc.text(`${genre}: ${count} (${pct}%)`, genPieCX + genR + 13, genLegY + 2.5);
+        genLegY += 6;
+      });
+    }
+
+    y = Math.max(natPieCY, genPieCY) + natR + 8;
 
     // --- Helper: check page break ---
     const checkPageBreak = (needed: number) => {
