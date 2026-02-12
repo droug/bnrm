@@ -287,6 +287,13 @@ serve(async (req) => {
           { table: 'visits_bookings', column: 'user_id' },
           { table: 'daily_pass_usage', column: 'user_id' },
           { table: 'search_logs', column: 'user_id' },
+          { table: 'user_tutorial_progress', column: 'user_id' },
+          { table: 'download_restrictions', column: 'user_id' },
+          { table: 'download_logs', column: 'user_id' },
+          { table: 'manuscript_bookmarks', column: 'user_id' },
+          { table: 'manuscript_reading_history', column: 'user_id' },
+          { table: 'manuscript_reviews', column: 'user_id' },
+          { table: 'professional_registration_documents', column: 'user_id' },
         ];
 
         for (const { table, column } of cleanupTables) {
@@ -313,6 +320,8 @@ serve(async (req) => {
           { table: 'legal_deposit_requests', column: 'validated_by_committee' },
           { table: 'legal_deposit_requests', column: 'validated_by_service' },
           { table: 'legal_deposit_requests', column: 'validated_by_department' },
+          { table: 'legal_deposit_requests', column: 'arbitration_requested_by' },
+          { table: 'legal_deposit_requests', column: 'arbitration_validated_by' },
           { table: 'deposit_workflow_steps', column: 'gestionnaire_id' },
           { table: 'deposit_activity_log', column: 'user_id' },
           { table: 'number_ranges', column: 'created_by' },
@@ -327,6 +336,22 @@ serve(async (req) => {
           { table: 'reproduction_requests', column: 'manager_validator_id' },
           { table: 'reproduction_requests', column: 'service_validator_id' },
           { table: 'reproduction_requests', column: 'rejected_by' },
+          { table: 'reproduction_requests', column: 'accounting_validator_id' },
+          { table: 'reproduction_workflow_steps', column: 'validator_id' },
+          { table: 'reproduction_notifications', column: 'recipient_id' },
+          { table: 'preservation_actions', column: 'performed_by' },
+          { table: 'preservation_backups', column: 'created_by' },
+          { table: 'preservation_schedules', column: 'created_by' },
+          { table: 'help_guides', column: 'created_by' },
+          { table: 'profile_pii_access_log', column: 'accessed_by' },
+          { table: 'download_restrictions', column: 'created_by' },
+          { table: 'virtual_exhibitions', column: 'created_by' },
+          { table: 'manuscript_reviews', column: 'reviewed_by' },
+          { table: 'partner_collections', column: 'approved_by' },
+          { table: 'partner_collections', column: 'created_by' },
+          { table: 'partner_manuscript_submissions', column: 'reviewed_by' },
+          { table: 'partner_manuscript_submissions', column: 'submitted_by' },
+          { table: 'partner_submission_history', column: 'performed_by' },
         ];
 
         for (const { table, column } of nullifyTables) {
