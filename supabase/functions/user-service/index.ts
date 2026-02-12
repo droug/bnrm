@@ -249,12 +249,12 @@ serve(async (req) => {
           throw new Error("L'ID utilisateur est requis");
         }
 
-        console.log(`[USER-SERVICE] Deleting professional account: ${user_id}`);
+        console.log(`[USER-SERVICE] Soft-deleting professional account: ${user_id}`);
 
         // Récupérer les infos du profil avant suppression pour le log
         const { data: profileToDelete } = await supabaseClient
           .from('profiles')
-          .select('first_name, last_name, email, institution, role')
+          .select('first_name, last_name, institution')
           .eq('user_id', user_id)
           .single();
 
@@ -265,125 +265,49 @@ serve(async (req) => {
           .eq('user_id', user_id)
           .single();
 
-        // IMPORTANT: Supprimer TOUTES les données liées AVANT de supprimer l'utilisateur Auth
-        // car il y a des contraintes FK vers auth.users avec ON DELETE NO ACTION ou CASCADE
-        console.log(`[USER-SERVICE] Cleaning up related data for user: ${user_id}`);
-        
-        // Tables avec FK directes vers auth.users - doivent être nettoyées AVANT la suppression Auth
-        const cleanupTables = [
-          { table: 'vexpo_exhibitions', column: 'created_by' },
-          { table: 'vexpo_artworks', column: 'created_by' },
-          { table: 'professional_registration_documents', column: 'user_id' },
-          { table: 'professional_registration_requests', column: 'user_id' },
-          { table: 'user_roles', column: 'user_id' },
-          { table: 'profiles', column: 'user_id' },
-          { table: 'chat_conversations', column: 'user_id' },
-          { table: 'chatbot_interactions', column: 'user_id' },
-          { table: 'reading_history', column: 'user_id' },
-          { table: 'favorites', column: 'user_id' },
-          { table: 'user_bookmarks', column: 'user_id' },
-          { table: 'user_reviews', column: 'user_id' },
-          { table: 'reproduction_requests', column: 'user_id' },
-          { table: 'professional_registry', column: 'user_id' },
-          { table: 'user_system_roles', column: 'user_id' },
-          { table: 'notifications', column: 'user_id' },
-          { table: 'bnrm_wallets', column: 'user_id' },
-          { table: 'legal_deposit_parties', column: 'user_id' },
-          { table: 'analytics_events', column: 'user_id' },
-          { table: 'access_requests', column: 'user_id' },
-          { table: 'digitization_requests', column: 'user_id' },
-          { table: 'cbm_adhesions', column: 'user_id' },
-          { table: 'cbm_adhesions_catalogue', column: 'user_id' },
-          { table: 'cbm_adhesions_reseau', column: 'user_id' },
-          { table: 'visits_bookings', column: 'user_id' },
-          { table: 'daily_pass_usage', column: 'user_id' },
-          { table: 'search_logs', column: 'user_id' },
-          { table: 'user_tutorial_progress', column: 'user_id' },
-          { table: 'download_restrictions', column: 'user_id' },
-          { table: 'download_logs', column: 'user_id' },
-          { table: 'manuscript_bookmarks', column: 'user_id' },
-          { table: 'manuscript_reading_history', column: 'user_id' },
-          { table: 'manuscript_reviews', column: 'user_id' },
-          { table: 'professional_registration_documents', column: 'user_id' },
-        ];
+        // Récupérer l'email depuis Auth
+        const { data: authUserData } = await supabaseClient.auth.admin.getUserById(user_id);
+        const deletedEmail = authUserData?.user?.email;
 
-        for (const { table, column } of cleanupTables) {
+        // 1. Soft-delete: marquer le profil comme "deleted"
+        const { error: softDeleteError } = await supabaseClient
+          .from('profiles')
+          .update({
+            account_status: 'deleted',
+            deleted_at: new Date().toISOString(),
+            deleted_by: currentUser.id,
+            is_approved: false,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', user_id);
+
+        if (softDeleteError) {
+          console.error('[USER-SERVICE] Error soft-deleting profile:', softDeleteError);
+          throw new Error(`Erreur lors du marquage du profil: ${softDeleteError.message}`);
+        }
+
+        // 2. Supprimer les rôles
+        for (const roleTable of ['user_roles', 'user_system_roles']) {
           try {
-            const { error: cleanupError } = await supabaseClient
-              .from(table)
-              .delete()
-              .eq(column, user_id);
-            
-            if (cleanupError) {
-              console.warn(`[USER-SERVICE] Warning cleaning ${table}: ${cleanupError.message}`);
-            } else {
-              console.log(`[USER-SERVICE] Cleaned ${table} for user ${user_id}`);
-            }
+            await supabaseClient.from(roleTable).delete().eq('user_id', user_id);
           } catch (e) {
-            console.warn(`[USER-SERVICE] Error cleaning ${table}:`, e);
+            console.warn(`[USER-SERVICE] Warning cleaning ${roleTable}:`, e);
           }
         }
 
-        // Mettre à NULL les références optionnelles (colonnes avec ON DELETE SET NULL)
-        const nullifyTables = [
-          { table: 'bnrm_tarifs_historique', column: 'utilisateur_responsable' },
-          { table: 'legal_deposit_requests', column: 'rejected_by' },
-          { table: 'legal_deposit_requests', column: 'validated_by_committee' },
-          { table: 'legal_deposit_requests', column: 'validated_by_service' },
-          { table: 'legal_deposit_requests', column: 'validated_by_department' },
-          { table: 'legal_deposit_requests', column: 'arbitration_requested_by' },
-          { table: 'legal_deposit_requests', column: 'arbitration_validated_by' },
-          { table: 'deposit_workflow_steps', column: 'gestionnaire_id' },
-          { table: 'deposit_activity_log', column: 'user_id' },
-          { table: 'number_ranges', column: 'created_by' },
-          { table: 'deposit_notifications', column: 'recipient_id' },
-          { table: 'user_reviews', column: 'reviewed_by' },
-          { table: 'catalog_metadata', column: 'created_by' },
-          { table: 'catalog_metadata', column: 'updated_by' },
-          { table: 'metadata_import_history', column: 'imported_by' },
-          { table: 'metadata_exports', column: 'exported_by' },
-          { table: 'sigb_configuration', column: 'configured_by' },
-          { table: 'reproduction_requests', column: 'processed_by' },
-          { table: 'reproduction_requests', column: 'manager_validator_id' },
-          { table: 'reproduction_requests', column: 'service_validator_id' },
-          { table: 'reproduction_requests', column: 'rejected_by' },
-          { table: 'reproduction_requests', column: 'accounting_validator_id' },
-          { table: 'reproduction_workflow_steps', column: 'validator_id' },
-          { table: 'reproduction_notifications', column: 'recipient_id' },
-          { table: 'preservation_actions', column: 'performed_by' },
-          { table: 'preservation_backups', column: 'created_by' },
-          { table: 'preservation_schedules', column: 'created_by' },
-          { table: 'help_guides', column: 'created_by' },
-          { table: 'profile_pii_access_log', column: 'accessed_by' },
-          { table: 'download_restrictions', column: 'created_by' },
-          { table: 'virtual_exhibitions', column: 'created_by' },
-          { table: 'manuscript_reviews', column: 'reviewed_by' },
-          { table: 'partner_collections', column: 'approved_by' },
-          { table: 'partner_collections', column: 'created_by' },
-          { table: 'partner_manuscript_submissions', column: 'reviewed_by' },
-          { table: 'partner_manuscript_submissions', column: 'submitted_by' },
-          { table: 'partner_submission_history', column: 'performed_by' },
-        ];
-
-        for (const { table, column } of nullifyTables) {
-          try {
-            const { error: nullifyError } = await supabaseClient
-              .from(table)
-              .update({ [column]: null })
-              .eq(column, user_id);
-            
-            if (nullifyError) {
-              console.warn(`[USER-SERVICE] Warning nullifying ${table}.${column}: ${nullifyError.message}`);
-            }
-          } catch (e) {
-            console.warn(`[USER-SERVICE] Error nullifying ${table}.${column}:`, e);
-          }
+        // 3. Désactiver le compte Auth (ban au lieu de supprimer)
+        try {
+          await supabaseClient.auth.admin.updateUserById(user_id, {
+            ban_duration: '876600h', // ~100 years
+          });
+          console.log(`[USER-SERVICE] Auth account banned for user ${user_id}`);
+        } catch (e) {
+          console.warn(`[USER-SERVICE] Error banning auth user:`, e);
         }
 
-        // Marquer les enregistrements dans les tables de répertoire comme supprimés
-        // pour qu'ils n'apparaissent plus dans l'autocomplétion
+        // 4. Marquer les enregistrements dans les tables de répertoire comme supprimés
         const directoryTables = ['publishers', 'printers', 'producers'];
-        const professionalEmail = profileToDelete?.email || registrationRequest?.registration_data?.email;
+        const professionalEmail = deletedEmail || registrationRequest?.registration_data?.email;
         const companyName = registrationRequest?.company_name;
 
         for (const dirTable of directoryTables) {
@@ -401,78 +325,38 @@ serve(async (req) => {
             const { error: dirError } = await query;
             if (dirError) {
               console.warn(`[USER-SERVICE] Warning updating ${dirTable}: ${dirError.message}`);
-            } else {
-              console.log(`[USER-SERVICE] Marked ${dirTable} records as deleted for ${professionalEmail || companyName}`);
             }
           } catch (e) {
             console.warn(`[USER-SERVICE] Error updating ${dirTable}:`, e);
           }
         }
 
-        // Annuler les tranches réservées pour ce professionnel supprimé
-        // On annule par email ET par nom séparément pour couvrir tous les cas
+        // 5. Annuler les tranches réservées
         try {
           if (professionalEmail) {
-            const { error: rangeError1 } = await supabaseClient
+            await supabaseClient
               .from('reserved_number_ranges')
               .update({ status: 'cancelled' })
               .eq('status', 'active')
               .eq('requester_email', professionalEmail);
-            if (rangeError1) {
-              console.warn(`[USER-SERVICE] Warning cancelling ranges by email: ${rangeError1.message}`);
-            } else {
-              console.log(`[USER-SERVICE] Cancelled reserved ranges by email for ${professionalEmail}`);
-            }
           }
           if (companyName) {
-            const { error: rangeError2 } = await supabaseClient
+            await supabaseClient
               .from('reserved_number_ranges')
               .update({ status: 'cancelled' })
               .eq('status', 'active')
               .eq('requester_name', companyName);
-            if (rangeError2) {
-              console.warn(`[USER-SERVICE] Warning cancelling ranges by name: ${rangeError2.message}`);
-            } else {
-              console.log(`[USER-SERVICE] Cancelled reserved ranges by name for ${companyName}`);
-            }
           }
-          // Also cancel by requester_id if available
-          const { error: rangeError3 } = await supabaseClient
+          await supabaseClient
             .from('reserved_number_ranges')
             .update({ status: 'cancelled' })
             .eq('status', 'active')
             .eq('requester_id', user_id);
-          if (rangeError3) {
-            console.warn(`[USER-SERVICE] Warning cancelling ranges by id: ${rangeError3.message}`);
-          } else {
-            console.log(`[USER-SERVICE] Cancelled reserved ranges by id for ${user_id}`);
-          }
         } catch (e) {
           console.warn(`[USER-SERVICE] Error cancelling reserved ranges:`, e);
         }
 
-        console.log(`[USER-SERVICE] Data cleanup completed, now deleting Auth user: ${user_id}`);
-
-        // Supprimer l'utilisateur de auth.users
-        // NB: l'opération doit être idempotente.
-        let alreadyDeleted = false;
-        const { error: deleteError } = await supabaseClient.auth.admin.deleteUser(user_id);
-
-        if (deleteError) {
-          const msg = (deleteError as any)?.message?.toString?.() ?? String(deleteError);
-          const isUserNotFound = msg.toLowerCase().includes('user not found') || msg.toLowerCase().includes('not found');
-          if (isUserNotFound) {
-            alreadyDeleted = true;
-            console.warn(`[USER-SERVICE] User ${user_id} not found in Auth; treating delete as success.`);
-          } else {
-            console.error('[USER-SERVICE] Error deleting user from auth:', deleteError);
-            throw new Error(`Erreur lors de la suppression: ${msg}`);
-          }
-        } else {
-          console.log(`[USER-SERVICE] User ${user_id} deleted from Auth successfully`);
-        }
-
-        // Log l'activité
+        // 6. Log l'activité
         await supabaseClient
           .from('activity_logs')
           .insert({
@@ -483,7 +367,7 @@ serve(async (req) => {
             details: {
               deleted_user: {
                 name: profileToDelete ? `${profileToDelete.first_name} ${profileToDelete.last_name}` : 'N/A',
-                email: profileToDelete?.email,
+                email: deletedEmail,
                 institution: profileToDelete?.institution,
                 role: registrationRequest?.professional_type,
                 company_name: registrationRequest?.company_name,
@@ -491,9 +375,11 @@ serve(async (req) => {
               reason: deleted_reason || undefined,
               deleted_by: currentUser.email,
               deleted_at: new Date().toISOString(),
-              already_deleted: alreadyDeleted,
+              soft_delete: true,
             },
           });
+
+        console.log(`[USER-SERVICE] Professional account soft-deleted: ${user_id}`);
 
         return new Response(JSON.stringify({ 
           success: true, 
@@ -520,30 +406,68 @@ serve(async (req) => {
 
         console.log(`[USER-SERVICE] Creating internal user: ${email}`);
 
-        // 1. Create user with admin API (no email confirmation needed)
-        const { data: newUser, error: createError } = await supabaseClient.auth.admin.createUser({
-          email,
-          password,
-          email_confirm: true, // Auto-confirm
-          user_metadata: {
-            first_name,
-            last_name,
+        // Check if a deleted account exists for this email
+        let newUserId: string;
+        let isReactivation = false;
+
+        // Look up existing auth user by email
+        const { data: existingUsers } = await supabaseClient.auth.admin.listUsers();
+        const existingAuthUser = existingUsers?.users?.find((u: any) => u.email === email);
+
+        if (existingAuthUser) {
+          // Check if this user has a deleted profile
+          const { data: existingProfile } = await supabaseClient
+            .from('profiles')
+            .select('account_status')
+            .eq('user_id', existingAuthUser.id)
+            .single();
+
+          if (existingProfile?.account_status === 'deleted') {
+            // Reactivate the deleted account
+            console.log(`[USER-SERVICE] Reactivating deleted account: ${existingAuthUser.id}`);
+            isReactivation = true;
+            newUserId = existingAuthUser.id;
+
+            // Unban and update password
+            const { error: updateAuthError } = await supabaseClient.auth.admin.updateUserById(newUserId, {
+              password,
+              ban_duration: 'none',
+              email_confirm: true,
+              user_metadata: { first_name, last_name },
+            });
+
+            if (updateAuthError) {
+              console.error('[USER-SERVICE] Error reactivating auth user:', updateAuthError);
+              throw new Error(`Erreur lors de la réactivation du compte: ${updateAuthError.message}`);
+            }
+          } else {
+            // Account exists and is active - cannot create
+            throw new Error("Un utilisateur avec cette adresse e-mail existe déjà et est actif.");
           }
-        });
+        } else {
+          // No existing auth user - create new
+          const { data: newUser, error: createError } = await supabaseClient.auth.admin.createUser({
+            email,
+            password,
+            email_confirm: true,
+            user_metadata: { first_name, last_name }
+          });
 
-        if (createError) {
-          console.error('[USER-SERVICE] Error creating user:', createError);
-          throw new Error(`Erreur lors de la création du compte: ${createError.message}`);
+          if (createError) {
+            console.error('[USER-SERVICE] Error creating user:', createError);
+            throw new Error(`Erreur lors de la création du compte: ${createError.message}`);
+          }
+
+          if (!newUser.user) {
+            throw new Error('Aucun utilisateur créé');
+          }
+
+          newUserId = newUser.user.id;
         }
 
-        if (!newUser.user) {
-          throw new Error('Aucun utilisateur créé');
-        }
+        console.log(`[USER-SERVICE] User ${isReactivation ? 'reactivated' : 'created'}: ${newUserId}`);
 
-        const newUserId = newUser.user.id;
-        console.log(`[USER-SERVICE] User created: ${newUserId}`);
-
-        // 2. Create/update profile
+        // 2. Create/update profile (reactivate if deleted)
         const { error: profileError } = await supabaseClient
           .from('profiles')
           .upsert({
@@ -554,16 +478,23 @@ serve(async (req) => {
             institution: institution || null,
             research_field: research_field || null,
             is_approved: true,
-            created_at: new Date().toISOString(),
+            account_status: 'active',
+            deleted_at: null,
+            deleted_by: null,
             updated_at: new Date().toISOString()
           }, { onConflict: 'user_id' });
 
         if (profileError) {
-          console.error('[USER-SERVICE] Error creating profile:', profileError);
-          // Don't throw - user is created, profile might be created by trigger
+          console.error('[USER-SERVICE] Error creating/updating profile:', profileError);
         }
 
-        // 3. Assign roles (support both single role and array of roles)
+        // 3. Clean old roles before assigning new ones (important for reactivation)
+        if (isReactivation) {
+          await supabaseClient.from('user_roles').delete().eq('user_id', newUserId);
+          await supabaseClient.from('user_system_roles').delete().eq('user_id', newUserId);
+        }
+
+        // 4. Assign roles
         const rolesToAssign = roles && roles.length > 0 
           ? roles 
           : (role_code ? [{ role_code, role_id: role_id || '' }] : []);
@@ -596,27 +527,29 @@ serve(async (req) => {
           }
         }
 
-        // 4. Activity log
+        // 5. Activity log
         await supabaseClient
           .from('activity_logs')
           .insert({
             user_id: currentUser.id,
-            action: 'create_internal_user',
+            action: isReactivation ? 'reactivate_internal_user' : 'create_internal_user',
             resource_type: 'user',
             resource_id: newUserId,
             details: {
               roles: rolesToAssign.map(r => r.role_code),
               created_by_admin: true,
+              reactivated: isReactivation,
               notes: notes || null
             }
           });
 
-        console.log(`[USER-SERVICE] Internal user created successfully: ${newUserId}`);
+        console.log(`[USER-SERVICE] Internal user ${isReactivation ? 'reactivated' : 'created'} successfully: ${newUserId}`);
 
         return new Response(JSON.stringify({ 
           success: true, 
           user_id: newUserId,
-          email 
+          email,
+          reactivated: isReactivation
         }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
           status: 200,

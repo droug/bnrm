@@ -9856,7 +9856,10 @@ export type Database = {
       profiles: {
         Row: {
           access_level_details: Json | null
+          account_status: string
           created_at: string | null
+          deleted_at: string | null
+          deleted_by: string | null
           first_name: string
           id: string
           institution: string | null
@@ -9875,7 +9878,10 @@ export type Database = {
         }
         Insert: {
           access_level_details?: Json | null
+          account_status?: string
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           first_name: string
           id?: string
           institution?: string | null
@@ -9894,7 +9900,10 @@ export type Database = {
         }
         Update: {
           access_level_details?: Json | null
+          account_status?: string
           created_at?: string | null
+          deleted_at?: string | null
+          deleted_by?: string | null
           first_name?: string
           id?: string
           institution?: string | null
