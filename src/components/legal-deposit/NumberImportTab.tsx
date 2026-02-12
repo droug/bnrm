@@ -71,43 +71,68 @@ export const NumberImportTab = () => {
   const [saving, setSaving] = useState(false);
 
   // Current form state for adding a new entry
-  const [rangeStart, setRangeStart] = useState('');
-  const [rangeEnd, setRangeEnd] = useState('');
   const [quantity, setQuantity] = useState<number | ''>('');
-  const [notes, setNotes] = useState('');
+  const [pastedNumbers, setPastedNumbers] = useState('');
+
+  const parsePastedNumbers = (text: string): string[] => {
+    return text
+      .split(/[\n,;\t]+/)
+      .map(n => n.trim())
+      .filter(n => n.length > 0);
+  };
 
   const addEntry = () => {
-    if (!rangeStart.trim() || !rangeEnd.trim()) {
+    if (!quantity) {
       toast({
-        title: "Champs requis",
-        description: "Veuillez remplir les champs début et fin de tranche",
+        title: "Champ requis",
+        description: "Veuillez sélectionner le nombre de numéros",
         variant: "destructive",
       });
       return;
     }
 
-    const qty = typeof quantity === 'number' && quantity > 0 ? quantity : 0;
+    const numbers = parsePastedNumbers(pastedNumbers);
+    if (numbers.length === 0) {
+      toast({
+        title: "Numéros requis",
+        description: "Veuillez coller les numéros à importer",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (numbers.length !== quantity) {
+      toast({
+        title: "Incohérence de quantité",
+        description: `Vous avez sélectionné ${quantity} numéros mais collé ${numbers.length} numéro(s). Veuillez corriger.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Sort numbers to determine range
+    const sorted = [...numbers].sort();
+    const rangeStart = sorted[0];
+    const rangeEnd = sorted[sorted.length - 1];
 
     const newEntry: NumberRangeEntry = {
       id: `entry-${++entryCounter}`,
       number_type: selectedNumberType,
-      range_start: rangeStart.trim(),
-      range_end: rangeEnd.trim(),
-      quantity: qty,
-      notes: notes.trim(),
+      range_start: rangeStart,
+      range_end: rangeEnd,
+      quantity: quantity,
+      notes: '',
     };
 
     setEntries(prev => [...prev, newEntry]);
 
     // Reset form
-    setRangeStart('');
-    setRangeEnd('');
     setQuantity('');
-    setNotes('');
+    setPastedNumbers('');
 
     toast({
       title: "Tranche ajoutée",
-      description: `${getNumberTypeLabel(selectedNumberType)} : ${newEntry.range_start} → ${newEntry.range_end}`,
+      description: `${getNumberTypeLabel(selectedNumberType)} : ${numbers.length} numéros (${rangeStart} → ${rangeEnd})`,
     });
   };
 
@@ -242,48 +267,54 @@ export const NumberImportTab = () => {
               Ajouter une tranche
             </Label>
             <div className="border rounded-lg p-4 bg-muted/30 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label>Début de tranche <span className="text-destructive">*</span></Label>
-                  <Input
-                    placeholder={getPlaceholder(selectedNumberType, 'start')}
-                    value={rangeStart}
-                    onChange={(e) => setRangeStart(e.target.value)}
-                    className="font-mono"
-                  />
+                  <Label>Nombre de numéros <span className="text-destructive">*</span></Label>
+                  <Select
+                    value={quantity ? String(quantity) : ''}
+                    onValueChange={(val) => setQuantity(parseInt(val))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner la quantité" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="10">10 numéros</SelectItem>
+                      <SelectItem value="100">100 numéros</SelectItem>
+                      <SelectItem value="1000">1000 numéros</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div className="space-y-2">
-                  <Label>Fin de tranche <span className="text-destructive">*</span></Label>
-                  <Input
-                    placeholder={getPlaceholder(selectedNumberType, 'end')}
-                    value={rangeEnd}
-                    onChange={(e) => setRangeEnd(e.target.value)}
-                    className="font-mono"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>Nombre de numéros</Label>
-                  <Input
-                    type="number"
-                    placeholder="100"
-                    min={1}
-                    value={quantity}
-                    onChange={(e) => setQuantity(e.target.value ? parseInt(e.target.value) : '')}
-                  />
-                  <p className="text-xs text-muted-foreground">Auto-calculé si vide</p>
+                <div className="flex items-end">
+                  {quantity && pastedNumbers && (
+                    <div className="text-sm">
+                      {(() => {
+                        const count = parsePastedNumbers(pastedNumbers).length;
+                        const isValid = count === quantity;
+                        return (
+                          <Badge variant={isValid ? "default" : "destructive"} className="text-xs">
+                            {count} / {quantity} numéros collés {isValid ? '✓' : '✗'}
+                          </Badge>
+                        );
+                      })()}
+                    </div>
+                  )}
                 </div>
               </div>
               <div className="space-y-2">
-                <Label>Notes (optionnel)</Label>
+                <Label>Numéros à importer (copier-coller) <span className="text-destructive">*</span></Label>
                 <Textarea
-                  placeholder="Commentaires sur cette tranche..."
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  rows={2}
+                  placeholder={`Collez vos numéros ici, un par ligne...\nExemple :\n${getPlaceholder(selectedNumberType, 'start')}\n${getPlaceholder(selectedNumberType, 'end')}`}
+                  value={pastedNumbers}
+                  onChange={(e) => setPastedNumbers(e.target.value)}
+                  rows={8}
+                  className="font-mono text-sm"
                 />
+                <p className="text-xs text-muted-foreground">
+                  Collez les numéros séparés par des retours à la ligne, virgules ou points-virgules.
+                </p>
               </div>
               <div className="flex justify-end">
-                <Button onClick={addEntry} disabled={!rangeStart.trim() || !rangeEnd.trim()}>
+                <Button onClick={addEntry} disabled={!quantity || !pastedNumbers.trim()}>
                   <Plus className="h-4 w-4 mr-2" />
                   Ajouter la tranche
                 </Button>
