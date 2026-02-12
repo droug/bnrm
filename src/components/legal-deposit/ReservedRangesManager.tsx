@@ -385,7 +385,15 @@ export const ReservedRangesManager = () => {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={() => setIsAddDialogOpen(true)}>
+          <Button onClick={() => {
+            resetForm();
+            if (activeProType === 'producteur') {
+              setFormData(prev => ({ ...prev, deposit_type: 'audiovisuel_logiciels_bd', number_type: 'ismn' }));
+            } else if (activeProType === 'editeur') {
+              setFormData(prev => ({ ...prev, deposit_type: 'monographie', number_type: 'isbn' }));
+            }
+            setIsAddDialogOpen(true);
+          }}>
             <Plus className="h-4 w-4 mr-2" />
             Attribuer une tranche
           </Button>
@@ -645,6 +653,8 @@ export const ReservedRangesManager = () => {
                 <Label>Type de dépôt *</Label>
                 {activeProType === 'editeur' ? (
                   <Input value="Monographie" disabled className="bg-muted cursor-not-allowed" />
+                ) : activeProType === 'producteur' ? (
+                  <Input value="Audio-visuel & Logiciels et BD" disabled className="bg-muted cursor-not-allowed" />
                 ) : (
                 <div className="relative">
                   <button
@@ -695,6 +705,8 @@ export const ReservedRangesManager = () => {
                 <Label>Type de numéro *</Label>
                 {activeProType === 'editeur' ? (
                   <Input value="ISBN" disabled className="bg-muted cursor-not-allowed" />
+                ) : activeProType === 'producteur' ? (
+                  <Input value="ISMN" disabled className="bg-muted cursor-not-allowed" />
                 ) : (
                 <div className="relative">
                   <button
