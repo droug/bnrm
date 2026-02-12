@@ -385,24 +385,12 @@ export function MyLegalDeposits() {
 
                         {/* Actions selon le statut */}
                         <div className="flex gap-2 pt-2 border-t">
-                          {deposit.status === 'brouillon' && (
-                            <>
-                              <Button 
-                                size="sm" 
-                                variant="default"
-                                className="flex-1"
-                                onClick={() => handleEditDraft(deposit)}
-                              >
-                                <Edit className="h-4 w-4 mr-2" />
-                                Reprendre l'édition
-                              </Button>
-                            </>
-                          )}
+                          
                           
                           <Button 
                             size="sm" 
                             variant="outline"
-                            className={deposit.status === 'brouillon' ? '' : 'flex-1'}
+                            className="flex-1"
                             onClick={() => handleViewDetails(deposit)}
                           >
                             <Eye className="h-4 w-4 mr-2" />
