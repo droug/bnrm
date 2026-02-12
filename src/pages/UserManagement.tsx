@@ -409,23 +409,36 @@ export default function UserManagement() {
 
   const deleteUser = async (userId: string) => {
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .delete()
-        .eq('id', userId);
+      // Utiliser la edge function user-service pour un nettoyage complet
+      // (auth.users, user_roles, user_system_roles, notifications, profiles, etc.)
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData?.session?.access_token;
+      if (!token) throw new Error("Non authentifié");
 
-      if (error) throw error;
+      const response = await supabase.functions.invoke('user-service', {
+        body: {
+          action: 'delete_professional',
+          user_id: userId,
+          deleted_reason: 'Suppression depuis la gestion des utilisateurs',
+        },
+      });
+
+      if (response.error) throw response.error;
+      if (response.data && !response.data.success) {
+        throw new Error(response.data.error || "Échec de la suppression");
+      }
 
       toast({
         title: "Utilisateur supprimé",
-        description: "L'utilisateur a été supprimé avec succès",
+        description: "L'utilisateur et toutes ses données liées ont été supprimés avec succès",
       });
 
       fetchData();
     } catch (error: any) {
+      console.error('Delete user error:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de supprimer l'utilisateur",
+        description: error.message || "Impossible de supprimer l'utilisateur",
         variant: "destructive",
       });
     }
