@@ -188,6 +188,20 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         if (metadata.declarationNature) setDeclarationNature(metadata.declarationNature);
         if (metadata.authorStatus) setAuthorStatus(metadata.authorStatus);
         if (metadata.selectedDiscipline) setSelectedDiscipline(metadata.selectedDiscipline);
+        if (metadata.targetAudience) setTargetAudience(metadata.targetAudience);
+        if (metadata.targetAudienceOther) setTargetAudienceOther(metadata.targetAudienceOther);
+        if (metadata.selectedLanguages && Array.isArray(metadata.selectedLanguages)) setSelectedLanguages(metadata.selectedLanguages);
+        if (metadata.multipleVolumes) setMultipleVolumes(metadata.multipleVolumes);
+        if (metadata.totalVolumes) setTotalVolumes(metadata.totalVolumes);
+        if (metadata.numberOfVolumes) setNumberOfVolumes(metadata.numberOfVolumes);
+        if (metadata.publicationTypeOther) setPublicationTypeOther(metadata.publicationTypeOther);
+        if (metadata.specialCollectionPublicationType) setSpecialCollectionPublicationType(metadata.specialCollectionPublicationType);
+        if (metadata.specialCollectionPublicationTypeOther) setSpecialCollectionPublicationTypeOther(metadata.specialCollectionPublicationTypeOther);
+        if (metadata.directorType) setDirectorType(metadata.directorType);
+        if (metadata.directorGender) setDirectorGender(metadata.directorGender);
+        if (metadata.directorPseudonym) setDirectorPseudonym(metadata.directorPseudonym);
+        if (metadata.directorRegion) setDirectorRegion(metadata.directorRegion);
+        if (metadata.directorCity) setDirectorCity(metadata.directorCity);
         
         // Aller directement au formulaire
         setCurrentStep("form_filling");
@@ -4056,6 +4070,20 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           declarationNature,
           authorStatus,
           selectedDiscipline,
+          targetAudience,
+          targetAudienceOther,
+          selectedLanguages,
+          multipleVolumes,
+          totalVolumes,
+          numberOfVolumes,
+          publicationTypeOther,
+          specialCollectionPublicationType,
+          specialCollectionPublicationTypeOther,
+          directorType,
+          directorGender,
+          directorPseudonym,
+          directorRegion,
+          directorCity,
           ...formData
         }
       };
