@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LegalDepositDeclaration from "@/components/LegalDepositDeclaration";
@@ -11,11 +12,19 @@ import { LegalDepositInfoCard } from "@/components/legal-deposit/LegalDepositInf
 import { WatermarkContainer } from "@/components/ui/watermark";
 
 export default function SpecializedCollectionsDeposit() {
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get('edit');
   const [showForm, setShowForm] = useState(false);
   const [showUserTypeModal, setShowUserTypeModal] = useState(false);
   const [showAuthChoiceModal, setShowAuthChoiceModal] = useState(false);
   const [selectedUserType, setSelectedUserType] = useState<"editeur" | "imprimeur">("editeur");
   const { user } = useAuth();
+
+  useEffect(() => {
+    if (editId && user) {
+      setShowForm(true);
+    }
+  }, [editId, user]);
 
   const handleStartDeclaration = () => {
     setShowUserTypeModal(true);
@@ -35,7 +44,14 @@ export default function SpecializedCollectionsDeposit() {
   const mappedUserType = selectedUserType === "editeur" ? "editor" : "printer";
 
   if (showForm) {
-    return <LegalDepositDeclaration depositType="collections_specialisees" onClose={() => setShowForm(false)} initialUserType={mappedUserType} />;
+    return (
+      <LegalDepositDeclaration 
+        depositType="collections_specialisees" 
+        onClose={() => setShowForm(false)} 
+        initialUserType={editId ? "editor" : mappedUserType}
+        editId={editId}
+      />
+    );
   }
 
   const documents = [
@@ -62,10 +78,10 @@ export default function SpecializedCollectionsDeposit() {
           <div className="max-w-4xl mx-auto space-y-6">
             <LegalDepositHeader
               title="Dépôt Légal - Collections Spécialisées"
-              subtitle="Formulaire de déclaration pour les collections spécialisées et documents rares"
+              subtitle="Formulaire de déclaration pour les cartes, partitions et collections spéciales"
               icon={FolderOpen}
-              iconColorClass="text-orange-600"
-              iconBgClass="bg-orange-100 dark:bg-orange-950"
+              iconColorClass="text-amber-600"
+              iconBgClass="bg-amber-100 dark:bg-amber-950"
               warningText="Pour accéder au formulaire de demande de dépôt légal, il est obligatoire de disposer d'un compte Éditeur et d'un compte Imprimeur"
             />
 
@@ -75,7 +91,6 @@ export default function SpecializedCollectionsDeposit() {
                 icon={FolderOpen}
                 buttonLabel="Commencer la déclaration"
                 onStartDeclaration={handleStartDeclaration}
-                showReciprocalWarning={true}
               />
             </div>
           </div>
