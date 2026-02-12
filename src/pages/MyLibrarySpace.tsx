@@ -241,7 +241,7 @@ export default function MyLibrarySpace() {
         if (ldData) {
           ldData.forEach(d => initiatorIds.add(d.id));
           legalDeposits += ldData.length;
-          ldPending += ldData.filter(d => ['soumis', 'en_attente_validation_b', 'en_attente_comite_validation'].includes(d.status)).length;
+          ldPending += ldData.filter(d => ['brouillon', 'soumis', 'en_attente_validation_b', 'en_attente_comite_validation'].includes(d.status)).length;
           ldCompleted += ldData.filter(d => ['attribue', 'termine'].includes(d.status)).length;
         }
       }
@@ -264,7 +264,7 @@ export default function MyLibrarySpace() {
             .in('id', uniquePartyIds);
           if (partyLdData) {
             legalDeposits += partyLdData.length;
-            ldPending += partyLdData.filter(d => ['soumis', 'en_attente_validation_b', 'en_attente_comite_validation'].includes(d.status)).length;
+            ldPending += partyLdData.filter(d => ['brouillon', 'soumis', 'en_attente_validation_b', 'en_attente_comite_validation'].includes(d.status)).length;
             ldCompleted += partyLdData.filter(d => ['attribue', 'termine'].includes(d.status)).length;
           }
         }
@@ -294,7 +294,7 @@ export default function MyLibrarySpace() {
       });
 
       // Set user profiles based on data
-      const hasProfessionalAccess = !!profId;
+      const hasProfessionalAccess = !!profId || legalDeposits > 0;
       setUserProfiles(prev => ({
         ...prev,
         isProfessional: hasProfessionalAccess,
