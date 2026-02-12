@@ -12,7 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Bell, Mail, FileText, Calendar, Send, Settings, AlertCircle, CheckCircle, Clock, XCircle, X, Undo2 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Bell, Mail, FileText, Calendar, Send, Settings, AlertCircle, CheckCircle, Clock, XCircle, X, Undo2, SlidersHorizontal } from "lucide-react";
 import { toast } from "sonner";
 import jsPDF from 'jspdf';
 import { addBNRMHeader, addBNRMFooter } from '@/lib/pdfHeaderUtils';
@@ -123,6 +125,31 @@ export default function BNRMEditorialMonitoring() {
   const [confirmCancelRejectOpen, setConfirmCancelRejectOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState<EditorialMonitoringItem | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
+
+  const allColumns = [
+    { key: "dlNumber", label: "N° DL" },
+    { key: "title", label: "Titre" },
+    { key: "author", label: "Auteur" },
+    { key: "publisher", label: "Éditeur" },
+    { key: "attribution", label: "Attribution" },
+    { key: "daysElapsed", label: "Jours écoulés" },
+    { key: "status", label: "Statut" },
+    { key: "lastAction", label: "Dernière action" },
+    { key: "nextAction", label: "Prochaine action" },
+    { key: "actions", label: "Actions" },
+  ];
+
+  const [visibleColumns, setVisibleColumns] = useState<Record<string, boolean>>(() => 
+    Object.fromEntries(allColumns.map(c => [c.key, true]))
+  );
+
+  const toggleColumn = (key: string) => {
+    // Don't allow hiding "actions" column
+    if (key === "actions") return;
+    setVisibleColumns(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const isColumnVisible = (key: string) => visibleColumns[key] !== false;
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -764,45 +791,70 @@ export default function BNRMEditorialMonitoring() {
                     <SelectItem value="received">Reçu</SelectItem>
                   </SelectContent>
                 </Select>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" size="icon" className="shrink-0" title="Colonnes à afficher">
+                      <SlidersHorizontal className="h-4 w-4" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="w-56 bg-popover z-50">
+                    <div className="space-y-1">
+                      <h4 className="font-medium text-sm mb-2">Colonnes visibles</h4>
+                      {allColumns.filter(c => c.key !== "actions").map((col) => (
+                        <label key={col.key} className="flex items-center gap-2 py-1 px-1 rounded hover:bg-muted cursor-pointer text-sm">
+                          <Checkbox
+                            checked={isColumnVisible(col.key)}
+                            onCheckedChange={() => toggleColumn(col.key)}
+                          />
+                          {col.label}
+                        </label>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
               </div>
 
               <div className="rounded-md border">
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>N° DL</TableHead>
-                      <TableHead>Titre</TableHead>
-                      <TableHead>Auteur</TableHead>
-                      <TableHead>Éditeur</TableHead>
-                      <TableHead>Attribution</TableHead>
-                      <TableHead>Jours écoulés</TableHead>
-                      <TableHead>Statut</TableHead>
-                      <TableHead>Dernière action</TableHead>
-                      <TableHead>Prochaine action</TableHead>
+                      {isColumnVisible("dlNumber") && <TableHead>N° DL</TableHead>}
+                      {isColumnVisible("title") && <TableHead>Titre</TableHead>}
+                      {isColumnVisible("author") && <TableHead>Auteur</TableHead>}
+                      {isColumnVisible("publisher") && <TableHead>Éditeur</TableHead>}
+                      {isColumnVisible("attribution") && <TableHead>Attribution</TableHead>}
+                      {isColumnVisible("daysElapsed") && <TableHead>Jours écoulés</TableHead>}
+                      {isColumnVisible("status") && <TableHead>Statut</TableHead>}
+                      {isColumnVisible("lastAction") && <TableHead>Dernière action</TableHead>}
+                      {isColumnVisible("nextAction") && <TableHead>Prochaine action</TableHead>}
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {paginatedItems.map((item) => (
                       <TableRow key={item.id}>
-                        <TableCell className="font-medium">{item.dlNumber}</TableCell>
-                        <TableCell>{item.title}</TableCell>
-                        <TableCell>{item.author}</TableCell>
-                        <TableCell>{item.publisher}</TableCell>
-                        <TableCell>{new Date(item.attributionDate).toLocaleDateString('fr-FR')}</TableCell>
-                        <TableCell>
-                          <Badge variant={item.daysElapsed > 60 ? "destructive" : item.daysElapsed > 40 ? "default" : "secondary"}>
-                            {item.daysElapsed}j
-                          </Badge>
-                        </TableCell>
-                        <TableCell>{getStatusBadge(item.status)}</TableCell>
-                        <TableCell className="text-sm text-muted-foreground">{item.lastAction}</TableCell>
-                        <TableCell>
-                          <div className="text-sm">
-                            <div>{item.nextAction}</div>
-                            <div className="text-muted-foreground text-xs">{new Date(item.nextActionDate).toLocaleDateString('fr-FR')}</div>
-                          </div>
-                        </TableCell>
+                        {isColumnVisible("dlNumber") && <TableCell className="font-medium">{item.dlNumber}</TableCell>}
+                        {isColumnVisible("title") && <TableCell>{item.title}</TableCell>}
+                        {isColumnVisible("author") && <TableCell>{item.author}</TableCell>}
+                        {isColumnVisible("publisher") && <TableCell>{item.publisher}</TableCell>}
+                        {isColumnVisible("attribution") && <TableCell>{new Date(item.attributionDate).toLocaleDateString('fr-FR')}</TableCell>}
+                        {isColumnVisible("daysElapsed") && (
+                          <TableCell>
+                            <Badge variant={item.daysElapsed > 60 ? "destructive" : item.daysElapsed > 40 ? "default" : "secondary"}>
+                              {item.daysElapsed}j
+                            </Badge>
+                          </TableCell>
+                        )}
+                        {isColumnVisible("status") && <TableCell>{getStatusBadge(item.status)}</TableCell>}
+                        {isColumnVisible("lastAction") && <TableCell className="text-sm text-muted-foreground">{item.lastAction}</TableCell>}
+                        {isColumnVisible("nextAction") && (
+                          <TableCell>
+                            <div className="text-sm">
+                              <div>{item.nextAction}</div>
+                              <div className="text-muted-foreground text-xs">{new Date(item.nextActionDate).toLocaleDateString('fr-FR')}</div>
+                            </div>
+                          </TableCell>
+                        )}
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
                             {item.daysElapsed >= 20 && item.status === 'pending' && (
