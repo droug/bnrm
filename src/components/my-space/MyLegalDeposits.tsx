@@ -613,7 +613,7 @@ export function MyLegalDeposits() {
               {/* Pièces jointes */}
               <AttachmentsSection
                 attachments={[
-                  ...(selectedDeposit.documents_urls || []).map((url: string, i: number) => ({
+                  ...(Array.isArray(selectedDeposit.documents_urls) ? selectedDeposit.documents_urls : []).map((url: string, i: number) => ({
                     label: `Document ${i + 1}`,
                     url,
                   })),
