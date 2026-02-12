@@ -1,10 +1,9 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { createPortal } from "react-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ScrollableDialog, ScrollableDialogContent, ScrollableDialogHeader, ScrollableDialogTitle } from "@/components/ui/scrollable-dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
@@ -71,8 +70,6 @@ export const ReservedRangesManager = () => {
   const [showNumberTypeDropdown, setShowNumberTypeDropdown] = useState(false);
   const [showQuantityDropdown, setShowQuantityDropdown] = useState(false);
   const [showSourceRangeDropdown, setShowSourceRangeDropdown] = useState(false);
-  const [sourceRangeDropdownPos, setSourceRangeDropdownPos] = useState<{ top: number; left: number; width: number }>({ top: 0, left: 0, width: 0 });
-  const sourceRangeBtnRef = useRef<HTMLButtonElement>(null);
   const [selectedSourceRange, setSelectedSourceRange] = useState<ReservedRange | null>(null);
 
   const [formData, setFormData] = useState({
@@ -571,13 +568,13 @@ export const ReservedRangesManager = () => {
         ))}
       </Tabs>
 
-      {/* Dialog pour attribuer une tranche */}
-      <ScrollableDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <ScrollableDialogContent className="max-w-2xl">
-          <ScrollableDialogHeader>
-            <ScrollableDialogTitle>Attribuer une tranche de numéros</ScrollableDialogTitle>
-          </ScrollableDialogHeader>
-          <div className="space-y-4 p-6">
+      {/* Sheet latéral pour attribuer une tranche */}
+      <Sheet open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+        <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Attribuer une tranche de numéros</SheetTitle>
+          </SheetHeader>
+          <div className="space-y-4 mt-6">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>{activeProType === 'imprimeur' ? 'Imprimeur' : activeProType === 'producteur' ? 'Producteur' : 'Éditeur'} *</Label>
@@ -800,16 +797,9 @@ export const ReservedRangesManager = () => {
               <Label>Plage source (attribution depuis les numéros importés) *</Label>
               <div className="relative">
                 <button
-                  ref={sourceRangeBtnRef}
                   type="button"
                   className="w-full flex items-center justify-between px-3 py-2 border rounded-md bg-background hover:bg-accent transition-colors"
-                  onClick={() => {
-                    if (sourceRangeBtnRef.current) {
-                      const rect = sourceRangeBtnRef.current.getBoundingClientRect();
-                      setSourceRangeDropdownPos({ top: rect.bottom + 4, left: rect.left, width: rect.width });
-                    }
-                    setShowSourceRangeDropdown(!showSourceRangeDropdown);
-                  }}
+                  onClick={() => setShowSourceRangeDropdown(!showSourceRangeDropdown)}
                 >
                   <span className={selectedSourceRange ? "" : "text-muted-foreground"}>
                     {selectedSourceRange
@@ -820,63 +810,43 @@ export const ReservedRangesManager = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                   </svg>
                 </button>
-                {showSourceRangeDropdown && createPortal(
-                  <>
-                    <div 
-                      className="fixed inset-0" 
-                      style={{ zIndex: 100000 }}
-                      onPointerDown={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        setShowSourceRangeDropdown(false);
-                      }}
-                    />
-                    <div 
-                      className="bg-popover text-popover-foreground border rounded-md shadow-lg max-h-60 overflow-y-auto"
-                      style={{ position: 'fixed', top: sourceRangeDropdownPos.top, left: sourceRangeDropdownPos.left, width: sourceRangeDropdownPos.width, zIndex: 100001 }}
-                      onPointerDown={(e) => e.stopPropagation()}
-                      onMouseDown={(e) => e.stopPropagation()}
-                    >
-                      {(() => {
-                        const selectedQty = parseInt(formData.quantity) || 0;
-                        const filtered = reservedRanges.filter(r => 
-                          r.number_type === formData.number_type && 
-                          r.status === 'active' && 
-                          (r.total_numbers - r.used_numbers) >= selectedQty &&
-                          selectedQty > 0 &&
-                          !r.requester_name?.includes('Professionnel')
-                        );
-                        return filtered.length > 0 ? filtered.map((range) => (
-                          <button
-                            key={range.id}
-                            type="button"
-                            className="w-full text-left px-3 py-2 hover:bg-accent transition-colors border-b last:border-b-0"
-                            onPointerDown={(e) => e.stopPropagation()}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              e.preventDefault();
-                              setSelectedSourceRange(range);
-                              setShowSourceRangeDropdown(false);
-                            }}
-                          >
-                            <div className="flex flex-col pointer-events-none">
-                              <span className="font-medium text-sm">{range.range_start} → {range.range_end}</span>
-                              <span className="text-xs text-muted-foreground">
-                                {range.total_numbers - range.used_numbers} numéros disponibles sur {range.total_numbers} • {range.notes}
-                              </span>
-                            </div>
-                          </button>
-                        )) : (
-                          <div className="px-3 py-2 text-sm text-muted-foreground">
-                            {selectedQty === 0 
-                              ? "Veuillez d'abord sélectionner le nombre de numéros"
-                              : `Aucune plage disponible avec au moins ${selectedQty} numéros pour ce type`}
+                {showSourceRangeDropdown && (
+                  <div className="absolute z-50 w-full mt-1 bg-popover text-popover-foreground border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                    {(() => {
+                      const selectedQty = parseInt(formData.quantity) || 0;
+                      const filtered = reservedRanges.filter(r => 
+                        r.number_type === formData.number_type && 
+                        r.status === 'active' && 
+                        (r.total_numbers - r.used_numbers) >= selectedQty &&
+                        selectedQty > 0 &&
+                        !r.requester_name?.includes('Professionnel')
+                      );
+                      return filtered.length > 0 ? filtered.map((range) => (
+                        <button
+                          key={range.id}
+                          type="button"
+                          className="w-full text-left px-3 py-2 hover:bg-accent transition-colors border-b last:border-b-0"
+                          onClick={() => {
+                            setSelectedSourceRange(range);
+                            setShowSourceRangeDropdown(false);
+                          }}
+                        >
+                          <div className="flex flex-col">
+                            <span className="font-medium text-sm">{range.range_start} → {range.range_end}</span>
+                            <span className="text-xs text-muted-foreground">
+                              {range.total_numbers - range.used_numbers} numéros disponibles sur {range.total_numbers} • {range.notes}
+                            </span>
                           </div>
-                        );
-                      })()}
-                    </div>
-                  </>,
-                  document.body
+                        </button>
+                      )) : (
+                        <div className="px-3 py-2 text-sm text-muted-foreground">
+                          {selectedQty === 0 
+                            ? "Veuillez d'abord sélectionner le nombre de numéros"
+                            : `Aucune plage disponible avec au moins ${selectedQty} numéros pour ce type`}
+                        </div>
+                      );
+                    })()}
+                  </div>
                 )}
               </div>
             </div>
@@ -897,8 +867,8 @@ export const ReservedRangesManager = () => {
               </Button>
             </div>
           </div>
-        </ScrollableDialogContent>
-      </ScrollableDialog>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
