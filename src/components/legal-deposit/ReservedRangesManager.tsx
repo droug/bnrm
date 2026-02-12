@@ -381,7 +381,7 @@ export const ReservedRangesManager = () => {
         <div className="flex items-center gap-2">
           <Button onClick={() => setIsAddDialogOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
-            Réserver une tranche
+            Attribuer une tranche
           </Button>
         </div>
       </div>
@@ -554,11 +554,11 @@ export const ReservedRangesManager = () => {
         ))}
       </Tabs>
 
-      {/* Dialog pour réserver une tranche */}
+      {/* Dialog pour attribuer une tranche */}
       <ScrollableDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <ScrollableDialogContent className="max-w-2xl">
           <ScrollableDialogHeader>
-            <ScrollableDialogTitle>Réserver une tranche de numéros</ScrollableDialogTitle>
+            <ScrollableDialogTitle>Attribuer une tranche de numéros</ScrollableDialogTitle>
           </ScrollableDialogHeader>
           <div className="space-y-4 p-6">
             <div className="grid grid-cols-2 gap-4">
