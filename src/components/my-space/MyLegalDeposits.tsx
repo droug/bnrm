@@ -8,7 +8,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, Clock, BookOpen, CheckCircle, AlertCircle, Edit, Eye, Award, XCircle, History, ChevronDown, ChevronUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
 import { ActivityTimeline } from "./ActivityTimeline";
 import { Collapsible, CollapsibleContent } from "@/components/ui/collapsible";
 
@@ -35,7 +36,7 @@ export function MyLegalDeposits() {
   const [deposits, setDeposits] = useState<LegalDepositRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedDeposit, setSelectedDeposit] = useState<LegalDepositRequest | null>(null);
-  const [showDetailsDialog, setShowDetailsDialog] = useState(false);
+  const [showDetailsSheet, setShowDetailsSheet] = useState(false);
   const [expandedDeposits, setExpandedDeposits] = useState<Set<string>>(new Set());
 
   const toggleExpand = (id: string) => {
@@ -198,7 +199,7 @@ export function MyLegalDeposits() {
 
   const handleViewDetails = (deposit: LegalDepositRequest) => {
     setSelectedDeposit(deposit);
-    setShowDetailsDialog(true);
+    setShowDetailsSheet(true);
   };
 
   const handleEditDraft = (deposit: LegalDepositRequest) => {
@@ -440,66 +441,188 @@ export function MyLegalDeposits() {
         </CardContent>
       </Card>
 
-      {/* Dialog pour les détails */}
-      <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Détails du dépôt légal</DialogTitle>
-            <DialogDescription>
+      {/* Sheet latéral pour les détails */}
+      <Sheet open={showDetailsSheet} onOpenChange={setShowDetailsSheet}>
+        <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Détails du dépôt légal</SheetTitle>
+            <SheetDescription>
               Demande N° {selectedDeposit?.request_number}
-            </DialogDescription>
-          </DialogHeader>
+            </SheetDescription>
+          </SheetHeader>
           {selectedDeposit && (
-            <div className="space-y-4 py-4">
-              <div>
-                <h4 className="font-semibold mb-2">Informations générales</h4>
-                <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="space-y-6 py-6">
+              {/* Statut */}
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-muted-foreground">Statut</span>
+                {getStatusBadge(selectedDeposit.status)}
+              </div>
+
+              <Separator />
+
+              {/* Informations générales */}
+              <div className="space-y-4">
+                <h4 className="font-semibold text-base">Informations générales</h4>
+                <div className="space-y-3">
                   <div>
-                    <span className="text-muted-foreground">Titre:</span>
+                    <span className="text-sm text-muted-foreground">Titre</span>
                     <p className="font-medium">{selectedDeposit.title}</p>
                   </div>
                   {selectedDeposit.author_name && (
                     <div>
-                      <span className="text-muted-foreground">Auteur:</span>
+                      <span className="text-sm text-muted-foreground">Auteur</span>
                       <p className="font-medium">{selectedDeposit.author_name}</p>
                     </div>
                   )}
                   <div>
-                    <span className="text-muted-foreground">Type de support:</span>
+                    <span className="text-sm text-muted-foreground">Type de support</span>
                     <p className="font-medium">{selectedDeposit.support_type}</p>
                   </div>
-                  <div>
-                    <span className="text-muted-foreground">Statut:</span>
-                    <div className="mt-1">{getStatusBadge(selectedDeposit.status)}</div>
-                  </div>
+                  {selectedDeposit.metadata?.depositType && (
+                    <div>
+                      <span className="text-sm text-muted-foreground">Type de dépôt</span>
+                      <p className="font-medium">
+                        {selectedDeposit.metadata.depositType === 'monographie' ? 'Livres' :
+                         selectedDeposit.metadata.depositType === 'periodique' ? 'Périodiques' :
+                         selectedDeposit.metadata.depositType === 'bd_logiciels' ? 'Audio-visuel & Logiciels' :
+                         selectedDeposit.metadata.depositType === 'collections_specialisees' ? 'Collections Spécialisées' :
+                         selectedDeposit.metadata.depositType}
+                      </p>
+                    </div>
+                  )}
                   {selectedDeposit.dl_number && (
                     <div>
-                      <span className="text-muted-foreground">Numéro DL:</span>
-                      <p className="font-medium">{selectedDeposit.dl_number}</p>
+                      <span className="text-sm text-muted-foreground">Numéro DL</span>
+                      <p className="font-medium text-lg">{selectedDeposit.dl_number}</p>
                     </div>
                   )}
                 </div>
               </div>
-              
-              <div>
-                <h4 className="font-semibold mb-2">Dates</h4>
-                <div className="grid grid-cols-2 gap-2 text-sm">
+
+              <Separator />
+
+              {/* Éditeur */}
+              {selectedDeposit.metadata?.editor?.name && (
+                <>
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-base">Éditeur</h4>
+                    <div className="space-y-3">
+                      <div>
+                        <span className="text-sm text-muted-foreground">Nom</span>
+                        <p className="font-medium">{selectedDeposit.metadata.editor.name}</p>
+                      </div>
+                      {selectedDeposit.metadata.editor.email && (
+                        <div>
+                          <span className="text-sm text-muted-foreground">Email</span>
+                          <p className="font-medium">{selectedDeposit.metadata.editor.email}</p>
+                        </div>
+                      )}
+                      {selectedDeposit.metadata.editor.country && (
+                        <div>
+                          <span className="text-sm text-muted-foreground">Pays</span>
+                          <p className="font-medium">{selectedDeposit.metadata.editor.country}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <Separator />
+                </>
+              )}
+
+              {/* Imprimeur */}
+              {selectedDeposit.metadata?.printer?.name && (
+                <>
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-base">Imprimeur</h4>
+                    <div className="space-y-3">
+                      <div>
+                        <span className="text-sm text-muted-foreground">Nom</span>
+                        <p className="font-medium">{selectedDeposit.metadata.printer.name}</p>
+                      </div>
+                      {selectedDeposit.metadata.printer.email && (
+                        <div>
+                          <span className="text-sm text-muted-foreground">Email</span>
+                          <p className="font-medium">{selectedDeposit.metadata.printer.email}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <Separator />
+                </>
+              )}
+
+              {/* Dates */}
+              <div className="space-y-4">
+                <h4 className="font-semibold text-base">Dates</h4>
+                <div className="space-y-3">
                   <div>
-                    <span className="text-muted-foreground">Créé le:</span>
+                    <span className="text-sm text-muted-foreground">Date de création</span>
                     <p className="font-medium">{formatDate(selectedDeposit.created_at)}</p>
                   </div>
                   {selectedDeposit.submission_date && (
                     <div>
-                      <span className="text-muted-foreground">Soumis le:</span>
+                      <span className="text-sm text-muted-foreground">Date de soumission</span>
                       <p className="font-medium">{formatDate(selectedDeposit.submission_date)}</p>
                     </div>
                   )}
                 </div>
               </div>
+
+              {/* Numéro DL attribué */}
+              {selectedDeposit.status === 'attribue' && selectedDeposit.dl_number && (
+                <>
+                  <Separator />
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <div className="flex items-start gap-2">
+                      <Award className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold text-green-900 text-sm mb-1">Numéro de dépôt légal attribué</h4>
+                        <p className="text-sm text-green-800">
+                          Votre numéro DL: <span className="font-bold">{selectedDeposit.dl_number}</span>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Rejet */}
+              {(selectedDeposit.status === 'rejete_par_b' || selectedDeposit.status === 'rejete_par_comite' || selectedDeposit.status === 'rejete') && selectedDeposit.rejection_reason && (
+                <>
+                  <Separator />
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-base text-destructive">Motif de rejet</h4>
+                    <p className="text-sm bg-destructive/10 p-3 rounded">{selectedDeposit.rejection_reason}</p>
+                  </div>
+                </>
+              )}
+
+              {/* Commentaires */}
+              {selectedDeposit.validation_comments && (
+                <>
+                  <Separator />
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-base">Commentaires de validation</h4>
+                    <p className="text-sm bg-muted p-3 rounded">{selectedDeposit.validation_comments}</p>
+                  </div>
+                </>
+              )}
+
+              <Separator />
+
+              {/* Historique */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-base">Historique des opérations</h4>
+                <ActivityTimeline 
+                  resourceType="legal_deposit" 
+                  resourceId={selectedDeposit.id} 
+                  compact 
+                />
+              </div>
             </div>
           )}
-        </DialogContent>
-      </Dialog>
+        </SheetContent>
+      </Sheet>
     </>
   );
 }

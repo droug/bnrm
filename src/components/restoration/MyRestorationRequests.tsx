@@ -5,10 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { AlertCircle, CheckCircle, Clock, DollarSign, FileText, Package, Wrench, Download, Check, X, Upload, Trash2, CreditCard, Building, Coins, History, ChevronDown, ChevronUp } from "lucide-react";
+import { AlertCircle, CheckCircle, Clock, DollarSign, FileText, Package, Wrench, Download, Check, X, Upload, Trash2, CreditCard, Building, Coins, History, ChevronDown, ChevronUp, Eye } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
 import { useEffect, useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -46,6 +48,8 @@ export function MyRestorationRequests() {
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<Record<string, string>>({});
   const [expandedRequests, setExpandedRequests] = useState<Set<string>>(new Set());
+  const [detailsRequest, setDetailsRequest] = useState<RestorationRequest | null>(null);
+  const [showDetailsSheet, setShowDetailsSheet] = useState(false);
 
   const toggleExpand = (id: string) => {
     setExpandedRequests(prev => {
@@ -777,63 +781,18 @@ export function MyRestorationRequests() {
                         </div>
                       )}
 
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="outline" size="sm" className="w-full">
-                            Voir les détails
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-2xl">
-                          <DialogHeader>
-                            <DialogTitle>Détails de la demande {request.request_number}</DialogTitle>
-                            <DialogDescription>
-                              Informations complètes sur votre demande de restauration
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="space-y-4">
-                            <div>
-                              <h4 className="font-semibold mb-2">Manuscrit</h4>
-                              <p className="text-sm">{request.manuscript_title}</p>
-                              <p className="text-sm text-muted-foreground">Cote: {request.manuscript_cote}</p>
-                            </div>
-                            <div>
-                              <h4 className="font-semibold mb-2">Description des dommages</h4>
-                              <p className="text-sm">{request.damage_description}</p>
-                            </div>
-                            <div className="flex gap-4">
-                              <div className="flex-1">
-                                <h4 className="font-semibold mb-2">Statut</h4>
-                                {getStatusBadge(request.status)}
-                              </div>
-                              <div className="flex-1">
-                                <h4 className="font-semibold mb-2">Urgence</h4>
-                                {getUrgencyBadge(request.urgency_level)}
-                              </div>
-                            </div>
-                            {request.payment_method && (
-                              <div>
-                                <h4 className="font-semibold mb-2">Modalité de paiement</h4>
-                                <Badge variant="outline" className="text-sm">
-                                  {request.payment_method === 'en_ligne' && 'Paiement en ligne'}
-                                  {request.payment_method === 'virement' && 'Virement bancaire'}
-                                  {request.payment_method === 'virement_en_ligne' && 'Virement bancaire en ligne'}
-                                  {request.payment_method === 'carte_guichet' && 'Carte au guichet sur place'}
-                                  {request.payment_method === 'espece' && 'Espèce'}
-                                  {request.payment_method === 'cheque' && 'Chèque'}
-                                </Badge>
-                              </div>
-                            )}
-                            {request.restoration_report && (
-                              <div>
-                                <h4 className="font-semibold mb-2">Rapport de restauration</h4>
-                                <p className="text-sm whitespace-pre-wrap bg-muted p-3 rounded">
-                                  {request.restoration_report}
-                                </p>
-                              </div>
-                            )}
-                          </div>
-                        </DialogContent>
-                      </Dialog>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="w-full"
+                        onClick={() => {
+                          setDetailsRequest(request);
+                          setShowDetailsSheet(true);
+                        }}
+                      >
+                        <Eye className="h-4 w-4 mr-2" />
+                        Voir les détails
+                      </Button>
                     </div>
 
                     {/* Timeline des opérations */}
@@ -921,6 +880,132 @@ export function MyRestorationRequests() {
           </DialogContent>
         </Dialog>
       </CardContent>
+
+      {/* Sheet latéral pour les détails */}
+      <Sheet open={showDetailsSheet} onOpenChange={setShowDetailsSheet}>
+        <SheetContent className="w-full sm:max-w-lg overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle>Détails de la demande</SheetTitle>
+            <SheetDescription>
+              Demande N° {detailsRequest?.request_number}
+            </SheetDescription>
+          </SheetHeader>
+          {detailsRequest && (
+            <div className="space-y-6 py-6">
+              {/* Statut et urgence */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {getStatusBadge(detailsRequest.status)}
+                  {getUrgencyBadge(detailsRequest.urgency_level)}
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Manuscrit */}
+              <div className="space-y-4">
+                <h4 className="font-semibold text-base">Manuscrit</h4>
+                <div className="space-y-3">
+                  <div>
+                    <span className="text-sm text-muted-foreground">Titre</span>
+                    <p className="font-medium">{detailsRequest.manuscript_title}</p>
+                  </div>
+                  <div>
+                    <span className="text-sm text-muted-foreground">Cote</span>
+                    <p className="font-medium">{detailsRequest.manuscript_cote}</p>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Description des dommages */}
+              <div className="space-y-2">
+                <h4 className="font-semibold text-base">Description des dommages</h4>
+                <p className="text-sm bg-muted p-3 rounded whitespace-pre-wrap">{detailsRequest.damage_description}</p>
+              </div>
+
+              <Separator />
+
+              {/* Devis */}
+              {detailsRequest.quote_amount && (
+                <>
+                  <div className="space-y-4">
+                    <h4 className="font-semibold text-base">Devis</h4>
+                    <div className="space-y-3">
+                      <div>
+                        <span className="text-sm text-muted-foreground">Montant</span>
+                        <p className="font-medium text-lg">{detailsRequest.quote_amount} DH</p>
+                      </div>
+                      {detailsRequest.estimated_duration && (
+                        <div>
+                          <span className="text-sm text-muted-foreground">Durée estimée</span>
+                          <p className="font-medium">{detailsRequest.estimated_duration} jours</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <Separator />
+                </>
+              )}
+
+              {/* Paiement */}
+              {detailsRequest.payment_method && (
+                <>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-base">Modalité de paiement</h4>
+                    <Badge variant="outline" className="text-sm">
+                      {detailsRequest.payment_method === 'en_ligne' && 'Paiement en ligne'}
+                      {detailsRequest.payment_method === 'virement' && 'Virement bancaire'}
+                      {detailsRequest.payment_method === 'virement_en_ligne' && 'Virement bancaire en ligne'}
+                      {detailsRequest.payment_method === 'carte_guichet' && 'Carte au guichet sur place'}
+                      {detailsRequest.payment_method === 'espece' && 'Espèce'}
+                      {detailsRequest.payment_method === 'cheque' && 'Chèque'}
+                    </Badge>
+                  </div>
+                  <Separator />
+                </>
+              )}
+
+              {/* Rapport */}
+              {detailsRequest.restoration_report && (
+                <>
+                  <div className="space-y-2">
+                    <h4 className="font-semibold text-base">Rapport de restauration</h4>
+                    <p className="text-sm whitespace-pre-wrap bg-muted p-3 rounded">
+                      {detailsRequest.restoration_report}
+                    </p>
+                  </div>
+                  <Separator />
+                </>
+              )}
+
+              {/* Dates */}
+              <div className="space-y-4">
+                <h4 className="font-semibold text-base">Dates</h4>
+                <div className="space-y-3">
+                  <div>
+                    <span className="text-sm text-muted-foreground">Date de soumission</span>
+                    <p className="font-medium">{format(new Date(detailsRequest.submitted_at), "d MMMM yyyy", { locale: fr })}</p>
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
+              {/* Historique */}
+              <div className="space-y-3">
+                <h4 className="font-semibold text-base">Historique des opérations</h4>
+                <ActivityTimeline 
+                  resourceType="restoration" 
+                  resourceId={detailsRequest.id} 
+                  compact 
+                />
+              </div>
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </Card>
   );
 }
