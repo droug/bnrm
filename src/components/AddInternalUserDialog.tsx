@@ -118,7 +118,12 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
 
       const result = response.data;
       if (result?.error) {
-        throw new Error(result.error);
+        // Traduire les erreurs connues en français
+        const errorMsg = result.error;
+        if (errorMsg.includes('already been registered') || errorMsg.includes('email_exists')) {
+          throw new Error("Un utilisateur avec cette adresse e-mail existe déjà. Veuillez utiliser une autre adresse.");
+        }
+        throw new Error(errorMsg);
       }
 
       toast({
