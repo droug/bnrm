@@ -205,6 +205,8 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         if (metadata.directorPseudonym) setDirectorPseudonym(metadata.directorPseudonym);
         if (metadata.directorRegion) setDirectorRegion(metadata.directorRegion);
         if (metadata.directorCity) setDirectorCity(metadata.directorCity);
+        if (metadata.periodicalPublicationType) setPeriodicalPublicationType(metadata.periodicalPublicationType);
+        if (metadata.fasciculeNumber) setFasciculeNumber(metadata.fasciculeNumber);
         
         // Charger les documents déjà uploadés
         if (data.documents_urls && typeof data.documents_urls === 'object' && !Array.isArray(data.documents_urls)) {
@@ -308,6 +310,8 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
     parentSelectedValue: publicationType,
     enabled: depositType === 'bd_logiciels' && !!publicationType
   });
+  const [periodicalPublicationType, setPeriodicalPublicationType] = useState<string>("");
+  const [fasciculeNumber, setFasciculeNumber] = useState<string>("");
   const [isIssnModalOpen, setIsIssnModalOpen] = useState(false);
   const [issnSubmitted, setIssnSubmitted] = useState(false);
   const [issnFormData, setIssnFormData] = useState({
@@ -1940,6 +1944,8 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                 <div className="space-y-2">
                   <Label>Type de publication</Label>
                   <InlineSelect
+                    value={periodicalPublicationType}
+                    onChange={setPeriodicalPublicationType}
                     placeholder="Sélectionner le type"
                     options={publicationTypePeriodicalOptions.filter(opt => 
                       opt.label.toLowerCase() !== "monographie simple"
@@ -1980,8 +1986,8 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                 <div className="space-y-2">
                   <Label>Type de support</Label>
                   <InlineSelect
-                    value={formData.supportType}
-                    onChange={(value) => setFormData({ ...formData, supportType: value })}
+                    value={supportType}
+                    onChange={setSupportType}
                     placeholder="Sélectionner le type"
                     options={[
                       { value: "printed", label: "Imprimé" },
@@ -1990,7 +1996,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                   />
                 </div>
 
-                {formData.supportType === "electronic" && (
+                {supportType === "electronic" && (
                   <div className="space-y-2">
                     <Label>URL Opérationnelle</Label>
                     <Input 
@@ -2015,7 +2021,11 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
 
                 <div className="space-y-2">
                   <Label>Fascicule N°</Label>
-                  <Input placeholder="Numéro du fascicule" />
+                  <Input 
+                    placeholder="Numéro du fascicule"
+                    value={fasciculeNumber}
+                    onChange={(e) => setFasciculeNumber(e.target.value)}
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -4187,6 +4197,8 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           directorPseudonym,
           directorRegion,
           directorCity,
+          periodicalPublicationType,
+          fasciculeNumber,
         }
       };
 
@@ -4403,6 +4415,8 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           directorPseudonym,
           directorRegion,
           directorCity,
+          periodicalPublicationType,
+          fasciculeNumber,
         }
       };
       
