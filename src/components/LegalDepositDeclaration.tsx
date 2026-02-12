@@ -4632,6 +4632,23 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
             <Button variant="ghost" onClick={() => setCurrentStep("type_selection")}>
               {language === 'ar' ? 'رجوع' : 'Retour'}
             </Button>
+            <Button 
+              variant="secondary"
+              onClick={handleSaveDraft}
+              disabled={isSavingDraft}
+            >
+              {isSavingDraft ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {language === 'ar' ? 'جارٍ الحفظ...' : 'Enregistrement...'}
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  {language === 'ar' ? 'حفظ' : 'Enregistrer'}
+                </>
+              )}
+            </Button>
             <Button onClick={() => handleAuthentication(isBDLogiciels ? "producer" : "editor", {
               name: editorData.name || "",
               address: editorData.address || "",
@@ -4795,6 +4812,23 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           <div className="flex gap-2">
             <Button variant="ghost" onClick={() => setCurrentStep(isFirstRole ? "editor_auth" : "type_selection")}>
               {language === 'ar' ? 'رجوع' : 'Retour'}
+            </Button>
+            <Button 
+              variant="secondary"
+              onClick={handleSaveDraft}
+              disabled={isSavingDraft}
+            >
+              {isSavingDraft ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {language === 'ar' ? 'جارٍ الحفظ...' : 'Enregistrement...'}
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  {language === 'ar' ? 'حفظ' : 'Enregistrer'}
+                </>
+              )}
             </Button>
             <Button onClick={() => handleAuthentication(isBDLogiciels ? "distributor" : "printer", {
               name: printerData.name || "",
