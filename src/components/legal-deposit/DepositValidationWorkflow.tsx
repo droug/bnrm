@@ -1697,16 +1697,6 @@ export function DepositValidationWorkflow() {
                                             Attribué
                                           </Badge>
                                         )}
-                                        {request.validated_by_department && (
-                                          <Button
-                                            size="sm"
-                                            variant="ghost"
-                                            onClick={() => generateAccuseReception(request)}
-                                            title="Télécharger l'accusé de réception"
-                                          >
-                                            <Download className="h-4 w-4" />
-                                          </Button>
-                                        )}
                                       </>
                                     )}
                                   </div>
