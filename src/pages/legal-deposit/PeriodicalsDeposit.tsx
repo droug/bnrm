@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LegalDepositDeclaration from "@/components/LegalDepositDeclaration";
@@ -11,11 +12,19 @@ import { LegalDepositInfoCard } from "@/components/legal-deposit/LegalDepositInf
 import { WatermarkContainer } from "@/components/ui/watermark";
 
 export default function PeriodicalsDeposit() {
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get('edit');
   const [showForm, setShowForm] = useState(false);
   const [showUserTypeModal, setShowUserTypeModal] = useState(false);
   const [showAuthChoiceModal, setShowAuthChoiceModal] = useState(false);
   const [selectedUserType, setSelectedUserType] = useState<"editeur" | "imprimeur">("editeur");
   const { user } = useAuth();
+
+  useEffect(() => {
+    if (editId && user) {
+      setShowForm(true);
+    }
+  }, [editId, user]);
 
   const handleStartDeclaration = () => {
     setShowUserTypeModal(true);
@@ -39,7 +48,8 @@ export default function PeriodicalsDeposit() {
       <LegalDepositDeclaration 
         depositType="periodique" 
         onClose={() => setShowForm(false)}
-        initialUserType={mappedUserType}
+        initialUserType={editId ? "editor" : mappedUserType}
+        editId={editId}
       />
     );
   }

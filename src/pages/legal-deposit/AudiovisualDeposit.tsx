@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import LegalDepositDeclaration from "@/components/LegalDepositDeclaration";
@@ -11,10 +12,18 @@ import { LegalDepositInfoCard } from "@/components/legal-deposit/LegalDepositInf
 import { WatermarkContainer } from "@/components/ui/watermark";
 
 export default function AudiovisualDeposit() {
+  const [searchParams] = useSearchParams();
+  const editId = searchParams.get('edit');
   const [showForm, setShowForm] = useState(false);
   const [showUserTypeModal, setShowUserTypeModal] = useState(false);
   const [showAuthChoiceModal, setShowAuthChoiceModal] = useState(false);
   const { user } = useAuth();
+
+  useEffect(() => {
+    if (editId && user) {
+      setShowForm(true);
+    }
+  }, [editId, user]);
 
   const handleStartDeclaration = () => {
     setShowUserTypeModal(true);
@@ -35,7 +44,8 @@ export default function AudiovisualDeposit() {
       <LegalDepositDeclaration 
         depositType="bd_logiciels" 
         onClose={() => setShowForm(false)}
-        initialUserType="producer"
+        initialUserType={editId ? "producer" : "producer"}
+        editId={editId}
       />
     );
   }
@@ -63,11 +73,12 @@ export default function AudiovisualDeposit() {
         <main className="container mx-auto px-4 py-8">
           <div className="max-w-4xl mx-auto space-y-6">
             <LegalDepositHeader
-              title="Dépôt Légal - Audio-visuel & Logiciels"
-              subtitle="Formulaire de déclaration pour les documents audiovisuels et logiciels"
+              title="Dépôt Légal - Audiovisuel & Logiciels"
+              subtitle="Formulaire de déclaration pour les contenus audiovisuels et logiciels"
               icon={Video}
               iconColorClass="text-purple-600"
               iconBgClass="bg-purple-100 dark:bg-purple-950"
+              warningText="Pour accéder au formulaire de demande de dépôt légal, il est obligatoire de disposer d'un compte Producteur"
             />
 
             <div className="grid gap-6">
@@ -76,7 +87,6 @@ export default function AudiovisualDeposit() {
                 icon={Video}
                 buttonLabel="Commencer la déclaration"
                 onStartDeclaration={handleStartDeclaration}
-                showReciprocalWarning={false}
               />
             </div>
           </div>
@@ -93,7 +103,7 @@ export default function AudiovisualDeposit() {
         <AuthChoiceModal
           open={showAuthChoiceModal}
           onOpenChange={setShowAuthChoiceModal}
-          userType="producteur"
+          userType="editeur"
           redirectPath="/depot-legal/audiovisuel"
         />
       </div>
