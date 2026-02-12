@@ -187,7 +187,9 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         if (metadata.authors && Array.isArray(metadata.authors)) setAuthors(metadata.authors);
         if (metadata.declarationNature) setDeclarationNature(metadata.declarationNature);
         if (metadata.authorStatus) setAuthorStatus(metadata.authorStatus);
-        if (metadata.selectedDiscipline) setSelectedDiscipline(metadata.selectedDiscipline);
+        if (metadata.selectedDiscipline) { setSelectedDiscipline(metadata.selectedDiscipline); setDisciplineSearch(metadata.selectedDiscipline); }
+        if (metadata.collectionNumber) setCollectionNumber(metadata.collectionNumber);
+        if (metadata.numberOfPages) setNumberOfPages(metadata.numberOfPages);
         if (metadata.targetAudience) setTargetAudience(metadata.targetAudience);
         if (metadata.targetAudienceOther) setTargetAudienceOther(metadata.targetAudienceOther);
         if (metadata.selectedLanguages && Array.isArray(metadata.selectedLanguages)) setSelectedLanguages(metadata.selectedLanguages);
@@ -284,6 +286,8 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
   const [hasScale, setHasScale] = useState<string>("");
   const [hasLegend, setHasLegend] = useState<string>("");
   const [collectionTitle, setCollectionTitle] = useState<string>("");
+  const [collectionNumber, setCollectionNumber] = useState<string>("");
+  const [numberOfPages, setNumberOfPages] = useState<string>("");
   const [periodicity, setPeriodicity] = useState<string>("");
   const [printRun, setPrintRun] = useState<string>("");
   const [supportType, setSupportType] = useState<string>("");
@@ -1362,7 +1366,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
 
                 <div className="space-y-2">
                   <Label>Numéro dans la collection</Label>
-                  <Input placeholder="Numéro dans la collection" />
+                  <Input placeholder="Numéro dans la collection" value={collectionNumber} onChange={(e) => setCollectionNumber(e.target.value)} />
                 </div>
 
                 <div className="space-y-2">
@@ -1471,7 +1475,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
 
                 <div className="space-y-2">
                   <Label>Nombre de pages</Label>
-                  <Input type="number" placeholder="Nombre de pages" />
+                  <Input type="number" placeholder="Nombre de pages" value={numberOfPages} onChange={(e) => setNumberOfPages(e.target.value)} />
                 </div>
               </div>
             </div>
@@ -4160,6 +4164,8 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           hasScale,
           hasLegend,
           collectionTitle,
+          collectionNumber,
+          numberOfPages,
           authors,
           declarationNature,
           authorStatus,
