@@ -19,6 +19,8 @@ import {
 } from "lucide-react";
 import { format, subDays, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { fr } from "date-fns/locale";
+import jsPDF from "jspdf";
+import { addBNRMHeader } from "@/lib/pdfHeaderUtils";
 
 interface StatusLevel {
   main: string;
@@ -276,49 +278,221 @@ export const BNRMStatistics = () => {
     color: TYPE_COLORS[name as keyof typeof TYPE_COLORS]
   }));
 
-  const exportStatistics = () => {
-    const csvContent = [
-      ['Type de statistique', 'Valeur'],
-      ['Demandes totales', stats.totalRequests],
-      ['Temps moyen de traitement (jours)', stats.averageProcessingTime],
-      ['Auteurs secondaires', stats.secondaryAuthors],
-      ['Doublons détectés', stats.duplicatesDetected],
-      [''],
-      ['Répartition par statut (2 niveaux)'],
-      ['Statut principal', 'Sous-statut', 'Nombre'],
-      ...stats.byStatusTwoLevels.map(s => [s.main, s.sub, s.count]),
-      [''],
-      ['Répartition par statut'],
-      ...statusData.map(s => [`Statut: ${s.name}`, s.value]),
-      [''],
-      ['Répartition par type'],
-      ...typeData.map(t => [`Type: ${t.name}`, t.value]),
-      [''],
-      ['Prévisions d\'édition par an'],
-      ...stats.editionForecasts.map(f => [`Année ${f.year}`, f.count]),
-      [''],
-      ['Nationalité des auteurs'],
-      ...Object.entries(stats.byAuthorNationality).map(([nat, count]) => [nat, count]),
-      [''],
-      ['Genre des auteurs'],
-      ...Object.entries(stats.byAuthorGender).map(([genre, count]) => [genre, count]),
-      [''],
-      ['Validations réciproques éditeur-imprimeur'],
-      ['Éditeur', 'Imprimeur', 'Statut', 'Date'],
-      ...stats.reciprocalValidations.map(v => [
-        v.editor, 
-        v.printer, 
-        v.validated ? 'Validé' : 'En attente',
-        format(new Date(v.date), 'dd/MM/yyyy')
-      ])
-    ].map(row => Array.isArray(row) ? row.join(',') : row).join('\n');
+  const exportStatistics = async () => {
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `statistiques-bnrm-${format(new Date(), 'yyyy-MM-dd')}.csv`;
-    a.click();
+    // En-tête BNRM
+    await addBNRMHeader(doc);
+
+    // Titre du rapport
+    let y = 50;
+    doc.setFillColor(0, 51, 102);
+    doc.roundedRect(15, y, pageWidth - 30, 18, 3, 3, 'F');
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(255, 255, 255);
+    doc.text("RAPPORT STATISTIQUE - DÉPÔT LÉGAL", pageWidth / 2, y + 12, { align: 'center' });
+
+    y += 26;
+    doc.setFontSize(9);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.text(`Rapport généré le ${format(new Date(), "dd MMMM yyyy 'à' HH:mm", { locale: fr })}`, pageWidth / 2, y, { align: 'center' });
+
+    // --- Section KPIs ---
+    y += 12;
+    doc.setFillColor(240, 245, 255);
+    doc.roundedRect(15, y, pageWidth - 30, 30, 2, 2, 'F');
+    doc.setDrawColor(0, 51, 102);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(15, y, pageWidth - 30, 30, 2, 2, 'S');
+
+    const kpis = [
+      { label: "Total demandes", value: stats.totalRequests.toString(), color: [59, 130, 246] },
+      { label: "En attente", value: (stats.byStatus['soumis'] || 0).toString(), color: [249, 115, 22] },
+      { label: "Traités", value: (stats.byStatus['traite'] || 0).toString(), color: [16, 185, 129] },
+      { label: "Temps moyen", value: `${stats.averageProcessingTime}j`, color: [139, 92, 246] },
+      { label: "Doublons", value: stats.duplicatesDetected.toString(), color: [239, 68, 68] },
+    ];
+
+    const kpiWidth = (pageWidth - 30) / kpis.length;
+    kpis.forEach((kpi, i) => {
+      const kpiX = 15 + i * kpiWidth;
+      doc.setFontSize(18);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(kpi.color[0], kpi.color[1], kpi.color[2]);
+      doc.text(kpi.value, kpiX + kpiWidth / 2, y + 14, { align: 'center' });
+      doc.setFontSize(7);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(100, 100, 100);
+      doc.text(kpi.label, kpiX + kpiWidth / 2, y + 22, { align: 'center' });
+    });
+
+    // --- Section Répartition par statut (2 niveaux) ---
+    y += 40;
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(0, 51, 102);
+    doc.text("Répartition par statut (2 niveaux)", 15, y);
+    y += 2;
+    doc.setDrawColor(0, 51, 102);
+    doc.setLineWidth(0.8);
+    doc.line(15, y, 100, y);
+
+    y += 8;
+    const mainStatuses = ['Soumise', 'En cours', 'Attente', 'Attribué', 'Rejeté'];
+    const mainColors: Record<string, number[]> = {
+      'Soumise': [59, 130, 246],
+      'En cours': [99, 102, 241],
+      'Attente': [245, 158, 11],
+      'Attribué': [16, 185, 129],
+      'Rejeté': [239, 68, 68]
+    };
+
+    // Table header
+    doc.setFillColor(0, 51, 102);
+    doc.rect(15, y, pageWidth - 30, 8, 'F');
+    doc.setFontSize(8);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(255, 255, 255);
+    doc.text("Statut principal", 20, y + 5.5);
+    doc.text("Sous-statut", 75, y + 5.5);
+    doc.text("Nombre", pageWidth - 25, y + 5.5, { align: 'right' });
+    y += 8;
+
+    stats.byStatusTwoLevels.forEach((status, idx) => {
+      const bgColor = idx % 2 === 0 ? [248, 250, 252] : [255, 255, 255];
+      doc.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
+      doc.rect(15, y, pageWidth - 30, 7, 'F');
+      
+      // Color indicator
+      const mc = mainColors[status.main] || [107, 114, 128];
+      doc.setFillColor(mc[0], mc[1], mc[2]);
+      doc.roundedRect(17, y + 1.5, 3, 4, 1, 1, 'F');
+
+      doc.setFontSize(8);
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(mc[0], mc[1], mc[2]);
+      doc.text(status.main, 23, y + 5);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(60, 60, 60);
+      doc.text(status.sub, 75, y + 5);
+      doc.setFont(undefined, 'bold');
+      doc.text(status.count.toString(), pageWidth - 25, y + 5, { align: 'right' });
+      y += 7;
+    });
+
+    // --- Section Répartition par type ---
+    y += 10;
+    if (y > pageHeight - 80) {
+      doc.addPage();
+      y = 20;
+    }
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(0, 51, 102);
+    doc.text("Répartition par type de document", 15, y);
+    y += 2;
+    doc.setDrawColor(0, 51, 102);
+    doc.setLineWidth(0.8);
+    doc.line(15, y, 120, y);
+    y += 8;
+
+    const typeColors: Record<string, number[]> = {
+      'Monographie': [99, 102, 241],
+      'Périodique': [236, 72, 153],
+      'Audiovisuel': [245, 158, 11],
+      'Numérique': [16, 185, 129]
+    };
+
+    typeData.forEach((td, idx) => {
+      const barWidth = Math.min((td.value / (stats.totalRequests || 1)) * (pageWidth - 100), pageWidth - 100);
+      const tc = typeColors[td.name] || [107, 114, 128];
+      
+      doc.setFontSize(9);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(60, 60, 60);
+      doc.text(td.name, 20, y + 4);
+      
+      // Bar background
+      doc.setFillColor(240, 240, 240);
+      doc.roundedRect(65, y, pageWidth - 100, 6, 2, 2, 'F');
+      // Bar fill
+      if (barWidth > 0) {
+        doc.setFillColor(tc[0], tc[1], tc[2]);
+        doc.roundedRect(65, y, Math.max(barWidth, 4), 6, 2, 2, 'F');
+      }
+      
+      doc.setFont(undefined, 'bold');
+      doc.setTextColor(tc[0], tc[1], tc[2]);
+      doc.text(`${td.value}`, pageWidth - 18, y + 4, { align: 'right' });
+      y += 10;
+    });
+
+    // --- Section Nationalité & Genre ---
+    y += 8;
+    if (y > pageHeight - 60) {
+      doc.addPage();
+      y = 20;
+    }
+    doc.setFontSize(12);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(0, 51, 102);
+    doc.text("Profil des auteurs", 15, y);
+    y += 2;
+    doc.setDrawColor(0, 51, 102);
+    doc.setLineWidth(0.8);
+    doc.line(15, y, 70, y);
+    y += 8;
+
+    // Nationalités
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(60, 60, 60);
+    doc.text("Nationalité", 20, y);
+    doc.text("Genre", pageWidth / 2 + 10, y);
+    y += 6;
+
+    const natColors = [[59, 130, 246], [16, 185, 129], [245, 158, 11], [239, 68, 68]];
+    Object.entries(stats.byAuthorNationality).forEach(([nat, count], idx) => {
+      doc.setFillColor(natColors[idx % 4][0], natColors[idx % 4][1], natColors[idx % 4][2]);
+      doc.circle(22, y + 1.5, 2, 'F');
+      doc.setFontSize(9);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(60, 60, 60);
+      doc.text(`${nat}: ${count}`, 27, y + 3);
+      y += 7;
+    });
+
+    // Genre (à droite)
+    let yGender = y - Object.keys(stats.byAuthorNationality).length * 7;
+    const genderColors = [[99, 102, 241], [236, 72, 153]];
+    Object.entries(stats.byAuthorGender).forEach(([genre, count], idx) => {
+      doc.setFillColor(genderColors[idx % 2][0], genderColors[idx % 2][1], genderColors[idx % 2][2]);
+      doc.circle(pageWidth / 2 + 12, yGender + 1.5, 2, 'F');
+      doc.setFontSize(9);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(60, 60, 60);
+      doc.text(`${genre}: ${count}`, pageWidth / 2 + 17, yGender + 3);
+      yGender += 7;
+    });
+
+    // --- Footer ---
+    doc.setDrawColor(139, 0, 0);
+    doc.setLineWidth(0.5);
+    doc.line(15, pageHeight - 25, pageWidth - 15, pageHeight - 25);
+    doc.setFontSize(7);
+    doc.setFont(undefined, 'normal');
+    doc.setTextColor(100, 100, 100);
+    doc.text("Bibliothèque Nationale du Royaume du Maroc - Avenue Ibn Battouta, BP 1003, Rabat-Agdal", pageWidth / 2, pageHeight - 20, { align: 'center' });
+    doc.text("Tél: +212 (0)5 37 77 18 74 | Email: contact@bnrm.ma | www.bnrm.ma", pageWidth / 2, pageHeight - 15, { align: 'center' });
+    doc.setFont(undefined, 'italic');
+    doc.setFontSize(6);
+    doc.text("Document généré automatiquement par le système de gestion du dépôt légal", pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+    doc.save(`Statistiques_BNRM_${format(new Date(), 'yyyy-MM-dd')}.pdf`);
   };
 
   return (
