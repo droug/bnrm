@@ -15025,6 +15025,7 @@ export type Database = {
       get_admin_users_with_email: {
         Args: never
         Returns: {
+          account_status: string
           all_roles: Database["public"]["Enums"]["user_role"][]
           created_at: string
           email: string

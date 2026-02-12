@@ -138,9 +138,12 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
       }
 
       const roleNames = selectedRolesInfo.map(r => r.role_name).join(', ');
+      const isReactivated = result?.reactivated;
       toast({
-        title: "Utilisateur créé avec succès",
-        description: `${formData.firstName} ${formData.lastName} a été ajouté avec ${selectedRolesInfo.length > 1 ? 'les rôles' : 'le rôle'} ${roleNames}`,
+        title: isReactivated ? "Compte réactivé avec succès" : "Utilisateur créé avec succès",
+        description: isReactivated 
+          ? `Le compte de ${formData.firstName} ${formData.lastName} a été réactivé avec ${selectedRolesInfo.length > 1 ? 'les rôles' : 'le rôle'} ${roleNames}`
+          : `${formData.firstName} ${formData.lastName} a été ajouté avec ${selectedRolesInfo.length > 1 ? 'les rôles' : 'le rôle'} ${roleNames}`,
       });
 
       resetForm();

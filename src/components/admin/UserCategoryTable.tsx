@@ -21,6 +21,7 @@ interface Profile {
   partner_organization?: string;
   subscription_type?: string;
   email?: string;
+  account_status?: string;
 }
 
 interface RoleOption {
@@ -145,9 +146,13 @@ export function UserCategoryTable({
                 </div>
               </TableCell>
               <TableCell>
-                <Badge variant={userProfile.is_approved ? "default" : "secondary"}>
-                  {userProfile.is_approved ? "Approuvé" : "En attente"}
-                </Badge>
+                {(userProfile as any).account_status === 'deleted' ? (
+                  <Badge variant="destructive">Supprimé</Badge>
+                ) : (
+                  <Badge variant={userProfile.is_approved ? "default" : "secondary"}>
+                    {userProfile.is_approved ? "Approuvé" : "En attente"}
+                  </Badge>
+                )}
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
