@@ -278,6 +278,8 @@ export const NumberImportTab = () => {
                       <SelectValue placeholder="Sélectionner la quantité" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="10">10 numéros</SelectItem>
+                      <SelectItem value="100">100 numéros</SelectItem>
                       <SelectItem value="1000">1000 numéros</SelectItem>
                     </SelectContent>
                   </Select>
