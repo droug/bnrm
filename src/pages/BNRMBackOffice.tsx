@@ -343,9 +343,9 @@ export default function BNRMBackOffice() {
             />
 
             {/* Layout en grille: Navigation sidebar + Contenu */}
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
               {/* Sidebar Navigation */}
-              <div className="lg:col-span-1">
+              <div>
                 <AdminBackOfficeNavigation 
                   activeTab={activeTab}
                   onTabChange={setActiveTab}
@@ -354,7 +354,7 @@ export default function BNRMBackOffice() {
               </div>
 
               {/* Main Content Area */}
-              <div className="lg:col-span-3">
+              <div className="min-w-0">
                 <Card className="border-0 shadow-sm">
                   <CardContent className="p-6">
                     {renderContent()}
