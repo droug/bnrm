@@ -817,7 +817,7 @@ export const ReservedRangesManager = () => {
                       const filtered = reservedRanges.filter(r => 
                         r.number_type === formData.number_type && 
                         r.status === 'active' && 
-                        (r.total_numbers - r.used_numbers) >= selectedQty &&
+                        (r.total_numbers - r.used_numbers) === selectedQty &&
                         selectedQty > 0 &&
                         !r.requester_name?.includes('Professionnel')
                       );
