@@ -612,12 +612,29 @@ export function MyLegalDeposits() {
 
               {/* Pièces jointes */}
               <AttachmentsSection
-                attachments={[
-                  ...(Array.isArray(selectedDeposit.documents_urls) ? selectedDeposit.documents_urls : []).map((url: string, i: number) => ({
-                    label: `Document ${i + 1}`,
-                    url,
-                  })),
-                ]}
+                attachments={(() => {
+                  const docs = selectedDeposit.documents_urls;
+                  if (!docs || typeof docs !== 'object') return [];
+                  if (Array.isArray(docs)) {
+                    return docs.map((url: string, i: number) => ({ label: `Document ${i + 1}`, url }));
+                  }
+                  // documents_urls is an object like { cover: { fileName, url }, cin: { fileName, url }, ... }
+                  const labelMap: Record<string, string> = {
+                    cover: 'Page de couverture',
+                    cin: 'Carte d\'identité (CIN)',
+                    abstract: 'Résumé / Extrait',
+                    summary: 'Sommaire',
+                    justificatif: 'Justificatif',
+                    contract: 'Contrat',
+                    authorization: 'Autorisation',
+                  };
+                  return Object.entries(docs as Record<string, any>)
+                    .filter(([, val]) => val && typeof val === 'object' && val.url)
+                    .map(([key, val]) => ({
+                      label: labelMap[key] || (val.fileName || key),
+                      url: val.url,
+                    }));
+                })()}
               />
 
               <Separator />
