@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { UserPlus, User, Mail, Building, BookOpen, Check, ChevronsUpDown } from "lucide-react";
+import { PasswordStrengthIndicator } from "@/components/ui/password-strength-indicator";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useSystemRoles } from "@/hooks/useSystemRoles";
@@ -72,6 +73,18 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const { validatePassword } = await import("@/lib/passwordValidation");
+    const validation = validatePassword(formData.password);
+    if (!validation.valid) {
+      toast({
+        title: "Mot de passe invalide",
+        description: validation.errors.join(", "),
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -273,8 +286,9 @@ export default function AddInternalUserDialog({ onUserAdded }: AddInternalUserDi
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   required
-                  placeholder="Minimum 6 caractères"
+                  placeholder="Min. 8 car., majuscule, minuscule, chiffre, symbole"
                 />
+                <PasswordStrengthIndicator password={formData.password} />
               </div>
               
               <div>

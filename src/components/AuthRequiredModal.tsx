@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from "@/hooks/useAuth";
 import { Loader2, LogIn, UserPlus } from "lucide-react";
+import { PasswordStrengthIndicator } from "@/components/ui/password-strength-indicator";
 
 interface AuthRequiredModalProps {
   open: boolean;
@@ -56,6 +57,12 @@ export function AuthRequiredModal({
     if (signupPassword !== signupConfirmPassword) {
       return;
     }
+
+    const { validatePassword } = await import("@/lib/passwordValidation");
+    const validation = validatePassword(signupPassword);
+    if (!validation.valid) {
+      return; // useAuth.signUp will also validate, but early return for UX
+    }
     
     setIsLoading(true);
     
@@ -66,7 +73,6 @@ export function AuthRequiredModal({
     setIsLoading(false);
     
     if (!error) {
-      // Switch to login tab after successful signup
       setActiveTab("login");
     }
   };
@@ -172,8 +178,9 @@ export function AuthRequiredModal({
                   value={signupPassword}
                   onChange={(e) => setSignupPassword(e.target.value)}
                   required
-                  minLength={6}
+                  minLength={8}
                 />
+                <PasswordStrengthIndicator password={signupPassword} />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="signup-confirm-password">Confirmer le mot de passe</Label>

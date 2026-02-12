@@ -493,7 +493,7 @@ export default function UsersManager() {
             </div>
             <div>
               <Label>Mot de passe *</Label>
-              <Input type="password" {...register("password", { required: true, minLength: 6 })} />
+              <Input type="password" {...register("password", { required: true, minLength: 8 })} placeholder="Min. 8 car., majuscule, minuscule, chiffre, symbole" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
