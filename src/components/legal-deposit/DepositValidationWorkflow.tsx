@@ -1500,11 +1500,11 @@ export function DepositValidationWorkflow() {
                         <Table className="w-full table-fixed">
                           <TableHeader>
                             <TableRow>
-                              <TableHead className="w-[40%]">Titre</TableHead>
+                              <TableHead className="w-[30%]">Titre</TableHead>
                               <TableHead className="w-[12%]">Support</TableHead>
                               <TableHead className="w-[15%]">Statut</TableHead>
                               <TableHead className="w-[13%]">Date</TableHead>
-                              <TableHead className="w-[20%]">Actions</TableHead>
+                              <TableHead className="w-[30%]">Actions</TableHead>
                             </TableRow>
                           </TableHeader>
                           <TableBody>
