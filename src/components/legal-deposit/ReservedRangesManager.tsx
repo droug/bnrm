@@ -821,45 +821,55 @@ export const ReservedRangesManager = () => {
                   </svg>
                 </button>
                 {showSourceRangeDropdown && createPortal(
-                  <div 
-                    className="bg-popover text-popover-foreground border rounded-md shadow-lg max-h-48 overflow-y-auto"
-                    style={{ position: 'fixed', top: sourceRangeDropdownPos.top, left: sourceRangeDropdownPos.left, width: sourceRangeDropdownPos.width, zIndex: 100001 }}
-                  >
-                    {(() => {
-                      const selectedQty = parseInt(formData.quantity) || 0;
-                      const filtered = reservedRanges.filter(r => 
-                        r.number_type === formData.number_type && 
-                        r.status === 'active' && 
-                        (r.total_numbers - r.used_numbers) >= selectedQty &&
-                        selectedQty > 0 &&
-                        !r.requester_name?.includes('Professionnel')
-                      );
-                      return filtered.length > 0 ? filtered.map((range) => (
-                        <button
-                          key={range.id}
-                          type="button"
-                          className="w-full text-left px-3 py-2 hover:bg-accent transition-colors border-b last:border-b-0"
-                          onClick={() => {
-                            setSelectedSourceRange(range);
-                            setShowSourceRangeDropdown(false);
-                          }}
-                        >
-                          <div className="flex flex-col">
-                            <span className="font-medium text-sm">{range.range_start} → {range.range_end}</span>
-                            <span className="text-xs text-muted-foreground">
-                              {range.total_numbers - range.used_numbers} numéros disponibles sur {range.total_numbers} • {range.notes}
-                            </span>
+                  <>
+                    <div 
+                      className="fixed inset-0" 
+                      style={{ zIndex: 100000 }}
+                      onClick={() => setShowSourceRangeDropdown(false)}
+                    />
+                    <div 
+                      className="bg-popover text-popover-foreground border rounded-md shadow-lg max-h-60 overflow-y-auto"
+                      style={{ position: 'fixed', top: sourceRangeDropdownPos.top, left: sourceRangeDropdownPos.left, width: sourceRangeDropdownPos.width, zIndex: 100001 }}
+                      onMouseDown={(e) => e.stopPropagation()}
+                    >
+                      {(() => {
+                        const selectedQty = parseInt(formData.quantity) || 0;
+                        const filtered = reservedRanges.filter(r => 
+                          r.number_type === formData.number_type && 
+                          r.status === 'active' && 
+                          (r.total_numbers - r.used_numbers) >= selectedQty &&
+                          selectedQty > 0 &&
+                          !r.requester_name?.includes('Professionnel')
+                        );
+                        return filtered.length > 0 ? filtered.map((range) => (
+                          <button
+                            key={range.id}
+                            type="button"
+                            className="w-full text-left px-3 py-2 hover:bg-accent transition-colors border-b last:border-b-0"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              e.preventDefault();
+                              setSelectedSourceRange(range);
+                              setShowSourceRangeDropdown(false);
+                            }}
+                          >
+                            <div className="flex flex-col">
+                              <span className="font-medium text-sm">{range.range_start} → {range.range_end}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {range.total_numbers - range.used_numbers} numéros disponibles sur {range.total_numbers} • {range.notes}
+                              </span>
+                            </div>
+                          </button>
+                        )) : (
+                          <div className="px-3 py-2 text-sm text-muted-foreground">
+                            {selectedQty === 0 
+                              ? "Veuillez d'abord sélectionner le nombre de numéros"
+                              : `Aucune plage disponible avec au moins ${selectedQty} numéros pour ce type`}
                           </div>
-                        </button>
-                      )) : (
-                        <div className="px-3 py-2 text-sm text-muted-foreground">
-                          {selectedQty === 0 
-                            ? "Veuillez d'abord sélectionner le nombre de numéros"
-                            : `Aucune plage disponible avec au moins ${selectedQty} numéros pour ce type`}
-                        </div>
-                      );
-                    })()}
-                  </div>,
+                        );
+                      })()}
+                    </div>
+                  </>,
                   document.body
                 )}
               </div>
