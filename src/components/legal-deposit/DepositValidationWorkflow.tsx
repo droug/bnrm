@@ -12,7 +12,8 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/hooks/use-toast";
-import { CheckCircle, XCircle, Eye, Clock, FileText, Download, AlertCircle, CheckCheck, Archive, GitBranch, Info, Search, ChevronLeft, ChevronRight, Scale } from "lucide-react";
+import { CheckCircle, XCircle, Eye, Clock, FileText, Download, AlertCircle, CheckCheck, Archive, GitBranch, Info, Search, ChevronLeft, ChevronRight, Scale, Hash, BookOpen, Newspaper } from "lucide-react";
+import { NumberSelectionModal } from "@/components/legal-deposit/NumberSelectionModal";
 import { DuplicateDetectionAlert } from "./DuplicateDetectionAlert";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -91,6 +92,127 @@ export function DepositValidationWorkflow() {
   // États pour la pagination
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+
+  // === États pour l'attribution de numéros (modale) ===
+  const [isAttributionDialogOpen, setIsAttributionDialogOpen] = useState(false);
+  const [attributionRequest, setAttributionRequest] = useState<DepositRequest | null>(null);
+  const [isNumberSelectionOpen, setIsNumberSelectionOpen] = useState(false);
+  const [selectedNumberType, setSelectedNumberType] = useState<'isbn' | 'issn' | 'ismn' | null>(null);
+  const [availableRanges, setAvailableRanges] = useState<any[]>([]);
+
+  // Paramétrage des numéros par type de document - avec persistance localStorage
+  const defaultNumberSettings = {
+    monographie_imprime: { isbn: true, issn: false, ismn: false, dl: true },
+    monographie_electronique: { isbn: true, issn: false, ismn: false, dl: false },
+    monographie_electronique_collection: { isbn: false, issn: true, ismn: false, dl: false },
+    periodique: { isbn: false, issn: true, ismn: false, dl: true },
+    audiovisuel: { isbn: false, issn: false, ismn: true, dl: true },
+    collections_specialisees: { isbn: false, issn: false, ismn: true, dl: true },
+  };
+
+  const [numberSettings] = useState<Record<string, { isbn: boolean; issn: boolean; ismn: boolean; dl: boolean }>>(() => {
+    const saved = localStorage.getItem('depot_legal_number_settings');
+    if (saved) {
+      try { return JSON.parse(saved); } catch { return defaultNumberSettings; }
+    }
+    return defaultNumberSettings;
+  });
+
+  const getSettingsForType = (depositType: string) => {
+    return numberSettings[depositType] || defaultNumberSettings.monographie_imprime;
+  };
+
+  const getDepositCategory = (req: DepositRequest): string => {
+    const supportType = req.support_type?.toLowerCase() || '';
+    const metadata = (req.metadata as Record<string, any>) || {};
+    const depositType = metadata?.deposit_type?.toLowerCase() || '';
+    const isCollection = metadata?.is_collection === true || metadata?.periodicite === 'oui';
+    const isElectronic = supportType.includes('electron') || supportType.includes('numérique');
+    
+    if (depositType.includes('audiovisuel') || supportType.includes('audio') || supportType.includes('video') || supportType.includes('logiciel')) {
+      return 'audiovisuel';
+    }
+    if (supportType.includes('partition') || supportType.includes('musique') || supportType.includes('carte') || supportType.includes('affiche')) {
+      return 'collections_specialisees';
+    }
+    if (supportType.includes('livre') || supportType.includes('monograph') || supportType === 'imprime' || supportType.includes('imprimé')) {
+      if (isElectronic && isCollection) return 'monographie_electronique_collection';
+      if (isElectronic) return 'monographie_electronique';
+      return 'monographie_imprime';
+    }
+    if (supportType.includes('periodique') || supportType.includes('périodique') || supportType.includes('journal') || supportType.includes('revue')) {
+      return 'periodique';
+    }
+    return 'monographie_imprime';
+  };
+
+  const getDepositTypeLabel = (type: string) => {
+    const labels: Record<string, string> = {
+      monographie_imprime: 'Monographie Imprimé',
+      monographie_electronique: 'Monographie Électronique',
+      monographie_electronique_collection: 'Monographie Électronique (Collection)',
+      periodique: 'Périodique',
+      audiovisuel: 'Audio-visuel',
+      collections_specialisees: 'Collections spécialisées',
+    };
+    return labels[type] || type;
+  };
+
+  const hasAnyAttributedNumber = (req: DepositRequest) => {
+    const metadata = (req.metadata ?? {}) as Record<string, any>;
+    return Boolean(metadata?.isbn_assigned || metadata?.issn_assigned || metadata?.ismn_assigned || metadata?.dl_assigned);
+  };
+
+  const generateNextNumber = (type: 'isbn' | 'issn' | 'ismn', currentRange: any): string => {
+    if (type === 'isbn' || type === 'ismn') {
+      const baseNumber = currentRange.current_position.replace(/-/g, '').slice(0, -1);
+      const nextSequence = (parseInt(baseNumber.slice(-4)) + 1).toString().padStart(4, '0');
+      const newNumber = `${baseNumber.slice(0, -4)}${nextSequence}`;
+      const checkDigit = '0';
+      return `${newNumber.slice(0, 3)}-${newNumber.slice(3, 7)}-${newNumber.slice(7, 10)}-${newNumber.slice(10, 12)}-${checkDigit}`;
+    } else {
+      const currentNum = parseInt(currentRange.current_position.replace('-', ''));
+      const nextNum = currentNum + 1;
+      const formatted = nextNum.toString().padStart(7, '0');
+      return `${formatted.slice(0, 4)}-${formatted.slice(4)}`;
+    }
+  };
+
+  const openNumberSelection = async (numberType: 'isbn' | 'issn' | 'ismn') => {
+    setSelectedNumberType(numberType);
+
+    try {
+      const { data: ranges } = await supabase
+        .from('reserved_number_ranges')
+        .select('*')
+        .eq('number_type', numberType)
+        .eq('status', 'active');
+      setAvailableRanges(ranges || []);
+    } catch (e) {
+      console.error("Error fetching ranges:", e);
+    }
+
+    setIsNumberSelectionOpen(true);
+  };
+
+  const handleNotifyAttribution = async (attribution: { deposit_id: string; number_type: string; attributed_number: string; metadata?: any }) => {
+    try {
+      await supabase.functions.invoke("notify-deposit-attribution", {
+        body: {
+          requestId: attribution.deposit_id,
+          attributedNumbers: {
+            isbn: attribution.number_type === 'isbn' ? attribution.attributed_number : undefined,
+            issn: attribution.number_type === 'issn' ? attribution.attributed_number : undefined,
+            ismn: attribution.number_type === 'ismn' ? attribution.attributed_number : undefined,
+            dlNumber: attribution.metadata?.dl_number,
+          }
+        }
+      });
+      toast({ title: "Notification envoyée", description: "Email envoyé avec succès" });
+    } catch (error: any) {
+      console.error("Notification error:", error);
+    }
+  };
 
   // Fonction pour détecter les doublons par titre
   const findDuplicatesByTitle = (request: DepositRequest): DepositRequest[] => {
@@ -1555,15 +1677,37 @@ export function DepositValidationWorkflow() {
                                     >
                                       <Info className="h-4 w-4" />
                                     </Button>
-                                    {activeTab === "validated" && request.validated_by_department && (
-                                      <Button
-                                        size="sm"
-                                        variant="ghost"
-                                        onClick={() => generateAccuseReception(request)}
-                                        title="Télécharger l'accusé de réception"
-                                      >
-                                        <Download className="h-4 w-4" />
-                                      </Button>
+                                    {activeTab === "validated" && (
+                                      <>
+                                        {!hasAnyAttributedNumber(request) ? (
+                                          <Button
+                                            size="sm"
+                                            onClick={() => {
+                                              setAttributionRequest(request);
+                                              setIsAttributionDialogOpen(true);
+                                            }}
+                                            title="Attribuer un numéro"
+                                          >
+                                            <Hash className="h-4 w-4 mr-1" />
+                                            Attribuer N°
+                                          </Button>
+                                        ) : (
+                                          <Badge variant="secondary" className="bg-green-100 text-green-800">
+                                            <CheckCircle className="h-3 w-3 mr-1" />
+                                            Attribué
+                                          </Badge>
+                                        )}
+                                        {request.validated_by_department && (
+                                          <Button
+                                            size="sm"
+                                            variant="ghost"
+                                            onClick={() => generateAccuseReception(request)}
+                                            title="Télécharger l'accusé de réception"
+                                          >
+                                            <Download className="h-4 w-4" />
+                                          </Button>
+                                        )}
+                                      </>
                                     )}
                                   </div>
                                 </TableCell>
@@ -2298,6 +2442,140 @@ export function DepositValidationWorkflow() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Attribution Dialog */}
+      <Dialog open={isAttributionDialogOpen} onOpenChange={setIsAttributionDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Attribution de numéro</DialogTitle>
+          </DialogHeader>
+          
+          {attributionRequest && (() => {
+            const depositType = getDepositCategory(attributionRequest);
+            const settings = getSettingsForType(depositType);
+            return (
+              <div className="space-y-4">
+                <div className="bg-muted p-4 rounded-lg space-y-2">
+                  <div>
+                    <Label className="text-sm text-muted-foreground">N° Demande</Label>
+                    <div className="font-mono font-medium">{attributionRequest.request_number}</div>
+                  </div>
+                  <div>
+                    <Label className="text-sm text-muted-foreground">Publication</Label>
+                    <div className="font-medium">{attributionRequest.title}</div>
+                  </div>
+                  <div>
+                    <Label className="text-sm text-muted-foreground">Type</Label>
+                    <div>{getDepositTypeLabel(depositType)}</div>
+                  </div>
+                </div>
+
+                {settings.dl && (
+                  <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
+                    <div className="flex items-center gap-2 mb-2">
+                      <FileText className="h-4 w-4 text-green-600" />
+                      <Label className="text-sm font-medium text-green-800">N° de Dépôt Légal (attribué automatiquement)</Label>
+                    </div>
+                    <div className="font-mono font-bold text-green-700">
+                      {(attributionRequest.metadata as any)?.dl_assigned || 'Sera généré à la validation'}
+                    </div>
+                  </div>
+                )}
+
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    Sélectionnez le type de numéro complémentaire à attribuer :
+                  </p>
+                  
+                  <div className="grid gap-2">
+                    {settings.isbn && (
+                      <Button className="w-full justify-start" onClick={() => openNumberSelection('isbn')}>
+                        <BookOpen className="h-4 w-4 mr-2" />
+                        Attribuer un numéro ISBN
+                      </Button>
+                    )}
+                    {settings.issn && (
+                      <Button className="w-full justify-start" onClick={() => openNumberSelection('issn')}>
+                        <Newspaper className="h-4 w-4 mr-2" />
+                        Attribuer un numéro ISSN
+                      </Button>
+                    )}
+                    {settings.ismn && (
+                      <Button className="w-full justify-start" onClick={() => openNumberSelection('ismn')}>
+                        <Hash className="h-4 w-4 mr-2" />
+                        Attribuer un numéro ISMN
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex justify-end pt-2">
+                  <Button variant="outline" onClick={() => {
+                    setIsAttributionDialogOpen(false);
+                    setAttributionRequest(null);
+                  }}>
+                    Annuler
+                  </Button>
+                </div>
+              </div>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
+
+      {/* Number Selection Modal */}
+      <NumberSelectionModal
+        isOpen={isNumberSelectionOpen}
+        onClose={() => {
+          setIsNumberSelectionOpen(false);
+          setSelectedNumberType(null);
+        }}
+        numberType={selectedNumberType || 'isbn'}
+        request={attributionRequest}
+        availableRanges={availableRanges}
+        onConfirm={async (attributedNumber: string) => {
+          if (!attributionRequest || !selectedNumberType) return;
+          
+          const currentMetadata = (attributionRequest.metadata as Record<string, any>) || {};
+          
+          const updateData: any = {
+            metadata: {
+              ...currentMetadata,
+              [`${selectedNumberType}_assigned`]: attributedNumber,
+              [`${selectedNumberType}_attribution_date`]: new Date().toISOString()
+            }
+          };
+
+          const { error } = await supabase
+            .from("legal_deposit_requests")
+            .update(updateData)
+            .eq("id", attributionRequest.id);
+
+          if (error) {
+            toast({ title: "Erreur", description: "Impossible d'attribuer le numéro", variant: "destructive" });
+            throw error;
+          }
+
+          toast({
+            title: "Succès",
+            description: `Numéro ${selectedNumberType.toUpperCase()} attribué: ${attributedNumber}`,
+          });
+
+          await handleNotifyAttribution({
+            deposit_id: attributionRequest.id,
+            number_type: selectedNumberType,
+            attributed_number: attributedNumber,
+            metadata: { dl_number: attributionRequest.request_number }
+          });
+
+          setIsNumberSelectionOpen(false);
+          setIsAttributionDialogOpen(false);
+          setAttributionRequest(null);
+          setSelectedNumberType(null);
+          fetchRequests();
+        }}
+        generateNextNumber={generateNextNumber}
+      />
     </>
   );
 }
