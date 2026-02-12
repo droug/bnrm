@@ -4059,6 +4059,40 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
     toast.success("Confirmation réciproque validée");
   };
 
+  // Fonction pour annuler et supprimer le brouillon
+  const handleCancel = async () => {
+    if (existingRequestId) {
+      try {
+        // Vérifier que c'est bien un brouillon avant de supprimer
+        const { data: request } = await supabase
+          .from('legal_deposit_requests')
+          .select('status')
+          .eq('id', existingRequestId)
+          .single();
+        
+        if (request?.status === 'brouillon') {
+          // Supprimer les parties liées d'abord
+          await supabase
+            .from('legal_deposit_parties')
+            .delete()
+            .eq('request_id', existingRequestId);
+          
+          // Supprimer le brouillon
+          await supabase
+            .from('legal_deposit_requests')
+            .delete()
+            .eq('id', existingRequestId)
+            .eq('status', 'brouillon');
+          
+          toast.success("Brouillon supprimé");
+        }
+      } catch (error) {
+        console.error('Error deleting draft:', error);
+      }
+    }
+    onClose();
+  };
+
   // Fonction pour enregistrer un brouillon
   const handleSaveDraft = async () => {
     if (!user) {
@@ -4639,7 +4673,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           )}
         </CardContent>
         <CardFooter>
-          <Button variant="ghost" onClick={onClose} className="w-full">
+          <Button variant="ghost" onClick={handleCancel} className="w-full">
             {language === 'ar' ? 'إلغاء' : 'Annuler'}
           </Button>
         </CardFooter>
@@ -4804,7 +4838,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button variant="outline" onClick={onClose} className="text-red-600 hover:text-red-700">
+          <Button variant="outline" onClick={handleCancel} className="text-red-600 hover:text-red-700">
             {language === 'ar' ? 'إلغاء' : 'Annuler'}
           </Button>
           <div className="flex gap-2">
@@ -4985,7 +5019,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
 
         </CardContent>
         <CardFooter className="flex justify-between">
-          <Button variant="outline" onClick={onClose} className="text-red-600 hover:text-red-700">
+          <Button variant="outline" onClick={handleCancel} className="text-red-600 hover:text-red-700">
             {language === 'ar' ? 'إلغاء' : 'Annuler'}
           </Button>
           <div className="flex gap-2">
@@ -5069,7 +5103,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           </CardContent>
 
           <CardFooter className="flex justify-between flex-wrap gap-2">
-            <Button variant="outline" onClick={onClose} className="text-red-600 hover:text-red-700">
+            <Button variant="outline" onClick={handleCancel} className="text-red-600 hover:text-red-700">
               {language === 'ar' ? 'إلغاء' : 'Annuler'}
             </Button>
             <div className="flex gap-2 flex-wrap">
