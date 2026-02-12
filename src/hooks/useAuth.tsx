@@ -103,6 +103,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signUp = async (email: string, password: string, userData: any) => {
+    // Validate password strength
+    const { validatePassword } = await import("@/lib/passwordValidation");
+    const validation = validatePassword(password);
+    if (!validation.valid) {
+      const message = "Le mot de passe ne respecte pas les critères requis : " + validation.errors.join(", ");
+      toast.error("Mot de passe invalide", { description: message });
+      return { error: { message } };
+    }
+
     const { error } = await supabase.auth.signUp({
       email,
       password,

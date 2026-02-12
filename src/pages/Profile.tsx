@@ -115,10 +115,12 @@ export default function Profile() {
       return;
     }
     
-    if (passwordData.newPassword.length < 6) {
+    const { validatePassword } = await import("@/lib/passwordValidation");
+    const validation = validatePassword(passwordData.newPassword);
+    if (!validation.valid) {
       toast({
-        title: "Erreur",
-        description: "Le mot de passe doit contenir au moins 6 caractères",
+        title: "Mot de passe invalide",
+        description: validation.errors.join(", "),
         variant: "destructive",
       });
       return;
@@ -421,7 +423,7 @@ export default function Profile() {
                         value={passwordData.newPassword}
                         onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
                         className="pl-10"
-                        placeholder="Minimum 6 caractères"
+                        placeholder="Min. 8 caractères"
                         required
                       />
                     </div>
@@ -445,7 +447,7 @@ export default function Profile() {
 
                   <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                     <p className="text-sm text-blue-800">
-                      💡 Utilisez un mot de passe fort avec au moins 6 caractères, incluant des lettres et des chiffres.
+                      💡 Le mot de passe doit contenir au moins 8 caractères, avec une majuscule, une minuscule, un chiffre et un symbole.
                     </p>
                   </div>
 

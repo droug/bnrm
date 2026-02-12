@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 import { Shield, Upload, CheckCircle2, AlertCircle } from 'lucide-react';
+import { PasswordStrengthIndicator } from '@/components/ui/password-strength-indicator';
 
 export default function ProfessionalSignup() {
   const [searchParams] = useSearchParams();
@@ -147,6 +148,17 @@ export default function ProfessionalSignup() {
       toast({
         title: 'Erreur',
         description: 'Les mots de passe ne correspondent pas',
+        variant: 'destructive'
+      });
+      return;
+    }
+
+    const { validatePassword } = await import("@/lib/passwordValidation");
+    const validation = validatePassword(formData.password);
+    if (!validation.valid) {
+      toast({
+        title: 'Mot de passe invalide',
+        description: validation.errors.join(", "),
         variant: 'destructive'
       });
       return;
@@ -323,6 +335,7 @@ export default function ProfessionalSignup() {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
+                <PasswordStrengthIndicator password={formData.password} />
               </div>
 
               <div className="grid gap-2">
