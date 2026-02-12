@@ -1797,6 +1797,22 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                   />
                 </div>
 
+                {/* Genre - right after Type for Personne Physique so Nom/Prénom align */}
+                {directorType === "personne_physique" && (
+                  <div className="space-y-2 animate-fade-in">
+                    <Label>Genre</Label>
+                    <InlineSelect
+                      placeholder="Sélectionner le genre"
+                      value={directorGender}
+                      onChange={setDirectorGender}
+                      options={[
+                        { value: "homme", label: "Homme" },
+                        { value: "femme", label: "Femme" }
+                      ]}
+                    />
+                  </div>
+                )}
+
                 {/* Nom */}
                 <div className="space-y-2">
                   <Label>{directorType === "personne_morale" ? "Nom de la collectivité" : "Nom"} <span className="text-destructive">*</span></Label>
@@ -1815,21 +1831,6 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
                       placeholder="Prénom du directeur"
                       value={formData.directorFirstName || ""}
                       onChange={(e) => setFormData({ ...formData, directorFirstName: e.target.value })}
-                    />
-                  </div>
-                )}
-
-                {directorType === "personne_physique" && (
-                  <div className="space-y-2 animate-fade-in">
-                    <Label>Genre</Label>
-                    <InlineSelect
-                      placeholder="Sélectionner le genre"
-                      value={directorGender}
-                      onChange={setDirectorGender}
-                      options={[
-                        { value: "homme", label: "Homme" },
-                        { value: "femme", label: "Femme" }
-                      ]}
                     />
                   </div>
                 )}
