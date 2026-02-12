@@ -4151,6 +4151,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         amazon_link: formData.amazon_link || null,
         documents_urls: documentsUrls,
         metadata: {
+          ...formData,
           depositType,
           editor: editorData,
           printer: printerData,
@@ -4186,7 +4187,6 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           directorPseudonym,
           directorRegion,
           directorCity,
-          ...formData
         }
       };
 
@@ -4366,6 +4366,7 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
         amazon_link: formData.amazon_link || null,
         requires_amazon_validation: !!formData.amazon_link,
         metadata: {
+          ...formData,
           depositType,
           editor: editorData,
           printer: printerData,
@@ -4377,11 +4378,31 @@ export default function LegalDepositDeclaration({ depositType, onClose, initialU
           hasScale: hasScale,
           hasLegend: hasLegend,
           collectionTitle: collectionTitle,
+          collectionNumber,
+          numberOfPages,
+          isPeriodic,
           printRun: printRun,
           editorIdentification: editorIdentification,
           authorGender: authorGender,
           customFields: customFieldsData,
-          ...formData
+          authors,
+          declarationNature,
+          authorStatus,
+          selectedDiscipline,
+          targetAudience,
+          targetAudienceOther,
+          selectedLanguages,
+          multipleVolumes,
+          totalVolumes,
+          numberOfVolumes,
+          publicationTypeOther,
+          specialCollectionPublicationType,
+          specialCollectionPublicationTypeOther,
+          directorType,
+          directorGender,
+          directorPseudonym,
+          directorRegion,
+          directorCity,
         }
       };
       
