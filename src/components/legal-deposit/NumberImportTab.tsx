@@ -313,113 +313,51 @@ export const NumberImportTab = () => {
                   Collez les numéros séparés par des retours à la ligne, virgules ou points-virgules.
                 </p>
               </div>
-              <div className="flex justify-end">
-                <Button onClick={addEntry} disabled={!quantity || !pastedNumbers.trim()}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Ajouter la tranche
-                </Button>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Button onClick={addEntry} disabled={!quantity || !pastedNumbers.trim()}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Ajouter la tranche
+                  </Button>
+                  {entries.length > 0 && (
+                    <Badge variant="secondary">
+                      {entries.length} tranche(s) ajoutée(s) — {totalNumbers} numéros
+                    </Badge>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  {entries.length > 0 && (
+                    <>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setEntries([])}
+                        disabled={saving}
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Tout effacer
+                      </Button>
+                      <Button
+                        onClick={handleSaveAll}
+                        disabled={saving}
+                      >
+                        {saving ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Enregistrement...
+                          </>
+                        ) : (
+                          <>
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Enregistrer {entries.length} tranche(s)
+                          </>
+                        )}
+                      </Button>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-
-          {/* Step 3: Preview & submit */}
-          <div className="space-y-3">
-            <Label className="flex items-center gap-2 text-base font-semibold">
-              <span className="flex items-center justify-center w-6 h-6 bg-primary text-primary-foreground rounded-full text-xs">3</span>
-              Tranches à importer
-              {entries.length > 0 && (
-                <Badge variant="secondary" className="ml-2">
-                  {entries.length} tranche(s) — {totalNumbers} numéros
-                </Badge>
-              )}
-            </Label>
-
-            {entries.length === 0 ? (
-              <div className="border rounded-lg p-8 text-center text-muted-foreground">
-                <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                <p>Aucune tranche ajoutée. Utilisez le formulaire ci-dessus pour ajouter des tranches.</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                <div className="border rounded-lg overflow-hidden">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="bg-muted/50">
-                        <TableHead>Type</TableHead>
-                        <TableHead>Début</TableHead>
-                        <TableHead>Fin</TableHead>
-                        <TableHead>Quantité</TableHead>
-                        <TableHead>Notes</TableHead>
-                        <TableHead className="w-12"></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {entries.map((entry) => {
-                        const Icon = getNumberTypeIcon(entry.number_type);
-                        const qty = entry.quantity > 0 ? entry.quantity : estimateQuantity(entry.range_start, entry.range_end);
-                        return (
-                          <TableRow key={entry.id}>
-                            <TableCell>
-                              <div className="flex items-center gap-2">
-                                <Icon className="h-4 w-4 text-muted-foreground" />
-                                <Badge variant="outline" className="font-mono text-xs">
-                                  {getNumberTypeLabel(entry.number_type)}
-                                </Badge>
-                              </div>
-                            </TableCell>
-                            <TableCell className="font-mono text-sm">{entry.range_start}</TableCell>
-                            <TableCell className="font-mono text-sm">{entry.range_end}</TableCell>
-                            <TableCell>
-                              <Badge variant="secondary">{qty}</Badge>
-                            </TableCell>
-                            <TableCell className="max-w-xs truncate text-sm text-muted-foreground">
-                              {entry.notes || '—'}
-                            </TableCell>
-                            <TableCell>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => removeEntry(entry.id)}
-                                className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        );
-                      })}
-                    </TableBody>
-                  </Table>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <Button
-                    variant="outline"
-                    onClick={() => setEntries([])}
-                    disabled={saving}
-                  >
-                    Tout effacer
-                  </Button>
-                  <Button
-                    onClick={handleSaveAll}
-                    disabled={saving}
-                    className="min-w-[200px]"
-                  >
-                    {saving ? (
-                      <>
-                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Enregistrement...
-                      </>
-                    ) : (
-                      <>
-                        <CheckCircle className="h-4 w-4 mr-2" />
-                        Importer {entries.length} tranche(s)
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-            )}
           </div>
         </CardContent>
       </Card>
