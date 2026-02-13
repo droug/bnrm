@@ -50,6 +50,8 @@ export default function AdvancedSearch() {
     // Recherche par date
     dateFrom: "",
     dateTo: "",
+    monthFrom: "",
+    monthTo: "",
     period: "",
     
     // Recherche par numéro
@@ -169,12 +171,24 @@ export default function AdvancedSearch() {
         baseQuery = baseQuery.eq('document_type', 'rare_book');
       }
       
-      // Filtrer par date
+      // Filtrer par date (année)
       if (params.dateFrom) {
         baseQuery = baseQuery.gte('publication_year', parseInt(params.dateFrom));
       }
       if (params.dateTo) {
         baseQuery = baseQuery.lte('publication_year', parseInt(params.dateTo));
+      }
+      
+      // Filtrer par mois (utilise created_at comme proxy si publication_year ne suffit pas)
+      if (params.monthFrom) {
+        const [year, month] = params.monthFrom.split('-');
+        baseQuery = baseQuery.gte('created_at', `${year}-${month}-01`);
+      }
+      if (params.monthTo) {
+        const [year, month] = params.monthTo.split('-');
+        // Dernier jour du mois
+        const lastDay = new Date(parseInt(year), parseInt(month), 0).getDate();
+        baseQuery = baseQuery.lte('created_at', `${year}-${month}-${lastDay}`);
       }
       
       console.log('🚀 Executing query...');
@@ -260,6 +274,8 @@ export default function AdvancedSearch() {
       classification: "",
       dateFrom: "",
       dateTo: "",
+      monthFrom: "",
+      monthTo: "",
       period: "",
       cote: "",
       isbn: "",
@@ -580,33 +596,73 @@ export default function AdvancedSearch() {
                     </p>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="dateFrom-tab" className="text-base font-semibold">Année de début</Label>
-                      <Input
-                        id="dateFrom-tab"
-                        type="number"
-                        placeholder="Ex: 1900"
-                        min="1000"
-                        max={new Date().getFullYear()}
-                        value={formData.dateFrom}
-                        onChange={(e) => setFormData({ ...formData, dateFrom: e.target.value })}
-                        className="h-11"
-                      />
-                    </div>
+                  {/* Recherche par année */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Par année</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="dateFrom-tab" className="text-base font-semibold">Année de début</Label>
+                        <Input
+                          id="dateFrom-tab"
+                          type="number"
+                          placeholder="Ex: 1900"
+                          min="1000"
+                          max={new Date().getFullYear()}
+                          value={formData.dateFrom}
+                          onChange={(e) => setFormData({ ...formData, dateFrom: e.target.value })}
+                          className="h-11"
+                        />
+                      </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="dateTo-tab" className="text-base font-semibold">Année de fin</Label>
-                      <Input
-                        id="dateTo-tab"
-                        type="number"
-                        placeholder={`Ex: ${new Date().getFullYear()}`}
-                        min="1000"
-                        max={new Date().getFullYear()}
-                        value={formData.dateTo}
-                        onChange={(e) => setFormData({ ...formData, dateTo: e.target.value })}
-                        className="h-11"
-                      />
+                      <div className="space-y-2">
+                        <Label htmlFor="dateTo-tab" className="text-base font-semibold">Année de fin</Label>
+                        <Input
+                          id="dateTo-tab"
+                          type="number"
+                          placeholder={`Ex: ${new Date().getFullYear()}`}
+                          min="1000"
+                          max={new Date().getFullYear()}
+                          value={formData.dateTo}
+                          onChange={(e) => setFormData({ ...formData, dateTo: e.target.value })}
+                          className="h-11"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <Separator />
+
+                  {/* Recherche par mois */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Par mois</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <Label htmlFor="monthFrom-tab" className="text-base font-semibold">Mois de début</Label>
+                        <Input
+                          id="monthFrom-tab"
+                          type="month"
+                          value={formData.monthFrom}
+                          onChange={(e) => setFormData({ ...formData, monthFrom: e.target.value })}
+                          className="h-11"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Format : mois et année (ex: janvier 2020)
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="monthTo-tab" className="text-base font-semibold">Mois de fin</Label>
+                        <Input
+                          id="monthTo-tab"
+                          type="month"
+                          value={formData.monthTo}
+                          onChange={(e) => setFormData({ ...formData, monthTo: e.target.value })}
+                          className="h-11"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Format : mois et année (ex: décembre 2024)
+                        </p>
+                      </div>
                     </div>
                   </div>
 
@@ -622,7 +678,7 @@ export default function AdvancedSearch() {
                   </div>
 
                   <div className="text-sm text-muted-foreground bg-amber-50 dark:bg-amber-950/20 p-3 rounded-lg">
-                    <strong>Note :</strong> Vous pouvez rechercher par plage d'années ou par période historique, ou combiner les deux critères.
+                    <strong>Note :</strong> Vous pouvez rechercher par plage d'années, par mois ou par période historique, ou combiner les critères.
                   </div>
                 </TabsContent>
 
