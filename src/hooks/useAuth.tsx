@@ -69,33 +69,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       
       if (session?.user) {
         console.log("AuthProvider - Fetching profile for user:", session.user.id);
-        // Fetch user profile for initial session
-        const { data: profileData, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('user_id', session.user.id)
-          .single();
-        console.log("AuthProvider - Profile query result:", { profileData, error });
-        
-        // Fetch user role from user_roles table
-        const { data: roleData } = await supabase
-          .from('user_roles')
-          .select('role')
-          .eq('user_id', session.user.id)
-          .order('granted_at', { ascending: false })
-          .limit(1)
-          .single();
-        
-        // Combine profile with role
-        setProfile({
-          ...profileData,
-          role: roleData?.role || 'visitor'
-        });
+        try {
+          const { data: profileData, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('user_id', session.user.id)
+            .single();
+          console.log("AuthProvider - Profile query result:", { profileData, error });
+          
+          const { data: roleData } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', session.user.id)
+            .order('granted_at', { ascending: false })
+            .limit(1)
+            .single();
+          
+          setProfile({
+            ...profileData,
+            role: roleData?.role || 'visitor'
+          });
+        } catch (err) {
+          console.error("AuthProvider - Error fetching profile:", err);
+          setProfile(null);
+        }
       } else {
         console.log("AuthProvider - No session, setting profile to null");
         setProfile(null);
       }
       
+      setLoading(false);
+    }).catch((err) => {
+      console.error("AuthProvider - getSession failed:", err);
       setLoading(false);
     });
 
