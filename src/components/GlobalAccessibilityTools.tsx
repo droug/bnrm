@@ -96,7 +96,7 @@ export function GlobalAccessibilityTools() {
     <>
       {/* Boutons flottants - Toujours visibles */}
       <div 
-        className="fixed top-6 right-6 flex flex-col gap-3"
+        className="fixed bottom-6 right-6 flex flex-col gap-3"
         style={{ zIndex: 999999 }}
       >
         {/* Bouton Accessibilité */}
