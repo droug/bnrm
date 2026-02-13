@@ -28,9 +28,10 @@ interface LatestAdditionsSectionProps {
   items: DocumentItem[];
   loading: boolean;
   onConsultDocument: (item: DocumentItem) => void;
+  titleOverride?: string;
 }
 
-export function LatestAdditionsSection({ items, loading, onConsultDocument }: LatestAdditionsSectionProps) {
+export function LatestAdditionsSection({ items, loading, onConsultDocument, titleOverride }: LatestAdditionsSectionProps) {
   const { t, language } = useLanguage();
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(0);
@@ -78,7 +79,7 @@ export function LatestAdditionsSection({ items, loading, onConsultDocument }: La
           </div>
           
           <h2 className="text-[48px] font-normal text-bn-blue-primary font-gilda">
-            {t('dl.home.latestAdditions')}
+            {titleOverride || t('dl.home.latestAdditions')}
           </h2>
           
           <p className="font-body text-regular text-muted-foreground max-w-2xl mx-auto mt-4">

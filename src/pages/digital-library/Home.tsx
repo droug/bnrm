@@ -1,5 +1,6 @@
 // Force cache regeneration: v7 - 2026-02-03
 import { useState, useEffect, useRef, useMemo } from "react";
+import { useBNSectionTitles, BN_SECTION_IDS } from "@/hooks/useBNSectionTitles";
 import { useQuery } from "@tanstack/react-query";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -70,6 +71,7 @@ export default function DigitalLibraryHome() {
     t,
     language
   } = useLanguage();
+  const { getTitle, getSubtitle, isVisible } = useBNSectionTitles();
   const [showReservationDialog, setShowReservationDialog] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
@@ -715,18 +717,30 @@ export default function DigitalLibraryHome() {
       </section>
 
       {/* Latest Additions - Reference Design */}
-      <LatestAdditionsSection items={newItems} loading={loading} onConsultDocument={handleConsultDocument} />
+      {isVisible(BN_SECTION_IDS.latestAdditions) && (
+        <LatestAdditionsSection 
+          items={newItems} 
+          loading={loading} 
+          onConsultDocument={handleConsultDocument}
+          titleOverride={getTitle(BN_SECTION_IDS.latestAdditions, language, 'Dernières apparitions', 'آخر الإضافات')}
+        />
+      )}
 
       {/* Ibn Battouta en chiffres - Stats Section */}
-      <IbnBattoutaStatsSection />
+      {isVisible(BN_SECTION_IDS.ibnBattoutaStats) && (
+        <IbnBattoutaStatsSection 
+          titleOverride={getTitle(BN_SECTION_IDS.ibnBattoutaStats, language, 'Ibn Battuta en chiffres', 'ابن بطوطة بالأرقام')}
+          subtitleOverride={getSubtitle(BN_SECTION_IDS.ibnBattoutaStats, language, 'Découvrez les documents récemment ajoutés à nos collections, soigneusement sélectionnés pour enrichir votre expérience.', 'اكتشف الوثائق المضافة حديثاً إلى مجموعاتنا، المختارة بعناية لإثراء تجربتك.')}
+        />
+      )}
 
       {/* Latest News */}
-      {newsArticles.length > 0 && <section className="bg-muted/30 py-12">
+      {newsArticles.length > 0 && isVisible(BN_SECTION_IDS.news) && <section className="bg-muted/30 py-12">
           <div className="container mx-auto px-4">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-[48px] font-normal text-bn-blue-primary font-gilda flex items-center gap-2">
                 <Calendar className="h-8 w-8 text-gold-bn-primary" />
-                {t('dl.home.latestNews')}
+                {getTitle(BN_SECTION_IDS.news, language, 'Actualités', 'الأخبار')}
               </h2>
               <Link to="/digital-library/news">
                 <Button variant="outline" className="border-gold-bn-primary text-bn-blue-primary hover:bg-gold-bn-surface">{t('dl.home.allNews')}</Button>
@@ -775,12 +789,10 @@ export default function DigitalLibraryHome() {
               </div>
               
               <h2 className="text-[48px] font-normal text-white font-gilda">
-                {(() => {
-                  const fallbacks: Record<string, string> = { fr: 'Expositions Virtuelles', ar: 'معارض افتراضية', en: 'Virtual Exhibitions', es: 'Exposiciones Virtuales', amz: 'ⵜⵉⵙⵎⵖⵓⵔⵉⵏ ⵜⵉⵎⵙⵍⵉⵏ' };
-                  if (language === 'ar') return vexpoHeroSettings?.title_ar || fallbacks.ar;
-                  if (language === 'fr') return vexpoHeroSettings?.title_fr || fallbacks.fr;
-                  return fallbacks[language] || vexpoHeroSettings?.title_fr || fallbacks.fr;
-                })()}
+                {getTitle(BN_SECTION_IDS.virtualExhibitions, language,
+                  vexpoHeroSettings?.title_fr || 'Expositions Virtuelles',
+                  vexpoHeroSettings?.title_ar || 'معارض افتراضية'
+                )}
               </h2>
               <p className="font-body text-regular text-white/80 max-w-2xl mx-auto mt-4">
                 {(() => {
@@ -897,7 +909,7 @@ export default function DigitalLibraryHome() {
               </div>
 
               <h2 className="text-[48px] font-normal text-foreground font-gilda">
-                {({ fr: 'Ressources électroniques', ar: 'الموارد الإلكترونية', en: 'Electronic Resources', es: 'Recursos electrónicos', amz: 'ⵜⵉⵖⴱⴰⵍⵓⵜⵉⵏ ⵜⵉⵍⵉⴽⵜⵕⵓⵏⵉⵢⵉⵏ' } as Record<string, string>)[language] || 'Ressources électroniques'}
+                {getTitle(BN_SECTION_IDS.electronicResources, language, 'Ressources électroniques', 'الموارد الإلكترونية')}
               </h2>
               <p className="font-body text-regular text-foreground max-w-2xl mx-auto mt-4">
                 {({ fr: 'Ces ressources permettent la centralisation et le partage du patrimoine documentaire et culturel à l\'échelle internationale', ar: 'تتيح هذه الموارد مركزة ومشاركة التراث الوثائقي والثقافي على المستوى الدولي', en: 'These resources enable the centralization and sharing of documentary and cultural heritage internationally', es: 'Estos recursos permiten la centralización y el intercambio del patrimonio documental y cultural a escala internacional', amz: 'ⵜⵉⵖⴱⴰⵍⵓⵜⵉⵏ ⴰⴷ ⴰⵔ ⵜⵜⴰⵊⵊⴰⵏⵜ ⴰⵙⵎⵓⵏ ⴷ ⵓⴱⵟⵟⵓ ⵏ ⵓⵢⴷⴰ ⴰⵙⴽⴽⵉⵍⴰⵏ ⴷ ⵓⴷⵍⵙⴰⵏ ⴳ ⵓⵙⵡⵉⵔ ⴰⵎⴰⴹⵍⴰⵏ' } as Record<string, string>)[language] || 'Ces ressources permettent la centralisation et le partage du patrimoine documentaire et culturel à l\'échelle internationale'}
