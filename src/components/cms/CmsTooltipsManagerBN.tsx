@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +36,7 @@ export default function CmsTooltipsManagerBN() {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState<BNTooltipConfig>(DEFAULT_TOOLTIPS);
 
-  const { isLoading } = useQuery({
+  const { data: savedData, isLoading } = useQuery({
     queryKey: ["bn-tooltips-admin"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -48,12 +48,15 @@ export default function CmsTooltipsManagerBN() {
       if (error) throw error;
 
       const saved = data?.setting_value as Record<string, string> | null;
-      const merged = { ...DEFAULT_TOOLTIPS, ...(saved || {}) };
-      setFormData(merged);
-      return merged;
+      return { ...DEFAULT_TOOLTIPS, ...(saved || {}) };
     },
   });
 
+  useEffect(() => {
+    if (savedData) {
+      setFormData(savedData);
+    }
+  }, [savedData]);
   const saveMutation = useMutation({
     mutationFn: async () => {
       const { data: existing } = await supabase
