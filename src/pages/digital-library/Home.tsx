@@ -16,6 +16,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import { ReservationRequestDialog } from "@/components/digital-library/ReservationRequestDialog";
 import { LatestAdditionsSection } from "@/components/digital-library/LatestAdditionsSection";
 import { IbnBattoutaStatsSection } from "@/components/digital-library/IbnBattoutaStatsSection";
+import { BNBannerDisplay } from "@/components/digital-library/BNBannerDisplay";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import Autoplay from "embla-carousel-autoplay";
@@ -450,14 +451,22 @@ export default function DigitalLibraryHome() {
         }]);
       }
 
-      // Charger les actualités
+      // Charger les actualités depuis cms_actualites
       const {
         data: news
-      } = await supabase.from('content').select('*').eq('content_type', 'news').eq('status', 'published').eq('is_featured', true).order('published_at', {
+      } = await supabase.from('cms_actualites').select('*').eq('status', 'published').order('date_publication', {
         ascending: false
       }).limit(2);
       if (news) {
-        setNewsArticles(news);
+        setNewsArticles(news.map((a: any) => ({
+          id: a.id,
+          title: language === 'ar' ? (a.title_ar || a.title_fr) : a.title_fr,
+          excerpt: language === 'ar' ? (a.chapo_ar || a.chapo_fr) : a.chapo_fr,
+          featured_image_url: a.image_url,
+          published_at: a.date_publication || a.published_at || a.created_at,
+          slug: a.slug,
+          category: a.category,
+        })));
       }
 
       // Charger les statistiques (tag: home-stats)
@@ -734,6 +743,9 @@ export default function DigitalLibraryHome() {
         />
       )}
 
+      {/* Bannières CMS */}
+      <BNBannerDisplay />
+
       {/* Latest News */}
       {newsArticles.length > 0 && isVisible(BN_SECTION_IDS.news) && <section className="bg-muted/30 py-12">
           <div className="container mx-auto px-4">
@@ -761,7 +773,7 @@ export default function DigitalLibraryHome() {
                     <CardDescription>{article.excerpt}</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <Link to={`/digital-library/news/${article.id}`}>
+                    <Link to={`/digital-library/news/${article.slug || article.id}`}>
                       <Button variant="outline" className="w-full border-gold-bn-primary text-bn-blue-primary hover:bg-gold-bn-surface">{t('dl.home.readMore')}</Button>
                     </Link>
                   </CardContent>
