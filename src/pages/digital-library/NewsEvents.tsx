@@ -69,13 +69,21 @@ export default function NewsEvents() {
               return (
                 <Card
                   key={item.id}
-                  className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-0 shadow-lg hover:-translate-y-1 overflow-hidden"
+                  className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-0 shadow-lg hover:-translate-y-1 overflow-hidden flex flex-col"
                   onClick={() => navigate(`/digital-library/news/${item.slug || item.id}`)}
                 >
                   <CardHeader className="pb-3">
                     {item.image_url ? (
                       <div className="aspect-video rounded-xl mb-4 overflow-hidden relative">
-                        <img src={item.image_url} alt={title} className="object-cover w-full h-full group-hover:scale-[1.02] transition-transform" />
+                        <img 
+                          src={item.image_url.startsWith('/') ? `${window.location.origin}${item.image_url}` : item.image_url} 
+                          alt={title} 
+                          className="object-cover w-full h-full group-hover:scale-[1.02] transition-transform"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.parentElement!.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-blue-500/20 via-amber-500/10 to-blue-500/10 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-blue-500/60"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"/></svg></div>';
+                          }}
+                        />
                       </div>
                     ) : (
                       <div className="aspect-video bg-gradient-to-br from-bn-blue-primary/20 via-gold-bn-primary/10 to-bn-blue-primary/10 rounded-xl mb-4 flex items-center justify-center group-hover:scale-[1.02] transition-transform overflow-hidden relative">
@@ -106,7 +114,7 @@ export default function NewsEvents() {
                     )}
                   </CardHeader>
                   
-                  <CardContent className="pt-0">
+                  <CardContent className="pt-0 mt-auto">
                     <div className="flex items-center justify-between text-sm">
                       <span className="flex items-center gap-1 text-muted-foreground">
                         <Eye className="h-4 w-4" />
