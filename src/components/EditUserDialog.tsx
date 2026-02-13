@@ -219,7 +219,6 @@ export const EditUserDialog: React.FC<EditUserDialogProps> = ({
           phone: data.phone.trim() || null,
           institution: data.institution.trim() || null,
           research_field: data.research_field.trim() || null,
-          role: roleCode,
           subscription_type: data.subscription_type.trim() || null,
           partner_organization: data.partner_organization.trim() || null,
           is_approved: data.is_approved,
