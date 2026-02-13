@@ -228,40 +228,49 @@ export const EditUserDialog: React.FC<EditUserDialogProps> = ({
 
       if (profileError) throw profileError;
 
-      // 2. Mettre à jour user_roles (enum-based)
-      await supabase
-        .from('user_roles')
-        .delete()
-        .eq('user_id', user.user_id);
-
+      // 2. Mettre à jour user_roles (enum-based) - upsert pour éviter la perte de rôle
       const { error: userRoleError } = await supabase
         .from('user_roles')
-        .insert({
+        .upsert({
           user_id: user.user_id,
           role: roleCode as UserRole
-        });
+        }, { onConflict: 'user_id,role' });
 
       if (userRoleError) {
         console.error('Error updating user_roles:', userRoleError);
+        throw new Error("Impossible de mettre à jour le rôle de l'utilisateur");
       }
 
-      // 3. Mettre à jour user_system_roles (dynamic roles)
-      await supabase
-        .from('user_system_roles')
+      // Supprimer les anciens rôles différents du nouveau (après upsert réussi)
+      const { error: deleteOldRolesError } = await supabase
+        .from('user_roles')
         .delete()
-        .eq('user_id', user.user_id);
+        .eq('user_id', user.user_id)
+        .neq('role', roleCode as UserRole);
 
+      if (deleteOldRolesError) {
+        console.error('Error cleaning old roles:', deleteOldRolesError);
+      }
+
+      // 3. Mettre à jour user_system_roles (dynamic roles) - upsert d'abord
       const { error: systemRoleError } = await supabase
         .from('user_system_roles')
-        .insert({
+        .upsert({
           user_id: user.user_id,
           role_id: data.role,
           is_active: true
-        });
+        }, { onConflict: 'user_id,role_id' });
 
       if (systemRoleError) {
         console.error('Error updating user_system_roles:', systemRoleError);
       }
+
+      // Supprimer les anciens rôles système différents (après upsert réussi)
+      await supabase
+        .from('user_system_roles')
+        .delete()
+        .eq('user_id', user.user_id)
+        .neq('role_id', data.role);
 
       toast({
         title: "Utilisateur mis à jour",
