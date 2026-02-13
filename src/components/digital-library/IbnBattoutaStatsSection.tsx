@@ -76,9 +76,11 @@ const labelTranslations: Record<string, Record<string, string>> = {
 
 interface IbnBattoutaStatsSectionProps {
   stats?: StatItem[];
+  titleOverride?: string;
+  subtitleOverride?: string;
 }
 
-export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaStatsSectionProps) {
+export function IbnBattoutaStatsSection({ stats = defaultStats, titleOverride, subtitleOverride }: IbnBattoutaStatsSectionProps) {
   const { language } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
   
@@ -98,11 +100,11 @@ export function IbnBattoutaStatsSection({ stats = defaultStats }: IbnBattoutaSta
           </div>
           
           <h2 className="text-[48px] font-normal font-gilda text-slate-dark mb-6">
-            {({ fr: 'Ibn Battuta en chiffres', ar: 'ابن بطوطة بالأرقام', en: 'Ibn Battuta in Numbers', es: 'Ibn Battuta en cifras', amz: 'ⵉⴱⵏ ⴱⴰⵟⵟⵓⵟⴰ ⵙ ⵉⵎⴹⴰⵏ' } as Record<string, string>)[language] || 'Ibn Battuta en chiffres'}
+            {titleOverride || (({ fr: 'Ibn Battuta en chiffres', ar: 'ابن بطوطة بالأرقام', en: 'Ibn Battuta in Numbers', es: 'Ibn Battuta en cifras', amz: 'ⵉⴱⵏ ⴱⴰⵟⵟⵓⵟⴰ ⵙ ⵉⵎⴹⴰⵏ' } as Record<string, string>)[language] || 'Ibn Battuta en chiffres')}
           </h2>
           
           <p className="font-body text-lg text-slate-text max-w-2xl mx-auto">
-            {({ fr: 'Découvrez les documents récemment ajoutés à nos collections, soigneusement sélectionnés pour enrichir votre expérience.', ar: 'اكتشف الوثائق المضافة حديثاً إلى مجموعاتنا، المختارة بعناية لإثراء تجربتك.', en: 'Discover the documents recently added to our collections, carefully selected to enrich your experience.', es: 'Descubra los documentos añadidos recientemente a nuestras colecciones, cuidadosamente seleccionados para enriquecer su experiencia.', amz: 'ⵙⵙⵓⴷⵓ ⵉⵙⴽⴽⵉⵍⵏ ⵉⵜⵜⵓⵔⵏⵓⵏ ⴰⵎⵉⵔⴰ ⵖⵔ ⵜⵉⴳⵔⴰⵡⵉⵏ ⵏⵏⵖ.' } as Record<string, string>)[language] || 'Découvrez les documents récemment ajoutés à nos collections, soigneusement sélectionnés pour enrichir votre expérience.'}
+            {subtitleOverride || (({ fr: 'Découvrez les documents récemment ajoutés à nos collections, soigneusement sélectionnés pour enrichir votre expérience.', ar: 'اكتشف الوثائق المضافة حديثاً إلى مجموعاتنا، المختارة بعناية لإثراء تجربتك.', en: 'Discover the documents recently added to our collections, carefully selected to enrich your experience.', es: 'Descubra los documentos añadidos recientemente a nuestras colecciones, cuidadosamente seleccionados para enriquecer su experiencia.', amz: 'ⵙⵙⵓⴷⵓ ⵉⵙⴽⴽⵉⵍⵏ ⵉⵜⵜⵓⵔⵏⵓⵏ ⴰⵎⵉⵔⴰ ⵖⵔ ⵜⵉⴳⵔⴰⵡⵉⵏ ⵏⵏⵖ.' } as Record<string, string>)[language] || 'Découvrez les documents récemment ajoutés à nos collections, soigneusement sélectionnés pour enrichir votre expérience.')}
           </p>
         </div>
 
