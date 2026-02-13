@@ -485,26 +485,26 @@ export default function UserManagement() {
       <div className="min-h-screen bg-background">
         {/* Header */}
         <header className="border-b bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/60 sticky top-0 z-10">
-          <div className="container flex h-16 items-center justify-between">
-            <div className="flex items-center space-x-4">
+          <div className="container flex h-14 sm:h-16 items-center justify-between px-4">
+            <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
               <Link to="/admin/settings">
-                <Button variant="ghost" size="sm">
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Retour
+                <Button variant="ghost" size="sm" className="px-2 sm:px-3">
+                  <ArrowLeft className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Retour</span>
                 </Button>
               </Link>
-              <div className="flex items-center space-x-2">
-                <Users className="h-6 w-6 text-primary" />
-                <div>
-                  <h1 className="text-xl font-bold">Gestion des Utilisateurs</h1>
-                  <p className="text-xs text-muted-foreground">
+              <div className="flex items-center space-x-2 min-w-0">
+                <Users className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
+                <div className="min-w-0">
+                  <h1 className="text-base sm:text-xl font-bold truncate">Gestion des Utilisateurs</h1>
+                  <p className="text-xs text-muted-foreground hidden sm:block">
                     Administration des comptes et permissions utilisateurs
                   </p>
                 </div>
               </div>
             </div>
-            <div className="flex items-center space-x-2">
-              <Badge variant="outline" className="gap-1">
+            <div className="flex items-center flex-shrink-0">
+              <Badge variant="outline" className="gap-1 hidden sm:flex">
                 <User className="h-3 w-3" />
                 {profile?.first_name} {profile?.last_name}
               </Badge>
@@ -513,7 +513,7 @@ export default function UserManagement() {
         </header>
 
         {/* Main Content */}
-        <main className="container py-8 space-y-8">
+        <main className="container py-4 sm:py-8 space-y-4 sm:space-y-8 px-4">
           {/* Quick Actions & Search */}
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div className="flex-1 w-full sm:max-w-md">
@@ -531,7 +531,7 @@ export default function UserManagement() {
           </div>
 
           {/* Statistics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-sm font-medium text-muted-foreground">Total Utilisateurs</CardTitle>
@@ -574,32 +574,34 @@ export default function UserManagement() {
 
           {/* Tabs */}
           <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
-            <TabsList className="grid w-full grid-cols-6">
-              <TabsTrigger value="internal" className="flex items-center gap-2">
-                <Shield className="h-4 w-4" />
-                Internes ({internalUsers.length})
-              </TabsTrigger>
-              <TabsTrigger value="professionals" className="flex items-center gap-2">
-                <Building className="h-4 w-4" />
-                Professionnels ({professionalUsers.length})
-              </TabsTrigger>
-              <TabsTrigger value="subscribers" className="flex items-center gap-2">
-                <Users className="h-4 w-4" />
-                Abonnés ({subscriberUsers.length})
-              </TabsTrigger>
-              <TabsTrigger value="permissions" className="flex items-center gap-2">
-                <Settings className="h-4 w-4" />
-                Permissions
-              </TabsTrigger>
-              <TabsTrigger value="plans" className="flex items-center gap-2">
-                <UserPlus className="h-4 w-4" />
-                Profils & Plans
-              </TabsTrigger>
-              <TabsTrigger value="requests" className="flex items-center gap-2">
-                <Clock className="h-4 w-4" />
-                Demandes ({pendingRequests.length})
-              </TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
+              <TabsList className="inline-flex w-auto min-w-full sm:grid sm:w-full sm:grid-cols-6">
+                <TabsTrigger value="internal" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm whitespace-nowrap">
+                  <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="hidden md:inline">Internes</span> ({internalUsers.length})
+                </TabsTrigger>
+                <TabsTrigger value="professionals" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm whitespace-nowrap">
+                  <Building className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="hidden md:inline">Professionnels</span> ({professionalUsers.length})
+                </TabsTrigger>
+                <TabsTrigger value="subscribers" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm whitespace-nowrap">
+                  <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="hidden md:inline">Abonnés</span> ({subscriberUsers.length})
+                </TabsTrigger>
+                <TabsTrigger value="permissions" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm whitespace-nowrap">
+                  <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="hidden md:inline">Permissions</span>
+                </TabsTrigger>
+                <TabsTrigger value="plans" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm whitespace-nowrap">
+                  <UserPlus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="hidden md:inline">Plans</span>
+                </TabsTrigger>
+                <TabsTrigger value="requests" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm whitespace-nowrap">
+                  <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="hidden md:inline">Demandes</span> ({pendingRequests.length})
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
             {/* Onglet Utilisateurs Internes */}
             <TabsContent value="internal" className="space-y-6">

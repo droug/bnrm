@@ -63,17 +63,17 @@ export function UserCategoryTable({
   }
 
   return (
-    <div className="rounded-md border">
-      <Table>
+    <div className="rounded-md border overflow-x-auto">
+      <Table className="min-w-[800px]">
         <TableHeader>
           <TableRow>
-            <TableHead>Utilisateur</TableHead>
-            <TableHead>Contact</TableHead>
-            <TableHead>Institution</TableHead>
-            <TableHead>Rôle(s)</TableHead>
-            <TableHead>Statut</TableHead>
-            <TableHead>Inscription</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead className="min-w-[180px]">Utilisateur</TableHead>
+            <TableHead className="min-w-[100px] hidden md:table-cell">Contact</TableHead>
+            <TableHead className="min-w-[120px] hidden lg:table-cell">Institution</TableHead>
+            <TableHead className="min-w-[160px]">Rôle(s)</TableHead>
+            <TableHead className="min-w-[90px]">Statut</TableHead>
+            <TableHead className="min-w-[120px] hidden md:table-cell">Inscription</TableHead>
+            <TableHead className="min-w-[140px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -102,7 +102,7 @@ export function UserCategoryTable({
                   </div>
                 </div>
               </TableCell>
-              <TableCell>
+              <TableCell className="hidden md:table-cell">
                 {userProfile.phone && (
                   <div className="flex items-center gap-1 text-sm">
                     <Phone className="h-3 w-3" />
@@ -110,10 +110,10 @@ export function UserCategoryTable({
                   </div>
                 )}
               </TableCell>
-              <TableCell>
+              <TableCell className="hidden lg:table-cell">
                 {userProfile.institution && (
-                  <div className="flex items-center gap-1 text-sm">
-                    <Building className="h-3 w-3" />
+                  <div className="flex items-center gap-1 text-sm truncate max-w-[200px]">
+                    <Building className="h-3 w-3 flex-shrink-0" />
                     {userProfile.institution}
                   </div>
                 )}
@@ -154,14 +154,14 @@ export function UserCategoryTable({
                   </Badge>
                 )}
               </TableCell>
-              <TableCell>
+              <TableCell className="hidden md:table-cell">
                 <div className="flex items-center gap-1 text-sm text-muted-foreground">
                   <Calendar className="h-3 w-3" />
                   {formatDate(userProfile.created_at)}
                 </div>
               </TableCell>
               <TableCell>
-                <div className="flex gap-2">
+                <div className="flex gap-1 sm:gap-2">
                   <Button 
                     size="sm" 
                     variant="outline"
