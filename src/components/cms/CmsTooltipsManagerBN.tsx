@@ -77,7 +77,6 @@ export default function CmsTooltipsManagerBN() {
             setting_key: "bn_tooltips",
             setting_value: jsonValue,
             category: "navigation",
-            platform: "bn",
           });
         if (error) throw error;
       }
