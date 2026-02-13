@@ -1,70 +1,32 @@
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, Eye, Image as ImageIcon } from "lucide-react";
+import { Calendar, Eye, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { BNPageHeader } from "@/components/digital-library/shared";
 import { Icon } from "@iconify/react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/hooks/useLanguage";
+import { format } from "date-fns";
+import { fr } from "date-fns/locale";
 
 export default function NewsEvents() {
   const navigate = useNavigate();
+  const { language } = useLanguage();
 
-  const news = [
-    {
-      id: 1,
-      title: "Nouvelle collection de manuscrits andalous numérisés",
-      date: "2025-01-15",
-      category: "Nouvelle collection",
-      views: "1,234",
-      excerpt: "Découvrez notre dernière collection de 150 manuscrits andalous récemment numérisés, datant du XIIe au XVe siècle.",
-      icon: "mdi:script-text-outline",
-    },
-    {
-      id: 2,
-      title: "Exposition virtuelle : Le Maroc à travers les âges",
-      date: "2025-01-10",
-      category: "Exposition",
-      views: "2,890",
-      excerpt: "Une exposition virtuelle interactive présentant l'histoire du Maroc à travers documents rares et photographies historiques.",
-      icon: "mdi:rotate-3d-variant",
-    },
-    {
-      id: 3,
-      title: "Dépôt légal : Bilan 2024",
-      date: "2025-01-05",
-      category: "Dépôt légal",
-      views: "567",
-      excerpt: "Statistiques et analyse du dépôt légal pour l'année 2024 : 15,340 documents déposés.",
-      icon: "mdi:chart-bar",
-    },
-    {
-      id: 4,
-      title: "Partenariat avec la Bibliothèque Nationale de France",
-      date: "2024-12-20",
-      category: "Partenariat",
-      views: "3,456",
-      excerpt: "Signature d'un accord de coopération pour la numérisation et l'échange de collections patrimoniales.",
-      icon: "mdi:handshake-outline",
-    },
-    {
-      id: 5,
-      title: "Formation : Catalogage Dublin Core et MARC21",
-      date: "2024-12-15",
-      category: "Formation",
-      views: "789",
-      excerpt: "Session de formation destinée aux bibliothécaires sur les standards de catalogage international.",
-      icon: "mdi:school-outline",
-    },
-    {
-      id: 6,
-      title: "Mise à jour : Nouveau moteur de recherche avancée",
-      date: "2024-12-10",
-      category: "Technologie",
-      views: "4,123",
-      excerpt: "Amélioration de notre moteur de recherche avec auto-complétion et filtres intelligents.",
-      icon: "mdi:magnify",
-    },
-  ];
+  const { data: news = [], isLoading } = useQuery({
+    queryKey: ['bn-news-events', language],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('cms_actualites')
+        .select('*')
+        .eq('status', 'published')
+        .order('date_publication', { ascending: false });
+      if (error) throw error;
+      return data || [];
+    }
+  });
 
   const getCategoryStyles = (category: string) => {
     const styles: Record<string, { bg: string; text: string; border: string }> = {
@@ -87,56 +49,80 @@ export default function NewsEvents() {
       />
 
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {news.map((item) => {
-            const categoryStyle = getCategoryStyles(item.category);
-            return (
-              <Card
-                key={item.id}
-                className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-0 shadow-lg hover:-translate-y-1 overflow-hidden"
-                onClick={() => navigate(`/digital-library/news/${item.id}`)}
-              >
-                <CardHeader className="pb-3">
-                  {/* Image placeholder with gradient */}
-                  <div className="aspect-video bg-gradient-to-br from-bn-blue-primary/20 via-gold-bn-primary/10 to-bn-blue-primary/10 rounded-xl mb-4 flex items-center justify-center group-hover:scale-[1.02] transition-transform overflow-hidden relative">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                    <Icon icon={item.icon} className="h-12 w-12 text-bn-blue-primary/60" />
-                  </div>
-                  
-                  <div className="flex items-center gap-2 mb-2">
-                    <Badge className={`${categoryStyle.bg} ${categoryStyle.text} border ${categoryStyle.border} font-medium`}>
-                      {item.category}
-                    </Badge>
-                    <span className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      {new Date(item.date).toLocaleDateString('fr-FR')}
-                    </span>
-                  </div>
+        {isLoading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : news.length === 0 ? (
+          <div className="text-center py-12 text-muted-foreground">
+            Aucune actualité publiée pour le moment.
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {news.map((item) => {
+              const title = language === 'ar' ? (item.title_ar || item.title_fr) : item.title_fr;
+              const excerpt = language === 'ar' ? (item.chapo_ar || item.chapo_fr) : item.chapo_fr;
+              const category = item.category || 'Actualité';
+              const categoryStyle = getCategoryStyles(category);
+              const pubDate = item.date_publication || item.created_at;
 
-                  <CardTitle className="text-lg group-hover:text-bn-blue-primary transition-colors line-clamp-2">
-                    {item.title}
-                  </CardTitle>
-                  <CardDescription className="line-clamp-3 text-sm">
-                    {item.excerpt}
-                  </CardDescription>
-                </CardHeader>
-                
-                <CardContent className="pt-0">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="flex items-center gap-1 text-muted-foreground">
-                      <Eye className="h-4 w-4" />
-                      {item.views} vues
-                    </span>
-                    <span className="text-bn-blue-primary font-medium group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
-                      Lire la suite
-                      <Icon icon="mdi:arrow-right" className="h-4 w-4" />
-                    </span>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+              return (
+                <Card
+                  key={item.id}
+                  className="group hover:shadow-xl transition-all duration-300 cursor-pointer border-0 shadow-lg hover:-translate-y-1 overflow-hidden"
+                  onClick={() => navigate(`/digital-library/news/${item.slug || item.id}`)}
+                >
+                  <CardHeader className="pb-3">
+                    {item.image_url ? (
+                      <div className="aspect-video rounded-xl mb-4 overflow-hidden relative">
+                        <img src={item.image_url} alt={title} className="object-cover w-full h-full group-hover:scale-[1.02] transition-transform" />
+                      </div>
+                    ) : (
+                      <div className="aspect-video bg-gradient-to-br from-bn-blue-primary/20 via-gold-bn-primary/10 to-bn-blue-primary/10 rounded-xl mb-4 flex items-center justify-center group-hover:scale-[1.02] transition-transform overflow-hidden relative">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                        <Icon icon="mdi:newspaper-variant-outline" className="h-12 w-12 text-bn-blue-primary/60" />
+                      </div>
+                    )}
+                    
+                    <div className="flex items-center gap-2 mb-2">
+                      <Badge className={`${categoryStyle.bg} ${categoryStyle.text} border ${categoryStyle.border} font-medium`}>
+                        {category}
+                      </Badge>
+                      {pubDate && (
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Calendar className="h-3 w-3" />
+                          {format(new Date(pubDate), 'dd MMM yyyy', { locale: fr })}
+                        </span>
+                      )}
+                    </div>
+
+                    <CardTitle className="text-lg group-hover:text-bn-blue-primary transition-colors line-clamp-2">
+                      {title}
+                    </CardTitle>
+                    {excerpt && (
+                      <CardDescription className="line-clamp-3 text-sm">
+                        {excerpt}
+                      </CardDescription>
+                    )}
+                  </CardHeader>
+                  
+                  <CardContent className="pt-0">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="flex items-center gap-1 text-muted-foreground">
+                        <Eye className="h-4 w-4" />
+                        {item.view_count || 0} vues
+                      </span>
+                      <span className="text-bn-blue-primary font-medium group-hover:translate-x-1 transition-transform inline-flex items-center gap-1">
+                        Lire la suite
+                        <Icon icon="mdi:arrow-right" className="h-4 w-4" />
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
       </div>
     </DigitalLibraryLayout>
   );
