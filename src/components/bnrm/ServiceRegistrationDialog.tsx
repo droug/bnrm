@@ -8,7 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Loader2, Search, X } from "lucide-react";
+import { Loader2, Search, X, UserPlus } from "lucide-react";
 import { PaymentDialog } from "./PaymentDialog";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
@@ -56,6 +56,9 @@ export function ServiceRegistrationDialog({
   const [pageCount, setPageCount] = useState<number>(1);
   const [availableTariffs, setAvailableTariffs] = useState<BNRMTariff[]>([]);
   const [autoSubmitPending, setAutoSubmitPending] = useState(false);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isCreatingAccount, setIsCreatingAccount] = useState(false);
   const [selectedTariff, setSelectedTariff] = useState<BNRMTariff | null>(null);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -212,21 +215,153 @@ export function ServiceRegistrationDialog({
     console.log("Tariff:", tariff);
 
     if (!user) {
-      // Save form data to sessionStorage so it can be restored after login
-      sessionStorage.setItem('pendingSubscription', JSON.stringify({
-        serviceId: service.id_service,
-        formData,
-        subscriptionType,
-        pageCount,
-        selectedTariffId: selectedTariff?.id_tarif,
-      }));
-      toast({
-        title: "Connexion requise",
-        description: "Veuillez vous connecter pour finaliser votre inscription. Vos données seront conservées.",
-      });
-      navigate(`/auth?redirect=${encodeURIComponent('/abonnements?platform=portal')}`);
-      onOpenChange(false);
-      return;
+      // Create account inline then proceed with subscription
+      if (!password || password.length < 6) {
+        toast({
+          title: "Mot de passe requis",
+          description: "Veuillez saisir un mot de passe d'au moins 6 caractères.",
+          variant: "destructive",
+        });
+        return;
+      }
+      if (password !== confirmPassword) {
+        toast({
+          title: "Erreur",
+          description: "Les mots de passe ne correspondent pas.",
+          variant: "destructive",
+        });
+        return;
+      }
+      if (!formData.email) {
+        toast({
+          title: "Email requis",
+          description: "Veuillez saisir votre adresse email.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setIsCreatingAccount(true);
+      setIsLoading(true);
+
+      try {
+        // Create account with Supabase Auth
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+          email: formData.email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/abonnements?platform=portal`,
+            data: {
+              first_name: formData.firstName,
+              last_name: formData.lastName,
+              phone: formData.phone,
+            }
+          }
+        });
+
+        if (signUpError) {
+          console.error("Sign up error:", signUpError);
+          toast({
+            title: "Erreur de création de compte",
+            description: signUpError.message,
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          setIsCreatingAccount(false);
+          return;
+        }
+
+        if (!signUpData.user) {
+          toast({
+            title: "Erreur",
+            description: "Impossible de créer le compte. Veuillez réessayer.",
+            variant: "destructive",
+          });
+          setIsLoading(false);
+          setIsCreatingAccount(false);
+          return;
+        }
+
+        console.log("Account created successfully:", signUpData.user.id);
+
+        // Update profile with form data
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .upsert({
+            user_id: signUpData.user.id,
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+            phone: formData.phone,
+            institution: formData.institution,
+          }, { onConflict: 'user_id' });
+
+        if (profileError) {
+          console.error("Profile update error:", profileError);
+        }
+
+        // Now proceed with subscription using the new user
+        const registrationData = {
+          user_id: signUpData.user.id,
+          service_id: service.id_service,
+          tariff_id: selectedTariff?.id_tarif || null,
+          status: isFreeService ? "active" : "pending",
+          is_paid: isFreeService,
+          registration_data: {
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            cnie: formData.cnie,
+            email: formData.email,
+            phone: formData.phone,
+            region: formData.region,
+            ville: formData.ville,
+            address: formData.address,
+            institution: formData.institution,
+            additionalInfo: formData.additionalInfo,
+            formuleType: selectedTariff 
+              ? `${selectedTariff.condition_tarif || "Non spécifié"} ${selectedTariff.periode_validite ? `Validité: ${selectedTariff.periode_validite}` : ""}`
+              : "Non spécifié",
+            ...(isPageBasedService && { pageCount }),
+            ...(selectedManuscript && { 
+              manuscriptId: selectedManuscript.id,
+              manuscriptTitle: selectedManuscript.title,
+              manuscriptCote: selectedManuscript.cote
+            }),
+          },
+        };
+
+        const { data: registration, error: regError } = await supabase
+          .from("service_registrations")
+          .insert(registrationData)
+          .select()
+          .single();
+
+        if (regError) {
+          console.error("Registration error:", regError);
+          throw regError;
+        }
+
+        console.log("Registration created for new user:", registration);
+
+        toast({
+          title: "Inscription et abonnement réussis !",
+          description: "Votre compte a été créé et votre demande d'abonnement a été enregistrée. Vérifiez votre email pour confirmer votre compte.",
+        });
+
+        setIsCreatingAccount(false);
+        setIsLoading(false);
+        onOpenChange(false);
+        return;
+      } catch (error: any) {
+        console.error("Error during account creation + subscription:", error);
+        toast({
+          title: "Erreur",
+          description: error.message || "Une erreur est survenue",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        setIsCreatingAccount(false);
+        return;
+      }
     }
 
     setIsLoading(true);
@@ -510,6 +645,42 @@ export function ServiceRegistrationDialog({
                 />
               </div>
 
+              {/* Password fields for new account creation */}
+              {!user && (
+                <div className="bg-primary/5 border border-primary/20 p-4 rounded-lg space-y-4">
+                  <h4 className="font-semibold text-sm flex items-center gap-2">
+                    <UserPlus className="h-4 w-4" />
+                    Création de compte
+                  </h4>
+                  <p className="text-xs text-muted-foreground">
+                    Un compte sera automatiquement créé avec votre email pour suivre votre abonnement.
+                  </p>
+                  <div className="grid gap-2">
+                    <Label htmlFor="password">Mot de passe *</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Minimum 6 caractères"
+                      required
+                      minLength={6}
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="confirmPassword">Confirmer le mot de passe *</Label>
+                    <Input
+                      id="confirmPassword"
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Retapez votre mot de passe"
+                      required
+                      minLength={6}
+                    />
+                  </div>
+                </div>
+              )}
               <div className="grid gap-2">
                 <Label htmlFor="phone">Téléphone *</Label>
                 <Input
@@ -774,7 +945,9 @@ export function ServiceRegistrationDialog({
                   Inscription en cours...
                 </>
               ) : (
-                isFreeService ? "S'inscrire" : "S'inscrire et réserver"
+                !user 
+                  ? (isCreatingAccount ? "Création du compte..." : "Créer un compte et s'inscrire")
+                  : (isFreeService ? "S'inscrire" : "S'inscrire et réserver")
               )}
             </Button>
           </div>
