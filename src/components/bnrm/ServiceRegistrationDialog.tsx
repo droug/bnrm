@@ -173,11 +173,20 @@ export function ServiceRegistrationDialog({
     console.log("Tariff:", tariff);
 
     if (!user) {
+      // Save form data to sessionStorage so it can be restored after login
+      sessionStorage.setItem('pendingSubscription', JSON.stringify({
+        serviceId: service.id_service,
+        formData,
+        subscriptionType,
+        pageCount,
+        selectedTariffId: selectedTariff?.id_tarif,
+      }));
       toast({
-        title: "Authentification requise",
-        description: "Veuillez vous connecter pour vous inscrire à ce service",
-        variant: "destructive",
+        title: "Connexion requise",
+        description: "Veuillez vous connecter pour finaliser votre inscription. Vos données seront conservées.",
       });
+      navigate(`/auth?redirect=${encodeURIComponent('/abonnements?platform=portal')}`);
+      onOpenChange(false);
       return;
     }
 
@@ -335,23 +344,7 @@ export function ServiceRegistrationDialog({
     onOpenChange(false);
   };
 
-  if (!user) {
-    return (
-      <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Authentification requise</DialogTitle>
-            <DialogDescription>
-              Veuillez vous connecter ou créer un compte pour vous inscrire à ce service.
-            </DialogDescription>
-          </DialogHeader>
-          <Button onClick={() => navigate("/auth")}>
-            Se connecter / S'inscrire
-          </Button>
-        </DialogContent>
-      </Dialog>
-    );
-  }
+  // No auth gate - form is accessible to everyone
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange} modal={true}>
@@ -440,7 +433,7 @@ export function ServiceRegistrationDialog({
                     value={formData.firstName}
                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                     required
-                    disabled={!!profile?.first_name}
+                    disabled={!!profile?.first_name && !!user}
                   />
                 </div>
                 <div className="grid gap-2">
@@ -450,7 +443,7 @@ export function ServiceRegistrationDialog({
                     value={formData.lastName}
                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                     required
-                    disabled={!!profile?.last_name}
+                    disabled={!!profile?.last_name && !!user}
                   />
                 </div>
               </div>
