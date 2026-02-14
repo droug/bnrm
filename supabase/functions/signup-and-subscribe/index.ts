@@ -45,7 +45,8 @@ Deno.serve(async (req) => {
     // Admin client for user creation, profile + registration inserts
     const adminClient = createClient(supabaseUrl, serviceRoleKey);
 
-    // 1. Create the user account using admin API (guarantees user is persisted)
+    // 1. Try to create the user account; if already exists, look them up
+    let userId: string;
     const { data: createData, error: createError } = await adminClient.auth.admin.createUser({
       email,
       password,
@@ -58,21 +59,39 @@ Deno.serve(async (req) => {
     });
 
     if (createError) {
-      return new Response(
-        JSON.stringify({ error: createError.message }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    if (!createData.user) {
+      // If user already exists, find them and reuse
+      if (createError.message.includes("already been registered")) {
+        const { data: listData, error: listError } = await adminClient.auth.admin.listUsers();
+        if (listError) {
+          return new Response(
+            JSON.stringify({ error: "Erreur lors de la recherche de l'utilisateur existant." }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        const existingUser = listData.users.find((u: { email?: string }) => u.email === email);
+        if (!existingUser) {
+          return new Response(
+            JSON.stringify({ error: "Un compte avec cet email existe déjà mais est introuvable." }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        userId = existingUser.id;
+        console.log("Existing user found:", userId);
+      } else {
+        return new Response(
+          JSON.stringify({ error: createError.message }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    } else if (!createData.user) {
       return new Response(
         JSON.stringify({ error: "Impossible de créer le compte." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    } else {
+      userId = createData.user.id;
+      console.log("User created:", userId);
     }
-
-    const userId = createData.user.id;
-    console.log("User created:", userId);
 
     // 2. Upsert profile using admin client (bypasses RLS)
     const { error: profileError } = await adminClient
