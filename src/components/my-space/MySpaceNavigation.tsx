@@ -12,7 +12,8 @@ import {
   MessageSquare,
   ChevronRight,
   Gift,
-  Scale
+  Scale,
+  CreditCard
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -51,6 +52,7 @@ interface MySpaceNavigationProps {
     reviews: number;
     mecenat?: number;
     arbitration?: number;
+    payments?: number;
   };
   userProfiles?: UserProfiles;
 }
@@ -149,6 +151,17 @@ export function MySpaceNavigation({ activeTab, onTabChange, counts, userProfiles
       bgColor: "bg-amber-50 hover:bg-amber-100",
     });
   }
+
+  // Always show payments
+  requestsItems.push({
+    id: "payments",
+    label: "Paiements",
+    description: "Historique des paiements par carte",
+    icon: CreditCard,
+    count: counts.payments,
+    color: "text-green-600",
+    bgColor: "bg-green-50 hover:bg-green-100",
+  });
 
   const actionsItems: NavigationItem[] = [
     {

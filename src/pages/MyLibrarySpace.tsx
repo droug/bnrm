@@ -34,6 +34,7 @@ import { MySpaceStats } from "@/components/my-space/MySpaceStats";
 import { MySpaceNavigation } from "@/components/my-space/MySpaceNavigation";
 import { MyDonorSpace } from "@/components/my-space/MyDonorSpace";
 import { ArbitrationWorkflow } from "@/components/legal-deposit/ArbitrationWorkflow";
+import { MyPayments } from "@/components/my-space/MyPayments";
 
 interface ReadingHistoryItem {
   id: string;
@@ -468,6 +469,8 @@ export default function MyLibrarySpace() {
         return <MyDonorSpace />;
       case 'arbitration':
         return <ArbitrationWorkflow />;
+      case 'payments':
+        return <MyPayments />;
       case 'history':
         return renderHistory();
       case 'favorites':
@@ -806,6 +809,7 @@ export default function MyLibrarySpace() {
                 reviews: reviews.length,
                 mecenat: 0,
                 arbitration: arbitrationCount,
+                payments: 0,
               }}
               userProfiles={userProfiles}
             />
