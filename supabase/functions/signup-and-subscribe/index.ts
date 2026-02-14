@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
+import { sendEmail } from "../_shared/smtp-client.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -152,6 +153,87 @@ Deno.serve(async (req) => {
         JSON.stringify({ error: "Compte créé mais erreur lors de l'inscription au service: " + regError.message }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    // 4. Send confirmation email via unified SMTP
+    const recipientName = [firstName, lastName].filter(Boolean).join(" ") || "Utilisateur";
+    const serviceName = selectedTariffInfo || serviceId;
+    
+    try {
+      const emailResult = await sendEmail({
+        to: email,
+        subject: "Inscription reçue - BNRM",
+        html: `
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <style>
+              body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+              .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+              .header { background: linear-gradient(135deg, #002B45 0%, #004d7a 100%); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+              .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
+              .footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; padding: 20px; }
+              .info-box { background: white; padding: 20px; margin: 20px 0; border-left: 4px solid #002B45; border-radius: 4px; }
+              .success-box { background: #e8f5e9; border-left-color: #4caf50; }
+              h1 { margin: 0; font-size: 24px; }
+              h2 { color: #002B45; margin-top: 0; }
+              ul { padding-left: 20px; }
+              li { margin: 8px 0; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <div class="header">
+                <h1>Bibliothèque Nationale du Royaume du Maroc</h1>
+              </div>
+              <div class="content">
+                <h2>Bonjour ${recipientName},</h2>
+                <p>Nous avons bien reçu votre demande d'inscription au service <strong>${serviceName}</strong> auprès de la Bibliothèque Nationale du Royaume du Maroc.</p>
+                
+                <div class="info-box success-box">
+                  <h3>✅ Votre compte a été créé avec succès</h3>
+                  <p>Votre demande d'abonnement est ${isFreeService ? "activée" : "en cours de traitement"}.</p>
+                </div>
+                
+                <div class="info-box">
+                  <h3>📋 Récapitulatif</h3>
+                  <ul>
+                    <li><strong>Email :</strong> ${email}</li>
+                    <li><strong>Service :</strong> ${serviceName}</li>
+                    <li><strong>Statut :</strong> ${isFreeService ? "Actif" : "En attente de validation"}</li>
+                  </ul>
+                </div>
+                
+                ${!isFreeService ? `
+                <p>Votre abonnement sera activé après validation par notre équipe. Vous recevrez un email de confirmation.</p>
+                ` : `
+                <p>Votre abonnement est maintenant actif. Vous pouvez vous connecter et accéder aux services.</p>
+                `}
+                
+                <p>En cas de questions, contactez-nous à <a href="mailto:contact@bnrm.ma">contact@bnrm.ma</a></p>
+                
+                <p>Cordialement,<br><strong>L'équipe de la BNRM</strong></p>
+              </div>
+              <div class="footer">
+                <p><strong>Bibliothèque Nationale du Royaume du Maroc</strong></p>
+                <p>Avenue Ibn Khaldoun, Rabat, Maroc</p>
+                <p>Tél: +212 537 77 18 33 | Email: contact@bnrm.ma</p>
+                <p><a href="https://www.bnrm.ma">www.bnrm.ma</a></p>
+              </div>
+            </div>
+          </body>
+          </html>
+        `,
+      });
+
+      if (emailResult.success) {
+        console.log("Confirmation email sent:", emailResult.messageId);
+      } else {
+        console.error("Email sending failed (non-blocking):", emailResult.error);
+      }
+    } catch (emailErr) {
+      console.error("Email error (non-blocking):", emailErr);
     }
 
     return new Response(
