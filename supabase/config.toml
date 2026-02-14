@@ -141,3 +141,6 @@ verify_jwt = true
 
 [functions.ai-translate]
 verify_jwt = false
+
+[functions.send-payment-email]
+verify_jwt = false

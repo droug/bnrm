@@ -13,6 +13,7 @@ export function useSecureRoles() {
 
   const isLibrarian = hasRole('librarian') || isAdmin;
   const isValidator = hasRole('validateur');
+  const isComptable = hasRole('comptable');
   const isProfessional = hasRole('editor') || hasRole('printer') || hasRole('producer') || hasRole('distributor');
   const isPartner = hasRole('partner');
   const isResearcher = hasRole('researcher');
@@ -37,6 +38,7 @@ export function useSecureRoles() {
     isAdmin,
     isLibrarian,
     isValidator,
+    isComptable,
     isProfessional,
     isPartner,
     isResearcher,
