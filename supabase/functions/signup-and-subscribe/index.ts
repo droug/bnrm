@@ -42,41 +42,36 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Client with anon key for signUp (so auth hooks fire normally)
-    const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-    const anonClient = createClient(supabaseUrl, anonKey);
-
-    // Admin client for profile + registration inserts
+    // Admin client for user creation, profile + registration inserts
     const adminClient = createClient(supabaseUrl, serviceRoleKey);
 
-    // 1. Create the user account
-    const { data: signUpData, error: signUpError } = await anonClient.auth.signUp({
+    // 1. Create the user account using admin API (guarantees user is persisted)
+    const { data: createData, error: createError } = await adminClient.auth.admin.createUser({
       email,
       password,
-      options: {
-        data: {
-          first_name: firstName,
-          last_name: lastName,
-          phone,
-        },
+      email_confirm: false,
+      user_metadata: {
+        first_name: firstName,
+        last_name: lastName,
+        phone,
       },
     });
 
-    if (signUpError) {
+    if (createError) {
       return new Response(
-        JSON.stringify({ error: signUpError.message }),
+        JSON.stringify({ error: createError.message }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    if (!signUpData.user) {
+    if (!createData.user) {
       return new Response(
         JSON.stringify({ error: "Impossible de créer le compte." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
-    const userId = signUpData.user.id;
+    const userId = createData.user.id;
     console.log("User created:", userId);
 
     // 2. Upsert profile using admin client (bypasses RLS)
