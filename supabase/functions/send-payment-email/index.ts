@@ -22,6 +22,8 @@ serve(async (req) => {
     }
 
     const formattedAmount = montant ? `${montant} ${devise || 'DH'}` : 'Gratuit';
+    const siteUrl = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
+    const paymentLink = `${siteUrl}/my-space?tab=payments`;
 
     const html = `
       <!DOCTYPE html>
@@ -56,11 +58,17 @@ serve(async (req) => {
                 </tr>
               </table>
             </div>
+
+            <div style="text-align: center; margin: 24px 0;">
+              <a href="${paymentLink}" style="display: inline-block; background: linear-gradient(135deg, #1a5632 0%, #2d7a4f 100%); color: white; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 15px; font-weight: 600;">
+                Accéder à mon espace de paiement
+              </a>
+            </div>
             
             <div style="background: #fff8e6; border: 1px solid #f0d68a; border-radius: 8px; padding: 16px; margin: 24px 0;">
               <h4 style="margin: 0 0 8px; color: #8a6d00; font-size: 14px;">💳 Modes de paiement acceptés</h4>
               <ul style="margin: 0; padding-left: 20px; color: #666; font-size: 13px; line-height: 1.8;">
-                <li><strong>Paiement en ligne</strong> : Rendez-vous sur votre espace personnel sur le portail BNRM pour payer par carte bancaire.</li>
+                <li><strong>Paiement en ligne</strong> : <a href="${paymentLink}" style="color: #1a5632; text-decoration: underline;">Rendez-vous sur votre espace personnel</a> sur le portail BNRM pour payer par carte bancaire.</li>
                 <li><strong>Virement bancaire</strong> : Veuillez effectuer un virement au compte de la BNRM et nous envoyer le justificatif.</li>
                 <li><strong>Paiement sur place</strong> : Présentez-vous à la caisse de la BNRM avec votre numéro de demande.</li>
               </ul>
