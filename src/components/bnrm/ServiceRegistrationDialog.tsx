@@ -55,6 +55,7 @@ export function ServiceRegistrationDialog({
   const [registrationId, setRegistrationId] = useState<string | null>(null);
   const [pageCount, setPageCount] = useState<number>(1);
   const [availableTariffs, setAvailableTariffs] = useState<BNRMTariff[]>([]);
+  const [autoSubmitPending, setAutoSubmitPending] = useState(false);
   const [selectedTariff, setSelectedTariff] = useState<BNRMTariff | null>(null);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -145,7 +146,7 @@ export function ServiceRegistrationDialog({
   useEffect(() => {
     // Try to restore form data from sessionStorage (after login redirect)
     const pendingData = sessionStorage.getItem('pendingSubscription');
-    if (pendingData && open) {
+    if (pendingData && open && user) {
       try {
         const parsed = JSON.parse(pendingData);
         if (parsed.formData) {
@@ -159,6 +160,8 @@ export function ServiceRegistrationDialog({
           if (parsed.pageCount) setPageCount(parsed.pageCount);
           // Clear after restoring
           sessionStorage.removeItem('pendingSubscription');
+          // Trigger auto-submit after state updates
+          setAutoSubmitPending(true);
           return; // Don't overwrite with profile data
         }
       } catch {
@@ -182,6 +185,19 @@ export function ServiceRegistrationDialog({
       }));
     }
   }, [profile, user, open]);
+
+  // Auto-submit after restoring pending data from sessionStorage
+  const formRef = useRef<HTMLFormElement>(null);
+  useEffect(() => {
+    if (autoSubmitPending && user && open) {
+      setAutoSubmitPending(false);
+      // Use a small delay to ensure state is fully updated, then submit the form
+      const timer = setTimeout(() => {
+        formRef.current?.requestSubmit();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [autoSubmitPending, user, open]);
 
   const isFreeService = !selectedTariff;
 
@@ -442,7 +458,7 @@ export function ServiceRegistrationDialog({
             </div>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             {/* Informations personnelles */}
             <div className="bg-muted/30 p-4 rounded-lg space-y-4">

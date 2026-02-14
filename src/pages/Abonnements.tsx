@@ -81,7 +81,7 @@ export default function Abonnements() {
           description: "Vos informations ont été conservées. Vous pouvez finaliser votre inscription.",
         });
       }
-      sessionStorage.removeItem('pendingSubscription');
+      // Don't remove here - let the dialog's useEffect handle cleanup after restoring form data
     } catch {
       sessionStorage.removeItem('pendingSubscription');
     }
