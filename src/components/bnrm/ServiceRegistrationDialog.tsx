@@ -245,102 +245,47 @@ export function ServiceRegistrationDialog({
       setIsLoading(true);
 
       try {
-        // Create account with Supabase Auth
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-          email: formData.email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/abonnements?platform=portal`,
-            data: {
-              first_name: formData.firstName,
-              last_name: formData.lastName,
+        // Call edge function to create account + profile + registration server-side
+        const { data: fnData, error: fnError } = await supabase.functions.invoke(
+          "signup-and-subscribe",
+          {
+            body: {
+              email: formData.email,
+              password,
+              firstName: formData.firstName,
+              lastName: formData.lastName,
               phone: formData.phone,
-            }
+              institution: formData.institution,
+              cnie: formData.cnie,
+              region: formData.region,
+              ville: formData.ville,
+              address: formData.address,
+              additionalInfo: formData.additionalInfo,
+              serviceId: service.id_service,
+              tariffId: selectedTariff?.id_tarif || null,
+              isFreeService,
+              selectedTariffInfo: selectedTariff
+                ? `${selectedTariff.condition_tarif || "Non spécifié"} ${selectedTariff.periode_validite ? `Validité: ${selectedTariff.periode_validite}` : ""}`
+                : "Non spécifié",
+              isPageBasedService,
+              pageCount,
+              selectedManuscript: selectedManuscript
+                ? { id: selectedManuscript.id, title: selectedManuscript.title, cote: selectedManuscript.cote }
+                : null,
+            },
           }
-        });
+        );
 
-        if (signUpError) {
-          console.error("Sign up error:", signUpError);
-          toast({
-            title: "Erreur de création de compte",
-            description: signUpError.message,
-            variant: "destructive",
-          });
-          setIsLoading(false);
-          setIsCreatingAccount(false);
-          return;
+        if (fnError) {
+          console.error("Edge function error:", fnError);
+          throw new Error(fnError.message || "Erreur lors de la création du compte");
         }
 
-        if (!signUpData.user) {
-          toast({
-            title: "Erreur",
-            description: "Impossible de créer le compte. Veuillez réessayer.",
-            variant: "destructive",
-          });
-          setIsLoading(false);
-          setIsCreatingAccount(false);
-          return;
+        if (fnData?.error) {
+          throw new Error(fnData.error);
         }
 
-        console.log("Account created successfully:", signUpData.user.id);
-
-        // Update profile with form data
-        const { error: profileError } = await supabase
-          .from("profiles")
-          .upsert({
-            user_id: signUpData.user.id,
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            phone: formData.phone,
-            institution: formData.institution,
-          }, { onConflict: 'user_id' });
-
-        if (profileError) {
-          console.error("Profile update error:", profileError);
-        }
-
-        // Now proceed with subscription using the new user
-        const registrationData = {
-          user_id: signUpData.user.id,
-          service_id: service.id_service,
-          tariff_id: selectedTariff?.id_tarif || null,
-          status: isFreeService ? "active" : "pending",
-          is_paid: isFreeService,
-          registration_data: {
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            cnie: formData.cnie,
-            email: formData.email,
-            phone: formData.phone,
-            region: formData.region,
-            ville: formData.ville,
-            address: formData.address,
-            institution: formData.institution,
-            additionalInfo: formData.additionalInfo,
-            formuleType: selectedTariff 
-              ? `${selectedTariff.condition_tarif || "Non spécifié"} ${selectedTariff.periode_validite ? `Validité: ${selectedTariff.periode_validite}` : ""}`
-              : "Non spécifié",
-            ...(isPageBasedService && { pageCount }),
-            ...(selectedManuscript && { 
-              manuscriptId: selectedManuscript.id,
-              manuscriptTitle: selectedManuscript.title,
-              manuscriptCote: selectedManuscript.cote
-            }),
-          },
-        };
-
-        const { data: registration, error: regError } = await supabase
-          .from("service_registrations")
-          .insert(registrationData)
-          .select()
-          .single();
-
-        if (regError) {
-          console.error("Registration error:", regError);
-          throw regError;
-        }
-
-        console.log("Registration created for new user:", registration);
+        console.log("Signup + subscribe success:", fnData);
 
         toast({
           title: "Inscription et abonnement réussis !",
