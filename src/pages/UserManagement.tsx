@@ -5,10 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Shield, Users, CheckCircle, XCircle, Clock, Settings, User, Mail, Phone, Building, Calendar, UserCheck, UserX, Edit, ArrowLeft, Home, Trash, UserPlus, Search as SearchIcon } from "lucide-react";
+import { Shield, Users, CheckCircle, XCircle, Clock, Settings, User, Mail, Phone, Building, Calendar, UserCheck, UserX, Edit, ArrowLeft, Home, Trash, UserPlus, Search as SearchIcon, ChevronRight, TrendingUp, FileText, AlertCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Navigate, Link } from "react-router-dom";
 import { WatermarkContainer } from "@/components/ui/watermark";
@@ -19,6 +17,10 @@ import SubscriptionPlansManager from "@/components/SubscriptionPlansManager";
 import AddInternalUserDialog from "@/components/AddInternalUserDialog";
 import { EditUserDialog } from "@/components/EditUserDialog";
 import { UserCategoryTable } from "@/components/admin/UserCategoryTable";
+import { AdminHeader } from "@/components/AdminHeader";
+import { AdminBackOfficeHeader } from "@/components/admin/AdminBackOfficeHeader";
+import { cn } from "@/lib/utils";
+
 interface Profile {
   id: string;
   user_id: string;
@@ -72,7 +74,6 @@ interface SystemRoleData {
   is_active: boolean;
 }
 
-// Mapping catégories DB → onglets UI
 const CATEGORY_TO_TAB: Record<string, string> = {
   administration: 'internal',
   internal: 'internal',
@@ -80,19 +81,27 @@ const CATEGORY_TO_TAB: Record<string, string> = {
   user: 'subscriber',
 };
 
+interface NavigationItem {
+  id: string;
+  label: string;
+  description: string;
+  icon: React.ElementType;
+  count?: number;
+  color: string;
+  bgColor: string;
+}
+
 export default function UserManagement() {
   const { user, profile, loading } = useAuth();
   const { isAdmin, loading: rolesLoading } = useSecureRoles();
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
-  
-  // Hook pour gérer les rôles système dynamiques
   const { availableRoles, grantRole: grantSystemRole, isAdmin: currentUserIsAdmin } = useSystemRoles();
   
   const [users, setUsers] = useState<Profile[]>([]);
   const [pendingRequests, setPendingRequests] = useState<AccessRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedTab, setSelectedTab] = useState("internal");
+  const [activeTab, setActiveTab] = useState("internal");
   const [editingUser, setEditingUser] = useState<Profile | null>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [systemRolesData, setSystemRolesData] = useState<SystemRoleData[]>([]);
@@ -126,7 +135,6 @@ export default function UserManagement() {
     }
   };
 
-  // Construire rolePermissions depuis les données DB
   const rolePermissions = useMemo(() => {
     const map: Record<string, { name: string; description: string; permissions: string[]; maxRequests: number; accessLevel: string }> = {};
     for (const r of systemRolesData) {
@@ -141,7 +149,6 @@ export default function UserManagement() {
     return map;
   }, [systemRolesData]);
 
-  // Catégories de rôles dynamiques depuis la DB
   const rolesByCategory = useMemo(() => {
     const internal: string[] = [];
     const professional: string[] = [];
@@ -157,52 +164,30 @@ export default function UserManagement() {
 
   const fetchData = async () => {
     try {
-      // Fetch all users (prefer secure admin RPC that includes email; fallback to profiles)
       let profilesData: any[] = [];
-
-      const { data: rpcData, error: usersError } = await supabase.rpc(
-        "get_admin_users_with_email"
-      );
+      const { data: rpcData, error: usersError } = await supabase.rpc("get_admin_users_with_email");
 
       if (usersError) {
         console.error("RPC get_admin_users_with_email failed", usersError);
-
-        // Fallback: keep the admin page usable even if the RPC is unavailable
         const { data: fallbackProfiles, error: fallbackError } = await supabase
           .from("profiles")
           .select("*")
           .order("updated_at", { ascending: false });
-
         if (fallbackError) throw fallbackError;
-
-        profilesData = (fallbackProfiles || []).map((p: any) => ({
-          ...p,
-          email: null,
-        }));
-
+        profilesData = (fallbackProfiles || []).map((p: any) => ({ ...p, email: null }));
         toast({
           title: "Avertissement",
-          description:
-            "Chargement en mode dégradé (emails indisponibles). La liste des utilisateurs reste accessible.",
+          description: "Chargement en mode dégradé (emails indisponibles).",
         });
       } else {
-        // La RPC retourne maintenant tous les rôles dans all_roles
         profilesData = (rpcData as any[]) || [];
       }
 
-      // Les rôles sont déjà inclus dans les données RPC
       setUsers(profilesData || []);
 
-      // Fetch pending access requests
       const { data: requestsData, error: requestsError } = await supabase
         .from("access_requests")
-        .select(
-          `
-          *,
-          manuscripts:manuscript_id (title, author),
-          profiles:user_id (first_name, last_name, institution)
-        `
-        )
+        .select(`*, manuscripts:manuscript_id (title, author), profiles:user_id (first_name, last_name, institution)`)
         .eq("status", "pending")
         .order("created_at", { ascending: false });
 
@@ -223,99 +208,48 @@ export default function UserManagement() {
   const updateUserRole = async (userId: string, newRoleCode: string) => {
     try {
       const { data: { user: currentUser } } = await supabase.auth.getUser();
-      
-      if (!currentUser) {
-        throw new Error("Non authentifié");
-      }
+      if (!currentUser) throw new Error("Non authentifié");
 
-      // Récupérer le user_id depuis le profile
       const userProfile = users.find(u => u.id === userId);
-      if (!userProfile) {
-        throw new Error("Utilisateur introuvable");
-      }
+      if (!userProfile) throw new Error("Utilisateur introuvable");
 
-      // Si le nouveau rôle est admin, utiliser user_roles (enum)
       if (newRoleCode === 'admin') {
-        // Supprimer tous les rôles système
-        await supabase
-          .from('user_system_roles')
-          .delete()
-          .eq('user_id', userProfile.user_id);
-
-        // Ajouter admin dans user_roles
-        const { error: roleError } = await supabase
-          .from('user_roles')
-          .insert({
-            user_id: userProfile.user_id,
-            role: 'admin',
-            granted_by: currentUser.id,
-          });
-
+        await supabase.from('user_system_roles').delete().eq('user_id', userProfile.user_id);
+        const { error: roleError } = await supabase.from('user_roles').insert({
+          user_id: userProfile.user_id, role: 'admin', granted_by: currentUser.id,
+        });
         if (roleError) throw roleError;
       } else {
-        // Trouver le rôle dans system_roles
         const systemRole = availableRoles.find(r => r.role_code === newRoleCode);
-        if (!systemRole) {
-          throw new Error(`Rôle système introuvable: ${newRoleCode}`);
-        }
+        if (!systemRole) throw new Error(`Rôle système introuvable: ${newRoleCode}`);
 
-        // Supprimer admin si présent
-        await supabase
-          .from('user_roles')
-          .delete()
-          .eq('user_id', userProfile.user_id)
-          .eq('role', 'admin');
-
-        // Supprimer les anciens rôles système
-        await supabase
-          .from('user_system_roles')
-          .delete()
-          .eq('user_id', userProfile.user_id);
-
-        // Ajouter le nouveau rôle système
-        const { error: roleError } = await supabase
-          .from('user_system_roles')
-          .insert({
-            user_id: userProfile.user_id,
-            role_id: systemRole.id,
-            granted_by: currentUser.id,
-          });
-
+        await supabase.from('user_roles').delete().eq('user_id', userProfile.user_id).eq('role', 'admin');
+        await supabase.from('user_system_roles').delete().eq('user_id', userProfile.user_id);
+        const { error: roleError } = await supabase.from('user_system_roles').insert({
+          user_id: userProfile.user_id, role_id: systemRole.id, granted_by: currentUser.id,
+        });
         if (roleError) throw roleError;
       }
 
-      toast({
-        title: "Rôle mis à jour",
-        description: "Le rôle de l'utilisateur a été modifié avec succès",
-      });
-      
+      toast({ title: "Rôle mis à jour", description: "Le rôle de l'utilisateur a été modifié avec succès" });
       fetchData();
     } catch (error: any) {
-      toast({
-        title: "Erreur",
-        description: error.message || "Impossible de mettre à jour le rôle",
-        variant: "destructive",
-      });
+      toast({ title: "Erreur", description: error.message || "Impossible de mettre à jour le rôle", variant: "destructive" });
     }
   };
 
   const updateUserApproval = async (userId: string, isApproved: boolean) => {
     try {
-      // Récupérer l'utilisateur pour avoir son email
       const userProfile = users.find(u => u.id === userId);
-      
       const { error } = await supabase
         .from('profiles')
         .update({ is_approved: isApproved, updated_at: new Date().toISOString() })
         .eq('id', userId);
-
       if (error) throw error;
 
-      // Envoyer l'email de notification
       if (userProfile) {
         const { data: authData } = await supabase.auth.admin.getUserById(userProfile.user_id);
         const userEmail = authData?.user?.email;
-        
         if (userEmail) {
           await supabase.functions.invoke('send-registration-email', {
             body: {
@@ -332,14 +266,9 @@ export default function UserManagement() {
         title: isApproved ? "Utilisateur approuvé" : "Approbation révoquée",
         description: `L'utilisateur a été ${isApproved ? 'approuvé' : 'désapprouvé'} avec succès`,
       });
-
       fetchData();
     } catch (error: any) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de modifier l'approbation",
-        variant: "destructive",
-      });
+      toast({ title: "Erreur", description: "Impossible de modifier l'approbation", variant: "destructive" });
     }
   };
 
@@ -347,34 +276,18 @@ export default function UserManagement() {
     try {
       const { error } = await supabase
         .from('access_requests')
-        .update({ 
-          status, 
-          approved_by: profile?.id,
-          updated_at: new Date().toISOString() 
-        })
+        .update({ status, approved_by: profile?.id, updated_at: new Date().toISOString() })
         .eq('id', requestId);
-
       if (error) throw error;
-
-      toast({
-        title: "Demande mise à jour",
-        description: `La demande a été ${status === 'approved' ? 'approuvée' : 'rejetée'}`,
-      });
-
+      toast({ title: "Demande mise à jour", description: `La demande a été ${status === 'approved' ? 'approuvée' : 'rejetée'}` });
       fetchData();
     } catch (error: any) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour la demande",
-        variant: "destructive",
-      });
+      toast({ title: "Erreur", description: "Impossible de mettre à jour la demande", variant: "destructive" });
     }
   };
 
   const deleteUser = async (userId: string) => {
     try {
-      // Utiliser la edge function user-service pour un nettoyage complet
-      // (auth.users, user_roles, user_system_roles, notifications, profiles, etc.)
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData?.session?.access_token;
       if (!token) throw new Error("Non authentifié");
@@ -392,42 +305,30 @@ export default function UserManagement() {
         throw new Error(response.data.error || "Échec de la suppression");
       }
 
-      toast({
-        title: "Utilisateur supprimé",
-        description: "L'utilisateur et toutes ses données liées ont été supprimés avec succès",
-      });
-
+      toast({ title: "Utilisateur supprimé", description: "L'utilisateur et toutes ses données liées ont été supprimés avec succès" });
       fetchData();
     } catch (error: any) {
       console.error('Delete user error:', error);
-      toast({
-        title: "Erreur",
-        description: error.message || "Impossible de supprimer l'utilisateur",
-        variant: "destructive",
-      });
+      toast({ title: "Erreur", description: error.message || "Impossible de supprimer l'utilisateur", variant: "destructive" });
     }
   };
 
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {
-      case 'admin': return 'destructive';
-      case 'librarian': return 'default';
-      case 'partner': return 'default';
-      case 'subscriber': return 'secondary';
-      case 'researcher': return 'secondary';
-      case 'public_user': return 'outline';
-      case 'visitor': return 'outline';
-      default: return 'outline';
+      case 'admin': return 'destructive' as const;
+      case 'librarian': return 'default' as const;
+      case 'partner': return 'default' as const;
+      case 'subscriber': return 'secondary' as const;
+      case 'researcher': return 'secondary' as const;
+      case 'public_user': return 'outline' as const;
+      case 'visitor': return 'outline' as const;
+      default: return 'outline' as const;
     }
   };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('fr-FR', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+      year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
     });
   };
 
@@ -443,12 +344,10 @@ export default function UserManagement() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // Catégories dynamiques depuis la DB
   const INTERNAL_ROLES = rolesByCategory.internal;
   const PROFESSIONAL_ROLES = rolesByCategory.professional;
   const SUBSCRIBER_ROLES = rolesByCategory.subscriber;
 
-  // Fonction pour vérifier si un utilisateur appartient à une catégorie
   const hasRoleInCategory = (userProfile: Profile, categoryRoles: string[]) => {
     if (userProfile.all_roles && userProfile.all_roles.length > 0) {
       return userProfile.all_roles.some(role => categoryRoles.includes(role));
@@ -456,7 +355,6 @@ export default function UserManagement() {
     return categoryRoles.includes(userProfile.role);
   };
 
-  // Filtrer les utilisateurs selon la recherche (nom, institution, rôle, email)
   const filteredUsers = users.filter(u => 
     `${u.first_name} ${u.last_name}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
     u.institution?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -464,7 +362,6 @@ export default function UserManagement() {
     u.email?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Séparer les utilisateurs par catégorie
   const internalUsers = filteredUsers.filter(u => hasRoleInCategory(u, INTERNAL_ROLES));
   const professionalUsers = filteredUsers.filter(u => hasRoleInCategory(u, PROFESSIONAL_ROLES));
   const subscriberUsers = filteredUsers.filter(u => 
@@ -473,267 +370,211 @@ export default function UserManagement() {
     !hasRoleInCategory(u, PROFESSIONAL_ROLES)
   );
 
-  return (
-    <WatermarkContainer 
-      watermarkProps={{ 
-        text: "BNRM - Gestion des Utilisateurs", 
-        variant: "subtle", 
-        position: "corner",
-        opacity: 0.03
-      }}
-    >
-      <div className="min-h-screen bg-background">
-        {/* Header */}
-        <header className="border-b bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/60 sticky top-0 z-10">
-          <div className="container flex h-14 sm:h-16 items-center justify-between px-4">
-            <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
-              <Link to="/admin/settings">
-                <Button variant="ghost" size="sm" className="px-2 sm:px-3">
-                  <ArrowLeft className="h-4 w-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Retour</span>
-                </Button>
-              </Link>
-              <div className="flex items-center space-x-2 min-w-0">
-                <Users className="h-5 w-5 sm:h-6 sm:w-6 text-primary flex-shrink-0" />
-                <div className="min-w-0">
-                  <h1 className="text-base sm:text-xl font-bold truncate">Gestion des Utilisateurs</h1>
-                  <p className="text-xs text-muted-foreground hidden sm:block">
-                    Administration des comptes et permissions utilisateurs
-                  </p>
-                </div>
+  // Navigation items matching depot-legal style
+  const managementItems: NavigationItem[] = [
+    {
+      id: "internal",
+      label: "Utilisateurs Internes",
+      description: "Administrateurs, bibliothécaires, direction",
+      icon: Shield,
+      count: internalUsers.length,
+      color: "text-blue-600",
+      bgColor: "bg-blue-50 hover:bg-blue-100",
+    },
+    {
+      id: "professionals",
+      label: "Professionnels",
+      description: "Éditeurs, imprimeurs, producteurs",
+      icon: Building,
+      count: professionalUsers.length,
+      color: "text-purple-600",
+      bgColor: "bg-purple-50 hover:bg-purple-100",
+    },
+    {
+      id: "subscribers",
+      label: "Abonnés & Usagers",
+      description: "Chercheurs, abonnés, grand public",
+      icon: Users,
+      count: subscriberUsers.length,
+      color: "text-emerald-600",
+      bgColor: "bg-emerald-50 hover:bg-emerald-100",
+    },
+  ];
+
+  const settingsItems: NavigationItem[] = [
+    {
+      id: "permissions",
+      label: "Permissions",
+      description: "Gestion des rôles et droits",
+      icon: Settings,
+      color: "text-amber-600",
+      bgColor: "bg-amber-50 hover:bg-amber-100",
+    },
+    {
+      id: "plans",
+      label: "Plans d'abonnement",
+      description: "Configuration des plans",
+      icon: UserPlus,
+      color: "text-indigo-600",
+      bgColor: "bg-indigo-50 hover:bg-indigo-100",
+    },
+    {
+      id: "requests",
+      label: "Demandes d'accès",
+      description: "Demandes en attente",
+      icon: Clock,
+      count: pendingRequests.length,
+      color: "text-orange-600",
+      bgColor: "bg-orange-50 hover:bg-orange-100",
+    },
+  ];
+
+  const renderNavItem = (item: NavigationItem) => {
+    const isActive = activeTab === item.id;
+    return (
+      <button
+        key={item.id}
+        onClick={() => setActiveTab(item.id)}
+        className={cn(
+          "w-full p-4 rounded-xl border text-left transition-all duration-200",
+          isActive
+            ? "border-primary bg-primary/5 shadow-sm ring-1 ring-primary/20"
+            : `border-transparent ${item.bgColor}`
+        )}
+      >
+        <div className="flex items-center gap-3">
+          <div className={cn(
+            "p-2 rounded-lg",
+            isActive ? "bg-primary text-primary-foreground" : item.color + " bg-white"
+          )}>
+            <item.icon className="h-5 w-5" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className={cn(
+                "font-medium truncate",
+                isActive ? "text-primary" : "text-foreground"
+              )}>
+                {item.label}
+              </span>
+              {item.count !== undefined && item.count > 0 && (
+                <Badge variant={isActive ? "default" : "secondary"} className="text-xs px-1.5 py-0">
+                  {item.count}
+                </Badge>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground truncate hidden md:block">
+              {item.description}
+            </p>
+          </div>
+          <ChevronRight className={cn(
+            "h-4 w-4 text-muted-foreground transition-transform",
+            isActive && "text-primary transform translate-x-1"
+          )} />
+        </div>
+      </button>
+    );
+  };
+
+  // Stats
+  const statsItems = [
+    { label: "Total utilisateurs", value: users.length, icon: Users, color: "text-blue-600 bg-blue-100" },
+    { label: "Approuvés", value: users.filter(u => u.is_approved).length, icon: CheckCircle, color: "text-emerald-600 bg-emerald-100" },
+    { label: "En attente", value: users.filter(u => !u.is_approved).length, icon: Clock, color: "text-amber-600 bg-amber-100" },
+    { label: "Internes", value: internalUsers.length, icon: Shield, color: "text-purple-600 bg-purple-100" },
+    { label: "Demandes d'accès", value: pendingRequests.length, icon: FileText, color: "text-red-600 bg-red-100" },
+  ];
+
+  const userTableProps = {
+    rolePermissions,
+    availableRoleOptions: [
+      { value: 'admin', label: 'Administrateur' },
+      ...availableRoles.map(role => ({ value: role.role_code, label: role.role_name }))
+    ],
+    onEditUser: (u: Profile) => { setEditingUser(u); setShowEditDialog(true); },
+    onUpdateRole: updateUserRole,
+    onUpdateApproval: updateUserApproval,
+    onDeleteUser: deleteUser,
+    getRoleBadgeVariant,
+    formatDate,
+  };
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'internal':
+        return (
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold flex items-center gap-2">
+                  <Shield className="h-5 w-5 text-primary" />
+                  Utilisateurs Internes
+                </h2>
+                <p className="text-sm text-muted-foreground">Personnel BNRM : administrateurs, bibliothécaires, direction, comptabilité</p>
               </div>
+              <AddInternalUserDialog onUserAdded={fetchData} />
             </div>
-            <div className="flex items-center flex-shrink-0">
-              <Badge variant="outline" className="gap-1 hidden sm:flex">
-                <User className="h-3 w-3" />
-                {profile?.first_name} {profile?.last_name}
-              </Badge>
+            <div className="relative max-w-md">
+              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Rechercher..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
             </div>
+            <UserCategoryTable users={internalUsers} {...userTableProps} emptyMessage="Aucun utilisateur interne trouvé" />
           </div>
-        </header>
-
-        {/* Main Content */}
-        <main className="container py-4 sm:py-8 space-y-4 sm:space-y-8 px-4">
-          {/* Quick Actions & Search */}
-          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-            <div className="flex-1 w-full sm:max-w-md">
-              <div className="relative">
-                <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Rechercher par nom, email, institution..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
+        );
+      case 'professionals':
+        return (
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <Building className="h-5 w-5 text-primary" />
+                Comptes Professionnels
+              </h2>
+              <p className="text-sm text-muted-foreground">Éditeurs, imprimeurs, producteurs et distributeurs inscrits pour le dépôt légal</p>
             </div>
-            <AddInternalUserDialog onUserAdded={fetchData} />
-          </div>
-
-          {/* Statistics Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Total Utilisateurs</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{users.length}</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Utilisateurs Approuvés</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">
-                  {users.filter(u => u.is_approved).length}
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">En Attente</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-amber-600">
-                  {users.filter(u => !u.is_approved).length}
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-sm font-medium text-muted-foreground">Demandes d'accès</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-blue-600">
-                  {pendingRequests.length}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Tabs */}
-          <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
-            <div className="overflow-x-auto -mx-4 px-4 sm:mx-0 sm:px-0">
-              <TabsList className="inline-flex w-auto min-w-full sm:grid sm:w-full sm:grid-cols-6">
-                <TabsTrigger value="internal" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm whitespace-nowrap">
-                  <Shield className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  <span className="hidden md:inline">Internes</span> ({internalUsers.length})
-                </TabsTrigger>
-                <TabsTrigger value="professionals" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm whitespace-nowrap">
-                  <Building className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  <span className="hidden md:inline">Professionnels</span> ({professionalUsers.length})
-                </TabsTrigger>
-                <TabsTrigger value="subscribers" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm whitespace-nowrap">
-                  <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  <span className="hidden md:inline">Abonnés</span> ({subscriberUsers.length})
-                </TabsTrigger>
-                <TabsTrigger value="permissions" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm whitespace-nowrap">
-                  <Settings className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  <span className="hidden md:inline">Permissions</span>
-                </TabsTrigger>
-                <TabsTrigger value="plans" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm whitespace-nowrap">
-                  <UserPlus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  <span className="hidden md:inline">Plans</span>
-                </TabsTrigger>
-                <TabsTrigger value="requests" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm whitespace-nowrap">
-                  <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-                  <span className="hidden md:inline">Demandes</span> ({pendingRequests.length})
-                </TabsTrigger>
-              </TabsList>
+            <div className="relative max-w-md">
+              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Rechercher..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
             </div>
-
-            {/* Onglet Utilisateurs Internes */}
-            <TabsContent value="internal" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Shield className="h-5 w-5" />
-                    Utilisateurs Internes
-                  </CardTitle>
-                  <CardDescription>
-                    Personnel BNRM : administrateurs, bibliothécaires, direction, comptabilité, etc.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <UserCategoryTable
-                    users={internalUsers}
-                    rolePermissions={rolePermissions}
-                    availableRoleOptions={[
-                      { value: 'admin', label: 'Administrateur' },
-                      ...availableRoles.map(role => ({
-                        value: role.role_code,
-                        label: role.role_name,
-                      }))
-                    ]}
-                    onEditUser={(user) => {
-                      setEditingUser(user);
-                      setShowEditDialog(true);
-                    }}
-                    onUpdateRole={updateUserRole}
-                    onUpdateApproval={updateUserApproval}
-                    onDeleteUser={deleteUser}
-                    getRoleBadgeVariant={getRoleBadgeVariant}
-                    formatDate={formatDate}
-                    emptyMessage="Aucun utilisateur interne trouvé"
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Onglet Professionnels */}
-            <TabsContent value="professionals" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Building className="h-5 w-5" />
-                    Comptes Professionnels
-                  </CardTitle>
-                  <CardDescription>
-                    Éditeurs, imprimeurs, producteurs et distributeurs inscrits pour le dépôt légal
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <UserCategoryTable
-                    users={professionalUsers}
-                    rolePermissions={rolePermissions}
-                    availableRoleOptions={[
-                      { value: 'admin', label: 'Administrateur' },
-                      ...availableRoles.map(role => ({
-                        value: role.role_code,
-                        label: role.role_name,
-                      }))
-                    ]}
-                    onEditUser={(user) => {
-                      setEditingUser(user);
-                      setShowEditDialog(true);
-                    }}
-                    onUpdateRole={updateUserRole}
-                    onUpdateApproval={updateUserApproval}
-                    onDeleteUser={deleteUser}
-                    getRoleBadgeVariant={getRoleBadgeVariant}
-                    formatDate={formatDate}
-                    emptyMessage="Aucun compte professionnel trouvé"
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            {/* Onglet Abonnés */}
-            <TabsContent value="subscribers" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5" />
-                    Abonnés & Usagers
-                  </CardTitle>
-                  <CardDescription>
-                    Chercheurs, abonnés premium, partenaires institutionnels et grand public
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <UserCategoryTable
-                    users={subscriberUsers}
-                    rolePermissions={rolePermissions}
-                    availableRoleOptions={[
-                      { value: 'admin', label: 'Administrateur' },
-                      ...availableRoles.map(role => ({
-                        value: role.role_code,
-                        label: role.role_name,
-                      }))
-                    ]}
-                    onEditUser={(user) => {
-                      setEditingUser(user);
-                      setShowEditDialog(true);
-                    }}
-                    onUpdateRole={updateUserRole}
-                    onUpdateApproval={updateUserApproval}
-                    onDeleteUser={deleteUser}
-                    getRoleBadgeVariant={getRoleBadgeVariant}
-                    formatDate={formatDate}
-                    emptyMessage="Aucun abonné trouvé"
-                  />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-          {/* Gestion des permissions */}
-          <TabsContent value="permissions" className="space-y-6">
+            <UserCategoryTable users={professionalUsers} {...userTableProps} emptyMessage="Aucun compte professionnel trouvé" />
+          </div>
+        );
+      case 'subscribers':
+        return (
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <Users className="h-5 w-5 text-primary" />
+                Abonnés & Usagers
+              </h2>
+              <p className="text-sm text-muted-foreground">Chercheurs, abonnés premium, partenaires institutionnels et grand public</p>
+            </div>
+            <div className="relative max-w-md">
+              <SearchIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input placeholder="Rechercher..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-10" />
+            </div>
+            <UserCategoryTable users={subscriberUsers} {...userTableProps} emptyMessage="Aucun abonné trouvé" />
+          </div>
+        );
+      case 'permissions':
+        return (
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <Settings className="h-5 w-5 text-primary" />
+                Gestion des Permissions
+              </h2>
+            </div>
             <div className="grid gap-6 md:grid-cols-2">
               {Object.entries(rolePermissions).map(([roleKey, roleData]) => (
                 <Card key={roleKey}>
                   <CardHeader>
                     <CardTitle className="flex items-center justify-between">
                       <span>{roleData.name}</span>
-                      <Badge variant={getRoleBadgeVariant(roleKey)}>
-                        {roleKey}
-                      </Badge>
+                      <Badge variant={getRoleBadgeVariant(roleKey)}>{roleKey}</Badge>
                     </CardTitle>
-                    <CardDescription>
-                      {roleData.description}
-                    </CardDescription>
+                    <CardDescription>{roleData.description}</CardDescription>
                   </CardHeader>
-                   <CardContent>
+                  <CardContent>
                     <div className="space-y-3">
                       <div className="grid grid-cols-2 gap-2 text-xs">
                         <div className="flex justify-between">
@@ -761,123 +602,195 @@ export default function UserManagement() {
                 </Card>
               ))}
             </div>
-          </TabsContent>
-
-          {/* Profils et Plans d'abonnement */}
-          <TabsContent value="plans" className="space-y-6">
+          </div>
+        );
+      case 'plans':
+        return (
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <UserPlus className="h-5 w-5 text-primary" />
+                Plans d'abonnement
+              </h2>
+            </div>
             <SubscriptionPlansManager />
-          </TabsContent>
-
-          {/* Demandes en attente */}
-          <TabsContent value="requests" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  Demandes d'Accès en Attente
-                </CardTitle>
-                <CardDescription>
-                  Gérez les demandes d'accès aux manuscrits
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {pendingRequests.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-foreground mb-2">Aucune demande en attente</h3>
-                    <p className="text-muted-foreground">
-                      Toutes les demandes ont été traitées.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {pendingRequests.map((request) => (
-                      <div key={request.id} className="p-4 border rounded-lg bg-card">
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="space-y-2">
-                            <h4 className="font-medium">
-                              {request.manuscripts?.title}
-                            </h4>
-                            <p className="text-sm text-muted-foreground">
-                              par {request.manuscripts?.author}
-                            </p>
-                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                              <span>Demandeur: {request.profiles?.first_name} {request.profiles?.last_name}</span>
-                              {request.profiles?.institution && (
-                                <span>({request.profiles.institution})</span>
-                              )}
-                            </div>
-                          </div>
-                          <Badge variant="secondary">{request.request_type}</Badge>
-                        </div>
-                        
-                        <div className="space-y-2 mb-4">
-                          <p className="text-sm"><strong>Objet:</strong> {request.purpose}</p>
-                          <p className="text-sm"><strong>Date demandée:</strong> {formatDate(request.requested_date)}</p>
-                          {request.notes && (
-                            <p className="text-sm"><strong>Notes:</strong> {request.notes}</p>
-                          )}
-                        </div>
-
-                        <div className="flex gap-2">
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button size="sm" className="flex items-center gap-1">
-                                <CheckCircle className="h-4 w-4" />
-                                Approuver
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Approuver la demande</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Êtes-vous sûr de vouloir approuver cette demande d'accès ?
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => updateRequestStatus(request.id, 'approved')}
-                                >
-                                  Approuver
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button size="sm" variant="outline" className="flex items-center gap-1">
-                                <XCircle className="h-4 w-4" />
-                                Rejeter
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Rejeter la demande</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  Êtes-vous sûr de vouloir rejeter cette demande d'accès ?
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => updateRequestStatus(request.id, 'rejected')}
-                                >
-                                  Rejeter
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
+          </div>
+        );
+      case 'requests':
+        return (
+          <div className="space-y-4">
+            <div>
+              <h2 className="text-lg font-semibold flex items-center gap-2">
+                <Clock className="h-5 w-5 text-primary" />
+                Demandes d'Accès en Attente
+              </h2>
+              <p className="text-sm text-muted-foreground">Gérez les demandes d'accès aux manuscrits</p>
+            </div>
+            {pendingRequests.length === 0 ? (
+              <div className="text-center py-8">
+                <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">Aucune demande en attente</h3>
+                <p className="text-muted-foreground">Toutes les demandes ont été traitées.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {pendingRequests.map((request) => (
+                  <div key={request.id} className="p-4 border rounded-lg bg-card">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="space-y-2">
+                        <h4 className="font-medium">{request.manuscripts?.title}</h4>
+                        <p className="text-sm text-muted-foreground">par {request.manuscripts?.author}</p>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span>Demandeur: {request.profiles?.first_name} {request.profiles?.last_name}</span>
+                          {request.profiles?.institution && <span>({request.profiles.institution})</span>}
                         </div>
                       </div>
-                    ))}
+                      <Badge variant="secondary">{request.request_type}</Badge>
+                    </div>
+                    <div className="space-y-2 mb-4">
+                      <p className="text-sm"><strong>Objet:</strong> {request.purpose}</p>
+                      <p className="text-sm"><strong>Date demandée:</strong> {formatDate(request.requested_date)}</p>
+                      {request.notes && <p className="text-sm"><strong>Notes:</strong> {request.notes}</p>}
+                    </div>
+                    <div className="flex gap-2">
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button size="sm" className="flex items-center gap-1">
+                            <CheckCircle className="h-4 w-4" /> Approuver
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Approuver la demande</AlertDialogTitle>
+                            <AlertDialogDescription>Êtes-vous sûr de vouloir approuver cette demande d'accès ?</AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => updateRequestStatus(request.id, 'approved')}>Approuver</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button size="sm" variant="outline" className="flex items-center gap-1">
+                            <XCircle className="h-4 w-4" /> Rejeter
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Rejeter la demande</AlertDialogTitle>
+                            <AlertDialogDescription>Êtes-vous sûr de vouloir rejeter cette demande d'accès ?</AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>Annuler</AlertDialogCancel>
+                            <AlertDialogAction onClick={() => updateRequestStatus(request.id, 'rejected')}>Rejeter</AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <WatermarkContainer 
+      watermarkProps={{ text: "BNRM - Gestion des Utilisateurs", variant: "subtle", position: "pattern", opacity: 0.02 }}
+    >
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-background to-blue-50/30 overflow-x-hidden">
+        {/* Header standardisé */}
+        <AdminHeader 
+          title="Gestion des Utilisateurs"
+          badgeText="Administration"
+          subtitle="Administrer les comptes utilisateurs, rôles et approbations"
+          backPath="/admin/settings"
+        />
+
+        {/* Main Content */}
+        <main className="container py-8">
+          <div className="space-y-6">
+            {/* Header inspiré du back-office */}
+            <AdminBackOfficeHeader 
+              title="Gestion des Utilisateurs"
+              subtitle="Administration des comptes et permissions utilisateurs"
+              badgeText="Administration"
+            />
+
+            {/* Stats Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {statsItems.map((stat) => (
+                <Card key={stat.label} className="hover:shadow-md transition-all duration-200 cursor-default group">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2.5 rounded-lg ${stat.color} group-hover:scale-110 transition-transform`}>
+                        <stat.icon className="h-5 w-5" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold">{stat.value}</p>
+                        <p className="text-xs text-muted-foreground">{stat.label}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Layout en grille: Navigation sidebar + Contenu */}
+            <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6">
+              {/* Sidebar Navigation */}
+              <div className="space-y-6">
+                <Card className="border-0 shadow-sm">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base font-semibold flex items-center gap-2">
+                      <Shield className="h-4 w-4 text-primary" />
+                      Catégories d'utilisateurs
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      Gestion par type de compte
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="space-y-2">
+                      {managementItems.map(renderNavItem)}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="border-0 shadow-sm">
+                  <CardHeader className="pb-3">
+                    <CardTitle className="text-base font-semibold flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4 text-primary" />
+                      Configuration
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      Permissions et plans
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <div className="space-y-2">
+                      {settingsItems.map(renderNavItem)}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Main Content Area */}
+              <div className="min-w-0">
+                <Card className="border-0 shadow-sm">
+                  <CardContent className="p-6">
+                    {renderContent()}
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </main>
 
         {/* Dialogue de modification d'utilisateur */}
         <EditUserDialog
@@ -886,8 +799,7 @@ export default function UserManagement() {
           onOpenChange={setShowEditDialog}
           onUserUpdated={fetchData}
         />
-      </main>
-    </div>
-  </WatermarkContainer>
+      </div>
+    </WatermarkContainer>
   );
 }
