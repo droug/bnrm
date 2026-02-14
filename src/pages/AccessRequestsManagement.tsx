@@ -541,77 +541,86 @@ export default function AccessRequestsManagement() {
           </>
         )}
 
-        {/* PAYMENT_SENT: Comptable can confirm payment */}
-        {request.status === 'payment_sent' && (isComptable || isAdmin) && (
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                title="Confirmer le paiement"
-              >
-                <BadgeCheck className="h-4 w-4" />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Confirmer le paiement</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Confirmez-vous la réception du paiement de{" "}
-                  <strong>{request.registration_data?.firstName} {request.registration_data?.lastName}</strong>{" "}
-                  pour le service <strong>{request.bnrm_services.nom_service}</strong>
-                  {request.bnrm_tarifs && ` (${request.bnrm_tarifs.montant} ${request.bnrm_tarifs.devise})`} ?
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Annuler</AlertDialogCancel>
-                <AlertDialogAction onClick={() => handleConfirmPayment(request)}>
-                  Confirmer le paiement
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
+        {/* PAYMENT TAB: Confirmer le paiement + Activer l'abonnement */}
+        {(request.status === 'payment_sent' || request.status === 'paid') && (isComptable || isAdmin) && (
+          <>
+            {/* Confirmer le paiement */}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={request.status === 'paid' 
+                    ? "text-muted-foreground opacity-50" 
+                    : "text-blue-600 hover:text-blue-700 hover:bg-blue-50"}
+                  title={request.status === 'paid' ? "Paiement déjà confirmé" : "Confirmer le paiement"}
+                  disabled={request.status === 'paid'}
+                >
+                  <BadgeCheck className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Confirmer le paiement</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Confirmez-vous la réception du paiement de{" "}
+                    <strong>{request.registration_data?.firstName} {request.registration_data?.lastName}</strong>{" "}
+                    pour le service <strong>{request.bnrm_services.nom_service}</strong>
+                    {request.bnrm_tarifs && ` (${request.bnrm_tarifs.montant} ${request.bnrm_tarifs.devise})`} ?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => handleConfirmPayment(request)}>
+                    Confirmer le paiement
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
 
-        {/* PAID: Admin can activate */}
-        {request.status === 'paid' && isAdmin && (
-          <AlertDialog open={approveDialogOpen && requestToApprove?.id === request.id} onOpenChange={(open) => {
-            if (!open) {
-              setApproveDialogOpen(false);
-              setRequestToApprove(null);
-            }
-          }}>
-            <AlertDialogTrigger asChild>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                title="Activer l'abonnement"
-                onClick={() => {
-                  setRequestToApprove(request);
-                  setApproveDialogOpen(true);
-                }}
-              >
-                <CheckCircle className="h-4 w-4" />
-              </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Activer l'abonnement</AlertDialogTitle>
-                <AlertDialogDescription>
-                  Le paiement a été confirmé par le comptable. Souhaitez-vous activer l'abonnement de{" "}
-                  <strong>{request.registration_data?.firstName} {request.registration_data?.lastName}</strong> ?
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Annuler</AlertDialogCancel>
-                <AlertDialogAction onClick={handleApprove}>
-                  Activer
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+            {/* Activer l'abonnement - disabled until payment confirmed */}
+            <AlertDialog open={approveDialogOpen && requestToApprove?.id === request.id} onOpenChange={(open) => {
+              if (!open) {
+                setApproveDialogOpen(false);
+                setRequestToApprove(null);
+              }
+            }}>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={request.status === 'paid' 
+                    ? "text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50" 
+                    : "text-muted-foreground opacity-50"}
+                  title={request.status === 'paid' ? "Activer l'abonnement" : "Veuillez d'abord confirmer le paiement"}
+                  disabled={request.status !== 'paid'}
+                  onClick={() => {
+                    if (request.status === 'paid') {
+                      setRequestToApprove(request);
+                      setApproveDialogOpen(true);
+                    }
+                  }}
+                >
+                  <CheckCircle className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Activer l'abonnement</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Le paiement a été confirmé. Souhaitez-vous activer l'abonnement de{" "}
+                    <strong>{request.registration_data?.firstName} {request.registration_data?.lastName}</strong> ?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleApprove}>
+                    Activer
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </>
         )}
 
         {/* ACTIVE: Deactivate and Delete */}
