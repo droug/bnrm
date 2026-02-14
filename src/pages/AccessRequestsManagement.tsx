@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, CheckCircle, XCircle, Clock, FileText, User, Calendar, AlertTriangle, Eye, Ban, Trash2 } from "lucide-react";
+import { ArrowLeft, CheckCircle, XCircle, Clock, FileText, User, Calendar, AlertTriangle, Eye, Ban, Trash2, Send, CreditCard, BadgeCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
@@ -48,7 +48,7 @@ interface ServiceRegistration {
 
 export default function AccessRequestsManagement() {
   const { user } = useAuth();
-  const { isAdmin, loading } = useSecureRoles();
+  const { isAdmin, isComptable, loading } = useSecureRoles();
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -63,13 +63,16 @@ export default function AccessRequestsManagement() {
   const [requestToApprove, setRequestToApprove] = useState<ServiceRegistration | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [sendingPaymentEmail, setSendingPaymentEmail] = useState<string | null>(null);
   const itemsPerPage = 10;
 
+  const canAccess = isAdmin || isComptable;
+
   useEffect(() => {
-    if (user && isAdmin && !loading) {
+    if (user && canAccess && !loading) {
       fetchRequests();
     }
-  }, [user, isAdmin, loading]);
+  }, [user, canAccess, loading]);
 
   const fetchRequests = async () => {
     try {
@@ -95,7 +98,6 @@ export default function AccessRequestsManagement() {
       
       setRequests(data || []);
       
-      // Load only subscription services (categorie = 'Abonnement')
       const { data: subscriptionServices, error: servicesError } = await supabase
         .from('bnrm_services')
         .select('nom_service')
@@ -118,8 +120,9 @@ export default function AccessRequestsManagement() {
     }
   };
 
-  const getFilteredRequests = (status: string) => {
-    let filtered = requests.filter(r => r.status === status);
+  const getFilteredRequests = (status: string | string[]) => {
+    const statuses = Array.isArray(status) ? status : [status];
+    let filtered = requests.filter(r => statuses.includes(r.status));
     
     if (categoryFilter !== "all") {
       filtered = filtered.filter(r => r.bnrm_services.nom_service === categoryFilter);
@@ -138,6 +141,94 @@ export default function AccessRequestsManagement() {
     return Math.ceil(requestsList.length / itemsPerPage);
   };
 
+  // Admin: envoyer email de paiement => status passe à payment_sent
+  const handleSendPaymentEmail = async (request: ServiceRegistration) => {
+    setSendingPaymentEmail(request.id);
+    try {
+      const montant = request.bnrm_tarifs?.montant ?? 0;
+      const devise = request.bnrm_tarifs?.devise ?? 'DH';
+      const serviceName = request.bnrm_services.nom_service;
+      const recipientEmail = request.registration_data?.email;
+      const recipientName = `${request.registration_data?.firstName || ''} ${request.registration_data?.lastName || ''}`.trim();
+
+      if (!recipientEmail) {
+        throw new Error("L'email du demandeur est introuvable");
+      }
+
+      // Invoke edge function to send payment email
+      const { error: emailError } = await supabase.functions.invoke('send-payment-email', {
+        body: {
+          to: recipientEmail,
+          recipientName,
+          serviceName,
+          montant,
+          devise,
+          registrationId: request.id,
+        },
+      });
+
+      if (emailError) throw emailError;
+
+      // Update status to payment_sent
+      const { error: updateError } = await supabase
+        .from('service_registrations')
+        .update({
+          status: 'payment_sent',
+          processed_by: user?.id,
+          processed_at: new Date().toISOString(),
+        })
+        .eq('id', request.id);
+
+      if (updateError) throw updateError;
+
+      toast({
+        title: "Email de paiement envoyé",
+        description: `Un email a été envoyé à ${recipientEmail} avec les instructions de paiement.`,
+      });
+      fetchRequests();
+    } catch (error: any) {
+      console.error('Error sending payment email:', error);
+      toast({
+        title: "Erreur",
+        description: error.message || "Impossible d'envoyer l'email de paiement",
+        variant: "destructive",
+      });
+    } finally {
+      setSendingPaymentEmail(null);
+    }
+  };
+
+  // Comptable: confirmer le paiement => status passe à paid
+  const handleConfirmPayment = async (request: ServiceRegistration) => {
+    try {
+      const { error } = await supabase
+        .from('service_registrations')
+        .update({
+          status: 'paid',
+          is_paid: true,
+          processed_by: user?.id,
+          processed_at: new Date().toISOString(),
+        })
+        .eq('id', request.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Paiement confirmé",
+        description: `Le paiement de ${request.registration_data?.firstName} ${request.registration_data?.lastName} a été validé.`,
+      });
+      fetchRequests();
+    } catch (error) {
+      console.error('Error confirming payment:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de confirmer le paiement",
+        variant: "destructive",
+      });
+    }
+  };
+
+  // Admin: activer l'abonnement après paiement confirmé => status passe à active
   const handleApprove = async () => {
     if (!requestToApprove) return;
 
@@ -275,6 +366,8 @@ export default function AccessRequestsManagement() {
   const getStatusBadge = (status: string) => {
     const statusConfig: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
       pending: { label: "En attente", variant: "default" },
+      payment_sent: { label: "Paiement envoyé", variant: "outline" },
+      paid: { label: "Payé", variant: "secondary" },
       active: { label: "Active", variant: "default" },
       rejected: { label: "Rejetée", variant: "destructive" },
       expired: { label: "Expirée", variant: "secondary" },
@@ -282,6 +375,367 @@ export default function AccessRequestsManagement() {
 
     const config = statusConfig[status] || { label: status, variant: "secondary" };
     return <Badge variant={config.variant}>{config.label}</Badge>;
+  };
+
+  const renderActionsForRequest = (request: ServiceRegistration) => {
+    return (
+      <div className="flex items-center justify-end gap-2">
+        {/* Details button - always visible */}
+        <Dialog open={detailsDialogOpen && selectedRequest?.id === request.id} onOpenChange={(open) => {
+          if (!open) {
+            setDetailsDialogOpen(false);
+            setSelectedRequest(null);
+          }
+        }}>
+          <DialogTrigger asChild>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                setSelectedRequest(request);
+                setDetailsDialogOpen(true);
+              }}
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Détails de la demande</DialogTitle>
+              <DialogDescription>
+                Informations complètes sur la demande d'abonnement
+              </DialogDescription>
+            </DialogHeader>
+            {selectedRequest && (
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-semibold mb-2">Service</h3>
+                  <p>{selectedRequest.bnrm_services.nom_service}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedRequest.bnrm_services.categorie}
+                  </p>
+                </div>
+                
+                <div>
+                  <h3 className="font-semibold mb-2">Utilisateur</h3>
+                  <p>{selectedRequest.registration_data?.firstName} {selectedRequest.registration_data?.lastName}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedRequest.registration_data?.email}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedRequest.registration_data?.phone}
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="font-semibold mb-2">Adresse</h3>
+                  <p className="text-sm">{selectedRequest.registration_data?.address}</p>
+                  {selectedRequest.registration_data?.ville && (
+                    <p className="text-sm text-muted-foreground">
+                      {selectedRequest.registration_data?.ville}
+                    </p>
+                  )}
+                </div>
+
+                {selectedRequest.bnrm_tarifs && (
+                  <div>
+                    <h3 className="font-semibold mb-2">Tarification</h3>
+                    <p className="text-sm">
+                      {selectedRequest.bnrm_tarifs.montant} {selectedRequest.bnrm_tarifs.devise}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedRequest.bnrm_tarifs.condition_tarif}
+                    </p>
+                  </div>
+                )}
+
+                {selectedRequest.rejection_reason && (
+                  <div>
+                    <h3 className="font-semibold mb-2 text-destructive">
+                      Raison du rejet
+                    </h3>
+                    <p className="text-sm">{selectedRequest.rejection_reason}</p>
+                  </div>
+                )}
+
+                <div>
+                  <h3 className="font-semibold mb-2">Statut</h3>
+                  {getStatusBadge(selectedRequest.status)}
+                </div>
+
+                <div>
+                  <h3 className="font-semibold mb-2">Date de création</h3>
+                  <p className="text-sm">
+                    {format(new Date(selectedRequest.created_at), "dd MMMM yyyy 'à' HH:mm", { locale: fr })}
+                  </p>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* PENDING: Admin can send payment email, approve directly (free), or reject */}
+        {request.status === 'pending' && isAdmin && (
+          <>
+            {/* Send payment email button */}
+            {request.bnrm_tarifs && request.bnrm_tarifs.montant > 0 && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                    title="Envoyer email de paiement"
+                    disabled={sendingPaymentEmail === request.id}
+                  >
+                    <Send className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Envoyer l'email de paiement</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Un email sera envoyé à <strong>{request.registration_data?.email}</strong> avec les instructions de paiement
+                      pour le service <strong>{request.bnrm_services.nom_service}</strong> ({request.bnrm_tarifs?.montant} {request.bnrm_tarifs?.devise}).
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => handleSendPaymentEmail(request)}>
+                      Envoyer
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+
+            {/* Approve directly (for free services) */}
+            {(!request.bnrm_tarifs || request.bnrm_tarifs.montant === 0) && (
+              <AlertDialog open={approveDialogOpen && requestToApprove?.id === request.id} onOpenChange={(open) => {
+                if (!open) {
+                  setApproveDialogOpen(false);
+                  setRequestToApprove(null);
+                }
+              }}>
+                <AlertDialogTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                    onClick={() => {
+                      setRequestToApprove(request);
+                      setApproveDialogOpen(true);
+                    }}
+                  >
+                    <CheckCircle className="h-4 w-4" />
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Approuver la demande</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Ce service est gratuit. Êtes-vous sûr de vouloir approuver directement cette demande ?
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Annuler</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleApprove}>
+                      Approuver
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+
+            {/* Reject */}
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  onClick={() => setSelectedRequest(request)}
+                >
+                  <XCircle className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Rejeter la demande</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Veuillez indiquer la raison du rejet
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <div className="py-4">
+                  <Textarea
+                    placeholder="Motif du rejet (obligatoire) ..."
+                    value={rejectReason}
+                    onChange={(e) => setRejectReason(e.target.value)}
+                    className="min-h-[100px]"
+                  />
+                </div>
+                <AlertDialogFooter>
+                  <AlertDialogCancel onClick={() => {
+                    setRejectReason("");
+                    setSelectedRequest(null);
+                  }}>
+                    Annuler
+                  </AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={handleReject}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Rejeter
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </>
+        )}
+
+        {/* PAYMENT_SENT: Comptable can confirm payment */}
+        {request.status === 'payment_sent' && (isComptable || isAdmin) && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                title="Confirmer le paiement"
+              >
+                <BadgeCheck className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Confirmer le paiement</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Confirmez-vous la réception du paiement de{" "}
+                  <strong>{request.registration_data?.firstName} {request.registration_data?.lastName}</strong>{" "}
+                  pour le service <strong>{request.bnrm_services.nom_service}</strong>
+                  {request.bnrm_tarifs && ` (${request.bnrm_tarifs.montant} ${request.bnrm_tarifs.devise})`} ?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                <AlertDialogAction onClick={() => handleConfirmPayment(request)}>
+                  Confirmer le paiement
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+
+        {/* PAID: Admin can activate */}
+        {request.status === 'paid' && isAdmin && (
+          <AlertDialog open={approveDialogOpen && requestToApprove?.id === request.id} onOpenChange={(open) => {
+            if (!open) {
+              setApproveDialogOpen(false);
+              setRequestToApprove(null);
+            }
+          }}>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                title="Activer l'abonnement"
+                onClick={() => {
+                  setRequestToApprove(request);
+                  setApproveDialogOpen(true);
+                }}
+              >
+                <CheckCircle className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Activer l'abonnement</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Le paiement a été confirmé par le comptable. Souhaitez-vous activer l'abonnement de{" "}
+                  <strong>{request.registration_data?.firstName} {request.registration_data?.lastName}</strong> ?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                <AlertDialogAction onClick={handleApprove}>
+                  Activer
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+
+        {/* ACTIVE: Deactivate and Delete */}
+        {request.status === 'active' && isAdmin && (
+          <>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                  title="Désactiver l'abonnement"
+                >
+                  <Ban className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Désactiver l'abonnement</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Êtes-vous sûr de vouloir désactiver l'abonnement de{" "}
+                    <strong>{request.registration_data?.firstName} {request.registration_data?.lastName}</strong> ?
+                    L'utilisateur ne pourra plus accéder au service.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => handleDeactivate(request)}
+                    className="bg-amber-600 text-white hover:bg-amber-700"
+                  >
+                    Désactiver
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                  title="Supprimer le compte"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="text-destructive">Supprimer le compte</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    <span className="font-semibold text-destructive">Action irréversible.</span>{" "}
+                    Le compte de <strong>{request.registration_data?.firstName} {request.registration_data?.lastName}</strong>{" "}
+                    ({request.registration_data?.email}) sera définitivement supprimé ainsi que son abonnement.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => handleDeleteAccount(request)}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Supprimer définitivement
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </>
+        )}
+      </div>
+    );
   };
 
   const renderRequestsTable = (requestsList: ServiceRegistration[]) => {
@@ -342,6 +796,7 @@ export default function AccessRequestsManagement() {
                   <TableHead>Service</TableHead>
                   <TableHead>Utilisateur</TableHead>
                   <TableHead>Formule</TableHead>
+                  <TableHead>Montant</TableHead>
                   <TableHead>Date</TableHead>
                   <TableHead>Statut</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
@@ -377,6 +832,15 @@ export default function AccessRequestsManagement() {
                        "Non spécifiée"}
                     </TableCell>
                     <TableCell>
+                      {request.bnrm_tarifs ? (
+                        <span className="font-medium">
+                          {request.bnrm_tarifs.montant} {request.bnrm_tarifs.devise}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
                       <div className="flex items-center gap-2 text-sm">
                         <Calendar className="h-4 w-4 text-muted-foreground" />
                         {format(new Date(request.created_at), "dd/MM/yyyy", { locale: fr })}
@@ -386,250 +850,7 @@ export default function AccessRequestsManagement() {
                       {getStatusBadge(request.status)}
                     </TableCell>
                     <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Dialog open={detailsDialogOpen && selectedRequest?.id === request.id} onOpenChange={(open) => {
-                          if (!open) {
-                            setDetailsDialogOpen(false);
-                            setSelectedRequest(null);
-                          }
-                        }}>
-                          <DialogTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => {
-                                setSelectedRequest(request);
-                                setDetailsDialogOpen(true);
-                              }}
-                            >
-                              <Eye className="h-4 w-4" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-                            <DialogHeader>
-                              <DialogTitle>Détails de la demande</DialogTitle>
-                              <DialogDescription>
-                                Informations complètes sur la demande d'abonnement
-                              </DialogDescription>
-                            </DialogHeader>
-                            {selectedRequest && (
-                              <div className="space-y-4">
-                                <div>
-                                  <h3 className="font-semibold mb-2">Service</h3>
-                                  <p>{selectedRequest.bnrm_services.nom_service}</p>
-                                  <p className="text-sm text-muted-foreground">
-                                    {selectedRequest.bnrm_services.categorie}
-                                  </p>
-                                </div>
-                                
-                                <div>
-                                  <h3 className="font-semibold mb-2">Utilisateur</h3>
-                                  <p>{selectedRequest.registration_data?.firstName} {selectedRequest.registration_data?.lastName}</p>
-                                  <p className="text-sm text-muted-foreground">
-                                    {selectedRequest.registration_data?.email}
-                                  </p>
-                                  <p className="text-sm text-muted-foreground">
-                                    {selectedRequest.registration_data?.phone}
-                                  </p>
-                                </div>
-
-                                <div>
-                                  <h3 className="font-semibold mb-2">Adresse</h3>
-                                  <p className="text-sm">{selectedRequest.registration_data?.address}</p>
-                                  {selectedRequest.registration_data?.ville && (
-                                    <p className="text-sm text-muted-foreground">
-                                      {selectedRequest.registration_data?.ville}
-                                    </p>
-                                  )}
-                                </div>
-
-                                {selectedRequest.bnrm_tarifs && (
-                                  <div>
-                                    <h3 className="font-semibold mb-2">Tarification</h3>
-                                    <p className="text-sm">
-                                      {selectedRequest.bnrm_tarifs.montant} {selectedRequest.bnrm_tarifs.devise}
-                                    </p>
-                                    <p className="text-sm text-muted-foreground">
-                                      {selectedRequest.bnrm_tarifs.condition_tarif}
-                                    </p>
-                                  </div>
-                                )}
-
-                                {selectedRequest.rejection_reason && (
-                                  <div>
-                                    <h3 className="font-semibold mb-2 text-destructive">
-                                      Raison du rejet
-                                    </h3>
-                                    <p className="text-sm">{selectedRequest.rejection_reason}</p>
-                                  </div>
-                                )}
-
-                                <div>
-                                  <h3 className="font-semibold mb-2">Statut</h3>
-                                  {getStatusBadge(selectedRequest.status)}
-                                </div>
-
-                                <div>
-                                  <h3 className="font-semibold mb-2">Date de création</h3>
-                                  <p className="text-sm">
-                                    {format(new Date(selectedRequest.created_at), "dd MMMM yyyy 'à' HH:mm", { locale: fr })}
-                                  </p>
-                                </div>
-                              </div>
-                            )}
-                          </DialogContent>
-                        </Dialog>
-
-                        {request.status === 'pending' && (
-                          <>
-                            <AlertDialog open={approveDialogOpen && requestToApprove?.id === request.id} onOpenChange={(open) => {
-                              if (!open) {
-                                setApproveDialogOpen(false);
-                                setRequestToApprove(null);
-                              }
-                            }}>
-                              <AlertDialogTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                                  onClick={() => {
-                                    setRequestToApprove(request);
-                                    setApproveDialogOpen(true);
-                                  }}
-                                >
-                                  <CheckCircle className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Approuver la demande</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Êtes-vous sûr de vouloir approuver cette demande d'abonnement ?
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                  <AlertDialogAction onClick={handleApprove}>
-                                    Approuver
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                  onClick={() => setSelectedRequest(request)}
-                                >
-                                  <XCircle className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Rejeter la demande</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Veuillez indiquer la raison du rejet
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <div className="py-4">
-                                  <Textarea
-                                    placeholder="Motif du rejet (obligatoire) ..."
-                                    value={rejectReason}
-                                    onChange={(e) => setRejectReason(e.target.value)}
-                                    className="min-h-[100px]"
-                                  />
-                                </div>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel onClick={() => {
-                                    setRejectReason("");
-                                    setSelectedRequest(null);
-                                  }}>
-                                    Annuler
-                                  </AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={handleReject}
-                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                  >
-                                    Rejeter
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </>
-                        )}
-
-                        {request.status === 'active' && (
-                          <>
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
-                                  title="Désactiver l'abonnement"
-                                >
-                                  <Ban className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>Désactiver l'abonnement</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Êtes-vous sûr de vouloir désactiver l'abonnement de{" "}
-                                    <strong>{request.registration_data?.firstName} {request.registration_data?.lastName}</strong> ?
-                                    L'utilisateur ne pourra plus accéder au service.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => handleDeactivate(request)}
-                                    className="bg-amber-600 text-white hover:bg-amber-700"
-                                  >
-                                    Désactiver
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                                  title="Supprimer le compte"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent>
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle className="text-destructive">Supprimer le compte</AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    <span className="font-semibold text-destructive">Action irréversible.</span>{" "}
-                                    Le compte de <strong>{request.registration_data?.firstName} {request.registration_data?.lastName}</strong>{" "}
-                                    ({request.registration_data?.email}) sera définitivement supprimé ainsi que son abonnement.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => handleDeleteAccount(request)}
-                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                                  >
-                                    Supprimer définitivement
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
-                          </>
-                        )}
-                      </div>
+                      {renderActionsForRequest(request)}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -683,11 +904,12 @@ export default function AccessRequestsManagement() {
     );
   }
 
-  if (!user || !isAdmin) {
+  if (!user || !canAccess) {
     return <Navigate to="/" replace />;
   }
 
   const pendingRequests = getFilteredRequests('pending');
+  const paymentRequests = getFilteredRequests(['payment_sent', 'paid']);
   const activeRequests = getFilteredRequests('active');
   const rejectedRequests = getFilteredRequests('rejected');
 
@@ -712,10 +934,14 @@ export default function AccessRequestsManagement() {
             setCurrentPage(1);
             setCategoryFilter("all");
           }} className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-6">
+            <TabsList className="grid w-full grid-cols-4 mb-6">
               <TabsTrigger value="pending" className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
                 En Attente ({pendingRequests.length})
+              </TabsTrigger>
+              <TabsTrigger value="payment" className="flex items-center gap-2">
+                <CreditCard className="h-4 w-4" />
+                Paiement ({paymentRequests.length})
               </TabsTrigger>
               <TabsTrigger value="active" className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4" />
@@ -729,6 +955,10 @@ export default function AccessRequestsManagement() {
 
             <TabsContent value="pending">
               {renderRequestsTable(pendingRequests)}
+            </TabsContent>
+
+            <TabsContent value="payment">
+              {renderRequestsTable(paymentRequests)}
             </TabsContent>
 
             <TabsContent value="active">
