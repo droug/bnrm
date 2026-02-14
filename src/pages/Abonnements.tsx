@@ -1,7 +1,8 @@
 // Abonnements - Page de gestion des abonnements (multi-plateforme)
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -43,6 +44,7 @@ export default function Abonnements() {
   const [registrationDialogOpen, setRegistrationDialogOpen] = useState(false);
   const [selectedServiceForRegistration, setSelectedServiceForRegistration] = useState<BNRMService | null>(null);
   const [selectedTariffForRegistration, setSelectedTariffForRegistration] = useState<BNRMTariff | null>(null);
+  const { user } = useAuth();
   const { toast } = useToast();
 
   // Detect platform from query param or referrer
@@ -53,6 +55,37 @@ export default function Abonnements() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Auto-restore pending subscription after login
+  useEffect(() => {
+    if (!user || loading || services.length === 0) return;
+    
+    const pendingData = sessionStorage.getItem('pendingSubscription');
+    if (!pendingData) return;
+    
+    try {
+      const parsed = JSON.parse(pendingData);
+      const service = services.find(s => s.id_service === parsed.serviceId);
+      if (service) {
+        const serviceTariffs = tariffs.filter(t => t.id_service === service.id_service);
+        const tariff = parsed.selectedTariffId 
+          ? serviceTariffs.find(t => t.id_tarif === parsed.selectedTariffId) 
+          : serviceTariffs[0];
+        
+        setSelectedServiceForRegistration(service);
+        setSelectedTariffForRegistration(tariff || null);
+        setRegistrationDialogOpen(true);
+        
+        toast({
+          title: "Données restaurées",
+          description: "Vos informations ont été conservées. Vous pouvez finaliser votre inscription.",
+        });
+      }
+      sessionStorage.removeItem('pendingSubscription');
+    } catch {
+      sessionStorage.removeItem('pendingSubscription');
+    }
+  }, [user, loading, services, tariffs]);
 
   const fetchData = async () => {
     try {
