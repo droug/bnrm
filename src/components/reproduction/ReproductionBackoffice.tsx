@@ -219,6 +219,24 @@ export function ReproductionBackoffice() {
         message: validationNotes,
       } as any);
 
+      // Create in-app notification with payment link
+      if (approve && selectedRequest?.user_id) {
+        await supabase.from("notifications").insert({
+          user_id: selectedRequest.user_id,
+          type: 'payment',
+          title: language === "ar" ? "دفع معلق" : "Paiement en attente",
+          message: language === "ar" 
+            ? "طلب النسخ الخاص بك قد تمت الموافقة عليه. يرجى المتابعة بالدفع."
+            : "Votre demande de reproduction a été approuvée. Veuillez procéder au paiement.",
+          is_read: false,
+          link: '/my-space?tab=payments',
+          related_url: '/my-space?tab=payments',
+          priority: 3,
+          category: 'payment',
+          module: 'reproduction',
+        });
+      }
+
       toast.success(
         approve
           ? language === "ar" ? "تمت الموافقة النهائية مع إرسال رابط الدفع" : "Approbation effectuée - Lien de paiement envoyé"
@@ -258,6 +276,24 @@ export function ReproductionBackoffice() {
         title: language === "ar" ? "تم استلام الدفع" : "Paiement reçu",
         message: language === "ar" ? "تم تأكيد استلام الدفع الخاص بك" : "Votre paiement a été confirmé",
       } as any);
+
+      // Create in-app notification with payment link
+      if (selectedRequest?.user_id) {
+        await supabase.from("notifications").insert({
+          user_id: selectedRequest.user_id,
+          type: 'payment',
+          title: language === "ar" ? "تم استلام الدفع" : "Paiement confirmé",
+          message: language === "ar" 
+            ? "تم تأكيد استلام الدفع الخاص بك. يمكنك مراجعة التفاصيل في مساحتك الشخصية."
+            : "Votre paiement a été confirmé. Consultez les détails dans votre espace personnel.",
+          is_read: false,
+          link: '/my-space?tab=payments',
+          related_url: '/my-space?tab=payments',
+          priority: 3,
+          category: 'payment',
+          module: 'reproduction',
+        });
+      }
 
       toast.success(language === "ar" ? "تم تأكيد الدفع" : "Paiement confirmé");
 
