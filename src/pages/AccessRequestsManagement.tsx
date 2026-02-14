@@ -11,7 +11,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, CheckCircle, XCircle, Clock, FileText, User, Calendar, AlertTriangle, Eye, Ban, Trash2, Send, CreditCard, BadgeCheck } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { WatermarkContainer } from "@/components/ui/watermark";
@@ -409,98 +410,17 @@ export default function AccessRequestsManagement() {
     return (
       <div className="flex items-center justify-end gap-2">
         {/* Details button - always visible */}
-        <Dialog open={detailsDialogOpen && selectedRequest?.id === request.id} onOpenChange={(open) => {
-          if (!open) {
-            setDetailsDialogOpen(false);
-            setSelectedRequest(null);
-          }
-        }}>
-          <DialogTrigger asChild>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => {
-                setSelectedRequest(request);
-                setDetailsDialogOpen(true);
-              }}
-            >
-              <Eye className="h-4 w-4" />
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Détails de la demande</DialogTitle>
-              <DialogDescription>
-                Informations complètes sur la demande d'abonnement
-              </DialogDescription>
-            </DialogHeader>
-            {selectedRequest && (
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-semibold mb-2">Service</h3>
-                  <p>{selectedRequest.bnrm_services.nom_service}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedRequest.bnrm_services.categorie}
-                  </p>
-                </div>
-                
-                <div>
-                  <h3 className="font-semibold mb-2">Utilisateur</h3>
-                  <p>{selectedRequest.registration_data?.firstName} {selectedRequest.registration_data?.lastName}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedRequest.registration_data?.email}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedRequest.registration_data?.phone}
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className="font-semibold mb-2">Adresse</h3>
-                  <p className="text-sm">{selectedRequest.registration_data?.address}</p>
-                  {selectedRequest.registration_data?.ville && (
-                    <p className="text-sm text-muted-foreground">
-                      {selectedRequest.registration_data?.ville}
-                    </p>
-                  )}
-                </div>
-
-                {selectedRequest.bnrm_tarifs && (
-                  <div>
-                    <h3 className="font-semibold mb-2">Tarification</h3>
-                    <p className="text-sm">
-                      {selectedRequest.bnrm_tarifs.montant} {selectedRequest.bnrm_tarifs.devise}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {selectedRequest.bnrm_tarifs.condition_tarif}
-                    </p>
-                  </div>
-                )}
-
-                {selectedRequest.rejection_reason && (
-                  <div>
-                    <h3 className="font-semibold mb-2 text-destructive">
-                      Raison du rejet
-                    </h3>
-                    <p className="text-sm">{selectedRequest.rejection_reason}</p>
-                  </div>
-                )}
-
-                <div>
-                  <h3 className="font-semibold mb-2">Statut</h3>
-                  {getStatusBadge(selectedRequest.status)}
-                </div>
-
-                <div>
-                  <h3 className="font-semibold mb-2">Date de création</h3>
-                  <p className="text-sm">
-                    {format(new Date(selectedRequest.created_at), "dd MMMM yyyy 'à' HH:mm", { locale: fr })}
-                  </p>
-                </div>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => {
+            setSelectedRequest(request);
+            setDetailsDialogOpen(true);
+          }}
+          title="Voir les détails"
+        >
+          <Eye className="h-4 w-4" />
+        </Button>
 
         {/* PENDING: Admin can send payment email, approve directly (free), or reject */}
         {request.status === 'pending' && isAdmin && (
@@ -998,6 +918,149 @@ export default function AccessRequestsManagement() {
             </TabsContent>
           </Tabs>
         </div>
+
+        {/* Details Sheet - side panel */}
+        <Sheet open={detailsDialogOpen} onOpenChange={(open) => {
+          if (!open) {
+            setDetailsDialogOpen(false);
+            setSelectedRequest(null);
+          }
+        }}>
+          <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto">
+            <SheetHeader>
+              <SheetTitle>Détails de la demande</SheetTitle>
+              <SheetDescription>
+                Informations complètes sur la demande d'abonnement
+              </SheetDescription>
+            </SheetHeader>
+            {selectedRequest && (
+              <div className="space-y-6 mt-6">
+                <div>
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">Service</h3>
+                  <p className="font-medium">{selectedRequest.bnrm_services.nom_service}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {selectedRequest.bnrm_services.categorie}
+                  </p>
+                </div>
+                <Separator />
+                
+                <div>
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">Utilisateur</h3>
+                  <div className="flex items-center gap-2 mb-1">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">{selectedRequest.registration_data?.firstName} {selectedRequest.registration_data?.lastName}</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground ml-6">
+                    {selectedRequest.registration_data?.email}
+                  </p>
+                  {selectedRequest.registration_data?.phone && (
+                    <p className="text-sm text-muted-foreground ml-6">
+                      {selectedRequest.registration_data?.phone}
+                    </p>
+                  )}
+                </div>
+                <Separator />
+
+                <div>
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">Adresse</h3>
+                  <p className="text-sm">{selectedRequest.registration_data?.address || '—'}</p>
+                  {selectedRequest.registration_data?.ville && (
+                    <p className="text-sm text-muted-foreground">
+                      {selectedRequest.registration_data?.ville}
+                    </p>
+                  )}
+                </div>
+                <Separator />
+
+                {selectedRequest.bnrm_tarifs && (
+                  <>
+                    <div>
+                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">Tarification</h3>
+                      <p className="text-lg font-semibold">
+                        {selectedRequest.bnrm_tarifs.montant} {selectedRequest.bnrm_tarifs.devise}
+                      </p>
+                      {selectedRequest.bnrm_tarifs.condition_tarif && (
+                        <p className="text-sm text-muted-foreground">
+                          {selectedRequest.bnrm_tarifs.condition_tarif}
+                        </p>
+                      )}
+                      <p className="text-sm text-muted-foreground">
+                        Période : {selectedRequest.bnrm_tarifs.periode_validite}
+                      </p>
+                    </div>
+                    <Separator />
+                  </>
+                )}
+
+                {selectedRequest.rejection_reason && (
+                  <>
+                    <div>
+                      <h3 className="text-sm font-semibold text-destructive uppercase tracking-wide mb-2">
+                        Raison du rejet
+                      </h3>
+                      <p className="text-sm">{selectedRequest.rejection_reason}</p>
+                    </div>
+                    <Separator />
+                  </>
+                )}
+
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">Statut</h3>
+                    {getStatusBadge(selectedRequest.status)}
+                  </div>
+                  <div className="text-right">
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">Date</h3>
+                    <p className="text-sm">
+                      {format(new Date(selectedRequest.created_at), "dd MMMM yyyy 'à' HH:mm", { locale: fr })}
+                    </p>
+                  </div>
+                </div>
+
+                {selectedRequest.processed_at && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">Traité le</h3>
+                      <p className="text-sm">
+                        {format(new Date(selectedRequest.processed_at), "dd MMMM yyyy 'à' HH:mm", { locale: fr })}
+                      </p>
+                    </div>
+                  </>
+                )}
+
+                {selectedRequest.registration_data && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">Données d'inscription</h3>
+                      <div className="space-y-2">
+                        {selectedRequest.registration_data.organization && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Organisation</span>
+                            <span>{selectedRequest.registration_data.organization}</span>
+                          </div>
+                        )}
+                        {selectedRequest.registration_data.formuleType && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">Formule</span>
+                            <span>{selectedRequest.registration_data.formuleType}</span>
+                          </div>
+                        )}
+                        {selectedRequest.registration_data.cin && (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-muted-foreground">CIN</span>
+                            <span>{selectedRequest.registration_data.cin}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </SheetContent>
+        </Sheet>
       </div>
     </WatermarkContainer>
   );
