@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ArrowLeft, CheckCircle, XCircle, Clock, FileText, User, Calendar, AlertTriangle, Eye } from "lucide-react";
+import { ArrowLeft, CheckCircle, XCircle, Clock, FileText, User, Calendar, AlertTriangle, Eye, Ban, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
@@ -207,6 +207,66 @@ export default function AccessRequestsManagement() {
       toast({
         title: "Erreur",
         description: "Impossible de rejeter la demande",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeactivate = async (request: ServiceRegistration) => {
+    try {
+      const { error } = await supabase
+        .from('service_registrations')
+        .update({
+          status: 'expired',
+          processed_by: user?.id,
+          processed_at: new Date().toISOString()
+        })
+        .eq('id', request.id);
+
+      if (error) throw error;
+
+      toast({
+        title: "Abonnement désactivé",
+        description: `L'abonnement de ${request.registration_data?.firstName || ''} ${request.registration_data?.lastName || ''} a été désactivé.`,
+      });
+      fetchRequests();
+    } catch (error) {
+      console.error('Error deactivating:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de désactiver l'abonnement",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteAccount = async (request: ServiceRegistration) => {
+    try {
+      const { error: regError } = await supabase
+        .from('service_registrations')
+        .delete()
+        .eq('id', request.id);
+
+      if (regError) throw regError;
+
+      const { error: fnError } = await supabase.functions.invoke('user-service', {
+        body: { action: 'delete', userId: request.user_id },
+      });
+
+      if (fnError) {
+        console.error('User deletion error (non-blocking):', fnError);
+      }
+
+      toast({
+        title: "Compte supprimé",
+        description: "Le compte et l'abonnement ont été supprimés.",
+      });
+      fetchRequests();
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer le compte",
         variant: "destructive",
       });
     }
@@ -495,6 +555,74 @@ export default function AccessRequestsManagement() {
                                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                                   >
                                     Rejeter
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </>
+                        )}
+
+                        {request.status === 'active' && (
+                          <>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                                  title="Désactiver l'abonnement"
+                                >
+                                  <Ban className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Désactiver l'abonnement</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    Êtes-vous sûr de vouloir désactiver l'abonnement de{" "}
+                                    <strong>{request.registration_data?.firstName} {request.registration_data?.lastName}</strong> ?
+                                    L'utilisateur ne pourra plus accéder au service.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDeactivate(request)}
+                                    className="bg-amber-600 text-white hover:bg-amber-700"
+                                  >
+                                    Désactiver
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                  title="Supprimer le compte"
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle className="text-destructive">Supprimer le compte</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    <span className="font-semibold text-destructive">Action irréversible.</span>{" "}
+                                    Le compte de <strong>{request.registration_data?.firstName} {request.registration_data?.lastName}</strong>{" "}
+                                    ({request.registration_data?.email}) sera définitivement supprimé ainsi que son abonnement.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => handleDeleteAccount(request)}
+                                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                  >
+                                    Supprimer définitivement
                                   </AlertDialogAction>
                                 </AlertDialogFooter>
                               </AlertDialogContent>
