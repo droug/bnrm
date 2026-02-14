@@ -143,6 +143,29 @@ export function ServiceRegistrationDialog({
   }, []);
 
   useEffect(() => {
+    // Try to restore form data from sessionStorage (after login redirect)
+    const pendingData = sessionStorage.getItem('pendingSubscription');
+    if (pendingData && open) {
+      try {
+        const parsed = JSON.parse(pendingData);
+        if (parsed.formData) {
+          setFormData(prev => ({
+            ...prev,
+            ...parsed.formData,
+            // Override email with authenticated user's email if available
+            email: user?.email || parsed.formData.email || "",
+          }));
+          if (parsed.subscriptionType) setSubscriptionType(parsed.subscriptionType);
+          if (parsed.pageCount) setPageCount(parsed.pageCount);
+          // Clear after restoring
+          sessionStorage.removeItem('pendingSubscription');
+          return; // Don't overwrite with profile data
+        }
+      } catch {
+        sessionStorage.removeItem('pendingSubscription');
+      }
+    }
+
     if (profile) {
       setFormData(prev => ({
         ...prev,
@@ -158,7 +181,7 @@ export function ServiceRegistrationDialog({
         email: user.email || "",
       }));
     }
-  }, [profile, user]);
+  }, [profile, user, open]);
 
   const isFreeService = !selectedTariff;
 
