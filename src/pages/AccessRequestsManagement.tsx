@@ -250,7 +250,7 @@ export default function AccessRequestsManagement() {
       if (regError) throw regError;
 
       const { error: fnError } = await supabase.functions.invoke('user-service', {
-        body: { action: 'delete', userId: request.user_id },
+        body: { action: 'delete_professional', user_id: request.user_id },
       });
 
       if (fnError) {
