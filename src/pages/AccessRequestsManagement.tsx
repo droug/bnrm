@@ -181,6 +181,20 @@ export default function AccessRequestsManagement() {
 
       if (updateError) throw updateError;
 
+      // Créer une notification in-app pour l'utilisateur
+      await supabase.from('notifications').insert({
+        user_id: request.user_id,
+        type: 'payment',
+        title: 'Instructions de paiement',
+        message: `Les instructions de paiement pour le service "${serviceName}" (${montant} ${devise}) vous ont été envoyées par email.`,
+        is_read: false,
+        link: '/my-space?tab=payments',
+        related_url: '/my-space?tab=payments',
+        priority: 3,
+        category: 'payment',
+        module: 'bnrm',
+      });
+
       toast({
         title: "Email de paiement envoyé",
         description: `Un email a été envoyé à ${recipientEmail} avec les instructions de paiement.`,
@@ -212,6 +226,20 @@ export default function AccessRequestsManagement() {
         .eq('id', request.id);
 
       if (error) throw error;
+
+      // Créer une notification in-app pour l'utilisateur
+      await supabase.from('notifications').insert({
+        user_id: request.user_id,
+        type: 'payment',
+        title: 'Paiement confirmé',
+        message: `Votre paiement pour le service "${request.bnrm_services.nom_service}" a été confirmé.`,
+        is_read: false,
+        link: '/my-space?tab=payments',
+        related_url: '/my-space?tab=payments',
+        priority: 3,
+        category: 'payment',
+        module: 'bnrm',
+      });
 
       toast({
         title: "Paiement confirmé",
