@@ -517,7 +517,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
             </Link>
 
             {/* Services aux lecteurs */}
-            {isAuthenticated && (
+            {true && (
               <div className="relative group pb-1">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
