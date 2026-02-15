@@ -221,25 +221,13 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
 
     const aspectRatio = pdfAspectRatio;
 
-    // Each page gets half the width
-    const maxPageWidth = containerWidth / 2;
-    const maxPageHeight = containerHeight;
+    // Each page gets half the width - ALWAYS fill full width
+    // The library with size="stretch" will scale down if height exceeds container
+    // So we use size="fixed" and calculate dimensions that fill full width
+    const pageWidth = containerWidth / 2;
+    const pageHeight = pageWidth / aspectRatio;
 
-    // Width-based height
-    const widthBasedHeight = maxPageWidth / aspectRatio;
-
-    let pageWidth: number;
-    let pageHeight: number;
-
-    if (widthBasedHeight <= maxPageHeight) {
-      // Width is limiting - fill full width
-      pageWidth = maxPageWidth;
-      pageHeight = widthBasedHeight;
-    } else {
-      // Height is limiting - fill full height
-      pageHeight = maxPageHeight;
-      pageWidth = pageHeight * aspectRatio;
-    }
+    
 
     setDimensions({ width: Math.round(Math.max(280, pageWidth)), height: Math.round(Math.max(373, pageHeight)) });
   }, [pdfAspectRatio]);
@@ -292,14 +280,14 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
   return (
     <div 
       ref={containerRef} 
-      className="flex items-center justify-center w-full h-full min-h-0" 
-      style={{ minHeight: "400px" }} 
+      className="flex items-start justify-center w-full h-full min-h-0 overflow-auto" 
+      style={{ minHeight: "400px", width: "100%" }} 
       dir={isRtl ? "rtl" : "ltr"}
     >
       <HTMLFlipBook
         width={dimensions.width}
         height={dimensions.height}
-        size="stretch"
+        size="fixed"
         minWidth={280}
         maxWidth={2400}
         minHeight={373}
@@ -319,7 +307,7 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
         flippingTime={800}
         usePortrait={false}
         startZIndex={0}
-        autoSize={true}
+        autoSize={false}
         clickEventForward={true}
         useMouseEvents={true}
         swipeDistance={30}
