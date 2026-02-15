@@ -75,38 +75,42 @@ export default function Auth() {
     const token = hp.token; // OTP token from generateLink
     const type = hp.type;
 
-    // Cas 1: Tokens de session complets (access_token + refresh_token)
-    if (access_token && refresh_token) {
+    // Sign out any existing session first to avoid showing wrong account
+    const establishRecoverySession = async () => {
       hasTriedRecoverySession.current = true;
       setIsLoading(true);
-      supabase.auth
-        .setSession({ access_token, refresh_token })
-        .then(({ error }) => {
-          if (error) {
-            toast.error("Lien invalide ou expiré", { description: error.message });
-          }
-        })
-        .finally(() => setIsLoading(false));
-      return;
-    }
 
-    // Cas 2: Token OTP (recovery link from generateLink)
-    if (token && type === "recovery") {
-      hasTriedRecoverySession.current = true;
-      setIsLoading(true);
-      supabase.auth
-        .verifyOtp({ token_hash: token, type: "recovery" })
-        .then(({ data, error }) => {
-          if (error) {
-            console.error("OTP verification failed:", error);
-            toast.error("Lien invalide ou expiré", { 
-              description: "Veuillez demander un nouveau lien de réinitialisation." 
-            });
-          } else if (data?.session) {
-            console.log("OTP verified, session established");
-          }
-        })
-        .finally(() => setIsLoading(false));
+      // Always sign out current user before establishing recovery session
+      await supabase.auth.signOut({ scope: 'local' }).catch(() => {});
+
+      // Cas 1: Tokens de session complets (access_token + refresh_token)
+      if (access_token && refresh_token) {
+        const { error } = await supabase.auth.setSession({ access_token, refresh_token });
+        if (error) {
+          toast.error("Lien invalide ou expiré", { description: error.message });
+        }
+        setIsLoading(false);
+        return;
+      }
+
+      // Cas 2: Token OTP (recovery link from generateLink)
+      if (token && type === "recovery") {
+        const { data, error } = await supabase.auth.verifyOtp({ token_hash: token, type: "recovery" });
+        if (error) {
+          console.error("OTP verification failed:", error);
+          toast.error("Lien invalide ou expiré", { 
+            description: "Veuillez demander un nouveau lien de réinitialisation." 
+          });
+        } else if (data?.session) {
+          console.log("OTP verified, session established for", data.session.user?.email);
+        }
+        setIsLoading(false);
+        return;
+      }
+    };
+
+    if ((access_token && refresh_token) || (token && type === "recovery")) {
+      establishRecoverySession();
       return;
     }
   }, [isResetFlow, location.hash]);
