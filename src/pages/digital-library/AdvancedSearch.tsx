@@ -321,8 +321,36 @@ export default function AdvancedSearch() {
 
                 <CollapsibleContent>
                   <div className="px-6 pb-6 space-y-6 border-t">
+                    {/* Search Tips */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-5">
+                      <div className="flex items-start gap-2 p-2.5 rounded-lg bg-muted/40">
+                        <div className="mt-0.5 h-1.5 w-1.5 rounded-full bg-gold-bn-primary flex-shrink-0" />
+                        <p className="text-xs text-muted-foreground">
+                          Utilisez les <strong className="text-foreground">guillemets ""</strong> pour une expression exacte
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2 p-2.5 rounded-lg bg-muted/40">
+                        <div className="mt-0.5 h-1.5 w-1.5 rounded-full bg-gold-bn-primary flex-shrink-0" />
+                        <p className="text-xs text-muted-foreground">
+                          Combinez <strong className="text-foreground">plusieurs filtres</strong> pour affiner
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2 p-2.5 rounded-lg bg-muted/40">
+                        <div className="mt-0.5 h-1.5 w-1.5 rounded-full bg-gold-bn-primary flex-shrink-0" />
+                        <p className="text-xs text-muted-foreground">
+                          L'<strong className="text-foreground">autocomplétion</strong> suggère les valeurs existantes
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2 p-2.5 rounded-lg bg-muted/40">
+                        <div className="mt-0.5 h-1.5 w-1.5 rounded-full bg-gold-bn-primary flex-shrink-0" />
+                        <p className="text-xs text-muted-foreground">
+                          La recherche est <strong className="text-foreground">insensible à la casse</strong>
+                        </p>
+                      </div>
+                    </div>
+
                     {/* Row 1: Title & Author */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <TitleAutocomplete
                         label="Titre"
                         placeholder="Titre du document"
