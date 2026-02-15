@@ -218,9 +218,9 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
     // Target aspect ratio (3:4 for document pages - typical manuscript ratio)
     const aspectRatio = 3 / 4;
 
-    // Reserve space for book shadow/perspective to avoid clipping (responsive safe margins)
-    const safeX = Math.max(48, Math.round(containerWidth * 0.04));
-    const safeY = Math.max(96, Math.round(containerHeight * 0.08));
+    // Minimal safe margins - maximize page size for realistic book feel
+    const safeX = 8;
+    const safeY = 16;
 
     const availableWidth = Math.max(0, containerWidth - safeX);
     const availableHeight = Math.max(0, containerHeight - safeY);
