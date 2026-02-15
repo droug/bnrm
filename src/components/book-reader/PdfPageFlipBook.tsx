@@ -88,10 +88,10 @@ const PdfPage = forwardRef<
   }, [pdfDoc, pageNumber]);
 
   return (
-    <div ref={ref} className="page bg-white shadow-2xl relative overflow-hidden">
+    <div ref={ref} className="page bg-[#f5f0e8] relative overflow-hidden" style={{ boxShadow: 'none', margin: 0, padding: 0 }}>
       <div
         ref={containerRef}
-        className="w-full h-full flex items-center justify-center overflow-hidden bg-white relative"
+        className="w-full h-full flex items-center justify-center overflow-hidden bg-[#f5f0e8] relative"
         style={{
           transform: `scale(${zoom / 100}) rotate(${finalRotation}deg)`,
           transformOrigin: "center",
@@ -126,12 +126,9 @@ const PdfPage = forwardRef<
           />
         )}
       </div>
-      {/* Coins décoratifs de page */}
-      <div className="absolute top-0 right-0 w-8 h-8 pointer-events-none">
-        <svg viewBox="0 0 32 32" className="w-full h-full text-muted-foreground/20">
-          <path d="M0 0 L32 0 L32 32 Z" fill="currentColor" />
-        </svg>
-      </div>
+      {/* Subtle page edge effect */}
+      <div className="absolute inset-y-0 right-0 w-[2px] pointer-events-none" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.08), rgba(0,0,0,0.02))' }} />
+      <div className="absolute inset-y-0 left-0 w-[2px] pointer-events-none" style={{ background: 'linear-gradient(to left, rgba(0,0,0,0.08), rgba(0,0,0,0.02))' }} />
     </div>
   );
 });
@@ -232,7 +229,7 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
     let pageHeight: number;
 
     // For double-page: each page gets roughly half the width
-    const maxPageWidth = (availableWidth / 2) - 16; // Gap between pages
+    const maxPageWidth = availableWidth / 2; // No gap - pages touch like a real book
     const maxPageHeight = availableHeight;
 
     // Calculate dimensions that fit within constraints while maintaining aspect ratio
@@ -316,7 +313,7 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
         maxWidth={1200}
         minHeight={373}
         maxHeight={1600}
-        maxShadowOpacity={0.5}
+        maxShadowOpacity={0.4}
         showCover={true}
         mobileScrollSupport={true}
         onFlip={(e: any) => {
@@ -325,7 +322,7 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
           onPageChange(realPage);
         }}
         className="book-container"
-        style={{}}
+        style={{ margin: 0, padding: 0, gap: 0 }}
         startPage={isRtl ? totalPages - currentPage : currentPage - 1}
         drawShadow={true}
         flippingTime={800}

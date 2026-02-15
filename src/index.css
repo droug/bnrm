@@ -985,3 +985,50 @@ Enhanced Moroccan Heritage Design System
     overflow: hidden;
   }
 }
+
+/* ================================================
+   Book Reader - Double page mode (no gap between pages)
+   ================================================ */
+.book-container {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.book-container .stf__parent {
+  gap: 0 !important;
+}
+
+.book-container .stf__wrapper {
+  gap: 0 !important;
+  column-gap: 0 !important;
+}
+
+.book-container .stf__block {
+  gap: 0 !important;
+  box-shadow: none !important;
+}
+
+.book-container .stf__item {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Center spine shadow for realistic book look */
+.book-container .stf__wrapper::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  background: linear-gradient(to right,
+    rgba(0,0,0,0.15),
+    rgba(0,0,0,0.05) 30%,
+    transparent 50%,
+    rgba(0,0,0,0.05) 70%,
+    rgba(0,0,0,0.15)
+  );
+  pointer-events: none;
+  z-index: 10;
+}
