@@ -1671,7 +1671,7 @@ const BookReader = () => {
                   </div>
                 </div>
               ) : viewMode === "double" ? (
-                <div className="flex-1 min-h-0 flex items-center justify-center p-4 md:p-8 relative">
+                <div className="flex-1 min-h-0 flex items-center justify-center p-0 relative">
                   <PanZoomContainer
                     zoom={zoom}
                     rotation={0}

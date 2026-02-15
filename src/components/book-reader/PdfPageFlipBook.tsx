@@ -126,9 +126,6 @@ const PdfPage = forwardRef<
           />
         )}
       </div>
-      {/* Subtle page edge effect */}
-      <div className="absolute inset-y-0 right-0 w-[2px] pointer-events-none" style={{ background: 'linear-gradient(to right, rgba(0,0,0,0.08), rgba(0,0,0,0.02))' }} />
-      <div className="absolute inset-y-0 left-0 w-[2px] pointer-events-none" style={{ background: 'linear-gradient(to left, rgba(0,0,0,0.08), rgba(0,0,0,0.02))' }} />
     </div>
   );
 });
