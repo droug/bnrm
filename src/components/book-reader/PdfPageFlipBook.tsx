@@ -218,12 +218,9 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
     // Target aspect ratio (3:4 for document pages - typical manuscript ratio)
     const aspectRatio = 3 / 4;
 
-    // Minimal safe margins - maximize page size for realistic book feel
-    const safeX = 8;
-    const safeY = 16;
-
-    const availableWidth = Math.max(0, containerWidth - safeX);
-    const availableHeight = Math.max(0, containerHeight - safeY);
+    // Zero margins - pages must fill the entire available space
+    const availableWidth = containerWidth;
+    const availableHeight = containerHeight;
 
     let pageWidth: number;
     let pageHeight: number;
@@ -246,9 +243,9 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
       pageHeight = widthBasedHeight;
     }
 
-    // Apply constraints
-    pageWidth = Math.max(280, Math.min(pageWidth, 800));
-    pageHeight = Math.max(373, Math.min(pageHeight, 1100));
+    // Minimal constraints - allow pages to use full container
+    pageWidth = Math.max(280, pageWidth);
+    pageHeight = Math.max(373, pageHeight);
 
     setDimensions({ width: Math.round(pageWidth), height: Math.round(pageHeight) });
   }, []);
@@ -310,9 +307,9 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
         height={dimensions.height}
         size="stretch"
         minWidth={280}
-        maxWidth={1200}
+        maxWidth={2400}
         minHeight={373}
-        maxHeight={1600}
+        maxHeight={2400}
         maxShadowOpacity={0.4}
         showCover={true}
         mobileScrollSupport={true}
