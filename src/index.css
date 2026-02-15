@@ -989,6 +989,11 @@ Enhanced Moroccan Heritage Design System
 /* ================================================
    Book Reader - Double page mode (no gap between pages)
    ================================================ */
+.book-container,
+.book-container * {
+  box-sizing: border-box !important;
+}
+
 .book-container {
   margin: 0 !important;
   padding: 0 !important;
@@ -996,21 +1001,44 @@ Enhanced Moroccan Heritage Design System
 
 .book-container .stf__parent {
   gap: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .book-container .stf__wrapper {
   gap: 0 !important;
   column-gap: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .book-container .stf__block {
   gap: 0 !important;
   box-shadow: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .book-container .stf__item {
   margin: 0 !important;
   padding: 0 !important;
+  border: none !important;
+}
+
+/* Force left page to touch right page */
+.book-container .stf__item:first-child {
+  margin-right: 0 !important;
+}
+
+.book-container .stf__item:last-child {
+  margin-left: 0 !important;
+}
+
+/* Override any internal borders or outlines */
+.book-container .page {
+  border: none !important;
+  outline: none !important;
+  margin: 0 !important;
 }
 
 /* Center spine shadow for realistic book look */
