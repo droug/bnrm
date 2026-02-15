@@ -331,7 +331,18 @@ serve(async (req) => {
           }
         }
 
-        // 5. Annuler les tranches réservées
+        // 5. Marquer la demande d'inscription comme supprimée
+        try {
+          await supabaseClient
+            .from('professional_registration_requests')
+            .update({ status: 'deleted', updated_at: new Date().toISOString() })
+            .eq('user_id', user_id);
+          console.log(`[USER-SERVICE] Registration request marked as deleted for user ${user_id}`);
+        } catch (e) {
+          console.warn(`[USER-SERVICE] Error updating registration request:`, e);
+        }
+
+        // 6. Annuler les tranches réservées
         try {
           if (professionalEmail) {
             await supabaseClient
@@ -356,7 +367,7 @@ serve(async (req) => {
           console.warn(`[USER-SERVICE] Error cancelling reserved ranges:`, e);
         }
 
-        // 6. Log l'activité
+        // 7. Log l'activité
         await supabaseClient
           .from('activity_logs')
           .insert({
