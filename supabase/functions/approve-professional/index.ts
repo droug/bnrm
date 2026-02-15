@@ -185,6 +185,21 @@ serve(async (req) => {
         // L'utilisateur existe déjà, utiliser son ID
         userId = existingUser.id;
         console.log("User already exists, using existing ID:", userId);
+
+        // Unban the user if they were previously deleted/banned
+        if (existingUser.banned_until || existingUser.user_metadata?.banned) {
+          console.log("User was previously banned, unbanning...");
+          const { error: unbanError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+            ban_duration: 'none',
+            user_metadata: { banned: false },
+          });
+          if (unbanError) {
+            console.error("Error unbanning user:", unbanError);
+          } else {
+            console.log("User unbanned successfully");
+          }
+        }
+
         // On génère quand même un lien de récupération pour les utilisateurs existants
         isNewUser = false;
       } else {
@@ -240,6 +255,7 @@ serve(async (req) => {
           phone: request.registration_data?.phone,
           institution: request.company_name,
           is_approved: true,
+          account_status: "active",
         }, { onConflict: "user_id" });
 
       if (profileError) {
