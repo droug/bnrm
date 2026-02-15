@@ -1013,6 +1013,8 @@ Enhanced Moroccan Heritage Design System
   column-gap: 0 !important;
   margin: 0 !important;
   padding: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 /* Force blocks (left/right halves) to have zero spacing */
