@@ -146,6 +146,7 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
   const bookRef = useRef<any>();
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 550, height: 733 });
+  const [pdfAspectRatio, setPdfAspectRatio] = useState<number>(3 / 4);
   const [pdfDoc, setPdfDoc] = useState<pdfjsLib.PDFDocumentProxy | null>(null);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -163,7 +164,13 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
         const loadingTask = pdfjsLib.getDocument(pdfUrl);
         const pdf = await loadingTask.promise;
         
+        // Get actual page aspect ratio from first page
+        const firstPage = await pdf.getPage(1);
+        const viewport = firstPage.getViewport({ scale: 1 });
+        const actualRatio = viewport.width / viewport.height;
+        
         if (!cancelled) {
+          setPdfAspectRatio(actualRatio);
           setPdfDoc(pdf);
           setTotalPages(pdf.numPages);
           onTotalPagesChange?.(pdf.numPages);
@@ -212,40 +219,30 @@ export const PdfPageFlipBook = forwardRef<PdfPageFlipBookHandle, PdfPageFlipBook
     const containerWidth = container.clientWidth;
     const containerHeight = container.clientHeight;
 
-    // Target aspect ratio (3:4 for document pages - typical manuscript ratio)
-    const aspectRatio = 3 / 4;
+    const aspectRatio = pdfAspectRatio;
 
-    // Zero margins - pages must fill the entire available space
-    const availableWidth = containerWidth;
-    const availableHeight = containerHeight;
+    // Each page gets half the width
+    const maxPageWidth = containerWidth / 2;
+    const maxPageHeight = containerHeight;
+
+    // Width-based height
+    const widthBasedHeight = maxPageWidth / aspectRatio;
 
     let pageWidth: number;
     let pageHeight: number;
 
-    // For double-page: each page gets roughly half the width
-    const maxPageWidth = availableWidth / 2; // No gap - pages touch like a real book
-    const maxPageHeight = availableHeight;
-
-    // Calculate dimensions that fit within constraints while maintaining aspect ratio
-    const heightBasedWidth = maxPageHeight * aspectRatio;
-    const widthBasedHeight = maxPageWidth / aspectRatio;
-
-    if (heightBasedWidth <= maxPageWidth) {
-      // Height is the limiting factor - use full height
-      pageHeight = maxPageHeight;
-      pageWidth = heightBasedWidth;
-    } else {
-      // Width is the limiting factor - use full width
+    if (widthBasedHeight <= maxPageHeight) {
+      // Width is limiting - fill full width
       pageWidth = maxPageWidth;
       pageHeight = widthBasedHeight;
+    } else {
+      // Height is limiting - fill full height
+      pageHeight = maxPageHeight;
+      pageWidth = pageHeight * aspectRatio;
     }
 
-    // Minimal constraints - allow pages to use full container
-    pageWidth = Math.max(280, pageWidth);
-    pageHeight = Math.max(373, pageHeight);
-
-    setDimensions({ width: Math.round(pageWidth), height: Math.round(pageHeight) });
-  }, []);
+    setDimensions({ width: Math.round(Math.max(280, pageWidth)), height: Math.round(Math.max(373, pageHeight)) });
+  }, [pdfAspectRatio]);
 
   useEffect(() => {
     calculateDimensions();
