@@ -132,7 +132,7 @@ export default function ReproductionManager() {
       const metadata = request.metadata as Record<string, any> | null;
       const documentTitle = metadata?.document_title || 'Document';
 
-      // Send ready notification via edge function (utilise le template 'ready')
+      // Send ready notification via edge function (utilise le template 'ready') avec la modalité
       const { error: notifError } = await supabase.functions.invoke('send-reproduction-notification', {
         body: {
           requestId: request.id,
@@ -140,6 +140,7 @@ export default function ReproductionManager() {
           notificationType: 'ready',
           requestNumber: request.request_number,
           documentTitle: documentTitle,
+          reproductionModality: request.reproduction_modality,
         }
       });
 
