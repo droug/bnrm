@@ -2087,7 +2087,7 @@ export default function DocumentsManager() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full" dir="ltr">
         <div className="overflow-x-auto" dir="ltr" style={{ direction: 'ltr' }}>
           <TabsList className="inline-flex w-auto min-w-full flex-row" style={{ direction: 'ltr', flexDirection: 'row' }}>
-            <TabsTrigger value="documents">Document</TabsTrigger>
+            <TabsTrigger value="documents">Documents</TabsTrigger>
             <TabsTrigger value="bulk-pdf" className="flex items-center gap-1">
               <Upload className="h-4 w-4" />
               <span className="hidden sm:inline">Documents par lot</span>
