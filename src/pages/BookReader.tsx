@@ -862,7 +862,19 @@ const BookReader = () => {
       toast.error(accessRestrictions?.restriction_message_fr || "Le téléchargement est désactivé pour ce document protégé par le droit d'auteur");
       return;
     }
-    toast.success(`Téléchargement en cours (${format})...`);
+    
+    if (pdfUrl) {
+      toast.success("Téléchargement en cours...");
+      const link = document.createElement('a');
+      link.href = pdfUrl;
+      link.download = `${documentData?.title || 'document'}.pdf`;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      toast.error("Aucun fichier disponible pour le téléchargement");
+    }
   };
 
   const handlePrint = async () => {
