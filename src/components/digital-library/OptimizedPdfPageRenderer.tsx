@@ -21,6 +21,7 @@ interface OptimizedPdfPageRendererProps {
   rotation?: number;
   className?: string;
   onPageLoad?: (totalPages: number) => void;
+  onImageRendered?: (width: number, height: number) => void;
   priority?: 'high' | 'low';
   preloadPages?: number[];
 }
@@ -124,6 +125,7 @@ export const OptimizedPdfPageRenderer = memo(function OptimizedPdfPageRenderer({
   rotation = 0,
   className = '',
   onPageLoad,
+  onImageRendered,
   priority = 'high',
   preloadPages,
 }: OptimizedPdfPageRendererProps) {
@@ -249,6 +251,10 @@ export const OptimizedPdfPageRenderer = memo(function OptimizedPdfPageRenderer({
           }}
           loading={priority === 'high' ? 'eager' : 'lazy'}
           decoding="async"
+          onLoad={(e) => {
+            const img = e.currentTarget;
+            onImageRendered?.(img.clientWidth, img.clientHeight);
+          }}
         />
       )}
     </div>

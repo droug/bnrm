@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, memo } from 'react';
+import { useState, useRef, useCallback, memo } from 'react';
 import { OptimizedPdfPageRenderer } from './OptimizedPdfPageRenderer';
 import { PdfTextLayer } from './PdfTextLayer';
 
@@ -28,42 +28,20 @@ export const PdfPageWithHighlight = memo(function PdfPageWithHighlight({
   documentId,
 }: PdfPageWithHighlightProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
 
-  // Poll for container size after image loads
-  useEffect(() => {
-    if (!containerRef.current) return;
+  const handleImageRendered = useCallback((width: number, height: number) => {
+    if (width > 10 && height > 10) {
+      setImageSize(prev => {
+        if (Math.abs(prev.width - width) > 2 || Math.abs(prev.height - height) > 2) {
+          return { width, height };
+        }
+        return prev;
+      });
+    }
+  }, []);
 
-    const checkSize = () => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      if (rect.width > 10 && rect.height > 10) {
-        setContainerSize(prev => {
-          if (Math.abs(prev.width - rect.width) > 2 || Math.abs(prev.height - rect.height) > 2) {
-            return { width: rect.width, height: rect.height };
-          }
-          return prev;
-        });
-      }
-    };
-
-    const resizeObserver = new ResizeObserver(checkSize);
-    resizeObserver.observe(containerRef.current);
-    
-    // Poll periodically to catch image load
-    checkSize();
-    const intervals = [100, 300, 600, 1000, 2000, 3000].map(ms => 
-      setTimeout(checkSize, ms)
-    );
-
-    return () => {
-      resizeObserver.disconnect();
-      intervals.forEach(clearTimeout);
-    };
-  }, [pageNumber, pdfUrl]);
-
-  const hasSize = containerSize.width > 10 && containerSize.height > 10;
+  const hasSize = imageSize.width > 10 && imageSize.height > 10;
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
@@ -73,6 +51,7 @@ export const PdfPageWithHighlight = memo(function PdfPageWithHighlight({
         scale={scale}
         rotation={rotation}
         onPageLoad={onPageLoad}
+        onImageRendered={handleImageRendered}
         priority={priority}
         preloadPages={preloadPages}
       />
@@ -84,8 +63,8 @@ export const PdfPageWithHighlight = memo(function PdfPageWithHighlight({
           pageNumber={pageNumber}
           scale={scale}
           rotation={rotation}
-          containerWidth={containerSize.width}
-          containerHeight={containerSize.height}
+          containerWidth={imageSize.width}
+          containerHeight={imageSize.height}
           searchHighlight={searchHighlight}
           documentId={documentId}
         />
