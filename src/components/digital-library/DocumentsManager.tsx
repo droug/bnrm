@@ -18,6 +18,7 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PortalSelect } from "@/components/ui/portal-select";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -2142,7 +2143,7 @@ export default function DocumentsManager() {
             </Button>
           </div>
 
-          <Dialog open={showAddDialog} onOpenChange={(open) => {
+          <Sheet open={showAddDialog} onOpenChange={(open) => {
             setShowAddDialog(open);
             if (!open) {
               setDocumentAddedSuccess(false);
@@ -2150,13 +2151,13 @@ export default function DocumentsManager() {
               setUploadProgress(0);
             }
           }}>
-            <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Ajouter un document</DialogTitle>
-                <DialogDescription>
+            <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle>Ajouter un document</SheetTitle>
+                <SheetDescription>
                   Saisissez le N° de cote. Les métadonnées seront récupérées automatiquement depuis le catalogue.
-                </DialogDescription>
-              </DialogHeader>
+                </SheetDescription>
+              </SheetHeader>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(
                   (values) => {
@@ -2453,7 +2454,7 @@ export default function DocumentsManager() {
                     </Alert>
                   )}
 
-                  <DialogFooter>
+                   <SheetFooter>
                     {documentAddedSuccess ? (
                       <Button 
                         type="button" 
@@ -2492,11 +2493,11 @@ export default function DocumentsManager() {
                         </Button>
                       </>
                     )}
-                  </DialogFooter>
+                  </SheetFooter>
                 </form>
               </Form>
-            </DialogContent>
-          </Dialog>
+            </SheetContent>
+          </Sheet>
 
           {/* Edit Document Dialog */}
           <Dialog open={showEditDialog} onOpenChange={(open) => {
