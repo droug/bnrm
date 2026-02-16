@@ -1312,15 +1312,6 @@ const BookReader = () => {
                       </DialogContent>
                     </Dialog>
 
-                    <Button
-                      variant="outline" 
-                      className="w-full justify-start" 
-                      size="sm"
-                      onClick={handlePrint}
-                    >
-                      <Printer className="h-4 w-4 mr-2" />
-                      Imprimer
-                    </Button>
 
                     <Button
                       variant="outline"
@@ -1581,18 +1572,6 @@ const BookReader = () => {
                   <Maximize className="h-4 w-4" />
                 </Button>
                 
-                {/* Bouton d'impression - visible uniquement pour le personnel BN */}
-                {(isAdmin || isLibrarian) && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={handlePrint}
-                    title="Imprimer le document (Service BN)"
-                    className="text-primary hover:bg-primary/10"
-                  >
-                    <Printer className="h-4 w-4" />
-                  </Button>
-                )}
                 <Button
                   variant={showSearch ? "default" : "outline"}
                   size="sm"
