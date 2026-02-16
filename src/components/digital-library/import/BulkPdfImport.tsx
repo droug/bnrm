@@ -49,6 +49,7 @@ export default function BulkPdfImport({ onSuccess }: BulkPdfImportProps) {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
+  const [batchName, setBatchName] = useState<string>("");
   const [pdfFiles, setPdfFiles] = useState<File[]>([]); // PDF + images
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -174,10 +175,8 @@ export default function BulkPdfImport({ onSuccess }: BulkPdfImportProps) {
 
         if (cbnError) throw cbnError;
 
-        // Create digital library document
-        const { data: newDoc, error: docError } = await supabase
-          .from('digital_library_documents')
-          .insert({
+        // Create digital library document with batch_name
+        const insertData: any = {
             cbn_document_id: newCbn.id,
             title: cote,
             pdf_url: fileUrl,
@@ -186,7 +185,15 @@ export default function BulkPdfImport({ onSuccess }: BulkPdfImportProps) {
             digitization_source: 'internal',
             publication_status: 'draft',
             ocr_processed: false,
-          })
+        };
+        
+        if (batchName.trim()) {
+          insertData.batch_name = batchName.trim();
+        }
+
+        const { data: newDoc, error: docError } = await supabase
+          .from('digital_library_documents')
+          .insert(insertData)
           .select('id')
           .single();
 
@@ -328,6 +335,31 @@ export default function BulkPdfImport({ onSuccess }: BulkPdfImportProps) {
 
   return (
     <div className="space-y-6">
+      {/* Batch Name */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Info className="h-5 w-5" />
+            Titre du lot
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <Label htmlFor="batch-name">Nom du lot (utilisé pour le Multi-OCR et les restrictions par lot)</Label>
+            <input
+              id="batch-name"
+              type="text"
+              value={batchName}
+              onChange={(e) => setBatchName(e.target.value)}
+              placeholder="Ex: Manuscrits arabes - Collection 2025"
+              className="flex h-11 w-full rounded-lg border border-input bg-white px-4 py-2.5 text-[15px] font-normal transition-all duration-200 text-foreground placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary hover:border-primary/40 shadow-sm"
+            />
+            <p className="text-xs text-muted-foreground">
+              Ce nom sera attribué à tous les documents importés dans ce lot. Il permettra de les retrouver facilement dans les onglets Multi-OCR et Restrictions par lot.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
       {/* OCR Settings */}
       <Card>
         <CardHeader className="pb-3">

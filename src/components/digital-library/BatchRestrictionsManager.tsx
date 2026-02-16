@@ -24,6 +24,7 @@ export function BatchRestrictionsManager() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("all");
+  const [filterBatch, setFilterBatch] = useState<string>("all");
   
   // État du formulaire batch
   const [isRestricted, setIsRestricted] = useState(false);
@@ -51,41 +52,62 @@ export function BatchRestrictionsManager() {
   const [selectedDocumentForDetails, setSelectedDocumentForDetails] = useState<any>(null);
   const [showDetailsDialog, setShowDetailsDialog] = useState(false);
 
-  // Fetch documents
+  // Fetch documents from digital_library_documents
   const { data: documents, isLoading } = useQuery({
     queryKey: ['digital-library-documents-batch-restrictions'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('content')
-        .select(`
-          *,
-          page_access_restrictions (*)
-        `)
-        .in('content_type', ['page', 'news'])
+      // Fetch documents
+      const { data: docs, error: docsError } = await supabase
+        .from('digital_library_documents')
+        .select('*')
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
-      return data;
+      if (docsError) throw docsError;
+
+      // Fetch all restrictions
+      const { data: restrictions, error: restError } = await supabase
+        .from('page_access_restrictions')
+        .select('*');
+      
+      if (restError) throw restError;
+
+      // Merge restrictions onto documents by content_id = doc.id
+      const restrictionMap = new Map<string, any>();
+      (restrictions || []).forEach((r: any) => {
+        restrictionMap.set(r.content_id, r);
+      });
+
+      return (docs || []).map((doc: any) => ({
+        ...doc,
+        _restriction: restrictionMap.get(doc.id) || null,
+      }));
     }
   });
+
+  // Extract unique batch names for filter
+  const batchNames = useMemo(() => {
+    if (!documents) return [];
+    const names = documents
+      .map((doc: any) => doc.batch_name)
+      .filter((name: string | null) => name && name.trim() !== '');
+    return [...new Set(names)] as string[];
+  }, [documents]);
 
   // Filtrer les documents
   const filteredDocuments = useMemo(() => {
     if (!documents) return [];
 
     const getRestriction = (doc: any) => {
-      const pr = doc?.page_access_restrictions;
-      if (!pr) return null;
-      return Array.isArray(pr) ? (pr[0] ?? null) : pr;
+      return doc?._restriction || null;
     };
 
-    return documents.filter((doc) => {
+    return documents.filter((doc: any) => {
       const matchesSearch =
         searchQuery === "" ||
         doc.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        doc.excerpt?.toLowerCase().includes(searchQuery.toLowerCase());
+        doc.author?.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesType = filterType === "all" || doc.content_type === filterType;
+      const matchesType = filterType === "all" || doc.document_type === filterType;
 
       const restriction = getRestriction(doc);
       const matchesStatus =
@@ -93,9 +115,14 @@ export function BatchRestrictionsManager() {
         (filterStatus === "restricted" && restriction?.is_restricted) ||
         (filterStatus === "public" && (!restriction || !restriction.is_restricted));
 
-      return matchesSearch && matchesType && matchesStatus;
+      const matchesBatch =
+        filterBatch === "all" ||
+        (filterBatch === "__none__" && !doc.batch_name) ||
+        doc.batch_name === filterBatch;
+
+      return matchesSearch && matchesType && matchesStatus && matchesBatch;
     });
-  }, [documents, searchQuery, filterType, filterStatus]);
+  }, [documents, searchQuery, filterType, filterStatus, filterBatch]);
 
   // Mutation pour appliquer les restrictions en lot
   const applyBatchRestrictions = useMutation({
@@ -359,7 +386,7 @@ export function BatchRestrictionsManager() {
           </div>
         </CardHeader>
         <CardContent className="pt-6">
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-3">
               <Label htmlFor="search" className="text-sm font-semibold flex items-center gap-2">
                 <Search className="h-4 w-4 text-muted-foreground" />
@@ -367,7 +394,7 @@ export function BatchRestrictionsManager() {
               </Label>
               <Input
                 id="search"
-                placeholder="Rechercher par titre ou description..."
+                placeholder="Rechercher par titre ou auteur..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="h-11"
@@ -377,17 +404,36 @@ export function BatchRestrictionsManager() {
             <div className="space-y-3">
               <Label htmlFor="filter-type" className="text-sm font-semibold flex items-center gap-2">
                 <Filter className="h-4 w-4 text-muted-foreground" />
-                Type de contenu
+                Type de document
               </Label>
               <SimpleDropdown
                 value={filterType}
                 onChange={setFilterType}
                 options={[
                   { value: "all", label: "Tous les types" },
-                  { value: "page", label: "Pages" },
-                  { value: "news", label: "Actualités" },
+                  { value: "livre", label: "Livres" },
+                  { value: "periodique", label: "Périodiques" },
+                  { value: "carte", label: "Cartes" },
+                  { value: "manuscrit", label: "Manuscrits" },
                 ]}
                 placeholder="Tous les types"
+              />
+            </div>
+            
+            <div className="space-y-3">
+              <Label htmlFor="filter-batch" className="text-sm font-semibold flex items-center gap-2">
+                <Layers className="h-4 w-4 text-muted-foreground" />
+                Lot d'import
+              </Label>
+              <SimpleDropdown
+                value={filterBatch}
+                onChange={setFilterBatch}
+                options={[
+                  { value: "all", label: "Tous les lots" },
+                  { value: "__none__", label: "Sans lot" },
+                  ...batchNames.map((name: string) => ({ value: name, label: name })),
+                ]}
+                placeholder="Tous les lots"
               />
             </div>
             
@@ -415,7 +461,7 @@ export function BatchRestrictionsManager() {
               <span className="text-muted-foreground">Résultats:</span>
               <span className="text-foreground font-bold">{filteredDocuments.length} document(s)</span>
             </div>
-            {(searchQuery || filterType !== "all" || filterStatus !== "all") && (
+            {(searchQuery || filterType !== "all" || filterStatus !== "all" || filterBatch !== "all") && (
               <Button
                 variant="ghost"
                 size="sm"
@@ -423,6 +469,7 @@ export function BatchRestrictionsManager() {
                   setSearchQuery("");
                   setFilterType("all");
                   setFilterStatus("all");
+                  setFilterBatch("all");
                 }}
               >
                 <X className="h-4 w-4 mr-2" />
@@ -500,7 +547,7 @@ export function BatchRestrictionsManager() {
                 </TableHeader>
                 <TableBody>
                   {filteredDocuments.map((doc) => {
-                    const restriction = doc.page_access_restrictions?.[0];
+                    const restriction = doc._restriction;
                     return (
                       <TableRow key={doc.id}>
                         <TableCell>
@@ -511,7 +558,7 @@ export function BatchRestrictionsManager() {
                         </TableCell>
                         <TableCell className="font-medium">{doc.title}</TableCell>
                         <TableCell>
-                          <Badge variant="outline">{doc.content_type}</Badge>
+                          <Badge variant="outline">{doc.document_type || doc.batch_name || '-'}</Badge>
                         </TableCell>
                         <TableCell>
                           {restriction?.is_restricted ? (
