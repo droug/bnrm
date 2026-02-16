@@ -2313,7 +2313,7 @@ export default function DocumentsManager() {
                         </div>
                       )}
                       <p className="text-xs text-muted-foreground">
-                        Formats acceptés : PDF, JPEG, PNG, TIFF, WebP, GIF, BMP, EPUB (max. 200 MB)
+                        Formats acceptés : PDF, JPEG, EPUB etc. (max. 200 MB)
                       </p>
                     </div>
 
