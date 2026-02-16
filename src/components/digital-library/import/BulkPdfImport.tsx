@@ -49,7 +49,7 @@ export default function BulkPdfImport({ onSuccess }: BulkPdfImportProps) {
   const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
-  const [pdfFiles, setPdfFiles] = useState<File[]>([]);
+  const [pdfFiles, setPdfFiles] = useState<File[]>([]); // PDF + images
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [currentFile, setCurrentFile] = useState<string>("");
@@ -67,14 +67,20 @@ export default function BulkPdfImport({ onSuccess }: BulkPdfImportProps) {
     // Reset input for future selections
     e.target.value = "";
 
+    const allowedTypes = [
+      'application/pdf',
+      'image/jpeg', 'image/jpg', 'image/png', 'image/tiff', 'image/webp', 'image/gif', 'image/bmp',
+    ];
+    const allowedExtensions = ['.pdf', '.jpg', '.jpeg', '.png', '.tiff', '.tif', '.webp', '.gif', '.bmp'];
+
     const validFiles = pickedFiles.filter(
-      (f) => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')
+      (f) => allowedTypes.includes(f.type) || allowedExtensions.some(ext => f.name.toLowerCase().endsWith(ext))
     );
 
     if (validFiles.length !== pickedFiles.length) {
       toast({
         title: "Attention",
-        description: `${pickedFiles.length - validFiles.length} fichier(s) non-PDF ont été ignorés`,
+        description: `${pickedFiles.length - validFiles.length} fichier(s) non supporté(s) ont été ignorés. Formats acceptés : PDF, JPG, PNG, TIFF, WebP, GIF, BMP`,
         variant: "destructive",
       });
     }
@@ -93,7 +99,7 @@ export default function BulkPdfImport({ onSuccess }: BulkPdfImportProps) {
 
     toast({
       title: "Fichiers ajoutés",
-      description: `${merged.length} fichier(s) PDF sélectionné(s)`,
+      description: `${merged.length} fichier(s) sélectionné(s)`,
     });
   };
 
@@ -118,23 +124,30 @@ export default function BulkPdfImport({ onSuccess }: BulkPdfImportProps) {
     for (let i = 0; i < pdfFiles.length; i++) {
       const file = pdfFiles[i];
       const fileName = file.name;
-      const cote = fileName.replace(/\.pdf$/i, '');
+      const cote = fileName.replace(/\.[^/.]+$/, ''); // Remove any extension
+      const isPdf = file.type === 'application/pdf' || fileName.toLowerCase().endsWith('.pdf');
+      const fileExt = fileName.split('.').pop()?.toUpperCase() || 'UNKNOWN';
       
       setCurrentFile(fileName);
       setProgress(Math.round((i / pdfFiles.length) * 100));
 
       try {
-        // Read PDF to get page count
-        const arrayBuffer = await file.arrayBuffer();
-        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-        const pagesCount = pdf.numPages;
+        let pagesCount = 1;
+        let pdfProxy: pdfjsLib.PDFDocumentProxy | null = null;
 
-        // Upload PDF to storage
+        if (isPdf) {
+          // Read PDF to get page count
+          const arrayBuffer = await file.arrayBuffer();
+          pdfProxy = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+          pagesCount = pdfProxy.numPages;
+        }
+
+        // Upload file to storage
         const storagePath = `documents/${Date.now()}-${fileName}`;
         const { error: uploadError } = await supabase.storage
           .from('digital-library')
           .upload(storagePath, file, {
-            contentType: 'application/pdf',
+            contentType: file.type || 'application/octet-stream',
             upsert: false,
           });
 
@@ -145,7 +158,7 @@ export default function BulkPdfImport({ onSuccess }: BulkPdfImportProps) {
           .from('digital-library')
           .getPublicUrl(storagePath);
 
-        const pdfUrl = urlData?.publicUrl;
+        const fileUrl = urlData?.publicUrl;
 
         // Create CBN document entry
         const { data: newCbn, error: cbnError } = await supabase
@@ -167,9 +180,9 @@ export default function BulkPdfImport({ onSuccess }: BulkPdfImportProps) {
           .insert({
             cbn_document_id: newCbn.id,
             title: cote,
-            pdf_url: pdfUrl,
+            pdf_url: fileUrl,
             pages_count: pagesCount,
-            file_format: 'PDF',
+            file_format: isPdf ? 'PDF' : fileExt,
             digitization_source: 'internal',
             publication_status: 'draft',
             ocr_processed: false,
@@ -179,11 +192,11 @@ export default function BulkPdfImport({ onSuccess }: BulkPdfImportProps) {
 
         if (docError) throw docError;
 
-        // Run OCR if enabled
-        if (enableOcr && newDoc) {
+        // Run OCR if enabled (only for PDFs)
+        if (enableOcr && newDoc && isPdf && pdfProxy) {
           try {
             setCurrentFile(`${fileName} - OCR en cours...`);
-            await processOcrForDocument(newDoc.id, pdf, pagesCount);
+            await processOcrForDocument(newDoc.id, pdfProxy, pagesCount);
             
             // Update ocr_processed flag
             await supabase
@@ -306,7 +319,7 @@ export default function BulkPdfImport({ onSuccess }: BulkPdfImportProps) {
 
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Rapport');
-    XLSX.writeFile(wb, `rapport_import_pdf_${new Date().toISOString().split('T')[0]}.xlsx`);
+    XLSX.writeFile(wb, `rapport_import_documents_${new Date().toISOString().split('T')[0]}.xlsx`);
   };
 
   const successCount = results.filter(r => r.status === 'success').length;
@@ -382,9 +395,9 @@ export default function BulkPdfImport({ onSuccess }: BulkPdfImportProps) {
       {/* Upload Zone */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Sélectionner les fichiers PDF</CardTitle>
+          <CardTitle className="text-lg">Sélectionner les fichiers (PDF, Images)</CardTitle>
           <CardDescription>
-            Le nom du fichier (sans .pdf) sera utilisé comme cote et titre provisoire
+            Le nom du fichier (sans extension) sera utilisé comme cote et titre provisoire
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -394,13 +407,13 @@ export default function BulkPdfImport({ onSuccess }: BulkPdfImportProps) {
           >
             <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
             <p className="text-sm text-muted-foreground mb-2">
-              Cliquez pour sélectionner vos fichiers PDF
+              Cliquez pour sélectionner vos fichiers (PDF, JPG, PNG, TIFF...)
             </p>
             <p className="text-xs text-muted-foreground">Sélection multiple autorisée</p>
             <input
               ref={fileInputRef}
               type="file"
-              accept=".pdf"
+              accept=".pdf,.jpg,.jpeg,.png,.tiff,.tif,.webp,.gif,.bmp"
               multiple
               onChange={handleFilesChange}
               className="hidden"
