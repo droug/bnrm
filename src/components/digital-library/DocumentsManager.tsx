@@ -284,12 +284,12 @@ export default function DocumentsManager() {
       // Validate that either a file is uploaded or a cote is provided
       if (!values.cote || values.cote.trim() === '') {
         console.error("[ADD DOC] Validation échouée: cote vide");
-        throw new Error("Veuillez téléverser un fichier PDF pour générer automatiquement le numéro de cote.");
+        throw new Error("Veuillez téléverser un fichier pour générer automatiquement le numéro de cote.");
       }
       
       if (!uploadFile && (!values.file_url || values.file_url.trim() === '')) {
         console.error("[ADD DOC] Validation échouée: pas de fichier ni URL");
-        throw new Error("Veuillez téléverser un fichier PDF ou fournir une URL de fichier.");
+        throw new Error("Veuillez téléverser un fichier ou fournir une URL de fichier.");
       }
       
       console.log("[ADD DOC] Validation OK, début du processus...");
@@ -2189,7 +2189,7 @@ export default function DocumentsManager() {
                           />
                         </FormControl>
                         <FormDescription>
-                          Généré automatiquement à partir du nom du fichier PDF téléversé.
+                          Généré automatiquement à partir du nom du fichier téléversé.
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
