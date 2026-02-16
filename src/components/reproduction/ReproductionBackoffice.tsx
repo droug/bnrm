@@ -88,16 +88,16 @@ export function ReproductionBackoffice() {
 
       if (error) throw error;
 
-      // Create notification
-      await supabase.from("reproduction_notifications").insert({
-        request_id: requestId,
-        recipient_id: selectedRequest?.user_id,
-        notification_type: approve ? "validation_service" : "rejection",
-        title: approve
-          ? language === "ar" ? "تم التحقق من طلبك" : "Votre demande a été validée"
-          : language === "ar" ? "تم رفض طلبك" : "Votre demande a été refusée",
-        message: validationNotes,
-      } as any);
+      // Only create notification for rejection (no email for service validation step)
+      if (!approve) {
+        await supabase.from("reproduction_notifications").insert({
+          request_id: requestId,
+          recipient_id: selectedRequest?.user_id,
+          notification_type: "rejection",
+          title: language === "ar" ? "تم رفض طلبك" : "Votre demande a été refusée",
+          message: validationNotes,
+        } as any);
+      }
 
       toast.success(
         approve
