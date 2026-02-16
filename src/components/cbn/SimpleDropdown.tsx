@@ -74,7 +74,15 @@ export function SimpleDropdown({
 
       {/* Dropdown List - Simple, no floating */}
       {isOpen && (
-        <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-input rounded-md shadow-lg overflow-hidden z-50">
+        <div className="absolute top-full left-0 right-0 mt-1 bg-background border border-input rounded-md shadow-lg overflow-hidden z-[9999]" style={{ position: 'fixed' as any }} ref={(el) => {
+          if (el && containerRef.current) {
+            const rect = containerRef.current.getBoundingClientRect();
+            el.style.position = 'fixed';
+            el.style.top = `${rect.bottom + 4}px`;
+            el.style.left = `${rect.left}px`;
+            el.style.width = `${rect.width}px`;
+          }
+        }}>
           {searchable && (
             <div className="p-2 border-b border-input">
               <input
