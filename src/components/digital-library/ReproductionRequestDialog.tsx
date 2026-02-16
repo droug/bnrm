@@ -6,14 +6,14 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { TitleAutocomplete } from "@/components/ui/title-autocomplete";
 import {
-  ScrollableDialog,
-  ScrollableDialogContent,
-  ScrollableDialogDescription,
-  ScrollableDialogHeader,
-  ScrollableDialogTitle,
-  ScrollableDialogBody,
-  ScrollableDialogFooter,
-} from "@/components/ui/scrollable-dialog";
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetFooter,
+} from "@/components/ui/sheet";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -182,22 +182,24 @@ export function ReproductionRequestDialog({
     }
   };
 
+  const acceptTerms = form.watch("acceptTerms");
+
   return (
-    <ScrollableDialog open={isOpen} onOpenChange={onClose}>
-      <ScrollableDialogContent className="sm:max-w-[650px]">
-        <ScrollableDialogHeader>
-          <ScrollableDialogTitle className="flex items-center gap-2">
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent className="w-full sm:max-w-[650px] p-0 flex flex-col">
+        <SheetHeader className="px-6 pt-6 pb-4 border-b">
+          <SheetTitle className="flex items-center gap-2">
             <Copy className="h-5 w-5 text-gold-bn-primary" />
             Demande de Reproduction
-          </ScrollableDialogTitle>
-          <ScrollableDialogDescription>
+          </SheetTitle>
+          <SheetDescription>
             Demandez une reproduction de documents patrimoniaux pour vos recherches ou projets
-          </ScrollableDialogDescription>
-        </ScrollableDialogHeader>
+          </SheetDescription>
+        </SheetHeader>
 
-        <ScrollableDialogBody>
+        <ScrollArea className="flex-1 px-6">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 py-6">
               {/* Informations demandeur */}
               <div className="p-4 rounded-lg bg-muted/50 border border-border/50">
                 <h4 className="text-sm font-semibold mb-3 flex items-center gap-2">
@@ -449,9 +451,9 @@ export function ReproductionRequestDialog({
               />
             </form>
           </Form>
-        </ScrollableDialogBody>
+        </ScrollArea>
 
-        <ScrollableDialogFooter>
+        <SheetFooter className="px-6 py-4 border-t gap-2">
           <Button
             type="button"
             variant="outline"
@@ -462,13 +464,13 @@ export function ReproductionRequestDialog({
           </Button>
           <Button 
             onClick={form.handleSubmit(onSubmit)} 
-            disabled={isSubmitting}
+            disabled={isSubmitting || !acceptTerms}
             className="bg-gold-bn-primary hover:bg-gold-bn-primary/90"
           >
             {isSubmitting ? "Envoi en cours..." : "Envoyer la demande"}
           </Button>
-        </ScrollableDialogFooter>
-      </ScrollableDialogContent>
-    </ScrollableDialog>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 }
