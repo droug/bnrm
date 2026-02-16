@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Lock, Unlock, Edit, Save, X, BookOpen, FileText, Search, Filter, Eye, EyeOff, Plus, Trash2, Shield, Download, Camera, MousePointerClick, Square, Sparkles, ArrowLeft, BookOpenCheck, ScrollText, FileQuestion, AlertTriangle } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { TemplateSelector } from "@/components/digital-library/TemplateSelector";
 
 export function PageAccessRestrictionsManager() {
   const { toast } = useToast();
@@ -399,6 +400,31 @@ export function PageAccessRestrictionsManager() {
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Colonne gauche - Paramètres principaux */}
           <div className="space-y-6">
+            {/* Appliquer depuis un modèle */}
+            <TemplateSelector onApply={(tpl) => {
+              setIsRestricted(tpl.is_restricted);
+              setRestrictionMode((tpl.restriction_mode as any) || "range");
+              if (tpl.restriction_mode === 'range') {
+                setPageRanges([{ start: tpl.start_page || 1, end: tpl.end_page || 10 }]);
+              }
+              if (tpl.restriction_mode === 'manual' && tpl.manual_pages) {
+                setManualPages(tpl.manual_pages);
+              }
+              if (tpl.restriction_mode === 'percentage') {
+                setPercentageValue(tpl.percentage_value || 10);
+                setPercentagePages(tpl.manual_pages || []);
+                setShowPercentagePages((tpl.manual_pages?.length || 0) > 0);
+              }
+              setAllowPhysicalConsultation(tpl.allow_physical_consultation ?? false);
+              setAllowDownload(tpl.allow_download ?? true);
+              setAllowScreenshot(tpl.allow_screenshot ?? true);
+              setAllowRightClick(tpl.allow_right_click ?? true);
+              setRestrictedPageDisplay((tpl.restricted_page_display as any) || "blur");
+              setRestrictedPageDisplayReason(tpl.restricted_page_display_reason || "Pages du document numérique consultables intégralement sur place");
+              setAllowDoublePageView(tpl.allow_double_page_view ?? true);
+              setAllowScrollView(tpl.allow_scroll_view ?? true);
+            }} />
+
             {/* Activer/Désactiver la restriction */}
             <Card>
               <CardContent className="p-6">

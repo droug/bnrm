@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { SimpleDropdown } from "@/components/cbn/SimpleDropdown";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Lock, Unlock, Search, Filter, FileText, X, Shield, Download, Camera, MousePointerClick, Layers, Eye, EyeOff, Info, Square, BookOpenCheck, ScrollText } from "lucide-react";
+import { TemplateSelector } from "@/components/digital-library/TemplateSelector";
 
 export function BatchRestrictionsManager() {
   const { toast } = useToast();
@@ -829,6 +830,28 @@ export function BatchRestrictionsManager() {
           </DialogHeader>
 
           <div className="space-y-6 py-4">
+            {/* Appliquer depuis un modèle */}
+            <TemplateSelector onApply={(tpl) => {
+              setIsRestricted(tpl.is_restricted);
+              setRestrictionMode((tpl.restriction_mode as any) || "range");
+              if (tpl.restriction_mode === 'range') {
+                setPageRanges([{ start: tpl.start_page || 1, end: tpl.end_page || 10 }]);
+              }
+              if (tpl.restriction_mode === 'manual' && tpl.manual_pages) {
+                setManualPages(tpl.manual_pages.join(", "));
+              }
+              if (tpl.restriction_mode === 'percentage') {
+                setPercentageValue(tpl.percentage_value || 10);
+                setPercentageDistribution((tpl.percentage_distribution as any) || "start");
+              }
+              setAllowPhysicalConsultation(tpl.allow_physical_consultation ?? false);
+              setAllowDownload(tpl.allow_download ?? true);
+              setAllowScreenshot(tpl.allow_screenshot ?? true);
+              setAllowRightClick(tpl.allow_right_click ?? true);
+              setRestrictedPageDisplay((tpl.restricted_page_display as any) || "blur");
+              setAllowDoublePageView(tpl.allow_double_page_view ?? true);
+              setAllowScrollView(tpl.allow_scroll_view ?? true);
+            }} />
             {/* Activer/Désactiver les restrictions */}
             <Card>
               <CardHeader className="pb-4">
