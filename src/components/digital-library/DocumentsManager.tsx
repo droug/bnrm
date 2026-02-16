@@ -27,6 +27,11 @@ import OcrImportTool from "@/components/digital-library/import/OcrImportTool";
 import PdfOcrTool from "@/components/digital-library/import/PdfOcrTool";
 import SigbSyncManager from "@/components/digital-library/SigbSyncManager";
 import { DraggableDocumentsList } from "@/components/digital-library/DraggableDocumentsList";
+import BulkPdfImport from "@/components/digital-library/import/BulkPdfImport";
+import BulkDocumentImport from "@/components/digital-library/import/BulkDocumentImport";
+import BulkAudiovisualImport from "@/components/digital-library/import/BulkAudiovisualImport";
+import AudiovisualTranscriptionTool from "@/components/digital-library/import/AudiovisualTranscriptionTool";
+import { MultiEngineOcrTool } from "@/components/digital-library/ocr-multiengine";
 import { FileUpload } from "@/components/ui/file-upload";
 import Tesseract from 'tesseract.js';
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
@@ -2142,25 +2147,57 @@ export default function DocumentsManager() {
       )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4 max-w-xl">
-          <TabsTrigger value="documents">Documents</TabsTrigger>
-          <TabsTrigger value="ocr" className="flex items-center gap-1">
-            <FileSearch className="h-4 w-4" />
-            OCR
-          </TabsTrigger>
-          <TabsTrigger value="sigb" className="flex items-center gap-1">
-            <Database className="h-4 w-4" />
-            SIGB
-          </TabsTrigger>
-          <TabsTrigger value="duplicates">Doublons</TabsTrigger>
-        </TabsList>
+        <div className="overflow-x-auto">
+          <TabsList className="inline-flex w-auto min-w-full">
+            <TabsTrigger value="documents">Documents</TabsTrigger>
+            <TabsTrigger value="bulk-pdf" className="flex items-center gap-1">
+              <Upload className="h-4 w-4" />
+              <span className="hidden sm:inline">Documents en masse</span>
+              <span className="sm:hidden">Import</span>
+            </TabsTrigger>
+            <TabsTrigger value="bulk-av" className="flex items-center gap-1">
+              <Mic className="h-4 w-4" />
+              <span className="hidden sm:inline">Audio/Vidéo</span>
+              <span className="sm:hidden">AV</span>
+            </TabsTrigger>
+            <TabsTrigger value="bulk-excel" className="flex items-center gap-1">
+              <FileText className="h-4 w-4" />
+              Excel
+            </TabsTrigger>
+            <TabsTrigger value="ocr" className="flex items-center gap-1">
+              <FileSearch className="h-4 w-4" />
+              OCR
+            </TabsTrigger>
+            <TabsTrigger value="ocr-multi" className="flex items-center gap-1">
+              <Wand2 className="h-4 w-4" />
+              Multi-OCR
+            </TabsTrigger>
+            <TabsTrigger value="sigb" className="flex items-center gap-1">
+              <Database className="h-4 w-4" />
+              SIGB
+            </TabsTrigger>
+            <TabsTrigger value="duplicates">Doublons</TabsTrigger>
+          </TabsList>
+        </div>
+
+        <TabsContent value="bulk-pdf">
+          <BulkPdfImport onSuccess={() => queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] })} />
+        </TabsContent>
+
+        <TabsContent value="bulk-av">
+          <BulkAudiovisualImport onSuccess={() => queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] })} />
+        </TabsContent>
+
+        <TabsContent value="bulk-excel">
+          <BulkDocumentImport onSuccess={() => queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] })} />
+        </TabsContent>
+
+        <TabsContent value="ocr-multi">
+          <MultiEngineOcrTool onSuccess={() => queryClient.invalidateQueries({ queryKey: ['digital-library-documents'] })} />
+        </TabsContent>
 
         <TabsContent value="documents" className="space-y-6">
           <div className="flex gap-2 justify-end mb-6">
-            <Button onClick={() => navigate("/admin/digital-library/bulk-import")}>
-              <Upload className="h-4 w-4 mr-2" />
-              Import en masse
-            </Button>
             <Button onClick={() => setShowAddDialog(true)}>
               <Plus className="h-4 w-4 mr-2" />
               Ajouter un document

@@ -249,7 +249,7 @@ export default function DigitalLibraryBackoffice() {
       title: "Import en masse",
       description: "Importer plusieurs documents avec métadonnées (CSV/Excel)",
       count: null,
-      action: () => navigate('/admin/digital-library/bulk-import'),
+      action: () => navigate('/admin/digital-library/documents'),
       gradient: "from-cyan-500 to-teal-600"
     },
     {
