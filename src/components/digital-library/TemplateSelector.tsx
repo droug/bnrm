@@ -67,7 +67,9 @@ export function TemplateSelector({ onApply }: TemplateSelectorProps) {
     }
   };
 
-  if (isLoading || !templates?.length) return null;
+  if (isLoading) return null;
+
+  const hasTemplates = templates && templates.length > 0;
 
   return (
     <Card className="border-emerald-200 dark:border-emerald-800 bg-gradient-to-r from-emerald-50/50 to-teal-50/50 dark:from-emerald-950/20 dark:to-teal-950/20">
@@ -76,48 +78,54 @@ export function TemplateSelector({ onApply }: TemplateSelectorProps) {
           <Icon icon="mdi:file-document-check-outline" className="h-4 w-4" />
           Appliquer depuis un modèle
         </div>
-        <div className="flex gap-2 items-end">
-          <div className="flex-1">
-            <SimpleDropdown
-              value={selectedTemplateId}
-              onChange={setSelectedTemplateId}
-              options={templates.map(t => ({
-                value: t.id,
-                label: t.name,
-              }))}
-              placeholder="Choisir un modèle..."
-            />
-          </div>
-          <Button
-            size="sm"
-            disabled={!selectedTemplate}
-            onClick={() => {
-              if (selectedTemplate) {
-                onApply(selectedTemplate);
-                setSelectedTemplateId("");
-              }
-            }}
-            className="gap-1.5 bg-emerald-600 hover:bg-emerald-700"
-          >
-            <Icon icon="mdi:check" className="h-4 w-4" />
-            Appliquer
-          </Button>
-        </div>
-        {selectedTemplate && (
-          <div className="flex flex-wrap gap-1.5 text-xs">
-            <Badge variant="outline" className="text-xs">{restrictionModeLabel(selectedTemplate.restriction_mode)}</Badge>
-            {selectedTemplate.restriction_mode === 'range' && (
-              <Badge variant="secondary" className="text-xs">Pages {selectedTemplate.start_page}-{selectedTemplate.end_page}</Badge>
+        {hasTemplates ? (
+          <>
+            <div className="flex gap-2 items-end">
+              <div className="flex-1">
+                <SimpleDropdown
+                  value={selectedTemplateId}
+                  onChange={setSelectedTemplateId}
+                  options={templates.map(t => ({
+                    value: t.id,
+                    label: t.name,
+                  }))}
+                  placeholder="Choisir un modèle..."
+                />
+              </div>
+              <Button
+                size="sm"
+                disabled={!selectedTemplate}
+                onClick={() => {
+                  if (selectedTemplate) {
+                    onApply(selectedTemplate);
+                    setSelectedTemplateId("");
+                  }
+                }}
+                className="gap-1.5 bg-emerald-600 hover:bg-emerald-700"
+              >
+                <Icon icon="mdi:check" className="h-4 w-4" />
+                Appliquer
+              </Button>
+            </div>
+            {selectedTemplate && (
+              <div className="flex flex-wrap gap-1.5 text-xs">
+                <Badge variant="outline" className="text-xs">{restrictionModeLabel(selectedTemplate.restriction_mode)}</Badge>
+                {selectedTemplate.restriction_mode === 'range' && (
+                  <Badge variant="secondary" className="text-xs">Pages {selectedTemplate.start_page}-{selectedTemplate.end_page}</Badge>
+                )}
+                {selectedTemplate.restriction_mode === 'percentage' && (
+                  <Badge variant="secondary" className="text-xs">{selectedTemplate.percentage_value}%</Badge>
+                )}
+                {selectedTemplate.restricted_page_display && (
+                  <Badge variant="secondary" className="text-xs">Affichage: {displayModeLabel(selectedTemplate.restricted_page_display)}</Badge>
+                )}
+                {!selectedTemplate.allow_download && <Badge variant="destructive" className="text-xs">DL bloqué</Badge>}
+                {!selectedTemplate.allow_screenshot && <Badge variant="destructive" className="text-xs">Capture bloquée</Badge>}
+              </div>
             )}
-            {selectedTemplate.restriction_mode === 'percentage' && (
-              <Badge variant="secondary" className="text-xs">{selectedTemplate.percentage_value}%</Badge>
-            )}
-            {selectedTemplate.restricted_page_display && (
-              <Badge variant="secondary" className="text-xs">Affichage: {displayModeLabel(selectedTemplate.restricted_page_display)}</Badge>
-            )}
-            {!selectedTemplate.allow_download && <Badge variant="destructive" className="text-xs">DL bloqué</Badge>}
-            {!selectedTemplate.allow_screenshot && <Badge variant="destructive" className="text-xs">Capture bloquée</Badge>}
-          </div>
+          </>
+        ) : (
+          <p className="text-sm text-muted-foreground italic">Aucun modèle disponible</p>
         )}
       </CardContent>
     </Card>
