@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,8 @@ import { Icon } from "@iconify/react";
 import { useOcrProviders } from "./hooks/useOcrProviders";
 import { TesseractProvider } from "./providers/TesseractProvider";
 import { OcrDocumentType, OcrProvider } from "./types";
+import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 interface MultiEngineOcrToolProps {
   onSuccess?: () => void;
@@ -26,6 +28,37 @@ export default function MultiEngineOcrTool({ onSuccess }: MultiEngineOcrToolProp
   const [isProcessing, setIsProcessing] = useState(false);
   const [progress, setProgress] = useState(0);
   const [results, setResults] = useState<any[]>([]);
+  const [selectedBatch, setSelectedBatch] = useState<string>("none");
+  const [batchDocuments, setBatchDocuments] = useState<any[]>([]);
+
+  // Fetch distinct batch names
+  const { data: batchNames } = useQuery({
+    queryKey: ['ocr-batch-names'],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('digital_library_documents')
+        .select('batch_name')
+        .not('batch_name', 'is', null)
+        .order('batch_name');
+      if (error) throw error;
+      const unique = [...new Set((data || []).map(d => d.batch_name).filter(Boolean))];
+      return unique as string[];
+    }
+  });
+
+  // Fetch documents for selected batch
+  useEffect(() => {
+    if (selectedBatch && selectedBatch !== "none") {
+      supabase
+        .from('digital_library_documents')
+        .select('id, title, document_type, file_url, thumbnail_url, pages_count')
+        .eq('batch_name', selectedBatch)
+        .order('title')
+        .then(({ data }) => setBatchDocuments(data || []));
+    } else {
+      setBatchDocuments([]);
+    }
+  }, [selectedBatch]);
 
   const getRecommendedProvider = (): OcrProvider => {
     if (documentType === 'handwritten') return 'escriptorium';
@@ -116,7 +149,42 @@ export default function MultiEngineOcrTool({ onSuccess }: MultiEngineOcrToolProp
             </div>
           </div>
 
-          {/* Upload */}
+          {/* Sélection par Lot */}
+          <Card className="border-dashed">
+            <CardContent className="pt-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Icon icon="mdi:folder-multiple" className="h-5 w-5 text-primary" />
+                <Label className="font-semibold">Charger un lot de documents</Label>
+              </div>
+              <Select value={selectedBatch} onValueChange={setSelectedBatch}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner un lot..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">— Aucun lot —</SelectItem>
+                  {(batchNames || []).map(name => (
+                    <SelectItem key={name} value={name}>{name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {batchDocuments.length > 0 && (
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">
+                    {batchDocuments.length} document(s) dans ce lot
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {batchDocuments.map(doc => (
+                      <Badge key={doc.id} variant="outline" className="text-xs">
+                        {doc.title} {doc.pages_count ? `(${doc.pages_count}p)` : ''}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Upload manuel */}
           <div className="border-2 border-dashed rounded-lg p-6 text-center">
             <input type="file" multiple accept="image/*,.pdf" onChange={handleFileChange} className="hidden" id="ocr-files" />
             <label htmlFor="ocr-files" className="cursor-pointer">
