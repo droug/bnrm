@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from "react";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -476,11 +477,13 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
     }
   };
 
+  const bothTermsAccepted = formData.termsAccepted && formData.copyrightAcknowledged;
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-xl">
+    <Sheet open={isOpen} onOpenChange={onClose}>
+      <SheetContent className="w-full sm:max-w-3xl p-0 flex flex-col">
+        <SheetHeader className="px-6 pt-6 pb-4 border-b">
+          <SheetTitle className="flex items-center gap-2 text-xl">
             <FileText className="h-5 w-5 text-primary" />
             Demande de Reproduction
             {isManuscript && (
@@ -488,8 +491,8 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                 📜 Manuscrit
               </Badge>
             )}
-          </DialogTitle>
-          <DialogDescription>
+          </SheetTitle>
+          <SheetDescription>
             Document : <span className="font-semibold text-foreground">{document.title}</span>
             <br />
             Auteur : {document.author} • Cote : {document.cote}
@@ -505,8 +508,10 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
                 </span>
               </div>
             )}
-          </DialogDescription>
-        </DialogHeader>
+          </SheetDescription>
+        </SheetHeader>
+
+        <ScrollArea className="flex-1 px-6">
 
         {/* Alerte propriétaire */}
         {!loadingOwnership && isOwner && (
@@ -1015,7 +1020,7 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
           </div>
 
           {/* Boutons d'action */}
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-3 pt-4 pb-6">
             <Button
               type="button"
               variant="outline"
@@ -1028,7 +1033,7 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
             <Button
               type="submit"
               className="flex-1"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !bothTermsAccepted}
             >
               {isSubmitting ? (
                 <>
@@ -1041,7 +1046,8 @@ export function ReproductionRequestDialog({ isOpen, onClose, document }: Reprodu
             </Button>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+        </ScrollArea>
+      </SheetContent>
+    </Sheet>
   );
 }
