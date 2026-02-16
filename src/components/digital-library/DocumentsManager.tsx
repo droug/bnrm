@@ -2090,8 +2090,8 @@ export default function DocumentsManager() {
             <TabsTrigger value="documents">Document</TabsTrigger>
             <TabsTrigger value="bulk-pdf" className="flex items-center gap-1">
               <Upload className="h-4 w-4" />
-              <span className="hidden sm:inline">Documents en masse</span>
-              <span className="sm:hidden">Import</span>
+              <span className="hidden sm:inline">Documents par lot</span>
+              <span className="sm:hidden">Lot</span>
             </TabsTrigger>
             <TabsTrigger value="bulk-av" className="flex items-center gap-1">
               <Mic className="h-4 w-4" />

@@ -4055,6 +4055,7 @@ export type Database = {
         Row: {
           access_level: string | null
           author: string | null
+          batch_name: string | null
           cbn_document_id: string
           cover_image_url: string | null
           created_at: string | null
@@ -4092,6 +4093,7 @@ export type Database = {
         Insert: {
           access_level?: string | null
           author?: string | null
+          batch_name?: string | null
           cbn_document_id: string
           cover_image_url?: string | null
           created_at?: string | null
@@ -4129,6 +4131,7 @@ export type Database = {
         Update: {
           access_level?: string | null
           author?: string | null
+          batch_name?: string | null
           cbn_document_id?: string
           cover_image_url?: string | null
           created_at?: string | null
