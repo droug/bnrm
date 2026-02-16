@@ -81,7 +81,8 @@ export function useBNSectionTitles() {
    */
   const isVisible = (sectionId: string): boolean => {
     const section = sectionsById.get(sectionId);
-    return section?.is_visible !== false;
+    if (!section) return false;
+    return section.is_visible !== false;
   };
 
   return { sections, getTitle, getSubtitle, isVisible };
