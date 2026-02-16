@@ -2157,10 +2157,6 @@ export default function DocumentsManager() {
 
         <TabsContent value="documents" className="space-y-6">
           <div className="flex gap-2 justify-end mb-6">
-            <Button variant="outline" onClick={downloadTemplate}>
-              <FileDown className="h-4 w-4 mr-2" />
-              Télécharger le modèle
-            </Button>
             <Button onClick={() => navigate("/admin/digital-library/bulk-import")}>
               <Upload className="h-4 w-4 mr-2" />
               Import en masse
