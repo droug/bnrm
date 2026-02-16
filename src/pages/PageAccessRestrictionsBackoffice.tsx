@@ -5,6 +5,7 @@ import { Navigate } from "react-router-dom";
 import { AdminPageWrapper, AdminSectionCard } from "@/components/digital-library/admin/AdminPageWrapper";
 import { PageAccessRestrictionsManager } from "@/components/digital-library/PageAccessRestrictionsManager";
 import { BatchRestrictionsManager } from "@/components/digital-library/BatchRestrictionsManager";
+import { RestrictionTemplatesManager } from "@/components/digital-library/RestrictionTemplatesManager";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Icon } from "@iconify/react";
 
@@ -35,13 +36,13 @@ export default function PageAccessRestrictionsBackoffice() {
   return (
     <AdminPageWrapper
       title="Restriction d'accès aux pages"
-      description="Gérez les restrictions d'accès par œuvre ou par lot pour protéger les contenus sensibles"
+      description="Gérez les restrictions d'accès par œuvre, par lot ou via des modèles réutilisables"
       icon="mdi:lock-outline"
       iconColor="text-rose-600"
       iconBgColor="bg-rose-500/10"
     >
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full max-w-md grid-cols-2 bg-muted/50">
+        <TabsList className="grid w-full max-w-lg grid-cols-3 bg-muted/50">
           <TabsTrigger value="individual" className="gap-2">
             <Icon icon="mdi:file-document-outline" className="h-4 w-4" />
             Par document
@@ -49,6 +50,10 @@ export default function PageAccessRestrictionsBackoffice() {
           <TabsTrigger value="batch" className="gap-2">
             <Icon icon="mdi:layers-outline" className="h-4 w-4" />
             Par lot
+          </TabsTrigger>
+          <TabsTrigger value="templates" className="gap-2">
+            <Icon icon="mdi:file-document-check-outline" className="h-4 w-4" />
+            Modèles
           </TabsTrigger>
         </TabsList>
 
@@ -58,6 +63,10 @@ export default function PageAccessRestrictionsBackoffice() {
 
         <TabsContent value="batch">
           <BatchRestrictionsManager />
+        </TabsContent>
+
+        <TabsContent value="templates">
+          <RestrictionTemplatesManager />
         </TabsContent>
       </Tabs>
     </AdminPageWrapper>

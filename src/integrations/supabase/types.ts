@@ -11331,6 +11331,78 @@ export type Database = {
         }
         Relationships: []
       }
+      restriction_templates: {
+        Row: {
+          allow_double_page_view: boolean | null
+          allow_download: boolean | null
+          allow_physical_consultation: boolean | null
+          allow_right_click: boolean | null
+          allow_screenshot: boolean | null
+          allow_scroll_view: boolean | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          end_page: number | null
+          id: string
+          is_restricted: boolean
+          manual_pages: number[] | null
+          name: string
+          percentage_distribution: string | null
+          percentage_value: number | null
+          restricted_page_display: string | null
+          restricted_page_display_reason: string | null
+          restriction_mode: string
+          start_page: number | null
+          updated_at: string
+        }
+        Insert: {
+          allow_double_page_view?: boolean | null
+          allow_download?: boolean | null
+          allow_physical_consultation?: boolean | null
+          allow_right_click?: boolean | null
+          allow_screenshot?: boolean | null
+          allow_scroll_view?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_page?: number | null
+          id?: string
+          is_restricted?: boolean
+          manual_pages?: number[] | null
+          name: string
+          percentage_distribution?: string | null
+          percentage_value?: number | null
+          restricted_page_display?: string | null
+          restricted_page_display_reason?: string | null
+          restriction_mode?: string
+          start_page?: number | null
+          updated_at?: string
+        }
+        Update: {
+          allow_double_page_view?: boolean | null
+          allow_download?: boolean | null
+          allow_physical_consultation?: boolean | null
+          allow_right_click?: boolean | null
+          allow_screenshot?: boolean | null
+          allow_scroll_view?: boolean | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_page?: number | null
+          id?: string
+          is_restricted?: boolean
+          manual_pages?: number[] | null
+          name?: string
+          percentage_distribution?: string | null
+          percentage_value?: number | null
+          restricted_page_display?: string | null
+          restricted_page_display_reason?: string | null
+          restriction_mode?: string
+          start_page?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       role_permissions: {
         Row: {
           created_at: string | null
