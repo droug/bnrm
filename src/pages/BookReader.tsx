@@ -857,7 +857,7 @@ const BookReader = () => {
     toast.success(`Navigation vers la page ${page}`);
   };
 
-  const handleDownload = (format: string) => {
+  const handleDownload = async (format: string) => {
     if (!allowDownload) {
       toast.error(accessRestrictions?.restriction_message_fr || "Le téléchargement est désactivé pour ce document protégé par le droit d'auteur");
       return;
@@ -865,13 +865,21 @@ const BookReader = () => {
     
     if (pdfUrl) {
       toast.success("Téléchargement en cours...");
-      const link = document.createElement('a');
-      link.href = pdfUrl;
-      link.download = `${documentData?.title || 'document'}.pdf`;
-      link.target = '_blank';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      try {
+        const response = await fetch(pdfUrl);
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = `${documentData?.title || 'document'}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
+      } catch (error) {
+        console.error('Download error:', error);
+        toast.error("Erreur lors du téléchargement");
+      }
     } else {
       toast.error("Aucun fichier disponible pour le téléchargement");
     }
@@ -889,26 +897,36 @@ const BookReader = () => {
       return;
     }
     
-    // Si on a un PDF direct, l'ouvrir dans un nouvel onglet pour impression
     if (pdfUrl) {
       toast.success("Préparation de l'impression du document...");
-      const printWindow = window.open(pdfUrl, '_blank');
-      if (printWindow) {
-        printWindow.onload = () => {
-          printWindow.print();
-        };
-      } else {
-        // Fallback: télécharger le PDF
-        const link = document.createElement('a');
-        link.href = pdfUrl;
-        link.download = `${documentData?.title || 'document'}.pdf`;
-        link.click();
-        toast.info("Le PDF a été téléchargé. Vous pouvez l'imprimer depuis votre lecteur PDF.");
+      try {
+        const response = await fetch(pdfUrl);
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const printWindow = window.open(blobUrl, '_blank');
+        if (printWindow) {
+          printWindow.onload = () => {
+            printWindow.print();
+            URL.revokeObjectURL(blobUrl);
+          };
+        } else {
+          // Fallback: télécharger le PDF
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = `${documentData?.title || 'document'}.pdf`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(blobUrl);
+          toast.info("Le PDF a été téléchargé. Vous pouvez l'imprimer depuis votre lecteur PDF.");
+        }
+      } catch (error) {
+        console.error('Print error:', error);
+        toast.error("Erreur lors de la préparation de l'impression");
       }
       return;
     }
     
-    // Fallback: impression de la page actuelle
     toast.success("Préparation de l'impression...");
     window.print();
   };
