@@ -2147,8 +2147,8 @@ export default function DocumentsManager() {
       )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <div className="overflow-x-auto">
-          <TabsList className="inline-flex w-auto min-w-full">
+        <div className="overflow-x-auto" dir="ltr">
+          <TabsList className="inline-flex w-auto min-w-full flex-row">
             <TabsTrigger value="documents">Documents</TabsTrigger>
             <TabsTrigger value="bulk-pdf" className="flex items-center gap-1">
               <Upload className="h-4 w-4" />
