@@ -100,7 +100,7 @@ export default function Administration() {
       title: "Import & Catalogage",
       description: "Import Excel/XML/OAI-PMH",
       iconName: "mdi:upload-outline",
-      path: "/admin/digital-library/bulk-import",
+      path: "/admin/digital-library/documents",
       bgColor: "from-amber-500/10 to-orange-500/5",
       borderColor: "border-amber-500/20 hover:border-amber-500/40",
       iconColor: "text-amber-600",
