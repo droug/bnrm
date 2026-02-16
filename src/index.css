@@ -1046,3 +1046,81 @@ Enhanced Moroccan Heritage Design System
 }
 
 /* No spine shadow - pages touch seamlessly */
+
+/* PDF.js Text Layer - selectable text overlay */
+.pdf-text-layer {
+  overflow: hidden;
+  opacity: 0.3;
+  line-height: 1.0;
+}
+
+.pdf-text-layer span,
+.pdf-text-layer br {
+  color: transparent;
+  position: absolute;
+  white-space: pre;
+  transform-origin: 0% 0%;
+  cursor: text;
+}
+
+.pdf-text-layer span::selection {
+  background: hsl(210, 80%, 60% / 0.4);
+  color: transparent;
+}
+
+.pdf-text-layer span::-moz-selection {
+  background: hsl(210, 80%, 60% / 0.4);
+  color: transparent;
+}
+
+.pdf-text-layer mark.pdf-search-highlight {
+  background: hsl(48, 100%, 60% / 0.6);
+  color: transparent;
+  border-radius: 2px;
+  padding: 2px 0;
+  box-shadow: 0 0 6px hsl(45, 100%, 50% / 0.5);
+  animation: pulse-highlight 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-highlight {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+
+/* OCR text fallback layer for scanned PDFs */
+.pdf-ocr-layer {
+  overflow: hidden;
+  cursor: text;
+}
+
+.pdf-ocr-layer .pdf-ocr-text-overlay {
+  width: 100%;
+  height: 100%;
+  padding: 1rem;
+  font-size: 0;
+  line-height: 0;
+  color: transparent;
+  user-select: text;
+  -webkit-user-select: text;
+  word-break: break-word;
+  overflow: hidden;
+}
+
+.pdf-ocr-layer .pdf-ocr-text-overlay::selection {
+  background: hsl(210, 80%, 60% / 0.4);
+}
+
+.pdf-ocr-layer .pdf-ocr-text-overlay::-moz-selection {
+  background: hsl(210, 80%, 60% / 0.4);
+}
+
+.pdf-ocr-layer mark.pdf-search-highlight {
+  background: hsl(48, 100%, 60% / 0.6);
+  color: transparent;
+  border-radius: 2px;
+  padding: 4px 2px;
+  font-size: 1rem;
+  line-height: 1.5;
+  box-shadow: 0 0 8px hsl(45, 100%, 50% / 0.5);
+  animation: pulse-highlight 1.5s ease-in-out infinite;
+}

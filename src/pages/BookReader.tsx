@@ -1752,6 +1752,7 @@ const BookReader = () => {
                         restrictedPageDisplay={restrictedPageDisplay}
                         getAccessDeniedMessage={getAccessDeniedMessage}
                         searchHighlight={searchHighlight}
+                        documentId={documentData?.id || id}
                       />
                     ) : (
                       /* Mode scroll avec images pré-extraites - scroll interne */
@@ -1883,6 +1884,7 @@ const BookReader = () => {
                                     }}
                                     preloadPages={[currentPage - 1, currentPage + 1, currentPage + 2]}
                                     searchHighlight={searchHighlight}
+                                    documentId={documentData?.id || id}
                                   />
                                 ) : documentPages.length > 0 || (documentImage && !documentImage.includes('manuscript-page')) ? (
                                   <img
@@ -2077,6 +2079,7 @@ const BookReader = () => {
                 }
               }}
               searchHighlight={searchHighlight}
+              documentId={documentData?.id || id}
             />
           ) : documentPages.length > 0 || documentImage ? (
             <img
