@@ -1292,30 +1292,15 @@ const BookReader = () => {
                       Imprimer
                     </Button>
 
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="outline" className="w-full justify-start" size="sm">
-                          <Download className="h-4 w-4 mr-2" />
-                          Télécharger
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuLabel>Format de téléchargement</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => handleDownload("PDF")}>
-                          PDF Haute résolution
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDownload("PDF-low")}>
-                          PDF Basse résolution
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDownload("JPEG")}>
-                          JPEG (Pages)
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDownload("EPUB")}>
-                          EPUB (eBook)
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start"
+                      size="sm"
+                      onClick={() => handleDownload("PDF")}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Télécharger
+                    </Button>
 
                     <Button 
                       variant="outline" 
