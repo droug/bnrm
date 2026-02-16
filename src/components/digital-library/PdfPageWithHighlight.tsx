@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, memo } from 'react';
+import { useState, useRef, useCallback, useEffect, memo } from 'react';
 import { OptimizedPdfPageRenderer } from './OptimizedPdfPageRenderer';
 import { PdfTextLayer } from './PdfTextLayer';
 
@@ -30,16 +30,34 @@ export const PdfPageWithHighlight = memo(function PdfPageWithHighlight({
   const containerRef = useRef<HTMLDivElement>(null);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
 
-  const handleImageRendered = useCallback((width: number, height: number) => {
-    if (width > 10 && height > 10) {
-      setImageSize(prev => {
-        if (Math.abs(prev.width - width) > 2 || Math.abs(prev.height - height) > 2) {
-          return { width, height };
-        }
-        return prev;
-      });
-    }
-  }, []);
+  // Detect image size via multiple strategies
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const detect = () => {
+      if (!containerRef.current) return;
+      const img = containerRef.current.querySelector('img');
+      if (!img) return;
+      const w = img.getBoundingClientRect().width;
+      const h = img.getBoundingClientRect().height;
+      if (w > 10 && h > 10) {
+        setImageSize(prev => {
+          if (Math.abs(prev.width - w) > 2 || Math.abs(prev.height - h) > 2) {
+            return { width: w, height: h };
+          }
+          return prev;
+        });
+      }
+    };
+
+    const ro = new ResizeObserver(detect);
+    ro.observe(containerRef.current);
+    const mo = new MutationObserver(detect);
+    mo.observe(containerRef.current, { childList: true, subtree: true, attributes: true });
+    const timers = [100, 300, 700, 1500, 3000, 5000].map(ms => setTimeout(detect, ms));
+
+    return () => { ro.disconnect(); mo.disconnect(); timers.forEach(clearTimeout); };
+  }, [pageNumber, pdfUrl]);
 
   const hasSize = imageSize.width > 10 && imageSize.height > 10;
 
@@ -51,12 +69,13 @@ export const PdfPageWithHighlight = memo(function PdfPageWithHighlight({
         scale={scale}
         rotation={rotation}
         onPageLoad={onPageLoad}
-        onImageRendered={handleImageRendered}
+        onImageRendered={(w, h) => {
+          if (w > 10 && h > 10) setImageSize({ width: w, height: h });
+        }}
         priority={priority}
         preloadPages={preloadPages}
       />
       
-      {/* Text layer for copy-paste and search highlight */}
       {hasSize && (
         <PdfTextLayer
           pdfUrl={pdfUrl}

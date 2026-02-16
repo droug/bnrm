@@ -103,6 +103,22 @@ export const PdfTextLayer = memo(function PdfTextLayer({
         await textLayer.render();
         if (!mountedRef.current) return;
 
+        // CRITICAL: Force pointer-events and user-select AFTER pdf.js render
+        // pdf.js TextLayer sets pointer-events: none on the container
+        textLayerDiv.style.pointerEvents = 'auto';
+        textLayerDiv.style.userSelect = 'text';
+        (textLayerDiv.style as any).webkitUserSelect = 'text';
+        textLayerDiv.style.cursor = 'text';
+        
+        // Also force on all child spans
+        const spans = textLayerDiv.querySelectorAll('span');
+        spans.forEach((span: Element) => {
+          (span as HTMLElement).style.pointerEvents = 'auto';
+          (span as HTMLElement).style.userSelect = 'text';
+          ((span as HTMLElement).style as any).webkitUserSelect = 'text';
+          (span as HTMLElement).style.cursor = 'text';
+        });
+
         // Highlight search terms
         if (searchHighlight && searchHighlight.length >= 2) {
           highlightSearchTerms(textLayerDiv, searchHighlight);
