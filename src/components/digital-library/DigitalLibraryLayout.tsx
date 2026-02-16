@@ -60,6 +60,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   const location = useLocation();
   const isHomePage = location.pathname === '/digital-library' || location.pathname === '/digital-library/';
   const isSearchPage = location.pathname === '/digital-library/search';
+  const isAdminPage = location.pathname.startsWith('/admin/');
   const { session, profile } = useAuth();
   const { tooltips: bnTooltips } = useBNTooltips();
   
@@ -619,7 +620,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
           </div>
 
           {/* Barre de recherche globale - Hidden on homepage since it has integrated search */}
-          {!isHomePage && !isSearchPage && (
+          {!isHomePage && !isSearchPage && !isAdminPage && (
             <div className="mt-4">
               <GlobalSearchBar />
             </div>
