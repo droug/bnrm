@@ -159,7 +159,7 @@ export function FileUpload({
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              Formats acceptés: {accept} (max. {maxSize} MB)
+              Formats acceptés : PDF, JPEG, EPUB etc. (max. {maxSize} MB)
             </p>
           </div>
         )}
