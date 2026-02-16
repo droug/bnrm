@@ -47,35 +47,32 @@ export const PdfTextLayer = memo(function PdfTextLayer({
   documentId,
 }: PdfTextLayerProps) {
   const textLayerRef = useRef<HTMLDivElement>(null);
-  const mountedRef = useRef(true);
   const [useFallback, setUseFallback] = useState(false);
   const [ocrText, setOcrText] = useState<string | null>(null);
+  const renderIdRef = useRef(0);
 
-  // Try pdf.js native text layer first
+  // Render native pdf.js text layer
   useEffect(() => {
-    mountedRef.current = true;
+    if (containerWidth <= 10 || containerHeight <= 10) return;
+
+    const currentRenderId = ++renderIdRef.current;
     
     const renderTextLayer = async () => {
-      if (!textLayerRef.current || containerWidth <= 0 || containerHeight <= 0) return;
-
-      // Clear previous content
-      textLayerRef.current.innerHTML = '';
+      if (!textLayerRef.current) return;
 
       try {
         const pdf = await loadPdfDocument(pdfUrl);
-        if (!mountedRef.current) return;
+        if (currentRenderId !== renderIdRef.current || !textLayerRef.current) return;
 
         if (pageNumber < 1 || pageNumber > pdf.numPages) return;
 
         const page = await pdf.getPage(pageNumber);
-        if (!mountedRef.current) return;
+        if (currentRenderId !== renderIdRef.current || !textLayerRef.current) return;
 
-        // Get the page viewport at scale 1 to know the natural dimensions
         const baseViewport = page.getViewport({ scale: 1, rotation });
         const textContent = await page.getTextContent();
-        if (!mountedRef.current || !textLayerRef.current) return;
+        if (currentRenderId !== renderIdRef.current || !textLayerRef.current) return;
 
-        // Check if PDF has actual text content
         const hasText = textContent.items.some((item: any) => item.str && item.str.trim().length > 0);
         
         if (!hasText) {
@@ -85,14 +82,15 @@ export const PdfTextLayer = memo(function PdfTextLayer({
 
         const textLayerDiv = textLayerRef.current;
         
-        // Calculate the scale needed to match the container size
+        // Clear ONLY right before we're about to render new content
+        textLayerDiv.innerHTML = '';
+
         const fitScale = containerWidth / baseViewport.width;
         const fitViewport = page.getViewport({ scale: fitScale, rotation });
         
         textLayerDiv.style.setProperty('--scale-factor', `${fitScale}`);
         textLayerDiv.style.width = `${containerWidth}px`;
         textLayerDiv.style.height = `${containerHeight}px`;
-        textLayerDiv.style.transform = '';
 
         const textLayer = new pdfjsLib.TextLayer({
           textContentSource: textContent,
@@ -101,22 +99,21 @@ export const PdfTextLayer = memo(function PdfTextLayer({
         });
 
         await textLayer.render();
-        if (!mountedRef.current) return;
+        if (currentRenderId !== renderIdRef.current || !textLayerRef.current) return;
 
-        // CRITICAL: Force pointer-events and user-select AFTER pdf.js render
-        // pdf.js TextLayer sets pointer-events: none on the container
+        // Force interactive styles after pdf.js render
         textLayerDiv.style.pointerEvents = 'auto';
         textLayerDiv.style.userSelect = 'text';
         (textLayerDiv.style as any).webkitUserSelect = 'text';
         textLayerDiv.style.cursor = 'text';
         
-        // Also force on all child spans
         const spans = textLayerDiv.querySelectorAll('span');
         spans.forEach((span: Element) => {
-          (span as HTMLElement).style.pointerEvents = 'auto';
-          (span as HTMLElement).style.userSelect = 'text';
-          ((span as HTMLElement).style as any).webkitUserSelect = 'text';
-          (span as HTMLElement).style.cursor = 'text';
+          const el = span as HTMLElement;
+          el.style.pointerEvents = 'auto';
+          el.style.userSelect = 'text';
+          (el.style as any).webkitUserSelect = 'text';
+          el.style.cursor = 'text';
         });
 
         // Highlight search terms
@@ -126,16 +123,14 @@ export const PdfTextLayer = memo(function PdfTextLayer({
 
       } catch (error) {
         console.warn('Error rendering text layer:', error);
-        setUseFallback(true);
+        if (currentRenderId === renderIdRef.current) {
+          setUseFallback(true);
+        }
       }
     };
 
     renderTextLayer();
-
-    return () => {
-      mountedRef.current = false;
-    };
-  }, [pdfUrl, pageNumber, scale, rotation, containerWidth, containerHeight, searchHighlight]);
+  }, [pdfUrl, pageNumber, rotation, containerWidth, containerHeight, searchHighlight]);
 
   // Fetch OCR text for fallback
   useEffect(() => {
@@ -157,17 +152,15 @@ export const PdfTextLayer = memo(function PdfTextLayer({
     fetchOcrText();
   }, [useFallback, documentId, pageNumber]);
 
-  // Render OCR text fallback with highlights
+  // Render OCR text fallback
   useEffect(() => {
     if (!useFallback || !ocrText || !textLayerRef.current) return;
 
     const div = textLayerRef.current;
     div.innerHTML = '';
-    div.style.transform = '';
     div.style.width = `${containerWidth}px`;
     div.style.height = `${containerHeight}px`;
 
-    // Create a selectable text overlay spanning the whole page
     const textOverlay = document.createElement('div');
     textOverlay.className = 'pdf-ocr-text-overlay';
     
@@ -197,7 +190,13 @@ export const PdfTextLayer = memo(function PdfTextLayer({
     <div
       ref={textLayerRef}
       className={`absolute top-0 left-0 z-30 ${useFallback ? 'pdf-ocr-layer' : 'pdf-text-layer textLayer'}`}
-      style={{ pointerEvents: 'auto', userSelect: 'text', WebkitUserSelect: 'text' }}
+      style={{
+        pointerEvents: 'auto',
+        userSelect: 'text',
+        WebkitUserSelect: 'text',
+        width: containerWidth > 10 ? `${containerWidth}px` : undefined,
+        height: containerHeight > 10 ? `${containerHeight}px` : undefined,
+      }}
     />
   );
 });
