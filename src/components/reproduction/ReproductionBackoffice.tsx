@@ -184,35 +184,26 @@ export function ReproductionBackoffice() {
         }
       }
 
-      // No email notification at manager approval step - email will be sent at accounting validation
-
-      // Create notification in database
-      await supabase.from("reproduction_notifications").insert({
-        request_id: requestId,
-        recipient_id: selectedRequest?.user_id,
-        notification_type: approve ? "approval" : "rejection",
-        title: approve
-          ? language === "ar" ? "تمت الموافقة على طلبك" : "Votre demande est approuvée"
-          : language === "ar" ? "تم رفض طلبك" : "Votre demande est refusée",
-        message: validationNotes,
-      } as any);
-
-      // Create in-app notification with payment link
-      if (approve && selectedRequest?.user_id) {
-        await supabase.from("notifications").insert({
-          user_id: selectedRequest.user_id,
-          type: 'payment',
-          title: language === "ar" ? "دفع معلق" : "Paiement en attente",
-          message: language === "ar" 
-            ? "طلب النسخ الخاص بك قد تمت الموافقة عليه. يرجى المتابعة بالدفع."
-            : "Votre demande de reproduction a été approuvée. Veuillez procéder au paiement.",
-          is_read: false,
-          link: '/my-space?tab=payments',
-          related_url: '/my-space?tab=payments',
-          priority: 3,
-          category: 'payment',
-          module: 'reproduction',
-        });
+      // Notification #2: Envoyer l'email de validation + lien de paiement à l'Approbation Responsable
+      if (approve && requestDetails?.user_id) {
+        try {
+          await supabase.functions.invoke('send-reproduction-notification', {
+            body: {
+              requestId: requestId,
+              recipientEmail: userEmail,
+              recipientId: requestDetails.user_id,
+              notificationType: 'payment_pending',
+              requestNumber: requestDetails.request_number,
+              documentTitle: (requestDetails as any).metadata?.documentTitle || 'Document demandé',
+              estimatedCost: requestDetails.payment_amount,
+              paymentLink: paymentUrl,
+              paymentMethod: 'all',
+            },
+          });
+          console.log("Email notification #2 (approbation + paiement) envoyé");
+        } catch (emailError) {
+          console.error("Erreur envoi email:", emailError);
+        }
       }
 
       toast.success(
@@ -246,32 +237,7 @@ export function ReproductionBackoffice() {
 
       if (error) throw error;
 
-      // Create notification
-      await supabase.from("reproduction_notifications").insert({
-        request_id: requestId,
-        recipient_id: selectedRequest?.user_id,
-        notification_type: "payment_received",
-        title: language === "ar" ? "تم استلام الدفع" : "Paiement reçu",
-        message: language === "ar" ? "تم تأكيد استلام الدفع الخاص بك" : "Votre paiement a été confirmé",
-      } as any);
-
-      // Create in-app notification with payment link
-      if (selectedRequest?.user_id) {
-        await supabase.from("notifications").insert({
-          user_id: selectedRequest.user_id,
-          type: 'payment',
-          title: language === "ar" ? "تم استلام الدفع" : "Paiement confirmé",
-          message: language === "ar" 
-            ? "تم تأكيد استلام الدفع الخاص بك. يمكنك مراجعة التفاصيل في مساحتك الشخصية."
-            : "Votre paiement a été confirmé. Consultez les détails dans votre espace personnel.",
-          is_read: false,
-          link: '/my-space?tab=payments',
-          related_url: '/my-space?tab=payments',
-          priority: 3,
-          category: 'payment',
-          module: 'reproduction',
-        });
-      }
+      // Pas de notification email ici - la notification sera envoyée à l'étape Validation Comptabilité
 
       toast.success(language === "ar" ? "تم تأكيد الدفع" : "Paiement confirmé");
 
