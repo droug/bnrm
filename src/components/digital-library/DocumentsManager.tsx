@@ -2149,7 +2149,7 @@ export default function DocumentsManager() {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <div className="overflow-x-auto" dir="ltr">
           <TabsList className="inline-flex w-auto min-w-full flex-row">
-            <TabsTrigger value="documents">Documents</TabsTrigger>
+            <TabsTrigger value="documents">Document</TabsTrigger>
             <TabsTrigger value="bulk-pdf" className="flex items-center gap-1">
               <Upload className="h-4 w-4" />
               <span className="hidden sm:inline">Documents en masse</span>
@@ -2162,7 +2162,7 @@ export default function DocumentsManager() {
             </TabsTrigger>
             <TabsTrigger value="bulk-excel" className="flex items-center gap-1">
               <FileText className="h-4 w-4" />
-              Excel
+              Import Métadonnées
             </TabsTrigger>
             <TabsTrigger value="ocr" className="flex items-center gap-1">
               <FileSearch className="h-4 w-4" />
