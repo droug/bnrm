@@ -185,7 +185,7 @@ export default function Administration() {
             <Card
               key={index}
               className={cn(
-                "group cursor-pointer transition-all duration-300",
+                "group cursor-pointer transition-all duration-300 flex flex-col",
                 "hover:shadow-xl hover:-translate-y-1",
                 "border bg-gradient-to-br overflow-hidden",
                 module.bgColor,
@@ -208,8 +208,8 @@ export default function Administration() {
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="pt-0">
-                <CardDescription className="text-sm line-clamp-2 mb-4">
+              <CardContent className="pt-0 flex-1 flex flex-col">
+                <CardDescription className="text-sm line-clamp-2 mb-4 flex-1">
                   {module.description}
                 </CardDescription>
                 <Button 
