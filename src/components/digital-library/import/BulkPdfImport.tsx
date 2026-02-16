@@ -71,8 +71,9 @@ export default function BulkPdfImport({ onSuccess }: BulkPdfImportProps) {
     const allowedTypes = [
       'application/pdf',
       'image/jpeg', 'image/jpg', 'image/png', 'image/tiff', 'image/webp', 'image/gif', 'image/bmp',
+      'application/epub+zip',
     ];
-    const allowedExtensions = ['.pdf', '.jpg', '.jpeg', '.png', '.tiff', '.tif', '.webp', '.gif', '.bmp'];
+    const allowedExtensions = ['.pdf', '.jpg', '.jpeg', '.png', '.tiff', '.tif', '.webp', '.gif', '.bmp', '.epub'];
 
     const validFiles = pickedFiles.filter(
       (f) => allowedTypes.includes(f.type) || allowedExtensions.some(ext => f.name.toLowerCase().endsWith(ext))
@@ -81,7 +82,7 @@ export default function BulkPdfImport({ onSuccess }: BulkPdfImportProps) {
     if (validFiles.length !== pickedFiles.length) {
       toast({
         title: "Attention",
-        description: `${pickedFiles.length - validFiles.length} fichier(s) non supporté(s) ont été ignorés. Formats acceptés : PDF, JPG, PNG, TIFF, WebP, GIF, BMP`,
+        description: `${pickedFiles.length - validFiles.length} fichier(s) non supporté(s) ont été ignorés. Formats acceptés : PDF, JPG, PNG, TIFF, WebP, GIF, BMP, EPUB`,
         variant: "destructive",
       });
     }
@@ -427,7 +428,7 @@ export default function BulkPdfImport({ onSuccess }: BulkPdfImportProps) {
       {/* Upload Zone */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Sélectionner les fichiers (PDF, Images)</CardTitle>
+          <CardTitle className="text-lg">Sélectionner les fichiers (PDF, Images, EPUB)</CardTitle>
           <CardDescription>
             Le nom du fichier (sans extension) sera utilisé comme cote et titre provisoire
           </CardDescription>
@@ -439,13 +440,13 @@ export default function BulkPdfImport({ onSuccess }: BulkPdfImportProps) {
           >
             <FileText className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
             <p className="text-sm text-muted-foreground mb-2">
-              Cliquez pour sélectionner vos fichiers (PDF, JPG, PNG, TIFF...)
+              Cliquez pour sélectionner vos fichiers (PDF, JPG, PNG, TIFF, EPUB...)
             </p>
             <p className="text-xs text-muted-foreground">Sélection multiple autorisée</p>
             <input
               ref={fileInputRef}
               type="file"
-              accept=".pdf,.jpg,.jpeg,.png,.tiff,.tif,.webp,.gif,.bmp"
+              accept=".pdf,.jpg,.jpeg,.png,.tiff,.tif,.webp,.gif,.bmp,.epub"
               multiple
               onChange={handleFilesChange}
               className="hidden"
