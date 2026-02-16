@@ -133,7 +133,7 @@ export default function DigitalLibraryDocumentImporter({
         <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="bulk-pdf" className="flex items-center gap-2">
             <Upload className="h-4 w-4" />
-            <span className="hidden sm:inline">PDF</span>
+            <span className="hidden sm:inline">Document</span>
           </TabsTrigger>
           <TabsTrigger value="bulk-av" className="flex items-center gap-2">
             <Film className="h-4 w-4" />
