@@ -151,8 +151,10 @@ export function MyReproductionRequests() {
                       </span>
                       {request.reproduction_modality && (
                         <Badge variant="outline">
-                          {request.reproduction_modality === 'numerique_mail' ? 'Email' : 
-                           request.reproduction_modality === 'numerique_espace' ? 'Sur place' : 
+                          {request.reproduction_modality === 'numerique_mail' ? 'Par E-mail' : 
+                           request.reproduction_modality === 'numerique_espace' ? 'Mon espace' : 
+                           request.reproduction_modality === 'support_physique' ? 'Retrait sur place' :
+                           request.reproduction_modality === 'papier' ? 'Papier' :
                            request.reproduction_modality}
                         </Badge>
                       )}

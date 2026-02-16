@@ -148,11 +148,20 @@ export function ReproductionRequestDialog({
       // Générer un numéro de demande unique
       const requestNumber = `REP-${Date.now()}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`;
 
+      // Mapper le mode de réception vers la modalité de reproduction
+      const getReproductionModality = (): "numerique_mail" | "numerique_espace" | "papier" | "support_physique" => {
+        if (data.deliveryMethod === "email") return "numerique_mail";
+        if (data.deliveryMethod === "telecharger_espace") return "numerique_espace";
+        if (data.deliveryMethod === "support_cd") return "support_physique";
+        // Fallback basé sur le type de reproduction
+        return data.reproductionType as "numerique_espace" | "numerique_mail" | "papier" | "support_physique";
+      };
+
       const insertData = {
         user_id: user.id,
         request_number: requestNumber,
-        reproduction_modality: data.reproductionType as "numerique_espace" | "numerique_mail" | "papier" | "support_physique",
-        status: "brouillon" as const,
+        reproduction_modality: getReproductionModality(),
+        status: "soumise" as const,
         user_notes: data.comments || null,
         metadata: {
           document_id: documentId || null,
