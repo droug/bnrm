@@ -1108,13 +1108,15 @@ Enhanced Moroccan Heritage Design System
   width: 100%;
   height: 100%;
   padding: 1rem;
-  font-size: 0;
-  line-height: 0;
+  font-size: 12px;
+  line-height: 1.4;
   color: transparent;
   user-select: text;
   -webkit-user-select: text;
   word-break: break-word;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  pointer-events: auto;
 }
 
 .pdf-ocr-layer .pdf-ocr-text-overlay::selection {
