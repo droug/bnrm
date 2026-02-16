@@ -94,10 +94,9 @@ export default function DocumentsManager() {
   const [selectedDocument, setSelectedDocument] = useState<any>(null);
   const [activeTab, setActiveTab] = useState("documents");
   const [showCompareDialog, setShowCompareDialog] = useState(false);
-  const [compareDocs, setCompareDocs] = useState<{ existing: any; imported: any; previewImage?: string; pages?: string[] } | null>(null);
-  const [keepSelection, setKeepSelection] = useState<"existing" | "imported" | "both">("both");
-  const [currentPageExisting, setCurrentPageExisting] = useState(0);
-  const [currentPageImported, setCurrentPageImported] = useState(0);
+  const [compareDocs, setCompareDocs] = useState<{ documents: any[]; previewImage?: string; pages?: string[] } | null>(null);
+  const [keepSelection, setKeepSelection] = useState<number>(0); // index of document to keep, or -1 for all
+  const [currentPagePerDoc, setCurrentPagePerDoc] = useState<number[]>([]);
   const [batchOcrRunning, setBatchOcrRunning] = useState(false);
   const [batchOcrResult, setBatchOcrResult] = useState<any>(null);
   const [ocrProcessingDocId, setOcrProcessingDocId] = useState<string | null>(null);
@@ -144,109 +143,53 @@ export default function DocumentsManager() {
   });
   const [runOcrInBackground, setRunOcrInBackground] = useState(true); // Default to background mode
 
-  // Exemple de doublons détectés
+  // Exemple de doublons détectés (support N documents semblables)
   const sampleDuplicates = [
     {
       id: 1,
       previewImage: documentPreview1,
       pages: [documentPreview1, documentPreview1Page2],
-      existing: {
-        id: "DOC-001",
-        title: "Introduction à la philosophie",
-        author: "Jean Dupont",
-        isbn: "978-2-1234-5678-9",
-        issn: "",
-        ismn: "",
-        cote: "PHI-001",
-        publication_date: "2020-05-15",
-        editeur: "Éditions Savoir",
-        nombre_pages: "350"
-      },
-      imported: {
-        id: "DOC-156",
-        title: "Introduction à la philosophie",
-        author: "Jean Dupont",
-        isbn: "978-2-1234-5678-9",
-        issn: "",
-        ismn: "",
-        cote: "PHI-001",
-        publication_date: "2020-05-15",
-        editeur: "Éditions Savoir",
-        nombre_pages: "352"
-      }
+      documents: [
+        { id: "DOC-001", title: "Introduction à la philosophie", author: "Jean Dupont", isbn: "978-2-1234-5678-9", issn: "", ismn: "", cote: "PHI-001", publication_date: "2020-05-15", editeur: "Éditions Savoir", nombre_pages: "350", badge: "Existant" },
+        { id: "DOC-156", title: "Introduction à la philosophie", author: "Jean Dupont", isbn: "978-2-1234-5678-9", issn: "", ismn: "", cote: "PHI-001", publication_date: "2020-05-15", editeur: "Éditions Savoir", nombre_pages: "352", badge: "Importé" },
+      ]
     },
     {
       id: 2,
       previewImage: documentPreview2,
       pages: [documentPreview2, documentPreview2Page2],
-      existing: {
-        id: "DOC-042",
-        title: "Revue scientifique - Vol. 12",
-        author: "Collectif",
-        isbn: "",
-        issn: "1234-5678",
-        ismn: "",
-        cote: "REV-SCI-012",
-        publication_date: "2023-01-10",
-        editeur: "Publications Scientifiques",
-        nombre_pages: "120"
-      },
-      imported: {
-        id: "DOC-198",
-        title: "Revue scientifique - Volume 12",
-        author: "Collectif",
-        isbn: "",
-        issn: "1234-5678",
-        ismn: "",
-        cote: "REV-SCI-012",
-        publication_date: "2023-01-10",
-        editeur: "Publications Scientifiques SA",
-        nombre_pages: "120"
-      }
+      documents: [
+        { id: "DOC-042", title: "Revue scientifique - Vol. 12", author: "Collectif", isbn: "", issn: "1234-5678", ismn: "", cote: "REV-SCI-012", publication_date: "2023-01-10", editeur: "Publications Scientifiques", nombre_pages: "120", badge: "Existant" },
+        { id: "DOC-198", title: "Revue scientifique - Volume 12", author: "Collectif", isbn: "", issn: "1234-5678", ismn: "", cote: "REV-SCI-012", publication_date: "2023-01-10", editeur: "Publications Scientifiques SA", nombre_pages: "120", badge: "Importé" },
+        { id: "DOC-301", title: "Revue scientifique - Vol. 12", author: "Collectif", isbn: "", issn: "1234-5678", ismn: "", cote: "REV-SCI-012", publication_date: "2023-02-01", editeur: "Publications Scientifiques", nombre_pages: "121", badge: "Doublon 3" },
+      ]
     },
     {
       id: 3,
       previewImage: documentPreview3,
       pages: [documentPreview3, documentPreview3Page2],
-      existing: {
-        id: "DOC-089",
-        title: "Partition musicale - Symphonie n°5",
-        author: "Mozart",
-        isbn: "",
-        issn: "",
-        ismn: "M-2306-7118-7",
-        cote: "MUS-MOZ-005",
-        publication_date: "2019-03-22",
-        editeur: "Éditions Musicales",
-        nombre_pages: "48"
-      },
-      imported: {
-        id: "DOC-223",
-        title: "Partition musicale - Symphonie n°5",
-        author: "W. A. Mozart",
-        isbn: "",
-        issn: "",
-        ismn: "M-2306-7118-7",
-        cote: "MUS-MOZ-005",
-        publication_date: "2019-03-22",
-        editeur: "Éditions Musicales",
-        nombre_pages: "48"
-      }
+      documents: [
+        { id: "DOC-089", title: "Partition musicale - Symphonie n°5", author: "Mozart", isbn: "", issn: "", ismn: "M-2306-7118-7", cote: "MUS-MOZ-005", publication_date: "2019-03-22", editeur: "Éditions Musicales", nombre_pages: "48", badge: "Existant" },
+        { id: "DOC-223", title: "Partition musicale - Symphonie n°5", author: "W. A. Mozart", isbn: "", issn: "", ismn: "M-2306-7118-7", cote: "MUS-MOZ-005", publication_date: "2019-03-22", editeur: "Éditions Musicales", nombre_pages: "48", badge: "Importé" },
+      ]
     }
   ];
 
   const handleCompare = (duplicate: any) => {
     setCompareDocs(duplicate);
-    setKeepSelection("both");
-    setCurrentPageExisting(0);
-    setCurrentPageImported(0);
+    setKeepSelection(-1); // -1 = keep all
+    setCurrentPagePerDoc(new Array(duplicate.documents.length).fill(0));
     setShowCompareDialog(true);
   };
 
   const handleKeepDocument = () => {
+    const docCount = compareDocs?.documents?.length || 0;
+    const desc = keepSelection === -1
+      ? "Conserver tous les documents"
+      : `Conserver uniquement "${compareDocs?.documents?.[keepSelection]?.id}"`;
     toast({
       title: "Action enregistrée",
-      description: `Choix: ${keepSelection === "existing" ? "Conserver l'existant" : keepSelection === "imported" ? "Conserver l'importé" : "Conserver les deux"}`,
+      description: desc,
     });
     setShowCompareDialog(false);
   };
@@ -298,11 +241,6 @@ export default function DocumentsManager() {
     }
   };
 
-  const getFieldComparison = (field: string, existingValue: any, importedValue: any) => {
-    const isIdentical = existingValue === importedValue;
-    const isEmpty = !existingValue && !importedValue;
-    return { isIdentical, isEmpty };
-  };
 
   const form = useForm<z.infer<typeof documentSchema>>({
     resolver: zodResolver(documentSchema),
@@ -3172,22 +3110,21 @@ export default function DocumentsManager() {
             <CardHeader>
               <CardTitle>Gestion des doublons</CardTitle>
               <CardDescription>
-                Identifiez et gérez les documents en double dans la bibliothèque numérique
+                Identifiez et gérez les documents en double (2, 3 ou plus) dans la bibliothèque numérique
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="flex items-center justify-between mb-4">
                   <Badge variant="secondary" className="text-sm">
-                    {sampleDuplicates.length} doublons détectés
+                    {sampleDuplicates.length} groupes de doublons détectés
                   </Badge>
                 </div>
 
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>ID Existant</TableHead>
-                      <TableHead>ID Importé</TableHead>
+                      <TableHead>Documents similaires</TableHead>
                       <TableHead>Titre</TableHead>
                       <TableHead>Identifiant commun</TableHead>
                       <TableHead>Actions</TableHead>
@@ -3196,27 +3133,35 @@ export default function DocumentsManager() {
                   <TableBody>
                     {sampleDuplicates.map((duplicate) => (
                       <TableRow key={duplicate.id}>
-                        <TableCell className="font-mono text-sm">{duplicate.existing.id}</TableCell>
-                        <TableCell className="font-mono text-sm">{duplicate.imported.id}</TableCell>
+                        <TableCell>
+                          <div className="flex flex-col gap-1">
+                            {duplicate.documents.map((doc: any, i: number) => (
+                              <Badge key={i} variant={i === 0 ? "secondary" : "outline"} className="w-fit text-xs font-mono">
+                                {doc.id}
+                              </Badge>
+                            ))}
+                            <span className="text-xs text-muted-foreground">{duplicate.documents.length} documents</span>
+                          </div>
+                        </TableCell>
                         <TableCell>
                           <div className="space-y-1">
-                            <p className="font-medium">{duplicate.existing.title}</p>
-                            <p className="text-sm text-muted-foreground">{duplicate.existing.author}</p>
+                            <p className="font-medium">{duplicate.documents[0]?.title}</p>
+                            <p className="text-sm text-muted-foreground">{duplicate.documents[0]?.author}</p>
                           </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-col gap-1">
-                            {duplicate.existing.isbn && (
-                              <Badge variant="outline" className="w-fit text-xs">ISBN: {duplicate.existing.isbn}</Badge>
+                            {duplicate.documents[0]?.isbn && (
+                              <Badge variant="outline" className="w-fit text-xs">ISBN: {duplicate.documents[0].isbn}</Badge>
                             )}
-                            {duplicate.existing.issn && (
-                              <Badge variant="outline" className="w-fit text-xs">ISSN: {duplicate.existing.issn}</Badge>
+                            {duplicate.documents[0]?.issn && (
+                              <Badge variant="outline" className="w-fit text-xs">ISSN: {duplicate.documents[0].issn}</Badge>
                             )}
-                            {duplicate.existing.ismn && (
-                              <Badge variant="outline" className="w-fit text-xs">ISMN: {duplicate.existing.ismn}</Badge>
+                            {duplicate.documents[0]?.ismn && (
+                              <Badge variant="outline" className="w-fit text-xs">ISMN: {duplicate.documents[0].ismn}</Badge>
                             )}
-                            {duplicate.existing.cote && (
-                              <Badge variant="outline" className="w-fit text-xs">Cote: {duplicate.existing.cote}</Badge>
+                            {duplicate.documents[0]?.cote && (
+                              <Badge variant="outline" className="w-fit text-xs">Cote: {duplicate.documents[0].cote}</Badge>
                             )}
                           </div>
                         </TableCell>
@@ -3238,13 +3183,13 @@ export default function DocumentsManager() {
             </CardContent>
           </Card>
 
-          {/* Modale de comparaison */}
+          {/* Modale de comparaison multi-documents */}
           <Dialog open={showCompareDialog} onOpenChange={setShowCompareDialog}>
-            <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-[95vw] max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Comparaison des documents</DialogTitle>
+                <DialogTitle>Comparaison des documents ({compareDocs?.documents?.length || 0} documents)</DialogTitle>
                 <DialogDescription>
-                  Comparez les détails des deux documents et choisissez lequel conserver
+                  Comparez les détails des documents similaires et choisissez lequel conserver
                 </DialogDescription>
               </DialogHeader>
 
@@ -3259,240 +3204,142 @@ export default function DocumentsManager() {
                       <div className="flex items-center space-x-2">
                         <input
                           type="radio"
-                          id="keep-existing"
+                          id="keep-all"
                           name="keep-selection"
-                          checked={keepSelection === "existing"}
-                          onChange={() => setKeepSelection("existing")}
+                          checked={keepSelection === -1}
+                          onChange={() => setKeepSelection(-1)}
                           className="h-4 w-4"
                         />
-                        <Label htmlFor="keep-existing" className="cursor-pointer font-normal">
-                          Conserver uniquement le document existant
+                        <Label htmlFor="keep-all" className="cursor-pointer font-normal">
+                          Conserver tous les documents
                         </Label>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="radio"
-                          id="keep-imported"
-                          name="keep-selection"
-                          checked={keepSelection === "imported"}
-                          onChange={() => setKeepSelection("imported")}
-                          className="h-4 w-4"
-                        />
-                        <Label htmlFor="keep-imported" className="cursor-pointer font-normal">
-                          Conserver uniquement le document importé
-                        </Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input
-                          type="radio"
-                          id="keep-both"
-                          name="keep-selection"
-                          checked={keepSelection === "both"}
-                          onChange={() => setKeepSelection("both")}
-                          className="h-4 w-4"
-                        />
-                        <Label htmlFor="keep-both" className="cursor-pointer font-normal">
-                          Conserver les deux documents
-                        </Label>
-                      </div>
+                      {compareDocs.documents.map((doc: any, index: number) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <input
+                            type="radio"
+                            id={`keep-doc-${index}`}
+                            name="keep-selection"
+                            checked={keepSelection === index}
+                            onChange={() => setKeepSelection(index)}
+                            className="h-4 w-4"
+                          />
+                          <Label htmlFor={`keep-doc-${index}`} className="cursor-pointer font-normal">
+                            Conserver uniquement <span className="font-mono text-xs">{doc.id}</span> ({doc.badge || `Document ${index + 1}`})
+                          </Label>
+                        </div>
+                      ))}
                     </CardContent>
                   </Card>
 
-                  {/* Comparaison détaillée */}
-                  <div className="grid grid-cols-2 gap-4">
-                    {/* Document existant */}
-                    <Card className={keepSelection === "existing" ? "border-primary border-2" : ""}>
-                      <CardHeader>
-                        <CardTitle className="text-lg flex items-center justify-between">
-                          Document Existant
-                          <Badge variant="secondary">Actuel</Badge>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        {/* Bouton de visualisation */}
-                        <Button 
-                          variant="outline" 
-                          className="w-full"
-                          onClick={() => {
-                            toast({
-                              title: "Aperçu du document",
-                              description: `Ouverture de ${compareDocs.existing.title}...`,
-                            });
-                            // Navigation vers la page de visualisation
-                            // navigate(`/digital-library/document/${compareDocs.existing.id}`);
-                          }}
-                        >
-                          <BookOpen className="h-4 w-4 mr-2" />
-                          Visualiser le document
-                        </Button>
-                        
-                        {/* Aperçu visuel du document avec pagination */}
-                        <div className="border rounded-lg overflow-hidden bg-muted/30">
-                          <img 
-                            src={compareDocs.pages?.[currentPageExisting] || compareDocs.previewImage} 
-                            alt={`Aperçu - ${compareDocs.existing.title}`}
-                            className="w-full h-48 object-cover"
-                          />
-                          <div className="p-2">
-                            <div className="flex items-center justify-between">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setCurrentPageExisting(Math.max(0, currentPageExisting - 1))}
-                                disabled={currentPageExisting === 0}
+                  {/* Comparaison détaillée - grille dynamique */}
+                  <div className="overflow-x-auto">
+                    <div className={`grid gap-4`} style={{ gridTemplateColumns: `repeat(${compareDocs.documents.length}, minmax(280px, 1fr))` }}>
+                      {compareDocs.documents.map((doc: any, docIndex: number) => {
+                        const currentPage = currentPagePerDoc[docIndex] || 0;
+                        return (
+                          <Card key={docIndex} className={keepSelection === docIndex ? "border-primary border-2" : ""}>
+                            <CardHeader>
+                              <CardTitle className="text-lg flex items-center justify-between">
+                                {doc.badge || `Document ${docIndex + 1}`}
+                                <Badge variant={docIndex === 0 ? "secondary" : "outline"}>
+                                  {docIndex === 0 ? "Actuel" : `#${docIndex + 1}`}
+                                </Badge>
+                              </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                              <Button 
+                                variant="outline" 
+                                className="w-full"
+                                onClick={() => {
+                                  toast({
+                                    title: "Aperçu du document",
+                                    description: `Ouverture de ${doc.title}...`,
+                                  });
+                                }}
                               >
-                                ← Précédent
+                                <BookOpen className="h-4 w-4 mr-2" />
+                                Visualiser
                               </Button>
-                              <div className="text-center">
-                                <p className="text-xs text-muted-foreground">Page {currentPageExisting + 1} / {compareDocs.pages?.length || 1}</p>
-                                <p className="text-xs font-mono mt-1">{compareDocs.existing.id}</p>
+                              
+                              <div className="border rounded-lg overflow-hidden bg-muted/30">
+                                <img 
+                                  src={compareDocs.pages?.[currentPage] || compareDocs.previewImage} 
+                                  alt={`Aperçu - ${doc.title}`}
+                                  className="w-full h-40 object-cover"
+                                />
+                                <div className="p-2">
+                                  <div className="flex items-center justify-between">
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        const updated = [...currentPagePerDoc];
+                                        updated[docIndex] = Math.max(0, currentPage - 1);
+                                        setCurrentPagePerDoc(updated);
+                                      }}
+                                      disabled={currentPage === 0}
+                                    >
+                                      ←
+                                    </Button>
+                                    <p className="text-xs text-muted-foreground">
+                                      {currentPage + 1} / {compareDocs.pages?.length || 1}
+                                    </p>
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={() => {
+                                        const updated = [...currentPagePerDoc];
+                                        updated[docIndex] = Math.min((compareDocs.pages?.length || 1) - 1, currentPage + 1);
+                                        setCurrentPagePerDoc(updated);
+                                      }}
+                                      disabled={currentPage >= (compareDocs.pages?.length || 1) - 1}
+                                    >
+                                      →
+                                    </Button>
+                                  </div>
+                                </div>
                               </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setCurrentPageExisting(Math.min((compareDocs.pages?.length || 1) - 1, currentPageExisting + 1))}
-                                disabled={currentPageExisting >= (compareDocs.pages?.length || 1) - 1}
-                              >
-                                Suivant →
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-3">
-                        {[
-                          { label: "ID", value: compareDocs.existing.id, key: "id", highlight: true },
-                          { label: "Cote", value: compareDocs.existing.cote, key: "cote", highlight: true },
-                          { label: "ISBN", value: compareDocs.existing.isbn || "-", key: "isbn", highlight: true },
-                          { label: "ISSN", value: compareDocs.existing.issn || "-", key: "issn", highlight: true },
-                          { label: "ISMN", value: compareDocs.existing.ismn || "-", key: "ismn", highlight: true },
-                          { label: "Titre", value: compareDocs.existing.title, key: "title" },
-                          { label: "Auteur", value: compareDocs.existing.author, key: "author" },
-                          { label: "Éditeur", value: compareDocs.existing.editeur, key: "editeur" },
-                          { label: "Date publication", value: compareDocs.existing.publication_date, key: "publication_date" },
-                          { label: "Nombre pages", value: compareDocs.existing.nombre_pages, key: "nombre_pages" },
-                        ].map((field) => {
-                          const comparison = getFieldComparison(
-                            field.key,
-                            compareDocs.existing[field.key],
-                            compareDocs.imported[field.key]
-                          );
-                          return (
-                            <div
-                              key={field.key}
-                              className={`p-2 rounded ${
-                                field.highlight && comparison.isIdentical && !comparison.isEmpty
-                                  ? "bg-green-100 dark:bg-green-900/20 border border-green-300 dark:border-green-700"
-                                  : !comparison.isIdentical && !comparison.isEmpty
-                                  ? "bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800"
-                                  : ""
-                              }`}
-                            >
-                              <p className="text-xs text-muted-foreground mb-1">{field.label}</p>
-                              <p className="text-sm font-medium">{field.value}</p>
-                            </div>
-                          );
-                        })}
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    {/* Document importé */}
-                    <Card className={keepSelection === "imported" ? "border-primary border-2" : ""}>
-                      <CardHeader>
-                        <CardTitle className="text-lg flex items-center justify-between">
-                          Document Importé
-                          <Badge variant="outline">Nouveau</Badge>
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-4">
-                        {/* Bouton de visualisation */}
-                        <Button 
-                          variant="outline" 
-                          className="w-full"
-                          onClick={() => {
-                            toast({
-                              title: "Aperçu du document",
-                              description: `Ouverture de ${compareDocs.imported.title}...`,
-                            });
-                            // Navigation vers la page de visualisation
-                            // navigate(`/digital-library/document/${compareDocs.imported.id}`);
-                          }}
-                        >
-                          <BookOpen className="h-4 w-4 mr-2" />
-                          Visualiser le document
-                        </Button>
-                        
-                        {/* Aperçu visuel du document avec pagination */}
-                        <div className="border rounded-lg overflow-hidden bg-muted/30">
-                          <img 
-                            src={compareDocs.pages?.[currentPageImported] || compareDocs.previewImage} 
-                            alt={`Aperçu - ${compareDocs.imported.title}`}
-                            className="w-full h-48 object-cover"
-                          />
-                          <div className="p-2">
-                            <div className="flex items-center justify-between">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setCurrentPageImported(Math.max(0, currentPageImported - 1))}
-                                disabled={currentPageImported === 0}
-                              >
-                                ← Précédent
-                              </Button>
-                              <div className="text-center">
-                                <p className="text-xs text-muted-foreground">Page {currentPageImported + 1} / {compareDocs.pages?.length || 1}</p>
-                                <p className="text-xs font-mono mt-1">{compareDocs.imported.id}</p>
+                              
+                              <div className="space-y-3">
+                                {[
+                                  { label: "ID", key: "id", highlight: true },
+                                  { label: "Cote", key: "cote", highlight: true },
+                                  { label: "ISBN", key: "isbn", highlight: true },
+                                  { label: "ISSN", key: "issn", highlight: true },
+                                  { label: "ISMN", key: "ismn", highlight: true },
+                                  { label: "Titre", key: "title", highlight: false },
+                                  { label: "Auteur", key: "author", highlight: false },
+                                  { label: "Éditeur", key: "editeur", highlight: false },
+                                  { label: "Date publication", key: "publication_date", highlight: false },
+                                  { label: "Nombre pages", key: "nombre_pages", highlight: false },
+                                ].map((field) => {
+                                  // Check if all documents have the same value for this field
+                                  const allValues = compareDocs.documents.map((d: any) => d[field.key] || "");
+                                  const allIdentical = allValues.every((v: string) => v === allValues[0]);
+                                  const isEmpty = allValues.every((v: string) => !v);
+                                  return (
+                                    <div
+                                      key={field.key}
+                                      className={`p-2 rounded ${
+                                        field.highlight && allIdentical && !isEmpty
+                                          ? "bg-green-100 dark:bg-green-900/20 border border-green-300 dark:border-green-700"
+                                          : !allIdentical && !isEmpty
+                                          ? "bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800"
+                                          : ""
+                                      }`}
+                                    >
+                                      <p className="text-xs text-muted-foreground mb-1">{field.label}</p>
+                                      <p className="text-sm font-medium">{doc[field.key] || "-"}</p>
+                                    </div>
+                                  );
+                                })}
                               </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setCurrentPageImported(Math.min((compareDocs.pages?.length || 1) - 1, currentPageImported + 1))}
-                                disabled={currentPageImported >= (compareDocs.pages?.length || 1) - 1}
-                              >
-                                Suivant →
-                              </Button>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-3">
-                        {[
-                          { label: "ID", value: compareDocs.imported.id, key: "id", highlight: true },
-                          { label: "Cote", value: compareDocs.imported.cote, key: "cote", highlight: true },
-                          { label: "ISBN", value: compareDocs.imported.isbn || "-", key: "isbn", highlight: true },
-                          { label: "ISSN", value: compareDocs.imported.issn || "-", key: "issn", highlight: true },
-                          { label: "ISMN", value: compareDocs.imported.ismn || "-", key: "ismn", highlight: true },
-                          { label: "Titre", value: compareDocs.imported.title, key: "title" },
-                          { label: "Auteur", value: compareDocs.imported.author, key: "author" },
-                          { label: "Éditeur", value: compareDocs.imported.editeur, key: "editeur" },
-                          { label: "Date publication", value: compareDocs.imported.publication_date, key: "publication_date" },
-                          { label: "Nombre pages", value: compareDocs.imported.nombre_pages, key: "nombre_pages" },
-                        ].map((field) => {
-                          const comparison = getFieldComparison(
-                            field.key,
-                            compareDocs.existing[field.key],
-                            compareDocs.imported[field.key]
-                          );
-                          return (
-                            <div
-                              key={field.key}
-                              className={`p-2 rounded ${
-                                field.highlight && comparison.isIdentical && !comparison.isEmpty
-                                  ? "bg-green-100 dark:bg-green-900/20 border border-green-300 dark:border-green-700"
-                                  : !comparison.isIdentical && !comparison.isEmpty
-                                  ? "bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800"
-                                  : ""
-                              }`}
-                            >
-                              <p className="text-xs text-muted-foreground mb-1">{field.label}</p>
-                              <p className="text-sm font-medium">{field.value}</p>
-                            </div>
-                          );
-                        })}
-                        </div>
-                      </CardContent>
-                    </Card>
+                            </CardContent>
+                          </Card>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   {/* Légende */}
