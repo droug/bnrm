@@ -44,6 +44,7 @@ export function PageAccessRestrictionsManager() {
   const [allowDownload, setAllowDownload] = useState(true);
   const [allowScreenshot, setAllowScreenshot] = useState(true);
   const [restrictedPageDisplay, setRestrictedPageDisplay] = useState<"blur" | "empty" | "hidden">("blur");
+  const [restrictedPageDisplayReason, setRestrictedPageDisplayReason] = useState("Pages du document numérique consultables intégralement sur place");
   const [allowRightClick, setAllowRightClick] = useState(true);
   const [allowInternetAccess, setAllowInternetAccess] = useState(true);
   const [allowInternalAccess, setAllowInternalAccess] = useState(false);
@@ -153,6 +154,7 @@ export function PageAccessRestrictionsManager() {
         allow_screenshot: data.allowScreenshot,
         allow_right_click: data.allowRightClick,
         restricted_page_display: data.restrictedPageDisplay,
+        restricted_page_display_reason: data.restrictedPageDisplayReason || null,
         allow_internet_access: data.allowInternetAccess,
         allow_internal_access: data.allowInternalAccess,
         is_rare_book: data.isRareBook,
@@ -221,6 +223,7 @@ export function PageAccessRestrictionsManager() {
       setAllowScreenshot(restriction.allow_screenshot !== false);
       setAllowRightClick(restriction.allow_right_click !== false);
       setRestrictedPageDisplay(restriction.restricted_page_display || "blur");
+      setRestrictedPageDisplayReason(restriction.restricted_page_display_reason || "Pages du document numérique consultables intégralement sur place");
       setAllowInternetAccess(restriction.allow_internet_access !== false);
       setAllowInternalAccess(restriction.allow_internal_access || false);
       setIsRareBook(restriction.is_rare_book || false);
@@ -276,6 +279,7 @@ export function PageAccessRestrictionsManager() {
       setAllowScreenshot(true);
       setAllowRightClick(true);
       setRestrictedPageDisplay("blur");
+      setRestrictedPageDisplayReason("Pages du document numérique consultables intégralement sur place");
       setAllowInternetAccess(true);
       setAllowInternalAccess(false);
       setIsRareBook(false);
@@ -301,6 +305,7 @@ export function PageAccessRestrictionsManager() {
       allowScreenshot,
       allowRightClick,
       restrictedPageDisplay,
+      restrictedPageDisplayReason,
       allowInternetAccess,
       allowInternalAccess,
       isRareBook,
@@ -930,6 +935,18 @@ export function PageAccessRestrictionsManager() {
                         <EyeOff className="h-5 w-5" />
                         <span className="text-xs">Masquer</span>
                       </Button>
+                    </div>
+
+                    {/* Raison affichée pour les pages non accessibles */}
+                    <div className="space-y-2 mt-4">
+                      <Label className="text-sm font-medium">Raison affichée à l'utilisateur</Label>
+                      <Textarea
+                        value={restrictedPageDisplayReason}
+                        onChange={(e) => setRestrictedPageDisplayReason(e.target.value)}
+                        placeholder="Indiquez la raison affichée pour les pages non accessibles"
+                        className="resize-none"
+                        rows={2}
+                      />
                     </div>
 
                     {/* Section Pages manquantes */}
