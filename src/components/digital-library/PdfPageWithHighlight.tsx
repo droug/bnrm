@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, memo } from 'react';
 import { OptimizedPdfPageRenderer } from './OptimizedPdfPageRenderer';
-import { PdfTextHighlightOverlay } from './PdfTextHighlightOverlay';
+import { PdfTextLayer } from './PdfTextLayer';
 
 interface PdfPageWithHighlightProps {
   pdfUrl: string;
@@ -12,6 +12,7 @@ interface PdfPageWithHighlightProps {
   priority?: 'high' | 'low';
   preloadPages?: number[];
   searchHighlight?: string;
+  documentId?: string;
 }
 
 export const PdfPageWithHighlight = memo(function PdfPageWithHighlight({
@@ -24,35 +25,45 @@ export const PdfPageWithHighlight = memo(function PdfPageWithHighlight({
   priority = 'high',
   preloadPages,
   searchHighlight,
+  documentId,
 }: PdfPageWithHighlightProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
+  const [imageLoaded, setImageLoaded] = useState(false);
 
-  // Observer le changement de taille du conteneur
+  // Poll for container size after image loads
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        const { width, height } = entry.contentRect;
-        if (width > 0 && height > 0) {
-          setContainerSize({ width, height });
-        }
+    const checkSize = () => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      if (rect.width > 10 && rect.height > 10) {
+        setContainerSize(prev => {
+          if (Math.abs(prev.width - rect.width) > 2 || Math.abs(prev.height - rect.height) > 2) {
+            return { width: rect.width, height: rect.height };
+          }
+          return prev;
+        });
       }
-    });
+    };
 
+    const resizeObserver = new ResizeObserver(checkSize);
     resizeObserver.observe(containerRef.current);
-
-    // Initial size
-    const rect = containerRef.current.getBoundingClientRect();
-    if (rect.width > 0 && rect.height > 0) {
-      setContainerSize({ width: rect.width, height: rect.height });
-    }
+    
+    // Poll periodically to catch image load
+    checkSize();
+    const intervals = [100, 300, 600, 1000, 2000, 3000].map(ms => 
+      setTimeout(checkSize, ms)
+    );
 
     return () => {
       resizeObserver.disconnect();
+      intervals.forEach(clearTimeout);
     };
-  }, []);
+  }, [pageNumber, pdfUrl]);
+
+  const hasSize = containerSize.width > 10 && containerSize.height > 10;
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
@@ -66,16 +77,17 @@ export const PdfPageWithHighlight = memo(function PdfPageWithHighlight({
         preloadPages={preloadPages}
       />
       
-      {/* Overlay de surbrillance si une recherche est active */}
-      {searchHighlight && containerSize.width > 0 && containerSize.height > 0 && (
-        <PdfTextHighlightOverlay
+      {/* Text layer for copy-paste and search highlight */}
+      {hasSize && (
+        <PdfTextLayer
           pdfUrl={pdfUrl}
           pageNumber={pageNumber}
-          searchText={searchHighlight}
           scale={scale}
           rotation={rotation}
           containerWidth={containerSize.width}
           containerHeight={containerSize.height}
+          searchHighlight={searchHighlight}
+          documentId={documentId}
         />
       )}
     </div>
