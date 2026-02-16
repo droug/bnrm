@@ -76,10 +76,17 @@ interface ReproductionRequestDialogProps {
 // Les types de reproduction sont maintenant chargés dynamiquement via useReproductionFormConfig
 
 const DELIVERY_METHOD_OPTIONS = [
+  { value: "email", label: "Par E-mail" },
   { value: "telecharger_espace", label: "À télécharger sur Mon espace" },
   { value: "support_cd", label: "Retrait sur place sous support CD" },
   { value: "autre", label: "Autre" },
 ];
+
+const DELIVERY_METHOD_DESCRIPTIONS: Record<string, string> = {
+  email: "Un lien de téléchargement vous sera envoyé par e-mail après validation du paiement.",
+  telecharger_espace: "Le document sera disponible dans votre espace personnel « Mon espace » pour téléchargement.",
+  support_cd: "Un e-mail de notification vous sera envoyé lorsque le CD sera prêt et disponible pour retrait sur place.",
+};
 
 const PURPOSE_OPTIONS = [
   { value: "recherche", label: "Recherche académique" },
@@ -316,6 +323,11 @@ export function ReproductionRequestDialog({
                           placeholder="Sélectionner..."
                           options={DELIVERY_METHOD_OPTIONS}
                         />
+                        {field.value && DELIVERY_METHOD_DESCRIPTIONS[field.value] && (
+                          <p className="text-xs text-muted-foreground mt-1 italic">
+                            {DELIVERY_METHOD_DESCRIPTIONS[field.value]}
+                          </p>
+                        )}
                         <FormMessage />
                       </FormItem>
                     )}
