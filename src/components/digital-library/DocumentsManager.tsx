@@ -2289,10 +2289,10 @@ export default function DocumentsManager() {
 
                     {/* File Upload Section */}
                     <div className="col-span-2 space-y-2">
-                      <Label>Fichier PDF</Label>
+                      <Label>Fichier du document</Label>
                       <FileUpload
-                        accept=".pdf"
-                        maxSize={100}
+                        accept=".pdf,.jpg,.jpeg,.png,.tiff,.tif,.webp,.gif,.bmp,.epub"
+                        maxSize={200}
                         value={uploadFile}
                         onChange={(file) => {
                           setUploadFile(file);
@@ -2313,7 +2313,7 @@ export default function DocumentsManager() {
                         </div>
                       )}
                       <p className="text-xs text-muted-foreground">
-                        Téléversez le fichier PDF du document. Formats acceptés: PDF (max. 100 MB)
+                        Formats acceptés : PDF, JPEG, PNG, TIFF, WebP, GIF, BMP, EPUB (max. 200 MB)
                       </p>
                     </div>
 
