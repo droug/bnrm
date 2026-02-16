@@ -230,7 +230,7 @@ export const OptimizedPdfPageRenderer = memo(function OptimizedPdfPageRenderer({
   }
 
   return (
-    <div className={`relative flex items-center justify-center ${className}`}>
+    <div className={`relative flex items-center justify-center ${className}`} style={{ pointerEvents: 'none' }}>
       {loading && !imageUrl && (
         <div className="flex items-center justify-center bg-muted/30 aspect-[3/4] min-h-[200px]">
           <div className="text-center space-y-2">

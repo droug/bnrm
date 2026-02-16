@@ -70,7 +70,8 @@ export const PdfTextLayer = memo(function PdfTextLayer({
         const page = await pdf.getPage(pageNumber);
         if (!mountedRef.current) return;
 
-        const viewport = page.getViewport({ scale, rotation });
+        // Get the page viewport at scale 1 to know the natural dimensions
+        const baseViewport = page.getViewport({ scale: 1, rotation });
         const textContent = await page.getTextContent();
         if (!mountedRef.current || !textLayerRef.current) return;
 
@@ -78,30 +79,29 @@ export const PdfTextLayer = memo(function PdfTextLayer({
         const hasText = textContent.items.some((item: any) => item.str && item.str.trim().length > 0);
         
         if (!hasText) {
-          // Scanned PDF - fall back to OCR text
           setUseFallback(true);
           return;
         }
 
         const textLayerDiv = textLayerRef.current;
-        textLayerDiv.style.setProperty('--scale-factor', `${scale}`);
+        
+        // Calculate the scale needed to match the container size
+        const fitScale = containerWidth / baseViewport.width;
+        const fitViewport = page.getViewport({ scale: fitScale, rotation });
+        
+        textLayerDiv.style.setProperty('--scale-factor', `${fitScale}`);
+        textLayerDiv.style.width = `${containerWidth}px`;
+        textLayerDiv.style.height = `${containerHeight}px`;
+        textLayerDiv.style.transform = '';
 
         const textLayer = new pdfjsLib.TextLayer({
           textContentSource: textContent,
           container: textLayerDiv,
-          viewport: viewport,
+          viewport: fitViewport,
         });
 
         await textLayer.render();
         if (!mountedRef.current) return;
-
-        // Scale to match container
-        const scaleX = containerWidth / viewport.width;
-        const scaleY = containerHeight / viewport.height;
-        textLayerDiv.style.transform = `scale(${scaleX}, ${scaleY})`;
-        textLayerDiv.style.transformOrigin = 'top left';
-        textLayerDiv.style.width = `${viewport.width}px`;
-        textLayerDiv.style.height = `${viewport.height}px`;
 
         // Highlight search terms
         if (searchHighlight && searchHighlight.length >= 2) {
@@ -180,7 +180,8 @@ export const PdfTextLayer = memo(function PdfTextLayer({
   return (
     <div
       ref={textLayerRef}
-      className={`absolute top-0 left-0 z-20 ${useFallback ? 'pdf-ocr-layer' : 'pdf-text-layer textLayer'}`}
+      className={`absolute top-0 left-0 z-30 ${useFallback ? 'pdf-ocr-layer' : 'pdf-text-layer textLayer'}`}
+      style={{ pointerEvents: 'auto', userSelect: 'text', WebkitUserSelect: 'text' }}
     />
   );
 });
