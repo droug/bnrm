@@ -184,29 +184,7 @@ export function ReproductionBackoffice() {
         }
       }
 
-      // Envoyer la notification par email avec le lien de paiement
-      if (approve && requestDetails?.user_id) {
-        try {
-          await supabase.functions.invoke('send-reproduction-notification', {
-            body: {
-              requestId: requestId,
-              recipientEmail: userEmail,
-              recipientId: requestDetails.user_id,
-              notificationType: 'payment_pending',
-              requestNumber: requestDetails.request_number,
-              documentTitle: (requestDetails as any).metadata?.documentTitle || 'Document demandé',
-              estimatedCost: requestDetails.payment_amount,
-              paymentLink: paymentUrl,
-              paymentMethod: 'all', // Afficher toutes les options de paiement
-            },
-          });
-          console.log("Email de notification avec lien de paiement envoyé");
-        } catch (emailError) {
-          console.error("Erreur envoi email:", emailError);
-        }
-      } else if (approve && !requestDetails?.user_id) {
-        toast.error(language === "ar" ? "معرف المستخدم غير متوفر" : "Utilisateur de la demande introuvable");
-      }
+      // No email notification at manager approval step - email will be sent at accounting validation
 
       // Create notification in database
       await supabase.from("reproduction_notifications").insert({
