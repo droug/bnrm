@@ -44,7 +44,7 @@ export default function PageAccessRestrictionsBackoffice() {
         <TabsList className="grid w-full max-w-md grid-cols-2 bg-muted/50">
           <TabsTrigger value="individual" className="gap-2">
             <Icon icon="mdi:file-document-outline" className="h-4 w-4" />
-            Par œuvre
+            Par document
           </TabsTrigger>
           <TabsTrigger value="batch" className="gap-2">
             <Icon icon="mdi:layers-outline" className="h-4 w-4" />
