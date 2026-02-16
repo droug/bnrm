@@ -8780,6 +8780,7 @@ export type Database = {
           missing_pages_custom_reason: string | null
           missing_pages_reason: string | null
           restricted_page_display: string | null
+          restricted_page_display_reason: string | null
           restriction_mode: string | null
           start_page: number | null
           updated_at: string | null
@@ -8805,6 +8806,7 @@ export type Database = {
           missing_pages_custom_reason?: string | null
           missing_pages_reason?: string | null
           restricted_page_display?: string | null
+          restricted_page_display_reason?: string | null
           restriction_mode?: string | null
           start_page?: number | null
           updated_at?: string | null
@@ -8830,6 +8832,7 @@ export type Database = {
           missing_pages_custom_reason?: string | null
           missing_pages_reason?: string | null
           restricted_page_display?: string | null
+          restricted_page_display_reason?: string | null
           restriction_mode?: string | null
           start_page?: number | null
           updated_at?: string | null
