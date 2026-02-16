@@ -15,6 +15,7 @@ interface NotificationRequest {
   requestNumber: string;
   documentTitle: string;
   reproductionType?: string;
+  reproductionModality?: string; // numerique_mail | numerique_espace | support_physique | papier
   format?: string;
   estimatedCost?: number;
   additionalInfo?: string;
@@ -319,12 +320,74 @@ const getEmailContent = (
         ${footer}`
       };
       
+    case 'accounting_validated': {
+      const siteUrl3 = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
+      return {
+        subject: `✅ Paiement validé - Reproduction en cours - ${requestNumber}`,
+        html: `${base}
+          <h2>✅ Paiement validé</h2>
+          <p>Nous vous confirmons que votre paiement a été <strong>validé par notre service comptabilité</strong>.</p>
+          
+          <div class="info-box">
+            <p class="info-row"><span class="info-label">N° de demande:</span><span class="info-value"><strong>${requestNumber}</strong></span></p>
+            <p class="info-row"><span class="info-label">Document:</span><span class="info-value">${documentTitle}</span></p>
+            <p class="info-row"><span class="info-label">Statut:</span><span class="status-badge status-approved">En cours de reproduction</span></p>
+          </div>
+          
+          <h3>📋 Prochaine étape</h3>
+          <p>Votre document est maintenant <strong>en cours de reproduction</strong>. Vous recevrez une notification dès qu'il sera prêt.</p>
+          
+          <p>Vous pouvez suivre l'état de votre demande dans votre <a href="${siteUrl3}/my-space?tab=reproductions" style="color: #002B45; font-weight: bold;">Espace Personnel</a>.</p>
+        ${footer}`
+      };
+    }
+      
     case 'ready':
+    case 'ready_for_pickup': {
+      const siteUrl2 = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
+      const modality = n.reproductionModality;
+      
+      // Contenu adapté selon la modalité de reproduction
+      let deliveryContent = '';
+      if (modality === 'numerique_mail') {
+        deliveryContent = `
+          <h3>📧 Téléchargement par e-mail</h3>
+          <p>Votre reproduction numérique est prête. Cliquez sur le bouton ci-dessous pour télécharger votre document :</p>
+          <div style="text-align: center; margin: 20px 0;">
+            <a href="${siteUrl2}/my-space?tab=reproductions" style="display: inline-block; background: #4caf50; color: white; padding: 14px 35px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
+              📥 Télécharger mon document
+            </a>
+          </div>
+          <p style="font-size: 13px; color: #666;">Ce lien vous redirige vers votre espace personnel où vous pourrez télécharger le fichier.</p>
+        `;
+      } else if (modality === 'numerique_espace') {
+        deliveryContent = `
+          <h3>💻 Disponible dans Mon espace</h3>
+          <p>Votre reproduction numérique est disponible dans votre <strong>Espace Personnel</strong>. Cliquez sur le bouton ci-dessous pour y accéder :</p>
+          <div style="text-align: center; margin: 20px 0;">
+            <a href="${siteUrl2}/my-space?tab=reproductions" style="display: inline-block; background: #002B45; color: white; padding: 14px 35px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
+              🏠 Accéder à Mon espace
+            </a>
+          </div>
+        `;
+      } else {
+        // support_physique / papier / default = retrait sur place
+        deliveryContent = `
+          <h3>📍 Retrait sur place</h3>
+          <p>Votre reproduction est prête et <strong>disponible pour retrait</strong> au Service de reproduction de la Bibliothèque Nationale.</p>
+          <div style="background: #fff3e0; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #ff9800;">
+            <p style="margin: 0 0 5px 0;"><strong>📅 Horaires:</strong> Du lundi au vendredi, 9h00 - 16h00</p>
+            <p style="margin: 0;"><strong>📍 Adresse:</strong> Avenue Ibn Khaldoun, Rabat</p>
+          </div>
+          <p>N'oubliez pas de vous munir d'une <strong>pièce d'identité</strong> et de votre <strong>numéro de demande</strong>.</p>
+        `;
+      }
+      
       return {
         subject: `🎉 Reproduction prête - ${requestNumber}`,
         html: `${base}
           <h2>🎉 Votre reproduction est prête !</h2>
-          <p>Nous avons le plaisir de vous informer que votre reproduction est <strong>prête à être récupérée</strong>.</p>
+          <p>Nous avons le plaisir de vous informer que votre reproduction est <strong>terminée</strong>.</p>
           
           <div class="info-box">
             <p class="info-row"><span class="info-label">N° de demande:</span><span class="info-value"><strong>${requestNumber}</strong></span></p>
@@ -332,13 +395,12 @@ const getEmailContent = (
             <p class="info-row"><span class="info-label">Statut:</span><span class="status-badge status-ready">Prête</span></p>
           </div>
           
-          <h3>📍 Retrait</h3>
-          <p>Vous pouvez récupérer votre reproduction au <strong>Service de reproduction</strong> de la Bibliothèque Nationale, du lundi au vendredi de 9h à 16h.</p>
-          <p>N'oubliez pas de vous munir d'une pièce d'identité et de votre numéro de demande.</p>
+          ${deliveryContent}
           
           ${additionalInfo ? `<p><strong>Information complémentaire:</strong> ${additionalInfo}</p>` : ''}
         ${footer}`
       };
+    }
       
     case 'rejected':
       return {

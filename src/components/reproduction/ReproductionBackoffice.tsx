@@ -311,6 +311,8 @@ export function ReproductionBackoffice() {
   const handleAccountingApproval = async (requestId: string, approve: boolean) => {
     setIsProcessing(true);
     try {
+      const requestDetails = selectedRequest;
+      
       const { error } = await supabase
         .from("reproduction_requests")
         .update({
@@ -326,7 +328,32 @@ export function ReproductionBackoffice() {
 
       if (error) throw error;
 
-      // Create notification
+      // Envoyer l'email de notification comptabilité
+      if (approve && requestDetails?.user_id) {
+        try {
+          // Résoudre l'email utilisateur
+          const userEmail =
+            (requestDetails as any)?.contact_email ||
+            (requestDetails as any)?.metadata?.email ||
+            (requestDetails as any)?.metadata?.user_email;
+
+          await supabase.functions.invoke('send-reproduction-notification', {
+            body: {
+              requestId: requestId,
+              recipientEmail: userEmail,
+              recipientId: requestDetails.user_id,
+              notificationType: 'accounting_validated',
+              requestNumber: requestDetails.request_number,
+              documentTitle: (requestDetails as any).metadata?.documentTitle || 'Document demandé',
+            },
+          });
+          console.log("Email notification comptabilité envoyé");
+        } catch (emailError) {
+          console.error("Erreur envoi email comptabilité:", emailError);
+        }
+      }
+
+      // Create notification in database
       await supabase.from("reproduction_notifications").insert({
         request_id: requestId,
         recipient_id: selectedRequest?.user_id,
@@ -382,7 +409,7 @@ export function ReproductionBackoffice() {
 
       if (error) throw error;
 
-      // Envoyer l'email "Votre reproduction est prête"
+      // Envoyer l'email "Votre reproduction est prête" avec la modalité
       if (requestDetails?.user_id) {
         try {
           await supabase.functions.invoke('send-reproduction-notification', {
@@ -393,6 +420,7 @@ export function ReproductionBackoffice() {
               notificationType: 'ready_for_pickup',
               requestNumber: requestDetails.request_number,
               documentTitle: (requestDetails as any).metadata?.documentTitle || 'Document demandé',
+              reproductionModality: requestDetails.reproduction_modality,
             },
           });
           console.log("Email 'reproduction prête' envoyé");
