@@ -285,7 +285,7 @@ const getEmailContent = (
     case 'payment_pending':
     case 'approved':
     case 'approval':
-      const siteUrl = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
+      const siteUrl = (Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma").replace(/\/+$/, '');
       const paymentOptions = getPaymentOptionsHtml(
         estimatedCost,
         paymentLink,
@@ -321,7 +321,7 @@ const getEmailContent = (
       };
       
     case 'accounting_validated': {
-      const siteUrl3 = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
+      const siteUrl3 = (Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma").replace(/\/+$/, '');
       return {
         subject: `✅ Paiement validé - Reproduction en cours - ${requestNumber}`,
         html: `${base}
@@ -344,7 +344,7 @@ const getEmailContent = (
       
     case 'ready':
     case 'ready_for_pickup': {
-      const siteUrl2 = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
+      const siteUrl2 = (Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma").replace(/\/+$/, '');
       const modality = n.reproductionModality;
       
       // Contenu adapté selon la modalité de reproduction
