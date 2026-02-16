@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { SimpleDropdown } from "@/components/cbn/SimpleDropdown";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Lock, Unlock, Search, Filter, FileText, X, Shield, Download, Camera, MousePointerClick, Layers, Eye, EyeOff, Info, Square, BookOpenCheck, ScrollText } from "lucide-react";
@@ -817,17 +818,17 @@ export function BatchRestrictionsManager() {
       </Dialog>
 
       {/* Dialog de configuration des restrictions en lot */}
-      <Dialog open={showBatchDialog} onOpenChange={setShowBatchDialog}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="text-2xl flex items-center gap-2">
+      <Sheet open={showBatchDialog} onOpenChange={setShowBatchDialog}>
+        <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
+          <SheetHeader>
+            <SheetTitle className="text-2xl flex items-center gap-2">
               <Layers className="h-6 w-6" />
               Appliquer des restrictions en lot
-            </DialogTitle>
-            <DialogDescription>
+            </SheetTitle>
+            <SheetDescription>
               Ces paramètres seront appliqués à {selectedDocuments.size} document(s) sélectionné(s)
-            </DialogDescription>
-          </DialogHeader>
+            </SheetDescription>
+          </SheetHeader>
 
           <div className="space-y-6 py-4">
             {/* Appliquer depuis un modèle */}
@@ -1283,16 +1284,16 @@ export function BatchRestrictionsManager() {
             )}
           </div>
 
-          <DialogFooter>
+          <SheetFooter className="mt-6">
             <Button variant="outline" onClick={() => setShowBatchDialog(false)}>
               Annuler
             </Button>
             <Button onClick={handleSaveBatchRestrictions} disabled={applyBatchRestrictions.isPending}>
               {applyBatchRestrictions.isPending ? "Application..." : "Appliquer les restrictions"}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }
