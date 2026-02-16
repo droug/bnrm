@@ -340,10 +340,17 @@ export function ReproductionTypeSelector({
               placeholder="Sélectionner le mode de réception"
               options={[
                 { value: "email", label: "Par e-mail" },
-                { value: "download", label: "À télécharger" },
-                { value: "support", label: "Sous support (CD, USB, Carte SD, Autre)" },
+                { value: "download", label: "À télécharger sur Mon espace" },
+                { value: "support", label: "Retrait sur place sous support (CD, USB, Carte SD, Autre)" },
               ]}
             />
+            {receptionMode && (
+              <p className="text-xs text-muted-foreground italic">
+                {receptionMode === "email" && "Un lien de téléchargement vous sera envoyé par e-mail après validation du paiement."}
+                {receptionMode === "download" && "Le document sera disponible dans votre espace personnel « Mon espace » pour téléchargement."}
+                {receptionMode === "support" && "Un e-mail de notification vous sera envoyé lorsque le support sera prêt et disponible pour retrait sur place."}
+              </p>
+            )}
           </div>
 
           {receptionMode === "support" && (
