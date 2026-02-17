@@ -1093,11 +1093,11 @@ export const BNRMStatistics = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <Clock className="h-5 w-5 text-amber-600" />
-                      <span className="font-medium">En attente de validation</span>
+                      <span className="font-medium">Mises en attente</span>
                     </div>
                     <span className="text-2xl font-bold text-amber-600">{stats.rejectionBreakdown.onHold}</span>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-2">Demandes en attente du comité de validation ou du département ABN</p>
+                  <p className="text-xs text-muted-foreground mt-2">Demandes mises en attente via le bouton "Mettre en attente"</p>
                 </div>
 
                 {/* Pie chart rejets */}
