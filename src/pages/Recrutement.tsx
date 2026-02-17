@@ -5,10 +5,14 @@ import depotLegalBg from "@/assets/depot-legal-bg.jpg";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, MapPin, Clock, Briefcase, Search, Filter, Calendar } from "lucide-react";
+import { Users, MapPin, Clock, Briefcase, Search, Filter, Calendar, Upload } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const offresEmploi = [
   {
@@ -61,11 +65,24 @@ export default function Recrutement() {
   const [search, setSearch] = useState("");
   const [filterType, setFilterType] = useState("tous");
 
+  const [selectedOffre, setSelectedOffre] = useState<typeof offresEmploi[0] | null>(null);
+  const [formData, setFormData] = useState({ nom: "", email: "", telephone: "", message: "" });
+
   const filtered = offresEmploi.filter((offre) => {
     const matchSearch = offre.titre.toLowerCase().includes(search.toLowerCase()) || offre.departement.toLowerCase().includes(search.toLowerCase());
     const matchType = filterType === "tous" || offre.type === filterType;
     return matchSearch && matchType;
   });
+
+  const handleSubmit = () => {
+    if (!formData.nom || !formData.email) {
+      toast.error("Veuillez remplir les champs obligatoires.");
+      return;
+    }
+    toast.success("Votre candidature a été envoyée avec succès !");
+    setSelectedOffre(null);
+    setFormData({ nom: "", email: "", telephone: "", message: "" });
+  };
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -143,7 +160,7 @@ export default function Recrutement() {
                     </div>
                   </div>
                   {offre.statut === "ouvert" && (
-                    <Button size="sm" variant="outline" className="mt-2 gap-2">
+                    <Button size="sm" variant="outline" className="mt-2 gap-2" onClick={() => setSelectedOffre(offre)}>
                       <Briefcase className="h-3.5 w-3.5" />
                       Postuler
                     </Button>
@@ -161,6 +178,39 @@ export default function Recrutement() {
         </div>
       </main>
       <div className="relative z-10"><Footer /></div>
+
+      {/* Dialog Postuler */}
+      <Dialog open={!!selectedOffre} onOpenChange={(open) => !open && setSelectedOffre(null)}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Postuler</DialogTitle>
+            <DialogDescription>{selectedOffre?.titre}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label htmlFor="nom">Nom complet *</Label>
+              <Input id="nom" value={formData.nom} onChange={(e) => setFormData(p => ({ ...p, nom: e.target.value }))} placeholder="Votre nom complet" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email *</Label>
+              <Input id="email" type="email" value={formData.email} onChange={(e) => setFormData(p => ({ ...p, email: e.target.value }))} placeholder="votre@email.com" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="telephone">Téléphone</Label>
+              <Input id="telephone" value={formData.telephone} onChange={(e) => setFormData(p => ({ ...p, telephone: e.target.value }))} placeholder="+212 6XX XXX XXX" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="message">Lettre de motivation</Label>
+              <Textarea id="message" value={formData.message} onChange={(e) => setFormData(p => ({ ...p, message: e.target.value }))} placeholder="Présentez votre profil et vos motivations..." rows={4} />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSelectedOffre(null)}>Annuler</Button>
+            <Button onClick={handleSubmit}>Envoyer la candidature</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       <GlobalAccessibilityTools />
     </div>
   );
