@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
 import { FloatingButtons } from "@/components/FloatingButtons";
-import WelcomePopup from "@/components/WelcomePopup";
+
 import { useTranslation } from "@/hooks/useTranslation";
 import SEOHead from "@/components/seo/SEOHead";
 import { Search, Book, BookOpen, Users, Download, Calendar, Globe, Accessibility, Share2, MousePointer, CreditCard, BadgeCheck, UserPlus, Filter, Scroll, HelpCircle } from "lucide-react";
@@ -31,7 +31,7 @@ import { supabase } from "@/integrations/supabase/client";
 const Index = () => {
   const { t, language, isRTL } = useTranslation();
   const navigate = useNavigate();
-  const [showWelcomePopup, setShowWelcomePopup] = useState(false);
+  
   const [searchQuery, setSearchQuery] = useState("");
   const [searchFilter, setSearchFilter] = useState("all");
 
@@ -90,15 +90,6 @@ const Index = () => {
   const heroTitle = getHeroTitle();
   const heroSubtitle = getHeroSubtitle();
 
-  useEffect(() => {
-    const hasSeenWelcome = sessionStorage.getItem('bnrm-welcome-popup-dismissed');
-    if (!hasSeenWelcome) {
-      const timer = setTimeout(() => {
-        setShowWelcomePopup(true);
-      }, 2000);
-      return () => clearTimeout(timer);
-    }
-  }, []);
 
   const handleSearch = () => {
     if (searchQuery.trim()) {
@@ -117,10 +108,6 @@ const Index = () => {
       <div className="min-h-screen bg-background">
         <Header />
 
-        <WelcomePopup
-          isOpen={showWelcomePopup}
-          onClose={() => setShowWelcomePopup(false)}
-        />
 
         {/* Hero Banner - Mobile First */}
         <section className="relative min-h-[50vh] sm:min-h-[60vh] md:min-h-[70vh] overflow-hidden pt-16 sm:pt-20">
