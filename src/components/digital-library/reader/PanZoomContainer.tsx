@@ -33,6 +33,10 @@ export function PanZoomContainer({
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!canPan) return;
+    // Don't prevent default on text layer elements to allow text selection
+    const target = e.target as HTMLElement;
+    const isTextLayer = target.closest('.pdf-text-layer, .textLayer, .pdf-ocr-layer, .pdf-ocr-text-overlay');
+    if (isTextLayer) return;
     
     e.preventDefault();
     setIsPanning(true);
@@ -105,7 +109,8 @@ export function PanZoomContainer({
     <div
       ref={containerRef}
       className={cn(
-        "w-full h-full flex items-stretch justify-center select-none",
+        "w-full h-full flex items-stretch justify-center",
+        canPan && "select-none",
         canPan ? "overflow-hidden" : "overflow-visible",
         className
       )}
