@@ -13,6 +13,7 @@ import {
   FileText, 
   Clock, 
   CheckCircle,
+  AlertCircle,
   Calendar,
   Download,
   Filter
@@ -29,6 +30,15 @@ interface StatusLevel {
   color: string;
 }
 
+interface RejectionBreakdown {
+  rejectedByArbitration: number;
+  rejectedByCommittee: number;
+  rejectedByABN: number;
+  rejectedOther: number;
+  onHold: number;
+  totalRejected: number;
+}
+
 interface StatsData {
   totalRequests: number;
   byStatus: Record<string, number>;
@@ -42,6 +52,7 @@ interface StatsData {
   byAuthorGender: Record<string, number>;
   secondaryAuthors: number;
   duplicatesDetected: number;
+  rejectionBreakdown: RejectionBreakdown;
   reciprocalValidations: Array<{ 
     editor: string; 
     printer: string; 
@@ -67,6 +78,7 @@ export const BNRMStatistics = () => {
     byAuthorGender: {},
     secondaryAuthors: 0,
     duplicatesDetected: 0,
+    rejectionBreakdown: { rejectedByArbitration: 0, rejectedByCommittee: 0, rejectedByABN: 0, rejectedOther: 0, onHold: 0, totalRejected: 0 },
     reciprocalValidations: []
   });
   const [loading, setLoading] = useState(true);
@@ -205,6 +217,41 @@ export const BNRMStatistics = () => {
         }
       });
 
+      // Calculer la ventilation des rejets et mises en attente
+      const rejectionBreakdown: RejectionBreakdown = {
+        rejectedByArbitration: 0,
+        rejectedByCommittee: 0,
+        rejectedByABN: 0,
+        rejectedOther: 0,
+        onHold: 0,
+        totalRejected: 0,
+      };
+
+      allRequests.forEach(req => {
+        const status = req.status as string;
+        const arbitrationStatus = (req as any).arbitration_status as string | null;
+
+        // Mises en attente (en attente comité ou ABN)
+        if (['en_attente_comite_validation', 'en_attente_validation_b'].includes(status)) {
+          rejectionBreakdown.onHold++;
+        }
+
+        // Rejets
+        if (status === 'rejete_par_comite') {
+          rejectionBreakdown.rejectedByCommittee++;
+          rejectionBreakdown.totalRejected++;
+        } else if (status === 'rejete_par_b') {
+          rejectionBreakdown.rejectedByABN++;
+          rejectionBreakdown.totalRejected++;
+        } else if (arbitrationStatus === 'rejected') {
+          rejectionBreakdown.rejectedByArbitration++;
+          rejectionBreakdown.totalRejected++;
+        } else if (status === 'rejete') {
+          rejectionBreakdown.rejectedOther++;
+          rejectionBreakdown.totalRejected++;
+        }
+      });
+
       setStats(prev => ({
         ...prev,
         totalRequests: allRequests.length,
@@ -213,6 +260,7 @@ export const BNRMStatistics = () => {
         byType,
         duplicatesDetected,
         secondaryAuthors,
+        rejectionBreakdown,
         averageProcessingTime: 3.5, // TODO: calculer depuis les dates
         requestsOverTime: prev.requestsOverTime.length ? prev.requestsOverTime : [
           { date: format(subDays(new Date(), 10), 'yyyy-MM-dd'), count: Math.floor(allRequests.length * 0.1) },
@@ -1004,6 +1052,88 @@ export const BNRMStatistics = () => {
                   </Bar>
                 </BarChart>
               </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Situation des demandes rejetées et mises en attente */}
+        <Card className="lg:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-destructive" />
+              Situation des demandes rejetées & mises en attente
+            </CardTitle>
+            <CardDescription>Ventilation détaillée des rejets par source et des demandes en attente</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Rejets par source */}
+              <div className="space-y-4">
+                <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Demandes rejetées</h4>
+                <div className="space-y-3">
+                  {[
+                    { label: "Rejeté par Arbitrage", value: stats.rejectionBreakdown.rejectedByArbitration, color: "#F59E0B", bg: "bg-amber-50 dark:bg-amber-950/30", border: "border-amber-200 dark:border-amber-800" },
+                    { label: "Rejeté par Comité de validation", value: stats.rejectionBreakdown.rejectedByCommittee, color: "#EF4444", bg: "bg-red-50 dark:bg-red-950/30", border: "border-red-200 dark:border-red-800" },
+                    { label: "Rejeté par Département ABN", value: stats.rejectionBreakdown.rejectedByABN, color: "#DC2626", bg: "bg-red-50 dark:bg-red-950/30", border: "border-red-300 dark:border-red-700" },
+                    { label: "Autres rejets", value: stats.rejectionBreakdown.rejectedOther, color: "#6B7280", bg: "bg-muted/50", border: "border-muted" },
+                  ].map((item) => (
+                    <div key={item.label} className={`flex items-center justify-between p-3 rounded-lg border ${item.bg} ${item.border}`}>
+                      <div className="flex items-center gap-3">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
+                        <span className="text-sm font-medium">{item.label}</span>
+                      </div>
+                      <span className="text-lg font-bold">{item.value}</span>
+                    </div>
+                  ))}
+                  <div className="flex items-center justify-between p-3 rounded-lg border-2 border-destructive/30 bg-destructive/5">
+                    <span className="text-sm font-semibold">Total rejetées</span>
+                    <span className="text-xl font-bold text-destructive">{stats.rejectionBreakdown.totalRejected}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mises en attente + Graphique */}
+              <div className="space-y-4">
+                <h4 className="font-semibold text-sm text-muted-foreground uppercase tracking-wide">Mises en attente</h4>
+                <div className="p-4 rounded-lg border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/30">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Clock className="h-5 w-5 text-amber-600" />
+                      <span className="font-medium">En attente de validation</span>
+                    </div>
+                    <span className="text-2xl font-bold text-amber-600">{stats.rejectionBreakdown.onHold}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-2">Demandes en attente du comité de validation ou du département ABN</p>
+                </div>
+
+                {/* Pie chart rejets */}
+                {stats.rejectionBreakdown.totalRejected > 0 && (
+                  <ResponsiveContainer width="100%" height={220}>
+                    <PieChart>
+                      <Pie
+                        data={[
+                          { name: "Arbitrage", value: stats.rejectionBreakdown.rejectedByArbitration },
+                          { name: "Comité", value: stats.rejectionBreakdown.rejectedByCommittee },
+                          { name: "ABN", value: stats.rejectionBreakdown.rejectedByABN },
+                          { name: "Autres", value: stats.rejectionBreakdown.rejectedOther },
+                        ].filter(d => d.value > 0)}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={50}
+                        outerRadius={80}
+                        dataKey="value"
+                        label={({ name, value }) => `${name}: ${value}`}
+                      >
+                        <Cell fill="#F59E0B" />
+                        <Cell fill="#EF4444" />
+                        <Cell fill="#DC2626" />
+                        <Cell fill="#6B7280" />
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
