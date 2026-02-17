@@ -149,6 +149,7 @@ const PageAccessRestrictionsBackoffice = lazy(() => import("./pages/PageAccessRe
 const AccessPolicies = lazy(() => import("./pages/AccessPolicies"));
 const ContentManagementPage = lazy(() => import("./pages/ContentManagementPage"));
 const ElectronicBundlesAdmin = lazy(() => import("./pages/digital-library/ElectronicBundlesAdmin"));
+const FederatedSearch = lazy(() => import("./pages/digital-library/FederatedSearch"));
 
 // Reproduction (lazy)
 const ReproductionPage = lazy(() => import("./pages/ReproductionPage"));
@@ -344,6 +345,7 @@ const App = () => {
           <Route path="/digital-library/themes" element={<Themes />} />
           <Route path="/digital-library/themes/:themeId" element={<ThemeDetails />} />
           <Route path="/digital-library/search" element={<AdvancedSearch />} />
+          <Route path="/digital-library/federated-search" element={<FederatedSearch />} />
           <Route path="/digital-library/news" element={<NewsEvents />} />
           <Route path="/digital-library/actualites" element={<NewsEvents />} />
           <Route path="/digital-library/exposition-virtuelle" element={<VirtualExhibition />} />
