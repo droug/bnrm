@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState, memo } from 'react';
+import { useEffect, useRef, useState, memo, useCallback } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import pdfWorkerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import { supabase } from '@/integrations/supabase/client';
+import { Copy, Check } from 'lucide-react';
 
 // Configure PDF.js worker
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorkerSrc;
@@ -52,6 +53,7 @@ export const PdfTextLayer = memo(function PdfTextLayer({
   const [useFallback, setUseFallback] = useState(false);
   const [ocrText, setOcrText] = useState<string | null>(null);
   const [hasOcrPages, setHasOcrPages] = useState<boolean | null>(null);
+  const [copied, setCopied] = useState(false);
   const renderIdRef = useRef(0);
 
   // Check if this document has OCR pages in the database
@@ -189,44 +191,58 @@ export const PdfTextLayer = memo(function PdfTextLayer({
     fetchOcrText();
   }, [useFallback, documentId, pageNumber]);
 
-  // Render OCR text fallback
-  useEffect(() => {
-    if (!useFallback || !ocrText || !textLayerRef.current) return;
-
-    const div = textLayerRef.current;
-    div.innerHTML = '';
-    div.style.width = `${containerWidth}px`;
-    div.style.height = `${containerHeight}px`;
-
-    const textOverlay = document.createElement('div');
-    textOverlay.className = 'pdf-ocr-text-overlay';
-    
-    if (searchHighlight && searchHighlight.length >= 2) {
-      const escapedSearch = searchHighlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const regex = new RegExp(`(${escapedSearch})`, 'gi');
-      const parts = ocrText.split(regex);
-      
-      parts.forEach((part) => {
-        if (part.toLowerCase() === searchHighlight.toLowerCase()) {
-          const mark = document.createElement('mark');
-          mark.className = 'pdf-search-highlight';
-          mark.textContent = part;
-          textOverlay.appendChild(mark);
-        } else {
-          textOverlay.appendChild(document.createTextNode(part));
-        }
-      });
-    } else {
-      textOverlay.textContent = ocrText;
+  const handleCopyText = useCallback(async () => {
+    if (!ocrText) return;
+    try {
+      await navigator.clipboard.writeText(ocrText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback
+      const ta = document.createElement('textarea');
+      ta.value = ocrText;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
+  }, [ocrText]);
 
-    div.appendChild(textOverlay);
-  }, [useFallback, ocrText, searchHighlight, containerWidth, containerHeight]);
+  // For OCR fallback: don't render an invisible text overlay (it can't align with the image).
+  // Instead, render nothing on the page and provide a copy button via the parent.
+  if (useFallback) {
+    return (
+      <>
+        {ocrText && (
+          <button
+            onClick={handleCopyText}
+            className="absolute top-2 right-2 z-[60] flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-black/60 hover:bg-black/80 text-white text-xs font-medium backdrop-blur-sm transition-all shadow-lg"
+            title="Copier le texte de cette page"
+          >
+            {copied ? (
+              <>
+                <Check className="h-3.5 w-3.5" />
+                <span>Copié</span>
+              </>
+            ) : (
+              <>
+                <Copy className="h-3.5 w-3.5" />
+                <span>Copier le texte</span>
+              </>
+            )}
+          </button>
+        )}
+      </>
+    );
+  }
 
+  // For native pdf.js text layer (non-scanned documents)
   return (
     <div
       ref={textLayerRef}
-      className={`absolute top-0 left-0 ${useFallback ? 'pdf-ocr-layer' : 'pdf-text-layer textLayer'}`}
+      className="absolute top-0 left-0 pdf-text-layer textLayer"
       style={{
         pointerEvents: 'auto',
         userSelect: 'text',
@@ -269,5 +285,4 @@ function highlightSearchTerms(container: HTMLDivElement, searchText: string) {
     }
   });
 }
-
 export default PdfTextLayer;
