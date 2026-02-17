@@ -16,6 +16,8 @@ import CmsDigitalServicesManager from "@/components/cms/CmsDigitalServicesManage
 import CmsWysiwygModule from "@/components/cms/CmsWysiwygModule";
 import CmsSeoManager from "@/components/cms/CmsSeoManager";
 import CmsVisualResourcesManager from "@/components/cms/CmsVisualResourcesManager";
+import CmsAppelsOffresManager from "@/components/cms/CmsAppelsOffresManager";
+import CmsRecrutementManager from "@/components/cms/CmsRecrutementManager";
 import {
   FileText, 
   Webhook, 
@@ -39,7 +41,8 @@ import {
   Palette,
   Settings2,
   PenSquare,
-  Shapes
+  Shapes,
+  Briefcase
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useQuery } from "@tanstack/react-query";
@@ -171,6 +174,28 @@ const tabs = [
     borderColor: "border-pink-500/30",
     gradient: "from-pink-500/20 to-pink-600/5",
     description: "Éditeur visuel multilingue",
+    category: "contenu"
+  },
+  { 
+    id: "appels-offres", 
+    label: "Appels d'offres", 
+    icon: FileText, 
+    color: "text-teal-500",
+    bgColor: "bg-teal-500/10",
+    borderColor: "border-teal-500/30",
+    gradient: "from-teal-500/20 to-teal-600/5",
+    description: "Marchés publics (/appels-offres)",
+    category: "contenu"
+  },
+  { 
+    id: "recrutement", 
+    label: "Recrutement", 
+    icon: Briefcase, 
+    color: "text-rose-500",
+    bgColor: "bg-rose-500/10",
+    borderColor: "border-rose-500/30",
+    gradient: "from-rose-500/20 to-rose-600/5",
+    description: "Offres d'emploi (/recrutement)",
     category: "contenu"
   },
 
@@ -437,6 +462,10 @@ export default function PortalContentManagementSystem() {
         return <CmsSeoManager />;
       case "webhooks":
         return <CmsWebhooksManager />;
+      case "appels-offres":
+        return <CmsAppelsOffresManager />;
+      case "recrutement":
+        return <CmsRecrutementManager />;
       default:
         return null;
     }
