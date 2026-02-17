@@ -87,7 +87,9 @@ const Footer = ({ forceKitabStyle = false }: { forceKitabStyle?: boolean } = {})
     { label: ml("Horaires", "المواعيد", "Opening Hours", "Horarios", "ⵜⵉⵙⵔⴰⴳⵉⵏ"), href: "/practical-info" },
     { label: ml("À propos", "حول", "About", "Acerca de", "ⵖⴼ"), href: "#inscription" },
     { label: ml("Services", "الخدمات", "Services", "Servicios", "ⵜⵉⵏⴰⴼⵓⵜⵉⵏ"), href: "#depot-legal" },
-    { label: ml("Contact", "اتصل بنا", "Contact", "Contacto", "ⴰⵎⵢⴰⵡⴰⴹ"), href: "#contact" }
+    { label: ml("Contact", "اتصل بنا", "Contact", "Contacto", "ⴰⵎⵢⴰⵡⴰⴹ"), href: "#contact" },
+    { label: ml("Appels d'offres", "طلبات العروض", "Tenders", "Licitaciones", "ⵉⵙⵓⵜⴰⵔ ⵏ ⵜⵓⵜⵜⵔⵉⵡⵉⵏ"), href: "/appels-offres" },
+    { label: ml("Recrutement", "التوظيف", "Recruitment", "Contratación", "ⴰⵙⵎⴰⴳⵍ"), href: "/recrutement" },
   ];
 
   const legalLinks = [

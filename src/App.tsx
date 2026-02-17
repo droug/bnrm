@@ -92,6 +92,8 @@ const RentalManagement = lazy(() => import("./pages/admin/RentalManagement"));
 const BibliographiesNationales = lazy(() => import("./pages/BibliographiesNationales"));
 const ReservationEspaces = lazy(() => import("./pages/ReservationEspaces"));
 const Abonnements = lazy(() => import("./pages/Abonnements"));
+const AppelsOffres = lazy(() => import("./pages/AppelsOffres"));
+const Recrutement = lazy(() => import("./pages/Recrutement"));
 
 // Legal Deposit (lazy)
 const LegalDepositTypes = lazy(() => import("./pages/LegalDepositTypes"));
@@ -307,6 +309,8 @@ const App = () => {
         <Route path="/tarifs-bnrm" element={<BNRMPortal />} />
         <Route path="/reservation-espaces" element={<ReservationEspaces />} />
         <Route path="/abonnements" element={<Abonnements />} />
+        <Route path="/appels-offres" element={<AppelsOffres />} />
+        <Route path="/recrutement" element={<Recrutement />} />
         <Route path="/services-tarifs" element={<ServicesCatalog />} />
         <Route path="/bibliographies" element={<BibliographiesNationales />} />
         <Route path="/admin/legal-deposit" element={<LegalDepositPage />} />
