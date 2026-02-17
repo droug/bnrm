@@ -282,28 +282,30 @@ serve(async (req) => {
         console.error("Error generating recovery link:", linkError);
       } else if (linkData?.properties?.action_link) {
         // Le lien brut pointe vers Supabase (xxx.supabase.co/auth/v1/verify?...).
-        // On le transforme pour qu'il pointe directement vers le site avec les tokens dans le hash.
+        // On le transforme pour qu'il pointe directement vers le site avec le hashed_token.
         const rawLink = linkData.properties.action_link;
+        const hashedToken = linkData.properties.hashed_token;
         console.log("Raw action_link from Supabase:", rawLink);
+        console.log("Hashed token available:", !!hashedToken);
         
-        try {
-          const linkUrl = new URL(rawLink);
-          const token = linkUrl.searchParams.get("token");
-          const type = linkUrl.searchParams.get("type");
-          
-          if (token && type) {
-            // Construire le lien direct vers le site avec les tokens dans le hash
-            // Format: https://site.com/auth?reset=true#access_token=...&type=recovery
-            passwordResetLink = `${siteUrl}/auth?reset=true#token=${encodeURIComponent(token)}&type=${type}`;
-            console.log("Transformed password reset link for direct access");
-          } else {
-            // Fallback: utiliser le lien brut
+        if (hashedToken) {
+          // Utiliser le hashed_token pour verifyOtp({ token_hash }) côté frontend
+          passwordResetLink = `${siteUrl}/auth?reset=true#token_hash=${encodeURIComponent(hashedToken)}&type=recovery`;
+          console.log("Built password reset link with hashed_token for direct OTP verification");
+        } else {
+          // Fallback: extraire le token de l'URL brute
+          try {
+            const linkUrl = new URL(rawLink);
+            const token = linkUrl.searchParams.get("token");
+            if (token) {
+              passwordResetLink = `${siteUrl}/auth?reset=true#token_hash=${encodeURIComponent(token)}&type=recovery`;
+            } else {
+              passwordResetLink = rawLink;
+            }
+          } catch (parseError) {
+            console.error("Error parsing action_link:", parseError);
             passwordResetLink = rawLink;
-            console.log("Using raw link (no token/type found)");
           }
-        } catch (parseError) {
-          console.error("Error parsing action_link:", parseError);
-          passwordResetLink = rawLink;
         }
       }
     }
