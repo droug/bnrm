@@ -5,10 +5,11 @@ import depotLegalBg from "@/assets/depot-legal-bg.jpg";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { FileText, Calendar, Clock, ExternalLink, Search, Filter } from "lucide-react";
+import { FileText, Calendar, Clock, Download, Search, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
+import { toast } from "sonner";
 
 const appelsOffres = [
   {
@@ -133,8 +134,10 @@ export default function AppelsOffres() {
                     <Badge variant="outline" className="text-xs">{ao.categorie}</Badge>
                   </div>
                   {ao.statut === "ouvert" && (
-                    <Button size="sm" variant="outline" className="mt-2 gap-2">
-                      <ExternalLink className="h-3.5 w-3.5" />
+                    <Button size="sm" variant="outline" className="mt-2 gap-2" onClick={() => {
+                      toast.info(`Téléchargement du dossier ${ao.reference} en cours...`);
+                    }}>
+                      <Download className="h-3.5 w-3.5" />
                       Consulter le dossier
                     </Button>
                   )}
