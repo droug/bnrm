@@ -58,7 +58,7 @@ export default function LegalDepositTypes() {
         className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
         style={{ backgroundImage: `url(${depotLegalBg})` }}
       />
-      <div className="fixed inset-0 z-0 bg-background/85 backdrop-blur-sm" />
+      <div className="fixed inset-0 z-0 bg-background/50" />
       <Header />
       
       <main className="container mx-auto px-4 py-12 relative z-10">
