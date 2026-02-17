@@ -78,16 +78,27 @@ serve(async (req) => {
     <p>Pour pouvoir confirmer les déclarations qui vous concernent et accéder à votre espace professionnel, nous vous invitons à créer votre compte sur notre plateforme.</p>
     
     <div style="text-align: center; margin: 30px 0;">
-      <a href="${registrationUrl}" 
-         style="background: linear-gradient(135deg, #1a365d 0%, #2d5a87 100%); 
-                color: white; 
-                padding: 15px 30px; 
-                text-decoration: none; 
-                border-radius: 6px; 
-                font-weight: bold;
-                display: inline-block;">
-        Créer mon compte Éditeur
-      </a>
+      <table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
+        <tr>
+          <td style="background: #1a365d; border-radius: 6px;">
+            <a href="${registrationUrl}" 
+               target="_blank"
+               style="color: #ffffff; 
+                      padding: 15px 30px; 
+                      text-decoration: none; 
+                      font-weight: bold;
+                      display: inline-block;
+                      font-size: 16px;">
+              Créer mon compte Éditeur
+            </a>
+          </td>
+        </tr>
+      </table>
+    </div>
+    
+    <div style="text-align: center; margin: 10px 0 20px 0;">
+      <p style="font-size: 12px; color: #666;">Si le bouton ne s'affiche pas, copiez ce lien dans votre navigateur :</p>
+      <p style="font-size: 12px; color: #1a365d; word-break: break-all;">${registrationUrl}</p>
     </div>
     
     ${phoneNotificationSection}
