@@ -159,7 +159,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (err) {
+      console.warn("Server signOut failed, clearing local session:", err);
+      // Force local cleanup even if server returns 403 (session_not_found)
+      await supabase.auth.signOut({ scope: 'local' });
+    }
     toast.success("Déconnexion", {
       description: "Vous avez été déconnecté avec succès.",
     });
