@@ -505,6 +505,21 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                       {ml('Aucune ressource disponible', 'لا توجد موارد متاحة', 'No resources available', 'No hay recursos disponibles', 'ⵓⵔ ⵍⵍⵉⵏ ⵜⵉⵖⴱⵓⵍⴰ')}
                     </DropdownMenuItem>
                   )}
+                  {/* Séparateur + Recherche fédérée */}
+                  <div className="border-t border-border my-1" />
+                  <Link to="/digital-library/federated-search" className="block">
+                    <DropdownMenuItem className="gap-3 cursor-pointer py-3 px-3 rounded-lg hover:bg-bn-blue-primary/5 transition-all duration-200 group">
+                      <div className="flex items-center gap-3 flex-1">
+                        <div className="p-2 rounded-xl bg-gradient-to-br from-bn-blue-primary/20 to-bn-blue-primary/5 group-hover:from-bn-blue-primary/30 group-hover:to-bn-blue-primary/10 transition-all duration-200">
+                          <Icon name="mdi:magnify-expand" className="h-5 w-5 text-bn-blue-primary" />
+                        </div>
+                        <span className="font-semibold text-foreground group-hover:text-bn-blue-primary transition-colors">
+                          {ml('Recherche fédérée', 'البحث الفيدرالي', 'Federated Search', 'Búsqueda federada', 'ⴰⵔⵣⵣⵓ ⴰⴼⵉⴷⵉⵔⴰⵍⵉ')}
+                        </span>
+                      </div>
+                      <Icon name="mdi:arrow-right" className="h-4 w-4 text-muted-foreground group-hover:text-bn-blue-primary transition-colors" />
+                    </DropdownMenuItem>
+                  </Link>
                 </DropdownMenuContent>
               </DropdownMenu>
               <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 ease-out group-hover:w-4/5 rounded-full" />
