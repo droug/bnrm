@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
+import depotLegalBg from "@/assets/depot-legal-bg.jpg";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -67,9 +68,11 @@ export default function Recrutement() {
   });
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <div className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${depotLegalBg})` }} />
+      <div className="fixed inset-0 z-0 bg-background/50" />
       <Header />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 relative z-10">
         <div className="max-w-5xl mx-auto">
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-2">
@@ -157,7 +160,7 @@ export default function Recrutement() {
           </div>
         </div>
       </main>
-      <Footer />
+      <div className="relative z-10"><Footer /></div>
       <GlobalAccessibilityTools />
     </div>
   );
