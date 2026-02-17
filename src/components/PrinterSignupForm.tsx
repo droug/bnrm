@@ -203,9 +203,12 @@ const PrinterSignupForm = ({ prefillEmail, prefillName }: PrinterSignupFormProps
     
     try {
       setIsSubmitting(true);
+      console.log("[PrinterSignup] Starting submission...");
 
       // Vérifier l'unicité de l'email
+      console.log("[PrinterSignup] Checking email uniqueness...");
       const emailCheck = await checkProfessionalEmailUniqueness(formData.email, 'printer');
+      console.log("[PrinterSignup] Email check result:", emailCheck);
       if (!emailCheck.allowed) {
         toast({
           title: "Email déjà utilisé",
@@ -220,15 +223,23 @@ const PrinterSignupForm = ({ prefillEmail, prefillName }: PrinterSignupFormProps
       const tempRefNumber = `REQ-PR-${Date.now().toString(36).toUpperCase()}`;
 
       // Upload files to storage
-      const fileUrls = await uploadProfessionalDocuments(
-        {
-          logoFile: formData.logoFile,
-          commerceRegistryFile: formData.commerceRegistryFile,
-          cinFile: formData.cinFile,
-        },
-        'printer',
-        tempRefNumber
-      );
+      console.log("[PrinterSignup] Uploading files...");
+      let fileUrls = {};
+      try {
+        fileUrls = await uploadProfessionalDocuments(
+          {
+            logoFile: formData.logoFile,
+            commerceRegistryFile: formData.commerceRegistryFile,
+            cinFile: formData.cinFile,
+          },
+          'printer',
+          tempRefNumber
+        );
+        console.log("[PrinterSignup] Files uploaded:", fileUrls);
+      } catch (uploadErr: any) {
+        console.warn("[PrinterSignup] File upload failed (continuing):", uploadErr);
+        // Continue without files - don't block registration
+      }
 
       // Prepare registration data with file URLs
       const registrationData = {
@@ -251,6 +262,7 @@ const PrinterSignupForm = ({ prefillEmail, prefillName }: PrinterSignupFormProps
       const companyName = formData.nameFr || formData.nameAr;
 
       // Insert into professional_registration_requests
+      console.log("[PrinterSignup] Inserting registration request...");
       const { error } = await supabase
         .from('professional_registration_requests')
         .insert({
@@ -262,14 +274,18 @@ const PrinterSignupForm = ({ prefillEmail, prefillName }: PrinterSignupFormProps
           status: 'pending'
         });
 
-      if (error) throw error;
+      if (error) {
+        console.error("[PrinterSignup] Insert error:", error);
+        throw error;
+      }
 
+      console.log("[PrinterSignup] Registration submitted successfully!");
       setIsSubmitted(true);
     } catch (error: any) {
-      console.error("Erreur lors de la soumission:", error);
+      console.error("[PrinterSignup] Erreur lors de la soumission:", error);
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue lors de l'envoi de votre demande.",
+        description: error?.message || "Une erreur est survenue lors de l'envoi de votre demande.",
         variant: "destructive",
       });
     } finally {
