@@ -253,7 +253,19 @@ export const OptimizedPdfPageRenderer = memo(function OptimizedPdfPageRenderer({
           decoding="async"
           onLoad={(e) => {
             const img = e.currentTarget;
-            onImageRendered?.(img.clientWidth, img.clientHeight);
+            const w = img.naturalWidth || img.clientWidth || img.getBoundingClientRect().width;
+            const h = img.naturalHeight || img.clientHeight || img.getBoundingClientRect().height;
+            if (w > 10 && h > 10) {
+              onImageRendered?.(img.getBoundingClientRect().width || w, img.getBoundingClientRect().height || h);
+            } else {
+              // Retry after layout
+              requestAnimationFrame(() => {
+                const rect = img.getBoundingClientRect();
+                if (rect.width > 10 && rect.height > 10) {
+                  onImageRendered?.(rect.width, rect.height);
+                }
+              });
+            }
           }}
         />
       )}

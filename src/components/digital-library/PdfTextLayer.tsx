@@ -189,13 +189,15 @@ export const PdfTextLayer = memo(function PdfTextLayer({
   return (
     <div
       ref={textLayerRef}
-      className={`absolute top-0 left-0 z-30 ${useFallback ? 'pdf-ocr-layer' : 'pdf-text-layer textLayer'}`}
+      className={`absolute top-0 left-0 ${useFallback ? 'pdf-ocr-layer' : 'pdf-text-layer textLayer'}`}
       style={{
         pointerEvents: 'auto',
         userSelect: 'text',
         WebkitUserSelect: 'text',
+        zIndex: 50,
         width: containerWidth > 10 ? `${containerWidth}px` : undefined,
         height: containerHeight > 10 ? `${containerHeight}px` : undefined,
+        cursor: 'text',
       }}
     />
   );
