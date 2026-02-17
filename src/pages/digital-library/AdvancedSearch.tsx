@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
-import { Search, RotateCcw, BookOpen, FileText, Calendar, Library, Loader2, Sparkles, ChevronDown, ChevronUp, Filter } from "lucide-react";
+import { Search, RotateCcw, BookOpen, FileText, Calendar, Library, Loader2, Sparkles, Filter, X } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { TitleAutocomplete } from "@/components/ui/title-autocomplete";
@@ -17,7 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { SearchPagination } from "@/components/ui/search-pagination";
 import { useSecureRoles } from "@/hooks/useSecureRoles";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 export default function AdvancedSearch() {
   const navigate = useNavigate();
@@ -278,51 +278,45 @@ export default function AdvancedSearch() {
               </CardContent>
             </Card>
 
-            {/* Filters Section */}
-            <Card className="mb-6 shadow-lg border-0 bg-card/95 backdrop-blur-sm overflow-hidden">
-              <Collapsible open={showAdvanced} onOpenChange={setShowAdvanced}>
-                <CollapsibleTrigger asChild>
-                  <button type="button" className="w-full flex items-center justify-between px-6 py-4 hover:bg-muted/30 transition-colors">
-                    <div className="flex items-center gap-3">
+            {/* Filters Button */}
+            <div className="mb-6 flex items-center gap-3">
+              <Sheet open={showAdvanced} onOpenChange={setShowAdvanced}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" className="gap-2 h-11 border-2">
+                    <Filter className="h-4 w-4" />
+                    Filtres avancés
+                    {activeFiltersCount > 0 && (
+                      <span className="px-2 py-0.5 text-xs font-bold rounded-full bg-bn-blue-primary text-white">
+                        {activeFiltersCount}
+                      </span>
+                    )}
+                  </Button>
+                </SheetTrigger>
+                {activeFiltersCount > 0 && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleReset}
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
+                    Effacer les filtres
+                  </Button>
+                )}
+                <SheetContent side="right" className="w-full sm:w-[520px] sm:max-w-[520px] overflow-y-auto">
+                  <SheetHeader>
+                    <SheetTitle className="flex items-center gap-3">
                       <div className="p-2 rounded-lg bg-gradient-to-br from-gold-bn-primary/20 to-gold-bn-primary/5">
                         <Filter className="h-4 w-4 text-gold-bn-primary" />
                       </div>
-                      <span className="font-semibold text-foreground">Filtres avancés</span>
-                      {activeFiltersCount > 0 && (
-                        <span className="px-2.5 py-0.5 text-xs font-bold rounded-full bg-bn-blue-primary text-white">
-                          {activeFiltersCount}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-3">
-                      {activeFiltersCount > 0 && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleReset();
-                          }}
-                          className="text-muted-foreground hover:text-foreground"
-                        >
-                          <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
-                          Effacer
-                        </Button>
-                      )}
-                      {showAdvanced ? (
-                        <ChevronUp className="h-5 w-5 text-muted-foreground" />
-                      ) : (
-                        <ChevronDown className="h-5 w-5 text-muted-foreground" />
-                      )}
-                    </div>
-                  </button>
-                </CollapsibleTrigger>
+                      Filtres avancés
+                    </SheetTitle>
+                  </SheetHeader>
 
-                <CollapsibleContent>
-                  <div className="px-6 pb-6 space-y-6 border-t">
+                  <div className="space-y-6 mt-6">
                     {/* Search Tips */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div className="flex items-start gap-2 p-2.5 rounded-lg bg-muted/40">
                         <div className="mt-0.5 h-1.5 w-1.5 rounded-full bg-gold-bn-primary flex-shrink-0" />
                         <p className="text-xs text-muted-foreground">
@@ -349,8 +343,8 @@ export default function AdvancedSearch() {
                       </div>
                     </div>
 
-                    {/* Row 1: Title & Author */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    {/* Title & Author */}
+                    <div className="grid grid-cols-1 gap-5">
                       <TitleAutocomplete
                         label="Titre"
                         placeholder="Titre du document"
@@ -365,8 +359,8 @@ export default function AdvancedSearch() {
                       />
                     </div>
 
-                    {/* Row 2: Document type, Language, Collection */}
-                    <div className={`grid grid-cols-1 ${!isRareBookFilter ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-5`}>
+                    {/* Document type, Language, Subject */}
+                    <div className="grid grid-cols-1 gap-5">
                       {!isRareBookFilter && (
                         <div className="space-y-2">
                           <Label className="text-sm font-semibold">Type de document</Label>
@@ -377,7 +371,7 @@ export default function AdvancedSearch() {
                             <SelectTrigger className="h-11">
                               <SelectValue placeholder="Tous les types" />
                             </SelectTrigger>
-                            <SelectContent className="bg-background z-50">
+                            <SelectContent className="bg-background z-[9999]">
                               <SelectItem value="manuscript">Manuscrits</SelectItem>
                               <SelectItem value="lithography">Lithographies</SelectItem>
                               <SelectItem value="book">Livres (Rares, Imprimés & E-Books)</SelectItem>
@@ -407,15 +401,15 @@ export default function AdvancedSearch() {
                       </div>
                     </div>
 
-                    <Separator className="my-1" />
+                    <Separator />
 
-                    {/* Row 3: Date range */}
+                    {/* Date range */}
                     <div>
                       <Label className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3 flex items-center gap-2">
                         <Calendar className="h-4 w-4" />
                         Période de publication
                       </Label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mt-3">
+                      <div className="grid grid-cols-2 gap-4 mt-3">
                         <div className="space-y-1.5">
                           <Label className="text-xs text-muted-foreground">Année de début</Label>
                           <Input
@@ -461,33 +455,35 @@ export default function AdvancedSearch() {
                       </div>
                     </div>
 
-                    <Separator className="my-1" />
+                    <Separator />
 
-                    {/* Row 4: Identifiers */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    {/* Identifiers */}
+                    <div className="grid grid-cols-1 gap-5">
                       <CoteAutocomplete
                         label="Cote"
                         placeholder="Numéro de cote"
                         value={formData.cote}
                         onChange={(value) => setFormData({ ...formData, cote: value })}
                       />
-                      <div className="space-y-2">
-                        <Label className="text-sm font-semibold">ISBN</Label>
-                        <Input
-                          placeholder="978-2-1234-5678-9"
-                          value={formData.isbn}
-                          onChange={(e) => setFormData({ ...formData, isbn: e.target.value })}
-                          className="h-11"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label className="text-sm font-semibold">ISSN</Label>
-                        <Input
-                          placeholder="1234-5678"
-                          value={formData.issn}
-                          onChange={(e) => setFormData({ ...formData, issn: e.target.value })}
-                          className="h-11"
-                        />
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label className="text-sm font-semibold">ISBN</Label>
+                          <Input
+                            placeholder="978-2-1234-5678-9"
+                            value={formData.isbn}
+                            onChange={(e) => setFormData({ ...formData, isbn: e.target.value })}
+                            className="h-11"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label className="text-sm font-semibold">ISSN</Label>
+                          <Input
+                            placeholder="1234-5678"
+                            value={formData.issn}
+                            onChange={(e) => setFormData({ ...formData, issn: e.target.value })}
+                            className="h-11"
+                          />
+                        </div>
                       </div>
                     </div>
 
@@ -513,9 +509,16 @@ export default function AdvancedSearch() {
                       />
                     </div>
 
-                    {/* Submit inside filters */}
-                    <div className="flex gap-3 pt-2">
-                      <Button type="submit" className="flex-1 h-12 bg-gradient-to-r from-bn-blue-primary to-bn-blue-deep hover:from-bn-blue-deep hover:to-bn-blue-primary shadow-lg transition-all duration-300">
+                    {/* Submit */}
+                    <div className="flex gap-3 pt-2 pb-4">
+                      <Button 
+                        type="button"
+                        onClick={(e) => {
+                          setShowAdvanced(false);
+                          handleSubmit(e as any);
+                        }}
+                        className="flex-1 h-12 bg-gradient-to-r from-bn-blue-primary to-bn-blue-deep hover:from-bn-blue-deep hover:to-bn-blue-primary shadow-lg transition-all duration-300"
+                      >
                         <Search className="h-4 w-4 mr-2" />
                         Appliquer les filtres
                       </Button>
@@ -530,9 +533,9 @@ export default function AdvancedSearch() {
                       </Button>
                     </div>
                   </div>
-                </CollapsibleContent>
-              </Collapsible>
-            </Card>
+                </SheetContent>
+              </Sheet>
+            </div>
           </form>
 
           {/* Search Results */}
