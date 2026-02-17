@@ -1117,6 +1117,12 @@ Enhanced Moroccan Heritage Design System
   overflow-y: auto;
   overflow-x: hidden;
   pointer-events: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.pdf-ocr-layer .pdf-ocr-text-overlay::-webkit-scrollbar {
+  display: none;
 }
 
 .pdf-ocr-layer .pdf-ocr-text-overlay::selection {

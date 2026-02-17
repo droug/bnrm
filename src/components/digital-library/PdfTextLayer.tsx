@@ -19,6 +19,8 @@ interface PdfTextLayerProps {
 
 // Cache for PDF documents
 const documentCache = new Map<string, pdfjsLib.PDFDocumentProxy>();
+// Cache to remember which documents have OCR pages
+const ocrCheckCache = new Map<string, boolean>();
 
 const loadPdfDocument = async (pdfUrl: string): Promise<pdfjsLib.PDFDocumentProxy> => {
   if (documentCache.has(pdfUrl)) {
@@ -49,11 +51,49 @@ export const PdfTextLayer = memo(function PdfTextLayer({
   const textLayerRef = useRef<HTMLDivElement>(null);
   const [useFallback, setUseFallback] = useState(false);
   const [ocrText, setOcrText] = useState<string | null>(null);
+  const [hasOcrPages, setHasOcrPages] = useState<boolean | null>(null);
   const renderIdRef = useRef(0);
 
-  // Render native pdf.js text layer
+  // Check if this document has OCR pages in the database
+  useEffect(() => {
+    if (!documentId) {
+      setHasOcrPages(false);
+      return;
+    }
+
+    // Use cache
+    if (ocrCheckCache.has(documentId)) {
+      setHasOcrPages(ocrCheckCache.get(documentId)!);
+      return;
+    }
+
+    const checkOcr = async () => {
+      const { count } = await supabase
+        .from('digital_library_pages')
+        .select('id', { count: 'exact', head: true })
+        .eq('document_id', documentId)
+        .not('ocr_text', 'is', null);
+      
+      const result = (count ?? 0) > 0;
+      ocrCheckCache.set(documentId, result);
+      setHasOcrPages(result);
+    };
+
+    checkOcr();
+  }, [documentId]);
+
+  // If document has OCR pages, skip pdf.js text layer and use OCR directly
+  useEffect(() => {
+    if (hasOcrPages === true) {
+      setUseFallback(true);
+    }
+  }, [hasOcrPages]);
+
+  // Render native pdf.js text layer (only if no OCR pages available)
   useEffect(() => {
     if (containerWidth <= 10 || containerHeight <= 10) return;
+    // Skip pdf.js text layer if we have OCR data
+    if (hasOcrPages === true || hasOcrPages === null) return;
 
     const currentRenderId = ++renderIdRef.current;
     
@@ -81,8 +121,6 @@ export const PdfTextLayer = memo(function PdfTextLayer({
         }
 
         const textLayerDiv = textLayerRef.current;
-        
-        // Clear ONLY right before we're about to render new content
         textLayerDiv.innerHTML = '';
 
         const fitScale = containerWidth / baseViewport.width;
@@ -130,7 +168,7 @@ export const PdfTextLayer = memo(function PdfTextLayer({
     };
 
     renderTextLayer();
-  }, [pdfUrl, pageNumber, rotation, containerWidth, containerHeight, searchHighlight]);
+  }, [pdfUrl, pageNumber, rotation, containerWidth, containerHeight, searchHighlight, hasOcrPages]);
 
   // Fetch OCR text for fallback
   useEffect(() => {
