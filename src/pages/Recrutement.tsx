@@ -66,6 +66,7 @@ export default function Recrutement() {
   const [filterType, setFilterType] = useState("tous");
 
   const [selectedOffre, setSelectedOffre] = useState<typeof offresEmploi[0] | null>(null);
+  const [cvFile, setCvFile] = useState<File | null>(null);
   const [formData, setFormData] = useState({ nom: "", email: "", telephone: "", message: "" });
 
   const filtered = offresEmploi.filter((offre) => {
@@ -75,13 +76,14 @@ export default function Recrutement() {
   });
 
   const handleSubmit = () => {
-    if (!formData.nom || !formData.email) {
-      toast.error("Veuillez remplir les champs obligatoires.");
+    if (!formData.nom || !formData.email || !cvFile) {
+      toast.error("Veuillez remplir les champs obligatoires et joindre votre CV.");
       return;
     }
     toast.success("Votre candidature a été envoyée avec succès !");
     setSelectedOffre(null);
     setFormData({ nom: "", email: "", telephone: "", message: "" });
+    setCvFile(null);
   };
 
   return (
@@ -202,6 +204,32 @@ export default function Recrutement() {
             <div className="space-y-2">
               <Label htmlFor="message">Lettre de motivation</Label>
               <Textarea id="message" value={formData.message} onChange={(e) => setFormData(p => ({ ...p, message: e.target.value }))} placeholder="Présentez votre profil et vos motivations..." rows={4} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="cv">CV (PDF, DOC, DOCX) *</Label>
+              <div className="flex items-center gap-3">
+                <Input
+                  id="cv"
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    if (file && file.size > 5 * 1024 * 1024) {
+                      toast.error("Le fichier ne doit pas dépasser 5 Mo.");
+                      e.target.value = "";
+                      return;
+                    }
+                    setCvFile(file);
+                  }}
+                  className="cursor-pointer"
+                />
+              </div>
+              {cvFile && (
+                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                  <Upload className="h-3 w-3" />
+                  {cvFile.name} ({(cvFile.size / 1024).toFixed(0)} Ko)
+                </p>
+              )}
             </div>
           </div>
           <DialogFooter>
