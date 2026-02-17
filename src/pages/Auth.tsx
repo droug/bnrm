@@ -72,7 +72,8 @@ export default function Auth() {
     const hp = parseHashParams(location.hash);
     const access_token = hp.access_token;
     const refresh_token = hp.refresh_token;
-    const token = hp.token; // OTP token from generateLink
+    const token = hp.token; // Legacy OTP token
+    const token_hash = hp.token_hash; // Hashed token from generateLink
     const type = hp.type;
 
     // Sign out any existing session first to avoid showing wrong account
@@ -93,9 +94,10 @@ export default function Auth() {
         return;
       }
 
-      // Cas 2: Token OTP (recovery link from generateLink)
-      if (token && type === "recovery") {
-        const { data, error } = await supabase.auth.verifyOtp({ token_hash: token, type: "recovery" });
+      // Cas 2: Token hash (recovery link from generateLink with hashed_token)
+      const otpToken = token_hash || token;
+      if (otpToken && type === "recovery") {
+        const { data, error } = await supabase.auth.verifyOtp({ token_hash: otpToken, type: "recovery" });
         if (error) {
           console.error("OTP verification failed:", error);
           toast.error("Lien invalide ou expiré", { 
@@ -109,7 +111,7 @@ export default function Auth() {
       }
     };
 
-    if ((access_token && refresh_token) || (token && type === "recovery")) {
+    if ((access_token && refresh_token) || ((token_hash || token) && type === "recovery")) {
       establishRecoverySession();
       return;
     }
