@@ -1110,7 +1110,7 @@ Enhanced Moroccan Heritage Design System
   padding: 1rem;
   font-size: 12px;
   line-height: 1.4;
-  color: transparent;
+  color: transparent !important;
   user-select: text;
   -webkit-user-select: text;
   word-break: break-word;
