@@ -229,8 +229,8 @@ export const BNRMStatistics = () => {
         const status = req.status as string;
         const arbitrationStatus = (req as any).arbitration_status as string | null;
 
-        // Mises en attente (en attente comité ou ABN)
-        if (['en_attente_comite_validation', 'en_attente_validation_b'].includes(status)) {
+        // Mises en attente (bouton "Mettre en attente" → statut en_cours)
+        if (status === 'en_cours') {
           rejectionBreakdown.onHold++;
         }
 
