@@ -61,7 +61,6 @@ export const PdfTextLayer = memo(function PdfTextLayer({
       return;
     }
 
-    // Use cache
     if (ocrCheckCache.has(documentId)) {
       setHasOcrPages(ocrCheckCache.get(documentId)!);
       return;

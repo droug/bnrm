@@ -243,7 +243,7 @@ export const OptimizedPdfPageRenderer = memo(function OptimizedPdfPageRenderer({
         <img
           src={imageUrl}
           alt={`Page ${pageNumber}`}
-          className="block w-auto h-auto object-contain"
+          className="block w-auto h-auto object-contain pointer-events-none"
           style={{ 
             opacity: loading ? 0.7 : 1,
             transition: 'opacity 0.2s ease-in-out',
