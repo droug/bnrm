@@ -38,8 +38,10 @@ export const PdfPageWithHighlight = memo(function PdfPageWithHighlight({
       if (!containerRef.current) return;
       const img = containerRef.current.querySelector('img');
       if (!img) return;
-      const w = img.getBoundingClientRect().width;
-      const h = img.getBoundingClientRect().height;
+      // Use getBoundingClientRect for reliable dimensions
+      const rect = img.getBoundingClientRect();
+      const w = rect.width;
+      const h = rect.height;
       if (w > 10 && h > 10) {
         setImageSize(prev => {
           if (Math.abs(prev.width - w) > 2 || Math.abs(prev.height - h) > 2) {
@@ -54,7 +56,8 @@ export const PdfPageWithHighlight = memo(function PdfPageWithHighlight({
     ro.observe(containerRef.current);
     const mo = new MutationObserver(detect);
     mo.observe(containerRef.current, { childList: true, subtree: true, attributes: true });
-    const timers = [100, 300, 700, 1500, 3000, 5000].map(ms => setTimeout(detect, ms));
+    // More aggressive polling to catch layout completion
+    const timers = [50, 100, 200, 400, 700, 1200, 2000, 3500, 5000].map(ms => setTimeout(detect, ms));
 
     return () => { ro.disconnect(); mo.disconnect(); timers.forEach(clearTimeout); };
   }, [pageNumber, pdfUrl]);
