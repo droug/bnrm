@@ -34,7 +34,6 @@ interface RejectionBreakdown {
   rejectedByArbitration: number;
   rejectedByCommittee: number;
   rejectedByABN: number;
-  rejectedOther: number;
   onHold: number;
   totalRejected: number;
 }
@@ -78,7 +77,7 @@ export const BNRMStatistics = () => {
     byAuthorGender: {},
     secondaryAuthors: 0,
     duplicatesDetected: 0,
-    rejectionBreakdown: { rejectedByArbitration: 0, rejectedByCommittee: 0, rejectedByABN: 0, rejectedOther: 0, onHold: 0, totalRejected: 0 },
+    rejectionBreakdown: { rejectedByArbitration: 0, rejectedByCommittee: 0, rejectedByABN: 0, onHold: 0, totalRejected: 0 },
     reciprocalValidations: []
   });
   const [loading, setLoading] = useState(true);
@@ -222,7 +221,6 @@ export const BNRMStatistics = () => {
         rejectedByArbitration: 0,
         rejectedByCommittee: 0,
         rejectedByABN: 0,
-        rejectedOther: 0,
         onHold: 0,
         totalRejected: 0,
       };
@@ -245,9 +243,6 @@ export const BNRMStatistics = () => {
           rejectionBreakdown.totalRejected++;
         } else if (arbitrationStatus === 'rejected') {
           rejectionBreakdown.rejectedByArbitration++;
-          rejectionBreakdown.totalRejected++;
-        } else if (status === 'rejete') {
-          rejectionBreakdown.rejectedOther++;
           rejectionBreakdown.totalRejected++;
         }
       });
@@ -1075,7 +1070,6 @@ export const BNRMStatistics = () => {
                     { label: "Rejeté par Arbitrage", value: stats.rejectionBreakdown.rejectedByArbitration, color: "#F59E0B", bg: "bg-amber-50 dark:bg-amber-950/30", border: "border-amber-200 dark:border-amber-800" },
                     { label: "Rejeté par Comité de validation", value: stats.rejectionBreakdown.rejectedByCommittee, color: "#EF4444", bg: "bg-red-50 dark:bg-red-950/30", border: "border-red-200 dark:border-red-800" },
                     { label: "Rejeté par Département ABN", value: stats.rejectionBreakdown.rejectedByABN, color: "#DC2626", bg: "bg-red-50 dark:bg-red-950/30", border: "border-red-300 dark:border-red-700" },
-                    { label: "Autres rejets", value: stats.rejectionBreakdown.rejectedOther, color: "#6B7280", bg: "bg-muted/50", border: "border-muted" },
                   ].map((item) => (
                     <div key={item.label} className={`flex items-center justify-between p-3 rounded-lg border ${item.bg} ${item.border}`}>
                       <div className="flex items-center gap-3">
@@ -1115,7 +1109,6 @@ export const BNRMStatistics = () => {
                           { name: "Arbitrage", value: stats.rejectionBreakdown.rejectedByArbitration },
                           { name: "Comité", value: stats.rejectionBreakdown.rejectedByCommittee },
                           { name: "ABN", value: stats.rejectionBreakdown.rejectedByABN },
-                          { name: "Autres", value: stats.rejectionBreakdown.rejectedOther },
                         ].filter(d => d.value > 0)}
                         cx="50%"
                         cy="50%"
