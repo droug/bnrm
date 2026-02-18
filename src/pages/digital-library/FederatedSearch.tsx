@@ -56,7 +56,10 @@ export default function FederatedSearch() {
   // Close dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (
+        dropdownRef.current && !dropdownRef.current.contains(e.target as Node) &&
+        triggerRef.current && !triggerRef.current.contains(e.target as Node)
+      ) {
         setDropdownOpen(false);
       }
     };
@@ -64,15 +67,29 @@ export default function FederatedSearch() {
     return () => document.removeEventListener("mousedown", handler);
   }, [dropdownOpen]);
 
+  // Update dropdown position on scroll/resize so it follows the trigger button
+  const updateDropdownPos = () => {
+    if (triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setDropdownPos({ top: rect.bottom + 4, left: rect.left, width: rect.width });
+    }
+  };
+
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    window.addEventListener("scroll", updateDropdownPos, true);
+    window.addEventListener("resize", updateDropdownPos);
+    return () => {
+      window.removeEventListener("scroll", updateDropdownPos, true);
+      window.removeEventListener("resize", updateDropdownPos);
+    };
+  }, [dropdownOpen]);
+
   // Compute fixed position for dropdown (position:fixed is relative to viewport, no scroll offset needed)
   const openDropdown = () => {
     if (triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
-      setDropdownPos({
-        top: rect.bottom + 4,
-        left: rect.left,
-        width: rect.width,
-      });
+      setDropdownPos({ top: rect.bottom + 4, left: rect.left, width: rect.width });
     }
     setDropdownOpen((v) => !v);
   };
