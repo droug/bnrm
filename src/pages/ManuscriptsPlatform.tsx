@@ -26,6 +26,7 @@ import { useManuscriptSearch, SearchFilters } from "@/hooks/useManuscriptSearch"
 import { SearchResultsPanel } from "@/components/manuscripts/SearchResultsPanel";
 import { SearchPagination } from "@/components/manuscripts/SearchPagination";
 import { ManuscriptSearchBar } from "@/components/manuscripts/ManuscriptSearchBar";
+import ManuscriptsAdmin from "@/components/manuscripts/ManuscriptsAdmin";
 import manuscriptBanner from "@/assets/manuscript-banner.jpg";
 import moroccanPatternBg from "@/assets/moroccan-pattern-bg.jpg";
 import zelligePattern1 from "@/assets/zellige-pattern-1.jpg";
@@ -313,6 +314,11 @@ export default function ManuscriptsPlatform() {
               <div className="w-32 sm:w-40 md:w-48 h-1 sm:h-2 bg-gradient-berber mx-auto rounded-full shadow-gold mt-4 sm:mt-6"></div>
             </div>
           </section>
+
+          {/* Section Administration (admins/librarians seulement) */}
+          {(profile?.role === 'admin' || profile?.role === 'librarian') && (
+            <ManuscriptsAdmin />
+          )}
 
           {/* Résultats */}
           <section className="mb-6">
