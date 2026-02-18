@@ -18,7 +18,7 @@ import { WatermarkContainer } from "@/components/ui/watermark";
 import { ProtectedWatermark } from "@/components/ui/protected-watermark";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Link, useNavigate } from "react-router-dom";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { PartnerCollectionForm } from "@/components/partner/PartnerCollectionForm";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { ManuscriptGrid } from "@/components/manuscripts/ManuscriptGrid";
@@ -256,20 +256,22 @@ export default function ManuscriptsPlatform() {
                 </Button>
                 
                 {user && (
-                  <Dialog open={partnerDialogOpen} onOpenChange={setPartnerDialogOpen}>
-                    <DialogTrigger asChild>
+                <Sheet open={partnerDialogOpen} onOpenChange={setPartnerDialogOpen}>
+                    <SheetTrigger asChild>
                       <Button size="default" className="bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white shadow-lg hover:shadow-xl transition-all w-full sm:w-auto text-sm sm:text-base">
                         <Users className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                         Devenir Partenaire
                       </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-[95vw] sm:max-w-2xl max-h-[90vh] overflow-y-auto mx-2 sm:mx-auto">
-                      <DialogHeader>
-                        <DialogTitle>Demande de Partenariat BNRM</DialogTitle>
-                      </DialogHeader>
-                      <PartnerCollectionForm onSuccess={() => setPartnerDialogOpen(false)} />
-                    </DialogContent>
-                  </Dialog>
+                    </SheetTrigger>
+                    <SheetContent side="right" className="w-full sm:w-[560px] sm:max-w-[560px] overflow-y-auto">
+                      <SheetHeader>
+                        <SheetTitle>Demande de Partenariat BNRM</SheetTitle>
+                      </SheetHeader>
+                      <div className="mt-4">
+                        <PartnerCollectionForm onSuccess={() => setPartnerDialogOpen(false)} />
+                      </div>
+                    </SheetContent>
+                  </Sheet>
                 )}
                 {profile?.role === 'partner' && (
                   <Button size="default" asChild className="bg-gold hover:bg-gold/90 text-white shadow-lg w-full sm:w-auto text-sm sm:text-base">
