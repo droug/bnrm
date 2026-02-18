@@ -644,135 +644,94 @@ function FederatedSearchInner() {
           </section>
         )}
 
-        {/* Results Section - only rendered when a search has been made */}
+        {/* Results Section - shown as document cards when a search has been made */}
         {hasSearched && (
           <section className="container mx-auto px-4 py-12">
             <AnimatePresence mode="wait">
-              {results.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="flex items-center justify-between gap-3 mb-8 flex-wrap">
-                    <div className="flex items-center gap-3">
-                      <Icon name="mdi:format-list-checks" className="h-6 w-6 text-bn-blue-primary" />
-                      <h2 className="text-2xl font-gilda text-foreground">
-                        {isAr
-                          ? `نتائج البحث عن "${query}" في ${results.length} قاعدة بيانات`
-                          : `Résultats pour « ${query} » dans ${results.length} base${results.length > 1 ? "s" : ""}`}
-                      </h2>
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="gap-2 border-muted-foreground/30 text-muted-foreground hover:text-foreground hover:border-foreground/40"
-                      onClick={() => {
-                        setHasSearched(false);
-                        setResults([]);
-                        setQuery("");
-                        setSelectedProviders(new Set());
-                      }}
-                    >
-                      <Icon name="mdi:refresh" className="h-4 w-4" />
-                      {isAr ? "بدء بحث جديد" : "Nouvelle recherche"}
-                    </Button>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {results.map((result, index) => {
-                      const key = result.provider.provider?.toLowerCase().trim() || "";
-                      const gradient = providerColors[key] || "from-gray-500 to-gray-600";
-                      const iconName = providerIcons[key] || "mdi:book-open-variant";
-
-                      return (
-                        <motion.div
-                          key={result.provider.id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.08 }}
-                        >
-                          <Card className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-bn-blue-primary/30 overflow-hidden">
-                            <div className={`h-2 bg-gradient-to-r ${gradient}`} />
-                            <CardContent className="p-6">
-                              <div className="flex items-start justify-between mb-4">
-                                <div className="flex items-center gap-3">
-                                  <div className={`p-3 rounded-xl bg-gradient-to-br ${gradient} text-white shadow-lg`}>
-                                    <Icon name={iconName} className="h-6 w-6" />
-                                  </div>
-                                  <div>
-                                    <h3 className="font-semibold text-lg text-foreground">
-                                      {isAr && result.provider.name_ar
-                                        ? result.provider.name_ar
-                                        : result.provider.name}
-                                    </h3>
-                                    <p className="text-xs text-muted-foreground">
-                                      {result.provider.provider}
-                                    </p>
-                                  </div>
-                                </div>
-                                {result.provider.document_count && result.provider.document_count > 0 && (
-                                  <Badge variant="secondary" className="text-xs">
-                                    {result.provider.document_count > 1000
-                                      ? `+${Math.floor(result.provider.document_count / 1000)}K`
-                                      : result.provider.document_count}{" "}
-                                    docs
-                                  </Badge>
-                                )}
-                              </div>
-
-                              <p className="text-sm text-muted-foreground mb-5 line-clamp-2">
-                                {isAr
-                                  ? result.provider.description_ar || result.provider.description
-                                  : result.provider.description}
-                              </p>
-
-                              <a href={result.url} target="_blank" rel="noopener noreferrer" className="block">
-                                <Button className="w-full gap-2 bg-gradient-to-r from-bn-blue-primary to-bn-blue-primary/80 hover:from-bn-blue-primary/90 hover:to-bn-blue-primary/70 group-hover:shadow-lg transition-all">
-                                  <Icon name="mdi:magnify" className="h-4 w-4" />
-                                  {isAr
-                                    ? `البحث في ${result.provider.name}`
-                                    : `Rechercher dans ${result.provider.name}`}
-                                  <Icon name="mdi:open-in-new" className="h-4 w-4 opacity-60" />
-                                </Button>
-                              </a>
-                            </CardContent>
-                          </Card>
-                        </motion.div>
-                      );
-                    })}
-                  </div>
-
-                  {/* Open all button */}
-                  <div className="text-center mt-8">
-                    <Button
-                      variant="outline"
-                      size="lg"
-                      className="gap-2 border-2 border-gold-bn-primary/50 text-gold-bn-primary hover:bg-gold-bn-primary/5"
-                      onClick={() => {
-                        results.forEach((r) => {
-                          if (r.url && r.url !== "#") window.open(r.url, "_blank");
-                        });
-                      }}
-                    >
-                      <Icon name="mdi:open-in-new" className="h-5 w-5" />
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between gap-3 mb-8 flex-wrap">
+                  <div className="flex items-center gap-3">
+                    <Icon name="mdi:format-list-checks" className="h-6 w-6 text-bn-blue-primary" />
+                    <h2 className="text-2xl font-gilda text-foreground">
                       {isAr
-                        ? "فتح جميع النتائج في علامات تبويب جديدة"
-                        : "Ouvrir tous les résultats dans de nouveaux onglets"}
-                    </Button>
+                        ? `نتائج البحث عن "${query}"`
+                        : `Résultats pour « ${query} »`}
+                    </h2>
+                    <span className="px-2.5 py-0.5 rounded-full bg-bn-blue-primary/10 text-bn-blue-primary text-xs font-medium border border-bn-blue-primary/30">
+                      {EXAMPLE_RESULTS.length} {isAr ? "نتيجة" : "résultats"}
+                    </span>
                   </div>
-                </motion.div>
-              )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="gap-2 border-muted-foreground/30 text-muted-foreground hover:text-foreground hover:border-foreground/40"
+                    onClick={() => {
+                      setHasSearched(false);
+                      setResults([]);
+                      setQuery("");
+                      setSelectedProviders(new Set());
+                    }}
+                  >
+                    <Icon name="mdi:refresh" className="h-4 w-4" />
+                    {isAr ? "بدء بحث جديد" : "Nouvelle recherche"}
+                  </Button>
+                </div>
 
-              {results.length === 0 && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20">
-                  <Icon name="mdi:database-off-outline" className="h-16 w-16 mx-auto text-muted-foreground/40 mb-4" />
-                  <p className="text-lg text-muted-foreground">
-                    {isAr ? "لم يتم العثور على قواعد بيانات مطابقة" : "Aucune base de données sélectionnée"}
-                  </p>
-                </motion.div>
-              )}
+                {/* Document result cards — same design as "Exemples de résultats" */}
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {EXAMPLE_RESULTS.map((item, index) => (
+                    <motion.div
+                      key={item.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.07 }}
+                    >
+                      <Card className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-bn-blue-primary/30 overflow-hidden h-full flex flex-col">
+                        <div className={`h-2 bg-gradient-to-r ${item.gradient}`} />
+                        <CardContent className="p-6 flex flex-col flex-1">
+                          <div className="flex items-start justify-between mb-3">
+                            <div className="flex items-center gap-3">
+                              <div className={`p-2.5 rounded-xl bg-gradient-to-br ${item.gradient} text-white shadow-md`}>
+                                <Icon name={item.icon} className="h-5 w-5" />
+                              </div>
+                              <div>
+                                <p className="text-xs font-semibold text-bn-blue-primary">{isAr ? item.source_ar : item.source}</p>
+                                <p className="text-xs text-muted-foreground">{isAr ? item.type_ar : item.type} · {item.year}</p>
+                              </div>
+                            </div>
+                            <Badge variant="outline" className="text-xs shrink-0 ml-2">{item.year}</Badge>
+                          </div>
+                          <h3 className="font-semibold text-base text-foreground mb-1 line-clamp-2 leading-snug">
+                            {isAr ? item.title_ar : item.title}
+                          </h3>
+                          <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1">
+                            <Icon name="mdi:account-outline" className="h-3.5 w-3.5 shrink-0" />
+                            {item.authors}
+                          </p>
+                          <p className="text-sm text-muted-foreground line-clamp-3 flex-1">
+                            {isAr ? item.description_ar : item.description}
+                          </p>
+                          <div className="mt-4 pt-3 border-t border-border">
+                            <Button
+                              size="sm"
+                              className="w-full gap-2 text-xs bg-gradient-to-r from-bn-blue-primary to-bn-blue-primary/80 hover:from-bn-blue-primary/90 hover:to-bn-blue-primary/70 text-primary-foreground"
+                            >
+                              <Icon name="mdi:open-in-new" className="h-3.5 w-3.5" />
+                              {isAr ? "الوصول إلى الوثيقة" : "Accéder au document"}
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
             </AnimatePresence>
           </section>
         )}
