@@ -649,13 +649,29 @@ export default function FederatedSearch() {
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <div className="flex items-center gap-3 mb-8">
-                    <Icon name="mdi:format-list-checks" className="h-6 w-6 text-bn-blue-primary" />
-                    <h2 className="text-2xl font-gilda text-foreground">
-                      {isAr
-                        ? `نتائج البحث عن "${query}" في ${results.length} قاعدة بيانات`
-                        : `Résultats pour « ${query} » dans ${results.length} base${results.length > 1 ? "s" : ""}`}
-                    </h2>
+                  <div className="flex items-center justify-between gap-3 mb-8 flex-wrap">
+                    <div className="flex items-center gap-3">
+                      <Icon name="mdi:format-list-checks" className="h-6 w-6 text-bn-blue-primary" />
+                      <h2 className="text-2xl font-gilda text-foreground">
+                        {isAr
+                          ? `نتائج البحث عن "${query}" في ${results.length} قاعدة بيانات`
+                          : `Résultats pour « ${query} » dans ${results.length} base${results.length > 1 ? "s" : ""}`}
+                      </h2>
+                    </div>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="gap-2 border-muted-foreground/30 text-muted-foreground hover:text-foreground hover:border-foreground/40"
+                      onClick={() => {
+                        setHasSearched(false);
+                        setResults([]);
+                        setQuery("");
+                        setSelectedProviders(new Set());
+                      }}
+                    >
+                      <Icon name="mdi:refresh" className="h-4 w-4" />
+                      {isAr ? "بدء بحث جديد" : "Nouvelle recherche"}
+                    </Button>
                   </div>
 
                   <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
