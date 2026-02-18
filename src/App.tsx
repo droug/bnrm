@@ -34,7 +34,6 @@ const MonEspaceDonateur = lazy(() => import("./pages/mecenat/MonEspaceDonateur")
 const MecenatBackoffice = lazy(() => import("./pages/mecenat/MecenatBackoffice"));
 
 // Manuscripts Platform (lazy)
-const Manuscripts = lazy(() => import("./pages/Manuscripts"));
 const ManuscriptsPlatform = lazy(() => import("./pages/ManuscriptsPlatform"));
 const ManuscriptAdvancedSearch = lazy(() => import("./pages/manuscripts/AdvancedSearch"));
 const ManuscriptReader = lazy(() => import("./pages/ManuscriptReader"));
@@ -272,7 +271,7 @@ const App = () => {
         <Route path="/auth-BN" element={<AuthBN />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/manuscripts" element={<Manuscripts />} />
+        <Route path="/manuscripts" element={<ManuscriptsPlatform />} />
         <Route path="/manuscripts-platform" element={<ManuscriptsPlatform />} />
         <Route path="/plateforme-manuscrits" element={<ManuscriptsPlatform />} />
         <Route path="/manuscripts/search" element={<ManuscriptAdvancedSearch />} />
@@ -377,7 +376,7 @@ const App = () => {
         <Route path="/demande-numerisation" element={<DemandeNumerisation />} />
         <Route path="/pass-journalier" element={<PassJournalier />} />
         <Route path="/location-service" element={<LocationService />} />
-        <Route path="/manuscripts" element={<Manuscripts />} />
+        <Route path="/manuscripts" element={<ManuscriptsPlatform />} />
         <Route path="/my-space" element={<MyLibrarySpace />} />
         <Route path="/help" element={<HelpPage />} />
         <Route path="/aide" element={<HelpPage />} />
