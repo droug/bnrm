@@ -278,7 +278,7 @@ const App = () => {
         <Route path="/manuscripts/search" element={<ManuscriptAdvancedSearch />} />
         <Route path="/manuscripts/help" element={<ManuscriptsHelp />} />
         <Route path="/aide-manuscrits" element={<ManuscriptsHelp />} />
-        <Route path="/admin/manuscripts-backoffice" element={<ManuscriptsBackoffice />} />
+        <Route path="/admin/manuscripts-backoffice" element={<Navigate to="/admin/content-management-manuscrits" replace />} />
         <Route path="/admin/manuscripts-backoffice/dashboard" element={<ManuscriptsBackofficeDashboard />} />
         <Route path="/admin/manuscripts-backoffice/documents" element={<ManuscriptsBackofficeDocuments />} />
         <Route path="/admin/manuscripts-backoffice/users" element={<ManuscriptsBackofficeUsers />} />
