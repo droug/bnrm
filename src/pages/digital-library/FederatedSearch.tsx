@@ -212,9 +212,8 @@ export default function FederatedSearch() {
 
           <div className="container mx-auto px-4 relative z-10">
             <div className="text-center mb-10">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-bn-blue-primary/10 text-bn-blue-primary text-sm font-medium mb-4">
-                <Icon name="mdi:magnify-expand" className="h-4 w-4" />
-                {isAr ? "بحث فيدرالي" : "Recherche fédérée"}
+              <div className="inline-flex items-center justify-center w-12 h-12 border border-bn-blue-primary rounded-lg mb-6">
+                <Icon name="mdi:magnify-expand" className="w-6 h-6 text-bn-blue-primary" />
               </div>
               <h1 className="text-4xl md:text-5xl font-gilda text-foreground mb-3">
                 {isAr ? "البحث في الموارد الإلكترونية" : "Recherche fédérée"}
