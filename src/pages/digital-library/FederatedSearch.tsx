@@ -1,9 +1,12 @@
 import { useState, useCallback, useRef, useMemo, useEffect } from "react";
+
 import { useQuery } from "@tanstack/react-query";
 import { useElectronicBundles, ElectronicBundle } from "@/hooks/useElectronicBundles";
 import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/hooks/useLanguage";
+import { useLocation } from "react-router-dom";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
+
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -211,7 +214,7 @@ function ExamplesButton({ isAr, setQuery }: { isAr: boolean; setQuery: (q: strin
   );
 }
 
-export default function FederatedSearch() {
+function FederatedSearchInner() {
   const { activeBundles } = useElectronicBundles();
   const { language } = useLanguage();
 
@@ -234,14 +237,6 @@ export default function FederatedSearch() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [repoCarouselIndex, setRepoCarouselIndex] = useState(0);
 
-  // Reset search state on mount (navigation SPA or page refresh)
-  useEffect(() => {
-    setQuery("");
-    setResults([]);
-    setHasSearched(false);
-    setSelectedProviders(new Set());
-    setDropdownOpen(false);
-  }, []);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
@@ -920,4 +915,10 @@ export default function FederatedSearch() {
       </div>
     </DigitalLibraryLayout>
   );
+}
+
+// Wrapper qui force un remontage complet à chaque navigation (location.key change)
+export default function FederatedSearch() {
+  const location = useLocation();
+  return <FederatedSearchInner key={location.key} />;
 }
