@@ -3,22 +3,22 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Handshake, ChevronRight, Settings, LayoutDashboard } from "lucide-react";
-import PartnershipsBackoffice from "@/components/cultural-activities/PartnershipsBackoffice";
+import { Handshake, ChevronRight, LayoutDashboard } from "lucide-react";
+import ManuscriptPartnershipsBackoffice from "@/components/manuscripts/ManuscriptPartnershipsBackoffice";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
 const ManuscriptsAdmin = () => {
   const [activeSheet, setActiveSheet] = useState<string | null>(null);
 
-  // Compteur demandes de partenariat en attente
+  // Compteur demandes de partenariat en attente (table partner_collections)
   const { data: pendingPartnerships } = useQuery({
     queryKey: ["manuscripts-pending-partnerships"],
     queryFn: async () => {
       const { count } = await supabase
-        .from("partnerships")
+        .from("partner_collections")
         .select("*", { count: "exact", head: true })
-        .eq("statut", "en_attente");
+        .is("is_approved", null);
       return count ?? 0;
     },
   });
@@ -34,7 +34,7 @@ const ManuscriptsAdmin = () => {
       color: "text-amber-600",
       bgColor: "from-amber-50 to-orange-50",
       borderColor: "border-amber-200",
-      component: <PartnershipsBackoffice />,
+      component: <ManuscriptPartnershipsBackoffice />,
     },
   ];
 
