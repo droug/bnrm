@@ -267,6 +267,28 @@ export default function FederatedSearch() {
                 </Button>
               </form>
 
+              {/* Exemples de recherche */}
+              <div className="mt-4 flex flex-wrap items-center gap-2">
+                <span className="text-xs text-white/60 font-medium shrink-0">
+                  {isAr ? "أمثلة :" : "Exemples :"}
+                </span>
+                {(isAr
+                  ? ["التراث المغربي", "الفلسفة الإسلامية", "الأدب العربي", "علم المكتبات", "تاريخ المغرب"]
+                  : ["Patrimoine marocain", "Philosophie islamique", "Littérature arabe", "Sciences de l'information", "Histoire du Maroc"]
+                ).map((example) => (
+                  <button
+                    key={example}
+                    type="button"
+                    onClick={() => {
+                      setQuery(example);
+                    }}
+                    className="px-3 py-1 rounded-full text-xs font-medium bg-white/15 text-white/90 border border-white/25 hover:bg-white/25 hover:border-white/50 transition-all duration-200 backdrop-blur-sm"
+                  >
+                    {example}
+                  </button>
+                ))}
+              </div>
+
               {/* Multi-select dropdown for databases */}
               {activeBundles && activeBundles.length > 0 && (
                 <div className="mt-4" ref={dropdownRef}>
