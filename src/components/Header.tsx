@@ -245,25 +245,15 @@ const Header = () => {
             <div className="flex items-center gap-2">
               {/* Bouton Administration Manuscrits - visible uniquement sur /plateforme-manuscrits pour admins/librarians */}
               {location.pathname === '/plateforme-manuscrits' && (profile?.role === 'admin' || profile?.role === 'librarian') && (
-                <DropdownMenu modal={false}>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="gap-2 bnrm-nav-menu text-gray-600 hover:text-blue-primary-dark hover:bg-gray-100">
-                      <Settings className="h-4 w-4" />
-                      <span className="hidden md:inline">Administration</span>
-                      <ChevronDown className="h-3 w-3" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" sideOffset={8} className="w-60 bg-white border border-gray-200 shadow-lg">
-                    <DropdownMenuItem className="cursor-pointer gap-2" onClick={() => navigate('/admin/content-management-manuscrits')}>
-                      <LayoutDashboard className="h-4 w-4 text-primary" />
-                      Gestion de la plateforme
-                    </DropdownMenuItem>
-                    <DropdownMenuItem className="cursor-pointer gap-2" onClick={() => navigate('/admin/manuscripts-backoffice')}>
-                      <Handshake className="h-4 w-4 text-amber-600" />
-                      Demandes de partenariat
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="gap-2 bnrm-nav-menu text-gray-600 hover:text-blue-primary-dark hover:bg-gray-100"
+                  onClick={() => navigate('/admin/content-management-manuscrits')}
+                >
+                  <Settings className="h-4 w-4" />
+                  <span className="hidden md:inline">Administration</span>
+                </Button>
               )}
 
               {/* Navigation Portails */}
