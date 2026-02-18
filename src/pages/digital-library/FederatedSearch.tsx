@@ -18,6 +18,7 @@ import logoEni from "@/assets/logos/logo-eni.svg";
 import logoRfn from "@/assets/logos/logo-rfn.png";
 import logoEuropeana from "@/assets/logos/logo-europeana.svg";
 import logoIfla from "@/assets/logos/logo-ifla.svg";
+import federatedSearchBg from "@/assets/federated-search-bg.jpg";
 
 const providerLogoMap: Record<string, string> = {
   'cairn': logoCairn,
@@ -204,21 +205,26 @@ export default function FederatedSearch() {
     <DigitalLibraryLayout>
       <div className="min-h-screen bg-gradient-to-b from-muted/30 to-background">
         {/* Hero Section */}
-        <section className="relative py-16 bg-gradient-to-br from-bn-blue-primary/10 via-background to-gold-bn-primary/5 overflow-hidden">
-          <div className="absolute inset-0 opacity-5">
-            <div className="absolute top-10 left-10 w-72 h-72 bg-bn-blue-primary rounded-full blur-3xl" />
-            <div className="absolute bottom-10 right-10 w-96 h-96 bg-gold-bn-primary rounded-full blur-3xl" />
-          </div>
+        <section
+          className="relative py-16 overflow-hidden"
+          style={{
+            backgroundImage: `url(${federatedSearchBg})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
+        >
+          {/* Overlay sombre pour lisibilité */}
+          <div className="absolute inset-0 bg-bn-blue-primary/70 backdrop-blur-[2px]" />
 
           <div className="container mx-auto px-4 relative z-10">
             <div className="text-center mb-10">
-              <div className="inline-flex items-center justify-center w-12 h-12 border border-bn-blue-primary rounded-lg mb-6">
-                <Icon name="mdi:magnify-expand" className="w-6 h-6 text-bn-blue-primary" />
+              <div className="inline-flex items-center justify-center w-12 h-12 border border-white/60 rounded-lg mb-6 bg-white/10">
+                <Icon name="mdi:magnify-expand" className="w-6 h-6 text-white" />
               </div>
-              <h1 className="text-4xl md:text-5xl font-gilda text-foreground mb-3">
+              <h1 className="text-4xl md:text-5xl font-gilda text-white mb-3 drop-shadow-lg">
                 {isAr ? "البحث في الموارد الإلكترونية" : "Recherche fédérée"}
               </h1>
-              <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
+              <p className="text-white/80 max-w-2xl mx-auto text-lg">
                 {isAr
                   ? "ابحث في جميع قواعد البيانات الإلكترونية في وقت واحد"
                   : "Interrogez simultanément toutes les bases de données électroniques"}
@@ -264,7 +270,7 @@ export default function FederatedSearch() {
               {/* Multi-select dropdown for databases */}
               {activeBundles && activeBundles.length > 0 && (
                 <div className="mt-4" ref={dropdownRef}>
-                  <p className="text-sm font-medium text-muted-foreground mb-2">
+                  <p className="text-sm font-medium text-white/80 mb-2">
                     {isAr ? "اختر قواعد البيانات للاستجواب" : "Sélectionnez les bases à interroger"}
                   </p>
                   {/* Trigger */}
@@ -272,23 +278,23 @@ export default function FederatedSearch() {
                     ref={triggerRef}
                     type="button"
                     onClick={openDropdown}
-                    className="w-full flex items-center justify-between h-12 px-4 rounded-xl border-2 border-muted-foreground/20 bg-background hover:border-bn-blue-primary/50 transition-colors focus:outline-none focus:border-bn-blue-primary text-sm"
+                    className="w-full flex items-center justify-between h-12 px-4 rounded-xl border-2 border-white/30 bg-white/15 hover:bg-white/20 hover:border-white/50 transition-colors focus:outline-none focus:border-white text-sm backdrop-blur-sm"
                   >
                     <div className="flex items-center gap-2">
-                      <Icon name="mdi:database-search" className="h-4 w-4 text-muted-foreground" />
-                      <span className={selectedCount === 0 ? "text-muted-foreground" : "text-foreground font-medium"}>
+                      <Icon name="mdi:database-search" className="h-4 w-4 text-white/70" />
+                      <span className="text-white/90 font-medium">
                         {dropdownLabel}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       {selectedCount > 0 && selectedCount < (activeBundles?.length || 0) && (
-                        <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-bn-blue-primary text-primary-foreground text-xs font-bold">
+                        <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-white text-bn-blue-primary text-xs font-bold">
                           {selectedCount}
                         </span>
                       )}
                       <Icon
                         name="mdi:chevron-down"
-                        className={`h-4 w-4 text-muted-foreground transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
+                        className={`h-4 w-4 text-white/70 transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
                       />
                     </div>
                   </button>
