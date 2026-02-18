@@ -53,14 +53,14 @@ const ManuscriptsAdmin = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {/* Carte : Gestion de la plateforme Manuscrits */}
+        {/* Carte : Gestion de la plateforme Manuscrits → CMS dédié */}
         <Card
           className="border border-primary/20 hover:shadow-md transition-all duration-200 cursor-pointer group"
-          onClick={() => navigate("/admin/manuscripts-backoffice")}
+          onClick={() => navigate("/admin/content-management-manuscrits")}
         >
           <CardHeader className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-t-xl pb-3">
             <div className="flex items-start justify-between">
-              <div className="p-2.5 rounded-xl bg-white/70 text-primary">
+              <div className="p-2.5 rounded-xl bg-background/70 text-primary">
                 <LayoutDashboard className="h-5 w-5" />
               </div>
             </div>
@@ -70,7 +70,7 @@ const ManuscriptsAdmin = () => {
           </CardHeader>
           <CardContent className="pt-3 pb-4">
             <CardDescription className="text-sm leading-relaxed mb-3">
-              Accédez à l'interface dédiée à l'administration complète de la plateforme des manuscrits.
+              Interface dédiée à la gestion du contenu, design et paramètres de la plateforme des manuscrits.
             </CardDescription>
             <Button
               size="sm"
@@ -78,7 +78,7 @@ const ManuscriptsAdmin = () => {
               className="w-full group-hover:border-primary group-hover:text-primary transition-colors"
               onClick={(e) => {
                 e.stopPropagation();
-                navigate("/admin/manuscripts-backoffice");
+                navigate("/admin/content-management-manuscrits");
               }}
             >
               Ouvrir l'interface

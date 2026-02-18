@@ -51,6 +51,7 @@ const ManuscriptsBackofficeExhibitions = lazy(() => import("./pages/ManuscriptsB
 const ManuscriptsBackofficeReports = lazy(() => import("./pages/ManuscriptsBackofficeReports"));
 const ManuscriptsBackofficeAccess = lazy(() => import("./pages/ManuscriptsBackofficeAccess"));
 const ManuscriptsBackofficeSettings = lazy(() => import("./pages/ManuscriptsBackofficeSettings"));
+const ManuscriptsCmsPage = lazy(() => import("./pages/ManuscriptsCmsPage"));
 
 // Admin - General (lazy)
 const UserManagement = lazy(() => import("./pages/UserManagement"));
@@ -286,6 +287,7 @@ const App = () => {
         <Route path="/admin/manuscripts-backoffice/reports" element={<ManuscriptsBackofficeReports />} />
         <Route path="/admin/manuscripts-backoffice/access" element={<ManuscriptsBackofficeAccess />} />
         <Route path="/admin/manuscripts-backoffice/settings" element={<ManuscriptsBackofficeSettings />} />
+        <Route path="/admin/content-management-manuscrits" element={<ManuscriptsCmsPage />} />
         <Route path="/manuscrit/:id" element={<ManuscriptReader />} />
         <Route path="/manuscript/:id" element={<ManuscriptReader />} />
         <Route path="/mon-espace-manuscrits" element={<MyManuscriptsSpace />} />
