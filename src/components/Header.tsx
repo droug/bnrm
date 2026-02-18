@@ -281,13 +281,13 @@ const Header = () => {
                   <DropdownMenuItem asChild className="cursor-pointer">
                     <Link to="/plateforme-manuscrits">
                       <FileText className="h-4 w-4 mr-2" />
-                      {ml({ fr: 'Manuscrits Numérisés', ar: 'المخطوطات الرقمية', en: 'Digitized Manuscripts', es: 'Manuscritos Digitalizados', amz: 'ⵉⴹⵕⵉⵚⵏ ⵉⵜⵜⵓⵙⵏⵓⵎⵎⵉⵏ' })}
+                      {ml({ fr: 'Plateforme Manuscrits', ar: 'منصة المخطوطات', en: 'Manuscripts Platform', es: 'Plataforma Manuscritos', amz: 'ⴰⵙⵙⵉⵡⴹ ⵏ ⵉⵎⵙⴽⵜⴰⵢⵏ' })}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild className="cursor-pointer">
                     <Link to="/cbm">
                       <Network className="h-4 w-4 mr-2" />
-                      {ml({ fr: 'Portail CBM', ar: 'بوابة CBM', en: 'CBM Portal', es: 'Portal CBM', amz: 'ⴰⵏⴱⴱⴰⴹ CBM' })}
+                      {ml({ fr: 'Plateforme CBM', ar: 'منصة الفهرس البيبليوغرافي', en: 'CBM Platform', es: 'Plataforma CBM', amz: 'ⴰⵙⵙⵉⵡⴹ CBM' })}
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
