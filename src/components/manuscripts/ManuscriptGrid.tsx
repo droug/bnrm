@@ -102,7 +102,7 @@ export function ManuscriptGrid({
       {manuscripts.map((manuscript) => (
         <Card 
           key={manuscript.id} 
-          className={`overflow-hidden hover:shadow-moroccan transition-all duration-500 bg-card/50 backdrop-blur border-2 border-gold/20 hover:border-gold/40 group relative ${
+          className={`flex flex-col overflow-hidden hover:shadow-moroccan transition-all duration-500 bg-card/50 backdrop-blur border-2 border-gold/20 hover:border-gold/40 group relative ${
             !canAccessManuscript(manuscript) ? 'opacity-60' : ''
           }`}
         >
@@ -131,17 +131,17 @@ export function ManuscriptGrid({
             </div>
           </div>
           
-          <div className="p-6 space-y-4">
-            <div>
+          <div className="p-6 flex flex-col flex-1 gap-4">
+            <div className="flex-1 space-y-2">
               <h3 className="font-moroccan text-xl font-bold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
                 {manuscript.title}
               </h3>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
                 <User className="h-4 w-4" />
                 <span>{manuscript.author}</span>
               </div>
               {manuscript.institution && (
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <MapPin className="h-4 w-4" />
                   <span>{manuscript.institution}</span>
                 </div>
@@ -164,7 +164,7 @@ export function ManuscriptGrid({
               </Badge>
             </div>
 
-            <div className="flex flex-col gap-2 pt-2">
+            <div className="pt-2">
               <Button 
                 size="sm" 
                 className="w-full"
