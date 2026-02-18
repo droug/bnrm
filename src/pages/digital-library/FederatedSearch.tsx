@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useMemo } from "react";
+import { useState, useCallback, useRef, useMemo, useEffect } from "react";
 import { useElectronicBundles, ElectronicBundle } from "@/hooks/useElectronicBundles";
 import { useLanguage } from "@/hooks/useLanguage";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
@@ -50,6 +50,32 @@ export default function FederatedSearch() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [repoCarouselIndex, setRepoCarouselIndex] = useState(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    if (dropdownOpen) document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [dropdownOpen]);
+
+  // Compute fixed position for dropdown
+  const openDropdown = () => {
+    if (triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setDropdownPos({
+        top: rect.bottom + window.scrollY + 4,
+        left: rect.left + window.scrollX,
+        width: rect.width,
+      });
+    }
+    setDropdownOpen((v) => !v);
+  };
 
   const isAr = language === "ar";
 
@@ -220,14 +246,15 @@ export default function FederatedSearch() {
 
               {/* Multi-select dropdown for databases */}
               {activeBundles && activeBundles.length > 0 && (
-                <div className="mt-4 relative" ref={dropdownRef}>
+                <div className="mt-4" ref={dropdownRef}>
                   <p className="text-sm font-medium text-muted-foreground mb-2">
                     {isAr ? "اختر قواعد البيانات للاستجواب" : "Sélectionnez les bases à interroger"}
                   </p>
                   {/* Trigger */}
                   <button
+                    ref={triggerRef}
                     type="button"
-                    onClick={() => setDropdownOpen((v) => !v)}
+                    onClick={openDropdown}
                     className="w-full flex items-center justify-between h-12 px-4 rounded-xl border-2 border-muted-foreground/20 bg-background hover:border-bn-blue-primary/50 transition-colors focus:outline-none focus:border-bn-blue-primary text-sm"
                   >
                     <div className="flex items-center gap-2">
@@ -249,9 +276,17 @@ export default function FederatedSearch() {
                     </div>
                   </button>
 
-                  {/* Dropdown panel */}
+                  {/* Dropdown panel - fixed positioning to avoid overflow clipping */}
                   {dropdownOpen && (
-                    <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-background border-2 border-muted-foreground/20 rounded-xl shadow-2xl overflow-hidden">
+                    <div
+                      style={{
+                        position: "fixed",
+                        top: `${dropdownPos.top}px`,
+                        left: `${dropdownPos.left}px`,
+                        width: `${dropdownPos.width}px`,
+                      }}
+                      className="z-[9999] bg-background border-2 border-muted-foreground/20 rounded-xl shadow-2xl overflow-hidden"
+                    >
                       {/* Header actions */}
                       <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/30">
                         <span className="text-xs text-muted-foreground font-medium">
@@ -268,7 +303,7 @@ export default function FederatedSearch() {
                         </button>
                       </div>
                       {/* Options list */}
-                      <div className="max-h-64 overflow-y-auto">
+                      <div className="max-h-72 overflow-y-auto">
                         {activeBundles.map((bundle) => {
                           const key = bundle.provider?.toLowerCase().trim() || "";
                           const isSelected = selectedProviders.has(bundle.id);
@@ -436,19 +471,6 @@ export default function FederatedSearch() {
               </motion.div>
             )}
 
-            {!hasSearched && (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12">
-                <Icon name="mdi:cloud-search-outline" className="h-20 w-20 mx-auto text-muted-foreground/20 mb-4" />
-                <p className="text-lg text-muted-foreground">
-                  {isAr ? "أدخل مصطلح البحث للبدء" : "Entrez un terme de recherche pour commencer"}
-                </p>
-                <p className="text-sm text-muted-foreground/60 mt-2">
-                  {isAr
-                    ? "سيتم البحث في جميع قواعد البيانات المشتركة في نفس الوقت"
-                    : "La recherche sera lancée simultanément sur toutes les bases sélectionnées"}
-                </p>
-              </motion.div>
-            )}
           </AnimatePresence>
         </section>
 
