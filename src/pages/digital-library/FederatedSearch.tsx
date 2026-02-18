@@ -484,7 +484,7 @@ export default function FederatedSearch() {
 
         {/* Carrousel Ressources Électroniques */}
         {activeBundles && activeBundles.length > 0 && (
-          <section className="py-20 bg-gradient-to-b from-muted to-background relative overflow-hidden">
+          <section className="py-20 bg-gradient-to-b from-muted to-background relative overflow-hidden" style={{ zIndex: 0, isolation: "auto" }}>
             <div className="absolute bottom-0 left-0 w-64 h-64 opacity-10">
               <div className="w-full h-full bg-gradient-to-tr from-gold-bn-primary/30 to-transparent rounded-full blur-3xl" />
             </div>
