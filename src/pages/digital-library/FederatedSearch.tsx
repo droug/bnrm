@@ -280,14 +280,19 @@ export default function FederatedSearch() {
                   {/* Dropdown panel - fixed positioning to avoid overflow clipping */}
                   {dropdownOpen && (
                     <div
+                      ref={dropdownRef}
                       style={{
                         position: "fixed",
                         top: `${dropdownPos.top}px`,
                         left: `${dropdownPos.left}px`,
                         width: `${dropdownPos.width}px`,
-                        backgroundColor: "hsl(var(--popover))",
+                        zIndex: 99999,
+                        background: "white",
+                        boxShadow: "0 8px 40px rgba(0,0,0,0.18)",
+                        border: "1.5px solid #e2e8f0",
+                        borderRadius: "12px",
+                        overflow: "hidden",
                       }}
-                      className="z-[9999] border-2 border-muted-foreground/20 rounded-xl shadow-2xl overflow-hidden"
                     >
                       {/* Header actions */}
                       <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/30">
