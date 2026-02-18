@@ -578,6 +578,70 @@ function FederatedSearchInner() {
           </div>
         </section>
 
+        {/* Example results - shown before any search */}
+        {!hasSearched && (
+          <section className="container mx-auto px-4 py-12">
+            <div className="flex items-center gap-3 mb-8">
+              <Icon name="mdi:star-four-points-outline" className="h-6 w-6 text-gold-bn-primary" />
+              <h2 className="text-2xl font-gilda text-foreground">
+                {isAr ? "أمثلة على النتائج" : "Exemples de résultats"}
+              </h2>
+              <span className="px-2.5 py-0.5 rounded-full bg-gold-bn-primary/10 text-gold-bn-primary text-xs font-medium border border-gold-bn-primary/30">
+                {isAr ? "تجريبي" : "Aperçu"}
+              </span>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {EXAMPLE_RESULTS.map((item, index) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.07 }}
+                >
+                  <Card className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-bn-blue-primary/30 overflow-hidden h-full flex flex-col">
+                    <div className={`h-2 bg-gradient-to-r ${item.gradient}`} />
+                    <CardContent className="p-6 flex flex-col flex-1">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2.5 rounded-xl bg-gradient-to-br ${item.gradient} text-white shadow-md`}>
+                            <Icon name={item.icon} className="h-5 w-5" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-bn-blue-primary">{isAr ? item.source_ar : item.source}</p>
+                            <p className="text-xs text-muted-foreground">{isAr ? item.type_ar : item.type} · {item.year}</p>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="text-xs shrink-0 ml-2">{item.year}</Badge>
+                      </div>
+                      <h3 className="font-semibold text-base text-foreground mb-1 line-clamp-2 leading-snug">
+                        {isAr ? item.title_ar : item.title}
+                      </h3>
+                      <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1">
+                        <Icon name="mdi:account-outline" className="h-3.5 w-3.5 shrink-0" />
+                        {item.authors}
+                      </p>
+                      <p className="text-sm text-muted-foreground line-clamp-3 flex-1">
+                        {isAr ? item.description_ar : item.description}
+                      </p>
+                      <div className="mt-4 pt-3 border-t border-border">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full gap-2 text-xs hover:bg-bn-blue-primary hover:text-white hover:border-bn-blue-primary transition-colors"
+                          onClick={() => setQuery(isAr ? item.title_ar : item.title)}
+                        >
+                          <Icon name="mdi:magnify" className="h-3.5 w-3.5" />
+                          {isAr ? "البحث عن هذا الموضوع" : "Rechercher ce sujet"}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Results Section - only rendered when a search has been made */}
         {hasSearched && (
           <section className="container mx-auto px-4 py-12">
