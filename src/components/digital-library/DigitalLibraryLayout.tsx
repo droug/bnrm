@@ -59,7 +59,7 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
   const { isAuthenticated, isLibrarian } = useAccessControl();
   const location = useLocation();
   const isHomePage = location.pathname === '/digital-library' || location.pathname === '/digital-library/';
-  const isSearchPage = location.pathname === '/digital-library/search';
+  const isSearchPage = location.pathname === '/digital-library/search' || location.pathname === '/digital-library/federated-search';
   const isAdminPage = location.pathname.startsWith('/admin/');
   const { session, profile } = useAuth();
   const { tooltips: bnTooltips } = useBNTooltips();
