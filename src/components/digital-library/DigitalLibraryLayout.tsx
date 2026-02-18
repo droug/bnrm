@@ -374,154 +374,19 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
               <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 ease-out group-hover:w-4/5 rounded-full" />
             </div>
 
-            {/* Bouquets électroniques */}
+            {/* Ressources électroniques - lien direct vers recherche fédérée */}
             <div className="relative group pb-1">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.electronicResources')} aria-haspopup="true">
-                      <Icon name="mdi:library" className="h-4 w-4" />
-                      {t('dl.electronicResources')}
-                      <Icon name="mdi:chevron-down" className="h-3 w-3" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="bg-card z-50 min-w-[320px] p-2">
-                  {activeBundles && activeBundles.length > 0 ? (
-                    activeBundles.map((bundle, index) => {
-                      // Chercher le logo local en priorité basé sur le nom du provider
-                      const providerKey = bundle.provider?.toLowerCase().trim();
-                      const localLogo = providerKey ? providerLogoMap[providerKey] : null;
-                      const logoSrc = localLogo || bundle.provider_logo_url;
-                      
-                      // Logos avec texte blanc nécessitant un fond sombre
-                      const needsDarkBackground = providerKey === 'almanhal' || providerKey === 'eni' || providerKey === 'eni-elearning';
-                      
-                      // Description du bouquet (bilingue) avec fallback
-                      const defaultDescriptions: Record<string, { fr: string; ar: string; icon: string }> = {
-                        'cairn': { 
-                          fr: "Plateforme contenant des revues et ouvrages en sciences humaines et sociales francophones", 
-                          ar: "منصة تحتوي على مجلات وكتب في العلوم الإنسانية والاجتماعية الفرنكوفونية",
-                          icon: "mdi:book-open-page-variant"
-                        },
-                        'ebsco': { 
-                          fr: "Plateforme contenant des milliers de revues académiques internationales multidisciplinaires", 
-                          ar: "منصة تحتوي على آلاف المجلات الأكاديمية الدولية متعددة التخصصات",
-                          icon: "mdi:database-search"
-                        },
-                        'brill': { 
-                          fr: "Plateforme contenant des publications académiques en études orientales, religion et histoire", 
-                          ar: "منصة تحتوي على منشورات أكاديمية في الدراسات الشرقية والدين والتاريخ",
-                          icon: "mdi:book-education"
-                        },
-                        'almanhal': { 
-                          fr: "Plateforme contenant des ressources numériques en langue arabe couvrant tous les domaines du savoir", 
-                          ar: "منصة تحتوي على موارد رقمية باللغة العربية تغطي جميع مجالات المعرفة",
-                          icon: "mdi:library"
-                        },
-                        'eni-elearning': { 
-                          fr: "Plateforme contenant des cours interactifs en informatique et technologies numériques", 
-                          ar: "منصة تحتوي على دورات تفاعلية في تكنولوجيا المعلومات والتقنيات الرقمية",
-                          icon: "mdi:laptop"
-                        },
-                        'eni': { 
-                          fr: "Plateforme contenant des cours interactifs en informatique et technologies numériques", 
-                          ar: "منصة تحتوي على دورات تفاعلية في تكنولوجيا المعلومات والتقنيات الرقمية",
-                          icon: "mdi:laptop"
-                        },
-                        'europeana': { 
-                          fr: "Plateforme contenant le patrimoine culturel européen numérisé", 
-                          ar: "منصة تحتوي على التراث الثقافي الأوروبي الرقمي",
-                          icon: "mdi:castle"
-                        },
-                        'rfn': { 
-                          fr: "Plateforme contenant les ressources du réseau francophone numérique", 
-                          ar: "منصة تحتوي على موارد الشبكة الفرنكوفونية الرقمية",
-                          icon: "mdi:earth"
-                        },
-                        'ifla': { 
-                          fr: "Plateforme contenant les ressources de la fédération internationale des bibliothèques", 
-                          ar: "منصة تحتوي على موارد الاتحاد الدولي لجمعيات المكتبات",
-                          icon: "mdi:account-group"
-                        },
-                      };
-                      
-                      const defaultData = providerKey ? defaultDescriptions[providerKey] : null;
-                      const bundleDescription = (() => {
-                        if (language === 'ar') return bundle.description_ar || defaultData?.ar || '';
-                        return bundle.description || defaultData?.fr || '';
-                      })();
-                      const bundleName = language === 'ar' && bundle.name_ar ? bundle.name_ar : bundle.name;
-                      const bundleIcon = defaultData?.icon || 'mdi:book-open-variant';
-                      
-                      // Styles de badges variés
-                      const badgeStyles = [
-                        "bg-gradient-to-r from-gold-bn-primary to-amber-500 text-white shadow-lg shadow-gold-bn-primary/30",
-                        "bg-gradient-to-r from-bn-blue-primary to-blue-600 text-white shadow-lg shadow-bn-blue-primary/30",
-                        "bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/30",
-                        "bg-gradient-to-br from-purple-500 to-violet-600 text-white shadow-lg shadow-purple-500/30",
-                        "bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-lg shadow-rose-500/30",
-                      ];
-                      
-                      return (
-                        <FancyTooltip 
-                          key={bundle.id}
-                          content={bundleName} 
-                          description={bundleDescription || ml("Accédez à cette ressource électronique", "الوصول إلى هذا المورد الإلكتروني", "Access this electronic resource", "Acceda a este recurso electrónico", "ⴽⵛⵎ ⵖⵔ ⵜⵖⴱⵓⵍⵜ ⴰⴷ ⵜⴰⵍⵉⴽⵜⵕⵓⵏⵉⵜ")}
-                          icon={bundleIcon}
-                          side="right"
-                          variant="gold"
-                        >
-                          <a 
-                            href={bundle.api_base_url || bundle.website_url || '#'} 
-                            target="_blank" 
-                            rel="noopener noreferrer"
-                            className="block"
-                          >
-                            <DropdownMenuItem className="gap-3 cursor-pointer focus:bg-accent focus:text-accent-foreground py-3 px-3 rounded-lg hover:bg-gold-bn-primary/5 transition-all duration-200 group">
-                              <div className="flex items-center gap-3 flex-1">
-                                {logoSrc ? (
-                                  <div className={`p-2 rounded-xl ${needsDarkBackground ? 'bg-bn-blue-primary' : 'bg-gradient-to-br from-gold-bn-primary/20 to-gold-bn-primary/5 group-hover:from-gold-bn-primary/30 group-hover:to-gold-bn-primary/10'} transition-all duration-200 group-hover:scale-110`}>
-                                    <img src={logoSrc} alt={bundle.provider} className="h-6 w-auto max-w-[80px] object-contain" />
-                                  </div>
-                                ) : (
-                                  <div className="p-2 rounded-xl bg-gradient-to-br from-gold-bn-primary/20 to-gold-bn-primary/5 group-hover:from-gold-bn-primary/30 group-hover:to-gold-bn-primary/10 transition-all duration-200 group-hover:scale-110">
-                                    <Icon name={bundleIcon} className="h-5 w-5 text-gold-bn-primary" />
-                                  </div>
-                                )}
-                                <span className="font-semibold text-foreground group-hover:text-gold-bn-primary transition-colors">{bundleName}</span>
-                              </div>
-                              {bundle.document_count && bundle.document_count > 0 && (
-                                <span className={`px-2 py-0.5 text-xs font-bold rounded-none transform transition-all duration-300 group-hover:scale-110 ${badgeStyles[index % badgeStyles.length]}`}>
-                                  {bundle.document_count > 1000 ? `+${Math.floor(bundle.document_count / 1000)}K` : bundle.document_count}
-                                </span>
-                              )}
-                              <Icon name="mdi:open-in-new" className="h-4 w-4 text-muted-foreground group-hover:text-gold-bn-primary transition-colors" />
-                            </DropdownMenuItem>
-                          </a>
-                        </FancyTooltip>
-                      );
-                    })
-                  ) : (
-                    <DropdownMenuItem disabled className="text-muted-foreground text-sm">
-                      {ml('Aucune ressource disponible', 'لا توجد موارد متاحة', 'No resources available', 'No hay recursos disponibles', 'ⵓⵔ ⵍⵍⵉⵏ ⵜⵉⵖⴱⵓⵍⴰ')}
-                    </DropdownMenuItem>
+              <Link to="/digital-library/federated-search">
+                <Button variant="ghost" size="sm" className="gap-2 text-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" aria-label={t('dl.electronicResources')}>
+                  <Icon name="mdi:library" className="h-4 w-4" />
+                  {t('dl.electronicResources')}
+                  {activeBundles && activeBundles.length > 0 && (
+                    <span className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-gold-bn-primary/20 text-gold-bn-primary text-[10px] font-bold">
+                      {activeBundles.length}
+                    </span>
                   )}
-                  {/* Séparateur + Recherche fédérée */}
-                  <div className="border-t border-border my-1" />
-                  <Link to="/digital-library/federated-search" className="block">
-                    <DropdownMenuItem className="gap-3 cursor-pointer py-3 px-3 rounded-lg hover:bg-bn-blue-primary/5 transition-all duration-200 group">
-                      <div className="flex items-center gap-3 flex-1">
-                        <div className="p-2 rounded-xl bg-gradient-to-br from-bn-blue-primary/20 to-bn-blue-primary/5 group-hover:from-bn-blue-primary/30 group-hover:to-bn-blue-primary/10 transition-all duration-200">
-                          <Icon name="mdi:magnify-expand" className="h-5 w-5 text-bn-blue-primary" />
-                        </div>
-                        <span className="font-semibold text-foreground group-hover:text-bn-blue-primary transition-colors">
-                          {ml('Recherche fédérée', 'البحث الفيدرالي', 'Federated Search', 'Búsqueda federada', 'ⴰⵔⵣⵣⵓ ⴰⴼⵉⴷⵉⵔⴰⵍⵉ')}
-                        </span>
-                      </div>
-                      <Icon name="mdi:arrow-right" className="h-4 w-4 text-muted-foreground group-hover:text-bn-blue-primary transition-colors" />
-                    </DropdownMenuItem>
-                  </Link>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                </Button>
+              </Link>
               <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-0 h-[2px] bg-gradient-to-r from-gold-bn-primary to-bn-blue-primary transition-all duration-300 ease-out group-hover:w-4/5 rounded-full" />
             </div>
 
