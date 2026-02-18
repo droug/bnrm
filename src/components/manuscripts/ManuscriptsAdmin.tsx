@@ -1,15 +1,17 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Handshake, ChevronRight, LayoutDashboard } from "lucide-react";
+import { Handshake, ChevronRight, LayoutDashboard, ExternalLink } from "lucide-react";
 import ManuscriptPartnershipsBackoffice from "@/components/manuscripts/ManuscriptPartnershipsBackoffice";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
 const ManuscriptsAdmin = () => {
   const [activeSheet, setActiveSheet] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   // Compteur demandes de partenariat en attente (table partner_collections)
   const { data: pendingPartnerships } = useQuery({
@@ -51,6 +53,41 @@ const ManuscriptsAdmin = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* Carte : Gestion de la plateforme Manuscrits */}
+        <Card
+          className="border border-primary/20 hover:shadow-md transition-all duration-200 cursor-pointer group"
+          onClick={() => navigate("/admin/manuscripts-backoffice")}
+        >
+          <CardHeader className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-t-xl pb-3">
+            <div className="flex items-start justify-between">
+              <div className="p-2.5 rounded-xl bg-white/70 text-primary">
+                <LayoutDashboard className="h-5 w-5" />
+              </div>
+            </div>
+            <CardTitle className="text-base font-semibold text-foreground mt-2">
+              Gestion de la plateforme
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-3 pb-4">
+            <CardDescription className="text-sm leading-relaxed mb-3">
+              Accédez à l'interface dédiée à l'administration complète de la plateforme des manuscrits.
+            </CardDescription>
+            <Button
+              size="sm"
+              variant="outline"
+              className="w-full group-hover:border-primary group-hover:text-primary transition-colors"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate("/admin/manuscripts-backoffice");
+              }}
+            >
+              Ouvrir l'interface
+              <ExternalLink className="h-4 w-4 ml-1" />
+            </Button>
+          </CardContent>
+        </Card>
+
+        {/* Cartes dynamiques (Sheet) */}
         {adminCards.map((card) => {
           const Icon = card.icon;
           return (
@@ -81,7 +118,7 @@ const ManuscriptsAdmin = () => {
                 <Button
                   size="sm"
                   variant="outline"
-                  className={`w-full group-hover:border-amber-400 group-hover:text-amber-700 transition-colors`}
+                  className="w-full group-hover:border-amber-400 group-hover:text-amber-700 transition-colors"
                   onClick={(e) => {
                     e.stopPropagation();
                     setActiveSheet(card.id);
