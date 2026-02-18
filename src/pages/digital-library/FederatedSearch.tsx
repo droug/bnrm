@@ -323,18 +323,19 @@ export default function FederatedSearch() {
                               key={bundle.id}
                               type="button"
                               onClick={() => toggleProvider(bundle.id)}
-                              className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-accent transition-colors ${isSelected ? "bg-bn-blue-primary/5" : ""}`}
+                              className={`w-full flex items-center gap-4 px-5 py-3 text-left hover:bg-accent transition-colors ${isSelected ? "bg-bn-blue-primary/5" : ""}`}
                             >
                               {/* Checkbox visuel */}
                               <div className={`flex-shrink-0 w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${isSelected ? "bg-bn-blue-primary border-bn-blue-primary" : "border-muted-foreground/40"}`}>
                                 {isSelected && <Icon name="mdi:check" className="h-3 w-3 text-primary-foreground" />}
                               </div>
-                              {/* Logo */}
-                              <div className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg ${needsDark ? "bg-bn-blue-primary" : "bg-muted"}`}>
+                              {/* Logo — zone fixe uniforme */}
+                              <div className={`flex-shrink-0 flex items-center justify-center rounded-lg ${needsDark ? "bg-bn-blue-primary" : "bg-muted"}`}
+                                style={{ width: 64, height: 36 }}>
                                 {logoSrc ? (
-                                  <img src={logoSrc} alt={bundle.provider || ""} className="h-5 w-auto max-w-[60px] object-contain" />
+                                  <img src={logoSrc} alt={bundle.provider || ""} className="object-contain" style={{ maxHeight: 24, maxWidth: 52 }} />
                                 ) : (
-                                  <Icon name={providerIcons[key] || "mdi:book-open-variant"} className="h-4 w-4 text-foreground/70" />
+                                  <Icon name={providerIcons[key] || "mdi:book-open-variant"} className="h-5 w-5 text-foreground/70" />
                                 )}
                               </div>
                               <div className="flex-1 min-w-0">
