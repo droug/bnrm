@@ -339,7 +339,7 @@ export default function FederatedSearch() {
                               </div>
                               <div className="flex-1 min-w-0">
                                 <span className="text-sm font-medium text-foreground">{bundleName}</span>
-                                {bundle.document_count && bundle.document_count > 0 && (
+                                {!!bundle.document_count && bundle.document_count > 0 && (
                                   <span className="ml-2 text-xs text-muted-foreground">
                                     {bundle.document_count > 1000 ? `+${Math.floor(bundle.document_count / 1000)}K` : bundle.document_count} docs
                                   </span>
@@ -568,7 +568,7 @@ export default function FederatedSearch() {
                                         </div>
                                       )}
                                     </div>
-                                    {bundle.document_count && bundle.document_count > 0 && (
+                                    {!!bundle.document_count && bundle.document_count > 0 && (
                                       <span className="mt-3 text-xs text-muted-foreground font-medium">
                                         {bundle.document_count > 1000 ? `+${Math.floor(bundle.document_count / 1000)}K` : bundle.document_count} docs
                                       </span>
