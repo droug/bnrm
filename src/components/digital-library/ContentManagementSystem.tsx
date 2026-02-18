@@ -18,6 +18,7 @@ import CmsSectionIconsManager from "@/components/cms/CmsSectionIconsManager";
 import CmsAboutManagerBN from "@/components/cms/CmsAboutManagerBN";
 import CmsHelpManagerBN from "@/components/cms/CmsHelpManagerBN";
 import CmsTooltipsManagerBN from "@/components/cms/CmsTooltipsManagerBN";
+import CmsFederatedSearchManager from "@/components/cms/CmsFederatedSearchManager";
 import FeaturedWorksManager from "@/components/admin/FeaturedWorksManager";
 import { Icon } from "@/components/ui/icon";
 import { 
@@ -94,6 +95,18 @@ const tabs = [
     borderColor: "border-pink-500/30",
     gradient: "from-pink-500/20 to-pink-600/5",
     description: "Bannières de la Bibliothèque Numérique",
+    category: "homepage"
+  },
+  { 
+    id: "federated-search",
+    label: "Recherche fédérée",
+    icon: null,
+    iconMdi: "mdi:magnify-expand",
+    color: "text-gold-bn-primary",
+    bgColor: "bg-gold-bn-primary/10",
+    borderColor: "border-gold-bn-primary/30",
+    gradient: "from-gold-bn-primary/20 to-gold-bn-primary/5",
+    description: "Photo de fond, titre et sous-titre de la page Recherche fédérée",
     category: "homepage"
   },
   // === CONTENU ===
@@ -414,6 +427,8 @@ export default function ContentManagementSystem() {
         return <CmsHelpManagerBN />;
       case "tooltips":
         return <CmsTooltipsManagerBN />;
+      case "federated-search":
+        return <CmsFederatedSearchManager />;
       default:
         return null;
     }

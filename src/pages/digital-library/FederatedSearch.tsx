@@ -1,5 +1,7 @@
 import { useState, useCallback, useRef, useMemo, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useElectronicBundles, ElectronicBundle } from "@/hooks/useElectronicBundles";
+import { supabase } from "@/integrations/supabase/client";
 import { useLanguage } from "@/hooks/useLanguage";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Input } from "@/components/ui/input";
@@ -212,6 +214,19 @@ function ExamplesButton({ isAr, setQuery }: { isAr: boolean; setQuery: (q: strin
 export default function FederatedSearch() {
   const { activeBundles } = useElectronicBundles();
   const { language } = useLanguage();
+
+  // Charger les paramètres CMS de la Recherche fédérée
+  const { data: cmsSettings } = useQuery({
+    queryKey: ["federated-search-settings"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("cms_portal_settings")
+        .select("setting_value")
+        .eq("setting_key", "federated_search_hero")
+        .maybeSingle();
+      return data?.setting_value as { hero_image_url?: string; title_fr?: string; title_ar?: string; subtitle_fr?: string; subtitle_ar?: string } | null;
+    },
+  });
   const [query, setQuery] = useState("");
   const [selectedProviders, setSelectedProviders] = useState<Set<string>>(new Set());
   const [results, setResults] = useState<ProviderResult[]>([]);
@@ -376,7 +391,7 @@ export default function FederatedSearch() {
         <section
           className="relative py-16 overflow-hidden"
           style={{
-            backgroundImage: `url(${federatedSearchBg})`,
+            backgroundImage: `url(${cmsSettings?.hero_image_url || federatedSearchBg})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
           }}
@@ -390,12 +405,12 @@ export default function FederatedSearch() {
                 <Icon name="mdi:magnify-expand" className="w-6 h-6 text-gold-bn-primary" />
               </div>
               <h1 className="text-4xl md:text-5xl font-gilda text-white mb-3 drop-shadow-lg">
-                {isAr ? "البحث في الموارد الإلكترونية" : "Recherche fédérée"}
+                {isAr ? (cmsSettings?.title_ar || "البحث في الموارد الإلكترونية") : (cmsSettings?.title_fr || "Recherche fédérée")}
               </h1>
               <p className="text-white/80 max-w-2xl mx-auto text-lg">
                 {isAr
-                  ? "ابحث في جميع قواعد البيانات الإلكترونية في وقت واحد"
-                  : "Interrogez simultanément toutes les bases de données électroniques"}
+                  ? (cmsSettings?.subtitle_ar || "ابحث في جميع قواعد البيانات الإلكترونية في وقت واحد")
+                  : (cmsSettings?.subtitle_fr || "Interrogez simultanément toutes les bases de données électroniques")}
               </p>
             </div>
 
