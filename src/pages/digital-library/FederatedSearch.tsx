@@ -284,8 +284,9 @@ export default function FederatedSearch() {
                         top: `${dropdownPos.top}px`,
                         left: `${dropdownPos.left}px`,
                         width: `${dropdownPos.width}px`,
+                        backgroundColor: "hsl(var(--popover))",
                       }}
-                      className="z-[9999] bg-background border-2 border-muted-foreground/20 rounded-xl shadow-2xl overflow-hidden"
+                      className="z-[9999] border-2 border-muted-foreground/20 rounded-xl shadow-2xl overflow-hidden"
                     >
                       {/* Header actions */}
                       <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/30">
