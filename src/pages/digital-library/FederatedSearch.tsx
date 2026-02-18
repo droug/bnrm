@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useMemo } from "react";
 import { useElectronicBundles, ElectronicBundle } from "@/hooks/useElectronicBundles";
 import { useLanguage } from "@/hooks/useLanguage";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
@@ -6,9 +6,33 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Icon } from "@iconify/react";
+import { Icon } from "@/components/ui/icon";
+import { FancyTooltip } from "@/components/ui/fancy-tooltip";
 import { motion, AnimatePresence } from "framer-motion";
+
+// Logos ressources électroniques
+import logoBrill from "@/assets/logos/logo-brill.png";
+import logoCairn from "@/assets/logos/logo-cairn.svg";
+import logoAlmanhal from "@/assets/logos/logo-almanhal.png";
+import logoEni from "@/assets/logos/logo-eni.svg";
+import logoRfn from "@/assets/logos/logo-rfn.png";
+import logoEuropeana from "@/assets/logos/logo-europeana.svg";
+import logoIfla from "@/assets/logos/logo-ifla.svg";
+
+const providerLogoMap: Record<string, string> = {
+  'cairn': logoCairn,
+  'cairn.info': logoCairn,
+  'brill': logoBrill,
+  'rfn': logoRfn,
+  'europeana': logoEuropeana,
+  'ifla': logoIfla,
+  'eni-elearning': logoEni,
+  'eni': logoEni,
+  'almanhal': logoAlmanhal,
+  'al-manhal': logoAlmanhal,
+};
+
+const darkBackgroundProviders = ['almanhal', 'al-manhal', 'eni', 'eni-elearning'];
 
 interface ProviderResult {
   provider: ElectronicBundle;
@@ -23,8 +47,16 @@ export default function FederatedSearch() {
   const [selectedProviders, setSelectedProviders] = useState<Set<string>>(new Set());
   const [results, setResults] = useState<ProviderResult[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [repoCarouselIndex, setRepoCarouselIndex] = useState(0);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const isAr = language === "ar";
+
+  const maxCarouselIndex = useMemo(() => {
+    if (!activeBundles || activeBundles.length <= 3) return 0;
+    return Math.ceil(activeBundles.length / 3) - 1;
+  }, [activeBundles]);
 
   const toggleProvider = (id: string) => {
     setSelectedProviders((prev) => {
@@ -91,6 +123,7 @@ export default function FederatedSearch() {
 
     setResults(providerResults);
     setHasSearched(true);
+    setDropdownOpen(false);
   }, [query, activeBundles, selectedProviders]);
 
   const providerIcons: Record<string, string> = {
@@ -115,6 +148,14 @@ export default function FederatedSearch() {
     europeana: "from-amber-500 to-yellow-600",
   };
 
+  // Multi-select dropdown label
+  const selectedCount = selectedProviders.size;
+  const dropdownLabel = selectedCount === 0
+    ? (isAr ? "جميع القواعد" : "Toutes les bases")
+    : selectedCount === activeBundles?.length
+      ? (isAr ? "جميع القواعد" : "Toutes les bases")
+      : (isAr ? `${selectedCount} قاعدة مختارة` : `${selectedCount} base${selectedCount > 1 ? "s" : ""} sélectionnée${selectedCount > 1 ? "s" : ""}`);
+
   return (
     <DigitalLibraryLayout>
       <div className="min-h-screen bg-gradient-to-b from-muted/30 to-background">
@@ -128,13 +169,11 @@ export default function FederatedSearch() {
           <div className="container mx-auto px-4 relative z-10">
             <div className="text-center mb-10">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-bn-blue-primary/10 text-bn-blue-primary text-sm font-medium mb-4">
-                <Icon icon="mdi:magnify-expand" className="h-4 w-4" />
+                <Icon name="mdi:magnify-expand" className="h-4 w-4" />
                 {isAr ? "بحث فيدرالي" : "Recherche fédérée"}
               </div>
               <h1 className="text-4xl md:text-5xl font-gilda text-foreground mb-3">
-                {isAr
-                  ? "البحث في الموارد الإلكترونية"
-                  : "Recherche fédérée"}
+                {isAr ? "البحث في الموارد الإلكترونية" : "Recherche fédérée"}
               </h1>
               <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
                 {isAr
@@ -154,7 +193,7 @@ export default function FederatedSearch() {
               >
                 <div className="relative flex-1">
                   <Icon
-                    icon="mdi:magnify"
+                    name="mdi:magnify"
                     className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground"
                   />
                   <Input
@@ -174,69 +213,113 @@ export default function FederatedSearch() {
                   disabled={!query.trim()}
                   className="h-14 px-8 text-lg rounded-xl bg-gradient-to-r from-bn-blue-primary to-bn-blue-primary/80 hover:from-bn-blue-primary/90 hover:to-bn-blue-primary/70 shadow-lg"
                 >
-                  <Icon icon="mdi:magnify" className="h-5 w-5 mr-2" />
+                  <Icon name="mdi:magnify" className="h-5 w-5 mr-2" />
                   {isAr ? "بحث" : "Rechercher"}
                 </Button>
               </form>
-            </div>
 
-            {/* Provider Selection */}
-            {activeBundles && activeBundles.length > 0 && (
-              <div className="max-w-3xl mx-auto mt-6">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium text-muted-foreground">
-                    {isAr ? "اختر قواعد البيانات" : "Sélectionnez les bases à interroger"}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={selectAll}
-                    className="text-xs text-bn-blue-primary hover:text-bn-blue-primary/80"
-                  >
-                    {selectedProviders.size === activeBundles.length
-                      ? isAr ? "إلغاء الكل" : "Désélectionner tout"
-                      : isAr ? "تحديد الكل" : "Tout sélectionner"}
-                  </Button>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {activeBundles.map((bundle) => {
-                    const key = bundle.provider?.toLowerCase().trim() || "";
-                    const isSelected =
-                      selectedProviders.size === 0 || selectedProviders.has(bundle.id);
-                    return (
-                      <label
-                        key={bundle.id}
-                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-xl border-2 cursor-pointer transition-all duration-200 ${
-                          isSelected
-                            ? "border-bn-blue-primary/50 bg-bn-blue-primary/5 shadow-sm"
-                            : "border-muted hover:border-muted-foreground/30 opacity-60"
-                        }`}
-                      >
-                        <Checkbox
-                          checked={selectedProviders.has(bundle.id)}
-                          onCheckedChange={() => toggleProvider(bundle.id)}
-                          className="h-4 w-4"
-                        />
-                        <Icon
-                          icon={providerIcons[key] || "mdi:book-open-variant"}
-                          className="h-4 w-4 text-foreground/70"
-                        />
-                        <span className="text-sm font-medium">
-                          {isAr && bundle.name_ar ? bundle.name_ar : bundle.name}
-                        </span>
-                      </label>
-                    );
-                  })}
-                </div>
-                {selectedProviders.size === 0 && (
-                  <p className="text-xs text-muted-foreground mt-2 italic">
-                    {isAr
-                      ? "جميع القواعد سيتم استجوابها"
-                      : "Toutes les bases seront interrogées si aucune n'est sélectionnée"}
+              {/* Multi-select dropdown for databases */}
+              {activeBundles && activeBundles.length > 0 && (
+                <div className="mt-4 relative" ref={dropdownRef}>
+                  <p className="text-sm font-medium text-muted-foreground mb-2">
+                    {isAr ? "اختر قواعد البيانات للاستجواب" : "Sélectionnez les bases à interroger"}
                   </p>
-                )}
-              </div>
-            )}
+                  {/* Trigger */}
+                  <button
+                    type="button"
+                    onClick={() => setDropdownOpen((v) => !v)}
+                    className="w-full flex items-center justify-between h-12 px-4 rounded-xl border-2 border-muted-foreground/20 bg-background hover:border-bn-blue-primary/50 transition-colors focus:outline-none focus:border-bn-blue-primary text-sm"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Icon name="mdi:database-search" className="h-4 w-4 text-muted-foreground" />
+                      <span className={selectedCount === 0 ? "text-muted-foreground" : "text-foreground font-medium"}>
+                        {dropdownLabel}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {selectedCount > 0 && selectedCount < (activeBundles?.length || 0) && (
+                        <span className="inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full bg-bn-blue-primary text-primary-foreground text-xs font-bold">
+                          {selectedCount}
+                        </span>
+                      )}
+                      <Icon
+                        name="mdi:chevron-down"
+                        className={`h-4 w-4 text-muted-foreground transition-transform ${dropdownOpen ? "rotate-180" : ""}`}
+                      />
+                    </div>
+                  </button>
+
+                  {/* Dropdown panel */}
+                  {dropdownOpen && (
+                    <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-background border-2 border-muted-foreground/20 rounded-xl shadow-2xl overflow-hidden">
+                      {/* Header actions */}
+                      <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-muted/30">
+                        <span className="text-xs text-muted-foreground font-medium">
+                          {isAr ? "اختر قواعد البيانات" : "Bases de données disponibles"}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={selectAll}
+                          className="text-xs text-bn-blue-primary hover:underline font-medium"
+                        >
+                          {selectedProviders.size === activeBundles.length
+                            ? (isAr ? "إلغاء الكل" : "Désélectionner tout")
+                            : (isAr ? "تحديد الكل" : "Tout sélectionner")}
+                        </button>
+                      </div>
+                      {/* Options list */}
+                      <div className="max-h-64 overflow-y-auto">
+                        {activeBundles.map((bundle) => {
+                          const key = bundle.provider?.toLowerCase().trim() || "";
+                          const isSelected = selectedProviders.has(bundle.id);
+                          const localLogo = key ? providerLogoMap[key] : null;
+                          const logoSrc = localLogo || bundle.provider_logo_url;
+                          const needsDark = darkBackgroundProviders.includes(key);
+                          const bundleName = isAr && bundle.name_ar ? bundle.name_ar : bundle.name;
+                          return (
+                            <button
+                              key={bundle.id}
+                              type="button"
+                              onClick={() => toggleProvider(bundle.id)}
+                              className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-accent transition-colors ${isSelected ? "bg-bn-blue-primary/5" : ""}`}
+                            >
+                              {/* Checkbox visuel */}
+                              <div className={`flex-shrink-0 w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${isSelected ? "bg-bn-blue-primary border-bn-blue-primary" : "border-muted-foreground/40"}`}>
+                                {isSelected && <Icon name="mdi:check" className="h-3 w-3 text-primary-foreground" />}
+                              </div>
+                              {/* Logo */}
+                              <div className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg ${needsDark ? "bg-bn-blue-primary" : "bg-muted"}`}>
+                                {logoSrc ? (
+                                  <img src={logoSrc} alt={bundle.provider || ""} className="h-5 w-auto max-w-[60px] object-contain" />
+                                ) : (
+                                  <Icon name={providerIcons[key] || "mdi:book-open-variant"} className="h-4 w-4 text-foreground/70" />
+                                )}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <span className="text-sm font-medium text-foreground">{bundleName}</span>
+                                {bundle.document_count && bundle.document_count > 0 && (
+                                  <span className="ml-2 text-xs text-muted-foreground">
+                                    {bundle.document_count > 1000 ? `+${Math.floor(bundle.document_count / 1000)}K` : bundle.document_count} docs
+                                  </span>
+                                )}
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {/* Footer */}
+                      <div className="px-4 py-2 border-t border-border bg-muted/30">
+                        <p className="text-xs text-muted-foreground italic">
+                          {selectedProviders.size === 0
+                            ? (isAr ? "جميع القواعد سيتم استجوابها" : "Toutes les bases seront interrogées si aucune n'est sélectionnée")
+                            : (isAr ? `سيتم البحث في ${selectedProviders.size} قاعدة بيانات` : `${selectedProviders.size} base${selectedProviders.size > 1 ? "s" : ""} sélectionnée${selectedProviders.size > 1 ? "s" : ""}`)}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </section>
 
@@ -251,7 +334,7 @@ export default function FederatedSearch() {
                 transition={{ duration: 0.3 }}
               >
                 <div className="flex items-center gap-3 mb-8">
-                  <Icon icon="mdi:format-list-checks" className="h-6 w-6 text-bn-blue-primary" />
+                  <Icon name="mdi:format-list-checks" className="h-6 w-6 text-bn-blue-primary" />
                   <h2 className="text-2xl font-gilda text-foreground">
                     {isAr
                       ? `نتائج البحث عن "${query}" في ${results.length} قاعدة بيانات`
@@ -261,12 +344,9 @@ export default function FederatedSearch() {
 
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {results.map((result, index) => {
-                    const key =
-                      result.provider.provider?.toLowerCase().trim() || "";
-                    const gradient =
-                      providerColors[key] || "from-gray-500 to-gray-600";
-                    const iconName =
-                      providerIcons[key] || "mdi:book-open-variant";
+                    const key = result.provider.provider?.toLowerCase().trim() || "";
+                    const gradient = providerColors[key] || "from-gray-500 to-gray-600";
+                    const iconName = providerIcons[key] || "mdi:book-open-variant";
 
                     return (
                       <motion.div
@@ -281,7 +361,7 @@ export default function FederatedSearch() {
                             <div className="flex items-start justify-between mb-4">
                               <div className="flex items-center gap-3">
                                 <div className={`p-3 rounded-xl bg-gradient-to-br ${gradient} text-white shadow-lg`}>
-                                  <Icon icon={iconName} className="h-6 w-6" />
+                                  <Icon name={iconName} className="h-6 w-6" />
                                 </div>
                                 <div>
                                   <h3 className="font-semibold text-lg text-foreground">
@@ -294,15 +374,14 @@ export default function FederatedSearch() {
                                   </p>
                                 </div>
                               </div>
-                              {result.provider.document_count &&
-                                result.provider.document_count > 0 && (
-                                  <Badge variant="secondary" className="text-xs">
-                                    {result.provider.document_count > 1000
-                                      ? `+${Math.floor(result.provider.document_count / 1000)}K`
-                                      : result.provider.document_count}{" "}
-                                    docs
-                                  </Badge>
-                                )}
+                              {result.provider.document_count && result.provider.document_count > 0 && (
+                                <Badge variant="secondary" className="text-xs">
+                                  {result.provider.document_count > 1000
+                                    ? `+${Math.floor(result.provider.document_count / 1000)}K`
+                                    : result.provider.document_count}{" "}
+                                  docs
+                                </Badge>
+                              )}
                             </div>
 
                             <p className="text-sm text-muted-foreground mb-5 line-clamp-2">
@@ -311,18 +390,13 @@ export default function FederatedSearch() {
                                 : result.provider.description}
                             </p>
 
-                            <a
-                              href={result.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="block"
-                            >
+                            <a href={result.url} target="_blank" rel="noopener noreferrer" className="block">
                               <Button className="w-full gap-2 bg-gradient-to-r from-bn-blue-primary to-bn-blue-primary/80 hover:from-bn-blue-primary/90 hover:to-bn-blue-primary/70 group-hover:shadow-lg transition-all">
-                                <Icon icon="mdi:magnify" className="h-4 w-4" />
+                                <Icon name="mdi:magnify" className="h-4 w-4" />
                                 {isAr
                                   ? `البحث في ${result.provider.name}`
                                   : `Rechercher dans ${result.provider.name}`}
-                                <Icon icon="mdi:open-in-new" className="h-4 w-4 opacity-60" />
+                                <Icon name="mdi:open-in-new" className="h-4 w-4 opacity-60" />
                               </Button>
                             </a>
                           </CardContent>
@@ -340,13 +414,11 @@ export default function FederatedSearch() {
                     className="gap-2 border-2 border-gold-bn-primary/50 text-gold-bn-primary hover:bg-gold-bn-primary/5"
                     onClick={() => {
                       results.forEach((r) => {
-                        if (r.url && r.url !== "#") {
-                          window.open(r.url, "_blank");
-                        }
+                        if (r.url && r.url !== "#") window.open(r.url, "_blank");
                       });
                     }}
                   >
-                    <Icon icon="mdi:open-in-new" className="h-5 w-5" />
+                    <Icon name="mdi:open-in-new" className="h-5 w-5" />
                     {isAr
                       ? "فتح جميع النتائج في علامات تبويب جديدة"
                       : "Ouvrir tous les résultats dans de nouveaux onglets"}
@@ -356,31 +428,19 @@ export default function FederatedSearch() {
             )}
 
             {hasSearched && results.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center py-20"
-              >
-                <Icon icon="mdi:database-off-outline" className="h-16 w-16 mx-auto text-muted-foreground/40 mb-4" />
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-20">
+                <Icon name="mdi:database-off-outline" className="h-16 w-16 mx-auto text-muted-foreground/40 mb-4" />
                 <p className="text-lg text-muted-foreground">
-                  {isAr
-                    ? "لم يتم العثور على قواعد بيانات مطابقة"
-                    : "Aucune base de données sélectionnée"}
+                  {isAr ? "لم يتم العثور على قواعد بيانات مطابقة" : "Aucune base de données sélectionnée"}
                 </p>
               </motion.div>
             )}
 
             {!hasSearched && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center py-20"
-              >
-                <Icon icon="mdi:cloud-search-outline" className="h-20 w-20 mx-auto text-muted-foreground/20 mb-4" />
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-12">
+                <Icon name="mdi:cloud-search-outline" className="h-20 w-20 mx-auto text-muted-foreground/20 mb-4" />
                 <p className="text-lg text-muted-foreground">
-                  {isAr
-                    ? "أدخل مصطلح البحث للبدء"
-                    : "Entrez un terme de recherche pour commencer"}
+                  {isAr ? "أدخل مصطلح البحث للبدء" : "Entrez un terme de recherche pour commencer"}
                 </p>
                 <p className="text-sm text-muted-foreground/60 mt-2">
                   {isAr
@@ -391,6 +451,140 @@ export default function FederatedSearch() {
             )}
           </AnimatePresence>
         </section>
+
+        {/* Carrousel Ressources Électroniques */}
+        {activeBundles && activeBundles.length > 0 && (
+          <section className="py-20 bg-gradient-to-b from-muted to-background relative overflow-hidden">
+            <div className="absolute bottom-0 left-0 w-64 h-64 opacity-10">
+              <div className="w-full h-full bg-gradient-to-tr from-gold-bn-primary/30 to-transparent rounded-full blur-3xl" />
+            </div>
+            <div className="absolute bottom-0 right-0 w-64 h-64 opacity-10">
+              <div className="w-full h-full bg-gradient-to-tl from-gold-bn-primary/30 to-transparent rounded-full blur-3xl" />
+            </div>
+
+            <div className="container mx-auto px-4 relative z-10">
+              {/* Header */}
+              <div className="text-center mb-14">
+                <div className="inline-flex items-center justify-center w-12 h-12 border border-gold-bn-primary rounded-lg mb-6">
+                  <Icon name="mdi:select-multiple" className="w-6 h-6 text-gold-bn-primary" />
+                </div>
+                <h2 className="text-[48px] font-normal text-foreground font-gilda">
+                  {isAr ? "الموارد الإلكترونية" : "Ressources électroniques"}
+                </h2>
+                {/* Badge nombre de bouquets */}
+                <div className="inline-flex items-center gap-2 mt-3 px-4 py-1.5 rounded-full bg-gold-bn-primary/10 border border-gold-bn-primary/30">
+                  <Icon name="mdi:bookshelf" className="h-4 w-4 text-gold-bn-primary" />
+                  <span className="text-sm font-semibold text-gold-bn-primary">
+                    {activeBundles.length} {isAr ? "bouquet électronique" : activeBundles.length > 1 ? "bouquets électroniques" : "bouquet électronique"}
+                  </span>
+                </div>
+                <p className="font-body text-regular text-muted-foreground max-w-2xl mx-auto mt-4">
+                  {isAr
+                    ? "تتيح هذه الموارد مركزة ومشاركة التراث الوثائقي والثقافي على المستوى الدولي"
+                    : "Ces ressources permettent la centralisation et le partage du patrimoine documentaire et culturel à l'échelle internationale"}
+                </p>
+              </div>
+
+              {/* Carrousel dynamique */}
+              <div className="relative px-16">
+                {/* Flèche gauche */}
+                <button
+                  onClick={() => setRepoCarouselIndex(prev => Math.max(0, prev - 1))}
+                  disabled={repoCarouselIndex === 0}
+                  className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                  aria-label="Précédent"
+                >
+                  <Icon name="mdi:chevron-left" className="h-6 w-6" />
+                </button>
+
+                {/* Slides */}
+                <div className="overflow-hidden">
+                  <div
+                    className="flex transition-transform duration-500 ease-in-out"
+                    style={{ transform: `translateX(-${repoCarouselIndex * 33.333}%)` }}
+                  >
+                    {activeBundles.map((bundle) => {
+                      const providerKey = bundle.provider?.toLowerCase().trim();
+                      const localLogo = providerKey ? providerLogoMap[providerKey] : null;
+                      const logoSrc = localLogo || bundle.provider_logo_url;
+                      const needsDarkBackground = providerKey && darkBackgroundProviders.includes(providerKey);
+                      const resourceUrl = bundle.api_base_url || bundle.website_url || '#';
+                      const description = isAr && bundle.description_ar ? bundle.description_ar : bundle.description || '';
+                      const bundleName = isAr && bundle.name_ar ? bundle.name_ar : bundle.name;
+
+                      return (
+                        <div key={bundle.id} className="flex-shrink-0 w-full md:w-1/3 px-4">
+                          <FancyTooltip
+                            content={bundle.provider || bundle.name}
+                            description={description}
+                            icon="mdi:book-open-variant"
+                            side="top"
+                            variant="gold"
+                          >
+                            <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+                              <CardContent className="p-8 flex flex-col items-center justify-center">
+                                <div className={`flex items-center justify-center h-[80px] ${needsDarkBackground ? 'bg-bn-blue-primary rounded-lg px-4' : ''}`}>
+                                  {logoSrc ? (
+                                    <img
+                                      src={logoSrc}
+                                      alt={bundleName}
+                                      className="h-[50px] max-w-[200px] object-contain"
+                                    />
+                                  ) : (
+                                    <div className="font-heading text-[42px] font-semibold text-bn-blue-primary tracking-wide">
+                                      {bundle.provider || bundle.name}
+                                    </div>
+                                  )}
+                                </div>
+                                {bundle.document_count && bundle.document_count > 0 && (
+                                  <span className="mt-3 text-xs text-muted-foreground font-medium">
+                                    {bundle.document_count > 1000 ? `+${Math.floor(bundle.document_count / 1000)}K` : bundle.document_count} docs
+                                  </span>
+                                )}
+                                <a
+                                  href={resourceUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="mt-4 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
+                                >
+                                  {isAr ? "استكشاف" : "Explorer"} <Icon name="mdi:chevron-right" className="h-4 w-4" />
+                                </a>
+                              </CardContent>
+                            </Card>
+                          </FancyTooltip>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Flèche droite */}
+                <button
+                  onClick={() => setRepoCarouselIndex(prev => Math.min(maxCarouselIndex, prev + 1))}
+                  disabled={repoCarouselIndex >= maxCarouselIndex}
+                  className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors disabled:opacity-20 disabled:cursor-not-allowed"
+                  aria-label="Suivant"
+                >
+                  <Icon name="mdi:chevron-right" className="h-6 w-6" />
+                </button>
+              </div>
+
+              {/* Pagination */}
+              {maxCarouselIndex > 0 && (
+                <div className="flex justify-center gap-3 mt-14">
+                  {Array.from({ length: maxCarouselIndex + 1 }, (_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setRepoCarouselIndex(index)}
+                      className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${repoCarouselIndex === index ? 'bg-gold-bn-primary' : 'bg-muted-foreground/25 hover:bg-muted-foreground/40'}`}
+                      aria-label={`Aller à la page ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
       </div>
     </DigitalLibraryLayout>
   );
