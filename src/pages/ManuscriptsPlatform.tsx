@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { BookOpen, Search, Eye, Download, Calendar, User, MapPin, Lock, AlertCircle, Star, Sparkles, Filter, ChevronDown, X, Users, Building2, HelpCircle, SlidersHorizontal } from "lucide-react";
+import { BookOpen, Search, Eye, Download, Calendar, User, MapPin, Lock, AlertCircle, Star, Sparkles, Filter, ChevronDown, X, Users, Building2, HelpCircle, SlidersHorizontal, LayoutDashboard, Handshake, Settings } from "lucide-react";
 import emblemeMaroc from "@/assets/embleme-maroc.png";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/Header";
@@ -26,7 +26,7 @@ import { useManuscriptSearch, SearchFilters } from "@/hooks/useManuscriptSearch"
 import { SearchResultsPanel } from "@/components/manuscripts/SearchResultsPanel";
 import { SearchPagination } from "@/components/manuscripts/SearchPagination";
 import { ManuscriptSearchBar } from "@/components/manuscripts/ManuscriptSearchBar";
-import ManuscriptsAdmin from "@/components/manuscripts/ManuscriptsAdmin";
+
 import manuscriptBanner from "@/assets/manuscript-banner.jpg";
 import moroccanPatternBg from "@/assets/moroccan-pattern-bg.jpg";
 import zelligePattern1 from "@/assets/zellige-pattern-1.jpg";
@@ -274,6 +274,33 @@ export default function ManuscriptsPlatform() {
                     </SheetContent>
                   </Sheet>
                 )}
+                {(profile?.role === 'admin' || profile?.role === 'librarian') && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button size="default" className="bg-white/10 hover:bg-white/20 backdrop-blur-md border-2 border-white/30 text-white shadow-lg hover:shadow-xl transition-all w-full sm:w-auto text-sm sm:text-base">
+                        <Settings className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                        Administration
+                        <ChevronDown className="h-4 w-4 ml-1" />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56 bg-background border shadow-lg z-50">
+                      <DropdownMenuItem
+                        className="cursor-pointer gap-2"
+                        onClick={() => navigate("/admin/content-management-manuscrits")}
+                      >
+                        <LayoutDashboard className="h-4 w-4 text-primary" />
+                        Gestion de la plateforme
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="cursor-pointer gap-2"
+                        onClick={() => navigate("/plateforme-manuscrits/admin/partenariats")}
+                      >
+                        <Handshake className="h-4 w-4 text-amber-600" />
+                        Demandes de partenariat
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
                 {profile?.role === 'partner' && (
                   <Button size="default" asChild className="bg-gold hover:bg-gold/90 text-white shadow-lg w-full sm:w-auto text-sm sm:text-base">
                     <Link to="/partner-dashboard">
@@ -315,10 +342,6 @@ export default function ManuscriptsPlatform() {
             </div>
           </section>
 
-          {/* Section Administration (admins/librarians seulement) */}
-          {(profile?.role === 'admin' || profile?.role === 'librarian') && (
-            <ManuscriptsAdmin />
-          )}
 
           {/* Résultats */}
           <section className="mb-6">
