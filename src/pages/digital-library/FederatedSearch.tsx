@@ -233,6 +233,15 @@ export default function FederatedSearch() {
   const [hasSearched, setHasSearched] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [repoCarouselIndex, setRepoCarouselIndex] = useState(0);
+
+  // Reset search state on mount (navigation SPA or page refresh)
+  useEffect(() => {
+    setQuery("");
+    setResults([]);
+    setHasSearched(false);
+    setSelectedProviders(new Set());
+    setDropdownOpen(false);
+  }, []);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
