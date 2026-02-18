@@ -143,6 +143,7 @@ const RequestsManagement = lazy(() => import("./pages/digital-library/RequestsMa
 const DigitalLibraryDocuments = lazy(() => import("./pages/DigitalLibraryDocuments"));
 const DigitalLibraryUsers = lazy(() => import("./pages/DigitalLibraryUsers"));
 const DigitalLibraryAnalytics = lazy(() => import("./pages/DigitalLibraryAnalytics"));
+const DigitalLibraryReaderNotes = lazy(() => import("./pages/DigitalLibraryReaderNotes"));
 const DigitalLibraryExhibitions = lazy(() => import("./pages/DigitalLibraryExhibitions"));
 const DigitalLibraryReproduction = lazy(() => import("./pages/DigitalLibraryReproduction"));
 const DigitalLibraryRestrictions = lazy(() => import("./pages/DigitalLibraryRestrictions"));
@@ -388,6 +389,7 @@ const App = () => {
           <Route path="/admin/digital-library/documents" element={<DigitalLibraryDocuments />} />
           <Route path="/admin/digital-library/users" element={<DigitalLibraryUsers />} />
           <Route path="/admin/digital-library/analytics" element={<DigitalLibraryAnalytics />} />
+          <Route path="/admin/digital-library/reader-notes" element={<DigitalLibraryReaderNotes />} />
           <Route path="/admin/digital-library/exhibitions" element={<DigitalLibraryExhibitions />} />
           <Route path="/admin/digital-library/reproduction" element={<DigitalLibraryReproduction />} />
           <Route path="/admin/digital-library/restrictions" element={<DigitalLibraryRestrictions />} />

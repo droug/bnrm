@@ -4448,6 +4448,60 @@ export type Database = {
         }
         Relationships: []
       }
+      document_reader_notes: {
+        Row: {
+          admin_response: string | null
+          admin_response_at: string | null
+          admin_response_by: string | null
+          content: string
+          created_at: string
+          document_cote: string | null
+          document_id: string
+          document_title: string | null
+          document_type: string | null
+          id: string
+          note_type: string
+          status: string
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_response?: string | null
+          admin_response_at?: string | null
+          admin_response_by?: string | null
+          content: string
+          created_at?: string
+          document_cote?: string | null
+          document_id: string
+          document_title?: string | null
+          document_type?: string | null
+          id?: string
+          note_type?: string
+          status?: string
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_response?: string | null
+          admin_response_at?: string | null
+          admin_response_by?: string | null
+          content?: string
+          created_at?: string
+          document_cote?: string | null
+          document_id?: string
+          document_title?: string | null
+          document_type?: string | null
+          id?: string
+          note_type?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       document_templates: {
         Row: {
           content_template: string

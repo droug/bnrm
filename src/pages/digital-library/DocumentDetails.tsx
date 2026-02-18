@@ -25,6 +25,8 @@ import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { ReservationRequestDialog } from "@/components/digital-library/ReservationRequestDialog";
 import { DigitizationRequestDialog } from "@/components/digital-library/DigitizationRequestDialog";
+import { ReaderNoteForm } from "@/components/digital-library/ReaderNoteForm";
+
 
 interface DocumentMetadata {
   dc_creator?: string;
@@ -625,9 +627,25 @@ export default function DocumentDetails() {
                         >
                           Souscrire à une adhésion
                         </Button>
-                      </div>
-                    </div>
-                  </div>
+          </div>
+        </div>
+
+        {/* Section notes privées du lecteur */}
+        {user && userProfile && (
+          <div className="mt-6">
+            <ReaderNoteForm
+              documentId={effectiveDocumentId || documentId || ""}
+              documentTitle={document.title}
+              documentType={document.document_type || undefined}
+              documentCote={document.cote || document.inventory_number || undefined}
+              userId={user.id}
+              userFirstName={userProfile.firstName}
+              userLastName={userProfile.lastName}
+              userEmail={userProfile.email}
+            />
+          </div>
+        )}
+      </div>
                 )}
 
                 {/* Statut des droits d'auteur */}
