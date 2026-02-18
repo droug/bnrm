@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import ScrollToTop from "@/components/ScrollToTop";
+import { ScrollToTopButton } from "@/components/ScrollToTopButton";
 import { useAutoSync } from "@/hooks/useAutoSync";
 import { PerformanceOptimizer } from "@/components/seo/PerformanceOptimizer";
 import { CriticalCssOptimizer, usePerformanceMetrics } from "@/components/seo/CriticalCss";
@@ -535,6 +536,7 @@ const App = () => {
         </Routes>
         </Suspense>
         <CookieBanner />
+        <ScrollToTopButton />
       </LanguageProvider>
     </ThemeProvider>
   );
