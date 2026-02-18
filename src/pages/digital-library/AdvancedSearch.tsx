@@ -23,6 +23,7 @@ import { toast as sonnerToast } from "sonner";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { motion, AnimatePresence } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 
 const NOTE_TYPES = [
   { value: "information", label: "Information complémentaire" },
@@ -37,6 +38,24 @@ export default function AdvancedSearch() {
   const { toast } = useToast();
   const { isLibrarian, loading: rolesLoading } = useSecureRoles();
   const { user, profile } = useAuth();
+
+  const { data: contactSettings } = useQuery({
+    queryKey: ["advanced-search-contact-settings"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("cms_portal_settings")
+        .select("setting_value")
+        .eq("setting_key", "advanced_search_contact")
+        .maybeSingle();
+      return data?.setting_value as { email?: string; phone?: string; phone_display?: string; address?: string; hours?: string } | null;
+    },
+  });
+
+  const contactEmail = contactSettings?.email || "info@bnrm.ma";
+  const contactPhone = contactSettings?.phone || "+212537279800";
+  const contactPhoneDisplay = contactSettings?.phone_display || "+212 5 37 27 98 00";
+  const contactAddress = contactSettings?.address || "Avenue Ibn Batouta, Rabat";
+  const contactHours = contactSettings?.hours || "Du lundi au vendredi, 8h30 – 18h00";
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
@@ -936,7 +955,7 @@ export default function AdvancedSearch() {
                     </p>
                     <div className="space-y-3">
                       <a
-                        href="mailto:info@bnrm.ma"
+                        href={`mailto:${contactEmail}`}
                         className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors group"
                       >
                         <div className="p-2 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
@@ -944,11 +963,11 @@ export default function AdvancedSearch() {
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Email</p>
-                          <p className="text-sm font-medium text-foreground">info@bnrm.ma</p>
+                          <p className="text-sm font-medium text-foreground">{contactEmail}</p>
                         </div>
                       </a>
                       <a
-                        href="tel:+212537279800"
+                        href={`tel:${contactPhone}`}
                         className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors group"
                       >
                         <div className="p-2 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
@@ -956,7 +975,7 @@ export default function AdvancedSearch() {
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Téléphone</p>
-                          <p className="text-sm font-medium text-foreground">+212 5 37 27 98 00</p>
+                          <p className="text-sm font-medium text-foreground">{contactPhoneDisplay}</p>
                         </div>
                       </a>
                       <div className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/20">
@@ -965,12 +984,12 @@ export default function AdvancedSearch() {
                         </div>
                         <div>
                           <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Adresse</p>
-                          <p className="text-sm font-medium text-foreground">Avenue Ibn Batouta, Rabat</p>
+                          <p className="text-sm font-medium text-foreground">{contactAddress}</p>
                         </div>
                       </div>
                     </div>
                     <div className="p-3 rounded-lg bg-gold-bn-primary/5 border border-gold-bn-primary/20 text-xs text-muted-foreground">
-                      <span className="font-semibold text-foreground">Horaires :</span> Du lundi au vendredi, 8h30 – 18h00
+                      <span className="font-semibold text-foreground">Horaires :</span> {contactHours}
                     </div>
                   </CardContent>
                 </Card>

@@ -19,6 +19,7 @@ import CmsAboutManagerBN from "@/components/cms/CmsAboutManagerBN";
 import CmsHelpManagerBN from "@/components/cms/CmsHelpManagerBN";
 import CmsTooltipsManagerBN from "@/components/cms/CmsTooltipsManagerBN";
 import CmsFederatedSearchManager from "@/components/cms/CmsFederatedSearchManager";
+import CmsSearchContactManager from "@/components/cms/CmsSearchContactManager";
 import FeaturedWorksManager from "@/components/admin/FeaturedWorksManager";
 import { Icon } from "@/components/ui/icon";
 import { 
@@ -107,6 +108,18 @@ const tabs = [
     borderColor: "border-gold-bn-primary/30",
     gradient: "from-gold-bn-primary/20 to-gold-bn-primary/5",
     description: "Photo de fond, titre et sous-titre de la page Recherche fédérée",
+    category: "homepage"
+  },
+  { 
+    id: "search-contact",
+    label: "Recherche avancée — Contact",
+    icon: null,
+    iconMdi: "mdi:card-account-phone-outline",
+    color: "text-cyan-600",
+    bgColor: "bg-cyan-500/10",
+    borderColor: "border-cyan-500/30",
+    gradient: "from-cyan-500/20 to-cyan-600/5",
+    description: "Coordonnées affichées quand la recherche est sans résultat",
     category: "homepage"
   },
   // === CONTENU ===
@@ -429,6 +442,8 @@ export default function ContentManagementSystem() {
         return <CmsTooltipsManagerBN />;
       case "federated-search":
         return <CmsFederatedSearchManager />;
+      case "search-contact":
+        return <CmsSearchContactManager />;
       default:
         return null;
     }
