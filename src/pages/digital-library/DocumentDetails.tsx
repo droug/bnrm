@@ -627,25 +627,9 @@ export default function DocumentDetails() {
                         >
                           Souscrire à une adhésion
                         </Button>
-          </div>
-        </div>
-
-        {/* Section notes privées du lecteur */}
-        {user && userProfile && (
-          <div className="mt-6">
-            <ReaderNoteForm
-              documentId={effectiveDocumentId || documentId || ""}
-              documentTitle={document.title}
-              documentType={document.document_type || undefined}
-              documentCote={document.cote || document.inventory_number || undefined}
-              userId={user.id}
-              userFirstName={userProfile.firstName}
-              userLastName={userProfile.lastName}
-              userEmail={userProfile.email}
-            />
-          </div>
-        )}
-      </div>
+                      </div>
+                    </div>
+                  </div>
                 )}
 
                 {/* Statut des droits d'auteur */}
@@ -746,6 +730,20 @@ export default function DocumentDetails() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Section notes privées du lecteur */}
+            {user && userProfile && (
+              <ReaderNoteForm
+                documentId={effectiveDocumentId || documentId || ""}
+                documentTitle={document.title}
+                documentType={document.document_type || undefined}
+                documentCote={document.cote || document.inventory_number || undefined}
+                userId={user.id}
+                userFirstName={userProfile.firstName}
+                userLastName={userProfile.lastName}
+                userEmail={userProfile.email}
+              />
+            )}
           </div>
 
           {/* Sidebar actions */}
