@@ -41,6 +41,115 @@ interface ProviderResult {
   url?: string;
 }
 
+interface ExampleResult {
+  id: string;
+  title: string;
+  title_ar: string;
+  authors: string;
+  year: string;
+  source: string;
+  source_ar: string;
+  type: string;
+  type_ar: string;
+  description: string;
+  description_ar: string;
+  gradient: string;
+  icon: string;
+}
+
+const EXAMPLE_RESULTS: ExampleResult[] = [
+  {
+    id: "1",
+    title: "Le patrimoine manuscrit marocain : histoire et conservation",
+    title_ar: "التراث المخطوطاتي المغربي: التاريخ والحفظ",
+    authors: "Mohammed El Mansouri, Fatima Zahra Benali",
+    year: "2022",
+    source: "Cairn.info",
+    source_ar: "كيرن إنفو",
+    type: "Article de revue",
+    type_ar: "مقال في مجلة",
+    description: "Étude approfondie sur les manuscrits du patrimoine marocain, leur classification et les méthodes de conservation numérique.",
+    description_ar: "دراسة معمقة حول مخطوطات التراث المغربي وتصنيفها وأساليب الحفظ الرقمي.",
+    gradient: "from-emerald-500 to-teal-600",
+    icon: "mdi:book-open-page-variant",
+  },
+  {
+    id: "2",
+    title: "Digital libraries and Islamic philosophy: A comparative study",
+    title_ar: "المكتبات الرقمية والفلسفة الإسلامية: دراسة مقارنة",
+    authors: "Ahmad Khalil, Sarah Johnson",
+    year: "2023",
+    source: "EBSCO Academic",
+    source_ar: "إبسكو أكاديمي",
+    type: "Article scientifique",
+    type_ar: "مقال علمي",
+    description: "Analyse comparative des ressources disponibles sur la philosophie islamique dans les grandes bases de données académiques mondiales.",
+    description_ar: "تحليل مقارن للموارد المتاحة حول الفلسفة الإسلامية في قواعد البيانات الأكاديمية العالمية الكبرى.",
+    gradient: "from-blue-500 to-indigo-600",
+    icon: "mdi:school",
+  },
+  {
+    id: "3",
+    title: "Arabic literature in the modern era: Trends and transformations",
+    title_ar: "الأدب العربي في العصر الحديث: الاتجاهات والتحولات",
+    authors: "Layla Al-Akhdar",
+    year: "2021",
+    source: "Al Manhal",
+    source_ar: "المنهل",
+    type: "Ouvrage",
+    type_ar: "كتاب",
+    description: "Un ouvrage de référence sur l'évolution de la littérature arabe contemporaine, ses courants majeurs et ses figures emblématiques.",
+    description_ar: "مرجع أساسي حول تطور الأدب العربي المعاصر وتياراته الكبرى وشخصياته الرمزية.",
+    gradient: "from-purple-500 to-violet-600",
+    icon: "mdi:book-variant",
+  },
+  {
+    id: "4",
+    title: "Information science in the age of artificial intelligence",
+    title_ar: "علم المعلومات في عصر الذكاء الاصطناعي",
+    authors: "Pierre Dupont, Amina Berrada",
+    year: "2023",
+    source: "BRILL",
+    source_ar: "بريل",
+    type: "Chapitre de livre",
+    type_ar: "فصل من كتاب",
+    description: "Exploration des nouvelles perspectives offertes par l'IA dans le domaine des sciences de l'information et de la documentation.",
+    description_ar: "استكشاف الآفاق الجديدة التي يوفرها الذكاء الاصطناعي في مجال علوم المعلومات والتوثيق.",
+    gradient: "from-amber-500 to-orange-600",
+    icon: "mdi:robot-outline",
+  },
+  {
+    id: "5",
+    title: "Histoire du Maroc : de l'Antiquité à l'époque contemporaine",
+    title_ar: "تاريخ المغرب: من العصور القديمة إلى العصر الحديث",
+    authors: "Rachid Bennani, Hassan Ouazzani",
+    year: "2020",
+    source: "ENI-Elearning",
+    source_ar: "إيني إي-ليرنينج",
+    type: "Cours en ligne",
+    type_ar: "دورة إلكترونية",
+    description: "Parcours pédagogique complet retraçant les grandes étapes de l'histoire marocaine, des origines berbères aux enjeux du XXIe siècle.",
+    description_ar: "مسار تعليمي شامل يتتبع المراحل الكبرى في التاريخ المغربي من الأصول الأمازيغية إلى تحديات القرن الحادي والعشرين.",
+    gradient: "from-cyan-500 to-blue-500",
+    icon: "mdi:laptop",
+  },
+  {
+    id: "6",
+    title: "Bibliothèques numériques et accès au savoir en Afrique",
+    title_ar: "المكتبات الرقمية والوصول إلى المعرفة في أفريقيا",
+    authors: "Mariama Diallo, Jean-Pierre Moreau",
+    year: "2022",
+    source: "Cairn.info",
+    source_ar: "كيرن إنفو",
+    type: "Article de revue",
+    type_ar: "مقال في مجلة",
+    description: "Analyse des défis et opportunités liés au développement des bibliothèques numériques dans les pays africains francophones.",
+    description_ar: "تحليل التحديات والفرص المرتبطة بتطوير المكتبات الرقمية في دول أفريقيا الناطقة بالفرنسية.",
+    gradient: "from-emerald-500 to-teal-600",
+    icon: "mdi:earth",
+  },
+];
+
 export default function FederatedSearch() {
   const { activeBundles } = useElectronicBundles();
   const { language } = useLanguage();
@@ -267,26 +376,39 @@ export default function FederatedSearch() {
                 </Button>
               </form>
 
-              {/* Exemples de recherche */}
-              <div className="mt-4 flex flex-wrap items-center gap-2">
-                <span className="text-xs text-white/60 font-medium shrink-0">
-                  {isAr ? "أمثلة :" : "Exemples :"}
-                </span>
-                {(isAr
-                  ? ["التراث المغربي", "الفلسفة الإسلامية", "الأدب العربي", "علم المكتبات", "تاريخ المغرب"]
-                  : ["Patrimoine marocain", "Philosophie islamique", "Littérature arabe", "Sciences de l'information", "Histoire du Maroc"]
-                ).map((example) => (
+              {/* Info-bulle temporaire pour tester les exemples */}
+              <div className="mt-3 flex items-center gap-2">
+                <div className="relative group">
                   <button
-                    key={example}
                     type="button"
-                    onClick={() => {
-                      setQuery(example);
-                    }}
-                    className="px-3 py-1 rounded-full text-xs font-medium bg-white/15 text-white/90 border border-white/25 hover:bg-white/25 hover:border-white/50 transition-all duration-200 backdrop-blur-sm"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-white/15 text-white/80 border border-white/25 hover:bg-white/25 transition-all backdrop-blur-sm"
                   >
-                    {example}
+                    <Icon name="mdi:lightbulb-outline" className="h-3.5 w-3.5 text-gold-bn-primary" />
+                    {isAr ? "أمثلة للبحث" : "Exemples de recherche"}
                   </button>
-                ))}
+                  {/* Tooltip */}
+                  <div className="absolute left-0 top-full mt-2 w-64 rounded-xl border border-white/20 bg-bn-blue-primary/95 backdrop-blur-md shadow-2xl p-3 hidden group-hover:block z-[99999]">
+                    <p className="text-xs text-white/60 font-medium mb-2 uppercase tracking-wide">
+                      {isAr ? "انقر لتطبيق مثال" : "Cliquez pour appliquer"}
+                    </p>
+                    <div className="flex flex-col gap-1">
+                      {(isAr
+                        ? ["التراث المغربي", "الفلسفة الإسلامية", "الأدب العربي", "علم المكتبات", "تاريخ المغرب"]
+                        : ["Patrimoine marocain", "Philosophie islamique", "Littérature arabe", "Sciences de l'information", "Histoire du Maroc"]
+                      ).map((example) => (
+                        <button
+                          key={example}
+                          type="button"
+                          onClick={() => setQuery(example)}
+                          className="text-left px-3 py-1.5 rounded-lg text-sm text-white hover:bg-white/20 transition-colors flex items-center gap-2"
+                        >
+                          <Icon name="mdi:magnify" className="h-3.5 w-3.5 text-gold-bn-primary shrink-0" />
+                          {example}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Multi-select dropdown for databases */}
@@ -409,6 +531,70 @@ export default function FederatedSearch() {
             </div>
           </div>
         </section>
+
+        {/* Example results - shown before any search */}
+        {!hasSearched && (
+          <section className="container mx-auto px-4 py-12">
+            <div className="flex items-center gap-3 mb-8">
+              <Icon name="mdi:star-four-points-outline" className="h-6 w-6 text-gold-bn-primary" />
+              <h2 className="text-2xl font-gilda text-foreground">
+                {isAr ? "أمثلة على النتائج" : "Exemples de résultats"}
+              </h2>
+              <span className="px-2.5 py-0.5 rounded-full bg-gold-bn-primary/10 text-gold-bn-primary text-xs font-medium border border-gold-bn-primary/30">
+                {isAr ? "تجريبي" : "Aperçu"}
+              </span>
+            </div>
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {EXAMPLE_RESULTS.map((item, index) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.07 }}
+                >
+                  <Card className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-bn-blue-primary/30 overflow-hidden h-full flex flex-col">
+                    <div className={`h-2 bg-gradient-to-r ${item.gradient}`} />
+                    <CardContent className="p-6 flex flex-col flex-1">
+                      <div className="flex items-start justify-between mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className={`p-2.5 rounded-xl bg-gradient-to-br ${item.gradient} text-white shadow-md`}>
+                            <Icon name={item.icon} className="h-5 w-5" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold text-bn-blue-primary">{isAr ? item.source_ar : item.source}</p>
+                            <p className="text-xs text-muted-foreground">{isAr ? item.type_ar : item.type} · {item.year}</p>
+                          </div>
+                        </div>
+                        <Badge variant="outline" className="text-xs shrink-0 ml-2">{item.year}</Badge>
+                      </div>
+                      <h3 className="font-semibold text-base text-foreground mb-1 line-clamp-2 leading-snug">
+                        {isAr ? item.title_ar : item.title}
+                      </h3>
+                      <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1">
+                        <Icon name="mdi:account-outline" className="h-3.5 w-3.5 shrink-0" />
+                        {item.authors}
+                      </p>
+                      <p className="text-sm text-muted-foreground line-clamp-3 flex-1">
+                        {isAr ? item.description_ar : item.description}
+                      </p>
+                      <div className="mt-4 pt-3 border-t border-border">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-full gap-2 text-xs hover:bg-bn-blue-primary hover:text-white hover:border-bn-blue-primary transition-colors"
+                          onClick={() => setQuery(isAr ? item.title_ar : item.title)}
+                        >
+                          <Icon name="mdi:magnify" className="h-3.5 w-3.5" />
+                          {isAr ? "البحث عن هذا الموضوع" : "Rechercher ce sujet"}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Results Section - only rendered when a search has been made */}
         {hasSearched && (
