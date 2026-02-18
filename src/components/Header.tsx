@@ -231,7 +231,7 @@ const Header = () => {
               <img src={logoImage} alt="Logo BNRM" className="h-14 w-auto" />
             </Link>
           
-            <div className={`hidden md:flex flex-1 max-w-md mx-8 ${location.pathname === '/plateforme-manuscrits' ? 'invisible' : ''}`}>
+            <div className={`hidden md:flex flex-1 max-w-md mx-8 ${(location.pathname === '/plateforme-manuscrits' || location.pathname.startsWith('/admin/content-management-manuscrits')) ? 'invisible' : ''}`}>
               <div className="relative w-full">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                 <Input
@@ -244,7 +244,7 @@ const Header = () => {
 
             <div className="flex items-center gap-2">
               {/* Bouton Administration Manuscrits - visible uniquement sur /plateforme-manuscrits pour admins/librarians */}
-              {location.pathname === '/plateforme-manuscrits' && (profile?.role === 'admin' || profile?.role === 'librarian') && (
+              {(location.pathname === '/plateforme-manuscrits' || location.pathname.startsWith('/admin/content-management-manuscrits')) && (profile?.role === 'admin' || profile?.role === 'librarian') && (
                 <Button
                   variant="ghost"
                   size="sm"
