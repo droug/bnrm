@@ -150,6 +150,65 @@ const EXAMPLE_RESULTS: ExampleResult[] = [
   },
 ];
 
+function ExamplesButton({ isAr, setQuery }: { isAr: boolean; setQuery: (q: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
+  const btnRef = useRef<HTMLButtonElement>(null);
+
+  const examples = isAr
+    ? ["التراث المغربي", "الفلسفة الإسلامية", "الأدب العربي", "علم المكتبات", "تاريخ المغرب"]
+    : ["Patrimoine marocain", "Philosophie islamique", "Littérature arabe", "Sciences de l'information", "Histoire du Maroc"];
+
+  const handleEnter = () => {
+    if (btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setPos({ top: rect.bottom + 6, left: rect.left });
+    }
+    setOpen(true);
+  };
+
+  return (
+    <div className="mt-3 flex items-center gap-2">
+      <button
+        ref={btnRef}
+        type="button"
+        onMouseEnter={handleEnter}
+        onMouseLeave={() => setOpen(false)}
+        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-white/15 text-white/80 border border-white/25 hover:bg-white/25 transition-all backdrop-blur-sm"
+      >
+        <Icon name="mdi:lightbulb-outline" className="h-3.5 w-3.5 text-gold-bn-primary" />
+        {isAr ? "أمثلة للبحث" : "Exemples de recherche"}
+      </button>
+
+      {open && (
+        <div
+          className="fixed w-64 rounded-xl border border-white/20 bg-slate-900/95 backdrop-blur-md shadow-2xl p-3 z-[99999]"
+          style={{ top: pos.top, left: pos.left }}
+          onMouseEnter={() => setOpen(true)}
+          onMouseLeave={() => setOpen(false)}
+        >
+          <p className="text-xs text-white/60 font-medium mb-2 uppercase tracking-wide">
+            {isAr ? "انقر لتطبيق مثال" : "Cliquez pour appliquer"}
+          </p>
+          <div className="flex flex-col gap-1">
+            {examples.map((example) => (
+              <button
+                key={example}
+                type="button"
+                onClick={() => { setQuery(example); setOpen(false); }}
+                className="text-left px-3 py-1.5 rounded-lg text-sm text-white hover:bg-white/20 transition-colors flex items-center gap-2"
+              >
+                <Icon name="mdi:magnify" className="h-3.5 w-3.5 text-gold-bn-primary shrink-0" />
+                {example}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function FederatedSearch() {
   const { activeBundles } = useElectronicBundles();
   const { language } = useLanguage();
@@ -377,39 +436,7 @@ export default function FederatedSearch() {
               </form>
 
               {/* Info-bulle temporaire pour tester les exemples */}
-              <div className="mt-3 flex items-center gap-2">
-                <div className="relative group">
-                  <button
-                    type="button"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-white/15 text-white/80 border border-white/25 hover:bg-white/25 transition-all backdrop-blur-sm"
-                  >
-                    <Icon name="mdi:lightbulb-outline" className="h-3.5 w-3.5 text-gold-bn-primary" />
-                    {isAr ? "أمثلة للبحث" : "Exemples de recherche"}
-                  </button>
-                  {/* Tooltip */}
-                  <div className="absolute left-0 top-full mt-2 w-64 rounded-xl border border-white/20 bg-bn-blue-primary/95 backdrop-blur-md shadow-2xl p-3 hidden group-hover:block z-[99999]">
-                    <p className="text-xs text-white/60 font-medium mb-2 uppercase tracking-wide">
-                      {isAr ? "انقر لتطبيق مثال" : "Cliquez pour appliquer"}
-                    </p>
-                    <div className="flex flex-col gap-1">
-                      {(isAr
-                        ? ["التراث المغربي", "الفلسفة الإسلامية", "الأدب العربي", "علم المكتبات", "تاريخ المغرب"]
-                        : ["Patrimoine marocain", "Philosophie islamique", "Littérature arabe", "Sciences de l'information", "Histoire du Maroc"]
-                      ).map((example) => (
-                        <button
-                          key={example}
-                          type="button"
-                          onClick={() => setQuery(example)}
-                          className="text-left px-3 py-1.5 rounded-lg text-sm text-white hover:bg-white/20 transition-colors flex items-center gap-2"
-                        >
-                          <Icon name="mdi:magnify" className="h-3.5 w-3.5 text-gold-bn-primary shrink-0" />
-                          {example}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <ExamplesButton isAr={isAr} setQuery={setQuery} />
 
               {/* Multi-select dropdown for databases */}
               {activeBundles && activeBundles.length > 0 && (
