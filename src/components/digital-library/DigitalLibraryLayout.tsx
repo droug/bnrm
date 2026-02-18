@@ -196,13 +196,13 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                 <Link to="/manuscripts">
                   <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
                     <Icon name="mdi:scroll-text-outline" className="h-4 w-4" />
-                    {ml('Manuscrits Numérisés', 'المخطوطات الرقمية', 'Digitized Manuscripts', 'Manuscritos Digitalizados', 'ⵉⵎⵙⴽⵜⴰⵢⵏ ⵉⵜⵜⵓⵙⵏⵓⵎⴰⵏⵏ')}
+                    {ml('Plateforme Manuscrits', 'منصة المخطوطات', 'Manuscripts Platform', 'Plataforma Manuscritos', 'ⴰⵙⵙⵉⵡⴹ ⵏ ⵉⵎⵙⴽⵜⴰⵢⵏ')}
                   </DropdownMenuItem>
                 </Link>
                 <Link to="/portail-cbm">
                   <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
                     <Icon name="mdi:earth" className="h-4 w-4" />
-                    {ml('Portail CBM', 'بوابة الفهرس البيبليوغرافي', 'CBM Portal', 'Portal CBM', 'ⴰⵖⵔⴰⴱ CBM')}
+                    {ml('Plateforme CBM', 'منصة الفهرس البيبليوغرافي', 'CBM Platform', 'Plataforma CBM', 'ⴰⵙⵙⵉⵡⴹ CBM')}
                   </DropdownMenuItem>
                 </Link>
               </DropdownMenuContent>
