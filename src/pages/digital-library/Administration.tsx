@@ -115,7 +115,7 @@ export default function Administration() {
       iconColor: "text-indigo-600",
     },
     {
-      title: "Documents de reproduction",
+      title: "Documents à reproduire",
       description: "Traitement des documents",
       iconName: "mdi:image-outline",
       path: "/admin/digital-library/reproduction",
