@@ -160,6 +160,15 @@ export default function Administration() {
       iconColor: "text-sky-600",
     },
     {
+      title: "Retours lecteurs",
+      description: "Informations et signalements transmis par les lecteurs",
+      iconName: "mdi:message-alert-outline",
+      path: "/admin/digital-library/reader-notes",
+      bgColor: "from-yellow-500/10 to-amber-500/5",
+      borderColor: "border-yellow-500/20 hover:border-yellow-500/40",
+      iconColor: "text-yellow-600",
+    },
+    {
       title: "Paramètres techniques",
       description: "Connecteurs, OAI-PMH, notifications",
       iconName: "mdi:cog-outline",
