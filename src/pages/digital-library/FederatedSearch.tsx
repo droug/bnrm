@@ -79,9 +79,10 @@ export default function FederatedSearch() {
 
   const isAr = language === "ar";
 
+  const itemsPerPage = 3;
   const maxCarouselIndex = useMemo(() => {
-    if (!activeBundles || activeBundles.length <= 3) return 0;
-    return Math.ceil(activeBundles.length / 3) - 1;
+    if (!activeBundles || activeBundles.length <= itemsPerPage) return 0;
+    return Math.ceil(activeBundles.length / itemsPerPage) - 1;
   }, [activeBundles]);
 
   const toggleProvider = (id: string) => {
@@ -525,60 +526,64 @@ export default function FederatedSearch() {
                 <div className="overflow-hidden">
                   <div
                     className="flex transition-transform duration-500 ease-in-out"
-                    style={{ transform: `translateX(-${repoCarouselIndex * 33.333}%)` }}
+                    style={{ transform: `translateX(-${repoCarouselIndex * 100}%)` }}
                   >
-                    {activeBundles.map((bundle) => {
-                      const providerKey = bundle.provider?.toLowerCase().trim();
-                      const localLogo = providerKey ? providerLogoMap[providerKey] : null;
-                      const logoSrc = localLogo || bundle.provider_logo_url;
-                      const needsDarkBackground = providerKey && darkBackgroundProviders.includes(providerKey);
-                      const resourceUrl = bundle.api_base_url || bundle.website_url || '#';
-                      const description = isAr && bundle.description_ar ? bundle.description_ar : bundle.description || '';
-                      const bundleName = isAr && bundle.name_ar ? bundle.name_ar : bundle.name;
+                    {Array.from({ length: Math.ceil(activeBundles.length / itemsPerPage) }, (_, pageIdx) => (
+                      <div key={pageIdx} className="flex flex-shrink-0 w-full">
+                        {activeBundles.slice(pageIdx * itemsPerPage, (pageIdx + 1) * itemsPerPage).map((bundle) => {
+                          const providerKey = bundle.provider?.toLowerCase().trim();
+                          const localLogo = providerKey ? providerLogoMap[providerKey] : null;
+                          const logoSrc = localLogo || bundle.provider_logo_url;
+                          const needsDarkBackground = providerKey && darkBackgroundProviders.includes(providerKey);
+                          const resourceUrl = bundle.api_base_url || bundle.website_url || '#';
+                          const description = isAr && bundle.description_ar ? bundle.description_ar : bundle.description || '';
+                          const bundleName = isAr && bundle.name_ar ? bundle.name_ar : bundle.name;
 
-                      return (
-                        <div key={bundle.id} className="flex-shrink-0 w-full md:w-1/3 px-4">
-                          <FancyTooltip
-                            content={bundle.provider || bundle.name}
-                            description={description}
-                            icon="mdi:book-open-variant"
-                            side="top"
-                            variant="gold"
-                          >
-                            <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
-                              <CardContent className="p-8 flex flex-col items-center justify-center">
-                                <div className={`flex items-center justify-center h-[80px] ${needsDarkBackground ? 'bg-bn-blue-primary rounded-lg px-4' : ''}`}>
-                                  {logoSrc ? (
-                                    <img
-                                      src={logoSrc}
-                                      alt={bundleName}
-                                      className="h-[50px] max-w-[200px] object-contain"
-                                    />
-                                  ) : (
-                                    <div className="font-heading text-[42px] font-semibold text-bn-blue-primary tracking-wide">
-                                      {bundle.provider || bundle.name}
+                          return (
+                            <div key={bundle.id} className="flex-1 px-4">
+                              <FancyTooltip
+                                content={bundle.provider || bundle.name}
+                                description={description}
+                                icon="mdi:book-open-variant"
+                                side="top"
+                                variant="gold"
+                              >
+                                <Card className="bg-card border-0 rounded-xl shadow-[0_6px_24px_hsl(0_0%_0%_/0.12)] hover:shadow-[0_12px_40px_hsl(0_0%_0%_/0.18)] hover:scale-[1.02] transition-all duration-300 cursor-pointer">
+                                  <CardContent className="p-8 flex flex-col items-center justify-center">
+                                    <div className={`flex items-center justify-center h-[80px] ${needsDarkBackground ? 'bg-bn-blue-primary rounded-lg px-4' : ''}`}>
+                                      {logoSrc ? (
+                                        <img
+                                          src={logoSrc}
+                                          alt={bundleName}
+                                          className="h-[50px] max-w-[200px] object-contain"
+                                        />
+                                      ) : (
+                                        <div className="font-heading text-[42px] font-semibold text-bn-blue-primary tracking-wide">
+                                          {bundle.provider || bundle.name}
+                                        </div>
+                                      )}
                                     </div>
-                                  )}
-                                </div>
-                                {bundle.document_count && bundle.document_count > 0 && (
-                                  <span className="mt-3 text-xs text-muted-foreground font-medium">
-                                    {bundle.document_count > 1000 ? `+${Math.floor(bundle.document_count / 1000)}K` : bundle.document_count} docs
-                                  </span>
-                                )}
-                                <a
-                                  href={resourceUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="mt-4 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
-                                >
-                                  {isAr ? "استكشاف" : "Explorer"} <Icon name="mdi:chevron-right" className="h-4 w-4" />
-                                </a>
-                              </CardContent>
-                            </Card>
-                          </FancyTooltip>
-                        </div>
-                      );
-                    })}
+                                    {bundle.document_count && bundle.document_count > 0 && (
+                                      <span className="mt-3 text-xs text-muted-foreground font-medium">
+                                        {bundle.document_count > 1000 ? `+${Math.floor(bundle.document_count / 1000)}K` : bundle.document_count} docs
+                                      </span>
+                                    )}
+                                    <a
+                                      href={resourceUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="mt-4 inline-flex items-center gap-2 px-6 py-2 rounded-md bg-gold-bn-surface text-bn-blue-primary text-sm font-medium hover:bg-gold-bn-primary/20 transition-colors"
+                                    >
+                                      {isAr ? "استكشاف" : "Explorer"} <Icon name="mdi:chevron-right" className="h-4 w-4" />
+                                    </a>
+                                  </CardContent>
+                                </Card>
+                              </FancyTooltip>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    ))}
                   </div>
                 </div>
 
