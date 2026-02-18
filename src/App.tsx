@@ -272,8 +272,8 @@ const App = () => {
         <Route path="/auth-BN" element={<AuthBN />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/manuscripts" element={<ManuscriptsPlatform />} />
-        <Route path="/manuscripts-platform" element={<ManuscriptsPlatform />} />
+        <Route path="/manuscripts" element={<Navigate to="/plateforme-manuscrits" replace />} />
+        <Route path="/manuscripts-platform" element={<Navigate to="/plateforme-manuscrits" replace />} />
         <Route path="/plateforme-manuscrits" element={<ManuscriptsPlatform />} />
         <Route path="/manuscripts/search" element={<ManuscriptAdvancedSearch />} />
         <Route path="/manuscripts/help" element={<ManuscriptsHelp />} />
@@ -378,7 +378,7 @@ const App = () => {
         <Route path="/demande-numerisation" element={<DemandeNumerisation />} />
         <Route path="/pass-journalier" element={<PassJournalier />} />
         <Route path="/location-service" element={<LocationService />} />
-        <Route path="/manuscripts" element={<ManuscriptsPlatform />} />
+        <Route path="/manuscripts" element={<Navigate to="/plateforme-manuscrits" replace />} />
         <Route path="/my-space" element={<MyLibrarySpace />} />
         <Route path="/help" element={<HelpPage />} />
         <Route path="/aide" element={<HelpPage />} />
