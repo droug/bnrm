@@ -556,53 +556,73 @@ export default function ContentManagementSystem() {
             </CardHeader>
             <CardContent className="p-2">
               <div className="overflow-y-auto max-h-[calc(100vh-300px)] pr-1">
-                <nav className="space-y-1">
-                  {tabs.map((tab, index) => {
-                    const LucideIcon = tab.icon;
-                    const isActive = activeTab === tab.id;
-                    
+                <nav className="space-y-0.5">
+                  {(["homepage", "content", "design", "technical"] as const).map((category) => {
+                    const categoryMeta: Record<string, { label: string; icon: string }> = {
+                      homepage: { label: "Accueil", icon: "mdi:home-outline" },
+                      content:  { label: "Contenu", icon: "mdi:file-document-outline" },
+                      design:   { label: "Design & Structure", icon: "mdi:palette-outline" },
+                      technical:{ label: "Médias & Technique", icon: "mdi:cog-outline" },
+                    };
+                    const categoryTabs = tabs.filter(t => t.category === category);
+                    if (!categoryTabs.length) return null;
+                    const meta = categoryMeta[category];
                     return (
-                      <motion.button
-                        key={tab.id}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.2, delay: index * 0.05 }}
-                        onClick={() => setActiveTab(tab.id)}
-                        className={cn(
-                          "w-full flex items-center gap-3 px-3 py-3 rounded-lg text-left transition-all duration-200 group relative",
-                          isActive 
-                            ? `bg-gradient-to-r ${tab.gradient} border ${tab.borderColor}` 
-                            : "hover:bg-muted/50"
-                        )}
-                      >
-                        <div className={cn(
-                          "p-2 rounded-lg transition-colors",
-                          isActive ? tab.bgColor : "bg-muted group-hover:bg-muted"
-                        )}>
-                          {(tab as any).logoUrl ? (
-                            <img src={(tab as any).logoUrl} alt="" className="h-4 w-4 object-contain" />
-                          ) : tab.iconMdi ? (
-                            <Icon name={tab.iconMdi} className={cn("h-4 w-4", tab.color)} />
-                          ) : LucideIcon ? (
-                            <LucideIcon className={cn("h-4 w-4", tab.color)} />
-                          ) : null}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <span className={cn(
-                            "font-medium text-sm truncate block",
-                            isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
-                          )}>
-                            {tab.label}
+                      <div key={category} className="mb-3">
+                        {/* Category Header */}
+                        <div className="flex items-center gap-2 px-3 py-1.5 mb-1">
+                          <Icon name={meta.icon} className="h-3.5 w-3.5 text-muted-foreground/60" />
+                          <span className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
+                            {meta.label}
                           </span>
-                          <p className="text-xs text-muted-foreground truncate mt-0.5">
-                            {tab.description}
-                          </p>
+                          <div className="flex-1 h-px bg-border/50" />
                         </div>
-                        <ChevronRight className={cn(
-                          "h-4 w-4 transition-all",
-                          isActive ? "opacity-100 text-muted-foreground" : "opacity-0 group-hover:opacity-50"
-                        )} />
-                      </motion.button>
+                        {/* Category Items */}
+                        <div className="space-y-0.5">
+                          {categoryTabs.map((tab, index) => {
+                            const LucideIcon = tab.icon;
+                            const isActive = activeTab === tab.id;
+                            return (
+                              <motion.button
+                                key={tab.id}
+                                initial={{ opacity: 0, x: -8 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ duration: 0.2, delay: index * 0.04 }}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={cn(
+                                  "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left transition-all duration-200 group relative",
+                                  isActive
+                                    ? `bg-gradient-to-r ${tab.gradient} border ${tab.borderColor} shadow-sm`
+                                    : "hover:bg-muted/60"
+                                )}
+                              >
+                                <div className={cn(
+                                  "p-1.5 rounded-md transition-colors flex-shrink-0",
+                                  isActive ? tab.bgColor : "bg-muted group-hover:bg-muted/80"
+                                )}>
+                                  {(tab as any).logoUrl ? (
+                                    <img src={(tab as any).logoUrl} alt="" className="h-3.5 w-3.5 object-contain" />
+                                  ) : tab.iconMdi ? (
+                                    <Icon name={tab.iconMdi} className={cn("h-3.5 w-3.5", tab.color)} />
+                                  ) : LucideIcon ? (
+                                    <LucideIcon className={cn("h-3.5 w-3.5", tab.color)} />
+                                  ) : null}
+                                </div>
+                                <span className={cn(
+                                  "font-medium text-sm truncate flex-1",
+                                  isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
+                                )}>
+                                  {tab.label}
+                                </span>
+                                <ChevronRight className={cn(
+                                  "h-3.5 w-3.5 flex-shrink-0 transition-all",
+                                  isActive ? "opacity-60 text-muted-foreground" : "opacity-0 group-hover:opacity-40"
+                                )} />
+                              </motion.button>
+                            );
+                          })}
+                        </div>
+                      </div>
                     );
                   })}
                 </nav>
