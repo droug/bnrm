@@ -2,42 +2,34 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Home,
   ImageIcon,
-  FileText,
-  Settings,
   Megaphone,
   BookOpen,
-  Users,
   Handshake,
-  BarChart3,
   Palette,
   ExternalLink,
   ChevronRight,
   LayoutDashboard,
+  MonitorPlay,
 } from "lucide-react";
 import ManuscriptPartnershipsBackoffice from "@/components/manuscripts/ManuscriptPartnershipsBackoffice";
 import CmsBannersManager from "@/components/cms/CmsBannersManager";
 import CmsMediaManager from "@/components/cms/CmsMediaManager";
 import CmsStyleManager from "@/components/cms/CmsStyleManager";
 
-// ---- Tabs definition ----
-const tabs = [
-  // ACCUEIL
+// CMS sub-items grouped into a single card
+const cmsItems = [
   {
     id: "hero",
     label: "Section Hero",
     icon: Home,
     color: "text-rose-500",
     bgColor: "bg-rose-500/10",
-    borderColor: "border-rose-500/30",
-    gradient: "from-rose-500/20 to-rose-600/5",
-    description: "Titre, sous-titre et image de la section héro de la plateforme",
-    category: "accueil",
+    description: "Titre, sous-titre et image de la section héro",
   },
   {
     id: "bannieres",
@@ -45,12 +37,28 @@ const tabs = [
     icon: Megaphone,
     color: "text-pink-500",
     bgColor: "bg-pink-500/10",
-    borderColor: "border-pink-500/30",
-    gradient: "from-pink-500/20 to-pink-600/5",
-    description: "Gestion des bannières promotionnelles de la plateforme",
-    category: "accueil",
+    description: "Bannières promotionnelles de la plateforme",
   },
-  // CONTENU
+  {
+    id: "medias",
+    label: "Médiathèque",
+    icon: ImageIcon,
+    color: "text-blue-500",
+    bgColor: "bg-blue-500/10",
+    description: "Bibliothèque d'images et fichiers",
+  },
+  {
+    id: "styles",
+    label: "Styles & Design",
+    icon: Palette,
+    color: "text-violet-500",
+    bgColor: "bg-violet-500/10",
+    description: "Couleurs, typographies et apparence visuelle",
+  },
+];
+
+// Standalone cards (not CMS)
+const standaloneCards = [
   {
     id: "partenariats",
     label: "Demandes de partenariat",
@@ -60,32 +68,7 @@ const tabs = [
     borderColor: "border-amber-500/30",
     gradient: "from-amber-500/20 to-amber-600/5",
     description: "Gestion des demandes soumises via le formulaire Devenir Partenaire",
-    category: "contenu",
   },
-  {
-    id: "medias",
-    label: "Médiathèque",
-    icon: ImageIcon,
-    color: "text-blue-500",
-    bgColor: "bg-blue-500/10",
-    borderColor: "border-blue-500/30",
-    gradient: "from-blue-500/20 to-blue-600/5",
-    description: "Bibliothèque d'images et fichiers de la plateforme manuscrits",
-    category: "contenu",
-  },
-  // DESIGN
-  {
-    id: "styles",
-    label: "Styles & Design",
-    icon: Palette,
-    color: "text-violet-500",
-    bgColor: "bg-violet-500/10",
-    borderColor: "border-violet-500/30",
-    gradient: "from-violet-500/20 to-violet-600/5",
-    description: "Couleurs, typographies et apparence visuelle",
-    category: "design",
-  },
-  // ADMINISTRATION
   {
     id: "backoffice",
     label: "Back-office complet",
@@ -95,18 +78,9 @@ const tabs = [
     borderColor: "border-indigo-500/30",
     gradient: "from-indigo-500/20 to-indigo-600/5",
     description: "Accès à l'interface d'administration complète des manuscrits",
-    category: "administration",
     isExternal: true,
     externalRoute: "/admin/manuscripts-backoffice",
   },
-];
-
-const categories = [
-  { id: "all", label: "Tout", icon: LayoutDashboard },
-  { id: "accueil", label: "Accueil", icon: Home },
-  { id: "contenu", label: "Contenu", icon: FileText },
-  { id: "design", label: "Design", icon: Palette },
-  { id: "administration", label: "Administration", icon: Settings },
 ];
 
 const renderTabContent = (tabId: string) => {
@@ -130,27 +104,22 @@ const renderTabContent = (tabId: string) => {
   }
 };
 
+const allCards = [...cmsItems, ...standaloneCards];
+
 export default function ManuscriptsCmsSystem() {
   const [activeTab, setActiveTab] = useState<string | null>(null);
-  const [activeCategory, setActiveCategory] = useState("all");
   const navigate = useNavigate();
 
-  const filteredTabs =
-    activeCategory === "all"
-      ? tabs
-      : tabs.filter((t) => t.category === activeCategory);
-
   if (activeTab) {
-    const tab = tabs.find((t) => t.id === activeTab);
-    if (!tab) return null;
-    const Icon = tab.icon;
+    const card = allCards.find((c) => c.id === activeTab);
+    if (!card) return null;
+    const Icon = card.icon;
     return (
       <motion.div
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.3 }}
       >
-        {/* Header */}
         <div className="flex items-center gap-4 mb-6">
           <Button
             variant="ghost"
@@ -159,15 +128,14 @@ export default function ManuscriptsCmsSystem() {
           >
             ← Retour
           </Button>
-          <div className={`p-2.5 rounded-xl ${tab.bgColor}`}>
-            <Icon className={`h-5 w-5 ${tab.color}`} />
+          <div className={`p-2.5 rounded-xl ${card.bgColor}`}>
+            <Icon className={`h-5 w-5 ${card.color}`} />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-foreground">{tab.label}</h2>
-            <p className="text-sm text-muted-foreground">{tab.description}</p>
+            <h2 className="text-xl font-bold text-foreground">{card.label}</h2>
+            <p className="text-sm text-muted-foreground">{card.description}</p>
           </div>
         </div>
-
         <div className="bg-background rounded-xl border p-6">
           {renderTabContent(activeTab)}
         </div>
@@ -187,91 +155,114 @@ export default function ManuscriptsCmsSystem() {
         </p>
       </div>
 
-      {/* Filtres par catégorie */}
-      <div className="flex flex-wrap gap-2">
-        {categories.map((cat) => {
-          const CatIcon = cat.icon;
-          return (
-            <Button
-              key={cat.id}
-              variant={activeCategory === cat.id ? "default" : "outline"}
-              size="sm"
-              onClick={() => setActiveCategory(cat.id)}
-              className="gap-2"
-            >
-              <CatIcon className="h-4 w-4" />
-              {cat.label}
-            </Button>
-          );
-        })}
-      </div>
+      {/* Grille principale */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
-      {/* Grille des modules */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredTabs.map((tab) => {
-          const Icon = tab.icon;
-          return (
-            <motion.div
-              key={tab.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.25 }}
-            >
-              <Card
-                className={cn(
-                  "group relative overflow-hidden border cursor-pointer hover:shadow-lg transition-all duration-300 flex flex-col",
-                  tab.borderColor,
-                  "hover:border-primary/40"
-                )}
-                onClick={() => {
-                  if ((tab as any).isExternal) {
-                    navigate((tab as any).externalRoute);
-                  } else {
-                    setActiveTab(tab.id);
-                  }
-                }}
-              >
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br ${tab.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`}
-                />
-                <CardHeader className="relative pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className={`p-2.5 rounded-xl ${tab.bgColor} ${tab.color}`}>
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    {(tab as any).isExternal && (
-                      <ExternalLink className="h-4 w-4 text-muted-foreground" />
+        {/* Carte CMS unifiée */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25 }}
+          className="lg:col-span-1"
+        >
+          <Card className="border border-primary/20 hover:border-primary/40 hover:shadow-lg transition-all duration-300 h-full flex flex-col">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-3 mb-1">
+                <div className="p-2.5 rounded-xl bg-primary/10">
+                  <MonitorPlay className="h-5 w-5 text-primary" />
+                </div>
+                <CardTitle className="text-base font-semibold text-foreground">
+                  Système de Gestion de Contenu
+                </CardTitle>
+              </div>
+              <CardDescription className="text-sm">
+                Gérez l'apparence et le contenu éditorial de la plateforme manuscrits.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-0 flex flex-col flex-1 gap-2">
+              {cmsItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => setActiveTab(item.id)}
+                    className={cn(
+                      "flex items-center gap-3 w-full rounded-lg px-3 py-2.5 text-left transition-all duration-200",
+                      "hover:bg-muted/60 border border-transparent hover:border-border group"
                     )}
-                  </div>
-                  <CardTitle className="text-base font-semibold text-foreground mt-3 group-hover:text-primary transition-colors">
-                    {tab.label}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="relative pt-0 flex flex-col flex-1 justify-between">
-                  <CardDescription className="text-sm leading-relaxed mb-4">
-                    {tab.description}
-                  </CardDescription>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="w-full group-hover:border-primary/50 group-hover:text-primary transition-colors"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if ((tab as any).isExternal) {
-                        navigate((tab as any).externalRoute);
-                      } else {
-                        setActiveTab(tab.id);
-                      }
-                    }}
                   >
-                    {(tab as any).isExternal ? "Ouvrir" : "Accéder"}
-                    <ChevronRight className="h-4 w-4 ml-1" />
-                  </Button>
-                </CardContent>
-              </Card>
-            </motion.div>
-          );
-        })}
+                    <div className={`p-1.5 rounded-lg ${item.bgColor} shrink-0`}>
+                      <Icon className={`h-4 w-4 ${item.color}`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">{item.label}</p>
+                      <p className="text-xs text-muted-foreground truncate">{item.description}</p>
+                    </div>
+                    <ChevronRight className="h-4 w-4 text-muted-foreground shrink-0 group-hover:text-primary transition-colors" />
+                  </button>
+                );
+              })}
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Cartes standalone */}
+        <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4 content-start">
+          {standaloneCards.map((card, i) => {
+            const Icon = card.icon;
+            return (
+              <motion.div
+                key={card.id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25, delay: i * 0.05 }}
+              >
+                <Card
+                  className={cn(
+                    "group relative overflow-hidden border cursor-pointer hover:shadow-lg transition-all duration-300 flex flex-col h-full",
+                    card.borderColor,
+                    "hover:border-primary/40"
+                  )}
+                  onClick={() => {
+                    if (card.isExternal) navigate(card.externalRoute!);
+                    else setActiveTab(card.id);
+                  }}
+                >
+                  <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                  <CardHeader className="relative pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className={`p-2.5 rounded-xl ${card.bgColor} ${card.color}`}>
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      {card.isExternal && <ExternalLink className="h-4 w-4 text-muted-foreground" />}
+                    </div>
+                    <CardTitle className="text-base font-semibold text-foreground mt-3 group-hover:text-primary transition-colors">
+                      {card.label}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="relative pt-0 flex flex-col flex-1 justify-between">
+                    <CardDescription className="text-sm leading-relaxed mb-4">
+                      {card.description}
+                    </CardDescription>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full group-hover:border-primary/50 group-hover:text-primary transition-colors"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (card.isExternal) navigate(card.externalRoute!);
+                        else setActiveTab(card.id);
+                      }}
+                    >
+                      {card.isExternal ? "Ouvrir" : "Accéder"}
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
