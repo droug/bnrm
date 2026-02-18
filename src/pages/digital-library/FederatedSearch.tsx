@@ -155,7 +155,7 @@ const EXAMPLE_RESULTS: ExampleResult[] = [
   },
 ];
 
-function ExamplesButton({ isAr, setQuery }: { isAr: boolean; setQuery: (q: string) => void }) {
+function ExamplesButton({ isAr, onSearch }: { isAr: boolean; onSearch: (q: string) => void }) {
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0 });
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -200,7 +200,7 @@ function ExamplesButton({ isAr, setQuery }: { isAr: boolean; setQuery: (q: strin
               <button
                 key={example}
                 type="button"
-                onClick={() => { setQuery(example); setOpen(false); }}
+                onClick={() => { onSearch(example); setOpen(false); }}
                 className="text-left px-3 py-1.5 rounded-lg text-sm text-white hover:bg-white/20 transition-colors flex items-center gap-2"
               >
                 <Icon name="mdi:magnify" className="h-3.5 w-3.5 text-gold-bn-primary shrink-0" />
@@ -339,8 +339,9 @@ function FederatedSearchInner() {
     return "#";
   };
 
-  const handleSearch = useCallback(() => {
-    if (!query.trim() || !activeBundles) return;
+  const handleSearch = useCallback((overrideQuery?: string) => {
+    const q = (overrideQuery ?? query).trim();
+    if (!q || !activeBundles) return;
 
     const providers =
       selectedProviders.size > 0
@@ -350,9 +351,10 @@ function FederatedSearchInner() {
     const providerResults: ProviderResult[] = providers.map((bundle) => ({
       provider: bundle,
       status: "success" as const,
-      url: buildSearchUrl(bundle, query.trim()),
+      url: buildSearchUrl(bundle, q),
     }));
 
+    if (overrideQuery) setQuery(overrideQuery);
     setResults(providerResults);
     setHasSearched(true);
     setDropdownOpen(false);
@@ -455,7 +457,7 @@ function FederatedSearchInner() {
               </form>
 
               {/* Info-bulle temporaire pour tester les exemples */}
-              <ExamplesButton isAr={isAr} setQuery={setQuery} />
+              <ExamplesButton isAr={isAr} onSearch={(q) => handleSearch(q)} />
 
               {/* Multi-select dropdown for databases */}
               {activeBundles && activeBundles.length > 0 && (
@@ -628,7 +630,7 @@ function FederatedSearchInner() {
                           variant="outline"
                           size="sm"
                           className="w-full gap-2 text-xs hover:bg-bn-blue-primary hover:text-white hover:border-bn-blue-primary transition-colors"
-                          onClick={() => setQuery(isAr ? item.title_ar : item.title)}
+                          onClick={() => handleSearch(isAr ? item.title_ar : item.title)}
                         >
                           <Icon name="mdi:magnify" className="h-3.5 w-3.5" />
                           {isAr ? "البحث عن هذا الموضوع" : "Rechercher ce sujet"}
