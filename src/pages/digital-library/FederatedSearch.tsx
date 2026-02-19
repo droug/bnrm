@@ -736,6 +736,49 @@ function FederatedSearchInner() {
           </section>
         )}
 
+        {/* Section Abonnements aux ressources électroniques */}
+        <section className="py-16 bg-background border-y border-border/50">
+          <div className="container mx-auto px-4 max-w-5xl">
+            <div className="flex flex-col md:flex-row gap-10 items-start">
+              {/* Icône + Titre */}
+              <div className="md:w-1/3 flex-shrink-0">
+                <div className="inline-flex items-center justify-center w-14 h-14 border border-gold-bn-primary/60 rounded-xl mb-5 bg-gold-bn-primary/10">
+                  <Icon name="mdi:certificate-outline" className="w-7 h-7 text-gold-bn-primary" />
+                </div>
+                <h2 className="text-2xl font-gilda text-foreground leading-tight mb-3">
+                  {isAr
+                    ? "الاشتراك في الموارد الإلكترونية"
+                    : "Abonnements aux ressources électroniques"}
+                </h2>
+                <div className="w-12 h-0.5 bg-gold-bn-primary rounded-full" />
+              </div>
+              {/* Texte */}
+              <div className={`md:w-2/3 space-y-4 text-muted-foreground text-sm leading-relaxed ${isAr ? "text-right" : "text-left"}`}>
+                <p>
+                  {isAr
+                    ? "في إطار استراتيجيتها للتحديث وتنويع عرضها الوثائقي، أرست المكتبة الوطنية للمملكة المغربية (BNRM) سياسة اشتراك في طيف واسع من الموارد الإلكترونية المرجعية على الصعيدين الوطني والدولي."
+                    : "Dans le cadre de sa stratégie de modernisation et de diversification de son offre documentaire, la Bibliothèque Nationale du Royaume du Maroc (BNRM) a mis en place une politique d'abonnement à un large éventail de ressources électroniques de référence à l'échelle nationale et internationale."}
+                </p>
+                <p>
+                  {isAr
+                    ? "تتيح هذه الاشتراكات للمستخدمين — باحثين وطلابا وأكاديميين وعموم الجمهور — الوصول إلى قواعد بيانات رقمية معترف بها، توفر محتوى غنياً وموثوقاً ومحدّثاً باستمرار. وتغطي الموارد المقترحة مجالات تخصصية متعددة وتشمل كتباً إلكترونية ومجلات علمية وموسوعات متخصصة وسجلات نصية كاملة فضلاً عن ببليوغرافيات وأدوات بحثية متقدمة."
+                    : "Ces abonnements permettent aux usagers – chercheurs, étudiants, universitaires et grand public – d'accéder à des bases de données numériques reconnues, offrant un contenu riche, fiable et régulièrement mis à jour. Les ressources proposées couvrent différents champs disciplinaires et se composent notamment de livres électroniques, de revues scientifiques, d'encyclopédies spécialisées, de corpus de textes intégraux ainsi que de bibliographies et d'outils de recherche avancés."}
+                </p>
+                <p>
+                  {isAr
+                    ? "تسعى المكتبة الوطنية من خلال هذا النهج إلى تيسير الوصول إلى المعلومات العلمية والثقافية، ودعم البحث الأكاديمي، وتعزيز اندماج خدماتها في البيئة الرقمية العالمية. ويُضمن الوصول إلى هذه الموارد وفق الرخص التعاقدية المبرمة مع الناشرين والموردين، مما يكفل استخداماً آمناً ومطابقاً للمعايير الدولية."
+                    : "Par cette démarche, la BNRM vise à faciliter l'accès à l'information scientifique et culturelle, à soutenir la recherche académique et à renforcer l'intégration de ses services dans l'environnement numérique mondial. L'accès à ces ressources est assuré dans le respect des licences contractuelles conclues avec les éditeurs et fournisseurs, garantissant ainsi un usage sécurisé et conforme aux standards internationaux."}
+                </p>
+                <p className="text-foreground/70 italic border-l-2 border-gold-bn-primary/50 pl-4">
+                  {isAr
+                    ? "يندرج هذا العرض كلياً في مهمة المكتبة الوطنية المتمثلة في نشر المعرفة وتثمين المحتويات الوثائقية ومرافقة المستخدمين في احتياجاتهم المعلوماتية في عصر الرقمنة."
+                    : "Cette offre s'inscrit pleinement dans la mission de la BNRM de diffusion du savoir, de valorisation des contenus documentaires et d'accompagnement des usagers dans leurs besoins informationnels à l'ère du numérique."}
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Carrousel Ressources Électroniques */}
         {activeBundles && activeBundles.length > 0 && (
           <section className="py-20 bg-gradient-to-b from-muted to-background relative overflow-hidden" style={{ zIndex: 0, isolation: "auto" }}>
