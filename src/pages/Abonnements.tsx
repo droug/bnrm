@@ -322,7 +322,6 @@ export default function Abonnements() {
                       </div>
                       <Button
                         className="w-full"
-                        variant="outline"
                         onClick={() => {
                           setSelectedFreeService(service);
                           setFreeSheetOpen(true);
