@@ -96,8 +96,8 @@ export default function BNRMTariffsPage() {
                 <CollapsibleTrigger asChild>
                   <button className="w-full flex items-center justify-between px-5 py-4 rounded-xl border bg-background shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-200 group">
                     <div className="flex items-center gap-3">
-                      <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-secondary group-hover:bg-secondary/80 transition-colors">
-                        <Gift className="h-4 w-4 text-secondary-foreground" />
+                      <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10 group-hover:bg-primary/15 transition-colors">
+                        <Gift className="h-4 w-4 text-primary" />
                       </div>
                       <div className="text-left">
                         <span className="text-base font-semibold text-foreground">Inscriptions gratuites</span>
@@ -119,8 +119,8 @@ export default function BNRMTariffsPage() {
                 <CollapsibleTrigger asChild>
                   <button className="w-full flex items-center justify-between px-5 py-4 rounded-xl border bg-background shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-200 group">
                     <div className="flex items-center gap-3">
-                      <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-muted group-hover:bg-muted/80 transition-colors">
-                        <CreditCard className="h-4 w-4 text-muted-foreground" />
+                      <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10 group-hover:bg-primary/15 transition-colors">
+                        <CreditCard className="h-4 w-4 text-primary" />
                       </div>
                       <div className="text-left">
                         <span className="text-base font-semibold text-foreground">Tarifs</span>
