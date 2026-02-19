@@ -3,12 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
-  MessageSquare, Search, Filter, User, BookOpen, Calendar,
+  MessageSquare, Search, User, BookOpen, Calendar,
   Clock, CheckCircle2, AlertCircle, Eye, ChevronDown, ChevronUp, SearchX, FileText
 } from "lucide-react";
 import { toast } from "sonner";
@@ -61,7 +60,6 @@ const DOC_TYPE_LABELS: Record<string, string> = {
 
 function NotesList({ notes, loading }: { notes: ReaderNote[]; loading: boolean }) {
   const [search, setSearch] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   if (loading) {
@@ -75,41 +73,25 @@ function NotesList({ notes, loading }: { notes: ReaderNote[]; loading: boolean }
   }
 
   const filtered = notes.filter((note) => {
-    const matchSearch =
+    return (
       !search ||
       note.subject.toLowerCase().includes(search.toLowerCase()) ||
       note.document_title?.toLowerCase().includes(search.toLowerCase()) ||
-      `${note.user_first_name || ""} ${note.user_last_name || ""}`.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = filterStatus === "all" || note.status === filterStatus;
-    return matchSearch && matchStatus;
+      `${note.user_first_name || ""} ${note.user_last_name || ""}`.toLowerCase().includes(search.toLowerCase())
+    );
   });
 
   return (
     <div className="space-y-4">
-      {/* Filtres */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Rechercher par objet, document, lecteur..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-        <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="w-48">
-            <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
-            <SelectValue placeholder="Statut" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tous les statuts</SelectItem>
-            <SelectItem value="nouveau">Nouveau</SelectItem>
-            <SelectItem value="en_cours">En cours</SelectItem>
-            <SelectItem value="traite">Traité</SelectItem>
-            <SelectItem value="ferme">Fermé</SelectItem>
-          </SelectContent>
-        </Select>
+      {/* Filtre recherche */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Rechercher par objet, document, lecteur..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="pl-9"
+        />
       </div>
 
       {/* Liste */}
