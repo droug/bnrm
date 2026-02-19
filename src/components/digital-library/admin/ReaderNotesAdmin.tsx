@@ -2,15 +2,13 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   MessageSquare, Search, Filter, User, BookOpen, Calendar,
-  Clock, CheckCircle2, AlertCircle, Eye, ChevronDown, ChevronUp, Send
+  Clock, CheckCircle2, AlertCircle, Eye, ChevronDown, ChevronUp
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -57,8 +55,6 @@ export function ReaderNotesAdmin() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterType, setFilterType] = useState("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [replyContent, setReplyContent] = useState<Record<string, string>>({});
-  const [savingId, setSavingId] = useState<string | null>(null);
 
   useEffect(() => {
     loadNotes();
@@ -104,57 +100,7 @@ export function ReaderNotesAdmin() {
     }
   };
 
-  const handleStatusChange = async (noteId: string, newStatus: string) => {
-    try {
-      const { error } = await supabase
-        .from("document_reader_notes" as any)
-        .update({ status: newStatus })
-        .eq("id", noteId);
 
-      if (error) throw error;
-
-      setNotes((prev) => prev.map((n) => n.id === noteId ? { ...n, status: newStatus } : n));
-      toast.success("Statut mis à jour");
-    } catch (error) {
-      toast.error("Erreur lors de la mise à jour");
-    }
-  };
-
-  const handleSendResponse = async (noteId: string) => {
-    const response = replyContent[noteId]?.trim();
-    if (!response) {
-      toast.error("Veuillez saisir une réponse");
-      return;
-    }
-
-    setSavingId(noteId);
-    try {
-      const { error } = await supabase
-        .from("document_reader_notes" as any)
-        .update({
-          admin_response: response,
-          admin_response_at: new Date().toISOString(),
-          status: "traite",
-        })
-        .eq("id", noteId);
-
-      if (error) throw error;
-
-      setNotes((prev) =>
-        prev.map((n) =>
-          n.id === noteId
-            ? { ...n, admin_response: response, admin_response_at: new Date().toISOString(), status: "traite" }
-            : n
-        )
-      );
-      setReplyContent((prev) => ({ ...prev, [noteId]: "" }));
-      toast.success("Réponse enregistrée et statut mis à jour en 'Traité'");
-    } catch (error) {
-      toast.error("Erreur lors de l'enregistrement");
-    } finally {
-      setSavingId(null);
-    }
-  };
 
   const filtered = notes.filter((note) => {
     const matchSearch =
@@ -302,14 +248,16 @@ export function ReaderNotesAdmin() {
                   <CardContent className="pt-0 space-y-4">
                     <Separator />
 
-                    {/* Informations lecteur */}
-                    <div className="rounded-lg bg-muted/50 border px-4 py-3 space-y-1">
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Informations du lecteur</p>
-                      <p className="text-sm font-medium">
-                        {note.user_first_name} {note.user_last_name}
-                      </p>
-                      <p className="text-xs text-muted-foreground">ID : {note.user_id}</p>
-                    </div>
+                    {/* Informations lecteur — uniquement si connecté */}
+                    {note.user_id && (note.user_first_name || note.user_last_name) && (
+                      <div className="rounded-lg bg-muted/50 border px-4 py-3 space-y-1">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Informations du lecteur</p>
+                        <p className="text-sm font-medium">
+                          {note.user_first_name} {note.user_last_name}
+                        </p>
+                        <p className="text-xs text-muted-foreground">ID : {note.user_id}</p>
+                      </div>
+                    )}
 
                     {/* Informations document */}
                     <div className="rounded-lg bg-muted/50 border px-4 py-3 space-y-1">
@@ -351,54 +299,6 @@ export function ReaderNotesAdmin() {
                         )}
                       </div>
                     )}
-
-                    {/* Actions */}
-                    <div className="flex flex-col gap-3">
-                      <div className="flex flex-wrap gap-2 items-center">
-                        <p className="text-sm font-medium">Changer le statut :</p>
-                        {Object.entries(STATUS_CONFIG).map(([key, cfg]) => (
-                          <Button
-                            key={key}
-                            size="sm"
-                            variant={note.status === key ? "default" : "outline"}
-                            onClick={() => handleStatusChange(note.id, key)}
-                            disabled={note.status === key}
-                          >
-                            {cfg.label}
-                          </Button>
-                        ))}
-                      </div>
-
-                      <div className="space-y-2">
-                        <p className="text-sm font-medium">Ajouter / mettre à jour une réponse :</p>
-                        <Textarea
-                          placeholder="Réponse interne (non transmise au lecteur pour le moment)..."
-                          value={replyContent[note.id] || note.admin_response || ""}
-                          onChange={(e) =>
-                            setReplyContent((prev) => ({ ...prev, [note.id]: e.target.value }))
-                          }
-                          rows={3}
-                          className="resize-none"
-                        />
-                        <Button
-                          size="sm"
-                          onClick={() => handleSendResponse(note.id)}
-                          disabled={savingId === note.id}
-                        >
-                          {savingId === note.id ? (
-                            <>
-                              <div className="h-3.5 w-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
-                              Enregistrement...
-                            </>
-                          ) : (
-                            <>
-                              <Send className="h-3.5 w-3.5 mr-2" />
-                              Enregistrer la réponse
-                            </>
-                          )}
-                        </Button>
-                      </div>
-                    </div>
                   </CardContent>
                 )}
               </Card>
