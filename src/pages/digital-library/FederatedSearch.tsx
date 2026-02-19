@@ -580,60 +580,6 @@ function FederatedSearchInner() {
           </div>
         </section>
 
-        {/* Example results - shown before any search */}
-        {!hasSearched && (
-          <section className="container mx-auto px-4 py-12">
-            <div className="flex items-center gap-3 mb-8">
-              <Icon name="mdi:star-four-points-outline" className="h-6 w-6 text-gold-bn-primary" />
-              <h2 className="text-2xl font-gilda text-foreground">
-                {isAr ? "أمثلة على النتائج" : "Exemples de résultats"}
-              </h2>
-              <span className="px-2.5 py-0.5 rounded-full bg-gold-bn-primary/10 text-gold-bn-primary text-xs font-medium border border-gold-bn-primary/30">
-                {isAr ? "تجريبي" : "Aperçu"}
-              </span>
-            </div>
-            <div className="flex flex-col divide-y divide-border border border-border rounded-xl overflow-hidden bg-card">
-              {EXAMPLE_RESULTS.map((item, index) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="group flex items-center gap-4 px-5 py-4 hover:bg-muted/40 transition-colors"
-                >
-                  <div className={`p-2 rounded-lg bg-gradient-to-br ${item.gradient} text-white shadow-sm shrink-0`}>
-                    <Icon name={item.icon} className="h-4 w-4" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                      <span className="text-xs font-semibold text-bn-blue-primary">{isAr ? item.source_ar : item.source}</span>
-                      <span className="text-xs text-muted-foreground">·</span>
-                      <span className="text-xs text-muted-foreground">{isAr ? item.type_ar : item.type}</span>
-                      <span className="text-xs text-muted-foreground">·</span>
-                      <Badge variant="outline" className="text-xs px-1.5 py-0">{item.year}</Badge>
-                    </div>
-                    <h3 className="font-semibold text-sm text-foreground leading-snug line-clamp-1">
-                      {isAr ? item.title_ar : item.title}
-                    </h3>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-                      <Icon name="mdi:account-outline" className="h-3 w-3 shrink-0" />
-                      {item.authors}
-                    </p>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="shrink-0 gap-1.5 text-xs text-muted-foreground hover:text-bn-blue-primary hover:bg-bn-blue-primary/10 transition-colors"
-                    onClick={() => handleSearch(isAr ? item.title_ar : item.title)}
-                  >
-                    <Icon name="mdi:magnify" className="h-3.5 w-3.5" />
-                    {isAr ? "بحث" : "Rechercher"}
-                  </Button>
-                </motion.div>
-              ))}
-            </div>
-          </section>
-        )}
 
         {/* Results Section - shown as document cards when a search has been made */}
         {hasSearched && (
