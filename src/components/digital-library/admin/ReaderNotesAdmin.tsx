@@ -6,9 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   MessageSquare, Search, Filter, User, BookOpen, Calendar,
-  Clock, CheckCircle2, AlertCircle, Eye, ChevronDown, ChevronUp
+  Clock, CheckCircle2, AlertCircle, Eye, ChevronDown, ChevronUp, SearchX, FileText
 } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
@@ -20,7 +21,8 @@ interface ReaderNote {
   document_title: string | null;
   document_type: string | null;
   document_cote: string | null;
-  user_id: string;
+  source: string;
+  user_id: string | null;
   note_type: string;
   subject: string;
   content: string;
@@ -29,7 +31,6 @@ interface ReaderNote {
   admin_response_at: string | null;
   created_at: string;
   // enriched
-  user_email?: string;
   user_first_name?: string;
   user_last_name?: string;
 }
@@ -48,72 +49,20 @@ const STATUS_CONFIG: Record<string, { label: string; variant: "default" | "secon
   ferme: { label: "Fermé", variant: "outline" },
 };
 
-export function ReaderNotesAdmin() {
-  const [notes, setNotes] = useState<ReaderNote[]>([]);
-  const [loading, setLoading] = useState(true);
+const DOC_TYPE_LABELS: Record<string, string> = {
+  manuscrit: "Manuscrit",
+  lithographie: "Lithographie",
+  livre: "Livre",
+  revue_journal: "Revue ou journal",
+  collection_specialisee: "Collection spécialisée",
+  audiovisuel: "Document Audio-visuel",
+  autre: "Autre",
+};
+
+function NotesList({ notes, loading }: { notes: ReaderNote[]; loading: boolean }) {
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [filterType, setFilterType] = useState("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
-
-  useEffect(() => {
-    loadNotes();
-  }, []);
-
-  const loadNotes = async () => {
-    setLoading(true);
-    try {
-      const { data: notesData, error } = await supabase
-        .from("document_reader_notes" as any)
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-
-      // Enrichir avec les infos utilisateur
-      const enriched: ReaderNote[] = await Promise.all(
-        (notesData || []).map(async (note: any) => {
-          const { data: profile } = await supabase
-            .from("profiles")
-            .select("first_name, last_name")
-            .eq("user_id", note.user_id)
-            .maybeSingle();
-
-          const { data: authData } = await supabase.auth.admin
-            ? { data: null }
-            : { data: null };
-
-          return {
-            ...note,
-            user_first_name: profile?.first_name || "",
-            user_last_name: profile?.last_name || "",
-          };
-        })
-      );
-
-      setNotes(enriched);
-    } catch (error) {
-      console.error("Error loading reader notes:", error);
-      toast.error("Erreur lors du chargement des notes");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-
-
-  const filtered = notes.filter((note) => {
-    const matchSearch =
-      !search ||
-      note.subject.toLowerCase().includes(search.toLowerCase()) ||
-      note.document_title?.toLowerCase().includes(search.toLowerCase()) ||
-      `${note.user_first_name} ${note.user_last_name}`.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = filterStatus === "all" || note.status === filterStatus;
-    const matchType = filterType === "all" || note.note_type === filterType;
-    return matchSearch && matchStatus && matchType;
-  });
-
-  const countByStatus = (status: string) => notes.filter((n) => n.status === status).length;
 
   if (loading) {
     return (
@@ -125,28 +74,18 @@ export function ReaderNotesAdmin() {
     );
   }
 
-  return (
-    <div className="space-y-6">
-      {/* Stats résumées */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { label: "Total", count: notes.length, icon: MessageSquare },
-          { label: "Nouveaux", count: countByStatus("nouveau"), icon: AlertCircle },
-          { label: "En cours", count: countByStatus("en_cours"), icon: Clock },
-          { label: "Traités", count: countByStatus("traite") + countByStatus("ferme"), icon: CheckCircle2 },
-        ].map(({ label, count, icon: Icon }) => (
-          <Card key={label} className="p-4 flex items-center gap-3">
-            <div className="p-2 rounded-lg bg-primary/10">
-              <Icon className="h-4 w-4 text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold">{count}</p>
-              <p className="text-xs text-muted-foreground">{label}</p>
-            </div>
-          </Card>
-        ))}
-      </div>
+  const filtered = notes.filter((note) => {
+    const matchSearch =
+      !search ||
+      note.subject.toLowerCase().includes(search.toLowerCase()) ||
+      note.document_title?.toLowerCase().includes(search.toLowerCase()) ||
+      `${note.user_first_name || ""} ${note.user_last_name || ""}`.toLowerCase().includes(search.toLowerCase());
+    const matchStatus = filterStatus === "all" || note.status === filterStatus;
+    return matchSearch && matchStatus;
+  });
 
+  return (
+    <div className="space-y-4">
       {/* Filtres */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
@@ -171,21 +110,9 @@ export function ReaderNotesAdmin() {
             <SelectItem value="ferme">Fermé</SelectItem>
           </SelectContent>
         </Select>
-        <Select value={filterType} onValueChange={setFilterType}>
-          <SelectTrigger className="w-52">
-            <SelectValue placeholder="Type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tous les types</SelectItem>
-            <SelectItem value="information">Information</SelectItem>
-            <SelectItem value="erreur">Erreur</SelectItem>
-            <SelectItem value="suggestion">Suggestion</SelectItem>
-            <SelectItem value="signalement">Signalement</SelectItem>
-          </SelectContent>
-        </Select>
       </div>
 
-      {/* Liste des notes */}
+      {/* Liste */}
       {filtered.length === 0 ? (
         <Card>
           <CardContent className="py-12 text-center">
@@ -211,9 +138,11 @@ export function ReaderNotesAdmin() {
                         <Badge variant={statusCfg.variant} className="text-xs">
                           {statusCfg.label}
                         </Badge>
-                        <Badge variant="outline" className="text-xs">
-                          {NOTE_TYPE_LABELS[note.note_type] || note.note_type}
-                        </Badge>
+                        {note.document_type && DOC_TYPE_LABELS[note.document_type] && (
+                          <Badge variant="outline" className="text-xs">
+                            {DOC_TYPE_LABELS[note.document_type]}
+                          </Badge>
+                        )}
                       </div>
                       <CardTitle className="text-base truncate">{note.subject}</CardTitle>
                       <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-xs text-muted-foreground">
@@ -221,7 +150,7 @@ export function ReaderNotesAdmin() {
                           <User className="h-3 w-3" />
                           {note.user_first_name || note.user_last_name
                             ? `${note.user_first_name} ${note.user_last_name}`.trim()
-                            : "Lecteur"}
+                            : "Lecteur anonyme"}
                         </span>
                         <span className="flex items-center gap-1">
                           <BookOpen className="h-3 w-3" />
@@ -265,18 +194,20 @@ export function ReaderNotesAdmin() {
                       <p className="text-sm font-medium">{note.document_title || "—"}</p>
                       <div className="flex flex-wrap gap-x-4 text-xs text-muted-foreground">
                         {note.document_cote && <span>Cote : {note.document_cote}</span>}
-                        {note.document_type && <span>Type : {note.document_type}</span>}
-                        <span>ID : {note.document_id}</span>
+                        {note.document_type && <span>Type : {DOC_TYPE_LABELS[note.document_type] || note.document_type}</span>}
+                        {note.source === "document" && <span>ID : {note.document_id}</span>}
                       </div>
-                      <a
-                        href={`/digital-library/document/${note.document_id}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-primary hover:underline inline-flex items-center gap-1 mt-1"
-                      >
-                        <Eye className="h-3 w-3" />
-                        Voir la notice du document
-                      </a>
+                      {note.source === "document" && (
+                        <a
+                          href={`/digital-library/document/${note.document_id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-primary hover:underline inline-flex items-center gap-1 mt-1"
+                        >
+                          <Eye className="h-3 w-3" />
+                          Voir la notice du document
+                        </a>
+                      )}
                     </div>
 
                     {/* Contenu de la note */}
@@ -306,6 +237,106 @@ export function ReaderNotesAdmin() {
           })}
         </div>
       )}
+    </div>
+  );
+}
+
+export function ReaderNotesAdmin() {
+  const [notes, setNotes] = useState<ReaderNote[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadNotes();
+  }, []);
+
+  const loadNotes = async () => {
+    setLoading(true);
+    try {
+      const { data: notesData, error } = await supabase
+        .from("document_reader_notes" as any)
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      // Enrichir avec les infos utilisateur (si connecté)
+      const enriched: ReaderNote[] = await Promise.all(
+        (notesData || []).map(async (note: any) => {
+          if (!note.user_id) return { ...note, user_first_name: "", user_last_name: "" };
+
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("first_name, last_name")
+            .eq("user_id", note.user_id)
+            .maybeSingle();
+
+          return {
+            ...note,
+            user_first_name: profile?.first_name || "",
+            user_last_name: profile?.last_name || "",
+          };
+        })
+      );
+
+      setNotes(enriched);
+    } catch (error) {
+      console.error("Error loading reader notes:", error);
+      toast.error("Erreur lors du chargement des notes");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const searchNotes = notes.filter((n) => n.source === "search");
+  const documentNotes = notes.filter((n) => n.source === "document");
+
+  const countByStatus = (list: ReaderNote[], status: string) => list.filter((n) => n.status === status).length;
+
+  return (
+    <div className="space-y-6">
+      {/* Stats globales */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[
+          { label: "Total", count: notes.length, icon: MessageSquare },
+          { label: "Nouveaux", count: countByStatus(notes, "nouveau"), icon: AlertCircle },
+          { label: "En cours", count: countByStatus(notes, "en_cours"), icon: Clock },
+          { label: "Traités", count: countByStatus(notes, "traite") + countByStatus(notes, "ferme"), icon: CheckCircle2 },
+        ].map(({ label, count, icon: Icon }) => (
+          <Card key={label} className="p-4 flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Icon className="h-4 w-4 text-primary" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold">{count}</p>
+              <p className="text-xs text-muted-foreground">{label}</p>
+            </div>
+          </Card>
+        ))}
+      </div>
+
+      {/* Onglets par source */}
+      <Tabs defaultValue="document">
+        <TabsList className="w-full sm:w-auto">
+          <TabsTrigger value="document" className="flex items-center gap-2">
+            <FileText className="h-4 w-4" />
+            Informations complémentaires
+            <Badge variant="secondary" className="ml-1 text-xs">{documentNotes.length}</Badge>
+          </TabsTrigger>
+          <TabsTrigger value="search" className="flex items-center gap-2">
+            <SearchX className="h-4 w-4" />
+            Recherches non abouties
+            <Badge variant="secondary" className="ml-1 text-xs">{searchNotes.length}</Badge>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="document" className="mt-6">
+          <NotesList notes={documentNotes} loading={loading} />
+        </TabsContent>
+
+        <TabsContent value="search" className="mt-6">
+          <NotesList notes={searchNotes} loading={loading} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

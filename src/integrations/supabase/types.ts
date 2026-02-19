@@ -4461,6 +4461,7 @@ export type Database = {
           document_type: string | null
           id: string
           note_type: string
+          source: string
           status: string
           subject: string
           updated_at: string
@@ -4478,6 +4479,7 @@ export type Database = {
           document_type?: string | null
           id?: string
           note_type?: string
+          source?: string
           status?: string
           subject: string
           updated_at?: string
@@ -4495,6 +4497,7 @@ export type Database = {
           document_type?: string | null
           id?: string
           note_type?: string
+          source?: string
           status?: string
           subject?: string
           updated_at?: string
