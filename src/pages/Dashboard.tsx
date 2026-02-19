@@ -13,7 +13,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { PermissionGuard } from "@/hooks/usePermissions";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { UserProfileDialog } from "@/components/UserProfileDialog";
-import logoBnrm from "@/assets/logo-bnrm.png";
+import logoBnrm from "@/assets/logo-bnrm-officiel-new.png";
 
 export default function Dashboard() {
   const { user, profile, signOut, loading } = useAuth();
@@ -204,7 +204,9 @@ export default function Dashboard() {
               </Button>
             </Link>
             <Link to="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-              <img src={logoBnrm} alt="Logo BNRM" className="h-8 w-auto object-contain" />
+              <div className="bg-white rounded-xl px-2 py-1 shadow-sm border border-border/30">
+                <img src={logoBnrm} alt="Logo BNRM" className="h-10 w-auto object-contain" />
+              </div>
               <span className="text-xl font-bold">Portail BNRM</span>
             </Link>
           </div>
