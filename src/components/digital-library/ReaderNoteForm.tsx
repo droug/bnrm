@@ -158,21 +158,6 @@ export function ReaderNoteForm({
                     onSubmit={handleSubmit}
                     className="space-y-4"
                   >
-                    {/* Infos expéditeur (lecture seule) */}
-                    <div className="rounded-lg bg-muted/50 border px-4 py-3 space-y-1">
-                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Vos informations (transmises au responsable)</p>
-                      <p className="text-sm font-medium">
-                        {userFirstName} {userLastName}
-                        {userEmail && (
-                          <span className="text-muted-foreground font-normal"> — {userEmail}</span>
-                        )}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Document : <span className="font-medium text-foreground">{documentTitle}</span>
-                        {documentCote && <span> · Cote : {documentCote}</span>}
-                      </p>
-                    </div>
-
                     {/* Objet */}
                     <div className="space-y-2">
                       <Label htmlFor="note-subject">
