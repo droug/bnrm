@@ -52,10 +52,9 @@ export default function BNRMTariffsPage() {
           </div>
           
           <Tabs defaultValue="subscriptions" className="w-full">
-            <TabsList className="grid w-full grid-cols-5">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
               <TabsTrigger value="services">Services</TabsTrigger>
-              <TabsTrigger value="free">Gratuités</TabsTrigger>
               <TabsTrigger value="statistics">Statistiques</TabsTrigger>
               <TabsTrigger value="history">Historique</TabsTrigger>
             </TabsList>
@@ -69,6 +68,7 @@ export default function BNRMTariffsPage() {
               </div>
               <BNRMServices filterCategory="Abonnement" />
               <BNRMTariffs filterCategory="Abonnement" />
+              <BNRMFreeRegistrations />
             </TabsContent>
 
             <TabsContent value="services" className="space-y-6 mt-6">
@@ -80,10 +80,6 @@ export default function BNRMTariffsPage() {
               </div>
               <BNRMServices filterCategory="Service à la demande" />
               <BNRMTariffs filterCategory="Service à la demande" />
-            </TabsContent>
-
-            <TabsContent value="free" className="space-y-6 mt-6">
-              <BNRMFreeRegistrations />
             </TabsContent>
 
             <TabsContent value="statistics" className="space-y-6 mt-6">
