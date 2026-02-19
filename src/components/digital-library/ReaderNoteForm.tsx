@@ -4,7 +4,6 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { MessageSquarePlus, Send, CheckCircle2, ChevronDown, ChevronUp, Lock, Clock } from "lucide-react";
@@ -23,13 +22,6 @@ interface ReaderNoteFormProps {
   userEmail: string;
 }
 
-const NOTE_TYPES = [
-  { value: "information", label: "Information complémentaire", color: "bg-secondary text-secondary-foreground border-border" },
-  { value: "erreur", label: "Erreur ou inexactitude", color: "bg-destructive/10 text-destructive border-destructive/30" },
-  { value: "suggestion", label: "Suggestion d'amélioration", color: "bg-primary/10 text-primary border-primary/30" },
-  { value: "signalement", label: "Signalement de contenu", color: "bg-accent text-accent-foreground border-border" },
-];
-
 export function ReaderNoteForm({
   documentId,
   documentTitle,
@@ -44,7 +36,6 @@ export function ReaderNoteForm({
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const [noteType, setNoteType] = useState("information");
   const [subject, setSubject] = useState("");
   const [content, setContent] = useState("");
 
@@ -63,7 +54,7 @@ export function ReaderNoteForm({
         document_type: documentType || null,
         document_cote: documentCote || null,
         user_id: userId,
-        note_type: noteType,
+        note_type: "information",
         subject: subject.trim(),
         content: content.trim(),
         status: "nouveau",
@@ -74,7 +65,6 @@ export function ReaderNoteForm({
       setSubmitted(true);
       setSubject("");
       setContent("");
-      setNoteType("information");
       toast.success("Votre information a été transmise au responsable.");
     } catch (error) {
       console.error("Error submitting reader note:", error);
@@ -88,8 +78,6 @@ export function ReaderNoteForm({
     setSubmitted(false);
     setIsExpanded(true);
   };
-
-  const selectedType = NOTE_TYPES.find((t) => t.value === noteType);
 
   return (
     <Card className="border-dashed border-2 border-primary/20 bg-primary/5">
@@ -183,33 +171,6 @@ export function ReaderNoteForm({
                         Document : <span className="font-medium text-foreground">{documentTitle}</span>
                         {documentCote && <span> · Cote : {documentCote}</span>}
                       </p>
-                    </div>
-
-                    {/* Type de note */}
-                    <div className="space-y-2">
-                      <Label htmlFor="note-type">
-                        Type d'information <span className="text-destructive">*</span>
-                      </Label>
-                      <Select value={noteType} onValueChange={setNoteType}>
-                        <SelectTrigger id="note-type">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {NOTE_TYPES.map((type) => (
-                            <SelectItem key={type.value} value={type.value}>
-                              {type.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      {selectedType && (
-                        <Badge
-                          variant="outline"
-                          className={`text-xs ${selectedType.color}`}
-                        >
-                          {selectedType.label}
-                        </Badge>
-                      )}
                     </div>
 
                     {/* Objet */}
