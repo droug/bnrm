@@ -66,6 +66,7 @@ export default function AdvancedSearch() {
   // States for search-page reader note form
   const [noteExpanded, setNoteExpanded] = useState(false);
   const [noteType, setNoteType] = useState("information");
+  const [noteDocType, setNoteDocType] = useState("");
   const [noteSubject, setNoteSubject] = useState("");
   const [noteContent, setNoteContent] = useState("");
   const [noteSubmitting, setNoteSubmitting] = useState(false);
@@ -272,7 +273,7 @@ export default function AdvancedSearch() {
       const { error } = await supabase.from("document_reader_notes" as any).insert({
         document_id: "search-query",
         document_title: `Recherche : ${searchParams.get('keyword') || searchParams.toString() || '(sans terme)'}`,
-        document_type: "search",
+        document_type: noteDocType || "search",
         user_id: user?.id || null,
         note_type: noteType,
         subject: noteSubject.trim(),
@@ -281,6 +282,7 @@ export default function AdvancedSearch() {
       });
       if (error) throw error;
       setNoteSubmitted(true);
+      setNoteDocType("");
       setNoteSubject("");
       setNoteContent("");
       setNoteType("information");
@@ -851,6 +853,24 @@ export default function AdvancedSearch() {
                                     </p>
                                   </div>
                                 )}
+
+                                <div className="space-y-2">
+                                  <Label htmlFor="s-note-doc-type">Type de document</Label>
+                                  <Select value={noteDocType} onValueChange={setNoteDocType}>
+                                    <SelectTrigger id="s-note-doc-type">
+                                      <SelectValue placeholder="Sélectionner un type..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="manuscrit">Manuscrit</SelectItem>
+                                      <SelectItem value="lithographie">Lithographie</SelectItem>
+                                      <SelectItem value="livre">Livre</SelectItem>
+                                      <SelectItem value="revue_journal">Revue ou journal</SelectItem>
+                                      <SelectItem value="collection_specialisee">Collection spécialisée</SelectItem>
+                                      <SelectItem value="audiovisuel">Document Audio-visuel</SelectItem>
+                                      <SelectItem value="autre">Autre</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
 
                                 <div className="space-y-2">
                                   <Label htmlFor="s-note-subject">Document Recherché <span className="text-destructive">*</span></Label>
