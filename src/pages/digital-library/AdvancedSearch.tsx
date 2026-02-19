@@ -839,20 +839,7 @@ export default function AdvancedSearch() {
                                 onSubmit={handleNoteSubmit}
                                 className="space-y-4"
                               >
-                                {user && (
-                                  <div className="rounded-lg bg-muted/50 border px-4 py-3 space-y-1">
-                                    <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Vos informations (transmises au responsable)</p>
-                                    <p className="text-sm font-medium">
-                                      {profile?.first_name} {profile?.last_name}
-                                      {user.email && <span className="text-muted-foreground font-normal"> — {user.email}</span>}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground">
-                                      Contexte : <span className="font-medium text-foreground">
-                                        Recherche sans résultat — {searchParams.get('keyword') || searchParams.toString() || 'aucun terme'}
-                                      </span>
-                                    </p>
-                                  </div>
-                                )}
+
 
                                 <div className="space-y-2">
                                   <Label htmlFor="s-note-doc-type">Type de document</Label>
