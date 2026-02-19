@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Bell, Settings, Home } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import logoImage from "@/assets/logo-bnrm-officiel.png";
+import logoImage from "@/assets/logo-bnrm-officiel-new.png";
 
 interface AdminHeaderProps {
   title: string;
@@ -42,12 +42,11 @@ export function AdminHeader({
           
           {/* Logo BNRM cliquable */}
           <Link to="/" className="flex items-center hover:scale-105 transition-all duration-300 group">
-            <div className="w-20 h-16 flex items-center justify-center relative">
-              <div className="absolute inset-0 bg-primary/5 rounded-xl blur-xl group-hover:bg-primary/10 transition-all duration-300"></div>
+            <div className="flex items-center justify-center relative bg-white rounded-xl px-3 py-1 shadow-sm border border-border/30 group-hover:shadow-md transition-all duration-300">
               <img 
                 src={logoImage} 
                 alt="Logo BNRM" 
-                className="h-14 w-auto object-contain relative z-10 drop-shadow-lg"
+                className="h-12 w-auto object-contain relative z-10"
               />
             </div>
           </Link>
