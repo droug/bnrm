@@ -19,9 +19,9 @@ export default function BNRMTariffsPage() {
   const { isAdmin, loading } = useSecureRoles();
   const navigate = useNavigate();
 
-  const [openServices, setOpenServices] = useState(true);
-  const [openTariffs, setOpenTariffs] = useState(true);
-  const [openFree, setOpenFree] = useState(true);
+  const [openServices, setOpenServices] = useState(false);
+  const [openTariffs, setOpenTariffs] = useState(false);
+  const [openFree, setOpenFree] = useState(false);
 
   if (loading) {
     return (
