@@ -151,15 +151,9 @@ export function BNRMFreeRegistrations() {
       {/* Section header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-lg bg-primary/10">
-            <Gift className="h-5 w-5 text-primary" />
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold">Inscriptions gratuites</h2>
-            <p className="text-sm text-muted-foreground">
-              Catégories bénéficiant d'un accès gratuit — Décision 2025
-            </p>
-          </div>
+          <p className="text-sm text-muted-foreground">
+            Catégories bénéficiant d'un accès gratuit — Décision 2025
+          </p>
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
