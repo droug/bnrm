@@ -14,7 +14,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, UserCheck, ArrowLeft, CreditCard, Gift, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { ServiceRegistrationDialog } from "@/components/bnrm/ServiceRegistrationDialog";
+import { ServiceRegistrationSheet } from "@/components/bnrm/ServiceRegistrationSheet";
+import { FreeRegistrationSheet } from "@/components/bnrm/FreeRegistrationSheet";
 import { Link } from "react-router-dom";
 
 interface BNRMService {
@@ -44,9 +45,11 @@ export default function Abonnements() {
   const [tariffs, setTariffs] = useState<BNRMTariff[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [registrationDialogOpen, setRegistrationDialogOpen] = useState(false);
+  const [registrationSheetOpen, setRegistrationSheetOpen] = useState(false);
+  const [freeSheetOpen, setFreeSheetOpen] = useState(false);
   const [selectedServiceForRegistration, setSelectedServiceForRegistration] = useState<BNRMService | null>(null);
   const [selectedTariffForRegistration, setSelectedTariffForRegistration] = useState<BNRMTariff | null>(null);
+  const [selectedFreeService, setSelectedFreeService] = useState<BNRMService | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
 
@@ -75,7 +78,7 @@ export default function Abonnements() {
 
         setSelectedServiceForRegistration(service);
         setSelectedTariffForRegistration(tariff || null);
-        setRegistrationDialogOpen(true);
+        setRegistrationSheetOpen(true);
 
         toast({
           title: "Données restaurées",
@@ -91,7 +94,6 @@ export default function Abonnements() {
     try {
       setLoading(true);
 
-      // Paid services
       const allowedServiceIds = ["I001", "I002", "I003", "S001", "S002", "S003"];
       const { data: paidData, error: paidError } = await supabase
         .from("bnrm_services")
@@ -101,7 +103,6 @@ export default function Abonnements() {
       if (paidError) throw paidError;
       setPaidServices(paidData || []);
 
-      // Free services
       const { data: freeData, error: freeError } = await supabase
         .from("bnrm_services")
         .select("*")
@@ -110,7 +111,6 @@ export default function Abonnements() {
       if (freeError) throw freeError;
       setFreeServices(freeData || []);
 
-      // Active tariffs
       const { data: tariffsData, error: tariffsError } = await supabase
         .from("bnrm_tarifs")
         .select("*")
@@ -263,7 +263,7 @@ export default function Abonnements() {
                         onClick={() => {
                           setSelectedServiceForRegistration(service);
                           setSelectedTariffForRegistration(serviceTariffs[0] || null);
-                          setRegistrationDialogOpen(true);
+                          setRegistrationSheetOpen(true);
                         }}
                       >
                         S'abonner
@@ -314,11 +314,23 @@ export default function Abonnements() {
                         {service.reference_legale}
                       </div>
                     )}
-                    <div className="mt-auto pt-2">
+                    <div className="flex-1" />
+                    <div className="space-y-2 pt-2">
                       <div className="flex items-center gap-2 text-sm text-primary font-medium">
                         <CheckCircle className="h-4 w-4" />
                         Accès gratuit — aucun frais requis
                       </div>
+                      <Button
+                        className="w-full"
+                        variant="outline"
+                        onClick={() => {
+                          setSelectedFreeService(service);
+                          setFreeSheetOpen(true);
+                        }}
+                      >
+                        <Gift className="h-4 w-4 mr-2" />
+                        Demander l'abonnement
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -331,12 +343,22 @@ export default function Abonnements() {
         </Tabs>
       </div>
 
+      {/* Sheet pour inscriptions payantes */}
       {selectedServiceForRegistration && (
-        <ServiceRegistrationDialog
-          open={registrationDialogOpen}
-          onOpenChange={setRegistrationDialogOpen}
+        <ServiceRegistrationSheet
+          open={registrationSheetOpen}
+          onOpenChange={setRegistrationSheetOpen}
           service={selectedServiceForRegistration}
           tariff={selectedTariffForRegistration}
+        />
+      )}
+
+      {/* Sheet pour inscriptions gratuites */}
+      {selectedFreeService && (
+        <FreeRegistrationSheet
+          open={freeSheetOpen}
+          onOpenChange={setFreeSheetOpen}
+          service={selectedFreeService}
         />
       )}
     </div>
