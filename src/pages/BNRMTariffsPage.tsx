@@ -4,6 +4,7 @@ import { BNRMTariffs } from "@/components/bnrm/BNRMTariffs";
 import { BNRMServices } from "@/components/bnrm/BNRMServices";
 import { BNRMStatistics } from "@/components/bnrm/BNRMStatistics";
 import { BNRMHistory } from "@/components/bnrm/BNRMHistory";
+import { BNRMFreeRegistrations } from "@/components/bnrm/BNRMFreeRegistrations";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ArrowLeft } from "lucide-react";
@@ -51,9 +52,10 @@ export default function BNRMTariffsPage() {
           </div>
           
           <Tabs defaultValue="subscriptions" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="subscriptions">Abonnements</TabsTrigger>
               <TabsTrigger value="services">Services</TabsTrigger>
+              <TabsTrigger value="free">Gratuités</TabsTrigger>
               <TabsTrigger value="statistics">Statistiques</TabsTrigger>
               <TabsTrigger value="history">Historique</TabsTrigger>
             </TabsList>
@@ -78,6 +80,10 @@ export default function BNRMTariffsPage() {
               </div>
               <BNRMServices filterCategory="Service à la demande" />
               <BNRMTariffs filterCategory="Service à la demande" />
+            </TabsContent>
+
+            <TabsContent value="free" className="space-y-6 mt-6">
+              <BNRMFreeRegistrations />
             </TabsContent>
 
             <TabsContent value="statistics" className="space-y-6 mt-6">
