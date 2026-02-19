@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -43,6 +44,7 @@ const NOTE_TYPE_LABELS: Record<string, string> = {
 
 const STATUS_CONFIG: Record<string, { label: string; variant: "default" | "secondary" | "destructive" | "outline" }> = {
   nouveau: { label: "Nouveau", variant: "destructive" },
+  consultee: { label: "Consultée", variant: "secondary" },
   en_cours: { label: "En cours", variant: "default" },
   traite: { label: "Traité", variant: "secondary" },
   ferme: { label: "Fermé", variant: "outline" },
@@ -58,9 +60,10 @@ const DOC_TYPE_LABELS: Record<string, string> = {
   autre: "Autre",
 };
 
-function NotesList({ notes, loading }: { notes: ReaderNote[]; loading: boolean }) {
+function NotesList({ notes, loading, onStatusChange }: { notes: ReaderNote[]; loading: boolean; onStatusChange: (id: string, status: string) => Promise<void> }) {
   const [search, setSearch] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   if (loading) {
     return (
@@ -107,9 +110,14 @@ function NotesList({ notes, loading }: { notes: ReaderNote[]; loading: boolean }
           {filtered.map((note) => {
             const isExpanded = expandedId === note.id;
             const statusCfg = STATUS_CONFIG[note.status] || STATUS_CONFIG.nouveau;
+            const isConsulted = note.status === "consultee";
+            const isUpdating = updatingId === note.id;
 
             return (
-              <Card key={note.id} className={`transition-all ${isExpanded ? "ring-2 ring-primary/20" : ""}`}>
+              <Card
+                key={note.id}
+                className={`transition-all ${isExpanded ? "ring-2 ring-primary/20" : ""} ${isConsulted ? "opacity-70" : ""}`}
+              >
                 <CardHeader className="pb-3">
                   <div
                     className="flex items-start justify-between cursor-pointer gap-3"
@@ -212,6 +220,32 @@ function NotesList({ notes, loading }: { notes: ReaderNote[]; loading: boolean }
                         )}
                       </div>
                     )}
+
+                    {/* Action "Consultée" */}
+                    <div className="flex justify-end pt-1">
+                      {isConsulted ? (
+                        <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                          <CheckCircle2 className="h-4 w-4 text-primary" />
+                          Marquée comme consultée
+                        </span>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={isUpdating}
+                          onClick={async (e) => {
+                            e.stopPropagation();
+                            setUpdatingId(note.id);
+                            await onStatusChange(note.id, "consultee");
+                            setUpdatingId(null);
+                          }}
+                          className="gap-1.5"
+                        >
+                          <CheckCircle2 className="h-4 w-4" />
+                          {isUpdating ? "En cours…" : "Marquer comme consultée"}
+                        </Button>
+                      )}
+                    </div>
                   </CardContent>
                 )}
               </Card>
@@ -269,6 +303,21 @@ export function ReaderNotesAdmin() {
     }
   };
 
+  const handleStatusChange = async (id: string, status: string) => {
+    try {
+      const { error } = await supabase
+        .from("document_reader_notes" as any)
+        .update({ status })
+        .eq("id", id);
+      if (error) throw error;
+      setNotes((prev) => prev.map((n) => (n.id === id ? { ...n, status } : n)));
+      toast.success("Statut mis à jour");
+    } catch (e) {
+      console.error(e);
+      toast.error("Erreur lors de la mise à jour");
+    }
+  };
+
   const searchNotes = notes.filter((n) => n.source === "search");
   const documentNotes = notes.filter((n) => n.source === "document");
 
@@ -280,9 +329,9 @@ export function ReaderNotesAdmin() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
           { label: "Total", count: notes.length, icon: MessageSquare },
-          { label: "Nouveaux", count: countByStatus(notes, "nouveau"), icon: AlertCircle },
-          { label: "En cours", count: countByStatus(notes, "en_cours"), icon: Clock },
-          { label: "Traités", count: countByStatus(notes, "traite") + countByStatus(notes, "ferme"), icon: CheckCircle2 },
+          { label: "Non consultées", count: countByStatus(notes, "nouveau"), icon: AlertCircle },
+          { label: "Consultées", count: countByStatus(notes, "consultee"), icon: CheckCircle2 },
+          { label: "Traités", count: countByStatus(notes, "traite") + countByStatus(notes, "ferme"), icon: Clock },
         ].map(({ label, count, icon: Icon }) => (
           <Card key={label} className="p-4 flex items-center gap-3">
             <div className="p-2 rounded-lg bg-primary/10">
@@ -312,11 +361,11 @@ export function ReaderNotesAdmin() {
         </TabsList>
 
         <TabsContent value="document" className="mt-6">
-          <NotesList notes={documentNotes} loading={loading} />
+          <NotesList notes={documentNotes} loading={loading} onStatusChange={handleStatusChange} />
         </TabsContent>
 
         <TabsContent value="search" className="mt-6">
-          <NotesList notes={searchNotes} loading={loading} />
+          <NotesList notes={searchNotes} loading={loading} onStatusChange={handleStatusChange} />
         </TabsContent>
       </Tabs>
     </div>
