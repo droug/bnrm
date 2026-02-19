@@ -919,6 +919,10 @@ export default function AccessRequestsManagement() {
                 <CreditCard className="h-4 w-4" />
                 Paiement ({paymentRequests.length})
               </TabsTrigger>
+              <TabsTrigger value="free" className="flex items-center gap-2">
+                <Gift className="h-4 w-4" />
+                Gratuites ({freeRequests.length})
+              </TabsTrigger>
               <TabsTrigger value="active" className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4" />
                 Actifs ({activeRequests.length})
@@ -926,10 +930,6 @@ export default function AccessRequestsManagement() {
               <TabsTrigger value="rejected" className="flex items-center gap-2">
                 <XCircle className="h-4 w-4" />
                 Rejetés ({rejectedRequests.length})
-              </TabsTrigger>
-              <TabsTrigger value="free" className="flex items-center gap-2">
-                <Gift className="h-4 w-4" />
-                Gratuites ({freeRequests.length})
               </TabsTrigger>
             </TabsList>
 
