@@ -73,7 +73,7 @@ export default function BNRMTariffsPage() {
                   <button className="w-full flex items-center justify-between px-4 py-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
                     <div className="flex items-center gap-3">
                       <BookOpen className="h-5 w-5 text-primary" />
-                      <span className="text-base font-semibold">Services</span>
+                      <span className="text-base font-semibold">Inscriptions payantes</span>
                     </div>
                     <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openServices ? "rotate-180" : ""}`} />
                   </button>
@@ -105,7 +105,7 @@ export default function BNRMTariffsPage() {
                   <button className="w-full flex items-center justify-between px-4 py-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
                     <div className="flex items-center gap-3">
                       <CreditCard className="h-5 w-5 text-primary" />
-                      <span className="text-base font-semibold">Tarifs — Abonnements payants</span>
+                      <span className="text-base font-semibold">Tarifs</span>
                     </div>
                     <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openTariffs ? "rotate-180" : ""}`} />
                   </button>
