@@ -853,21 +853,7 @@ export default function AdvancedSearch() {
                                 )}
 
                                 <div className="space-y-2">
-                                  <Label htmlFor="s-note-type">Type d'information <span className="text-destructive">*</span></Label>
-                                  <Select value={noteType} onValueChange={setNoteType}>
-                                    <SelectTrigger id="s-note-type">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {NOTE_TYPES.map((t) => (
-                                        <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>
-                                      ))}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-
-                                <div className="space-y-2">
-                                  <Label htmlFor="s-note-subject">Objet <span className="text-destructive">*</span></Label>
+                                  <Label htmlFor="s-note-subject">Document Recherché <span className="text-destructive">*</span></Label>
                                   <Input
                                     id="s-note-subject"
                                     value={noteSubject}
