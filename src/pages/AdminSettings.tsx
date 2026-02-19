@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { CreateTestDepositButton } from "@/components/admin/CreateTestDepositButton";
 import { ExternalSystemsConfig } from "@/components/admin/ExternalSystemsConfig";
 import { SmtpConfigCard } from "@/components/admin/SmtpConfigCard";
-import logoImage from "@/assets/FINAL_LOGO_3.png";
+import logoImage from "@/assets/logo-bnrm-officiel.png";
 
 export default function AdminSettings() {
   const navigate = useNavigate();
@@ -340,7 +340,7 @@ export default function AdminSettings() {
                        <CardHeader className="relative flex-grow">
                          <CardTitle className="flex items-center space-x-3">
                            <div className={`p-3 rounded-2xl bg-gradient-to-br ${card.gradient} shadow-lg group-hover:scale-110 transition-transform duration-300 flex items-center justify-center`}>
-                             <img src={logoImage} alt="BNRM" className="h-6 w-6 object-contain brightness-0 invert" />
+                             <img src={logoImage} alt="BNRM" className="h-8 w-8 object-contain brightness-0 invert" />
                            </div>
                            <span className="text-lg group-hover:text-primary transition-colors">{card.title}</span>
                          </CardTitle>
@@ -384,7 +384,7 @@ export default function AdminSettings() {
                        <CardHeader className="relative flex-grow">
                          <CardTitle className="flex items-center space-x-3">
                            <div className={`p-3 rounded-2xl bg-gradient-to-br ${card.gradient} shadow-lg group-hover:scale-110 transition-transform duration-300 flex items-center justify-center`}>
-                             <img src={logoImage} alt="BNRM" className="h-6 w-6 object-contain brightness-0 invert" />
+                             <img src={logoImage} alt="BNRM" className="h-8 w-8 object-contain brightness-0 invert" />
                            </div>
                            <span className="text-lg group-hover:text-primary transition-colors">{card.title}</span>
                          </CardTitle>
