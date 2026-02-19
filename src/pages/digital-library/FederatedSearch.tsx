@@ -675,50 +675,41 @@ function FederatedSearchInner() {
                 </div>
 
                 {/* Document result cards — same design as "Exemples de résultats" */}
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                <div className="flex flex-col divide-y divide-border border border-border rounded-xl overflow-hidden bg-card">
                   {EXAMPLE_RESULTS.map((item, index) => (
                     <motion.div
                       key={item.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.07 }}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                      className="group flex items-center gap-4 px-5 py-4 hover:bg-muted/40 transition-colors"
                     >
-                      <Card className="group hover:shadow-xl transition-all duration-300 border-2 hover:border-bn-blue-primary/30 overflow-hidden h-full flex flex-col">
-                        <div className={`h-2 bg-gradient-to-r ${item.gradient}`} />
-                        <CardContent className="p-6 flex flex-col flex-1">
-                          <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center gap-3">
-                              <div className={`p-2.5 rounded-xl bg-gradient-to-br ${item.gradient} text-white shadow-md`}>
-                                <Icon name={item.icon} className="h-5 w-5" />
-                              </div>
-                              <div>
-                                <p className="text-xs font-semibold text-bn-blue-primary">{isAr ? item.source_ar : item.source}</p>
-                                <p className="text-xs text-muted-foreground">{isAr ? item.type_ar : item.type} · {item.year}</p>
-                              </div>
-                            </div>
-                            <Badge variant="outline" className="text-xs shrink-0 ml-2">{item.year}</Badge>
-                          </div>
-                          <h3 className="font-semibold text-base text-foreground mb-1 line-clamp-2 leading-snug">
-                            {isAr ? item.title_ar : item.title}
-                          </h3>
-                          <p className="text-xs text-muted-foreground mb-3 flex items-center gap-1">
-                            <Icon name="mdi:account-outline" className="h-3.5 w-3.5 shrink-0" />
-                            {item.authors}
-                          </p>
-                          <p className="text-sm text-muted-foreground line-clamp-3 flex-1">
-                            {isAr ? item.description_ar : item.description}
-                          </p>
-                          <div className="mt-4 pt-3 border-t border-border">
-                            <Button
-                              size="sm"
-                              className="w-full gap-2 text-xs bg-gradient-to-r from-bn-blue-primary to-bn-blue-primary/80 hover:from-bn-blue-primary/90 hover:to-bn-blue-primary/70 text-primary-foreground"
-                            >
-                              <Icon name="mdi:open-in-new" className="h-3.5 w-3.5" />
-                              {isAr ? "الوصول إلى الوثيقة" : "Accéder au document"}
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
+                      <div className={`p-2 rounded-lg bg-gradient-to-br ${item.gradient} text-white shadow-sm shrink-0`}>
+                        <Icon name={item.icon} className="h-4 w-4" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                          <span className="text-xs font-semibold text-bn-blue-primary">{isAr ? item.source_ar : item.source}</span>
+                          <span className="text-xs text-muted-foreground">·</span>
+                          <span className="text-xs text-muted-foreground">{isAr ? item.type_ar : item.type}</span>
+                          <span className="text-xs text-muted-foreground">·</span>
+                          <Badge variant="outline" className="text-xs px-1.5 py-0">{item.year}</Badge>
+                        </div>
+                        <h3 className="font-semibold text-sm text-foreground leading-snug line-clamp-1">
+                          {isAr ? item.title_ar : item.title}
+                        </h3>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                          <Icon name="mdi:account-outline" className="h-3 w-3 shrink-0" />
+                          {item.authors}
+                        </p>
+                      </div>
+                      <Button
+                        size="sm"
+                        className="shrink-0 gap-1.5 text-xs bg-gradient-to-r from-bn-blue-primary to-bn-blue-primary/80 hover:from-bn-blue-primary/90 hover:to-bn-blue-primary/70 text-primary-foreground"
+                      >
+                        <Icon name="mdi:open-in-new" className="h-3.5 w-3.5" />
+                        {isAr ? "الوصول إلى الوثيقة" : "Accéder au document"}
+                      </Button>
                     </motion.div>
                   ))}
                 </div>
