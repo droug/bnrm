@@ -53,6 +53,7 @@ export function ReaderNoteForm({
         document_title: documentTitle,
         document_type: documentType || null,
         document_cote: documentCote || null,
+        source: "document",
         user_id: userId,
         note_type: "information",
         subject: subject.trim(),

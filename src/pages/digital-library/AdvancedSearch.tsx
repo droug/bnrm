@@ -274,6 +274,7 @@ export default function AdvancedSearch() {
         document_id: "search-query",
         document_title: `Recherche : ${searchParams.get('keyword') || searchParams.toString() || '(sans terme)'}`,
         document_type: noteDocType || "search",
+        source: "search",
         user_id: user?.id || null,
         note_type: noteType,
         subject: noteSubject.trim(),
