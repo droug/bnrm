@@ -7,15 +7,21 @@ import { BNRMHistory } from "@/components/bnrm/BNRMHistory";
 import { BNRMFreeRegistrations } from "@/components/bnrm/BNRMFreeRegistrations";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ArrowLeft } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { ArrowLeft, ChevronDown, BookOpen, CreditCard, Gift } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Navigate } from "react-router-dom";
+import { useState } from "react";
 
 export default function BNRMTariffsPage() {
   const { user } = useAuth();
   const { isAdmin, loading } = useSecureRoles();
   const navigate = useNavigate();
+
+  const [openServices, setOpenServices] = useState(true);
+  const [openTariffs, setOpenTariffs] = useState(true);
+  const [openFree, setOpenFree] = useState(true);
 
   if (loading) {
     return (
@@ -59,16 +65,56 @@ export default function BNRMTariffsPage() {
               <TabsTrigger value="history">Historique</TabsTrigger>
             </TabsList>
 
-            <TabsContent value="subscriptions" className="space-y-6 mt-6">
-              <div>
-                <h2 className="text-xl font-semibold mb-2">Gestion des Abonnements</h2>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Services d'abonnement et tarifs associés
-                </p>
-              </div>
-              <BNRMServices filterCategory="Abonnement" />
-              <BNRMTariffs filterCategory="Abonnement" />
-              <BNRMFreeRegistrations />
+            <TabsContent value="subscriptions" className="space-y-4 mt-6">
+
+              {/* Accordéon 1 : Services */}
+              <Collapsible open={openServices} onOpenChange={setOpenServices}>
+                <CollapsibleTrigger asChild>
+                  <button className="w-full flex items-center justify-between px-4 py-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <BookOpen className="h-5 w-5 text-primary" />
+                      <span className="text-base font-semibold">Services</span>
+                    </div>
+                    <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openServices ? "rotate-180" : ""}`} />
+                  </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-3 px-1">
+                  <BNRMServices filterCategory="Abonnement" />
+                </CollapsibleContent>
+              </Collapsible>
+
+              {/* Accordéon 2 : Inscriptions gratuites */}
+              <Collapsible open={openFree} onOpenChange={setOpenFree}>
+                <CollapsibleTrigger asChild>
+                  <button className="w-full flex items-center justify-between px-4 py-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <Gift className="h-5 w-5 text-primary" />
+                      <span className="text-base font-semibold">Inscriptions gratuites</span>
+                    </div>
+                    <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openFree ? "rotate-180" : ""}`} />
+                  </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-3 px-1">
+                  <BNRMFreeRegistrations />
+                </CollapsibleContent>
+              </Collapsible>
+
+              {/* Accordéon 3 : Tarifs (en dernier) */}
+              <Collapsible open={openTariffs} onOpenChange={setOpenTariffs}>
+                <CollapsibleTrigger asChild>
+                  <button className="w-full flex items-center justify-between px-4 py-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <CreditCard className="h-5 w-5 text-primary" />
+                      <span className="text-base font-semibold">Tarifs — Abonnements payants</span>
+                    </div>
+                    <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openTariffs ? "rotate-180" : ""}`} />
+                  </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-3 px-1">
+                  <BNRMTariffs filterCategory="Abonnement" />
+                </CollapsibleContent>
+              </Collapsible>
+
             </TabsContent>
 
             <TabsContent value="services" className="space-y-6 mt-6">
