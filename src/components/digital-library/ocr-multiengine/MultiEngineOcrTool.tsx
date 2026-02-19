@@ -11,9 +11,14 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Icon } from "@iconify/react";
 import { useOcrProviders } from "./hooks/useOcrProviders";
 import { TesseractProvider } from "./providers/TesseractProvider";
+import { PaddleOcrProvider } from "./providers/PaddleOcrProvider";
+import PaddleOcrTool from "./PaddleOcrTool";
 import { OcrDocumentType, OcrProvider } from "./types";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+
+// Extend OcrProvider type to include paddleocr
+type ExtendedOcrProvider = OcrProvider | 'paddleocr';
 
 interface MultiEngineOcrToolProps {
   onSuccess?: () => void;
@@ -104,11 +109,11 @@ export default function MultiEngineOcrTool({ onSuccess }: MultiEngineOcrToolProp
         <CardHeader>
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600">
-              <Icon icon="mdi:text-recognition" className="h-6 w-6 text-white" />
+              <Icon icon="mdi:text-recognition" className="h-6 w-6 text-primary-foreground" />
             </div>
             <div>
               <CardTitle>OCR Multi-Moteurs Arabe</CardTitle>
-              <CardDescription>Tesseract (imprimé) • Sanad.ai (cloud) • eScriptorium/Kraken (manuscrits)</CardDescription>
+              <CardDescription>Tesseract (imprimé) • Sanad.ai (cloud) • eScriptorium/Kraken (manuscrits) • PaddleOCR (multilingue)</CardDescription>
             </div>
           </div>
         </CardHeader>
@@ -136,6 +141,7 @@ export default function MultiEngineOcrTool({ onSuccess }: MultiEngineOcrToolProp
                   <SelectItem value="tesseract">Tesseract (local)</SelectItem>
                   <SelectItem value="sanad" disabled={!cloudAllowed}>Sanad.ai (cloud)</SelectItem>
                   <SelectItem value="escriptorium">eScriptorium/Kraken</SelectItem>
+                  <SelectItem value="paddleocr">🏓 PaddleOCR (multilingue)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -243,6 +249,18 @@ export default function MultiEngineOcrTool({ onSuccess }: MultiEngineOcrToolProp
           )}
         </CardContent>
       </Card>
+
+      {/* Section PaddleOCR dédiée */}
+      <div className="border rounded-lg p-1 bg-muted/10">
+        <div className="flex items-center gap-2 px-4 py-2 border-b">
+          <Icon icon="simple-icons:paddlepaddle" className="h-4 w-4 text-primary" />
+          <span className="text-sm font-semibold">PaddleOCR — Outil de test dédié</span>
+          <Badge variant="outline" className="text-xs">PP-OCRv4</Badge>
+        </div>
+        <div className="p-4">
+          <PaddleOcrTool onSuccess={onSuccess} />
+        </div>
+      </div>
     </div>
   );
 }
