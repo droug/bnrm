@@ -181,7 +181,7 @@ function NotesList({ notes, loading }: { notes: ReaderNote[]; loading: boolean }
                       </div>
                       {note.source === "document" && (
                         <a
-                          href={`/digital-library/document/${note.document_id}`}
+                          href={`https://bnrm-dev.digiup.ma/digital-library/document/${note.document_id}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-xs text-primary hover:underline inline-flex items-center gap-1 mt-1"
