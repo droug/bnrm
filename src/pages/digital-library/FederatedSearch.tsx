@@ -436,7 +436,13 @@ function FederatedSearchInner() {
                   />
                   <Input
                     value={query}
-                    onChange={(e) => setQuery(e.target.value)}
+                    onChange={(e) => {
+                      setQuery(e.target.value);
+                      if (!e.target.value) {
+                        setHasSearched(false);
+                        setResults([]);
+                      }
+                    }}
                     placeholder={
                       isAr
                         ? "ابحث عن مقالات، كتب، مجلات..."
