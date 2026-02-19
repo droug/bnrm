@@ -271,20 +271,6 @@ export default function AdminSettings() {
               </Button>
             </div>
             
-            {/* Bouton de création de test */}
-            <div className="mb-8">
-              <Card>
-                <CardHeader>
-                  <CardTitle>🧪 Environnement de Test</CardTitle>
-                  <CardDescription>
-                    Créer des données de test pour le système de dépôt légal
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <CreateTestDepositButton />
-                </CardContent>
-              </Card>
-            </div>
             
             {/* Interconnexions avec systèmes externes */}
             <div className="mb-8">
