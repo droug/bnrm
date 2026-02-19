@@ -13,7 +13,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, CheckCircle, XCircle, Clock, FileText, User, Calendar, AlertTriangle, Eye, Ban, Trash2, Send, CreditCard, BadgeCheck } from "lucide-react";
+import { ArrowLeft, CheckCircle, XCircle, Clock, FileText, User, Calendar, AlertTriangle, Eye, Ban, Trash2, Send, CreditCard, BadgeCheck, Gift } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
@@ -54,6 +54,7 @@ export default function AccessRequestsManagement() {
   const navigate = useNavigate();
   
   const [requests, setRequests] = useState<ServiceRegistration[]>([]);
+  const [freeServiceIds, setFreeServiceIds] = useState<string[]>([]);
   const [services, setServices] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<string>("pending");
@@ -99,6 +100,13 @@ export default function AccessRequestsManagement() {
       
       setRequests(data || []);
       
+      // Fetch free service IDs
+      const { data: freeServicesData } = await supabase
+        .from('bnrm_services')
+        .select('id_service')
+        .eq('is_free', true);
+      setFreeServiceIds((freeServicesData || []).map(s => s.id_service));
+
       const { data: subscriptionServices, error: servicesError } = await supabase
         .from('bnrm_services')
         .select('nom_service')
@@ -121,9 +129,15 @@ export default function AccessRequestsManagement() {
     }
   };
 
-  const getFilteredRequests = (status: string | string[]) => {
+  const getFilteredRequests = (status: string | string[], freeOnly = false) => {
     const statuses = Array.isArray(status) ? status : [status];
     let filtered = requests.filter(r => statuses.includes(r.status));
+    
+    if (freeOnly) {
+      filtered = filtered.filter(r => freeServiceIds.includes(r.service_id));
+    } else {
+      filtered = filtered.filter(r => !freeServiceIds.includes(r.service_id));
+    }
     
     if (categoryFilter !== "all") {
       filtered = filtered.filter(r => r.bnrm_services.nom_service === categoryFilter);
@@ -869,6 +883,11 @@ export default function AccessRequestsManagement() {
   const paymentRequests = getFilteredRequests(['payment_sent', 'paid']);
   const activeRequests = getFilteredRequests('active');
   const rejectedRequests = getFilteredRequests('rejected');
+  const freeRequests = [
+    ...getFilteredRequests('pending', true),
+    ...getFilteredRequests('active', true),
+    ...getFilteredRequests('rejected', true),
+  ];
 
   return (
     <WatermarkContainer 
@@ -891,7 +910,7 @@ export default function AccessRequestsManagement() {
             setCurrentPage(1);
             setCategoryFilter("all");
           }} className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-6">
+            <TabsList className="grid w-full grid-cols-5 mb-6">
               <TabsTrigger value="pending" className="flex items-center gap-2">
                 <Clock className="h-4 w-4" />
                 En Attente ({pendingRequests.length})
@@ -907,6 +926,10 @@ export default function AccessRequestsManagement() {
               <TabsTrigger value="rejected" className="flex items-center gap-2">
                 <XCircle className="h-4 w-4" />
                 Rejetés ({rejectedRequests.length})
+              </TabsTrigger>
+              <TabsTrigger value="free" className="flex items-center gap-2">
+                <Gift className="h-4 w-4" />
+                Gratuites ({freeRequests.length})
               </TabsTrigger>
             </TabsList>
 
@@ -924,6 +947,10 @@ export default function AccessRequestsManagement() {
 
             <TabsContent value="rejected">
               {renderRequestsTable(rejectedRequests)}
+            </TabsContent>
+
+            <TabsContent value="free">
+              {renderRequestsTable(freeRequests)}
             </TabsContent>
           </Tabs>
         </div>
