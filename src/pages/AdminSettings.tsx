@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { CreateTestDepositButton } from "@/components/admin/CreateTestDepositButton";
 import { ExternalSystemsConfig } from "@/components/admin/ExternalSystemsConfig";
 import { SmtpConfigCard } from "@/components/admin/SmtpConfigCard";
+import logoImage from "@/assets/FINAL_LOGO_3.png";
 
 export default function AdminSettings() {
   const navigate = useNavigate();
@@ -334,16 +335,16 @@ export default function AdminSettings() {
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {requestCards.map((card) => (
                   <PermissionGuard key={card.title} permission={card.permission}>
-                    <Card className="group relative overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-primary/40 flex flex-col">
-                      <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
-                      <CardHeader className="relative flex-grow">
-                        <CardTitle className="flex items-center space-x-3">
-                          <div className={`p-3 rounded-2xl bg-gradient-to-br ${card.gradient} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                            <card.icon className="h-6 w-6 text-white" />
-                          </div>
-                          <span className="text-lg group-hover:text-primary transition-colors">{card.title}</span>
-                        </CardTitle>
-                        <CardDescription className="text-base leading-relaxed mt-2">
+                     <Card className="group relative overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-primary/40 flex flex-col">
+                       <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                       <CardHeader className="relative flex-grow">
+                         <CardTitle className="flex items-center space-x-3">
+                           <div className={`p-3 rounded-2xl bg-gradient-to-br ${card.gradient} shadow-lg group-hover:scale-110 transition-transform duration-300 flex items-center justify-center`}>
+                             <img src={logoImage} alt="BNRM" className="h-6 w-6 object-contain brightness-0 invert" />
+                           </div>
+                           <span className="text-lg group-hover:text-primary transition-colors">{card.title}</span>
+                         </CardTitle>
+                         <CardDescription className="text-base leading-relaxed mt-2">
                           {card.description}
                         </CardDescription>
                       </CardHeader>
@@ -378,16 +379,16 @@ export default function AdminSettings() {
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {otherCards.map((card) => (
                   <PermissionGuard key={card.title} permission={card.permission}>
-                    <Card className="group relative overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-primary/40 flex flex-col">
-                      <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
-                      <CardHeader className="relative flex-grow">
-                        <CardTitle className="flex items-center space-x-3">
-                          <div className={`p-3 rounded-2xl bg-gradient-to-br ${card.gradient} shadow-lg group-hover:scale-110 transition-transform duration-300`}>
-                            <card.icon className="h-6 w-6 text-white" />
-                          </div>
-                          <span className="text-lg group-hover:text-primary transition-colors">{card.title}</span>
-                        </CardTitle>
-                        <CardDescription className="text-base leading-relaxed mt-2">
+                     <Card className="group relative overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-2 hover:border-primary/40 flex flex-col">
+                       <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}></div>
+                       <CardHeader className="relative flex-grow">
+                         <CardTitle className="flex items-center space-x-3">
+                           <div className={`p-3 rounded-2xl bg-gradient-to-br ${card.gradient} shadow-lg group-hover:scale-110 transition-transform duration-300 flex items-center justify-center`}>
+                             <img src={logoImage} alt="BNRM" className="h-6 w-6 object-contain brightness-0 invert" />
+                           </div>
+                           <span className="text-lg group-hover:text-primary transition-colors">{card.title}</span>
+                         </CardTitle>
+                         <CardDescription className="text-base leading-relaxed mt-2">
                           {card.description}
                         </CardDescription>
                       </CardHeader>

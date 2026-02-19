@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Bell, Settings, Home } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
-import logoImage from "@/assets/logo-bnrm.png";
+import logoImage from "@/assets/FINAL_LOGO_3.png";
 
 interface AdminHeaderProps {
   title: string;
