@@ -113,7 +113,35 @@ Deno.serve(async (req) => {
       // Non-blocking: profile will be created by trigger or later
     }
 
-    // 3. Create service registration using admin client
+    // 3. Check if a registration already exists for this user + service
+    const { data: existingReg, error: checkError } = await adminClient
+      .from("service_registrations")
+      .select("id, status")
+      .eq("user_id", userId)
+      .eq("service_id", serviceId)
+      .maybeSingle();
+
+    if (checkError) {
+      console.error("Check existing registration error:", checkError);
+    }
+
+    if (existingReg) {
+      const statusMessages: Record<string, string> = {
+        pending: "Vous avez déjà une demande en attente de validation pour ce service.",
+        payment_sent: "Vous avez déjà une demande en attente de paiement pour ce service.",
+        paid: "Vous avez déjà un paiement confirmé en attente d'activation pour ce service.",
+        active: "Vous êtes déjà abonné à ce service.",
+        rejected: "Votre demande précédente a été rejetée. Veuillez contacter la BNRM pour plus d'informations.",
+        expired: "Votre abonnement précédent a expiré. Veuillez contacter la BNRM pour renouveler.",
+      };
+      const message = statusMessages[existingReg.status] || "Une inscription existe déjà pour ce service.";
+      return new Response(
+        JSON.stringify({ error: message }),
+        { status: 409, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // 4. Create service registration using admin client
     const registrationData: Record<string, unknown> = {
       user_id: userId,
       service_id: serviceId,
