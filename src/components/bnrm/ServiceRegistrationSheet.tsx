@@ -245,17 +245,68 @@ export function ServiceRegistrationSheet({
     setIsLoading(true);
 
     try {
-      if (!isPageBasedService && !isFreeService) {
-        const { data: existingRegistration } = await supabase
-          .from("service_registrations")
-          .select("*")
-          .eq("user_id", user.id)
-          .eq("service_id", service.id_service)
-          .eq("is_paid", true)
-          .maybeSingle();
+      // Check for any existing registration for this user + service
+      const { data: existingReg } = await supabase
+        .from("service_registrations")
+        .select("id, status")
+        .eq("user_id", user.id)
+        .eq("service_id", service.id_service)
+        .maybeSingle();
 
-        if (existingRegistration) {
-          toast({ title: "Déjà inscrit", description: "Vous avez déjà un abonnement actif pour ce service", variant: "destructive" });
+      const renewableStatuses = ["rejected", "expired"];
+      const blockingStatuses = ["pending", "payment_sent", "paid", "active"];
+
+      if (existingReg) {
+        if (blockingStatuses.includes(existingReg.status)) {
+          const statusLabels: Record<string, string> = {
+            pending: "Vous avez déjà une demande en attente de validation.",
+            payment_sent: "Vous avez déjà une demande en attente de paiement.",
+            paid: "Vous avez déjà un paiement confirmé en attente d'activation.",
+            active: "Vous êtes déjà abonné à ce service.",
+          };
+          toast({ title: "Déjà inscrit", description: statusLabels[existingReg.status] || "Une inscription existe déjà.", variant: "destructive" });
+          setIsLoading(false);
+          return;
+        }
+        // For rejected or expired: update existing record instead of inserting
+        if (renewableStatuses.includes(existingReg.status)) {
+          const newRegData = {
+            tariff_id: selectedTariff?.id_tarif || null,
+            status: isFreeService ? "active" : "pending",
+            is_paid: isFreeService,
+            updated_at: new Date().toISOString(),
+            registration_data: {
+              firstName: formData.firstName,
+              lastName: formData.lastName,
+              cnie: formData.cnie,
+              email: formData.email,
+              phone: formData.phone,
+              region: formData.region,
+              ville: formData.ville,
+              address: formData.address,
+              institution: formData.institution,
+              additionalInfo: formData.additionalInfo,
+              formuleType: selectedTariff
+                ? `${selectedTariff.condition_tarif || "Non spécifié"} ${selectedTariff.periode_validite ? `Validité: ${selectedTariff.periode_validite}` : ""}`
+                : "Non spécifié",
+              ...(isPageBasedService && { pageCount }),
+              ...(selectedManuscript && { manuscriptId: selectedManuscript.id, manuscriptTitle: selectedManuscript.title, manuscriptCote: selectedManuscript.cote }),
+            },
+          };
+          const { data: updatedReg, error: updateError } = await supabase
+            .from("service_registrations")
+            .update(newRegData)
+            .eq("id", existingReg.id)
+            .select()
+            .single();
+          if (updateError) throw updateError;
+          setRegistrationId(updatedReg.id);
+          if (!isFreeService && selectedTariff && !isPageBasedService) {
+            setShowPaymentOptions(true);
+          } else {
+            toast({ title: "Nouvelle demande enregistrée", description: "Votre nouvelle demande d'inscription a été soumise." });
+            onOpenChange(false);
+          }
           setIsLoading(false);
           return;
         }
