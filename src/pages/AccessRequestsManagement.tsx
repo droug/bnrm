@@ -1267,6 +1267,36 @@ export default function AccessRequestsManagement() {
                               </AlertDialogFooter>
                             </AlertDialogContent>
                           </AlertDialog>
+
+                          {/* Rejeter la demande */}
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="outline" className="w-full border-destructive/50 text-destructive hover:bg-destructive/10"
+                                onClick={() => setRejectReason("")}>
+                                <XCircle className="h-4 w-4 mr-2" />
+                                Rejeter la demande
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Rejeter la demande</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Veuillez indiquer la raison du rejet pour{" "}
+                                  <strong>{selectedRequest.registration_data?.firstName} {selectedRequest.registration_data?.lastName}</strong>.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <Textarea placeholder="Raison du rejet..." value={rejectReason} onChange={(e) => setRejectReason(e.target.value)} className="mt-2" />
+                              <AlertDialogFooter>
+                                <AlertDialogCancel onClick={() => setRejectReason("")}>Annuler</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={async () => { await handleReject(); setDetailsDialogOpen(false); setSelectedRequest(null); }}
+                                  disabled={!rejectReason.trim()}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50 disabled:cursor-not-allowed">
+                                  Rejeter
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </div>
                     </>
