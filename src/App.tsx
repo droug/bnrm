@@ -4,7 +4,7 @@ import { BackgroundOcrFloatingPanel } from "@/components/digital-library/Backgro
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/hooks/useLanguage";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useParams } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import ScrollToTop from "@/components/ScrollToTop";
 import { ScrollToTopButton } from "@/components/ScrollToTopButton";
@@ -249,6 +249,12 @@ const PageLoader = () => (
   </div>
 );
 
+// Redirect /manuscript-reader/:id → /digital-library/book-reader/:id
+const RedirectToBookReader = () => {
+  const { id } = useParams();
+  return <Navigate to={`/digital-library/book-reader/${id}`} replace />;
+};
+
 const App = () => {
   // Synchronisation automatique des listes système au démarrage
   useAutoSync(true);
@@ -372,6 +378,8 @@ const App = () => {
           <Route path="/digital-library/mes-demandes" element={<MyRequests />} />
           <Route path="/digital-library/account-settings" element={<AccountSettings />} />
           <Route path="/digital-library/book-reader/:id" element={<BookReader />} />
+          {/* Redirect legacy manuscript-reader URLs to book-reader */}
+          <Route path="/manuscript-reader/:id" element={<RedirectToBookReader />} />
         <Route path="/reproduction" element={<ReproductionPage />} />
         <Route path="/reproduction/:action" element={<ReproductionPage />} />
         <Route path="/reproduction/details/:id" element={<ReproductionDetailsPage />} />
