@@ -11605,13 +11605,16 @@ export type Database = {
       }
       service_registrations: {
         Row: {
+          activated_at: string | null
           created_at: string | null
+          expires_at: string | null
           id: string
           is_paid: boolean | null
           processed_at: string | null
           processed_by: string | null
           registration_data: Json
           rejection_reason: string | null
+          renewal_reminder_sent: boolean | null
           service_id: string
           status: string
           subscription_id: string | null
@@ -11620,13 +11623,16 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          activated_at?: string | null
           created_at?: string | null
+          expires_at?: string | null
           id?: string
           is_paid?: boolean | null
           processed_at?: string | null
           processed_by?: string | null
           registration_data?: Json
           rejection_reason?: string | null
+          renewal_reminder_sent?: boolean | null
           service_id: string
           status?: string
           subscription_id?: string | null
@@ -11635,13 +11641,16 @@ export type Database = {
           user_id: string
         }
         Update: {
+          activated_at?: string | null
           created_at?: string | null
+          expires_at?: string | null
           id?: string
           is_paid?: boolean | null
           processed_at?: string | null
           processed_by?: string | null
           registration_data?: Json
           rejection_reason?: string | null
+          renewal_reminder_sent?: boolean | null
           service_id?: string
           status?: string
           subscription_id?: string | null
@@ -15077,6 +15086,10 @@ export type Database = {
         Args: { p_start_date: string; p_subscription_type: string }
         Returns: string
       }
+      calculate_subscription_expiry: {
+        Args: { p_activated_at?: string; p_tariff_condition: string }
+        Returns: string
+      }
       can_access_legal_deposit_request:
         | {
             Args: {
@@ -15351,6 +15364,13 @@ export type Database = {
         Returns: undefined
       }
       perform_automatic_archiving: { Args: never; Returns: Json }
+      process_subscription_expirations: {
+        Args: never
+        Returns: {
+          processed_expired: number
+          processed_reminders: number
+        }[]
+      }
       record_daily_pass_usage: {
         Args: { p_service_id?: string; p_user_id: string }
         Returns: Json
