@@ -1189,7 +1189,8 @@ export default function AccessRequestsManagement() {
                               <AlertDialogCancel onClick={() => setRejectReason("")}>Annuler</AlertDialogCancel>
                               <AlertDialogAction
                                 onClick={async () => { await handleReject(); setDetailsDialogOpen(false); setSelectedRequest(null); }}
-                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                disabled={!rejectReason.trim()}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50 disabled:cursor-not-allowed">
                                 Rejeter
                               </AlertDialogAction>
                             </AlertDialogFooter>
