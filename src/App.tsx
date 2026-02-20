@@ -1,5 +1,6 @@
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
+import { BackgroundOcrFloatingPanel } from "@/components/digital-library/BackgroundOcrFloatingPanel";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { LanguageProvider } from "@/hooks/useLanguage";
 import { ThemeProvider } from "@/components/ThemeProvider";
@@ -263,6 +264,7 @@ const App = () => {
         <ScrollToTop />
         <Toaster />
         <Sonner />
+        <BackgroundOcrFloatingPanel />
         <Suspense fallback={<PageLoader />}>
           <AuthRecoveryRedirect />
             <Routes>
