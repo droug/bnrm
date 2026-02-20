@@ -13,7 +13,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, CheckCircle, XCircle, Clock, FileText, User, Calendar, AlertTriangle, Eye, Ban, Trash2, Send, CreditCard, BadgeCheck, Gift } from "lucide-react";
+import { ArrowLeft, CheckCircle, XCircle, Clock, FileText, User, Calendar, AlertTriangle, Eye, Ban, Trash2, Send, CreditCard, BadgeCheck, Gift, Download, ExternalLink, Phone, Mail, MapPin, Building, BookOpen, Hash, Info, ChevronRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
@@ -962,133 +962,355 @@ export default function AccessRequestsManagement() {
             setSelectedRequest(null);
           }
         }}>
-          <SheetContent side="right" className="w-full sm:max-w-lg overflow-y-auto">
-            <SheetHeader>
-              <SheetTitle>Détails de la demande</SheetTitle>
+          <SheetContent side="right" className="w-full sm:max-w-2xl overflow-y-auto">
+            <SheetHeader className="pb-4 border-b">
+              <SheetTitle className="flex items-center gap-2 text-lg">
+                <FileText className="h-5 w-5 text-primary" />
+                Détails de la demande
+              </SheetTitle>
               <SheetDescription>
                 Informations complètes sur la demande d'abonnement
               </SheetDescription>
             </SheetHeader>
+
             {selectedRequest && (
-              <div className="space-y-6 mt-6">
-                <div>
-                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">Service</h3>
-                  <p className="font-medium">{selectedRequest.bnrm_services.nom_service}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {selectedRequest.bnrm_services.categorie}
-                  </p>
-                </div>
-                <Separator />
-                
-                <div>
-                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">Utilisateur</h3>
-                  <div className="flex items-center gap-2 mb-1">
-                    <User className="h-4 w-4 text-muted-foreground" />
-                    <span className="font-medium">{selectedRequest.registration_data?.firstName} {selectedRequest.registration_data?.lastName}</span>
-                  </div>
-                  <p className="text-sm text-muted-foreground ml-6">
-                    {selectedRequest.registration_data?.email}
-                  </p>
-                  {selectedRequest.registration_data?.phone && (
-                    <p className="text-sm text-muted-foreground ml-6">
-                      {selectedRequest.registration_data?.phone}
-                    </p>
-                  )}
-                </div>
-                <Separator />
+              <div className="space-y-5 mt-5 pb-6">
 
-                <div>
-                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">Adresse</h3>
-                  <p className="text-sm">{selectedRequest.registration_data?.address || '—'}</p>
-                  {selectedRequest.registration_data?.ville && (
-                    <p className="text-sm text-muted-foreground">
-                      {selectedRequest.registration_data?.ville}
-                    </p>
-                  )}
-                </div>
-                <Separator />
-
-                {selectedRequest.bnrm_tarifs && (
-                  <>
-                    <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">Tarification</h3>
-                      <p className="text-lg font-semibold">
-                        {selectedRequest.bnrm_tarifs.montant} {selectedRequest.bnrm_tarifs.devise}
-                      </p>
-                      {selectedRequest.bnrm_tarifs.condition_tarif && (
-                        <p className="text-sm text-muted-foreground">
-                          {selectedRequest.bnrm_tarifs.condition_tarif}
-                        </p>
-                      )}
-                      <p className="text-sm text-muted-foreground">
-                        Période : {selectedRequest.bnrm_tarifs.periode_validite}
-                      </p>
-                    </div>
-                    <Separator />
-                  </>
-                )}
-
-                {selectedRequest.rejection_reason && (
-                  <>
-                    <div>
-                      <h3 className="text-sm font-semibold text-destructive uppercase tracking-wide mb-2">
-                        Raison du rejet
-                      </h3>
-                      <p className="text-sm">{selectedRequest.rejection_reason}</p>
-                    </div>
-                    <Separator />
-                  </>
-                )}
-
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">Statut</h3>
+                {/* Statut */}
+                <div className="flex items-center justify-between bg-muted/40 rounded-lg px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-muted-foreground">Statut :</span>
                     {getStatusBadge(selectedRequest.status)}
                   </div>
                   <div className="text-right">
-                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">Date</h3>
-                    <p className="text-sm">
-                      {format(new Date(selectedRequest.created_at), "dd MMMM yyyy 'à' HH:mm", { locale: fr })}
+                    <p className="text-xs text-muted-foreground">
+                      Soumise le {format(new Date(selectedRequest.created_at), "dd/MM/yyyy à HH:mm", { locale: fr })}
                     </p>
+                    {selectedRequest.processed_at && (
+                      <p className="text-xs text-muted-foreground">
+                        Traitée le {format(new Date(selectedRequest.processed_at), "dd/MM/yyyy à HH:mm", { locale: fr })}
+                      </p>
+                    )}
                   </div>
                 </div>
 
-                {selectedRequest.processed_at && (
+                {/* Service */}
+                <div>
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <BookOpen className="h-3.5 w-3.5" /> Service demandé
+                  </h3>
+                  <div className="bg-card border rounded-lg p-3 space-y-1">
+                    <p className="font-semibold">{selectedRequest.bnrm_services.nom_service}</p>
+                    <p className="text-sm text-muted-foreground">{selectedRequest.bnrm_services.categorie}</p>
+                    {selectedRequest.bnrm_tarifs && (
+                      <div className="flex items-center gap-3 mt-2 pt-2 border-t">
+                        <span className="text-base font-bold text-primary">
+                          {selectedRequest.bnrm_tarifs.montant === 0 ? "Gratuit" : `${selectedRequest.bnrm_tarifs.montant} ${selectedRequest.bnrm_tarifs.devise}`}
+                        </span>
+                        <span className="text-xs text-muted-foreground">— {selectedRequest.bnrm_tarifs.periode_validite}</span>
+                        {selectedRequest.bnrm_tarifs.condition_tarif && (
+                          <Badge variant="outline" className="text-xs">{selectedRequest.bnrm_tarifs.condition_tarif}</Badge>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <Separator />
+
+                {/* Identité */}
+                <div>
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <User className="h-3.5 w-3.5" /> Identité du demandeur
+                  </h3>
+                  <div className="bg-card border rounded-lg p-3 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4 text-muted-foreground shrink-0" />
+                      <span className="font-medium">
+                        {selectedRequest.registration_data?.firstName} {selectedRequest.registration_data?.lastName}
+                      </span>
+                    </div>
+                    {selectedRequest.registration_data?.email && (
+                      <div className="flex items-center gap-2">
+                        <Mail className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <span className="text-sm">{selectedRequest.registration_data.email}</span>
+                      </div>
+                    )}
+                    {selectedRequest.registration_data?.phone && (
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <span className="text-sm">{selectedRequest.registration_data.phone}</span>
+                      </div>
+                    )}
+                    {selectedRequest.registration_data?.cin && (
+                      <div className="flex items-center gap-2">
+                        <Hash className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <span className="text-sm">CIN : <strong>{selectedRequest.registration_data.cin}</strong></span>
+                      </div>
+                    )}
+                    {(selectedRequest.registration_data?.address || selectedRequest.registration_data?.ville) && (
+                      <div className="flex items-start gap-2">
+                        <MapPin className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+                        <span className="text-sm">
+                          {selectedRequest.registration_data?.address}
+                          {selectedRequest.registration_data?.address && selectedRequest.registration_data?.ville && ", "}
+                          {selectedRequest.registration_data?.ville}
+                        </span>
+                      </div>
+                    )}
+                    {selectedRequest.registration_data?.organization && (
+                      <div className="flex items-center gap-2">
+                        <Building className="h-4 w-4 text-muted-foreground shrink-0" />
+                        <span className="text-sm">{selectedRequest.registration_data.organization}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Données complémentaires */}
+                {(() => {
+                  const excludedKeys = ['firstName', 'lastName', 'email', 'phone', 'cin', 'address', 'ville', 'organization', 'formuleType', 'attachments', 'files', 'documents'];
+                  const extraData = Object.entries(selectedRequest.registration_data || {})
+                    .filter(([key, val]) => !excludedKeys.includes(key) && val !== null && val !== undefined && val !== '' && typeof val !== 'object');
+                  const hasFormule = !!selectedRequest.registration_data?.formuleType;
+                  if (extraData.length === 0 && !hasFormule) return null;
+                  const labelMap: Record<string, string> = {
+                    birthDate: 'Date de naissance', birthPlace: 'Lieu de naissance',
+                    nationality: 'Nationalité', profession: 'Profession',
+                    institution: 'Établissement', domaine: 'Domaine',
+                    specialite: 'Spécialité', niveau: 'Niveau',
+                    typeLecteur: 'Type de lecteur', typeOrganisme: "Type d'organisme",
+                    nbreExemplaires: 'Nb exemplaires', motif: 'Motif',
+                    description: 'Description', region: 'Région', codePostal: 'Code postal',
+                  };
+                  return (
+                    <>
+                      <Separator />
+                      <div>
+                        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                          <Info className="h-3.5 w-3.5" /> Informations complémentaires
+                        </h3>
+                        <div className="bg-card border rounded-lg p-3 space-y-1.5">
+                          {hasFormule && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">Formule</span>
+                              <span className="font-medium">{selectedRequest.registration_data.formuleType}</span>
+                            </div>
+                          )}
+                          {extraData.map(([key, val]) => (
+                            <div key={key} className="flex justify-between text-sm">
+                              <span className="text-muted-foreground">{labelMap[key] || key}</span>
+                              <span className="font-medium text-right max-w-[60%]">{String(val)}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  );
+                })()}
+
+                {/* Pièces jointes */}
+                {(() => {
+                  const data = selectedRequest.registration_data || {};
+                  const attachments: Array<{ name: string; url: string }> = [];
+                  const attachmentKeys = ['attachments', 'files', 'documents', 'pieces_jointes', 'piecesJointes'];
+                  for (const key of attachmentKeys) {
+                    if (data[key]) {
+                      if (Array.isArray(data[key])) {
+                        data[key].forEach((item: any) => {
+                          if (typeof item === 'string') attachments.push({ name: item.split('/').pop() || item, url: item });
+                          else if (item?.url) attachments.push({ name: item.name || item.url.split('/').pop(), url: item.url });
+                        });
+                      } else if (typeof data[key] === 'string') {
+                        attachments.push({ name: data[key].split('/').pop() || data[key], url: data[key] });
+                      }
+                    }
+                  }
+                  const urlKeyMap: Record<string, string> = {
+                    photoUrl: 'Photo', cinUrl: 'CIN (scan)', carteEtudiantUrl: "Carte étudiant",
+                    attestationUrl: 'Attestation', documentUrl: 'Document', fileUrl: 'Fichier',
+                    photoPath: 'Photo', cinPath: 'CIN (scan)', scanUrl: 'Document scanné',
+                  };
+                  Object.entries(data).forEach(([key, val]) => {
+                    if (typeof val === 'string' && (String(val).startsWith('http') || String(val).startsWith('/')) &&
+                      (key.toLowerCase().includes('url') || key.toLowerCase().includes('file') || key.toLowerCase().includes('path') ||
+                       key.toLowerCase().includes('doc') || key.toLowerCase().includes('piece') || key.toLowerCase().includes('photo') ||
+                       key.toLowerCase().includes('carte') || key.toLowerCase().includes('scan'))) {
+                      if (!attachments.find(a => a.url === val)) {
+                        attachments.push({ name: urlKeyMap[key] || key, url: String(val) });
+                      }
+                    }
+                  });
+
+                  return (
+                    <>
+                      <Separator />
+                      <div>
+                        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                          <FileText className="h-3.5 w-3.5" /> Pièces jointes
+                          <Badge variant="secondary" className="ml-auto text-xs">{attachments.length}</Badge>
+                        </h3>
+                        {attachments.length === 0 ? (
+                          <div className="bg-muted/30 border border-dashed rounded-lg p-4 text-center text-sm text-muted-foreground">
+                            Aucune pièce jointe associée à cette demande
+                          </div>
+                        ) : (
+                          <div className="space-y-2">
+                            {attachments.map((att, idx) => {
+                              const isImage = /\.(jpg|jpeg|png|gif|webp|svg)(\?|$)/i.test(att.url);
+                              const isPdf = /\.pdf(\?|$)/i.test(att.url);
+                              return (
+                                <div key={idx} className="bg-card border rounded-lg overflow-hidden">
+                                  {isImage && (
+                                    <div className="bg-muted/30 p-2 border-b">
+                                      <img src={att.url} alt={att.name} className="max-h-48 w-full object-contain rounded"
+                                        onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                    </div>
+                                  )}
+                                  {isPdf && (
+                                    <div className="bg-muted/30 p-1 border-b">
+                                      <iframe src={att.url} title={att.name} className="w-full h-40 rounded" />
+                                    </div>
+                                  )}
+                                  <div className="flex items-center justify-between px-3 py-2 gap-2">
+                                    <div className="flex items-center gap-2 min-w-0">
+                                      <FileText className="h-4 w-4 text-muted-foreground shrink-0" />
+                                      <span className="text-sm font-medium truncate">{att.name}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1 shrink-0">
+                                      <Button variant="ghost" size="sm" className="h-7 px-2 text-xs"
+                                        onClick={() => window.open(att.url, '_blank')} title="Visualiser">
+                                        <ExternalLink className="h-3.5 w-3.5 mr-1" />Voir
+                                      </Button>
+                                      <Button variant="ghost" size="sm" className="h-7 px-2 text-xs"
+                                        onClick={() => { const a = document.createElement('a'); a.href = att.url; a.download = att.name; a.target = '_blank'; a.click(); }}
+                                        title="Télécharger">
+                                        <Download className="h-3.5 w-3.5 mr-1" />DL
+                                      </Button>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  );
+                })()}
+
+                {/* Raison du rejet */}
+                {selectedRequest.rejection_reason && (
                   <>
                     <Separator />
-                    <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">Traité le</h3>
-                      <p className="text-sm">
-                        {format(new Date(selectedRequest.processed_at), "dd MMMM yyyy 'à' HH:mm", { locale: fr })}
-                      </p>
+                    <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-3">
+                      <h3 className="text-xs font-semibold text-destructive uppercase tracking-wider mb-1.5">Raison du rejet</h3>
+                      <p className="text-sm">{selectedRequest.rejection_reason}</p>
                     </div>
                   </>
                 )}
 
-                {selectedRequest.registration_data && (
+                {/* BOUTONS D'ACTION dans le Sheet — En attente & Gratuites */}
+                {selectedRequest.status === 'pending' && isAdmin && (
                   <>
                     <Separator />
                     <div>
-                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide mb-2">Données d'inscription</h3>
-                      <div className="space-y-2">
-                        {selectedRequest.registration_data.organization && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Organisation</span>
-                            <span>{selectedRequest.registration_data.organization}</span>
-                          </div>
+                      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Actions</h3>
+                      <div className="flex flex-col gap-2">
+
+                        {/* Valider directement si gratuit */}
+                        {(!selectedRequest.bnrm_tarifs || selectedRequest.bnrm_tarifs.montant === 0) && (
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Valider et activer
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Valider la demande</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Souhaitez-vous valider et activer directement la demande de{" "}
+                                  <strong>{selectedRequest.registration_data?.firstName} {selectedRequest.registration_data?.lastName}</strong> ?
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={async () => {
+                                    setRequestToApprove(selectedRequest);
+                                    await handleApprove();
+                                    setDetailsDialogOpen(false);
+                                    setSelectedRequest(null);
+                                  }}
+                                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                                >
+                                  Valider
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         )}
-                        {selectedRequest.registration_data.formuleType && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">Formule</span>
-                            <span>{selectedRequest.registration_data.formuleType}</span>
-                          </div>
+
+                        {/* Envoyer email de paiement si payant */}
+                        {selectedRequest.bnrm_tarifs && selectedRequest.bnrm_tarifs.montant > 0 && (
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button className="w-full" variant="outline">
+                                <Send className="h-4 w-4 mr-2" />
+                                Envoyer instructions de paiement
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Envoyer l'email de paiement</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Un email sera envoyé à <strong>{selectedRequest.registration_data?.email}</strong> avec les instructions
+                                  de paiement pour <strong>{selectedRequest.bnrm_services.nom_service}</strong> ({selectedRequest.bnrm_tarifs?.montant} {selectedRequest.bnrm_tarifs?.devise}).
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => { handleSendPaymentEmail(selectedRequest); setDetailsDialogOpen(false); }}>
+                                  Envoyer
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         )}
-                        {selectedRequest.registration_data.cin && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-muted-foreground">CIN</span>
-                            <span>{selectedRequest.registration_data.cin}</span>
-                          </div>
-                        )}
+
+                        {/* Rejeter */}
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="outline" className="w-full border-destructive/50 text-destructive hover:bg-destructive/10"
+                              onClick={() => setRejectReason("")}>
+                              <XCircle className="h-4 w-4 mr-2" />
+                              Rejeter la demande
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Rejeter la demande</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Veuillez indiquer la raison du rejet pour{" "}
+                                <strong>{selectedRequest.registration_data?.firstName} {selectedRequest.registration_data?.lastName}</strong>
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <div className="py-4">
+                              <Textarea placeholder="Motif du rejet (obligatoire) ..." value={rejectReason}
+                                onChange={(e) => setRejectReason(e.target.value)} className="min-h-[100px]" />
+                            </div>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel onClick={() => setRejectReason("")}>Annuler</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={async () => { await handleReject(); setDetailsDialogOpen(false); setSelectedRequest(null); }}
+                                className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                Rejeter
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
                       </div>
                     </div>
                   </>
