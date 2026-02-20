@@ -291,12 +291,13 @@ export default function AccessRequestsManagement() {
   };
 
   // Admin: activer l'abonnement après paiement confirmé => status passe à active
-  const handleApprove = async () => {
-    if (!requestToApprove) return;
+  const handleApprove = async (overrideRequest?: ServiceRegistration) => {
+    const target = overrideRequest ?? requestToApprove;
+    if (!target) return;
 
     try {
       const activatedAt = new Date();
-      const conditionTarif = requestToApprove.bnrm_tarifs?.condition_tarif;
+      const conditionTarif = target.bnrm_tarifs?.condition_tarif;
       const expiresAt = calculateExpiryDate(conditionTarif, activatedAt);
 
       const { error } = await supabase
@@ -309,7 +310,7 @@ export default function AccessRequestsManagement() {
           processed_by: user?.id,
           processed_at: activatedAt.toISOString()
         })
-        .eq('id', requestToApprove.id);
+        .eq('id', target.id);
 
       if (error) throw error;
 
@@ -1121,13 +1122,12 @@ export default function AccessRequestsManagement() {
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={async () => {
-                                    setRequestToApprove(selectedRequest);
-                                    await handleApprove();
-                                    setDetailsDialogOpen(false);
-                                    setSelectedRequest(null);
-                                  }}
+                                 <AlertDialogAction
+                                   onClick={async () => {
+                                     await handleApprove(selectedRequest);
+                                     setDetailsDialogOpen(false);
+                                     setSelectedRequest(null);
+                                   }}
                                   className="bg-emerald-600 hover:bg-emerald-700 text-white"
                                 >
                                   Activer
@@ -1256,12 +1256,11 @@ export default function AccessRequestsManagement() {
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                <AlertDialogAction onClick={async () => {
-                                  setRequestToApprove(selectedRequest);
-                                  await handleApprove();
-                                  setDetailsDialogOpen(false);
-                                  setSelectedRequest(null);
-                                }}>
+                                 <AlertDialogAction onClick={async () => {
+                                   await handleApprove(selectedRequest);
+                                   setDetailsDialogOpen(false);
+                                   setSelectedRequest(null);
+                                 }}>
                                   Activer
                                 </AlertDialogAction>
                               </AlertDialogFooter>
@@ -1335,13 +1334,12 @@ export default function AccessRequestsManagement() {
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={async () => {
-                                    setRequestToApprove(selectedRequest);
-                                    await handleApprove();
-                                    setDetailsDialogOpen(false);
-                                    setSelectedRequest(null);
-                                  }}
+                                 <AlertDialogAction
+                                   onClick={async () => {
+                                     await handleApprove(selectedRequest);
+                                     setDetailsDialogOpen(false);
+                                     setSelectedRequest(null);
+                                   }}
                                   className="bg-emerald-600 hover:bg-emerald-700 text-white"
                                 >
                                   Réactiver
