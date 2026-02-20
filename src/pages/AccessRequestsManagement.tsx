@@ -996,20 +996,20 @@ export default function AccessRequestsManagement() {
                       <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Actions</h3>
                       <div className="flex flex-col gap-2">
 
-                        {/* Valider directement si gratuit */}
+                        {/* Activer directement si gratuit */}
                         {(!selectedRequest.bnrm_tarifs || selectedRequest.bnrm_tarifs.montant === 0) && (
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
                               <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
                                 <CheckCircle className="h-4 w-4 mr-2" />
-                                Valider et activer
+                                Activer l'abonnement
                               </Button>
                             </AlertDialogTrigger>
                             <AlertDialogContent>
                               <AlertDialogHeader>
-                                <AlertDialogTitle>Valider la demande</AlertDialogTitle>
+                                <AlertDialogTitle>Activer l'abonnement</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Souhaitez-vous valider et activer directement la demande de{" "}
+                                  Souhaitez-vous activer directement l'abonnement de{" "}
                                   <strong>{selectedRequest.registration_data?.firstName} {selectedRequest.registration_data?.lastName}</strong> ?
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
@@ -1024,7 +1024,7 @@ export default function AccessRequestsManagement() {
                                   }}
                                   className="bg-emerald-600 hover:bg-emerald-700 text-white"
                                 >
-                                  Valider
+                                  Activer
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
