@@ -413,7 +413,7 @@ export default function AccessRequestsManagement() {
       paid: { label: "Payé", variant: "secondary" },
       active: { label: "Active", variant: "default" },
       rejected: { label: "Rejetée", variant: "destructive" },
-      expired: { label: "Expirée", variant: "secondary" },
+      expired: { label: "Désabonné", variant: "secondary" },
     };
 
     const config = statusConfig[status] || { label: status, variant: "secondary" };
@@ -627,11 +627,12 @@ export default function AccessRequestsManagement() {
   const pendingRequests = getFilteredRequests('pending');
   const paymentRequests = getFilteredRequests(['payment_sent', 'paid']);
   const activeRequests = getFilteredRequests('active');
-  const rejectedRequests = getFilteredRequests('rejected');
+  const rejectedRequests = [...getFilteredRequests('rejected'), ...getFilteredRequests('expired')];
   const freeRequests = [
     ...getFilteredRequests('pending', true),
     ...getFilteredRequests('active', true),
     ...getFilteredRequests('rejected', true),
+    ...getFilteredRequests('expired', true),
   ];
 
   return (
@@ -1176,7 +1177,7 @@ export default function AccessRequestsManagement() {
                           {/* Désactiver */}
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <Button variant="outline" className="w-full border-warning/50 text-warning hover:bg-warning/10">
+                              <Button variant="outline" className="w-full border-orange-500/50 text-orange-600 hover:bg-orange-50">
                                 <Ban className="h-4 w-4 mr-2" />
                                 Désactiver l'abonnement
                               </Button>
@@ -1185,15 +1186,60 @@ export default function AccessRequestsManagement() {
                               <AlertDialogHeader>
                                 <AlertDialogTitle>Désactiver l'abonnement</AlertDialogTitle>
                                 <AlertDialogDescription>
-                                  Êtes-vous sûr de vouloir désactiver l'abonnement de{" "}
-                                  <strong>{selectedRequest.registration_data?.firstName} {selectedRequest.registration_data?.lastName}</strong> ?
-                                  L'utilisateur ne pourra plus accéder au service.
+                                  L'abonnement de{" "}
+                                  <strong>{selectedRequest.registration_data?.firstName} {selectedRequest.registration_data?.lastName}</strong>{" "}
+                                  sera désactivé. Le compte sera conservé et pourra être réactivé ultérieurement.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
                                 <AlertDialogCancel>Annuler</AlertDialogCancel>
                                 <AlertDialogAction onClick={() => { handleDeactivate(selectedRequest); setDetailsDialogOpen(false); setSelectedRequest(null); }}>
                                   Désactiver
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* BOUTONS D'ACTION — Désabonné (expired) */}
+                  {selectedRequest.status === 'expired' && isAdmin && (
+                    <>
+                      <Separator />
+                      <div>
+                        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Actions</h3>
+                        <div className="flex flex-col gap-2">
+                          {/* Réactiver */}
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white">
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Réactiver l'abonnement
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Réactiver l'abonnement</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Souhaitez-vous réactiver l'abonnement de{" "}
+                                  <strong>{selectedRequest.registration_data?.firstName} {selectedRequest.registration_data?.lastName}</strong>{" "}
+                                  pour le service <strong>{selectedRequest.bnrm_services.nom_service}</strong> ?
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={async () => {
+                                    setRequestToApprove(selectedRequest);
+                                    await handleApprove();
+                                    setDetailsDialogOpen(false);
+                                    setSelectedRequest(null);
+                                  }}
+                                  className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                                >
+                                  Réactiver
                                 </AlertDialogAction>
                               </AlertDialogFooter>
                             </AlertDialogContent>
@@ -1213,7 +1259,7 @@ export default function AccessRequestsManagement() {
                                 <AlertDialogDescription>
                                   <span className="font-semibold text-destructive">Action irréversible.</span>{" "}
                                   Le compte de <strong>{selectedRequest.registration_data?.firstName} {selectedRequest.registration_data?.lastName}</strong>{" "}
-                                  ({selectedRequest.registration_data?.email}) sera définitivement supprimé ainsi que son abonnement.
+                                  ({selectedRequest.registration_data?.email}) sera définitivement supprimé.
                                 </AlertDialogDescription>
                               </AlertDialogHeader>
                               <AlertDialogFooter>
