@@ -126,13 +126,80 @@ Deno.serve(async (req) => {
     }
 
     if (existingReg) {
+      // For rejected or expired statuses, allow re-registration by updating the existing record
+      const renewableStatuses = ["rejected", "expired"];
+      if (renewableStatuses.includes(existingReg.status)) {
+        console.log(`Re-registration allowed for status: ${existingReg.status}, reg id: ${existingReg.id}`);
+        // Update the existing registration back to pending with new data
+        const { data: updatedReg, error: updateError } = await adminClient
+          .from("service_registrations")
+          .update({
+            status: "pending",
+            tariff_id: tariffId || null,
+            is_paid: false,
+            updated_at: new Date().toISOString(),
+            registration_data: {
+              firstName,
+              lastName,
+              cnie,
+              email,
+              phone,
+              region,
+              ville,
+              address,
+              institution,
+              additionalInfo,
+              formuleType: selectedTariffInfo || "Non spécifié",
+              ...(isPageBasedService && { pageCount }),
+              ...(selectedManuscript && {
+                manuscriptId: selectedManuscript.id,
+                manuscriptTitle: selectedManuscript.title,
+                manuscriptCote: selectedManuscript.cote,
+              }),
+            },
+          })
+          .eq("id", existingReg.id)
+          .select()
+          .single();
+
+        if (updateError) {
+          console.error("Re-registration update error:", updateError);
+          return new Response(
+            JSON.stringify({ error: "Erreur lors de la mise à jour de votre demande: " + updateError.message }),
+            { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+
+        // Send confirmation email and return success (same as new registration)
+        const recipientName2 = [firstName, lastName].filter(Boolean).join(" ") || "Utilisateur";
+        const serviceName2 = selectedTariffInfo || serviceId;
+        try {
+          await sendEmail({
+            to: email,
+            subject: "Nouvelle demande d'inscription reçue - BNRM",
+            html: `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="font-family:Arial,sans-serif;color:#333"><div style="max-width:600px;margin:0 auto;padding:20px"><div style="background:linear-gradient(135deg,#002B45,#004d7a);color:white;padding:30px;text-align:center;border-radius:8px 8px 0 0"><h1 style="margin:0;font-size:24px">Bibliothèque Nationale du Royaume du Maroc</h1></div><div style="background:#f9f9f9;padding:30px;border-radius:0 0 8px 8px"><h2 style="color:#002B45">Bonjour ${recipientName2},</h2><p>Nous avons bien reçu votre nouvelle demande d'inscription au service <strong>${serviceName2}</strong>.</p><div style="background:#e8f5e9;border-left:4px solid #4caf50;padding:15px;margin:15px 0"><strong>✅ Votre demande a été bien reçue</strong><p>Votre demande est en cours de traitement par notre équipe.</p></div><p>En cas de questions, contactez-nous à <a href="mailto:contact@bnrm.ma">contact@bnrm.ma</a></p><p>Cordialement,<br><strong>L'équipe de la BNRM</strong></p></div></div></body></html>`,
+          });
+        } catch (emailErr) {
+          console.error("Email error (non-blocking):", emailErr);
+        }
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            userId,
+            registrationId: updatedReg.id,
+            message: "Votre nouvelle demande d'inscription a été enregistrée avec succès.",
+          }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
+      // For other statuses, block with contextual message
       const statusMessages: Record<string, string> = {
         pending: "Vous avez déjà une demande en attente de validation pour ce service.",
         payment_sent: "Vous avez déjà une demande en attente de paiement pour ce service.",
         paid: "Vous avez déjà un paiement confirmé en attente d'activation pour ce service.",
         active: "Vous êtes déjà abonné à ce service.",
-        rejected: "Votre demande précédente a été rejetée. Veuillez contacter la BNRM pour plus d'informations.",
-        expired: "Votre abonnement précédent a expiré. Veuillez contacter la BNRM pour renouveler.",
       };
       const message = statusMessages[existingReg.status] || "Une inscription existe déjà pour ce service.";
       return new Response(
