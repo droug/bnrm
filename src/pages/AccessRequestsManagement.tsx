@@ -420,294 +420,39 @@ export default function AccessRequestsManagement() {
     return <Badge variant={config.variant}>{config.label}</Badge>;
   };
 
+  const getActionLabel = (status: string) => {
+    switch (status) {
+      case 'pending': return 'Traiter';
+      case 'payment_sent': return 'Suivre';
+      case 'paid': return 'Activer';
+      case 'active': return 'Gérer';
+      case 'rejected': return 'Détails';
+      case 'expired': return 'Détails';
+      default: return 'Détails';
+    }
+  };
+
   const renderActionsForRequest = (request: ServiceRegistration) => {
     return (
       <div className="flex items-center justify-end gap-2">
-        {/* Details button - always visible */}
         <Button
-          variant="ghost"
+          variant="outline"
           size="sm"
+          className="gap-1.5 text-xs font-medium"
           onClick={() => {
             setSelectedRequest(request);
             setDetailsDialogOpen(true);
           }}
-          title="Voir les détails"
         >
-          <Eye className="h-4 w-4" />
+          <Eye className="h-3.5 w-3.5" />
+          {getActionLabel(request.status)}
         </Button>
-
-        {/* PENDING: Admin can send payment email, approve directly (free), or reject */}
-        {request.status === 'pending' && isAdmin && (
-          <>
-            {/* Send payment email button */}
-            {request.bnrm_tarifs && request.bnrm_tarifs.montant > 0 && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                    title="Envoyer email de paiement"
-                    disabled={sendingPaymentEmail === request.id}
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Envoyer l'email de paiement</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Un email sera envoyé à <strong>{request.registration_data?.email}</strong> avec les instructions de paiement
-                      pour le service <strong>{request.bnrm_services.nom_service}</strong> ({request.bnrm_tarifs?.montant} {request.bnrm_tarifs?.devise}).
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Annuler</AlertDialogCancel>
-                    <AlertDialogAction onClick={() => handleSendPaymentEmail(request)}>
-                      Envoyer
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
-
-            {/* Approve directly (for free services) */}
-            {(!request.bnrm_tarifs || request.bnrm_tarifs.montant === 0) && (
-              <AlertDialog open={approveDialogOpen && requestToApprove?.id === request.id} onOpenChange={(open) => {
-                if (!open) {
-                  setApproveDialogOpen(false);
-                  setRequestToApprove(null);
-                }
-              }}>
-                <AlertDialogTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                    onClick={() => {
-                      setRequestToApprove(request);
-                      setApproveDialogOpen(true);
-                    }}
-                  >
-                    <CheckCircle className="h-4 w-4" />
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Approuver la demande</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Ce service est gratuit. Êtes-vous sûr de vouloir approuver directement cette demande ?
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Annuler</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleApprove}>
-                      Approuver
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
-            )}
-
-            {/* Reject */}
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                  onClick={() => setSelectedRequest(request)}
-                >
-                  <XCircle className="h-4 w-4" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Rejeter la demande</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Veuillez indiquer la raison du rejet
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <div className="py-4">
-                  <Textarea
-                    placeholder="Motif du rejet (obligatoire) ..."
-                    value={rejectReason}
-                    onChange={(e) => setRejectReason(e.target.value)}
-                    className="min-h-[100px]"
-                  />
-                </div>
-                <AlertDialogFooter>
-                  <AlertDialogCancel onClick={() => {
-                    setRejectReason("");
-                    setSelectedRequest(null);
-                  }}>
-                    Annuler
-                  </AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={handleReject}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  >
-                    Rejeter
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </>
-        )}
-
-        {/* PAYMENT TAB: Confirmer le paiement + Activer l'abonnement */}
-        {(request.status === 'payment_sent' || request.status === 'paid') && (isComptable || isAdmin) && (
-          <>
-            {/* Confirmer le paiement */}
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={request.status === 'paid' 
-                    ? "text-muted-foreground opacity-50" 
-                    : "text-blue-600 hover:text-blue-700 hover:bg-blue-50"}
-                  title={request.status === 'paid' ? "Paiement déjà confirmé" : "Confirmer le paiement"}
-                  disabled={request.status === 'paid'}
-                >
-                  <BadgeCheck className="h-4 w-4" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Confirmer le paiement</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Confirmez-vous la réception du paiement de{" "}
-                    <strong>{request.registration_data?.firstName} {request.registration_data?.lastName}</strong>{" "}
-                    pour le service <strong>{request.bnrm_services.nom_service}</strong>
-                    {request.bnrm_tarifs && ` (${request.bnrm_tarifs.montant} ${request.bnrm_tarifs.devise})`} ?
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Annuler</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => handleConfirmPayment(request)}>
-                    Confirmer le paiement
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-
-            {/* Activer l'abonnement - disabled until payment confirmed */}
-            <AlertDialog open={approveDialogOpen && requestToApprove?.id === request.id} onOpenChange={(open) => {
-              if (!open) {
-                setApproveDialogOpen(false);
-                setRequestToApprove(null);
-              }
-            }}>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={request.status === 'paid' 
-                    ? "text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50" 
-                    : "text-muted-foreground opacity-50"}
-                  title={request.status === 'paid' ? "Activer l'abonnement" : "Veuillez d'abord confirmer le paiement"}
-                  disabled={request.status !== 'paid'}
-                  onClick={() => {
-                    if (request.status === 'paid') {
-                      setRequestToApprove(request);
-                      setApproveDialogOpen(true);
-                    }
-                  }}
-                >
-                  <CheckCircle className="h-4 w-4" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Activer l'abonnement</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Le paiement a été confirmé. Souhaitez-vous activer l'abonnement de{" "}
-                    <strong>{request.registration_data?.firstName} {request.registration_data?.lastName}</strong> ?
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Annuler</AlertDialogCancel>
-                  <AlertDialogAction onClick={handleApprove}>
-                    Activer
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </>
-        )}
-
-        {/* ACTIVE: Deactivate and Delete */}
-        {request.status === 'active' && isAdmin && (
-          <>
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-amber-600 hover:text-amber-700 hover:bg-amber-50"
-                  title="Désactiver l'abonnement"
-                >
-                  <Ban className="h-4 w-4" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Désactiver l'abonnement</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Êtes-vous sûr de vouloir désactiver l'abonnement de{" "}
-                    <strong>{request.registration_data?.firstName} {request.registration_data?.lastName}</strong> ?
-                    L'utilisateur ne pourra plus accéder au service.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Annuler</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={() => handleDeactivate(request)}
-                    className="bg-amber-600 text-white hover:bg-amber-700"
-                  >
-                    Désactiver
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                  title="Supprimer le compte"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle className="text-destructive">Supprimer le compte</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    <span className="font-semibold text-destructive">Action irréversible.</span>{" "}
-                    Le compte de <strong>{request.registration_data?.firstName} {request.registration_data?.lastName}</strong>{" "}
-                    ({request.registration_data?.email}) sera définitivement supprimé ainsi que son abonnement.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Annuler</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={() => handleDeleteAccount(request)}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  >
-                    Supprimer définitivement
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </>
-        )}
       </div>
     );
   };
+
+
+
 
   const renderRequestsTable = (requestsList: ServiceRegistration[]) => {
     if (isLoading) {
@@ -1344,10 +1089,148 @@ export default function AccessRequestsManagement() {
                             </AlertDialogFooter>
                           </AlertDialogContent>
                         </AlertDialog>
+                        </div>
                       </div>
-                    </div>
-                  </>
-                )}
+                    </>
+                  )}
+
+                  {/* BOUTONS D'ACTION — Paiement (payment_sent / paid) */}
+                  {(selectedRequest.status === 'payment_sent' || selectedRequest.status === 'paid') && (isComptable || isAdmin) && (
+                    <>
+                      <Separator />
+                      <div>
+                        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Actions</h3>
+                        <div className="flex flex-col gap-2">
+                          {/* Confirmer le paiement */}
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button className="w-full" variant="outline" disabled={selectedRequest.status === 'paid'}>
+                                <BadgeCheck className="h-4 w-4 mr-2" />
+                                {selectedRequest.status === 'paid' ? 'Paiement déjà confirmé' : 'Confirmer le paiement'}
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Confirmer le paiement</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Confirmez-vous la réception du paiement de{" "}
+                                  <strong>{selectedRequest.registration_data?.firstName} {selectedRequest.registration_data?.lastName}</strong>{" "}
+                                  pour le service <strong>{selectedRequest.bnrm_services.nom_service}</strong>
+                                  {selectedRequest.bnrm_tarifs && ` (${selectedRequest.bnrm_tarifs.montant} ${selectedRequest.bnrm_tarifs.devise})`} ?
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => { handleConfirmPayment(selectedRequest); setDetailsDialogOpen(false); }}>
+                                  Confirmer le paiement
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+
+                          {/* Activer l'abonnement */}
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                className="w-full"
+                                disabled={selectedRequest.status !== 'paid'}
+                                title={selectedRequest.status !== 'paid' ? "Veuillez d'abord confirmer le paiement" : undefined}
+                              >
+                                <CheckCircle className="h-4 w-4 mr-2" />
+                                Activer l'abonnement
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Activer l'abonnement</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Le paiement a été confirmé. Souhaitez-vous activer l'abonnement de{" "}
+                                  <strong>{selectedRequest.registration_data?.firstName} {selectedRequest.registration_data?.lastName}</strong> ?
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                <AlertDialogAction onClick={async () => {
+                                  setRequestToApprove(selectedRequest);
+                                  await handleApprove();
+                                  setDetailsDialogOpen(false);
+                                  setSelectedRequest(null);
+                                }}>
+                                  Activer
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  {/* BOUTONS D'ACTION — Actif */}
+                  {selectedRequest.status === 'active' && isAdmin && (
+                    <>
+                      <Separator />
+                      <div>
+                        <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Actions</h3>
+                        <div className="flex flex-col gap-2">
+                          {/* Désactiver */}
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="outline" className="w-full border-warning/50 text-warning hover:bg-warning/10">
+                                <Ban className="h-4 w-4 mr-2" />
+                                Désactiver l'abonnement
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Désactiver l'abonnement</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Êtes-vous sûr de vouloir désactiver l'abonnement de{" "}
+                                  <strong>{selectedRequest.registration_data?.firstName} {selectedRequest.registration_data?.lastName}</strong> ?
+                                  L'utilisateur ne pourra plus accéder au service.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => { handleDeactivate(selectedRequest); setDetailsDialogOpen(false); setSelectedRequest(null); }}>
+                                  Désactiver
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+
+                          {/* Supprimer le compte */}
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="outline" className="w-full border-destructive/50 text-destructive hover:bg-destructive/10">
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Supprimer le compte
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle className="text-destructive">Supprimer le compte</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  <span className="font-semibold text-destructive">Action irréversible.</span>{" "}
+                                  Le compte de <strong>{selectedRequest.registration_data?.firstName} {selectedRequest.registration_data?.lastName}</strong>{" "}
+                                  ({selectedRequest.registration_data?.email}) sera définitivement supprimé ainsi que son abonnement.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => { handleDeleteAccount(selectedRequest); setDetailsDialogOpen(false); setSelectedRequest(null); }}
+                                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                                >
+                                  Supprimer définitivement
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
+                      </div>
+                    </>
+                  )}
               </div>
             )}
           </SheetContent>
@@ -1356,3 +1239,4 @@ export default function AccessRequestsManagement() {
     </WatermarkContainer>
   );
 }
+
