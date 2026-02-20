@@ -108,6 +108,7 @@ export default function DocumentsManager() {
   const [ocrExistingPagesCount, setOcrExistingPagesCount] = useState(0); // Pages with image_url
   const [ocrPdfFile, setOcrPdfFile] = useState<File | null>(null); // PDF file for OCR upload
   const [ocrMode, setOcrMode] = useState<"ocr" | "extract">("extract"); // OCR mode: extract embedded text or run Tesseract
+  const [ocrEngine, setOcrEngine] = useState<"tesseract" | "paddleocr" | "sanad" | "escriptorium">("tesseract"); // OCR engine selection
   const [pdfHasEmbeddedText, setPdfHasEmbeddedText] = useState(false); // Whether PDF has embedded text
   const [selectedDocIds, setSelectedDocIds] = useState<string[]>([]);
   const [bulkOcrRunning, setBulkOcrRunning] = useState(false);
@@ -3501,6 +3502,40 @@ export default function DocumentsManager() {
               </div>
             )}
             
+            {/* OCR Engine selection - only show for OCR mode */}
+            {ocrMode === "ocr" && (
+              <div className="space-y-2">
+                <Label>Outil d'OCR</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { value: "tesseract", label: "Tesseract", desc: "Open-source, local", icon: "🔬" },
+                    { value: "paddleocr", label: "PaddleOCR", desc: "Baidu AI, multi-langues", icon: "🏓" },
+                    { value: "sanad", label: "Sanad.ai", desc: "Arabe & manuscrits", icon: "📜" },
+                    { value: "escriptorium", label: "eScriptorium", desc: "HTR manuscrits", icon: "✍️" },
+                  ].map((engine) => (
+                    <button
+                      key={engine.value}
+                      type="button"
+                      onClick={() => setOcrEngine(engine.value as typeof ocrEngine)}
+                      className={`p-3 rounded-lg border-2 text-left transition-all ${
+                        ocrEngine === engine.value
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-lg">{engine.icon}</span>
+                        <div>
+                          <p className="text-sm font-medium">{engine.label}</p>
+                          <p className="text-xs text-muted-foreground">{engine.desc}</p>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Language selection - only show for OCR mode */}
             {ocrMode === "ocr" && (
               <div className="space-y-2">
