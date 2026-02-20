@@ -118,8 +118,8 @@ Deno.serve(async (req) => {
       user_id: userId,
       service_id: serviceId,
       tariff_id: tariffId || null,
-      status: isFreeService ? "active" : "pending",
-      is_paid: !!isFreeService,
+      status: "pending",
+      is_paid: false,
       registration_data: {
         firstName,
         lastName,
@@ -192,8 +192,8 @@ Deno.serve(async (req) => {
                 <p>Nous avons bien reçu votre demande d'inscription au service <strong>${serviceName}</strong> auprès de la Bibliothèque Nationale du Royaume du Maroc.</p>
                 
                 <div class="info-box success-box">
-                  <h3>✅ Votre compte a été créé avec succès</h3>
-                  <p>Votre demande d'abonnement est ${isFreeService ? "activée" : "en cours de traitement"}.</p>
+                  <h3>✅ Votre demande a été bien reçue</h3>
+                  <p>Votre demande d'abonnement est en cours de traitement par notre équipe.</p>
                 </div>
                 
                 <div class="info-box">
@@ -201,15 +201,11 @@ Deno.serve(async (req) => {
                   <ul>
                     <li><strong>Email :</strong> ${email}</li>
                     <li><strong>Service :</strong> ${serviceName}</li>
-                    <li><strong>Statut :</strong> ${isFreeService ? "Actif" : "En attente de validation"}</li>
+                    <li><strong>Statut :</strong> En attente de validation</li>
                   </ul>
                 </div>
                 
-                ${!isFreeService ? `
-                <p>Votre abonnement sera activé après validation par notre équipe. Vous recevrez un email de confirmation.</p>
-                ` : `
-                <p>Votre abonnement est maintenant actif. Vous pouvez vous connecter et accéder aux services.</p>
-                `}
+                <p>Votre abonnement sera activé après validation par notre équipe. Vous recevrez un email de confirmation dès que votre demande sera traitée.</p>
                 
                 <p>En cas de questions, contactez-nous à <a href="mailto:contact@bnrm.ma">contact@bnrm.ma</a></p>
                 
