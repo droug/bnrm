@@ -13,7 +13,7 @@ import { Pagination, PaginationContent, PaginationItem, PaginationLink, Paginati
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, CheckCircle, XCircle, Clock, FileText, User, Calendar, AlertTriangle, Eye, Ban, Trash2, Send, CreditCard, BadgeCheck, Gift, Download, ExternalLink, Phone, Mail, MapPin, Building, BookOpen, Hash, Info, ChevronRight } from "lucide-react";
+import { ArrowLeft, CheckCircle, XCircle, Clock, FileText, User, Calendar, AlertTriangle, Eye, Ban, Trash2, Send, CreditCard, BadgeCheck, Gift, Download, ExternalLink, Phone, Mail, MapPin, Building, BookOpen, Hash, Info, ChevronRight, Timer, RefreshCw } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { AdminHeader } from "@/components/AdminHeader";
@@ -32,6 +32,9 @@ interface ServiceRegistration {
   rejection_reason?: string | null;
   processed_by?: string | null;
   processed_at?: string | null;
+  activated_at?: string | null;
+  expires_at?: string | null;
+  renewal_reminder_sent?: boolean | null;
   created_at: string;
   updated_at: string;
   subscription_id: string;
@@ -271,25 +274,53 @@ export default function AccessRequestsManagement() {
     }
   };
 
+  // Calcule la durée de l'abonnement à partir de la condition tarifaire
+  const calculateExpiryDate = (conditionTarif: string | null | undefined, activatedAt: Date): Date => {
+    const lower = (conditionTarif || '').toLowerCase();
+    if (lower.includes('semestriel') || lower.includes('6 mois') || lower.includes('semestre')) {
+      return new Date(activatedAt.getTime() + 6 * 30 * 24 * 60 * 60 * 1000);
+    }
+    if (lower.includes('trimestriel') || lower.includes('3 mois')) {
+      return new Date(activatedAt.getTime() + 3 * 30 * 24 * 60 * 60 * 1000);
+    }
+    if (lower.includes('mensuel') || lower.includes('1 mois')) {
+      return new Date(activatedAt.getTime() + 30 * 24 * 60 * 60 * 1000);
+    }
+    // Annuelle par défaut (annuel, 12 mois, ou non défini)
+    return new Date(activatedAt.getTime() + 365 * 24 * 60 * 60 * 1000);
+  };
+
   // Admin: activer l'abonnement après paiement confirmé => status passe à active
   const handleApprove = async () => {
     if (!requestToApprove) return;
 
     try {
+      const activatedAt = new Date();
+      const conditionTarif = requestToApprove.bnrm_tarifs?.condition_tarif;
+      const expiresAt = calculateExpiryDate(conditionTarif, activatedAt);
+
       const { error } = await supabase
         .from('service_registrations')
         .update({ 
           status: 'active',
+          activated_at: activatedAt.toISOString(),
+          expires_at: expiresAt.toISOString(),
+          renewal_reminder_sent: false,
           processed_by: user?.id,
-          processed_at: new Date().toISOString()
+          processed_at: activatedAt.toISOString()
         })
         .eq('id', requestToApprove.id);
 
       if (error) throw error;
 
+      const durationLabel = conditionTarif?.toLowerCase().includes('semestriel') ? 'semestrielle (6 mois)'
+        : conditionTarif?.toLowerCase().includes('trimestriel') ? 'trimestrielle (3 mois)'
+        : conditionTarif?.toLowerCase().includes('mensuel') ? 'mensuelle (1 mois)'
+        : 'annuelle (12 mois)';
+
       toast({
-        title: "Demande approuvée",
-        description: "L'utilisateur a été notifié",
+        title: "Abonnement activé",
+        description: `Formule ${durationLabel}. Expire le ${format(expiresAt, "dd/MM/yyyy", { locale: fr })}.`,
       });
 
       setApproveDialogOpen(false);
@@ -513,7 +544,8 @@ export default function AccessRequestsManagement() {
                   <TableHead>Utilisateur</TableHead>
                   <TableHead>Formule</TableHead>
                   <TableHead>Montant</TableHead>
-                  <TableHead>Date</TableHead>
+                  <TableHead>Date demande</TableHead>
+                  <TableHead>Expire le</TableHead>
                   <TableHead>Statut</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
@@ -561,6 +593,26 @@ export default function AccessRequestsManagement() {
                         <Calendar className="h-4 w-4 text-muted-foreground" />
                         {format(new Date(request.created_at), "dd/MM/yyyy", { locale: fr })}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {request.expires_at ? (() => {
+                        const exp = new Date(request.expires_at);
+                        const daysLeft = Math.ceil((exp.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                        const isExpired = exp < new Date();
+                        const isWarning = !isExpired && daysLeft <= 7;
+                        return (
+                          <div className="text-sm">
+                            <div className={`font-medium ${isExpired ? 'text-destructive' : isWarning ? 'text-amber-600' : ''}`}>
+                              {format(exp, "dd/MM/yyyy", { locale: fr })}
+                            </div>
+                            {!isExpired && daysLeft <= 30 && (
+                              <div className={`text-xs ${isWarning ? 'text-amber-500' : 'text-muted-foreground'}`}>
+                                {isWarning ? `⚠️ ${daysLeft}j` : `${daysLeft}j restants`}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })() : <span className="text-muted-foreground text-sm">—</span>}
                     </TableCell>
                     <TableCell>
                       {getStatusBadge(request.status)}
@@ -763,6 +815,59 @@ export default function AccessRequestsManagement() {
                 </div>
 
                 <Separator />
+
+                {/* Dates d'abonnement */}
+                {(selectedRequest.activated_at || selectedRequest.expires_at) && (
+                  <>
+                    <Separator />
+                    <div>
+                      <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <Timer className="h-3.5 w-3.5" /> Durée de l'abonnement
+                      </h3>
+                      <div className="bg-card border rounded-lg p-3 space-y-2">
+                        {selectedRequest.activated_at && (
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-muted-foreground flex items-center gap-1.5">
+                              <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />
+                              Activé le
+                            </span>
+                            <span className="font-medium">
+                              {format(new Date(selectedRequest.activated_at), "dd/MM/yyyy", { locale: fr })}
+                            </span>
+                          </div>
+                        )}
+                        {selectedRequest.expires_at && (() => {
+                          const expiresAt = new Date(selectedRequest.expires_at);
+                          const now = new Date();
+                          const daysLeft = Math.ceil((expiresAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                          const isExpired = expiresAt < now;
+                          const isWarning = !isExpired && daysLeft <= 7;
+                          return (
+                            <div className="flex items-center justify-between text-sm">
+                              <span className={`flex items-center gap-1.5 ${isExpired ? 'text-destructive' : isWarning ? 'text-amber-600' : 'text-muted-foreground'}`}>
+                                {isExpired ? <XCircle className="h-3.5 w-3.5" /> : isWarning ? <AlertTriangle className="h-3.5 w-3.5" /> : <Calendar className="h-3.5 w-3.5" />}
+                                Expire le
+                              </span>
+                              <div className="text-right">
+                                <span className={`font-medium ${isExpired ? 'text-destructive' : isWarning ? 'text-amber-600' : ''}`}>
+                                  {format(expiresAt, "dd/MM/yyyy", { locale: fr })}
+                                </span>
+                                {!isExpired && (
+                                  <span className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${isWarning ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                                    {daysLeft}j restants
+                                  </span>
+                                )}
+                                {isExpired && (
+                                  <span className="ml-2 text-xs px-1.5 py-0.5 rounded-full bg-destructive/10 text-destructive">Expiré</span>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 {/* Identité */}
                 <div>
