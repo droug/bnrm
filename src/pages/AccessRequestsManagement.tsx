@@ -1113,31 +1113,64 @@ export default function AccessRequestsManagement() {
                 {(() => {
                   const data = selectedRequest.registration_data || {};
                   const attachments: Array<{ name: string; url: string }> = [];
-                  const attachmentKeys = ['attachments', 'files', 'documents', 'pieces_jointes', 'piecesJointes'];
-                  for (const key of attachmentKeys) {
-                    if (data[key]) {
-                      if (Array.isArray(data[key])) {
-                        data[key].forEach((item: any) => {
-                          if (typeof item === 'string') attachments.push({ name: item.split('/').pop() || item, url: item });
-                          else if (item?.url) attachments.push({ name: item.name || item.url.split('/').pop(), url: item.url });
-                        });
-                      } else if (typeof data[key] === 'string') {
-                        attachments.push({ name: data[key].split('/').pop() || data[key], url: data[key] });
+                  const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+
+                  // Helper: convert a storage path to a public URL
+                  const toPublicUrl = (bucket: string, path: string) =>
+                    `${SUPABASE_URL}/storage/v1/object/public/${bucket}/${path}`;
+
+                  // Case 1: attachments is an object { "label": "storage/path" }
+                  const rawAttachments = data['attachments'];
+                  if (rawAttachments && typeof rawAttachments === 'object' && !Array.isArray(rawAttachments)) {
+                    Object.entries(rawAttachments).forEach(([label, pathOrUrl]) => {
+                      if (typeof pathOrUrl === 'string' && pathOrUrl) {
+                        const url = pathOrUrl.startsWith('http')
+                          ? pathOrUrl
+                          : toPublicUrl('documents', pathOrUrl);
+                        attachments.push({ name: label, url });
                       }
-                    }
+                    });
                   }
+                  // Case 2: attachments is an array
+                  else if (Array.isArray(rawAttachments)) {
+                    rawAttachments.forEach((item: any) => {
+                      if (typeof item === 'string' && item) {
+                        const url = item.startsWith('http') ? item : toPublicUrl('documents', item);
+                        attachments.push({ name: item.split('/').pop() || item, url });
+                      } else if (item?.url) {
+                        const url = item.url.startsWith('http') ? item.url : toPublicUrl('documents', item.url);
+                        attachments.push({ name: item.name || item.url.split('/').pop(), url });
+                      }
+                    });
+                  }
+                  // Case 2b: attachments is a plain string path
+                  else if (typeof rawAttachments === 'string' && rawAttachments) {
+                    const url = rawAttachments.startsWith('http') ? rawAttachments : toPublicUrl('documents', rawAttachments);
+                    attachments.push({ name: rawAttachments.split('/').pop() || rawAttachments, url });
+                  }
+
+                  // Case 3: other keys with URL/path values
                   const urlKeyMap: Record<string, string> = {
                     photoUrl: 'Photo', cinUrl: 'CIN (scan)', carteEtudiantUrl: "Carte étudiant",
                     attestationUrl: 'Attestation', documentUrl: 'Document', fileUrl: 'Fichier',
                     photoPath: 'Photo', cinPath: 'CIN (scan)', scanUrl: 'Document scanné',
                   };
+                  const urlKeys = ['files', 'documents', 'pieces_jointes', 'piecesJointes'];
+                  urlKeys.forEach(key => {
+                    if (data[key] && typeof data[key] === 'string') {
+                      const url = data[key].startsWith('http') ? data[key] : toPublicUrl('documents', data[key]);
+                      if (!attachments.find(a => a.url === url))
+                        attachments.push({ name: urlKeyMap[key] || key, url });
+                    }
+                  });
                   Object.entries(data).forEach(([key, val]) => {
-                    if (typeof val === 'string' && (String(val).startsWith('http') || String(val).startsWith('/')) &&
-                      (key.toLowerCase().includes('url') || key.toLowerCase().includes('file') || key.toLowerCase().includes('path') ||
-                       key.toLowerCase().includes('doc') || key.toLowerCase().includes('piece') || key.toLowerCase().includes('photo') ||
-                       key.toLowerCase().includes('carte') || key.toLowerCase().includes('scan'))) {
-                      if (!attachments.find(a => a.url === val)) {
-                        attachments.push({ name: urlKeyMap[key] || key, url: String(val) });
+                    if (typeof val === 'string' && val &&
+                      (key.toLowerCase().includes('url') || key.toLowerCase().includes('path') ||
+                       key.toLowerCase().includes('photo') || key.toLowerCase().includes('carte') || key.toLowerCase().includes('scan')) &&
+                      key !== 'attachments') {
+                      const url = val.startsWith('http') ? val : val.startsWith('free-') || val.startsWith('registrations/') ? toPublicUrl('documents', val) : null;
+                      if (url && !attachments.find(a => a.url === url)) {
+                        attachments.push({ name: urlKeyMap[key] || key, url });
                       }
                     }
                   });
