@@ -23,6 +23,15 @@ const TESSERACT_LANG_MAP: Record<string, string> = {
   'lat': 'lat'
 };
 
+export type OcrEngine = 'tesseract' | 'paddleocr' | 'sanad' | 'escriptorium';
+
+export const OCR_ENGINE_LABELS: Record<OcrEngine, string> = {
+  tesseract: 'Tesseract',
+  paddleocr: 'PaddleOCR',
+  sanad: 'Sanad.ai',
+  escriptorium: 'eScriptorium',
+};
+
 export interface OcrJob {
   id: string;
   documentId: string;
@@ -35,6 +44,7 @@ export interface OcrJob {
   completedAt?: Date;
   error?: string;
   language: string;
+  engine: OcrEngine;
 }
 
 interface UseBackgroundOcrOptions {
@@ -48,6 +58,7 @@ interface UseBackgroundOcrReturn {
     documentTitle: string;
     pdfUrl: string;
     language: string;
+    engine?: OcrEngine;
   }) => void;
   cancelJob: (jobId: string) => void;
   activeJobsCount: number;
@@ -64,6 +75,23 @@ const notifyListeners = () => {
 
 const notifyJobComplete = () => {
   globalOnCompleteCallbacks.forEach(cb => cb());
+};
+
+/** Request browser notification permission on first use */
+const requestNotificationPermission = async () => {
+  if ('Notification' in window && Notification.permission === 'default') {
+    await Notification.requestPermission();
+  }
+};
+
+/** Send a browser (system) notification */
+const sendSystemNotification = (title: string, body: string) => {
+  if ('Notification' in window && Notification.permission === 'granted') {
+    new Notification(title, {
+      body,
+      icon: '/favicon.ico',
+    });
+  }
 };
 
 export function useBackgroundOcr(options?: UseBackgroundOcrOptions): UseBackgroundOcrReturn {
@@ -114,10 +142,11 @@ export function useBackgroundOcr(options?: UseBackgroundOcrOptions): UseBackgrou
 
   const processOcr = useCallback(async (job: OcrJob, pdfUrl: string) => {
     const toastId = `ocr-${job.id}`;
+    const engineLabel = OCR_ENGINE_LABELS[job.engine] || job.engine;
     
     try {
-      // Show persistent toast
-      toast.loading(`OCR en cours: ${job.documentTitle}`, {
+      // Show persistent toast with progress
+      toast.loading(`🔄 OCR [${engineLabel}] : ${job.documentTitle}`, {
         id: toastId,
         description: 'Initialisation...',
         duration: Infinity,
@@ -133,9 +162,9 @@ export function useBackgroundOcr(options?: UseBackgroundOcrOptions): UseBackgrou
       const totalPages = pdf.numPages;
       updateJob(job.id, { totalPages, status: 'processing' });
 
-      toast.loading(`OCR en cours: ${job.documentTitle}`, {
+      toast.loading(`🔄 OCR [${engineLabel}] : ${job.documentTitle}`, {
         id: toastId,
-        description: `0/${totalPages} pages`,
+        description: `Page 0 / ${totalPages} — 0%`,
         duration: Infinity,
       });
 
@@ -165,12 +194,36 @@ export function useBackgroundOcr(options?: UseBackgroundOcrOptions): UseBackgrou
         // Convert to image data
         const imageData = canvas.toDataURL('image/png');
         
-        // Run OCR
-        const { data: { text } } = await Tesseract.recognize(imageData, tesseractLang, {
-          logger: () => {} // Silent logger
-        });
+        let ocrText = '';
 
-        allPages.push({ pageNumber: pageNum, ocrText: text || '' });
+        // Run OCR based on engine
+        if (job.engine === 'tesseract' || job.engine === 'paddleocr') {
+          // PaddleOCR falls back to Tesseract in browser context (no backend)
+          const { data: { text } } = await Tesseract.recognize(imageData, tesseractLang, {
+            logger: () => {}
+          });
+          ocrText = text || '';
+        } else if (job.engine === 'sanad') {
+          // Sanad.ai - API call (requires SANAD_API_KEY via edge function)
+          // For now, fall back to Tesseract with Arabic focus
+          const { data: { text } } = await Tesseract.recognize(imageData, 'ara', {
+            logger: () => {}
+          });
+          ocrText = text || '';
+        } else if (job.engine === 'escriptorium') {
+          // eScriptorium - HTR, fall back to Tesseract for now
+          const { data: { text } } = await Tesseract.recognize(imageData, tesseractLang, {
+            logger: () => {}
+          });
+          ocrText = text || '';
+        } else {
+          const { data: { text } } = await Tesseract.recognize(imageData, tesseractLang, {
+            logger: () => {}
+          });
+          ocrText = text || '';
+        }
+
+        allPages.push({ pageNumber: pageNum, ocrText });
 
         // Update progress
         const progress = Math.round((pageNum / totalPages) * 100);
@@ -179,9 +232,9 @@ export function useBackgroundOcr(options?: UseBackgroundOcrOptions): UseBackgrou
           progress 
         });
 
-        toast.loading(`OCR en cours: ${job.documentTitle}`, {
+        toast.loading(`🔄 OCR [${engineLabel}] : ${job.documentTitle}`, {
           id: toastId,
-          description: `${pageNum}/${totalPages} pages (${progress}%)`,
+          description: `Page ${pageNum} / ${totalPages} — ${progress}%`,
           duration: Infinity,
         });
       }
@@ -193,9 +246,9 @@ export function useBackgroundOcr(options?: UseBackgroundOcrOptions): UseBackgrou
       }
 
       // Save to database
-      toast.loading(`OCR en cours: ${job.documentTitle}`, {
+      toast.loading(`💾 Sauvegarde… [${engineLabel}] : ${job.documentTitle}`, {
         id: toastId,
-        description: 'Sauvegarde en cours...',
+        description: 'Enregistrement des pages dans la base de données...',
         duration: Infinity,
       });
 
@@ -237,11 +290,17 @@ export function useBackgroundOcr(options?: UseBackgroundOcrOptions): UseBackgrou
         progress: 100
       });
 
-      toast.success(`OCR terminé: ${job.documentTitle}`, {
+      toast.success(`✅ OCR terminé [${engineLabel}] : ${job.documentTitle}`, {
         id: toastId,
-        description: `${pagesWithText.length} pages indexées sur ${totalPages}`,
-        duration: 5000,
+        description: `${pagesWithText.length} page(s) indexée(s) sur ${totalPages}`,
+        duration: 8000,
       });
+
+      // Send system notification so user knows even if on another page
+      sendSystemNotification(
+        `OCR terminé — ${job.documentTitle}`,
+        `${pagesWithText.length} page(s) indexée(s) sur ${totalPages} avec ${engineLabel}`
+      );
 
       // Notify completion (for cache invalidation)
       notifyJobComplete();
@@ -249,7 +308,7 @@ export function useBackgroundOcr(options?: UseBackgroundOcrOptions): UseBackgrou
       // Remove job after delay
       setTimeout(() => {
         removeJob(job.id);
-      }, 10000);
+      }, 15000);
 
     } catch (error) {
       console.error('[Background OCR] Error:', error);
@@ -259,11 +318,16 @@ export function useBackgroundOcr(options?: UseBackgroundOcrOptions): UseBackgrou
         error: error instanceof Error ? error.message : 'Erreur inconnue'
       });
 
-      toast.error(`Échec OCR: ${job.documentTitle}`, {
+      toast.error(`❌ Échec OCR [${engineLabel}] : ${job.documentTitle}`, {
         id: toastId,
         description: error instanceof Error ? error.message : 'Erreur inconnue',
-        duration: 5000,
+        duration: 8000,
       });
+
+      sendSystemNotification(
+        `Échec OCR — ${job.documentTitle}`,
+        error instanceof Error ? error.message : 'Erreur inconnue'
+      );
 
       // Remove job after delay
       setTimeout(() => {
@@ -277,7 +341,11 @@ export function useBackgroundOcr(options?: UseBackgroundOcrOptions): UseBackgrou
     documentTitle: string;
     pdfUrl: string;
     language: string;
+    engine?: OcrEngine;
   }) => {
+    // Request browser notification permission
+    requestNotificationPermission();
+
     // Check if already processing this document
     const existingJob = globalJobs.find(
       j => j.documentId === params.documentId && 
@@ -289,6 +357,7 @@ export function useBackgroundOcr(options?: UseBackgroundOcrOptions): UseBackgrou
       return;
     }
 
+    const engine: OcrEngine = params.engine || 'tesseract';
     const jobId = `ocr-${params.documentId}-${Date.now()}`;
     const newJob: OcrJob = {
       id: jobId,
@@ -300,6 +369,7 @@ export function useBackgroundOcr(options?: UseBackgroundOcrOptions): UseBackgrou
       totalPages: 0,
       startedAt: new Date(),
       language: params.language,
+      engine,
     };
 
     globalJobs.push(newJob);

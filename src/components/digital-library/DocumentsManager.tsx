@@ -1025,6 +1025,7 @@ export default function DocumentsManager() {
       startOcrJob({
         documentId: ocrDocumentTarget.id,
         documentTitle: ocrDocumentTarget.title || 'Document sans titre',
+        engine: ocrEngine,
         pdfUrl: pdfUrlToUse,
         language: ocrLanguage,
       });
