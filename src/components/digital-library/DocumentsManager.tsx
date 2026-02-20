@@ -263,7 +263,7 @@ export default function DocumentsManager() {
       const { data, error } = await supabase
         .from('digital_library_documents')
         .select('*, cbn_documents!fk_digital_library_cbn_document(cote)')
-        .order('sort_order', { ascending: true, nullsFirst: false })
+        .order('created_at', { ascending: false })
         .order('created_at', { ascending: false });
       
       if (error) throw error;
