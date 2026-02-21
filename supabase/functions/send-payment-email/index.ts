@@ -22,7 +22,7 @@ serve(async (req) => {
     }
 
     const formattedAmount = montant ? `${montant} ${devise || 'DH'}` : 'Gratuit';
-    const siteUrl = Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma";
+    const siteUrl = (Deno.env.get("SITE_URL") || "https://bnrm-dev.digiup.ma").replace(/\/+$/, '');
     const paymentLink = `${siteUrl}/my-space?tab=payments`;
 
     const html = `
