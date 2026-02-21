@@ -169,11 +169,42 @@ const KitabHeader = () => {
             </Button>
           </Link>
           <div className="h-6 w-px bg-border mx-2" />
-          <Link to="/">
-            <Button variant="outline" size="sm" className="border-[hsl(var(--kitab-primary))]/40 hover:bg-[hsl(var(--kitab-primary))]/10">
-              Retour BNRM
-            </Button>
-          </Link>
+          {/* Menu Portails */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm" className="border-[hsl(var(--kitab-primary))]/40 hover:bg-[hsl(var(--kitab-primary))]/10 gap-1">
+                Portails
+                <ChevronDown className="h-3 w-3" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56 bg-background border-[hsl(var(--kitab-primary))]/20">
+              <DropdownMenuItem asChild>
+                <Link to="/" className="w-full cursor-pointer gap-2">
+                  Portail Principal BNRM
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/digital-library" className="w-full cursor-pointer gap-2">
+                  Bibliothèque Numérique
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/manuscripts" className="w-full cursor-pointer gap-2">
+                  Plateforme Manuscrits
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/portail-cbm" className="w-full cursor-pointer gap-2">
+                  Plateforme CBM
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link to="/activites-culturelles" className="w-full cursor-pointer gap-2">
+                  Plateforme Activités culturelles
+                </Link>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </nav>
 
         {/* Navigation Mobile */}
@@ -240,9 +271,31 @@ const KitabHeader = () => {
                 Contact
               </Button>
             </Link>
+            <div className="border-t border-[hsl(var(--kitab-primary))]/20 my-2" />
+            <div className="text-xs font-semibold text-muted-foreground px-3 py-2">Portails</div>
             <Link to="/" onClick={() => setIsMenuOpen(false)}>
-              <Button variant="outline" size="sm" className="w-full justify-start border-[hsl(var(--kitab-primary))]/40">
-                Retour BNRM
+              <Button variant="ghost" size="sm" className="w-full justify-start pl-6">
+                Portail Principal BNRM
+              </Button>
+            </Link>
+            <Link to="/digital-library" onClick={() => setIsMenuOpen(false)}>
+              <Button variant="ghost" size="sm" className="w-full justify-start pl-6">
+                Bibliothèque Numérique
+              </Button>
+            </Link>
+            <Link to="/manuscripts" onClick={() => setIsMenuOpen(false)}>
+              <Button variant="ghost" size="sm" className="w-full justify-start pl-6">
+                Plateforme Manuscrits
+              </Button>
+            </Link>
+            <Link to="/portail-cbm" onClick={() => setIsMenuOpen(false)}>
+              <Button variant="ghost" size="sm" className="w-full justify-start pl-6">
+                Plateforme CBM
+              </Button>
+            </Link>
+            <Link to="/activites-culturelles" onClick={() => setIsMenuOpen(false)}>
+              <Button variant="ghost" size="sm" className="w-full justify-start pl-6">
+                Plateforme Activités culturelles
               </Button>
             </Link>
           </nav>
