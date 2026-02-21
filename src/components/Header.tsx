@@ -115,11 +115,6 @@ const Header = () => {
             href: "/services-bnrm?open=daily-pass"
           },
           {
-            title: { fr: "Consulter la Bibliothèque Nationale", ar: "استشارة المكتبة الوطنية", en: "Consult the National Library", es: "Consultar la Biblioteca Nacional", amz: "ⵙⵙⵓⴷⵓ ⵜⴰⵙⴷⵍⵉⵙⵜ ⵜⴰⵏⴰⵎⵓⵔⵜ" },
-            desc: { fr: "Accédez à notre bibliothèque numérique", ar: "الوصول إلى مكتبتنا الرقمية", en: "Access our digital library", es: "Acceda a nuestra biblioteca digital", amz: "ⴽⵛⵎ ⵖⵔ ⵜⵙⴷⵍⵉⵙⵜ ⵜⴰⵏⵓⵎⴰⵏⵜ" },
-            href: "/digital-library"
-          },
-          {
             title: { fr: "Réserver un document", ar: "حجز وثيقة", en: "Reserve a Document", es: "Reservar un documento", amz: "ⴰⵃⵟⵟⵓ ⵏ ⵓⵙⴳⴷ" },
             desc: { fr: "Recherchez et réservez un document CBN", ar: "ابحث واحجز وثيقة", en: "Search and reserve a CBN document", es: "Busque y reserve un documento CBN", amz: "ⵔⵣⵓ ⴷ ⵃⵟⵟⵓ ⴰⵙⴳⴷ" },
             href: "/cbn/reserver-ouvrage"
