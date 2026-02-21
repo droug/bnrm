@@ -205,6 +205,18 @@ export function DigitalLibraryLayout({ children }: DigitalLibraryLayoutProps) {
                     {ml('Plateforme CBM', 'منصة الفهرس البيبليوغرافي', 'CBM Platform', 'Plataforma CBM', 'ⴰⵙⵙⵉⵡⴹ CBM')}
                   </DropdownMenuItem>
                 </Link>
+                <Link to="/kitab">
+                  <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
+                    <Icon name="mdi:book-open-page-variant-outline" className="h-4 w-4" />
+                    {ml('Plateforme Kitab', 'منصة كتاب', 'Kitab Platform', 'Plataforma Kitab', 'ⴰⵙⵙⵉⵡⴹ ⴽⵉⵜⴰⴱ')}
+                  </DropdownMenuItem>
+                </Link>
+                <Link to="/activites-culturelles">
+                  <DropdownMenuItem className="gap-2 cursor-pointer focus:bg-accent focus:text-accent-foreground">
+                    <Icon name="mdi:theater" className="h-4 w-4" />
+                    {ml('Plateforme Activités culturelles', 'منصة الأنشطة الثقافية', 'Cultural Activities Platform', 'Plataforma Actividades Culturales', 'ⴰⵙⵙⵉⵡⴹ ⵏ ⵜⵖⵔⵎⵉⵡⵉⵏ ⵜⵉⴷⵍⵙⴰⵏⵉⵏ')}
+                  </DropdownMenuItem>
+                </Link>
               </DropdownMenuContent>
             </DropdownMenu>
 
