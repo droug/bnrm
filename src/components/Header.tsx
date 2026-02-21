@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Menu, X, Book, Globe, Users, User, LogIn, BookOpen, FileText, Calendar, Building, Download, Phone, MapPin, Mail, UserCheck, Archive, ChevronDown, Accessibility, Bot, MessageCircle, Shield, HelpCircle, Network, LayoutDashboard, Handshake, Settings } from "lucide-react";
+import { Search, Menu, X, Book, Globe, Users, User, LogIn, BookOpen, FileText, Calendar, Building, Download, Phone, MapPin, Mail, UserCheck, Archive, ChevronDown, Accessibility, Bot, MessageCircle, Shield, HelpCircle, Network, LayoutDashboard, Handshake, Settings, BookMarked, Theater } from "lucide-react";
 import SearchBar from "@/components/SearchBar";
 import { useTranslation } from "@/hooks/useTranslation";
 import { useAuth } from "@/hooks/useAuth";
@@ -288,6 +288,18 @@ const Header = () => {
                     <Link to="/cbm">
                       <Network className="h-4 w-4 mr-2" />
                       {ml({ fr: 'Plateforme CBM', ar: 'منصة الفهرس البيبليوغرافي', en: 'CBM Platform', es: 'Plataforma CBM', amz: 'ⴰⵙⵙⵉⵡⴹ CBM' })}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link to="/kitab">
+                      <BookMarked className="h-4 w-4 mr-2" />
+                      {ml({ fr: 'Plateforme Kitab', ar: 'منصة كتاب', en: 'Kitab Platform', es: 'Plataforma Kitab', amz: 'ⴰⵙⵙⵉⵡⴹ ⴽⵉⵜⴰⴱ' })}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild className="cursor-pointer">
+                    <Link to="/activites-culturelles">
+                      <Theater className="h-4 w-4 mr-2" />
+                      {ml({ fr: 'Plateforme Activités culturelles', ar: 'منصة الأنشطة الثقافية', en: 'Cultural Activities Platform', es: 'Plataforma Actividades Culturales', amz: 'ⴰⵙⵙⵉⵡⴹ ⵏ ⵜⵖⵔⵎⵉⵡⵉⵏ ⵜⵉⴷⵍⵙⴰⵏⵉⵏ' })}
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
