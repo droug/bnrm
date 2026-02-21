@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Building, Printer, Clapperboard } from "lucide-react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EditorSignupForm from "@/components/EditorSignupForm";
@@ -12,6 +12,7 @@ import { WatermarkContainer } from "@/components/ui/watermark";
 
 const SignupPage = () => {
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [selectedType, setSelectedType] = useState<string>("");
   const [prefillData, setPrefillData] = useState<{
     email?: string;
@@ -66,6 +67,15 @@ const SignupPage = () => {
 
   const renderTypeSelection = () => (
     <div className="max-w-5xl mx-auto space-y-8">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={() => navigate(-1)}
+        className="group hover:bg-primary/10 transition-all duration-300"
+      >
+        <ArrowLeft className="h-4 w-4 mr-2 group-hover:-translate-x-1 transition-transform duration-300" />
+        Retour
+      </Button>
       <div className="text-center">
         <h1 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-foreground via-foreground to-foreground/70 bg-clip-text">
           Choisir le type de compte
