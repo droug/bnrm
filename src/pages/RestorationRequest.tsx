@@ -660,7 +660,9 @@ export default function RestorationRequest() {
         </DialogContent>
       </Dialog>
 
-      <Footer />
+      <div className="relative z-10 bg-background">
+        <Footer />
+      </div>
     </div>
   );
 }

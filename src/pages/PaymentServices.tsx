@@ -527,7 +527,9 @@ export default function PaymentServices() {
         </section>
       </main>
 
-      <Footer />
+      <div className="relative z-10 bg-background">
+        <Footer />
+      </div>
       
       {/* Dialog pour le formulaire Pass journalier */}
       <Dialog open={isDailyPassFormOpen} onOpenChange={setIsDailyPassFormOpen}>
