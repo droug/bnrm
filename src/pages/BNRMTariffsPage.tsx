@@ -93,7 +93,8 @@ export default function BNRMTariffsPage() {
                   </button>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="mt-3">
-                  <div className="rounded-xl border bg-background shadow-sm p-4">
+                  <div className="rounded-xl border bg-background shadow-sm p-4 space-y-6">
+                    <h3 className="text-base font-semibold text-foreground border-b pb-2">Services</h3>
                     <BNRMServices filterCategory="Abonnement" />
                   </div>
                 </CollapsibleContent>
@@ -139,7 +140,8 @@ export default function BNRMTariffsPage() {
                   </button>
                 </CollapsibleTrigger>
                 <CollapsibleContent className="mt-3">
-                  <div className="rounded-xl border bg-background shadow-sm p-4">
+                  <div className="rounded-xl border bg-background shadow-sm p-4 space-y-6">
+                    <h3 className="text-base font-semibold text-foreground border-b pb-2">Tarifs</h3>
                     <BNRMTariffs filterCategory="Abonnement" />
                   </div>
                 </CollapsibleContent>
@@ -167,7 +169,9 @@ export default function BNRMTariffsPage() {
                 </CollapsibleTrigger>
                 <CollapsibleContent className="mt-3">
                   <div className="rounded-xl border bg-background shadow-sm p-4 space-y-6">
+                    <h3 className="text-base font-semibold text-foreground border-b pb-2">Services</h3>
                     <BNRMServices filterCategory="Service à la demande" />
+                    <h3 className="text-base font-semibold text-foreground border-b pb-2">Tarifs</h3>
                     <BNRMTariffs filterCategory="Service à la demande" />
                   </div>
                 </CollapsibleContent>
@@ -191,7 +195,9 @@ export default function BNRMTariffsPage() {
                 </CollapsibleTrigger>
                 <CollapsibleContent className="mt-3">
                   <div className="rounded-xl border bg-background shadow-sm p-4 space-y-6">
+                    <h3 className="text-base font-semibold text-foreground border-b pb-2">Services</h3>
                     <BNRMServices filterCategory="Reproduction" />
+                    <h3 className="text-base font-semibold text-foreground border-b pb-2">Tarifs</h3>
                     <BNRMTariffs filterCategory="Reproduction" />
                   </div>
                 </CollapsibleContent>
@@ -215,7 +221,9 @@ export default function BNRMTariffsPage() {
                 </CollapsibleTrigger>
                 <CollapsibleContent className="mt-3">
                   <div className="rounded-xl border bg-background shadow-sm p-4 space-y-6">
+                    <h3 className="text-base font-semibold text-foreground border-b pb-2">Services</h3>
                     <BNRMServices filterCategory="Restauration" />
+                    <h3 className="text-base font-semibold text-foreground border-b pb-2">Tarifs</h3>
                     <BNRMTariffs filterCategory="Restauration" />
                   </div>
                 </CollapsibleContent>
