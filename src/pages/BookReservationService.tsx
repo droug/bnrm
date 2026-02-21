@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { ServicePageBackground } from "@/components/ServicePageBackground";
 import { CBNSearchWithSelection } from "@/components/cbn/CBNSearchWithSelection";
 import { BookReservationDialog } from "@/components/cbn/BookReservationDialog";
 import { AvailabilityCalendar } from "@/components/cbn/AvailabilityCalendar";
@@ -71,9 +72,10 @@ export default function BookReservationService() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <ServicePageBackground />
       <Header />
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 relative z-10">
         <div className="mb-6 flex items-center justify-between">
           <Button
             variant="ghost"
@@ -173,7 +175,9 @@ export default function BookReservationService() {
           />
         )}
       </main>
-      <Footer />
+      <div className="relative z-10 bg-background">
+        <Footer />
+      </div>
     </div>
   );
 }
