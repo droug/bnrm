@@ -178,21 +178,6 @@ export default function DemandeReproduction() {
   const mainContent = (
     <>
       <main className="container mx-auto px-4 py-8">
-        {/* Bouton retour */}
-        <Button
-          variant="ghost"
-          className="mb-6"
-          onClick={() => {
-            if (window.history.length > 1) {
-              navigate(-1);
-            } else {
-              navigate(isBNPlatform ? '/digital-library' : '/');
-            }
-          }}
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Retour
-        </Button>
 
         {/* En-tête */}
         <div className="mb-8">

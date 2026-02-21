@@ -141,11 +141,6 @@ export default function ReservationEspaces() {
       
       <main className="container mx-auto px-4 py-8 relative z-10">
         <div className="max-w-7xl mx-auto">
-          {/* Back Button */}
-          <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors">
-            <ArrowLeft className="h-4 w-4" />
-            Retour à l'accueil
-          </Link>
 
           {/* Header Section */}
           <div className="mb-8">

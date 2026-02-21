@@ -76,16 +76,6 @@ export default function BookReservationService() {
       <ServicePageBackground />
       <Header />
       <main className="container mx-auto px-4 py-8 relative z-10">
-        <div className="mb-6 flex items-center justify-between">
-          <Button
-            variant="ghost"
-            onClick={() => window.history.length > 1 ? navigate(-1) : navigate('/')}
-            className="gap-2"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            Retour
-          </Button>
-        </div>
 
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Réserver un document</h1>
