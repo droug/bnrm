@@ -8,7 +8,7 @@ import { BNRMFreeRegistrations } from "@/components/bnrm/BNRMFreeRegistrations";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ArrowLeft, ChevronDown, BookOpen, CreditCard, Gift } from "lucide-react";
+import { ArrowLeft, ChevronDown, BookOpen, CreditCard, Gift, Wrench, Copy, Hammer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Navigate } from "react-router-dom";
@@ -22,6 +22,14 @@ export default function BNRMTariffsPage() {
   const [openServices, setOpenServices] = useState(false);
   const [openTariffs, setOpenTariffs] = useState(false);
   const [openFree, setOpenFree] = useState(false);
+  
+  // Services tab accordions
+  const [openServDemande, setOpenServDemande] = useState(false);
+  const [openServReproduction, setOpenServReproduction] = useState(false);
+  const [openServRestauration, setOpenServRestauration] = useState(false);
+  const [openTarifsDemande, setOpenTarifsDemande] = useState(false);
+  const [openTarifsReproduction, setOpenTarifsReproduction] = useState(false);
+  const [openTarifsRestauration, setOpenTarifsRestauration] = useState(false);
 
   if (loading) {
     return (
@@ -139,15 +147,80 @@ export default function BNRMTariffsPage() {
 
             </TabsContent>
 
-            <TabsContent value="services" className="space-y-6">
-              <div className="rounded-xl border bg-background shadow-sm p-6">
-                <h2 className="text-xl font-semibold mb-1">Gestion des Services Ponctuels</h2>
-                <p className="text-sm text-muted-foreground mb-6">Services à la demande et tarifs associés</p>
-                <BNRMServices filterCategory="Service à la demande" />
-                <div className="mt-6">
-                  <BNRMTariffs filterCategory="Service à la demande" />
-                </div>
-              </div>
+            <TabsContent value="services" className="space-y-4">
+
+              {/* Accordéon : Services à la demande */}
+              <Collapsible open={openServDemande} onOpenChange={setOpenServDemande}>
+                <CollapsibleTrigger asChild>
+                  <button className="w-full flex items-center justify-between px-5 py-4 rounded-xl border bg-background shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-200 group">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10 group-hover:bg-primary/15 transition-colors">
+                        <Wrench className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="text-left">
+                        <span className="text-base font-semibold text-foreground">Services à la demande</span>
+                        <p className="text-xs text-muted-foreground mt-0.5">Photocopie, impression, numérisation et services ponctuels</p>
+                      </div>
+                    </div>
+                    <ChevronDown className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${openServDemande ? "rotate-180" : ""}`} />
+                  </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-3">
+                  <div className="rounded-xl border bg-background shadow-sm p-4 space-y-6">
+                    <BNRMServices filterCategory="Service à la demande" />
+                    <BNRMTariffs filterCategory="Service à la demande" />
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+
+              {/* Accordéon : Reproduction */}
+              <Collapsible open={openServReproduction} onOpenChange={setOpenServReproduction}>
+                <CollapsibleTrigger asChild>
+                  <button className="w-full flex items-center justify-between px-5 py-4 rounded-xl border bg-background shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-200 group">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10 group-hover:bg-primary/15 transition-colors">
+                        <Copy className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="text-left">
+                        <span className="text-base font-semibold text-foreground">Reproduction</span>
+                        <p className="text-xs text-muted-foreground mt-0.5">Microfilm, papier, numérique, collections spécialisées et audiovisuel</p>
+                      </div>
+                    </div>
+                    <ChevronDown className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${openServReproduction ? "rotate-180" : ""}`} />
+                  </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-3">
+                  <div className="rounded-xl border bg-background shadow-sm p-4 space-y-6">
+                    <BNRMServices filterCategory="Reproduction" />
+                    <BNRMTariffs filterCategory="Reproduction" />
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+
+              {/* Accordéon : Restauration */}
+              <Collapsible open={openServRestauration} onOpenChange={setOpenServRestauration}>
+                <CollapsibleTrigger asChild>
+                  <button className="w-full flex items-center justify-between px-5 py-4 rounded-xl border bg-background shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-200 group">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10 group-hover:bg-primary/15 transition-colors">
+                        <Hammer className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="text-left">
+                        <span className="text-base font-semibold text-foreground">Restauration</span>
+                        <p className="text-xs text-muted-foreground mt-0.5">Services de restauration de documents</p>
+                      </div>
+                    </div>
+                    <ChevronDown className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${openServRestauration ? "rotate-180" : ""}`} />
+                  </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-3">
+                  <div className="rounded-xl border bg-background shadow-sm p-4 space-y-6">
+                    <BNRMServices filterCategory="Restauration" />
+                    <BNRMTariffs filterCategory="Restauration" />
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+
             </TabsContent>
 
             <TabsContent value="statistics">
