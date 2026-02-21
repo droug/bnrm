@@ -13,6 +13,7 @@ import { Upload, FileText, Calendar, User, Mail, Phone, MessageSquare } from "lu
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SimpleDropdown } from "@/components/ui/simple-dropdown";
 import { supabase } from "@/integrations/supabase/client";
+import { ServicePageBackground } from "@/components/ServicePageBackground";
 
 export default function RestorationRequest() {
   const [isOpen, setIsOpen] = useState(false);
@@ -258,10 +259,11 @@ export default function RestorationRequest() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative">
+      <ServicePageBackground />
       <Header />
       
-      <main className="flex-1 py-16 bg-accent/5">
+      <main className="flex-1 py-16 relative z-10">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center mb-12">
             <h1 className="text-4xl font-bold mb-4">Service de Restauration</h1>

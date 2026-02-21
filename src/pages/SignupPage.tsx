@@ -9,6 +9,7 @@ import EditorSignupForm from "@/components/EditorSignupForm";
 import PrinterSignupForm from "@/components/PrinterSignupForm";
 import ProducerSignupForm from "@/components/ProducerSignupForm";
 import { WatermarkContainer } from "@/components/ui/watermark";
+import { ServicePageBackground } from "@/components/ServicePageBackground";
 
 const SignupPage = () => {
   const [searchParams] = useSearchParams();
@@ -223,15 +224,11 @@ const SignupPage = () => {
 
   return (
     <WatermarkContainer>
-      <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-background to-muted/20">
+      <div className="min-h-screen flex flex-col bg-background relative">
+        <ServicePageBackground />
         <Header />
         
-        <main className="flex-1 relative">
-          {/* Background decorative elements */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="absolute -top-40 -right-40 w-[500px] h-[500px] bg-gradient-to-br from-accent/15 via-primary/10 to-transparent rounded-full blur-3xl" />
-            <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] bg-gradient-to-tr from-highlight/10 via-accent/5 to-transparent rounded-full blur-3xl" />
-          </div>
+        <main className="flex-1 relative z-10">
 
           <div className="relative z-10 container mx-auto px-4 py-8">
             {!selectedType ? (

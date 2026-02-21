@@ -2,6 +2,7 @@ import { useParams, useSearchParams, Navigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
+import { ServicePageBackground } from "@/components/ServicePageBackground";
 import { ReproductionRequestForm } from "@/components/reproduction/ReproductionRequestForm";
 import { ReproductionRequestsList } from "@/components/reproduction/ReproductionRequestsList";
 import { useAuth } from "@/hooks/useAuth";
@@ -43,9 +44,10 @@ export default function ReproductionPage() {
 
   // Layout portail par défaut
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <ServicePageBackground />
       <Header />
-      {content}
+      <div className="relative z-10">{content}</div>
       <Footer />
     </div>
   );

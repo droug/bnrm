@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import CmsPagesManager from "@/components/cms/CmsPagesManager";
+import { ServiceBackgroundManager } from "@/components/cms/ServiceBackgroundManager";
 import CmsWebhooksManager from "@/components/cms/CmsWebhooksManager";
 import CmsMediaManager from "@/components/cms/CmsMediaManager";
 import CmsActualitesManager from "@/components/cms/CmsActualitesManager";
@@ -443,7 +444,12 @@ export default function PortalContentManagementSystem() {
       case "bannieres":
         return <CmsBannersManager />;
       case "pages":
-        return <CmsPagesManager />;
+        return (
+          <div className="space-y-6">
+            <ServiceBackgroundManager />
+            <CmsPagesManager />
+          </div>
+        );
       case "sections":
         return <CmsSectionsManager />;
       case "wysiwyg":

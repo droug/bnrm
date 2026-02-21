@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ServiceRegistrationDialog } from "@/components/bnrm/ServiceRegistrationDialog";
 import { BoxReservationDialog } from "@/components/bnrm/BoxReservationDialog";
 import { Link } from "react-router-dom";
+import { ServicePageBackground } from "@/components/ServicePageBackground";
 
 interface BNRMService {
   id_service: string;
@@ -134,10 +135,11 @@ export default function ReservationEspaces() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <ServicePageBackground />
       <Header />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-8 relative z-10">
         <div className="max-w-7xl mx-auto">
           {/* Back Button */}
           <Link to="/" className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors">
