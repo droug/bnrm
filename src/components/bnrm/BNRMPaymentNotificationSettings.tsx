@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Bell, Save, Loader2, Mail, Smartphone, MonitorSpeaker, Users, FileText, CreditCard, CheckCircle, XCircle, Hash, Package, ClipboardCheck, UserPlus, Settings, AlertTriangle, FileEdit, Eye, RotateCcw, ExternalLink } from "lucide-react";
+import { Bell, Save, Loader2, Mail, Smartphone, MonitorSpeaker, Users, FileText, CreditCard, CheckCircle, XCircle, Hash, Package, ClipboardCheck, UserPlus, Settings, AlertTriangle, FileEdit, Eye, RotateCcw, ExternalLink, MessageCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -22,6 +22,7 @@ interface NotificationChannel {
   email: boolean;
   system: boolean;
   sms: boolean;
+  whatsapp: boolean;
 }
 
 interface NotificationConfig {
@@ -69,6 +70,17 @@ interface SMSSettings {
   country_code: string;
 }
 
+interface WhatsAppSettings {
+  enabled: boolean;
+  provider: 'meta_cloud_api' | 'twilio_whatsapp' | 'infobip_whatsapp';
+  phone_number_id: string;
+  business_account_id: string;
+  api_key_configured: boolean;
+  test_phone: string;
+  country_code: string;
+  display_name: string;
+}
+
 const defaultSMSSettings: SMSSettings = {
   enabled: false,
   provider: 'twilio',
@@ -76,6 +88,17 @@ const defaultSMSSettings: SMSSettings = {
   api_key_configured: false,
   test_phone: '',
   country_code: '+212',
+};
+
+const defaultWhatsAppSettings: WhatsAppSettings = {
+  enabled: false,
+  provider: 'meta_cloud_api',
+  phone_number_id: '',
+  business_account_id: '',
+  api_key_configured: false,
+  test_phone: '',
+  country_code: '+212',
+  display_name: 'BNRM',
 };
 
 interface EmailTemplate {
@@ -317,6 +340,7 @@ const defaultChannels: NotificationChannel = {
   email: true,
   system: true,
   sms: false,
+  whatsapp: false,
 };
 
 const defaultNotificationSettings: NotificationSettings = {
@@ -324,7 +348,7 @@ const defaultNotificationSettings: NotificationSettings = {
   user_registration: { enabled: true, channels: { ...defaultChannels } },
   user_validation: { enabled: true, channels: { ...defaultChannels } },
   user_rejection: { enabled: true, channels: { ...defaultChannels } },
-  password_reset: { enabled: true, channels: { email: true, system: false, sms: false } },
+  password_reset: { enabled: true, channels: { email: true, system: false, sms: false, whatsapp: false } },
   
   // Dépôt légal
   deposit_submission: { enabled: true, channels: { ...defaultChannels } },
@@ -346,7 +370,7 @@ const defaultNotificationSettings: NotificationSettings = {
   cbm_formation_request: { enabled: true, channels: { ...defaultChannels } },
   
   // Général
-  system_maintenance: { enabled: true, channels: { email: true, system: true, sms: false } },
+  system_maintenance: { enabled: true, channels: { email: true, system: true, sms: false, whatsapp: false } },
   new_content_published: { enabled: true, channels: { ...defaultChannels } },
 };
 
@@ -429,6 +453,18 @@ function NotificationItem({ id, label, description, icon, config, onChange, temp
             </Label>
           </div>
           
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id={`${id}-whatsapp`}
+              checked={config.channels.whatsapp}
+              onCheckedChange={(checked) => handleChannelChange("whatsapp", checked === true)}
+            />
+            <Label htmlFor={`${id}-whatsapp`} className="text-xs flex items-center gap-1 cursor-pointer">
+              <MessageCircle className="h-3 w-3" />
+              WhatsApp
+            </Label>
+          </div>
+          
           {templateKey && onEditTemplate && (
             <Button 
               variant="ghost" 
@@ -452,6 +488,7 @@ export function BNRMPaymentNotificationSettings() {
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState<NotificationSettings>(defaultNotificationSettings);
   const [smsSettings, setSmsSettings] = useState<SMSSettings>(defaultSMSSettings);
+  const [whatsappSettings, setWhatsappSettings] = useState<WhatsAppSettings>(defaultWhatsAppSettings);
   const [emailTemplates, setEmailTemplates] = useState<EmailTemplates>(defaultEmailTemplates);
   const [editingTemplate, setEditingTemplate] = useState<{ key: keyof EmailTemplates; template: EmailTemplate } | null>(null);
 
@@ -485,6 +522,17 @@ export function BNRMPaymentNotificationSettings() {
       if (!smsError && smsData && smsData.length > 0) {
         const savedSmsSettings = JSON.parse(smsData[0].valeur);
         setSmsSettings({ ...defaultSMSSettings, ...savedSmsSettings });
+      }
+
+      // Fetch WhatsApp settings
+      const { data: whatsappData, error: whatsappError } = await supabase
+        .from("bnrm_parametres")
+        .select("*")
+        .eq("parametre", "whatsapp_notification_settings");
+
+      if (!whatsappError && whatsappData && whatsappData.length > 0) {
+        const savedWhatsappSettings = JSON.parse(whatsappData[0].valeur);
+        setWhatsappSettings({ ...defaultWhatsAppSettings, ...savedWhatsappSettings });
       }
 
       // Fetch email templates
@@ -534,6 +582,19 @@ export function BNRMPaymentNotificationSettings() {
 
       if (smsError) throw smsError;
 
+      // Save WhatsApp settings
+      const { error: whatsappError } = await supabase
+        .from("bnrm_parametres")
+        .upsert({
+          parametre: "whatsapp_notification_settings",
+          valeur: JSON.stringify(whatsappSettings),
+          commentaire: "Paramètres WhatsApp Business",
+        }, {
+          onConflict: "parametre"
+        });
+
+      if (whatsappError) throw whatsappError;
+
       // Save email templates
       const { error: templatesError } = await supabase
         .from("bnrm_parametres")
@@ -569,6 +630,10 @@ export function BNRMPaymentNotificationSettings() {
 
   const handleSmsSettingsChange = (field: keyof SMSSettings, value: any) => {
     setSmsSettings((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleWhatsappSettingsChange = (field: keyof WhatsAppSettings, value: any) => {
+    setWhatsappSettings((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleEditTemplate = (key: keyof EmailTemplates) => {
@@ -734,7 +799,7 @@ export function BNRMPaymentNotificationSettings() {
             </TabsTrigger>
             <TabsTrigger value="sms" className="text-xs">
               <Smartphone className="h-4 w-4 mr-1" />
-              Config SMS
+              Config SMS/WhatsApp
             </TabsTrigger>
           </TabsList>
 
@@ -946,8 +1011,13 @@ export function BNRMPaymentNotificationSettings() {
             </div>
           </TabsContent>
 
-          {/* Configuration SMS */}
+          {/* Configuration SMS / WhatsApp */}
           <TabsContent value="sms" className="space-y-6">
+            {/* ===== Section SMS ===== */}
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <Smartphone className="h-5 w-5" />
+              Configuration SMS
+            </h3>
             <div className="space-y-6">
               {/* Activation globale SMS */}
               <div className="flex items-center justify-between p-4 border rounded-lg bg-card">
@@ -979,7 +1049,6 @@ export function BNRMPaymentNotificationSettings() {
 
               {smsSettings.enabled && (
                 <div className="space-y-6">
-                  {/* Fournisseur SMS */}
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="sms-provider">Fournisseur SMS</Label>
@@ -997,9 +1066,6 @@ export function BNRMPaymentNotificationSettings() {
                           <SelectItem value="custom">Personnalisé (API)</SelectItem>
                         </SelectContent>
                       </Select>
-                      <p className="text-xs text-muted-foreground">
-                        Choisissez votre fournisseur de services SMS
-                      </p>
                     </div>
 
                     <div className="space-y-2">
@@ -1019,13 +1085,9 @@ export function BNRMPaymentNotificationSettings() {
                           <SelectItem value="+44">+44 (Royaume-Uni)</SelectItem>
                         </SelectContent>
                       </Select>
-                      <p className="text-xs text-muted-foreground">
-                        Utilisé pour les numéros sans indicatif
-                      </p>
                     </div>
                   </div>
 
-                  {/* Identifiant expéditeur */}
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="sender-id">Identifiant expéditeur (Sender ID)</Label>
@@ -1037,7 +1099,7 @@ export function BNRMPaymentNotificationSettings() {
                         maxLength={11}
                       />
                       <p className="text-xs text-muted-foreground">
-                        Nom affiché comme expéditeur (max 11 caractères alphanumériques)
+                        Max 11 caractères alphanumériques
                       </p>
                     </div>
 
@@ -1049,17 +1111,13 @@ export function BNRMPaymentNotificationSettings() {
                         onChange={(e) => handleSmsSettingsChange('test_phone', e.target.value)}
                         placeholder="0612345678"
                       />
-                      <p className="text-xs text-muted-foreground">
-                        Numéro pour envoyer des SMS de test
-                      </p>
                     </div>
                   </div>
 
-                  {/* Configuration API */}
                   <div className="p-4 border rounded-lg bg-muted/30 space-y-4">
                     <div className="flex items-center gap-2">
                       <Settings className="h-4 w-4 text-muted-foreground" />
-                      <Label className="text-sm font-medium">Configuration API</Label>
+                      <Label className="text-sm font-medium">Configuration API SMS</Label>
                     </div>
                     
                     <div className="flex items-center justify-between">
@@ -1068,7 +1126,7 @@ export function BNRMPaymentNotificationSettings() {
                         <p className="text-xs text-muted-foreground">
                           {smsSettings.api_key_configured 
                             ? "✓ Configurée dans les secrets Supabase" 
-                            : "⚠ Non configurée - Les SMS ne seront pas envoyés"}
+                            : "⚠ Non configurée"}
                         </p>
                       </div>
                       <Button variant="outline" size="sm" asChild>
@@ -1083,23 +1141,14 @@ export function BNRMPaymentNotificationSettings() {
                     </div>
 
                     <div className="text-xs text-muted-foreground space-y-1">
-                      <p><strong>Variables requises selon le fournisseur :</strong></p>
-                      {smsSettings.provider === 'twilio' && (
-                        <p>• TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN</p>
-                      )}
-                      {smsSettings.provider === 'infobip' && (
-                        <p>• INFOBIP_API_KEY, INFOBIP_BASE_URL</p>
-                      )}
-                      {smsSettings.provider === 'orange' && (
-                        <p>• ORANGE_CLIENT_ID, ORANGE_CLIENT_SECRET</p>
-                      )}
-                      {smsSettings.provider === 'custom' && (
-                        <p>• SMS_API_URL, SMS_API_KEY</p>
-                      )}
+                      <p><strong>Variables requises :</strong></p>
+                      {smsSettings.provider === 'twilio' && <p>• TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN</p>}
+                      {smsSettings.provider === 'infobip' && <p>• INFOBIP_API_KEY, INFOBIP_BASE_URL</p>}
+                      {smsSettings.provider === 'orange' && <p>• ORANGE_CLIENT_ID, ORANGE_CLIENT_SECRET</p>}
+                      {smsSettings.provider === 'custom' && <p>• SMS_API_URL, SMS_API_KEY</p>}
                     </div>
                   </div>
 
-                  {/* Bouton de test */}
                   <div className="flex items-center gap-4">
                     <Button 
                       variant="outline" 
@@ -1116,6 +1165,229 @@ export function BNRMPaymentNotificationSettings() {
                     </Button>
                     <span className="text-xs text-muted-foreground">
                       Enverra un SMS au numéro de test configuré
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <Separator className="my-6" />
+
+            {/* ===== Section WhatsApp ===== */}
+            <h3 className="text-lg font-semibold flex items-center gap-2">
+              <MessageCircle className="h-5 w-5" />
+              Configuration WhatsApp Business
+            </h3>
+            <div className="space-y-6">
+              {/* Activation globale WhatsApp */}
+              <div className="flex items-center justify-between p-4 border rounded-lg bg-card">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-100 dark:bg-green-950/30 rounded-lg">
+                    <MessageCircle className="h-5 w-5 text-green-600" />
+                  </div>
+                  <div>
+                    <Label className="text-base font-medium">Activer les notifications WhatsApp</Label>
+                    <p className="text-sm text-muted-foreground">
+                      Permet l'envoi de messages WhatsApp pour les notifications configurées
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={whatsappSettings.enabled}
+                  onCheckedChange={(checked) => handleWhatsappSettingsChange('enabled', checked)}
+                />
+              </div>
+
+              {!whatsappSettings.enabled && (
+                <Alert>
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertDescription>
+                    Les notifications WhatsApp sont désactivées. Activez-les pour configurer les paramètres ci-dessous.
+                  </AlertDescription>
+                </Alert>
+              )}
+
+              {whatsappSettings.enabled && (
+                <div className="space-y-6">
+                  {/* Fournisseur WhatsApp */}
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="whatsapp-provider">Fournisseur WhatsApp</Label>
+                      <Select
+                        value={whatsappSettings.provider}
+                        onValueChange={(value) => handleWhatsappSettingsChange('provider', value)}
+                      >
+                        <SelectTrigger id="whatsapp-provider">
+                          <SelectValue placeholder="Sélectionner un fournisseur" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="meta_cloud_api">Meta Cloud API (Officiel)</SelectItem>
+                          <SelectItem value="twilio_whatsapp">Twilio WhatsApp</SelectItem>
+                          <SelectItem value="infobip_whatsapp">Infobip WhatsApp</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">
+                        API officielle Meta recommandée pour la fiabilité
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="whatsapp-country-code">Indicatif pays par défaut</Label>
+                      <Select
+                        value={whatsappSettings.country_code}
+                        onValueChange={(value) => handleWhatsappSettingsChange('country_code', value)}
+                      >
+                        <SelectTrigger id="whatsapp-country-code">
+                          <SelectValue placeholder="Sélectionner l'indicatif" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="+212">+212 (Maroc)</SelectItem>
+                          <SelectItem value="+33">+33 (France)</SelectItem>
+                          <SelectItem value="+34">+34 (Espagne)</SelectItem>
+                          <SelectItem value="+1">+1 (USA/Canada)</SelectItem>
+                          <SelectItem value="+44">+44 (Royaume-Uni)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* Informations du compte */}
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="whatsapp-display-name">Nom d'affichage</Label>
+                      <Input
+                        id="whatsapp-display-name"
+                        value={whatsappSettings.display_name}
+                        onChange={(e) => handleWhatsappSettingsChange('display_name', e.target.value)}
+                        placeholder="BNRM"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Nom affiché dans les conversations WhatsApp
+                      </p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="whatsapp-test-phone">Numéro de test</Label>
+                      <Input
+                        id="whatsapp-test-phone"
+                        value={whatsappSettings.test_phone}
+                        onChange={(e) => handleWhatsappSettingsChange('test_phone', e.target.value)}
+                        placeholder="0612345678"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Numéro pour envoyer des messages WhatsApp de test
+                      </p>
+                    </div>
+                  </div>
+
+                  {whatsappSettings.provider === 'meta_cloud_api' && (
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="whatsapp-phone-number-id">Phone Number ID</Label>
+                        <Input
+                          id="whatsapp-phone-number-id"
+                          value={whatsappSettings.phone_number_id}
+                          onChange={(e) => handleWhatsappSettingsChange('phone_number_id', e.target.value)}
+                          placeholder="Ex: 123456789012345"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          ID du numéro de téléphone dans Meta Business
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="whatsapp-business-id">WhatsApp Business Account ID</Label>
+                        <Input
+                          id="whatsapp-business-id"
+                          value={whatsappSettings.business_account_id}
+                          onChange={(e) => handleWhatsappSettingsChange('business_account_id', e.target.value)}
+                          placeholder="Ex: 123456789012345"
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          ID du compte WhatsApp Business
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Configuration API WhatsApp */}
+                  <div className="p-4 border rounded-lg bg-muted/30 space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Settings className="h-4 w-4 text-muted-foreground" />
+                      <Label className="text-sm font-medium">Configuration API WhatsApp</Label>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium">
+                          Token d'accès {whatsappSettings.provider === 'meta_cloud_api' ? 'Meta' : whatsappSettings.provider === 'twilio_whatsapp' ? 'Twilio' : 'Infobip'}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {whatsappSettings.api_key_configured 
+                            ? "✓ Configuré dans les secrets Supabase" 
+                            : "⚠ Non configuré - Les messages WhatsApp ne seront pas envoyés"}
+                        </p>
+                      </div>
+                      <Button variant="outline" size="sm" asChild>
+                        <a 
+                          href="https://supabase.com/dashboard/project/safeppmznupzqkqmzjzt/settings/functions" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                        >
+                          Configurer les secrets
+                        </a>
+                      </Button>
+                    </div>
+
+                    <div className="text-xs text-muted-foreground space-y-1">
+                      <p><strong>Variables requises :</strong></p>
+                      {whatsappSettings.provider === 'meta_cloud_api' && (
+                        <p>• WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID</p>
+                      )}
+                      {whatsappSettings.provider === 'twilio_whatsapp' && (
+                        <p>• TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_FROM</p>
+                      )}
+                      {whatsappSettings.provider === 'infobip_whatsapp' && (
+                        <p>• INFOBIP_API_KEY, INFOBIP_BASE_URL, INFOBIP_WHATSAPP_SENDER</p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Info templates WhatsApp */}
+                  <Alert className="bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800">
+                    <MessageCircle className="h-4 w-4 text-green-600" />
+                    <AlertDescription className="text-green-700 dark:text-green-300">
+                      <span className="font-medium">Note :</span> Les messages WhatsApp Business nécessitent des templates pré-approuvés par Meta. 
+                      Configurez vos templates dans le{" "}
+                      <a 
+                        href="https://business.facebook.com/wa/manage/message-templates/" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 font-medium underline"
+                      >
+                        Meta Business Manager
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </AlertDescription>
+                  </Alert>
+
+                  {/* Bouton de test WhatsApp */}
+                  <div className="flex items-center gap-4">
+                    <Button 
+                      variant="outline" 
+                      disabled={!whatsappSettings.test_phone}
+                      onClick={() => {
+                        toast({
+                          title: "WhatsApp de test",
+                          description: `Un message WhatsApp de test serait envoyé à ${whatsappSettings.country_code}${whatsappSettings.test_phone}`,
+                        });
+                      }}
+                    >
+                      <MessageCircle className="mr-2 h-4 w-4" />
+                      Envoyer un message WhatsApp de test
+                    </Button>
+                    <span className="text-xs text-muted-foreground">
+                      Enverra un message au numéro de test configuré
                     </span>
                   </div>
                 </div>
