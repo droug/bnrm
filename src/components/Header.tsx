@@ -102,7 +102,7 @@ const Header = () => {
           {
             title: { fr: "Inscription professionnels", ar: "تسجيل المهنيين", en: "Professional Registration", es: "Inscripción profesionales", amz: "ⴰⵙⵎⴰⵍ ⵏ ⵉⵎⵙⵙⵓⴳⵓⵔⵏ" },
             desc: { fr: "Créer votre compte professionnel pour accéder aux services du Dépôt légal", ar: "إنشاء حساب مهني للوصول إلى خدمات الإيداع القانوني", en: "Create your professional account for Legal Deposit services", es: "Cree su cuenta profesional para los servicios de Depósito Legal", amz: "ⵙⵏⴼⵍⵓⵍ ⴰⵎⵉⴹⴰⵏ ⴰⵎⵙⵙⵓⴳⵓⵔ" },
-            href: "/auth?action=signup&type=professional"
+            href: "/signup"
           },
           {
             title: { fr: "Adhésion (Abonnement)", ar: "الاشتراك (العضوية)", en: "Membership (Subscription)", es: "Adhesión (Suscripción)", amz: "ⴰⵙⵎⴰⵍ (ⴰⵎⵢⴰⵙⵙⴰ)" },
