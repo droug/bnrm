@@ -107,7 +107,7 @@ const Header = () => {
           {
             title: { fr: "Adhésion (Abonnement)", ar: "الاشتراك (العضوية)", en: "Membership (Subscription)", es: "Adhesión (Suscripción)", amz: "ⴰⵙⵎⴰⵍ (ⴰⵎⵢⴰⵙⵙⴰ)" },
             desc: { fr: "Découvrez nos différentes formules d'adhésion et d'abonnement", ar: "اكتشف أنواع العضوية والاشتراكات المتاحة", en: "Discover our membership and subscription plans", es: "Descubra nuestras fórmulas de adhesión y suscripción", amz: "ⵙⵙⵓⴷⵓ ⵜⵉⵖⴰⵡⵙⵉⵡⵉⵏ ⵏ ⵓⵎⵢⴰⵙⵙⴰ" },
-            href: "/abonnements"
+            href: "/abonnements?platform=portal"
           },
           {
             title: { fr: "Pass journalier", ar: "التصريح اليومي", en: "Daily Pass", es: "Pase diario", amz: "ⴰⵙⵉⵔⴰ ⵏ ⵡⴰⵙⵙ" },
