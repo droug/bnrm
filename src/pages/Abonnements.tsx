@@ -393,7 +393,9 @@ export default function Abonnements() {
         <ServicePageBackground />
         <Header />
         <main className="relative z-10">{content}</main>
-        <Footer />
+        <div className="relative z-10 bg-background">
+          <Footer />
+        </div>
         <GlobalAccessibilityTools />
       </div>
     );

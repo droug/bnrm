@@ -268,7 +268,9 @@ export default function ReservationEspaces() {
         </div>
       </main>
       
-      <Footer />
+      <div className="relative z-10 bg-background">
+        <Footer />
+      </div>
       
       {/* Outils globaux (Accessibilité + Chatbot) */}
       <GlobalAccessibilityTools />

@@ -48,7 +48,9 @@ export default function ReproductionPage() {
       <ServicePageBackground />
       <Header />
       <div className="relative z-10">{content}</div>
-      <Footer />
+      <div className="relative z-10 bg-background">
+        <Footer />
+      </div>
     </div>
   );
 }
