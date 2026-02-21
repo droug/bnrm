@@ -2,6 +2,7 @@ import { useState, useEffect, ReactNode } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { ServicePageBackground } from "@/components/ServicePageBackground";
 import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibraryLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -397,10 +398,13 @@ export default function DemandeReproduction() {
 
   // Layout portail par défaut
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <ServicePageBackground />
       <Header />
-      {mainContent}
-      <Footer />
+      <div className="relative z-10">{mainContent}</div>
+      <div className="relative z-10 bg-background">
+        <Footer />
+      </div>
     </div>
   );
 }
