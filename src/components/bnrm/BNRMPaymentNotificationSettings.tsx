@@ -7,7 +7,7 @@ import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Bell, Save, Loader2, Mail, Smartphone, MonitorSpeaker, Users, FileText, CreditCard, CheckCircle, XCircle, Hash, Package, ClipboardCheck, UserPlus, Settings, AlertTriangle, FileEdit, Eye, RotateCcw, ExternalLink, MessageCircle } from "lucide-react";
+import { Bell, Save, Loader2, Mail, Smartphone, MonitorSpeaker, Users, FileText, CreditCard, CheckCircle, XCircle, Hash, Package, ClipboardCheck, UserPlus, Settings, AlertTriangle, FileEdit, Eye, RotateCcw, ExternalLink, MessageCircle, BookOpen } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -1261,9 +1261,95 @@ export function BNRMPaymentNotificationSettings() {
 
                   {/* Configuration API */}
                   <div className="p-4 border rounded-lg bg-muted/30 space-y-4">
-                    <div className="flex items-center gap-2">
-                      <Settings className="h-4 w-4 text-muted-foreground" />
-                      <Label className="text-sm font-medium">Configuration Meta Cloud API</Label>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Settings className="h-4 w-4 text-muted-foreground" />
+                        <Label className="text-sm font-medium">Configuration Meta Cloud API</Label>
+                      </div>
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            <BookOpen className="mr-2 h-3 w-3" />
+                            Procédure
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+                          <DialogHeader>
+                            <DialogTitle className="flex items-center gap-2">
+                              <BookOpen className="h-5 w-5" />
+                              Procédure de configuration Meta Cloud API
+                            </DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-6 text-sm">
+                            <div className="space-y-3">
+                              <h4 className="font-semibold text-base flex items-center gap-2">
+                                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">1</span>
+                                Créer l'application
+                              </h4>
+                              <ul className="space-y-2 pl-8 list-disc text-muted-foreground">
+                                <li>Allez sur <a href="https://developers.facebook.com" target="_blank" rel="noopener noreferrer" className="underline font-medium text-foreground">developers.facebook.com</a></li>
+                                <li>Cliquez <strong className="text-foreground">"Mes applications"</strong> → <strong className="text-foreground">"Créer une application"</strong></li>
+                                <li>Choisissez le type <strong className="text-foreground">"Business"</strong> (ou "Autre" si Business n'apparaît pas)</li>
+                                <li>Donnez un nom (ex: "BNRM Notifications")</li>
+                                <li>Sélectionnez votre <strong className="text-foreground">Meta Business Account</strong> (celui lié à votre page BNRM)</li>
+                              </ul>
+                            </div>
+
+                            <Separator />
+
+                            <div className="space-y-3">
+                              <h4 className="font-semibold text-base flex items-center gap-2">
+                                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">2</span>
+                                Ajouter le produit WhatsApp
+                              </h4>
+                              <ul className="space-y-2 pl-8 list-disc text-muted-foreground">
+                                <li>Dans le tableau de bord de l'app, section <strong className="text-foreground">"Ajouter des produits"</strong>, trouvez <strong className="text-foreground">"WhatsApp"</strong> et cliquez <strong className="text-foreground">"Configurer"</strong></li>
+                                <li>Associez votre <strong className="text-foreground">Business Account</strong></li>
+                                <li>Dans le menu latéral → <strong className="text-foreground">WhatsApp &gt; Configuration de l'API</strong></li>
+                                <li>Vous verrez :
+                                  <ul className="list-disc pl-5 mt-1 space-y-1">
+                                    <li><strong className="text-foreground">Phone Number ID</strong> → copiez-le comme secret <code className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono">WHATSAPP_PHONE_NUMBER_ID</code></li>
+                                    <li>Un numéro de test temporaire (ou ajoutez le vôtre +212640289700)</li>
+                                  </ul>
+                                </li>
+                              </ul>
+                            </div>
+
+                            <Separator />
+
+                            <div className="space-y-3">
+                              <h4 className="font-semibold text-base flex items-center gap-2">
+                                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">3</span>
+                                Générer le token d'accès
+                              </h4>
+                              <ul className="space-y-2 pl-8 list-disc text-muted-foreground">
+                                <li>Dans <strong className="text-foreground">WhatsApp &gt; Configuration de l'API</strong>, cliquez <strong className="text-foreground">"Générer un token d'accès temporaire"</strong> (valide 24h pour tester)</li>
+                                <li>Pour un <strong className="text-foreground">token permanent</strong> : allez dans <strong className="text-foreground">Paramètres de l'app &gt; Basique</strong>, puis créez un token système dans votre Business Manager → <strong className="text-foreground">Paramètres &gt; Utilisateurs système</strong> → générez un token avec la permission <code className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono">whatsapp_business_messaging</code></li>
+                                <li>Copiez-le comme secret <code className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono">WHATSAPP_ACCESS_TOKEN</code></li>
+                              </ul>
+                            </div>
+
+                            <Separator />
+
+                            <div className="space-y-3">
+                              <h4 className="font-semibold text-base flex items-center gap-2">
+                                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs font-bold">4</span>
+                                Ajouter un numéro de test
+                              </h4>
+                              <ul className="space-y-2 pl-8 list-disc text-muted-foreground">
+                                <li>Dans <strong className="text-foreground">WhatsApp &gt; Configuration de l'API</strong> → <strong className="text-foreground">"À"</strong>, ajoutez votre numéro perso pour recevoir les tests</li>
+                              </ul>
+                            </div>
+
+                            <Alert className="bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800">
+                              <CheckCircle className="h-4 w-4 text-green-600" />
+                              <AlertDescription className="text-green-700 dark:text-green-300 text-xs">
+                                Une fois les deux secrets ajoutés dans Supabase, le bouton <strong>"Envoyer un test"</strong> dans cette page fonctionnera.
+                              </AlertDescription>
+                            </Alert>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                     </div>
                     
                     <div className="flex items-center justify-between">
@@ -1283,15 +1369,6 @@ export function BNRMPaymentNotificationSettings() {
                           Gérer les secrets
                         </a>
                       </Button>
-                    </div>
-
-                    <div className="text-xs text-muted-foreground space-y-1">
-                      <p><strong>Pour obtenir ces valeurs :</strong></p>
-                      <ol className="list-decimal list-inside space-y-1">
-                        <li>Créez une app sur <a href="https://developers.facebook.com" target="_blank" rel="noopener noreferrer" className="underline font-medium">developers.facebook.com</a></li>
-                        <li>Ajoutez le produit "WhatsApp" à votre app</li>
-                        <li>Copiez le <strong>Phone Number ID</strong> et le <strong>Access Token</strong></li>
-                      </ol>
                     </div>
                   </div>
 
