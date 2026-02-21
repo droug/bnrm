@@ -196,7 +196,7 @@ export default function DemandeReproduction() {
 
         {/* En-tête */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-primary mb-2">Demande de reproduction</h1>
+          <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-primary via-primary-dark to-secondary bg-clip-text text-transparent">Demande de reproduction</h1>
           <p className="text-lg text-muted-foreground">
             {prefilledDocument 
               ? "Complétez votre demande de reproduction pour le document sélectionné"
