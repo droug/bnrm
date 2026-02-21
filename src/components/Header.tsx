@@ -100,9 +100,14 @@ const Header = () => {
         title: { fr: "Services aux usagers", ar: "الخدمات للمستخدمين", en: "User Services", es: "Servicios al usuario", amz: "ⵜⵉⵏⴰⴼⵓⵜⵉⵏ ⵉ ⵉⵎⵙⵙⵎⵔⵙⵏ" },
         items: [
           {
-            title: { fr: "Inscription en ligne / Réinscription", ar: "التسجيل عبر الإنترنت / إعادة التسجيل", en: "Online Registration / Re-registration", es: "Inscripción en línea / Reinscripción", amz: "ⴰⵙⵎⴰⵍ ⵙ ⵓⵣⵔⴰⵡⵉⵏ" },
-            desc: { fr: "Créez votre compte ou renouvelez votre abonnement", ar: "أنشئ حسابك أو جدد اشتراكك", en: "Create your account or renew your subscription", es: "Cree su cuenta o renueve su suscripción", amz: "ⵙⵏⴼⵍⵓⵍ ⴰⵎⵉⴹⴰⵏ ⵏⵏⴽ" },
-            href: "/auth?action=signup"
+            title: { fr: "Inscription professionnels", ar: "تسجيل المهنيين", en: "Professional Registration", es: "Inscripción profesionales", amz: "ⴰⵙⵎⴰⵍ ⵏ ⵉⵎⵙⵙⵓⴳⵓⵔⵏ" },
+            desc: { fr: "Créer votre compte professionnel pour accéder aux services du Dépôt légal", ar: "إنشاء حساب مهني للوصول إلى خدمات الإيداع القانوني", en: "Create your professional account for Legal Deposit services", es: "Cree su cuenta profesional para los servicios de Depósito Legal", amz: "ⵙⵏⴼⵍⵓⵍ ⴰⵎⵉⴹⴰⵏ ⴰⵎⵙⵙⵓⴳⵓⵔ" },
+            href: "/auth?action=signup&type=professional"
+          },
+          {
+            title: { fr: "Adhésion (Abonnement)", ar: "الاشتراك (العضوية)", en: "Membership (Subscription)", es: "Adhesión (Suscripción)", amz: "ⴰⵙⵎⴰⵍ (ⴰⵎⵢⴰⵙⵙⴰ)" },
+            desc: { fr: "Découvrez nos différentes formules d'adhésion et d'abonnement", ar: "اكتشف أنواع العضوية والاشتراكات المتاحة", en: "Discover our membership and subscription plans", es: "Descubra nuestras fórmulas de adhesión y suscripción", amz: "ⵙⵙⵓⴷⵓ ⵜⵉⵖⴰⵡⵙⵉⵡⵉⵏ ⵏ ⵓⵎⵢⴰⵙⵙⴰ" },
+            href: "/abonnements"
           },
           {
             title: { fr: "Pass journalier", ar: "التصريح اليومي", en: "Daily Pass", es: "Pase diario", amz: "ⴰⵙⵉⵔⴰ ⵏ ⵡⴰⵙⵙ" },
@@ -544,7 +549,7 @@ const Header = () => {
                         {ml(menuData.services.userServices.title)}
                       </h4>
                       {menuData.services.userServices.items.map((item, idx) => {
-                        const icons = ['mdi:account-plus', 'mdi:badge-account', 'mdi:library', 'mdi:book-clock', 'mdi:calendar-check'];
+                        const icons = ['mdi:account-tie', 'mdi:card-account-details', 'mdi:badge-account', 'mdi:library', 'mdi:book-clock', 'mdi:calendar-check'];
                         return (
                           <BNRMTooltip 
                             key={idx}
