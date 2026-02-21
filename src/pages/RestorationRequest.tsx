@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { Upload, FileText, Calendar, User, Mail, Phone, MessageSquare } from "lucide-react";
+import { Upload, FileText, Calendar, User, Mail, Phone, MessageSquare, Award, Wrench, Shield } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { SimpleDropdown } from "@/components/ui/simple-dropdown";
 import { supabase } from "@/integrations/supabase/client";
@@ -272,39 +272,52 @@ export default function RestorationRequest() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto mb-12">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Expertise</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Équipe de restaurateurs qualifiés avec des années d'expérience
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Techniques</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Méthodes traditionnelles et technologies modernes de restauration
-                </p>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Préservation</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground">
-                  Respect du patrimoine et conservation à long terme
-                </p>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-12">
+            {[
+              {
+                icon: Award,
+                title: "Expertise",
+                description: "Équipe de restaurateurs qualifiés avec des années d'expérience",
+                gradient: "from-blue-500/20 to-blue-600/5",
+                iconBg: "bg-blue-500/15 text-blue-600 dark:text-blue-400",
+              },
+              {
+                icon: Wrench,
+                title: "Techniques",
+                description: "Méthodes traditionnelles et technologies modernes de restauration",
+                gradient: "from-amber-500/20 to-amber-600/5",
+                iconBg: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
+              },
+              {
+                icon: Shield,
+                title: "Préservation",
+                description: "Respect du patrimoine et conservation à long terme",
+                gradient: "from-emerald-500/20 to-emerald-600/5",
+                iconBg: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
+              },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <Card
+                  key={item.title}
+                  className="group relative overflow-hidden border-none shadow-lg hover:shadow-xl transition-all duration-500 hover:-translate-y-1 bg-card/80 backdrop-blur-sm"
+                >
+                  <div className={`absolute inset-0 bg-gradient-to-br ${item.gradient} opacity-60 group-hover:opacity-100 transition-opacity duration-500`} />
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-white/10 to-transparent rounded-bl-full" />
+                  <CardHeader className="relative pb-2">
+                    <div className={`w-14 h-14 rounded-2xl ${item.iconBg} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}>
+                      <Icon className="h-7 w-7" />
+                    </div>
+                    <CardTitle className="text-xl font-semibold">{item.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="relative">
+                    <p className="text-muted-foreground leading-relaxed">
+                      {item.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </div>
 
           <div className="text-center mt-12">
