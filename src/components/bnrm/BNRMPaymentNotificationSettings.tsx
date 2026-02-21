@@ -75,7 +75,9 @@ interface WhatsAppSettings {
   connected: boolean;
   phone_number: string;
   display_name: string;
-  session_id: string;
+  verified_name: string;
+  quality_rating: string;
+  test_phone: string;
 }
 
 const defaultSMSSettings: SMSSettings = {
@@ -92,7 +94,9 @@ const defaultWhatsAppSettings: WhatsAppSettings = {
   connected: false,
   phone_number: '+212640289700',
   display_name: 'BNRM',
-  session_id: '',
+  verified_name: '',
+  quality_rating: '',
+  test_phone: '',
 };
 
 interface EmailTemplate {
@@ -1203,108 +1207,95 @@ export function BNRMPaymentNotificationSettings() {
 
               {whatsappSettings.enabled && (
                 <div className="space-y-6">
-                  {/* QR Code de connexion */}
-                  <div className="p-6 border-2 border-dashed border-green-300 dark:border-green-700 rounded-xl bg-green-50/50 dark:bg-green-950/10">
-                    <div className="flex flex-col items-center text-center space-y-4">
-                      <div className="p-3 bg-green-100 dark:bg-green-900/40 rounded-full">
-                        <MessageCircle className="h-8 w-8 text-green-600" />
-                      </div>
-                      <div>
-                        <h4 className="text-lg font-semibold">Connecter WhatsApp</h4>
-                        <p className="text-sm text-muted-foreground max-w-md">
-                          Scannez le QR code ci-dessous avec votre téléphone pour lier votre compte WhatsApp Business
-                        </p>
-                      </div>
-
-                      {/* QR Code généré */}
-                      <div className="relative p-4 bg-white rounded-2xl shadow-lg border">
-                        <div className="w-64 h-64 flex items-center justify-center">
-                          {whatsappSettings.connected ? (
-                            <div className="flex flex-col items-center gap-3">
-                              <CheckCircle className="h-16 w-16 text-green-500" />
-                              <p className="text-sm font-medium text-green-700">Connecté</p>
-                            </div>
-                          ) : (
-                            <img 
-                              src={`https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(
-                                `https://wa.me/${(whatsappSettings.phone_number || '+212640289700').replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Connexion BNRM Notifications')}`
-                              )}&format=svg&ecc=M`}
-                              alt="QR Code WhatsApp"
-                              className="w-full h-full"
-                            />
-                          )}
-                        </div>
-                      </div>
-
-                      {/* Instructions */}
-                      <div className="text-sm text-muted-foreground space-y-2 max-w-sm">
-                        <p className="font-medium text-foreground">Comment scanner :</p>
-                        <ol className="list-decimal list-inside space-y-1 text-left">
-                          <li>Ouvrez <span className="font-medium">WhatsApp</span> sur votre téléphone</li>
-                          <li>Allez dans <span className="font-medium">Paramètres → Appareils liés</span></li>
-                          <li>Appuyez sur <span className="font-medium">Lier un appareil</span></li>
-                          <li>Scannez ce QR code avec votre caméra</li>
-                        </ol>
-                      </div>
-
-                      {/* Boutons d'action */}
-                      <div className="flex items-center gap-3 pt-2">
-                        {whatsappSettings.connected ? (
-                          <Button 
-                            variant="destructive" 
-                            size="sm"
-                            onClick={() => {
-                              handleWhatsappSettingsChange('connected', false);
-                              handleWhatsappSettingsChange('session_id', '');
-                              toast({
-                                title: "WhatsApp déconnecté",
-                                description: "La session WhatsApp a été déconnectée.",
-                              });
-                            }}
-                          >
-                            <XCircle className="mr-2 h-4 w-4" />
-                            Déconnecter
-                          </Button>
-                        ) : (
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => {
-                              handleWhatsappSettingsChange('session_id', 'bnrm-' + Date.now());
-                              toast({
-                                title: "QR Code régénéré",
-                                description: "Un nouveau QR code a été généré. Scannez-le avec WhatsApp.",
-                              });
-                            }}
-                          >
-                            <RotateCcw className="mr-2 h-4 w-4" />
-                            Régénérer le QR Code
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Statut de connexion */}
+                  {/* Vérification de connexion */}
                   <div className="p-4 border rounded-lg bg-card">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className={`w-3 h-3 rounded-full ${whatsappSettings.connected ? 'bg-green-500 animate-pulse' : 'bg-muted-foreground/30'}`} />
                         <div>
                           <p className="text-sm font-medium">
-                            {whatsappSettings.connected ? 'WhatsApp connecté' : 'En attente de connexion'}
+                            {whatsappSettings.connected ? 'WhatsApp Business API connecté' : 'Non connecté'}
                           </p>
                           <p className="text-xs text-muted-foreground">
                             {whatsappSettings.connected 
-                              ? `Nom : ${whatsappSettings.display_name || 'BNRM'}` 
-                              : 'Scannez le QR code pour connecter votre compte'}
+                              ? `${whatsappSettings.verified_name || whatsappSettings.display_name} • ${whatsappSettings.phone_number} • Qualité: ${whatsappSettings.quality_rating || 'N/A'}` 
+                              : 'Cliquez sur "Vérifier la connexion" pour tester la configuration'}
                           </p>
                         </div>
                       </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={async () => {
+                          try {
+                            const { data, error } = await supabase.functions.invoke('send-whatsapp-notification', {
+                              body: { action: 'verify_connection' },
+                            });
+                            if (error) throw error;
+                            if (!data.success) throw new Error(data.error);
+                            
+                            handleWhatsappSettingsChange('connected', true);
+                            handleWhatsappSettingsChange('verified_name', data.verified_name || '');
+                            handleWhatsappSettingsChange('quality_rating', data.quality_rating || '');
+                            handleWhatsappSettingsChange('phone_number', data.phone_number || whatsappSettings.phone_number);
+                            
+                            toast({
+                              title: "✅ Connexion vérifiée",
+                              description: `WhatsApp Business connecté : ${data.verified_name || 'BNRM'} (${data.phone_number})`,
+                            });
+                          } catch (err: any) {
+                            handleWhatsappSettingsChange('connected', false);
+                            toast({
+                              title: "❌ Erreur de connexion",
+                              description: err.message || "Vérifiez vos secrets WHATSAPP_ACCESS_TOKEN et WHATSAPP_PHONE_NUMBER_ID",
+                              variant: "destructive",
+                            });
+                          }
+                        }}
+                      >
+                        <RotateCcw className="mr-2 h-4 w-4" />
+                        Vérifier la connexion
+                      </Button>
                     </div>
                   </div>
 
-                  {/* Nom d'affichage */}
+                  {/* Configuration API */}
+                  <div className="p-4 border rounded-lg bg-muted/30 space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Settings className="h-4 w-4 text-muted-foreground" />
+                      <Label className="text-sm font-medium">Configuration Meta Cloud API</Label>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium">Secrets WhatsApp</p>
+                        <p className="text-xs text-muted-foreground">
+                          WHATSAPP_ACCESS_TOKEN et WHATSAPP_PHONE_NUMBER_ID
+                        </p>
+                      </div>
+                      <Button variant="outline" size="sm" asChild>
+                        <a 
+                          href="https://supabase.com/dashboard/project/safeppmznupzqkqmzjzt/settings/functions" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                        >
+                          <ExternalLink className="mr-2 h-3 w-3" />
+                          Gérer les secrets
+                        </a>
+                      </Button>
+                    </div>
+
+                    <div className="text-xs text-muted-foreground space-y-1">
+                      <p><strong>Pour obtenir ces valeurs :</strong></p>
+                      <ol className="list-decimal list-inside space-y-1">
+                        <li>Créez une app sur <a href="https://developers.facebook.com" target="_blank" rel="noopener noreferrer" className="underline font-medium">developers.facebook.com</a></li>
+                        <li>Ajoutez le produit "WhatsApp" à votre app</li>
+                        <li>Copiez le <strong>Phone Number ID</strong> et le <strong>Access Token</strong></li>
+                      </ol>
+                    </div>
+                  </div>
+
+                  {/* Nom d'affichage et numéro */}
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="whatsapp-display-name">Nom d'affichage</Label>
@@ -1320,18 +1311,89 @@ export function BNRMPaymentNotificationSettings() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="whatsapp-phone">Numéro WhatsApp</Label>
+                      <Label htmlFor="whatsapp-phone">Numéro WhatsApp Business</Label>
                       <Input
                         id="whatsapp-phone"
                         value={whatsappSettings.phone_number}
                         onChange={(e) => handleWhatsappSettingsChange('phone_number', e.target.value)}
                         placeholder="+212 6XX XXX XXX"
+                        disabled
                       />
                       <p className="text-xs text-muted-foreground">
-                        Numéro associé au compte WhatsApp Business
+                        Récupéré automatiquement lors de la vérification
                       </p>
                     </div>
                   </div>
+
+                  {/* Test d'envoi */}
+                  <div className="p-4 border rounded-lg bg-card space-y-4">
+                    <Label className="text-sm font-medium">Envoyer un message de test</Label>
+                    <div className="grid gap-4 md:grid-cols-2">
+                      <div className="space-y-2">
+                        <Label htmlFor="whatsapp-test-phone" className="text-xs">Numéro destinataire</Label>
+                        <Input
+                          id="whatsapp-test-phone"
+                          value={whatsappSettings.test_phone}
+                          onChange={(e) => handleWhatsappSettingsChange('test_phone', e.target.value)}
+                          placeholder="+212612345678"
+                        />
+                      </div>
+                      <div className="flex items-end">
+                        <Button 
+                          variant="outline" 
+                          disabled={!whatsappSettings.test_phone || !whatsappSettings.connected}
+                          onClick={async () => {
+                            try {
+                              const { data, error } = await supabase.functions.invoke('send-whatsapp-notification', {
+                                body: { 
+                                  action: 'send_text', 
+                                  to: whatsappSettings.test_phone,
+                                  text_message: `✅ Test BNRM - Les notifications WhatsApp sont bien configurées ! (${new Date().toLocaleString('fr-MA')})`,
+                                },
+                              });
+                              if (error) throw error;
+                              if (!data.success) throw new Error(data.error);
+                              toast({
+                                title: "✅ Message envoyé",
+                                description: `Message WhatsApp envoyé à ${whatsappSettings.test_phone}`,
+                              });
+                            } catch (err: any) {
+                              toast({
+                                title: "❌ Échec d'envoi",
+                                description: err.message || "Erreur lors de l'envoi du message de test",
+                                variant: "destructive",
+                              });
+                            }
+                          }}
+                        >
+                          <MessageCircle className="mr-2 h-4 w-4" />
+                          Envoyer un test
+                        </Button>
+                      </div>
+                    </div>
+                    {!whatsappSettings.connected && (
+                      <p className="text-xs text-amber-600">
+                        ⚠ Vérifiez d'abord la connexion avant d'envoyer un test
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Info templates */}
+                  <Alert className="bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800">
+                    <MessageCircle className="h-4 w-4 text-green-600" />
+                    <AlertDescription className="text-green-700 dark:text-green-300">
+                      <span className="font-medium">1 000 conversations gratuites/mois.</span> Les notifications utilisent des templates pré-approuvés.{" "}
+                      <a 
+                        href="https://business.facebook.com/wa/manage/message-templates/" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 font-medium underline"
+                      >
+                        Gérer les templates
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </AlertDescription>
+                  </Alert>
                 </div>
               )}
             </div>

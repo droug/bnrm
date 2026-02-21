@@ -144,3 +144,6 @@ verify_jwt = false
 
 [functions.send-payment-email]
 verify_jwt = false
+
+[functions.send-whatsapp-notification]
+verify_jwt = false
