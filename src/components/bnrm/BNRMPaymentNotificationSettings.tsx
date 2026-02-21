@@ -90,7 +90,7 @@ const defaultSMSSettings: SMSSettings = {
 const defaultWhatsAppSettings: WhatsAppSettings = {
   enabled: false,
   connected: false,
-  phone_number: '',
+  phone_number: '+212640289700',
   display_name: 'BNRM',
   session_id: '',
 };
@@ -1227,7 +1227,7 @@ export function BNRMPaymentNotificationSettings() {
                           ) : (
                             <img 
                               src={`https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(
-                                `whatsapp-bnrm-session:${whatsappSettings.session_id || 'bnrm-' + Date.now()}`
+                                `https://wa.me/${(whatsappSettings.phone_number || '+212640289700').replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Connexion BNRM Notifications')}`
                               )}&format=svg&ecc=M`}
                               alt="QR Code WhatsApp"
                               className="w-full h-full"
