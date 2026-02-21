@@ -110,12 +110,8 @@ export function BNRMTariffs({ filterCategory }: BNRMTariffsProps) {
     
     // Appliquer le filtre de catégorie si spécifié
     let matchesFilter = true;
-    if (filterCategory === "Abonnement") {
-      // Abonnements = services avec catégorie "Abonnement"
-      matchesFilter = tariff.bnrm_services?.categorie === 'Abonnement';
-    } else if (filterCategory === "Service à la demande") {
-      // Services = services avec catégorie "Service à la demande"
-      matchesFilter = tariff.bnrm_services?.categorie === 'Service à la demande';
+    if (filterCategory) {
+      matchesFilter = tariff.bnrm_services?.categorie === filterCategory;
     }
     
     return matchesSearch && matchesService && matchesFilter;
