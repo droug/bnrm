@@ -109,10 +109,10 @@ export const portalTranslations = {
     // ============= Quick Links Section =============
     'portal.quickLinks.title': 'Liens rapides',
     'portal.quickLinks.subtitle': 'Accès rapide à nos services essentiels',
-    'portal.quickLinks.registration.title': 'Inscription',
-    'portal.quickLinks.registration.desc': 'Créez votre compte pour accéder à tous nos services',
+    'portal.quickLinks.registration.title': 'Inscription professionnels',
+    'portal.quickLinks.registration.desc': 'Créer votre compte professionnel pour accéder nos services du Dépôt légal',
     'portal.quickLinks.subscriptions.title': 'Adhésions',
-    'portal.quickLinks.subscriptions.desc': 'Découvrez nos différentes formules d\'adhésion',
+    'portal.quickLinks.subscriptions.desc': 'Découvrez nos différentes formules d\'adhésion (Abonnements)',
     'portal.quickLinks.help.title': 'Aide & Support',
     'portal.quickLinks.help.desc': 'Obtenez l\'aide dont vous avez besoin',
     
