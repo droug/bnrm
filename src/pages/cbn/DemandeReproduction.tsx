@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { CBNSearchWithSelection } from "@/components/cbn/CBNSearchWithSelection";
 import { ReproductionRequestDialog } from "@/components/cbn/ReproductionRequestDialog";
 import { UnifiedDocumentSearch } from "@/components/reproduction/UnifiedDocumentSearch";
+import { ReproductionUserTypeModal } from "@/components/reproduction/ReproductionUserTypeModal";
 import { FileText, ShoppingCart, ArrowLeft, BookOpen, Info, Search, Database } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -31,7 +32,9 @@ export default function DemandeReproduction() {
   const { toast } = useToast();
   const [selectedDocuments, setSelectedDocuments] = useState<SelectedDocument[]>([]);
   const [showReproductionDialog, setShowReproductionDialog] = useState(false);
+  const [showUserTypeModal, setShowUserTypeModal] = useState(false);
   const [currentDocument, setCurrentDocument] = useState<SelectedDocument | null>(null);
+  const [pendingDocument, setPendingDocument] = useState<SelectedDocument | null>(null);
   const [prefilledDocument, setPrefilledDocument] = useState<SelectedDocument | null>(null);
 
   // Déterminer si on utilise le layout BN
@@ -170,8 +173,16 @@ export default function DemandeReproduction() {
       });
       return;
     }
-    setCurrentDocument(docToRequest);
-    setShowReproductionDialog(true);
+    setPendingDocument(docToRequest);
+    setShowUserTypeModal(true);
+  };
+
+  const handleUserTypeConfirmed = () => {
+    if (pendingDocument) {
+      setCurrentDocument(pendingDocument);
+      setShowReproductionDialog(true);
+      setPendingDocument(null);
+    }
   };
 
   // Contenu principal partagé
@@ -369,6 +380,14 @@ export default function DemandeReproduction() {
           }}
         />
       )}
+
+      {/* Modal choix type utilisateur */}
+      <ReproductionUserTypeModal
+        open={showUserTypeModal}
+        onOpenChange={setShowUserTypeModal}
+        onProceed={handleUserTypeConfirmed}
+        documentTitle={pendingDocument?.title}
+      />
     </>
   );
 
