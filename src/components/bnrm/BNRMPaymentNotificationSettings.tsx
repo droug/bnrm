@@ -72,13 +72,10 @@ interface SMSSettings {
 
 interface WhatsAppSettings {
   enabled: boolean;
-  provider: 'meta_cloud_api' | 'twilio_whatsapp' | 'infobip_whatsapp';
-  phone_number_id: string;
-  business_account_id: string;
-  api_key_configured: boolean;
-  test_phone: string;
-  country_code: string;
+  connected: boolean;
+  phone_number: string;
   display_name: string;
+  session_id: string;
 }
 
 const defaultSMSSettings: SMSSettings = {
@@ -92,13 +89,10 @@ const defaultSMSSettings: SMSSettings = {
 
 const defaultWhatsAppSettings: WhatsAppSettings = {
   enabled: false,
-  provider: 'meta_cloud_api',
-  phone_number_id: '',
-  business_account_id: '',
-  api_key_configured: false,
-  test_phone: '',
-  country_code: '+212',
+  connected: false,
+  phone_number: '',
   display_name: 'BNRM',
+  session_id: '',
 };
 
 interface EmailTemplate {
@@ -1176,7 +1170,7 @@ export function BNRMPaymentNotificationSettings() {
             {/* ===== Section WhatsApp ===== */}
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <MessageCircle className="h-5 w-5" />
-              Configuration WhatsApp Business
+              Configuration WhatsApp
             </h3>
             <div className="space-y-6">
               {/* Activation globale WhatsApp */}
@@ -1202,56 +1196,115 @@ export function BNRMPaymentNotificationSettings() {
                 <Alert>
                   <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>
-                    Les notifications WhatsApp sont désactivées. Activez-les pour configurer les paramètres ci-dessous.
+                    Les notifications WhatsApp sont désactivées. Activez-les pour configurer la connexion ci-dessous.
                   </AlertDescription>
                 </Alert>
               )}
 
               {whatsappSettings.enabled && (
                 <div className="space-y-6">
-                  {/* Fournisseur WhatsApp */}
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="whatsapp-provider">Fournisseur WhatsApp</Label>
-                      <Select
-                        value={whatsappSettings.provider}
-                        onValueChange={(value) => handleWhatsappSettingsChange('provider', value)}
-                      >
-                        <SelectTrigger id="whatsapp-provider">
-                          <SelectValue placeholder="Sélectionner un fournisseur" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="meta_cloud_api">Meta Cloud API (Officiel)</SelectItem>
-                          <SelectItem value="twilio_whatsapp">Twilio WhatsApp</SelectItem>
-                          <SelectItem value="infobip_whatsapp">Infobip WhatsApp</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <p className="text-xs text-muted-foreground">
-                        API officielle Meta recommandée pour la fiabilité
-                      </p>
-                    </div>
+                  {/* QR Code de connexion */}
+                  <div className="p-6 border-2 border-dashed border-green-300 dark:border-green-700 rounded-xl bg-green-50/50 dark:bg-green-950/10">
+                    <div className="flex flex-col items-center text-center space-y-4">
+                      <div className="p-3 bg-green-100 dark:bg-green-900/40 rounded-full">
+                        <MessageCircle className="h-8 w-8 text-green-600" />
+                      </div>
+                      <div>
+                        <h4 className="text-lg font-semibold">Connecter WhatsApp</h4>
+                        <p className="text-sm text-muted-foreground max-w-md">
+                          Scannez le QR code ci-dessous avec votre téléphone pour lier votre compte WhatsApp Business
+                        </p>
+                      </div>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="whatsapp-country-code">Indicatif pays par défaut</Label>
-                      <Select
-                        value={whatsappSettings.country_code}
-                        onValueChange={(value) => handleWhatsappSettingsChange('country_code', value)}
-                      >
-                        <SelectTrigger id="whatsapp-country-code">
-                          <SelectValue placeholder="Sélectionner l'indicatif" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="+212">+212 (Maroc)</SelectItem>
-                          <SelectItem value="+33">+33 (France)</SelectItem>
-                          <SelectItem value="+34">+34 (Espagne)</SelectItem>
-                          <SelectItem value="+1">+1 (USA/Canada)</SelectItem>
-                          <SelectItem value="+44">+44 (Royaume-Uni)</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      {/* QR Code généré */}
+                      <div className="relative p-4 bg-white rounded-2xl shadow-lg border">
+                        <div className="w-64 h-64 flex items-center justify-center">
+                          {whatsappSettings.connected ? (
+                            <div className="flex flex-col items-center gap-3">
+                              <CheckCircle className="h-16 w-16 text-green-500" />
+                              <p className="text-sm font-medium text-green-700">Connecté</p>
+                            </div>
+                          ) : (
+                            <img 
+                              src={`https://api.qrserver.com/v1/create-qr-code/?size=256x256&data=${encodeURIComponent(
+                                `whatsapp-bnrm-session:${whatsappSettings.session_id || 'bnrm-' + Date.now()}`
+                              )}&format=svg&ecc=M`}
+                              alt="QR Code WhatsApp"
+                              className="w-full h-full"
+                            />
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Instructions */}
+                      <div className="text-sm text-muted-foreground space-y-2 max-w-sm">
+                        <p className="font-medium text-foreground">Comment scanner :</p>
+                        <ol className="list-decimal list-inside space-y-1 text-left">
+                          <li>Ouvrez <span className="font-medium">WhatsApp</span> sur votre téléphone</li>
+                          <li>Allez dans <span className="font-medium">Paramètres → Appareils liés</span></li>
+                          <li>Appuyez sur <span className="font-medium">Lier un appareil</span></li>
+                          <li>Scannez ce QR code avec votre caméra</li>
+                        </ol>
+                      </div>
+
+                      {/* Boutons d'action */}
+                      <div className="flex items-center gap-3 pt-2">
+                        {whatsappSettings.connected ? (
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            onClick={() => {
+                              handleWhatsappSettingsChange('connected', false);
+                              handleWhatsappSettingsChange('session_id', '');
+                              toast({
+                                title: "WhatsApp déconnecté",
+                                description: "La session WhatsApp a été déconnectée.",
+                              });
+                            }}
+                          >
+                            <XCircle className="mr-2 h-4 w-4" />
+                            Déconnecter
+                          </Button>
+                        ) : (
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => {
+                              handleWhatsappSettingsChange('session_id', 'bnrm-' + Date.now());
+                              toast({
+                                title: "QR Code régénéré",
+                                description: "Un nouveau QR code a été généré. Scannez-le avec WhatsApp.",
+                              });
+                            }}
+                          >
+                            <RotateCcw className="mr-2 h-4 w-4" />
+                            Régénérer le QR Code
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Informations du compte */}
+                  {/* Statut de connexion */}
+                  <div className="p-4 border rounded-lg bg-card">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-3 h-3 rounded-full ${whatsappSettings.connected ? 'bg-green-500 animate-pulse' : 'bg-muted-foreground/30'}`} />
+                        <div>
+                          <p className="text-sm font-medium">
+                            {whatsappSettings.connected ? 'WhatsApp connecté' : 'En attente de connexion'}
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            {whatsappSettings.connected 
+                              ? `Nom : ${whatsappSettings.display_name || 'BNRM'}` 
+                              : 'Scannez le QR code pour connecter votre compte'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Nom d'affichage */}
                   <div className="grid gap-4 md:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="whatsapp-display-name">Nom d'affichage</Label>
@@ -1267,128 +1320,17 @@ export function BNRMPaymentNotificationSettings() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="whatsapp-test-phone">Numéro de test</Label>
+                      <Label htmlFor="whatsapp-phone">Numéro WhatsApp</Label>
                       <Input
-                        id="whatsapp-test-phone"
-                        value={whatsappSettings.test_phone}
-                        onChange={(e) => handleWhatsappSettingsChange('test_phone', e.target.value)}
-                        placeholder="0612345678"
+                        id="whatsapp-phone"
+                        value={whatsappSettings.phone_number}
+                        onChange={(e) => handleWhatsappSettingsChange('phone_number', e.target.value)}
+                        placeholder="+212 6XX XXX XXX"
                       />
                       <p className="text-xs text-muted-foreground">
-                        Numéro pour envoyer des messages WhatsApp de test
+                        Numéro associé au compte WhatsApp Business
                       </p>
                     </div>
-                  </div>
-
-                  {whatsappSettings.provider === 'meta_cloud_api' && (
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <div className="space-y-2">
-                        <Label htmlFor="whatsapp-phone-number-id">Phone Number ID</Label>
-                        <Input
-                          id="whatsapp-phone-number-id"
-                          value={whatsappSettings.phone_number_id}
-                          onChange={(e) => handleWhatsappSettingsChange('phone_number_id', e.target.value)}
-                          placeholder="Ex: 123456789012345"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          ID du numéro de téléphone dans Meta Business
-                        </p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="whatsapp-business-id">WhatsApp Business Account ID</Label>
-                        <Input
-                          id="whatsapp-business-id"
-                          value={whatsappSettings.business_account_id}
-                          onChange={(e) => handleWhatsappSettingsChange('business_account_id', e.target.value)}
-                          placeholder="Ex: 123456789012345"
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          ID du compte WhatsApp Business
-                        </p>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Configuration API WhatsApp */}
-                  <div className="p-4 border rounded-lg bg-muted/30 space-y-4">
-                    <div className="flex items-center gap-2">
-                      <Settings className="h-4 w-4 text-muted-foreground" />
-                      <Label className="text-sm font-medium">Configuration API WhatsApp</Label>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium">
-                          Token d'accès {whatsappSettings.provider === 'meta_cloud_api' ? 'Meta' : whatsappSettings.provider === 'twilio_whatsapp' ? 'Twilio' : 'Infobip'}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                          {whatsappSettings.api_key_configured 
-                            ? "✓ Configuré dans les secrets Supabase" 
-                            : "⚠ Non configuré - Les messages WhatsApp ne seront pas envoyés"}
-                        </p>
-                      </div>
-                      <Button variant="outline" size="sm" asChild>
-                        <a 
-                          href="https://supabase.com/dashboard/project/safeppmznupzqkqmzjzt/settings/functions" 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                        >
-                          Configurer les secrets
-                        </a>
-                      </Button>
-                    </div>
-
-                    <div className="text-xs text-muted-foreground space-y-1">
-                      <p><strong>Variables requises :</strong></p>
-                      {whatsappSettings.provider === 'meta_cloud_api' && (
-                        <p>• WHATSAPP_ACCESS_TOKEN, WHATSAPP_PHONE_NUMBER_ID</p>
-                      )}
-                      {whatsappSettings.provider === 'twilio_whatsapp' && (
-                        <p>• TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_WHATSAPP_FROM</p>
-                      )}
-                      {whatsappSettings.provider === 'infobip_whatsapp' && (
-                        <p>• INFOBIP_API_KEY, INFOBIP_BASE_URL, INFOBIP_WHATSAPP_SENDER</p>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Info templates WhatsApp */}
-                  <Alert className="bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800">
-                    <MessageCircle className="h-4 w-4 text-green-600" />
-                    <AlertDescription className="text-green-700 dark:text-green-300">
-                      <span className="font-medium">Note :</span> Les messages WhatsApp Business nécessitent des templates pré-approuvés par Meta. 
-                      Configurez vos templates dans le{" "}
-                      <a 
-                        href="https://business.facebook.com/wa/manage/message-templates/" 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 font-medium underline"
-                      >
-                        Meta Business Manager
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    </AlertDescription>
-                  </Alert>
-
-                  {/* Bouton de test WhatsApp */}
-                  <div className="flex items-center gap-4">
-                    <Button 
-                      variant="outline" 
-                      disabled={!whatsappSettings.test_phone}
-                      onClick={() => {
-                        toast({
-                          title: "WhatsApp de test",
-                          description: `Un message WhatsApp de test serait envoyé à ${whatsappSettings.country_code}${whatsappSettings.test_phone}`,
-                        });
-                      }}
-                    >
-                      <MessageCircle className="mr-2 h-4 w-4" />
-                      Envoyer un message WhatsApp de test
-                    </Button>
-                    <span className="text-xs text-muted-foreground">
-                      Enverra un message au numéro de test configuré
-                    </span>
                   </div>
                 </div>
               )}
