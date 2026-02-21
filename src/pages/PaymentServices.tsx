@@ -26,6 +26,7 @@ import {
   Package
 } from "lucide-react";
 import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
+import { ServicePageBackground } from "@/components/ServicePageBackground";
 import { DailyPassForm } from "@/components/daily-pass/DailyPassForm";
 
 export default function PaymentServices() {
@@ -267,10 +268,11 @@ export default function PaymentServices() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative">
+      <ServicePageBackground />
       <Header />
       
-      <main className="flex-1">
+      <main className="flex-1 relative z-10">
         {/* Hero Section */}
         <section className="bg-gradient-to-br from-primary via-primary-dark to-secondary text-white py-16">
           <div className="container mx-auto px-4">

@@ -7,6 +7,7 @@ import { DigitalLibraryLayout } from "@/components/digital-library/DigitalLibrar
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { GlobalAccessibilityTools } from "@/components/GlobalAccessibilityTools";
+import { ServicePageBackground } from "@/components/ServicePageBackground";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -388,9 +389,10 @@ export default function Abonnements() {
 
   if (isPortal) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background relative">
+        <ServicePageBackground />
         <Header />
-        <main>{content}</main>
+        <main className="relative z-10">{content}</main>
         <Footer />
         <GlobalAccessibilityTools />
       </div>

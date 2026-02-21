@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Book, Newspaper, Video, FolderOpen } from "lucide-react";
-import depotLegalBg from "@/assets/depot-legal-bg.jpg";
+import { ServicePageBackground } from "@/components/ServicePageBackground";
 
 export default function LegalDepositTypes() {
   const navigate = useNavigate();
@@ -53,12 +53,7 @@ export default function LegalDepositTypes() {
 
   return (
     <div className="min-h-screen bg-background relative">
-      {/* Background image */}
-      <div 
-        className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${depotLegalBg})` }}
-      />
-      <div className="fixed inset-0 z-0 bg-background/50" />
+      <ServicePageBackground />
       <Header />
       
       <main className="container mx-auto px-4 py-12 relative z-10">
