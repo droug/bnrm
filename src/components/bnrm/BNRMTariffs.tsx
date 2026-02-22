@@ -124,13 +124,20 @@ export function BNRMTariffs({ filterCategory, filterServiceIds, excludeServiceId
     
     return matchesSearch && matchesService && matchesFilter;
   }).sort((a, b) => {
-    // Trier : Particuliers avant Entreprises/Institutionnels
     const condA = a.condition_tarif?.toLowerCase() || '';
     const condB = b.condition_tarif?.toLowerCase() || '';
-    const aIsParticulier = condA.startsWith('particuliers');
-    const bIsParticulier = condB.startsWith('particuliers');
-    if (aIsParticulier && !bIsParticulier) return -1;
-    if (!aIsParticulier && bIsParticulier) return 1;
+    
+    const getOrder = (cond: string) => {
+      const isParticulier = cond.startsWith('particuliers');
+      const isNonCommercial = cond.includes('(non commercial)') || cond.includes('non commercial');
+      if (isParticulier && isNonCommercial) return 0;
+      if (isParticulier && !isNonCommercial) return 1;
+      if (!isParticulier && isNonCommercial) return 2;
+      return 3; // Entreprises commercial
+    };
+    
+    const orderDiff = getOrder(condA) - getOrder(condB);
+    if (orderDiff !== 0) return orderDiff;
     return condA.localeCompare(condB, 'fr');
   });
 
