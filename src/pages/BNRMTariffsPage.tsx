@@ -271,6 +271,17 @@ export default function BNRMTariffsPage() {
                 </CollapsibleTrigger>
                 <CollapsibleContent className="mt-3">
                   <div className="rounded-xl border bg-background shadow-sm p-4 space-y-6">
+                    {/* Note réglementaire */}
+                    <div className="rounded-lg border border-amber-200 bg-amber-50/50 dark:border-amber-900/50 dark:bg-amber-950/20 p-4 text-sm text-foreground/80">
+                      <p className="font-semibold mb-2">Le tarif pour les « Associations et assimilées » prévu à l'article 3 ci-dessus est réservé uniquement aux publics suivants :</p>
+                      <ul className="list-disc list-inside space-y-1 ml-2">
+                        <li>Organisations non gouvernementales « ONG » nationales ou internationales, œuvrant dans les domaines d'intérêt public ;</li>
+                        <li>Associations sans but lucratif ;</li>
+                        <li>Représentations diplomatiques accréditées au Maroc ;</li>
+                        <li>Organismes internationaux d'intérêt public ;</li>
+                        <li>Ministères et établissements publics à caractère administratif.</li>
+                      </ul>
+                    </div>
                     <h3 className="text-base font-semibold text-foreground border-b pb-2">Services</h3>
                     <BNRMServices filterCategory="Location espaces" />
                     <Collapsible open={openTarifsLocation} onOpenChange={setOpenTarifsLocation}>
