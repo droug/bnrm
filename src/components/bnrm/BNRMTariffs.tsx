@@ -124,22 +124,24 @@ export function BNRMTariffs({ filterCategory, filterServiceIds, excludeServiceId
     
     return matchesSearch && matchesService && matchesFilter;
   }).sort((a, b) => {
-    const getOrder = (cond: string | null | undefined) => {
+    // Tri: Particuliers non-commercial → Particuliers commercial → Entreprises non-commercial → Entreprises commercial
+    const getSortPriority = (cond: string | null | undefined): number => {
       if (!cond) return 99;
-      const c = cond.toLowerCase();
-      const isParticulier = c.includes('particuliers');
-      const isEntreprise = c.includes('entreprises') || c.includes('institutionnels');
-      const isNonCommercial = c.includes('non commercial');
+      const lower = cond.toLowerCase();
+      const particulier = lower.includes('particuliers');
+      const entreprise = lower.includes('entreprises') || lower.includes('institutionnels');
+      const nonCommercial = lower.includes('non commercial');
       
-      if (isParticulier && isNonCommercial) return 0;
-      if (isParticulier && !isNonCommercial) return 1;
-      if (isEntreprise && isNonCommercial) return 2;
-      if (isEntreprise && !isNonCommercial) return 3;
+      if (particulier && nonCommercial) return 0;
+      if (particulier && !nonCommercial) return 1;
+      if (entreprise && nonCommercial) return 2;
+      if (entreprise && !nonCommercial) return 3;
       return 50;
     };
     
-    const diff = getOrder(a.condition_tarif) - getOrder(b.condition_tarif);
-    if (diff !== 0) return diff;
+    const priorityA = getSortPriority(a.condition_tarif);
+    const priorityB = getSortPriority(b.condition_tarif);
+    if (priorityA !== priorityB) return priorityA - priorityB;
     return (a.condition_tarif || '').localeCompare(b.condition_tarif || '', 'fr');
   });
 
