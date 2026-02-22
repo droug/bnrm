@@ -8,7 +8,7 @@ import { BNRMFreeRegistrations } from "@/components/bnrm/BNRMFreeRegistrations";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ArrowLeft, ChevronDown, BookOpen, CreditCard, Gift, Wrench, Copy, Hammer, Film, FileDigit } from "lucide-react";
+import { ArrowLeft, ChevronDown, BookOpen, CreditCard, Gift, Wrench, Copy, Hammer, Film, FileDigit, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Navigate } from "react-router-dom";
@@ -30,6 +30,8 @@ export default function BNRMTariffsPage() {
   const [openTarifsDemande, setOpenTarifsDemande] = useState(false);
   const [openTarifsReproduction, setOpenTarifsReproduction] = useState(false);
   const [openTarifsRestauration, setOpenTarifsRestauration] = useState(false);
+  const [openServLocation, setOpenServLocation] = useState(false);
+  const [openTarifsLocation, setOpenTarifsLocation] = useState(false);
 
   if (loading) {
     return (
@@ -245,6 +247,41 @@ export default function BNRMTariffsPage() {
                       </CollapsibleTrigger>
                       <CollapsibleContent className="pt-4">
                         <BNRMTariffs filterServiceIds={["SRV-REP-NUM"]} />
+                      </CollapsibleContent>
+                    </Collapsible>
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+
+              {/* Accordéon : Location espaces */}
+              <Collapsible open={openServLocation} onOpenChange={setOpenServLocation}>
+                <CollapsibleTrigger asChild>
+                  <button className="w-full flex items-center justify-between px-5 py-4 rounded-xl border bg-background shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-200 group">
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-9 h-9 rounded-lg bg-primary/10 group-hover:bg-primary/15 transition-colors">
+                        <Building2 className="h-4 w-4 text-primary" />
+                      </div>
+                      <div className="text-left">
+                        <span className="text-base font-semibold text-foreground">Location espaces</span>
+                        <p className="text-xs text-muted-foreground mt-0.5">Tarifs de location des salles, espaces et esplanades</p>
+                      </div>
+                    </div>
+                    <ChevronDown className={`h-5 w-5 text-muted-foreground transition-transform duration-200 ${openServLocation ? "rotate-180" : ""}`} />
+                  </button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="mt-3">
+                  <div className="rounded-xl border bg-background shadow-sm p-4 space-y-6">
+                    <h3 className="text-base font-semibold text-foreground border-b pb-2">Services</h3>
+                    <BNRMServices filterCategory="Location espaces" />
+                    <Collapsible open={openTarifsLocation} onOpenChange={setOpenTarifsLocation}>
+                      <CollapsibleTrigger asChild>
+                        <button className="w-full flex items-center justify-between py-2 border-b group">
+                          <h3 className="text-base font-semibold text-foreground">Tarifs</h3>
+                          <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openTarifsLocation ? "rotate-180" : ""}`} />
+                        </button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="pt-4">
+                        <BNRMTariffs filterCategory="Location espaces" />
                       </CollapsibleContent>
                     </Collapsible>
                   </div>
