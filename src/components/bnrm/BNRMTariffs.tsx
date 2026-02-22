@@ -34,9 +34,11 @@ interface BNRMService {
 
 interface BNRMTariffsProps {
   filterCategory?: string; // "Abonnement" pour abonnements, "Service à la demande" pour services
+  filterServiceIds?: string[]; // Filtrer par IDs de service spécifiques
+  excludeServiceIds?: string[]; // Exclure des IDs de service spécifiques
 }
 
-export function BNRMTariffs({ filterCategory }: BNRMTariffsProps) {
+export function BNRMTariffs({ filterCategory, filterServiceIds, excludeServiceIds }: BNRMTariffsProps) {
   const [tariffs, setTariffs] = useState<BNRMTariff[]>([]);
   const [services, setServices] = useState<BNRMService[]>([]);
   const [loading, setLoading] = useState(true);
@@ -112,6 +114,12 @@ export function BNRMTariffs({ filterCategory }: BNRMTariffsProps) {
     let matchesFilter = true;
     if (filterCategory) {
       matchesFilter = tariff.bnrm_services?.categorie === filterCategory;
+    }
+    if (filterServiceIds && filterServiceIds.length > 0) {
+      matchesFilter = matchesFilter && filterServiceIds.includes(tariff.id_service);
+    }
+    if (excludeServiceIds && excludeServiceIds.length > 0) {
+      matchesFilter = matchesFilter && !excludeServiceIds.includes(tariff.id_service);
     }
     
     return matchesSearch && matchesService && matchesFilter;
