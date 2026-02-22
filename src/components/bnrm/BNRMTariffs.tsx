@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -104,46 +104,48 @@ export function BNRMTariffs({ filterCategory, filterServiceIds, excludeServiceId
     }
   };
 
-  const filteredTariffs = tariffs.filter(tariff => {
-    const matchesSearch = tariff.id_tarif.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         tariff.condition_tarif?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         tariff.bnrm_services?.nom_service.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesService = selectedService === "all" || tariff.id_service === selectedService;
+  const getSortPriority = (cond: string | null | undefined): number => {
+    if (!cond) return 99;
+    const lower = cond.toLowerCase();
+    const isParticulier = lower.includes('particuliers');
+    const isEntreprise = lower.includes('entreprises') || lower.includes('institutionnels');
+    const isNonCommercial = lower.includes('non commercial');
     
-    // Appliquer le filtre de catégorie si spécifié
-    let matchesFilter = true;
-    if (filterCategory) {
-      matchesFilter = tariff.bnrm_services?.categorie === filterCategory;
-    }
-    if (filterServiceIds && filterServiceIds.length > 0) {
-      matchesFilter = matchesFilter && filterServiceIds.includes(tariff.id_service);
-    }
-    if (excludeServiceIds && excludeServiceIds.length > 0) {
-      matchesFilter = matchesFilter && !excludeServiceIds.includes(tariff.id_service);
-    }
-    
-    return matchesSearch && matchesService && matchesFilter;
-  }).sort((a, b) => {
-    // Tri: Particuliers non-commercial → Particuliers commercial → Entreprises non-commercial → Entreprises commercial
-    const getSortPriority = (cond: string | null | undefined): number => {
-      if (!cond) return 99;
-      const lower = cond.toLowerCase();
-      const particulier = lower.includes('particuliers');
-      const entreprise = lower.includes('entreprises') || lower.includes('institutionnels');
-      const nonCommercial = lower.includes('non commercial');
+    if (isParticulier && isNonCommercial) return 0;
+    if (isParticulier && !isNonCommercial) return 1;
+    if (isEntreprise && isNonCommercial) return 2;
+    if (isEntreprise && !isNonCommercial) return 3;
+    return 50;
+  };
+
+  const filteredTariffs = useMemo(() => {
+    const filtered = tariffs.filter(tariff => {
+      const matchesSearch = tariff.id_tarif.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           tariff.condition_tarif?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           tariff.bnrm_services?.nom_service.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesService = selectedService === "all" || tariff.id_service === selectedService;
       
-      if (particulier && nonCommercial) return 0;
-      if (particulier && !nonCommercial) return 1;
-      if (entreprise && nonCommercial) return 2;
-      if (entreprise && !nonCommercial) return 3;
-      return 50;
-    };
-    
-    const priorityA = getSortPriority(a.condition_tarif);
-    const priorityB = getSortPriority(b.condition_tarif);
-    if (priorityA !== priorityB) return priorityA - priorityB;
-    return (a.condition_tarif || '').localeCompare(b.condition_tarif || '', 'fr');
-  });
+      let matchesFilter = true;
+      if (filterCategory) {
+        matchesFilter = tariff.bnrm_services?.categorie === filterCategory;
+      }
+      if (filterServiceIds && filterServiceIds.length > 0) {
+        matchesFilter = matchesFilter && filterServiceIds.includes(tariff.id_service);
+      }
+      if (excludeServiceIds && excludeServiceIds.length > 0) {
+        matchesFilter = matchesFilter && !excludeServiceIds.includes(tariff.id_service);
+      }
+      
+      return matchesSearch && matchesService && matchesFilter;
+    });
+
+    return [...filtered].sort((a, b) => {
+      const priorityA = getSortPriority(a.condition_tarif);
+      const priorityB = getSortPriority(b.condition_tarif);
+      if (priorityA !== priorityB) return priorityA - priorityB;
+      return (a.condition_tarif || '').localeCompare(b.condition_tarif || '', 'fr');
+    });
+  }, [tariffs, searchTerm, selectedService, filterCategory, filterServiceIds, excludeServiceIds]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
