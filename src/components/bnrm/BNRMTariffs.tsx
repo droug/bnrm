@@ -123,6 +123,15 @@ export function BNRMTariffs({ filterCategory, filterServiceIds, excludeServiceId
     }
     
     return matchesSearch && matchesService && matchesFilter;
+  }).sort((a, b) => {
+    // Trier : Particuliers avant Entreprises/Institutionnels
+    const condA = a.condition_tarif?.toLowerCase() || '';
+    const condB = b.condition_tarif?.toLowerCase() || '';
+    const aIsParticulier = condA.startsWith('particuliers');
+    const bIsParticulier = condB.startsWith('particuliers');
+    if (aIsParticulier && !bIsParticulier) return -1;
+    if (!aIsParticulier && bIsParticulier) return 1;
+    return condA.localeCompare(condB, 'fr');
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
