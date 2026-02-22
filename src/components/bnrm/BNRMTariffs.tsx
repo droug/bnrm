@@ -124,21 +124,23 @@ export function BNRMTariffs({ filterCategory, filterServiceIds, excludeServiceId
     
     return matchesSearch && matchesService && matchesFilter;
   }).sort((a, b) => {
-    const condA = a.condition_tarif?.toLowerCase() || '';
-    const condB = b.condition_tarif?.toLowerCase() || '';
-    
-    const getOrder = (cond: string) => {
-      const isParticulier = cond.startsWith('particuliers');
-      const isNonCommercial = cond.includes('(non commercial)') || cond.includes('non commercial');
+    const getOrder = (cond: string | null | undefined) => {
+      if (!cond) return 99;
+      const c = cond.toLowerCase();
+      const isParticulier = c.includes('particuliers');
+      const isEntreprise = c.includes('entreprises') || c.includes('institutionnels');
+      const isNonCommercial = c.includes('non commercial');
+      
       if (isParticulier && isNonCommercial) return 0;
       if (isParticulier && !isNonCommercial) return 1;
-      if (!isParticulier && isNonCommercial) return 2;
-      return 3; // Entreprises commercial
+      if (isEntreprise && isNonCommercial) return 2;
+      if (isEntreprise && !isNonCommercial) return 3;
+      return 50;
     };
     
-    const orderDiff = getOrder(condA) - getOrder(condB);
-    if (orderDiff !== 0) return orderDiff;
-    return condA.localeCompare(condB, 'fr');
+    const diff = getOrder(a.condition_tarif) - getOrder(b.condition_tarif);
+    if (diff !== 0) return diff;
+    return (a.condition_tarif || '').localeCompare(b.condition_tarif || '', 'fr');
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
