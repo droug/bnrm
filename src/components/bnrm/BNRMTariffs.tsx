@@ -77,7 +77,23 @@ export function BNRMTariffs({ filterCategory, filterServiceIds, excludeServiceId
         .order('id_tarif');
 
       if (error) throw error;
-      setTariffs(data || []);
+      
+      // Tri : Particuliers non-commercial → Particuliers commercial → Entreprises non-commercial → Entreprises commercial
+      const sorted = (data || []).sort((a, b) => {
+        const getPriority = (c: string | null) => {
+          if (!c) return 99;
+          const l = c.toLowerCase();
+          if (l.includes('particuliers') && l.includes('non commercial')) return 0;
+          if (l.includes('particuliers')) return 1;
+          if ((l.includes('entreprises') || l.includes('institutionnels')) && l.includes('non commercial')) return 2;
+          if (l.includes('entreprises') || l.includes('institutionnels')) return 3;
+          return 50;
+        };
+        const diff = getPriority(a.condition_tarif) - getPriority(b.condition_tarif);
+        if (diff !== 0) return diff;
+        return (a.condition_tarif || '').localeCompare(b.condition_tarif || '', 'fr');
+      });
+      setTariffs(sorted);
     } catch (error) {
       console.error('Error fetching tariffs:', error);
       toast({
