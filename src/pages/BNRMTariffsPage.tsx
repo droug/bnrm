@@ -8,7 +8,7 @@ import { BNRMFreeRegistrations } from "@/components/bnrm/BNRMFreeRegistrations";
 import { WatermarkContainer } from "@/components/ui/watermark";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ArrowLeft, ChevronDown, BookOpen, CreditCard, Gift, Wrench, Copy, Hammer } from "lucide-react";
+import { ArrowLeft, ChevronDown, BookOpen, CreditCard, Gift, Wrench, Copy, Hammer, Film, FileDigit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Navigate } from "react-router-dom";
@@ -209,12 +209,42 @@ export default function BNRMTariffsPage() {
                     <Collapsible open={openTarifsReproduction} onOpenChange={setOpenTarifsReproduction}>
                       <CollapsibleTrigger asChild>
                         <button className="w-full flex items-center justify-between py-2 border-b group">
-                          <h3 className="text-base font-semibold text-foreground">Tarifs</h3>
+                          <h3 className="text-base font-semibold text-foreground">Tarifs généraux</h3>
                           <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openTarifsReproduction ? "rotate-180" : ""}`} />
                         </button>
                       </CollapsibleTrigger>
                       <CollapsibleContent className="pt-4">
-                        <BNRMTariffs filterCategory="Reproduction" />
+                        <BNRMTariffs filterCategory="Reproduction" excludeServiceIds={["SRV-REP-COLL", "SRV-REP-NUM"]} />
+                      </CollapsibleContent>
+                    </Collapsible>
+
+                    <Collapsible>
+                      <CollapsibleTrigger asChild>
+                        <button className="w-full flex items-center justify-between py-2 border-b group">
+                          <div className="flex items-center gap-2">
+                            <Film className="h-4 w-4 text-primary/70" />
+                            <h3 className="text-base font-semibold text-foreground">Tarifs — Collections spécialisées et audiovisuel</h3>
+                          </div>
+                          <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180 [&[data-state=open]>svg]:rotate-180" />
+                        </button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="pt-4">
+                        <BNRMTariffs filterServiceIds={["SRV-REP-COLL"]} />
+                      </CollapsibleContent>
+                    </Collapsible>
+
+                    <Collapsible>
+                      <CollapsibleTrigger asChild>
+                        <button className="w-full flex items-center justify-between py-2 border-b group">
+                          <div className="flex items-center gap-2">
+                            <FileDigit className="h-4 w-4 text-primary/70" />
+                            <h3 className="text-base font-semibold text-foreground">Tarifs — Reproduction numérique</h3>
+                          </div>
+                          <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                        </button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="pt-4">
+                        <BNRMTariffs filterServiceIds={["SRV-REP-NUM"]} />
                       </CollapsibleContent>
                     </Collapsible>
                   </div>
