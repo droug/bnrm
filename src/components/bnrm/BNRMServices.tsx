@@ -597,8 +597,22 @@ export function BNRMServices({ filterCategory }: BNRMServicesProps) {
                 
                 {service.bnrm_tarifs && service.bnrm_tarifs.length > 0 ? (
                   <div className="space-y-2">
-                    {service.bnrm_tarifs
+                    {[...service.bnrm_tarifs]
                       .filter(tarif => tarif.is_active)
+                      .sort((a, b) => {
+                        const getPriority = (c: string | null) => {
+                          if (!c) return 99;
+                          const l = c.toLowerCase();
+                          if (l.includes('particuliers') && l.includes('non commercial')) return 0;
+                          if (l.includes('particuliers')) return 1;
+                          if ((l.includes('entreprises') || l.includes('institutionnels')) && l.includes('non commercial')) return 2;
+                          if (l.includes('entreprises') || l.includes('institutionnels')) return 3;
+                          return 50;
+                        };
+                        const diff = getPriority(a.condition_tarif) - getPriority(b.condition_tarif);
+                        if (diff !== 0) return diff;
+                        return (a.condition_tarif || '').localeCompare(b.condition_tarif || '', 'fr');
+                      })
                       .map((tarif) => (
                         <div 
                           key={tarif.id_tarif} 
