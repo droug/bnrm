@@ -67,11 +67,11 @@ export default function BNRMTariffsPage() {
         {/* Main content */}
         <div className="container mx-auto px-6 py-8">
           <Tabs defaultValue="subscriptions" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 mb-8 rounded-xl h-12 bg-background border shadow-sm">
-              <TabsTrigger value="subscriptions" className="rounded-lg text-sm font-medium">Abonnements</TabsTrigger>
-              <TabsTrigger value="services" className="rounded-lg text-sm font-medium">Services</TabsTrigger>
-              <TabsTrigger value="statistics" className="rounded-lg text-sm font-medium">Statistiques</TabsTrigger>
-              <TabsTrigger value="history" className="rounded-lg text-sm font-medium">Historique</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-4 mb-8 rounded-xl h-12 bg-primary/5 border border-primary/10 shadow-sm">
+              <TabsTrigger value="subscriptions" className="rounded-lg text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Abonnements</TabsTrigger>
+              <TabsTrigger value="services" className="rounded-lg text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Services</TabsTrigger>
+              <TabsTrigger value="statistics" className="rounded-lg text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Statistiques</TabsTrigger>
+              <TabsTrigger value="history" className="rounded-lg text-sm font-medium data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">Historique</TabsTrigger>
             </TabsList>
 
             <TabsContent value="subscriptions" className="space-y-4">
