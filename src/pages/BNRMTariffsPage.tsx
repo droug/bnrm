@@ -171,8 +171,17 @@ export default function BNRMTariffsPage() {
                   <div className="rounded-xl border bg-background shadow-sm p-4 space-y-6">
                     <h3 className="text-base font-semibold text-foreground border-b pb-2">Services</h3>
                     <BNRMServices filterCategory="Service à la demande" />
-                    <h3 className="text-base font-semibold text-foreground border-b pb-2">Tarifs</h3>
-                    <BNRMTariffs filterCategory="Service à la demande" />
+                    <Collapsible open={openTarifsDemande} onOpenChange={setOpenTarifsDemande}>
+                      <CollapsibleTrigger asChild>
+                        <button className="w-full flex items-center justify-between py-2 border-b group">
+                          <h3 className="text-base font-semibold text-foreground">Tarifs</h3>
+                          <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openTarifsDemande ? "rotate-180" : ""}`} />
+                        </button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="pt-4">
+                        <BNRMTariffs filterCategory="Service à la demande" />
+                      </CollapsibleContent>
+                    </Collapsible>
                   </div>
                 </CollapsibleContent>
               </Collapsible>
@@ -197,8 +206,17 @@ export default function BNRMTariffsPage() {
                   <div className="rounded-xl border bg-background shadow-sm p-4 space-y-6">
                     <h3 className="text-base font-semibold text-foreground border-b pb-2">Services</h3>
                     <BNRMServices filterCategory="Reproduction" />
-                    <h3 className="text-base font-semibold text-foreground border-b pb-2">Tarifs</h3>
-                    <BNRMTariffs filterCategory="Reproduction" />
+                    <Collapsible open={openTarifsReproduction} onOpenChange={setOpenTarifsReproduction}>
+                      <CollapsibleTrigger asChild>
+                        <button className="w-full flex items-center justify-between py-2 border-b group">
+                          <h3 className="text-base font-semibold text-foreground">Tarifs</h3>
+                          <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openTarifsReproduction ? "rotate-180" : ""}`} />
+                        </button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="pt-4">
+                        <BNRMTariffs filterCategory="Reproduction" />
+                      </CollapsibleContent>
+                    </Collapsible>
                   </div>
                 </CollapsibleContent>
               </Collapsible>
@@ -223,8 +241,17 @@ export default function BNRMTariffsPage() {
                   <div className="rounded-xl border bg-background shadow-sm p-4 space-y-6">
                     <h3 className="text-base font-semibold text-foreground border-b pb-2">Services</h3>
                     <BNRMServices filterCategory="Restauration" />
-                    <h3 className="text-base font-semibold text-foreground border-b pb-2">Tarifs</h3>
-                    <BNRMTariffs filterCategory="Restauration" />
+                    <Collapsible open={openTarifsRestauration} onOpenChange={setOpenTarifsRestauration}>
+                      <CollapsibleTrigger asChild>
+                        <button className="w-full flex items-center justify-between py-2 border-b group">
+                          <h3 className="text-base font-semibold text-foreground">Tarifs</h3>
+                          <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${openTarifsRestauration ? "rotate-180" : ""}`} />
+                        </button>
+                      </CollapsibleTrigger>
+                      <CollapsibleContent className="pt-4">
+                        <BNRMTariffs filterCategory="Restauration" />
+                      </CollapsibleContent>
+                    </Collapsible>
                   </div>
                 </CollapsibleContent>
               </Collapsible>
